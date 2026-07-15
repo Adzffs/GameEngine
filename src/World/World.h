@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Entity/Entity.h"
+#include "../Entity/Manager/EntityManager.h"
 
 class World
 {
@@ -10,5 +10,5 @@ public:
     void Update();
 
 private:
-    Entity player;
+    EntityManager entityManager;
 };
