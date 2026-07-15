@@ -14,4 +14,6 @@ add_executable(GameEngine
     src/Entity/Entity.cpp
     src/Entity/Manager/EntityManager.cpp
     src/Movement/Movement.cpp
+    src/World/Map.cpp
+    src/World/Tile/Tile.cpp
 )

@@ -2,6 +2,7 @@
 #include <iostream>
 
 World::World()
+    : map(100, 100)
 {
 
     entityManager.CreateEntity(EntityType::PLAYER);
