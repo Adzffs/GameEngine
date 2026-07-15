@@ -14,5 +14,5 @@ void World::Update()
 {
     std::cout << "Updating World..." << std::endl;
 
-    entityManager.Update();
+    entityManager.Update(map);
 }

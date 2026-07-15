@@ -15,7 +15,7 @@ void EntityManager::CreateEntity(EntityType type)
     nextID++;
 }
 
-void EntityManager::Update()
+void EntityManager::Update(Map &map)
 {
     std::cout
         << "Updating "
