@@ -1,14 +1,20 @@
 #pragma once
 
+#include "TileType.h"
+
 class Tile
 {
 public:
     Tile();
 
+    TileType GetType();
+
+    void SetType(TileType type);
+
     bool IsBlocked();
 
-    void SetBlocked(bool blocked);
-
 private:
+    TileType type;
+
     bool blocked;
 };
