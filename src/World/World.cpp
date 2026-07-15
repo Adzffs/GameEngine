@@ -1,5 +1,7 @@
 #include "World.h"
 #include <iostream>
+#include "Object/Resource/ResourceNode.h"
+#include "../Core/Logger.h"
 
 World::World()
     : map(100, 100)
@@ -8,13 +10,11 @@ World::World()
     entityManager.CreateEntity(EntityType::PLAYER);
     entityManager.CreateEntity(EntityType::NPC);
     entityManager.CreateEntity(EntityType::RESOURCE);
-    objectManager.CreateResource(5, 5);
-    objectManager.CreateResource(10, 10);
 }
 
 void World::Update()
 {
-    std::cout << "Updating World..." << std::endl;
+    Logger::Debug("Updating World");
 
     entityManager.Update(map);
     objectManager.Update();

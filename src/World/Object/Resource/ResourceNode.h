@@ -8,6 +8,7 @@ public:
     ResourceNode(int id, int x, int y);
 
     void Gather();
+    void Interact();
 
 private:
     int amount;

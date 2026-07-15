@@ -1,9 +1,10 @@
 #include "Engine.h"
 #include <iostream>
+#include "Core/Logger.h"
 
 void Engine::Run()
 {
-    std::cout << "Server Started\n";
+    Logger::Info("Server Started");
 
     while (running)
     {

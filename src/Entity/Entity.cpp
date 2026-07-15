@@ -1,6 +1,7 @@
 #include "Entity.h"
 #include <iostream>
 #include <string>
+#include "Core/Logger.h"
 
 Entity::Entity(int id, EntityType type)
     : position(0, 0)
@@ -45,15 +46,6 @@ void Entity::Update()
         break;
     }
 
-    std::cout
-        << "Entity ID: "
-        << id
-        << " Type: "
-        << name
-        << " Position: ("
-        << position.GetX()
-        << ", "
-        << position.GetY()
-        << ")"
-        << std::endl;
+    Logger::Debug(
+        "Entity ID: " + std::to_string(id));
 }

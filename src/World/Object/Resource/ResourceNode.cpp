@@ -25,3 +25,8 @@ void ResourceNode::Gather()
             << std::endl;
     }
 }
+
+void ResourceNode::Interact()
+{
+    Gather();
+}

@@ -1,7 +1,7 @@
 #include "EntityManager.h"
 #include <iostream>
 #include "../../Movement/Movement.h"
-
+#include "../../Core/Logger.h"
 EntityManager::EntityManager()
 {
 }
@@ -17,11 +17,8 @@ void EntityManager::CreateEntity(EntityType type)
 
 void EntityManager::Update(Map &map)
 {
-    std::cout
-        << "Updating "
-        << entities.size()
-        << " Entities..."
-        << std::endl;
+    Logger::Debug(
+        "Updating " + std::to_string(entities.size()) + " Entities");
 
     for (auto &entity : entities)
     {
