@@ -16,6 +16,8 @@ public:
 
     void Update();
 
+    void StartAction();
+
 private:
     int id;
 

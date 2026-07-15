@@ -24,6 +24,9 @@ void EntityManager::Update(Map &map)
     {
         if (entity.GetType() == EntityType::PLAYER)
         {
+            // temporary movement test
+            // remove when player input exists
+
             bool moved = Movement::Move(entity, map, 1, 0);
 
             if (!moved)

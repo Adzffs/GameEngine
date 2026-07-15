@@ -49,3 +49,11 @@ void Entity::Update()
     Logger::Debug(
         "Entity ID: " + std::to_string(id));
 }
+void Entity::StartAction()
+{
+    std::cout
+        << "Entity "
+        << id
+        << " started an action"
+        << std::endl;
+}
