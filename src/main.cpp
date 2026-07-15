@@ -3,8 +3,6 @@
 
 int main()
 {
-    std::cout << "Starting Game Engine..." << std::endl;
-
     Engine engine;
 
     engine.Run();

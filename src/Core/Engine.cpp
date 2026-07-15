@@ -1,20 +1,30 @@
 #include "Engine.h"
 #include <iostream>
-#include <thread>
-#include <chrono>
 
 void Engine::Run()
 {
-    for (int tick = 0; tick < 10; tick++)
+    std::cout << "Server Started\n";
+
+    while (running)
     {
-        std::cout
-            << "Game Tick: "
-            << tick
-            << std::endl;
-
-        std::this_thread::sleep_for(
-            std::chrono::milliseconds(600));
+        if (clock.ShouldTick())
+        {
+            Update();
+        }
     }
+}
 
-    std::cout << "Engine Finished" << std::endl;
+void Engine::Update()
+{
+    tick++;
+
+    std::cout
+        << "Server Tick: "
+        << tick
+        << std::endl;
+
+    if (tick >= 10)
+    {
+        running = false;
+    }
 }
