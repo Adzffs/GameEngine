@@ -1,8 +1,0 @@
-# ninja log v7
-16	463	1784128938206675600	CMakeFiles/GameEngine.dir/src/main.cpp.o	1f11f176e5aaab4e
-39	1052	1784128938228983000	CMakeFiles/GameEngine.dir/src/Core/Engine.cpp.o	2c590033ff4e8e48
-1052	1222	1784128939242598900	GameEngine.exe	c6b22cec9220e65a
-51	1076	1784129766517333700	CMakeFiles/GameEngine.dir/src/Core/Engine.cpp.o	2c590033ff4e8e48
-68	1078	1784129766533242400	CMakeFiles/GameEngine.dir/src/Time/Clock.cpp.o	8b745c4de0e893f0
-31	1092	1784129766496691500	CMakeFiles/GameEngine.dir/src/main.cpp.o	1f11f176e5aaab4e
-1092	1262	1784129767557422200	GameEngine.exe	47a30bcaba7b2b99

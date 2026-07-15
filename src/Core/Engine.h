@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Time/Clock.h"
+#include "../World/World.h"
 
 class Engine
 {
@@ -11,6 +12,8 @@ private:
     bool running = true;
 
     Clock clock;
+
+    World world;
 
     int tick = 0;
 

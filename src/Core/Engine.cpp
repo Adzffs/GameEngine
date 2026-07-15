@@ -23,6 +23,8 @@ void Engine::Update()
         << tick
         << std::endl;
 
+    world.Update();
+
     if (tick >= 10)
     {
         running = false;
