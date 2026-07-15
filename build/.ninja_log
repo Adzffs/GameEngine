@@ -1,0 +1,4 @@
+# ninja log v7
+16	463	1784128938206675600	CMakeFiles/GameEngine.dir/src/main.cpp.o	1f11f176e5aaab4e
+39	1052	1784128938228983000	CMakeFiles/GameEngine.dir/src/Core/Engine.cpp.o	2c590033ff4e8e48
+1052	1222	1784128939242598900	GameEngine.exe	c6b22cec9220e65a
