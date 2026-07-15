@@ -3,6 +3,7 @@
 #include "../Entity.h"
 #include <vector>
 #include "../../World/Map.h"
+#include "../../Input/InputManager.h"
 
 class EntityManager
 {
@@ -17,4 +18,6 @@ private:
     std::vector<Entity> entities;
 
     int nextID = 1;
+
+    InputManager input;
 };
