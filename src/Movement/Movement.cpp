@@ -1,11 +1,19 @@
 #include "Movement.h"
 #include "../World/Map.h"
 
-void Movement::Move(Entity &entity, int x, int y)
+bool Movement::Move(Entity &entity, Map &map, int x, int y)
 {
     Position &position = entity.GetPosition();
 
-    position.SetPosition(
-        position.GetX() + x,
-        position.GetY() + y);
+    int newX = position.GetX() + x;
+    int newY = position.GetY() + y;
+
+    if (!map.IsValidPosition(newX, newY))
+    {
+        return false;
+    }
+
+    position.SetPosition(newX, newY);
+
+    return true;
 }

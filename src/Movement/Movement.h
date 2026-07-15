@@ -1,9 +1,10 @@
 #pragma once
 
 #include "../Entity/Entity.h"
+#include "../World/Map.h"
 
 class Movement
 {
 public:
-    static void Move(Entity &entity, int x, int y);
+    static bool Move(Entity &entity, Map &map, int x, int y);
 };

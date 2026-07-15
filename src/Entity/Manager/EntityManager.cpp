@@ -27,7 +27,12 @@ void EntityManager::Update(Map &map)
     {
         if (entity.GetType() == EntityType::PLAYER)
         {
-            Movement::Move(entity, 1, 0);
+            bool moved = Movement::Move(entity, map, 1, 0);
+
+            if (!moved)
+            {
+                std::cout << "Movement blocked!" << std::endl;
+            }
         }
 
         entity.Update();
