@@ -19,6 +19,8 @@ add_executable(GameEngine
     src/World/Object/WorldObject.cpp
     src/World/Object/Resource/ResourceNode.cpp
     src/World/Object/Manager/ObjectManager.cpp
+    src/Action/Action.cpp
+    src/Action/ActionManager.cpp
 
 )
 target_include_directories(GameEngine PRIVATE src)
