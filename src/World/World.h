@@ -2,6 +2,7 @@
 
 #include "../Entity/Manager/EntityManager.h"
 #include "Map.h"
+#include "Object/Manager/ObjectManager.h"
 
 class World
 {
@@ -12,6 +13,8 @@ public:
 
 private:
     EntityManager entityManager;
+
+    ObjectManager objectManager;
 
     Map map;
 };

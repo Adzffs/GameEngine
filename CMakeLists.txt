@@ -18,4 +18,5 @@ add_executable(GameEngine
     src/World/Tile/Tile.cpp
     src/World/Object/WorldObject.cpp
     src/World/Object/Resource/ResourceNode.cpp
+    src/World/Object/Manager/ObjectManager.cpp
 )
