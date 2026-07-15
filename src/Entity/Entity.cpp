@@ -3,11 +3,15 @@
 #include <string>
 
 Entity::Entity(int id, EntityType type)
+    : position(0, 0)
 {
     this->id = id;
     this->type = type;
 }
-
+Position &Entity::GetPosition()
+{
+    return position;
+}
 int Entity::GetID()
 {
     return id;
@@ -46,5 +50,10 @@ void Entity::Update()
         << id
         << " Type: "
         << name
+        << " Position: ("
+        << position.GetX()
+        << ", "
+        << position.GetY()
+        << ")"
         << std::endl;
 }

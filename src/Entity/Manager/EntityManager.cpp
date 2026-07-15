@@ -1,5 +1,6 @@
 #include "EntityManager.h"
 #include <iostream>
+#include "../../Movement/Movement.h"
 
 EntityManager::EntityManager()
 {
@@ -24,6 +25,11 @@ void EntityManager::Update()
 
     for (auto &entity : entities)
     {
+        if (entity.GetType() == EntityType::PLAYER)
+        {
+            Movement::Move(entity, 1, 0);
+        }
+
         entity.Update();
     }
 }

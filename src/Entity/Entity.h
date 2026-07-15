@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EntityType.h"
+#include "../World/Position.h"
 
 class Entity
 {
@@ -11,10 +12,14 @@ public:
 
     EntityType GetType();
 
+    Position &GetPosition();
+
     void Update();
 
 private:
     int id;
 
     EntityType type;
+
+    Position position;
 };
