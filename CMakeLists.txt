@@ -10,4 +10,5 @@ add_executable(GameEngine
     src/Core/Engine.cpp
     src/Time/Clock.cpp
     src/World/World.cpp
+    src/Entity/Entity.cpp
 )
