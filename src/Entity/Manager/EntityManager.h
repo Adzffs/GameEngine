@@ -10,7 +10,7 @@ public:
 
     void Update();
 
-    void CreateEntity();
+    void CreateEntity(EntityType type);
 
 private:
     std::vector<Entity> entities;

@@ -5,9 +5,9 @@ EntityManager::EntityManager()
 {
 }
 
-void EntityManager::CreateEntity()
+void EntityManager::CreateEntity(EntityType type)
 {
-    Entity entity(nextID);
+    Entity entity(nextID, type);
 
     entities.push_back(entity);
 
