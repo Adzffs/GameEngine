@@ -2,6 +2,7 @@
 #include <iostream>
 #include "../World/Map.h"
 #include <string>
+#include <array>
 
 Graphics::Graphics()
     : window(nullptr),
@@ -9,7 +10,8 @@ Graphics::Graphics()
       clickPending(false),
       hasClickedTile(false),
       clickedTileX(0),
-      clickedTileY(0)
+      clickedTileY(0),
+      selectedTab(SidePanelTab::INVENTORY)
 {
 }
 
@@ -58,7 +60,70 @@ bool Graphics::Initialize()
 
     return true;
 }
+bool Graphics::HandleSidePanelClick(
+    float mouseX,
+    float mouseY)
+{
+    constexpr float panelWidth = 192.0f;
+    constexpr float panelHeight = 348.0f;
 
+    constexpr float tabWidth = 30.0f;
+    constexpr float tabHeight = 30.0f;
+    constexpr float tabGap = 2.0f;
+
+    const float panelX =
+        static_cast<float>(WindowWidth) -
+        panelWidth -
+        20.0f;
+
+    const float panelY =
+        static_cast<float>(WindowHeight) -
+        panelHeight -
+        20.0f;
+
+    const float tabY =
+        panelY -
+        tabHeight -
+        4.0f;
+
+    const std::array<SidePanelTab, 6> tabs{
+        SidePanelTab::SKILLS,
+        SidePanelTab::QUESTS,
+        SidePanelTab::INVENTORY,
+        SidePanelTab::PRAYER,
+        SidePanelTab::MAGIC,
+        SidePanelTab::SETTINGS};
+
+    for (std::size_t tabIndex = 0;
+         tabIndex < tabs.size();
+         tabIndex++)
+    {
+        float tabX =
+            panelX +
+            static_cast<float>(tabIndex) *
+                (tabWidth + tabGap);
+
+        bool insideTab =
+            mouseX >= tabX &&
+            mouseX <= tabX + tabWidth &&
+            mouseY >= tabY &&
+            mouseY <= tabY + tabHeight;
+
+        if (insideTab)
+        {
+            selectedTab = tabs[tabIndex];
+            return true;
+        }
+    }
+
+    bool insidePanelArea =
+        mouseX >= panelX &&
+        mouseX <= panelX + panelWidth &&
+        mouseY >= tabY &&
+        mouseY <= panelY + panelHeight;
+
+    return insidePanelArea;
+}
 void Graphics::ProcessEvents(bool &running)
 {
     SDL_Event event;
@@ -73,11 +138,21 @@ void Graphics::ProcessEvents(bool &running)
         if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
             event.button.button == SDL_BUTTON_LEFT)
         {
+            float mouseX = event.button.x;
+            float mouseY = event.button.y;
+
+            if (HandleSidePanelClick(
+                    mouseX,
+                    mouseY))
+            {
+                continue;
+            }
+
             clickedTileX =
-                static_cast<int>(event.button.x) / TileSize;
+                static_cast<int>(mouseX) / TileSize;
 
             clickedTileY =
-                static_cast<int>(event.button.y) / TileSize;
+                static_cast<int>(mouseY) / TileSize;
 
             hasClickedTile = true;
             clickPending = true;
@@ -305,6 +380,326 @@ void Graphics::DrawResources(
         }
     }
 }
+void Graphics::DrawSkills(
+    int woodcuttingLevel,
+    int woodcuttingXP,
+    int currentLevelXP,
+    int nextLevelXP)
+{
+    constexpr float panelWidth = 192.0f;
+    constexpr float panelHeight = 348.0f;
+
+    const float panelX =
+        static_cast<float>(WindowWidth) -
+        panelWidth -
+        20.0f;
+
+    const float panelY =
+        static_cast<float>(WindowHeight) -
+        panelHeight -
+        20.0f;
+
+    SDL_FRect panelRectangle{
+        panelX,
+        panelY,
+        panelWidth,
+        panelHeight};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        30,
+        30,
+        30,
+        240);
+
+    SDL_RenderFillRect(
+        renderer,
+        &panelRectangle);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        180,
+        180,
+        180,
+        255);
+
+    SDL_RenderRect(
+        renderer,
+        &panelRectangle);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        255,
+        255,
+        255,
+        255);
+
+    SDL_RenderDebugText(
+        renderer,
+        panelX + 10.0f,
+        panelY + 10.0f,
+        "SKILLS");
+
+    SDL_RenderDebugText(
+        renderer,
+        panelX + 10.0f,
+        panelY + 42.0f,
+        "WOODCUTTING");
+
+    std::string levelText =
+        "Level: " +
+        std::to_string(woodcuttingLevel);
+
+    SDL_RenderDebugText(
+        renderer,
+        panelX + 10.0f,
+        panelY + 64.0f,
+        levelText.c_str());
+
+    std::string xpText =
+        "XP: " +
+        std::to_string(woodcuttingXP) +
+        " / " +
+        std::to_string(nextLevelXP);
+
+    SDL_RenderDebugText(
+        renderer,
+        panelX + 10.0f,
+        panelY + 84.0f,
+        xpText.c_str());
+
+    float progress = 1.0f;
+
+    if (nextLevelXP > currentLevelXP)
+    {
+        progress =
+            static_cast<float>(
+                woodcuttingXP - currentLevelXP) /
+            static_cast<float>(
+                nextLevelXP - currentLevelXP);
+    }
+
+    if (progress < 0.0f)
+    {
+        progress = 0.0f;
+    }
+
+    if (progress > 1.0f)
+    {
+        progress = 1.0f;
+    }
+
+    SDL_FRect progressBackground{
+        panelX + 10.0f,
+        panelY + 110.0f,
+        panelWidth - 20.0f,
+        16.0f};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        55,
+        55,
+        55,
+        255);
+
+    SDL_RenderFillRect(
+        renderer,
+        &progressBackground);
+
+    SDL_FRect progressFill{
+        progressBackground.x,
+        progressBackground.y,
+        progressBackground.w * progress,
+        progressBackground.h};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        70,
+        160,
+        70,
+        255);
+
+    SDL_RenderFillRect(
+        renderer,
+        &progressFill);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        130,
+        130,
+        130,
+        255);
+
+    SDL_RenderRect(
+        renderer,
+        &progressBackground);
+}
+void Graphics::DrawPlaceholderPanel(
+    const char *title)
+{
+    constexpr float panelWidth = 192.0f;
+    constexpr float panelHeight = 348.0f;
+
+    const float panelX =
+        static_cast<float>(WindowWidth) -
+        panelWidth -
+        20.0f;
+
+    const float panelY =
+        static_cast<float>(WindowHeight) -
+        panelHeight -
+        20.0f;
+
+    SDL_FRect panelRectangle{
+        panelX,
+        panelY,
+        panelWidth,
+        panelHeight};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        30,
+        30,
+        30,
+        240);
+
+    SDL_RenderFillRect(
+        renderer,
+        &panelRectangle);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        180,
+        180,
+        180,
+        255);
+
+    SDL_RenderRect(
+        renderer,
+        &panelRectangle);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        255,
+        255,
+        255,
+        255);
+
+    SDL_RenderDebugText(
+        renderer,
+        panelX + 10.0f,
+        panelY + 10.0f,
+        title);
+
+    SDL_RenderDebugText(
+        renderer,
+        panelX + 45.0f,
+        panelY + 160.0f,
+        "COMING SOON");
+}
+void Graphics::DrawSidePanelTabs()
+{
+    constexpr float panelWidth = 192.0f;
+    constexpr float panelHeight = 348.0f;
+
+    constexpr float tabWidth = 30.0f;
+    constexpr float tabHeight = 30.0f;
+    constexpr float tabGap = 2.0f;
+
+    const float panelX =
+        static_cast<float>(WindowWidth) -
+        panelWidth -
+        20.0f;
+
+    const float panelY =
+        static_cast<float>(WindowHeight) -
+        panelHeight -
+        20.0f;
+
+    const float tabY =
+        panelY -
+        tabHeight -
+        4.0f;
+
+    const std::array<SidePanelTab, 6> tabs{
+        SidePanelTab::SKILLS,
+        SidePanelTab::QUESTS,
+        SidePanelTab::INVENTORY,
+        SidePanelTab::PRAYER,
+        SidePanelTab::MAGIC,
+        SidePanelTab::SETTINGS};
+
+    const std::array<const char *, 6> labels{
+        "SK",
+        "QU",
+        "IN",
+        "PR",
+        "MA",
+        "SE"};
+
+    for (std::size_t tabIndex = 0;
+         tabIndex < tabs.size();
+         tabIndex++)
+    {
+        float tabX =
+            panelX +
+            static_cast<float>(tabIndex) *
+                (tabWidth + tabGap);
+
+        SDL_FRect tabRectangle{
+            tabX,
+            tabY,
+            tabWidth,
+            tabHeight};
+
+        if (selectedTab == tabs[tabIndex])
+        {
+            SDL_SetRenderDrawColor(
+                renderer,
+                120,
+                95,
+                55,
+                255);
+        }
+        else
+        {
+            SDL_SetRenderDrawColor(
+                renderer,
+                45,
+                45,
+                45,
+                255);
+        }
+
+        SDL_RenderFillRect(
+            renderer,
+            &tabRectangle);
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            160,
+            160,
+            160,
+            255);
+
+        SDL_RenderRect(
+            renderer,
+            &tabRectangle);
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            255,
+            255,
+            255,
+            255);
+
+        SDL_RenderDebugText(
+            renderer,
+            tabX + 7.0f,
+            tabY + 11.0f,
+            labels[tabIndex]);
+    }
+}
 void Graphics::DrawInventory(
     const Inventory &inventory)
 {
@@ -484,7 +879,11 @@ void Graphics::Render(
     const std::vector<ResourceNode> &resources,
     int playerX,
     int playerY,
-    const Inventory &inventory)
+    const Inventory &inventory,
+    int woodcuttingLevel,
+    int woodcuttingXP,
+    int currentLevelXP,
+    int nextLevelXP)
 {
     SDL_SetRenderDrawColor(
         renderer,
@@ -501,7 +900,39 @@ void Graphics::Render(
     DrawResources(resources);
     DrawNPCs(entities);
     DrawPlayer(playerX, playerY);
-    DrawInventory(inventory);
+
+    DrawSidePanelTabs();
+
+    switch (selectedTab)
+    {
+    case SidePanelTab::INVENTORY:
+        DrawInventory(inventory);
+        break;
+
+    case SidePanelTab::SKILLS:
+        DrawSkills(
+            woodcuttingLevel,
+            woodcuttingXP,
+            currentLevelXP,
+            nextLevelXP);
+        break;
+
+    case SidePanelTab::QUESTS:
+        DrawPlaceholderPanel("QUESTS");
+        break;
+
+    case SidePanelTab::PRAYER:
+        DrawPlaceholderPanel("PRAYER");
+        break;
+
+    case SidePanelTab::MAGIC:
+        DrawPlaceholderPanel("MAGIC");
+        break;
+
+    case SidePanelTab::SETTINGS:
+        DrawPlaceholderPanel("SETTINGS");
+        break;
+    }
 
     SDL_RenderPresent(renderer);
 }

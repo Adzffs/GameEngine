@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include "../Player/Player.h"
 #include "../Inventory/ItemType.h"
+#include "../Skills/SkillType.h"
 
 World::World()
     : map(100, 100)
@@ -394,6 +395,19 @@ void World::ProcessCompletedActions(
             continue;
         }
 
+        int previousLevel =
+            player->GetSkills()
+                .GetSkill(SkillType::WOODCUTTING)
+                .GetLevel();
+
+        player->GetSkills().AddXP(
+            SkillType::WOODCUTTING,
+            25);
+
+        const Skill &woodcutting =
+            player->GetSkills()
+                .GetSkill(SkillType::WOODCUTTING);
+
         std::cout
             << "Player "
             << player->GetID()
@@ -401,6 +415,22 @@ void World::ProcessCompletedActions(
             << player->GetInventory().GetItemAmount(
                    ItemType::LOG)
             << std::endl;
+
+        std::cout
+            << "Woodcutting XP: "
+            << woodcutting.GetXP()
+            << " Level: "
+            << woodcutting.GetLevel()
+            << std::endl;
+
+        if (woodcutting.GetLevel() > previousLevel)
+        {
+            std::cout
+                << "Woodcutting level increased to "
+                << woodcutting.GetLevel()
+                << "!"
+                << std::endl;
+        }
 
         resource->Deplete();
     }

@@ -20,3 +20,12 @@ const Inventory &Player::GetInventory() const
 {
     return inventory;
 }
+SkillSet &Player::GetSkills()
+{
+    return skills;
+}
+
+const SkillSet &Player::GetSkills() const
+{
+    return skills;
+}
