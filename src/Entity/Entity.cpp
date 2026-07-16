@@ -1,4 +1,5 @@
 #include "Entity.h"
+#include "../World/World.h"
 #include <iostream>
 #include <string>
 #include "Core/Logger.h"
@@ -23,8 +24,10 @@ EntityType Entity::GetType()
     return type;
 }
 
-void Entity::Update()
+void Entity::Update(World &world)
 {
+    (void)world;
+
     std::string name;
 
     switch (type)
@@ -46,8 +49,17 @@ void Entity::Update()
         break;
     }
 
-    Logger::Debug(
-        "Entity ID: " + std::to_string(id));
+    std::cout
+        << "Entity ID: "
+        << id
+        << " Type: "
+        << name
+        << " Position: ("
+        << position.GetX()
+        << ", "
+        << position.GetY()
+        << ")"
+        << std::endl;
 }
 void Entity::StartAction()
 {

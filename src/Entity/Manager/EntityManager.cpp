@@ -4,17 +4,10 @@
 #include "../../Core/Logger.h"
 #include "../../Movement/MovementRequest.h"
 #include "../../Player/Player.h"
+#include "../../World/World.h"
 
 EntityManager::EntityManager()
 {
-}
-
-void EntityManager::CreateEntity(EntityType type)
-{
-    entities.push_back(
-        std::make_unique<Entity>(nextID, type));
-
-    nextID++;
 }
 
 void EntityManager::CreatePlayer()
@@ -25,13 +18,13 @@ void EntityManager::CreatePlayer()
     nextID++;
 }
 
-void EntityManager::Update(Map &map)
+void EntityManager::Update(World &world)
 {
     Logger::Debug(
         "Updating " + std::to_string(entities.size()) + " Entities");
 
     for (auto &entity : entities)
     {
-        entity->Update();
+        entity->Update(world);
     }
 }

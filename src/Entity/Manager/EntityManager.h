@@ -2,18 +2,16 @@
 #include <memory>
 #include "../Entity.h"
 #include <vector>
-#include "../../World/Map.h"
 #include "../../Input/InputManager.h"
 #include "../../Player/Player.h"
+class World;
 
 class EntityManager
 {
 public:
     EntityManager();
 
-    void Update(Map &map);
-
-    void CreateEntity(EntityType type);
+    void Update(World &world);
 
     void CreatePlayer();
 

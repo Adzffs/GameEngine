@@ -1,4 +1,7 @@
 #include "Player.h"
+#include "../World/World.h"
+#include "../Movement/Movement.h"
+
 #include <iostream>
 
 Player::Player(int id)
@@ -6,15 +9,13 @@ Player::Player(int id)
 {
 }
 
-void Player::Update()
+void Player::Update(World &world)
 {
-    std::cout
-        << "Player ID: "
-        << GetID()
-        << " Position: ("
-        << GetPosition().GetX()
-        << ", "
-        << GetPosition().GetY()
-        << ")"
-        << std::endl;
+    MovementRequest request = input.GetMovementRequest();
+
+    Movement::Move(
+        *this,
+        world.GetMap(),
+        request.GetX(),
+        request.GetY());
 }

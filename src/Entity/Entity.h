@@ -3,6 +3,8 @@
 #include "EntityType.h"
 #include "../World/Position.h"
 
+class World;
+
 class Entity
 {
 public:
@@ -16,7 +18,7 @@ public:
 
     Position &GetPosition();
 
-    virtual void Update();
+    virtual void Update(World &world) = 0;
 
     void StartAction();
 

@@ -5,14 +5,22 @@ Map::Map(int width, int height)
     this->width = width;
     this->height = height;
 
-    tiles = new Tile *[width];
+    tiles.resize(static_cast<size_t>(width) * height);
 
-    for (int x = 0; x < width; x++)
+    if (width > 5 && height > 5)
     {
-        tiles[x] = new Tile[height];
-        }
-    tiles[5][5].SetType(TileType::TREE);
-    tiles[10][10].SetType(TileType::WATER);
+        GetTile(5, 5).SetType(TileType::TREE);
+    }
+
+    if (width > 10 && height > 10)
+    {
+        GetTile(10, 10).SetType(TileType::WATER);
+    }
+}
+
+Tile &Map::GetTile(int x, int y)
+{
+    return tiles[static_cast<size_t>(y) * width + x];
 }
 
 bool Map::IsValidPosition(int x, int y)
@@ -23,5 +31,5 @@ bool Map::IsValidPosition(int x, int y)
     if (x >= width || y >= height)
         return false;
 
-    return !tiles[x][y].IsBlocked();
+    return !GetTile(x, y).IsBlocked();
 }

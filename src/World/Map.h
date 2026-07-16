@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Tile/Tile.h"
+#include <vector>
 
 class Map
 {
@@ -14,5 +15,7 @@ private:
 
     int height;
 
-    Tile **tiles;
+    std::vector<Tile> tiles;
+
+    Tile &GetTile(int x, int y);
 };

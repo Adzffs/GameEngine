@@ -12,6 +12,8 @@ public:
 
     void Update();
 
+    Map &GetMap();
+
 private:
     EntityManager entityManager;
 
