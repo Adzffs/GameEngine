@@ -6,22 +6,50 @@ const ItemDefinition &ItemDatabase::Get(
     static const ItemDefinition none{
         ItemType::NONE,
         "None",
-        false};
+        false,
+        EquipmentSlotType::NONE,
+        ToolType::NONE,
+        0};
 
     static const ItemDefinition log{
         ItemType::LOG,
         "Log",
-        false};
+        false,
+        EquipmentSlotType::NONE,
+        ToolType::NONE,
+        0};
 
     static const ItemDefinition coins{
         ItemType::COINS,
         "Coins",
-        true};
+        true,
+        EquipmentSlotType::NONE,
+        ToolType::NONE,
+        0};
 
     static const ItemDefinition bronzeAxe{
         ItemType::BRONZE_AXE,
         "Bronze axe",
-        false};
+        false,
+        EquipmentSlotType::WEAPON,
+        ToolType::AXE,
+        5};
+
+    static const ItemDefinition ironAxe{
+        ItemType::IRON_AXE,
+        "Iron axe",
+        false,
+        EquipmentSlotType::WEAPON,
+        ToolType::AXE,
+        4};
+
+    static const ItemDefinition steelAxe{
+        ItemType::STEEL_AXE,
+        "Steel axe",
+        false,
+        EquipmentSlotType::WEAPON,
+        ToolType::AXE,
+        3};
 
     switch (itemType)
     {
@@ -33,6 +61,12 @@ const ItemDefinition &ItemDatabase::Get(
 
     case ItemType::BRONZE_AXE:
         return bronzeAxe;
+
+    case ItemType::IRON_AXE:
+        return ironAxe;
+
+    case ItemType::STEEL_AXE:
+        return steelAxe;
 
     case ItemType::NONE:
     default:

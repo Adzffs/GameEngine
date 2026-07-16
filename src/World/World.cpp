@@ -9,6 +9,8 @@
 #include "../Inventory/ItemType.h"
 #include "../Skills/SkillType.h"
 #include "../Equipment/EquipmentSlotType.h"
+#include "../Item/ItemDatabase.h"
+#include "../Item/ToolType.h"
 
 World::World()
     : map(100, 100)
@@ -220,10 +222,12 @@ void World::ProcessResourceInteractions()
             interactionIterator->second;
 
         Entity *entity =
-            entityManager.GetEntityByID(entityID);
+            entityManager.GetEntityByID(
+                entityID);
 
         ResourceNode *resource =
-            objectManager.GetResourceByID(resourceID);
+            objectManager.GetResourceByID(
+                resourceID);
 
         if (entity == nullptr ||
             resource == nullptr)
@@ -276,8 +280,17 @@ void World::ProcessResourceInteractions()
             continue;
         }
 
-        if (!player->GetEquipment().IsEquipped(
-                ItemType::BRONZE_AXE))
+        ItemType equippedWeapon =
+            player->GetEquipment()
+                .GetEquippedItem(
+                    EquipmentSlotType::WEAPON);
+
+        const ItemDefinition &weaponDefinition =
+            ItemDatabase::Get(
+                equippedWeapon);
+
+        if (weaponDefinition.GetToolType() !=
+            ToolType::AXE)
         {
             Logger::Game(
                 "You need to equip an axe to chop this tree");
@@ -289,12 +302,14 @@ void World::ProcessResourceInteractions()
             continue;
         }
 
-        if (!actionManager.HasActionForEntity(entityID))
+        if (!actionManager.HasActionForEntity(
+                entityID))
         {
             actionManager.AddAction(
                 Action(
                     "Chopping Tree",
-                    5,
+                    weaponDefinition
+                        .GetActionDurationTicks(),
                     entityID,
                     resourceID));
         }
@@ -433,62 +448,129 @@ bool World::TryEquipInventoryItem(
         return false;
     }
 
-    const InventorySlot &slot =
-        player->GetInventory()
-            .GetSlots()[slotIndex];
+    Inventory &inventory =
+        player->GetInventory();
 
-    if (slot.IsEmpty())
+    const InventorySlot &inventorySlot =
+        inventory.GetSlots()[slotIndex];
+
+    if (inventorySlot.IsEmpty())
     {
         return false;
     }
 
-    ItemType itemType =
-        slot.GetItemType();
+    ItemType newItem =
+        inventorySlot.GetItemType();
 
-    if (itemType !=
-        ItemType::BRONZE_AXE)
+    const ItemDefinition &newDefinition =
+        ItemDatabase::Get(newItem);
+
+    if (!newDefinition.IsEquippable())
     {
         return false;
     }
+
+    EquipmentSlotType equipmentSlot =
+        newDefinition.GetEquipmentSlot();
 
     Equipment &equipment =
         player->GetEquipment();
 
-    if (!equipment.IsSlotEmpty(
-            EquipmentSlotType::WEAPON))
+    ItemType previousItem =
+        equipment.GetEquippedItem(
+            equipmentSlot);
+
+    if (previousItem == newItem)
     {
         Logger::Game(
-            "Your weapon slot is occupied");
+            newDefinition.GetName() +
+            " is already equipped");
 
         return false;
     }
 
-    bool removed =
-        player->GetInventory().RemoveItem(
-            itemType,
+    // Removing the new item first guarantees that
+    // there is space for the old equipped item.
+    bool removedNewItem =
+        inventory.RemoveItem(
+            newItem,
             1);
 
-    if (!removed)
+    if (!removedNewItem)
     {
         return false;
     }
 
-    bool equipped =
+    if (previousItem != ItemType::NONE)
+    {
+        equipment.Unequip(
+            equipmentSlot);
+    }
+
+    bool equippedNewItem =
         equipment.Equip(
-            EquipmentSlotType::WEAPON,
-            itemType);
+            equipmentSlot,
+            newItem);
 
-    if (!equipped)
+    if (!equippedNewItem)
     {
-        player->GetInventory().AddItem(
-            itemType,
+        if (previousItem != ItemType::NONE)
+        {
+            equipment.Equip(
+                equipmentSlot,
+                previousItem);
+        }
+
+        inventory.AddItem(
+            newItem,
             1);
 
         return false;
+    }
+
+    if (previousItem != ItemType::NONE)
+    {
+        bool returnedPreviousItem =
+            inventory.AddItem(
+                previousItem,
+                1);
+
+        if (!returnedPreviousItem)
+        {
+            // Roll everything back so no item is lost.
+            equipment.Unequip(
+                equipmentSlot);
+
+            equipment.Equip(
+                equipmentSlot,
+                previousItem);
+
+            inventory.AddItem(
+                newItem,
+                1);
+
+            Logger::Error(
+                "Equipment swap failed");
+
+            return false;
+        }
+
+        const ItemDefinition &previousDefinition =
+            ItemDatabase::Get(
+                previousItem);
+
+        Logger::Game(
+            newDefinition.GetName() +
+            " equipped | " +
+            previousDefinition.GetName() +
+            " returned to inventory");
+
+        return true;
     }
 
     Logger::Game(
-        "Bronze axe equipped");
+        newDefinition.GetName() +
+        " equipped");
 
     return true;
 }

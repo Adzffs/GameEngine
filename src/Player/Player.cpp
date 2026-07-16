@@ -9,6 +9,14 @@ Player::Player(int id)
     inventory.AddItem(
         ItemType::BRONZE_AXE,
         1);
+
+    inventory.AddItem(
+        ItemType::IRON_AXE,
+        1);
+
+    inventory.AddItem(
+        ItemType::STEEL_AXE,
+        1);
 }
 
 void Player::Update(World &world)

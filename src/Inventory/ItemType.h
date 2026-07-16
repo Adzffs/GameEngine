@@ -5,5 +5,7 @@ enum class ItemType
     NONE,
     LOG,
     COINS,
-    BRONZE_AXE
+    BRONZE_AXE,
+    IRON_AXE,
+    STEEL_AXE
 };

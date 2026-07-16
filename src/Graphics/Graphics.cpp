@@ -800,6 +800,76 @@ void Graphics::DrawSidePanelTabs()
             labels[tabIndex]);
     }
 }
+
+void Graphics::DrawAxeIcon(
+    ItemType itemType,
+    float x,
+    float y,
+    float size)
+{
+    int headRed = 0;
+    int headGreen = 0;
+    int headBlue = 0;
+
+    switch (itemType)
+    {
+    case ItemType::BRONZE_AXE:
+        headRed = 170;
+        headGreen = 110;
+        headBlue = 60;
+        break;
+
+    case ItemType::IRON_AXE:
+        headRed = 165;
+        headGreen = 165;
+        headBlue = 165;
+        break;
+
+    case ItemType::STEEL_AXE:
+        headRed = 90;
+        headGreen = 115;
+        headBlue = 140;
+        break;
+
+    default:
+        return;
+    }
+
+    SDL_FRect handleRectangle{
+        x + size * 0.45f,
+        y + size * 0.20f,
+        size * 0.14f,
+        size * 0.62f};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        130,
+        80,
+        35,
+        255);
+
+    SDL_RenderFillRect(
+        renderer,
+        &handleRectangle);
+
+    SDL_FRect axeHeadRectangle{
+        x + size * 0.24f,
+        y + size * 0.16f,
+        size * 0.54f,
+        size * 0.25f};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        headRed,
+        headGreen,
+        headBlue,
+        255);
+
+    SDL_RenderFillRect(
+        renderer,
+        &axeHeadRectangle);
+}
+
 void Graphics::DrawInventory(
     const Inventory &inventory)
 {
@@ -953,6 +1023,11 @@ void Graphics::DrawInventory(
                 renderer,
                 &logRectangle);
         }
+        DrawAxeIcon(
+            slot.GetItemType(),
+            slotX,
+            slotY,
+            slotSize);
 
         if (slot.GetAmount() > 1)
         {
@@ -1125,43 +1200,11 @@ void Graphics::DrawEquipment(
             equipment.GetEquippedItem(
                 slot.slotType);
 
-        if (equippedItem ==
-            ItemType::BRONZE_AXE)
-        {
-            SDL_FRect handleRectangle{
-                slot.x + 21.0f,
-                slot.y + 10.0f,
-                6.0f,
-                29.0f};
-
-            SDL_SetRenderDrawColor(
-                renderer,
-                130,
-                80,
-                35,
-                255);
-
-            SDL_RenderFillRect(
-                renderer,
-                &handleRectangle);
-
-            SDL_FRect axeHeadRectangle{
-                slot.x + 11.0f,
-                slot.y + 8.0f,
-                26.0f,
-                11.0f};
-
-            SDL_SetRenderDrawColor(
-                renderer,
-                170,
-                110,
-                60,
-                255);
-
-            SDL_RenderFillRect(
-                renderer,
-                &axeHeadRectangle);
-        }
+        DrawAxeIcon(
+            equippedItem,
+            slot.x,
+            slot.y,
+            slotSize);
     }
 }
 

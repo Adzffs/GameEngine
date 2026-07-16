@@ -75,6 +75,11 @@ public:
         int nextLevelXP);
     void DrawEquipment(
         const Equipment &equipment);
+    void DrawAxeIcon(
+        ItemType itemType,
+        float x,
+        float y,
+        float size);
     SDL_Window *window;
     SDL_Renderer *renderer;
 
