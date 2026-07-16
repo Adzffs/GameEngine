@@ -18,6 +18,10 @@ int World::CreatePlayer()
 {
     return entityManager.CreatePlayer();
 }
+Entity *World::GetEntityByID(int id)
+{
+    return entityManager.GetEntityByID(id);
+}
 void World::Update()
 {
     Logger::Debug("Updating World");

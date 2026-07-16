@@ -1,26 +1,52 @@
 #include "Engine.h"
+#include <chrono>
 #include <iostream>
 #include <thread>
 #include "Core/Logger.h"
-#include <iostream>
+
 Engine::Engine()
     : playerID(-1)
 {
+    if (!graphics.Initialize())
+    {
+        running = false;
+        return;
+    }
+
     playerID = world.CreatePlayer();
 }
+
 void Engine::Run()
 {
     Logger::Info("Server Started");
 
     while (running)
     {
+        graphics.ProcessEvents(running);
+
+        if (!running)
+        {
+            break;
+        }
+
         if (clock.ShouldTick())
         {
             Update();
         }
         else
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(
+                std::chrono::milliseconds(1));
+        }
+
+        Entity *player =
+            world.GetEntityByID(playerID);
+
+        if (player != nullptr)
+        {
+            graphics.Render(
+                player->GetPosition().GetX(),
+                player->GetPosition().GetY());
         }
     }
 }
@@ -35,7 +61,8 @@ void Engine::Update()
         << std::endl;
 
     world.Update();
-    // Revmove later when i dont just need 10 ticks
+
+    // Remove later when the engine should run continuously.
     if (tick >= 10)
     {
         running = false;

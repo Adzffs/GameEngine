@@ -16,7 +16,10 @@ public:
     Map &GetMap();
 
     int CreatePlayer();
-    void QueueMovementRequest(const MovementRequest &request);
+    Entity *GetEntityByID(int id);
+
+    void QueueMovementRequest(
+        const MovementRequest &request);
 
 private:
     EntityManager entityManager;

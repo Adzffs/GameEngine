@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(GameEngine)
+find_package(SDL3 REQUIRED CONFIG)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -25,5 +26,7 @@ add_executable(GameEngine
     src/Input/InputManager.cpp
     src/Player/Player.cpp
     src/NPC/NPC.cpp
+    src/Graphics/Graphics.cpp
 )
 target_include_directories(GameEngine PRIVATE src)
+target_link_libraries(GameEngine PRIVATE SDL3::SDL3)
