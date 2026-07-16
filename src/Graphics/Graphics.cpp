@@ -11,7 +11,10 @@ Graphics::Graphics()
       hasClickedTile(false),
       clickedTileX(0),
       clickedTileY(0),
-      selectedTab(SidePanelTab::INVENTORY)
+      selectedTab(SidePanelTab::INVENTORY),
+      inventorySlotClickPending(false),
+      clickedInventorySlotIndex(-1),
+      weaponSlotClickPending(false)
 {
 }
 
@@ -67,7 +70,7 @@ bool Graphics::HandleSidePanelClick(
     constexpr float panelWidth = 192.0f;
     constexpr float panelHeight = 348.0f;
 
-    constexpr float tabWidth = 30.0f;
+    constexpr float tabWidth = 25.0f;
     constexpr float tabHeight = 30.0f;
     constexpr float tabGap = 2.0f;
 
@@ -86,28 +89,30 @@ bool Graphics::HandleSidePanelClick(
         tabHeight -
         4.0f;
 
-    const std::array<SidePanelTab, 6> tabs{
+    const std::array<SidePanelTab, 7> tabs{
         SidePanelTab::SKILLS,
         SidePanelTab::QUESTS,
         SidePanelTab::INVENTORY,
+        SidePanelTab::EQUIPMENT,
         SidePanelTab::PRAYER,
         SidePanelTab::MAGIC,
         SidePanelTab::SETTINGS};
 
+    // Check tab buttons first.
     for (std::size_t tabIndex = 0;
          tabIndex < tabs.size();
          tabIndex++)
     {
-        float tabX =
+        const float tabX =
             panelX +
             static_cast<float>(tabIndex) *
                 (tabWidth + tabGap);
 
-        bool insideTab =
+        const bool insideTab =
             mouseX >= tabX &&
-            mouseX <= tabX + tabWidth &&
+            mouseX < tabX + tabWidth &&
             mouseY >= tabY &&
-            mouseY <= tabY + tabHeight;
+            mouseY < tabY + tabHeight;
 
         if (insideTab)
         {
@@ -116,13 +121,106 @@ bool Graphics::HandleSidePanelClick(
         }
     }
 
-    bool insidePanelArea =
+    const bool insidePanel =
         mouseX >= panelX &&
-        mouseX <= panelX + panelWidth &&
-        mouseY >= tabY &&
-        mouseY <= panelY + panelHeight;
+        mouseX < panelX + panelWidth &&
+        mouseY >= panelY &&
+        mouseY < panelY + panelHeight;
 
-    return insidePanelArea;
+    if (!insidePanel)
+    {
+        return false;
+    }
+
+    // Inventory slot clicks.
+    if (selectedTab ==
+        SidePanelTab::INVENTORY)
+    {
+        constexpr int columns = 4;
+
+        constexpr float slotSize = 40.0f;
+        constexpr float slotGap = 4.0f;
+        constexpr float padding = 10.0f;
+        constexpr float headerHeight = 24.0f;
+
+        for (int slotIndex = 0;
+             slotIndex < Inventory::SlotCount;
+             slotIndex++)
+        {
+            const int column =
+                slotIndex % columns;
+
+            const int row =
+                slotIndex / columns;
+
+            const float slotX =
+                panelX +
+                padding +
+                static_cast<float>(column) *
+                    (slotSize + slotGap);
+
+            const float slotY =
+                panelY +
+                padding +
+                headerHeight +
+                static_cast<float>(row) *
+                    (slotSize + slotGap);
+
+            const bool insideSlot =
+                mouseX >= slotX &&
+                mouseX < slotX + slotSize &&
+                mouseY >= slotY &&
+                mouseY < slotY + slotSize;
+
+            if (insideSlot)
+            {
+                clickedInventorySlotIndex =
+                    slotIndex;
+
+                inventorySlotClickPending =
+                    true;
+
+                return true;
+            }
+        }
+    }
+
+    // Equipment weapon-slot click.
+    if (selectedTab ==
+        SidePanelTab::EQUIPMENT)
+    {
+        constexpr float weaponXOffset =
+            16.0f;
+
+        constexpr float weaponYOffset =
+            112.0f;
+
+        constexpr float equipmentSlotSize =
+            48.0f;
+
+        const float weaponX =
+            panelX + weaponXOffset;
+
+        const float weaponY =
+            panelY + weaponYOffset;
+
+        const bool insideWeaponSlot =
+            mouseX >= weaponX &&
+            mouseX < weaponX +
+                         equipmentSlotSize &&
+            mouseY >= weaponY &&
+            mouseY < weaponY +
+                         equipmentSlotSize;
+
+        if (insideWeaponSlot)
+        {
+            weaponSlotClickPending = true;
+            return true;
+        }
+    }
+
+    // Consume other panel clicks so they do not move the player.
+    return true;
 }
 void Graphics::ProcessEvents(bool &running)
 {
@@ -602,7 +700,7 @@ void Graphics::DrawSidePanelTabs()
     constexpr float panelWidth = 192.0f;
     constexpr float panelHeight = 348.0f;
 
-    constexpr float tabWidth = 30.0f;
+    constexpr float tabWidth = 25.0f;
     constexpr float tabHeight = 30.0f;
     constexpr float tabGap = 2.0f;
 
@@ -621,18 +719,20 @@ void Graphics::DrawSidePanelTabs()
         tabHeight -
         4.0f;
 
-    const std::array<SidePanelTab, 6> tabs{
+    const std::array<SidePanelTab, 7> tabs{
         SidePanelTab::SKILLS,
         SidePanelTab::QUESTS,
         SidePanelTab::INVENTORY,
+        SidePanelTab::EQUIPMENT,
         SidePanelTab::PRAYER,
         SidePanelTab::MAGIC,
         SidePanelTab::SETTINGS};
 
-    const std::array<const char *, 6> labels{
+    const std::array<const char *, 7> labels{
         "SK",
         "QU",
         "IN",
+        "EQ",
         "PR",
         "MA",
         "SE"};
@@ -641,7 +741,7 @@ void Graphics::DrawSidePanelTabs()
          tabIndex < tabs.size();
          tabIndex++)
     {
-        float tabX =
+        const float tabX =
             panelX +
             static_cast<float>(tabIndex) *
                 (tabWidth + tabGap);
@@ -695,7 +795,7 @@ void Graphics::DrawSidePanelTabs()
 
         SDL_RenderDebugText(
             renderer,
-            tabX + 7.0f,
+            tabX + 4.0f,
             tabY + 11.0f,
             labels[tabIndex]);
     }
@@ -876,6 +976,222 @@ void Graphics::DrawInventory(
     }
 }
 
+void Graphics::DrawEquipment(
+    const Equipment &equipment)
+{
+    constexpr float panelWidth = 192.0f;
+    constexpr float panelHeight = 348.0f;
+
+    const float panelX =
+        static_cast<float>(WindowWidth) -
+        panelWidth -
+        20.0f;
+
+    const float panelY =
+        static_cast<float>(WindowHeight) -
+        panelHeight -
+        20.0f;
+
+    SDL_FRect panelRectangle{
+        panelX,
+        panelY,
+        panelWidth,
+        panelHeight};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        30,
+        30,
+        30,
+        240);
+
+    SDL_RenderFillRect(
+        renderer,
+        &panelRectangle);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        180,
+        180,
+        180,
+        255);
+
+    SDL_RenderRect(
+        renderer,
+        &panelRectangle);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        255,
+        255,
+        255,
+        255);
+
+    SDL_RenderDebugText(
+        renderer,
+        panelX + 10.0f,
+        panelY + 10.0f,
+        "EQUIPMENT");
+
+    struct EquipmentSlotDisplay
+    {
+        EquipmentSlotType slotType;
+        const char *label;
+        float x;
+        float y;
+    };
+
+    const std::array<
+        EquipmentSlotDisplay,
+        5>
+        equipmentSlots{
+            EquipmentSlotDisplay{
+                EquipmentSlotType::HEAD,
+                "HEAD",
+                panelX + 76.0f,
+                panelY + 48.0f},
+
+            EquipmentSlotDisplay{
+                EquipmentSlotType::BODY,
+                "BODY",
+                panelX + 76.0f,
+                panelY + 112.0f},
+
+            EquipmentSlotDisplay{
+                EquipmentSlotType::LEGS,
+                "LEGS",
+                panelX + 76.0f,
+                panelY + 176.0f},
+
+            EquipmentSlotDisplay{
+                EquipmentSlotType::WEAPON,
+                "WEAPON",
+                panelX + 16.0f,
+                panelY + 112.0f},
+
+            EquipmentSlotDisplay{
+                EquipmentSlotType::SHIELD,
+                "SHIELD",
+                panelX + 136.0f,
+                panelY + 112.0f}};
+
+    constexpr float slotSize = 48.0f;
+
+    for (const EquipmentSlotDisplay &slot :
+         equipmentSlots)
+    {
+        SDL_FRect slotRectangle{
+            slot.x,
+            slot.y,
+            slotSize,
+            slotSize};
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            55,
+            55,
+            55,
+            255);
+
+        SDL_RenderFillRect(
+            renderer,
+            &slotRectangle);
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            130,
+            130,
+            130,
+            255);
+
+        SDL_RenderRect(
+            renderer,
+            &slotRectangle);
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            210,
+            210,
+            210,
+            255);
+
+        SDL_RenderDebugText(
+            renderer,
+            slot.x,
+            slot.y + 52.0f,
+            slot.label);
+
+        ItemType equippedItem =
+            equipment.GetEquippedItem(
+                slot.slotType);
+
+        if (equippedItem ==
+            ItemType::BRONZE_AXE)
+        {
+            SDL_FRect handleRectangle{
+                slot.x + 21.0f,
+                slot.y + 10.0f,
+                6.0f,
+                29.0f};
+
+            SDL_SetRenderDrawColor(
+                renderer,
+                130,
+                80,
+                35,
+                255);
+
+            SDL_RenderFillRect(
+                renderer,
+                &handleRectangle);
+
+            SDL_FRect axeHeadRectangle{
+                slot.x + 11.0f,
+                slot.y + 8.0f,
+                26.0f,
+                11.0f};
+
+            SDL_SetRenderDrawColor(
+                renderer,
+                170,
+                110,
+                60,
+                255);
+
+            SDL_RenderFillRect(
+                renderer,
+                &axeHeadRectangle);
+        }
+    }
+}
+
+bool Graphics::ConsumeInventorySlotClick(
+    int &slotIndex)
+{
+    if (!inventorySlotClickPending)
+    {
+        return false;
+    }
+
+    slotIndex = clickedInventorySlotIndex;
+
+    inventorySlotClickPending = false;
+    clickedInventorySlotIndex = -1;
+
+    return true;
+}
+
+bool Graphics::ConsumeWeaponSlotClick()
+{
+    if (!weaponSlotClickPending)
+    {
+        return false;
+    }
+
+    weaponSlotClickPending = false;
+    return true;
+}
+
 void Graphics::Render(
     Map &map,
     const std::vector<std::unique_ptr<Entity>> &entities,
@@ -883,6 +1199,7 @@ void Graphics::Render(
     int playerX,
     int playerY,
     const Inventory &inventory,
+    const Equipment &equipment,
     int woodcuttingLevel,
     int woodcuttingXP,
     int currentLevelXP,
@@ -910,6 +1227,10 @@ void Graphics::Render(
     {
     case SidePanelTab::INVENTORY:
         DrawInventory(inventory);
+        break;
+
+    case SidePanelTab::EQUIPMENT:
+        DrawEquipment(equipment);
         break;
 
     case SidePanelTab::SKILLS:

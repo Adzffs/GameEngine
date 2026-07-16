@@ -52,7 +52,6 @@ bool Inventory::AddItem(
         }
     }
 
-    // Prevent partially adding an item request.
     if (emptySlotCount < amount)
     {
         return false;
@@ -72,6 +71,56 @@ bool Inventory::AddItem(
             1);
 
         remainingAmount--;
+
+        if (remainingAmount == 0)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool Inventory::RemoveItem(
+    ItemType itemType,
+    int amount)
+{
+    if (itemType == ItemType::NONE ||
+        amount <= 0)
+    {
+        return false;
+    }
+
+    if (GetItemAmount(itemType) < amount)
+    {
+        return false;
+    }
+
+    int remainingAmount = amount;
+
+    for (InventorySlot &slot : slots)
+    {
+        if (slot.IsEmpty() ||
+            slot.GetItemType() != itemType)
+        {
+            continue;
+        }
+
+        int amountToRemove =
+            slot.GetAmount();
+
+        if (amountToRemove >
+            remainingAmount)
+        {
+            amountToRemove =
+                remainingAmount;
+        }
+
+        slot.RemoveAmount(
+            amountToRemove);
+
+        remainingAmount -=
+            amountToRemove;
 
         if (remainingAmount == 0)
         {

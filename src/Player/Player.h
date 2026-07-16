@@ -3,6 +3,7 @@
 #include "../Entity/Entity.h"
 #include "../Inventory/Inventory.h"
 #include "../Skills/SkillSet.h"
+#include "../Equipment/Equipment.h"
 
 class World;
 
@@ -19,8 +20,13 @@ public:
     SkillSet &GetSkills();
     const SkillSet &GetSkills() const;
 
+    Equipment &GetEquipment();
+    const Equipment &GetEquipment() const;
+
 private:
     Inventory inventory;
 
     SkillSet skills;
+
+    Equipment equipment;
 };

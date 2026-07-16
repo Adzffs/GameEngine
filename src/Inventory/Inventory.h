@@ -13,6 +13,10 @@ public:
         ItemType itemType,
         int amount);
 
+    bool RemoveItem(
+        ItemType itemType,
+        int amount);
+
     int GetItemAmount(
         ItemType itemType) const;
 

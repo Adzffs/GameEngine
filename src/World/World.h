@@ -37,6 +37,13 @@ public:
     void ClearPendingResourceInteraction(
         int entityID);
 
+    bool TryEquipInventoryItem(
+        int entityID,
+        int slotIndex);
+
+    bool TryUnequipWeapon(
+        int entityID);
+
 private:
     EntityManager entityManager;
 

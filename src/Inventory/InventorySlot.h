@@ -17,6 +17,8 @@ public:
         int amount);
 
     void AddAmount(int amount);
+    void RemoveAmount(int amount);
+    void Clear();
 
 private:
     ItemType itemType;

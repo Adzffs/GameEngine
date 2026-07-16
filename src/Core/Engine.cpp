@@ -30,6 +30,22 @@ void Engine::Run()
         {
             break;
         }
+        int clickedInventorySlot = -1;
+
+        if (graphics.ConsumeInventorySlotClick(
+                clickedInventorySlot))
+        {
+            world.TryEquipInventoryItem(
+                playerID,
+                clickedInventorySlot);
+        }
+
+        if (graphics.ConsumeWeaponSlotClick())
+        {
+            world.TryUnequipWeapon(
+                playerID);
+        }
+
         int clickedTileX;
         int clickedTileY;
 
@@ -90,6 +106,7 @@ void Engine::Run()
                 player->GetPosition().GetX(),
                 player->GetPosition().GetY(),
                 player->GetInventory(),
+                player->GetEquipment(),
                 woodcutting.GetLevel(),
                 woodcutting.GetXP(),
                 woodcutting.GetXPForCurrentLevel(),

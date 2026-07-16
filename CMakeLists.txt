@@ -29,13 +29,14 @@ add_executable(GameEngine
     src/Player/Player.cpp
     src/NPC/NPC.cpp
     src/Graphics/Graphics.cpp
-    src/Player/Player.cpp
     src/Inventory/Inventory.cpp
     src/Inventory/InventorySlot.cpp
     src/Skills/Skill.cpp
     src/Skills/SkillSet.cpp
+    src/Equipment/Equipment.cpp
     src/Item/ItemDefinition.cpp
     src/Item/ItemDatabase.cpp
+
 )
 target_include_directories(GameEngine PRIVATE src)
 target_link_libraries(GameEngine PRIVATE SDL3::SDL3)

@@ -8,6 +8,7 @@
 #include "../Player/Player.h"
 #include "../Inventory/ItemType.h"
 #include "../Skills/SkillType.h"
+#include "../Equipment/EquipmentSlotType.h"
 
 World::World()
     : map(100, 100)
@@ -275,11 +276,11 @@ void World::ProcessResourceInteractions()
             continue;
         }
 
-        if (!player->GetInventory().HasItem(
+        if (!player->GetEquipment().IsEquipped(
                 ItemType::BRONZE_AXE))
         {
             Logger::Game(
-                "You need a bronze axe to chop this tree");
+                "You need to equip an axe to chop this tree");
 
             interactionIterator =
                 pendingResourceInteractions.erase(
@@ -409,4 +410,135 @@ void World::ProcessMovementRequests()
             request.GetX(),
             request.GetY());
     }
+}
+bool World::TryEquipInventoryItem(
+    int entityID,
+    int slotIndex)
+{
+    Entity *entity =
+        entityManager.GetEntityByID(
+            entityID);
+
+    Player *player =
+        dynamic_cast<Player *>(entity);
+
+    if (player == nullptr)
+    {
+        return false;
+    }
+
+    if (slotIndex < 0 ||
+        slotIndex >= Inventory::SlotCount)
+    {
+        return false;
+    }
+
+    const InventorySlot &slot =
+        player->GetInventory()
+            .GetSlots()[slotIndex];
+
+    if (slot.IsEmpty())
+    {
+        return false;
+    }
+
+    ItemType itemType =
+        slot.GetItemType();
+
+    if (itemType !=
+        ItemType::BRONZE_AXE)
+    {
+        return false;
+    }
+
+    Equipment &equipment =
+        player->GetEquipment();
+
+    if (!equipment.IsSlotEmpty(
+            EquipmentSlotType::WEAPON))
+    {
+        Logger::Game(
+            "Your weapon slot is occupied");
+
+        return false;
+    }
+
+    bool removed =
+        player->GetInventory().RemoveItem(
+            itemType,
+            1);
+
+    if (!removed)
+    {
+        return false;
+    }
+
+    bool equipped =
+        equipment.Equip(
+            EquipmentSlotType::WEAPON,
+            itemType);
+
+    if (!equipped)
+    {
+        player->GetInventory().AddItem(
+            itemType,
+            1);
+
+        return false;
+    }
+
+    Logger::Game(
+        "Bronze axe equipped");
+
+    return true;
+}
+
+bool World::TryUnequipWeapon(
+    int entityID)
+{
+    Entity *entity =
+        entityManager.GetEntityByID(
+            entityID);
+
+    Player *player =
+        dynamic_cast<Player *>(entity);
+
+    if (player == nullptr)
+    {
+        return false;
+    }
+
+    Equipment &equipment =
+        player->GetEquipment();
+
+    ItemType equippedItem =
+        equipment.GetEquippedItem(
+            EquipmentSlotType::WEAPON);
+
+    if (equippedItem ==
+        ItemType::NONE)
+    {
+        return false;
+    }
+
+    bool added =
+        player->GetInventory().AddItem(
+            equippedItem,
+            1);
+
+    if (!added)
+    {
+        Logger::Game(
+            "Your inventory is full");
+
+        return false;
+    }
+
+    equipment.Unequip(
+        EquipmentSlotType::WEAPON);
+
+    Logger::Game(
+        "Weapon unequipped");
+
+    return true;
 }

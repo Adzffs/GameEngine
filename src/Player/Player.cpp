@@ -32,3 +32,12 @@ const SkillSet &Player::GetSkills() const
 {
     return skills;
 }
+Equipment &Player::GetEquipment()
+{
+    return equipment;
+}
+
+const Equipment &Player::GetEquipment() const
+{
+    return equipment;
+}

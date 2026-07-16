@@ -29,7 +29,35 @@ void InventorySlot::SetItem(
     amount = newAmount;
 }
 
-void InventorySlot::AddAmount(int addedAmount)
+void InventorySlot::AddAmount(
+    int addedAmount)
 {
+    if (addedAmount <= 0)
+    {
+        return;
+    }
+
     amount += addedAmount;
+}
+
+void InventorySlot::RemoveAmount(
+    int removedAmount)
+{
+    if (removedAmount <= 0)
+    {
+        return;
+    }
+
+    amount -= removedAmount;
+
+    if (amount <= 0)
+    {
+        Clear();
+    }
+}
+
+void InventorySlot::Clear()
+{
+    itemType = ItemType::NONE;
+    amount = 0;
 }

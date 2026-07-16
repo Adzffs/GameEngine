@@ -8,6 +8,7 @@
 #include "../World/Object/Resource/ResourceNode.h"
 
 #include "../Inventory/Inventory.h"
+#include "../Equipment/Equipment.h"
 
 class Map;
 
@@ -20,6 +21,10 @@ public:
     bool Initialize();
     void ProcessEvents(bool &running);
     bool ConsumeClickedTile(int &tileX, int &tileY);
+    bool ConsumeInventorySlotClick(
+        int &slotIndex);
+
+    bool ConsumeWeaponSlotClick();
 
     void Render(
         Map &map,
@@ -28,17 +33,18 @@ public:
         int playerX,
         int playerY,
         const Inventory &inventory,
+        const Equipment &equipment,
         int woodcuttingLevel,
         int woodcuttingXP,
         int currentLevelXP,
         int nextLevelXP);
 
-private:
     enum class SidePanelTab
     {
         SKILLS,
         QUESTS,
         INVENTORY,
+        EQUIPMENT,
         PRAYER,
         MAGIC,
         SETTINGS
@@ -67,7 +73,8 @@ private:
         int woodcuttingXP,
         int currentLevelXP,
         int nextLevelXP);
-
+    void DrawEquipment(
+        const Equipment &equipment);
     SDL_Window *window;
     SDL_Renderer *renderer;
 
@@ -81,4 +88,10 @@ private:
     static constexpr int WindowHeight = 720;
     static constexpr int TileSize = 32;
     SidePanelTab selectedTab;
+
+private:
+    bool inventorySlotClickPending;
+    int clickedInventorySlotIndex;
+
+    bool weaponSlotClickPending;
 };
