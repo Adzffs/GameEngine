@@ -1,5 +1,4 @@
 #include "ObjectManager.h"
-#include <iostream>
 
 ObjectManager::ObjectManager()
 {
@@ -47,23 +46,9 @@ ResourceNode *ObjectManager::GetResourceByID(int id)
 }
 void ObjectManager::Update()
 {
-    std::cout
-        << "Updating "
-        << resources.size()
-        << " World Objects..."
-        << std::endl;
 
     for (auto &resource : resources)
     {
         resource.Update();
-        std::cout
-            << "Resource ID: "
-            << resource.GetID()
-            << " Position: ("
-            << resource.GetX()
-            << ", "
-            << resource.GetY()
-            << ")"
-            << std::endl;
     }
 }

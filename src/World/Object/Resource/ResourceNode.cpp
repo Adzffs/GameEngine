@@ -1,7 +1,5 @@
 #include "ResourceNode.h"
 
-#include <iostream>
-
 ResourceNode::ResourceNode(
     int id,
     int x,
@@ -24,25 +22,11 @@ void ResourceNode::Update()
     if (remainingRespawnTicks > 0)
     {
         remainingRespawnTicks--;
-
-        std::cout
-            << "Resource "
-            << GetID()
-            << " respawning in "
-            << remainingRespawnTicks
-            << " ticks."
-            << std::endl;
     }
 
     if (remainingRespawnTicks == 0)
     {
         active = true;
-
-        std::cout
-            << "Resource "
-            << GetID()
-            << " has respawned."
-            << std::endl;
     }
 }
 
@@ -55,12 +39,6 @@ void ResourceNode::Deplete()
 
     active = false;
     remainingRespawnTicks = respawnTicks;
-
-    std::cout
-        << "Resource "
-        << GetID()
-        << " has been depleted."
-        << std::endl;
 }
 
 bool ResourceNode::IsActive() const

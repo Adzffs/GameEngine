@@ -109,12 +109,6 @@ void World::ProcessMovementDestinationRequests()
 
         if (entity == nullptr)
         {
-            std::cout
-                << "Cannot calculate path: Entity "
-                << request.GetEntityID()
-                << " was not found."
-                << std::endl;
-
             continue;
         }
 
@@ -134,24 +128,6 @@ void World::ProcessMovementDestinationRequests()
 
         if (path.empty())
         {
-            if (startX == request.GetDestinationX() &&
-                startY == request.GetDestinationY())
-            {
-                std::cout
-                    << "Entity is already at destination."
-                    << std::endl;
-            }
-            else
-            {
-                std::cout
-                    << "No path found to destination: ("
-                    << request.GetDestinationX()
-                    << ", "
-                    << request.GetDestinationY()
-                    << ")"
-                    << std::endl;
-            }
-
             continue;
         }
         const PathStep &finalStep = path.back();
@@ -159,22 +135,7 @@ void World::ProcessMovementDestinationRequests()
         if (finalStep.x != request.GetDestinationX() ||
             finalStep.y != request.GetDestinationY())
         {
-            std::cout
-                << "Destination was blocked or unreachable."
-                << " Using nearest reachable tile: ("
-                << finalStep.x
-                << ", "
-                << finalStep.y
-                << ")"
-                << std::endl;
         }
-
-        std::cout
-            << "Path found for Entity ID: "
-            << request.GetEntityID()
-            << " Steps: "
-            << path.size()
-            << std::endl;
 
         std::queue<PathStep> storedPath;
 
@@ -185,11 +146,6 @@ void World::ProcessMovementDestinationRequests()
 
         activeMovementPaths[request.GetEntityID()] =
             storedPath;
-
-        std::cout
-            << "Path stored for Entity ID: "
-            << request.GetEntityID()
-            << std::endl;
     }
 }
 void World::ProcessActiveMovementPaths()
@@ -235,23 +191,8 @@ void World::ProcessActiveMovementPaths()
 
         path.pop();
 
-        std::cout
-            << "Entity "
-            << entityID
-            << " moved to: ("
-            << entity->GetPosition().GetX()
-            << ", "
-            << entity->GetPosition().GetY()
-            << ")"
-            << std::endl;
-
         if (path.empty())
         {
-            std::cout
-                << "Entity "
-                << entityID
-                << " reached its destination."
-                << std::endl;
 
             pathIterator =
                 activeMovementPaths.erase(
@@ -386,11 +327,8 @@ void World::ProcessCompletedActions(
 
         if (!itemAdded)
         {
-            std::cout
-                << "Player "
-                << player->GetID()
-                << " inventory is full."
-                << std::endl;
+            Logger::Game(
+                "Player inventory is full");
 
             continue;
         }
@@ -408,28 +346,25 @@ void World::ProcessCompletedActions(
             player->GetSkills()
                 .GetSkill(SkillType::WOODCUTTING);
 
-        std::cout
-            << "Player "
-            << player->GetID()
-            << " received 1 log. Total logs: "
-            << player->GetInventory().GetItemAmount(
-                   ItemType::LOG)
-            << std::endl;
-
-        std::cout
-            << "Woodcutting XP: "
-            << woodcutting.GetXP()
-            << " Level: "
-            << woodcutting.GetLevel()
-            << std::endl;
+        Logger::Game(
+            "Player " +
+            std::to_string(player->GetID()) +
+            " chopped 1 log | Logs: " +
+            std::to_string(
+                player->GetInventory().GetItemAmount(
+                    ItemType::LOG)) +
+            " | Woodcutting: " +
+            std::to_string(woodcutting.GetXP()) +
+            " XP (Level " +
+            std::to_string(woodcutting.GetLevel()) +
+            ")");
 
         if (woodcutting.GetLevel() > previousLevel)
         {
-            std::cout
-                << "Woodcutting level increased to "
-                << woodcutting.GetLevel()
-                << "!"
-                << std::endl;
+            Logger::Game(
+                "Woodcutting level increased to " +
+                std::to_string(
+                    woodcutting.GetLevel()));
         }
 
         resource->Deplete();

@@ -1,7 +1,5 @@
 #include "Action.h"
 
-#include <iostream>
-
 Action::Action(
     std::string name,
     int duration,
@@ -23,19 +21,6 @@ void Action::Update()
     }
 
     currentTick++;
-
-    std::cout
-        << "Entity "
-        << entityID
-        << " Action: "
-        << name
-        << " Target: "
-        << targetID
-        << " Tick "
-        << currentTick
-        << "/"
-        << duration
-        << std::endl;
 }
 
 bool Action::IsComplete() const

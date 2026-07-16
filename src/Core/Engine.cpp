@@ -1,6 +1,5 @@
 #include "Engine.h"
 #include <chrono>
-#include <iostream>
 #include <thread>
 #include "Core/Logger.h"
 #include "../Movement/MovementDestinationRequest.h"
@@ -49,27 +48,11 @@ void Engine::Run()
                 world.QueueResourceInteraction(
                     playerID,
                     resource->GetID());
-
-                std::cout
-                    << "Resource interaction queued for Entity "
-                    << playerID
-                    << " and Resource "
-                    << resource->GetID()
-                    << std::endl;
             }
             else
             {
                 world.ClearPendingResourceInteraction(
                     playerID);
-
-                if (resource != nullptr)
-                {
-                    std::cout
-                        << "Resource "
-                        << resource->GetID()
-                        << " is depleted."
-                        << std::endl;
-                }
             }
 
             MovementDestinationRequest request(
@@ -113,6 +96,7 @@ void Engine::Run()
                 woodcutting.GetXPForNextLevel());
         }
     }
+    Logger::Info("Server stopped");
 }
 
 void Engine::Update()
