@@ -1,23 +1,47 @@
 #include "ActionManager.h"
 
-void ActionManager::AddAction(Action action)
+void ActionManager::AddAction(
+    const Action &action)
 {
     actions.push_back(action);
 }
 
-void ActionManager::Update()
+bool ActionManager::HasActionForEntity(
+    int entityID) const
 {
-    for (auto it = actions.begin(); it != actions.end();)
+    for (const Action &action : actions)
     {
-        it->Update();
-
-        if (it->IsComplete())
+        if (action.GetEntityID() == entityID)
         {
-            it = actions.erase(it);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+std::vector<Action> ActionManager::Update()
+{
+    std::vector<Action> completedActions;
+
+    for (auto actionIterator = actions.begin();
+         actionIterator != actions.end();)
+    {
+        actionIterator->Update();
+
+        if (actionIterator->IsComplete())
+        {
+            completedActions.push_back(
+                *actionIterator);
+
+            actionIterator =
+                actions.erase(actionIterator);
         }
         else
         {
-            ++it;
+            ++actionIterator;
         }
     }
+
+    return completedActions;
 }

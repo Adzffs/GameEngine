@@ -41,7 +41,8 @@ void Engine::Run()
                     clickedTileX,
                     clickedTileY);
 
-            if (resource != nullptr)
+            if (resource != nullptr &&
+                resource->IsActive())
             {
                 world.QueueResourceInteraction(
                     playerID,
@@ -58,6 +59,15 @@ void Engine::Run()
             {
                 world.ClearPendingResourceInteraction(
                     playerID);
+
+                if (resource != nullptr)
+                {
+                    std::cout
+                        << "Resource "
+                        << resource->GetID()
+                        << " is depleted."
+                        << std::endl;
+                }
             }
 
             MovementDestinationRequest request(

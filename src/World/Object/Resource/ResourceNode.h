@@ -5,11 +5,22 @@
 class ResourceNode : public WorldObject
 {
 public:
-    ResourceNode(int id, int x, int y);
+    ResourceNode(
+        int id,
+        int x,
+        int y,
+        int respawnTicks = 10);
 
-    void Gather();
-    void Interact();
+    void Update();
+
+    void Deplete();
+
+    bool IsActive() const;
+    int GetRemainingRespawnTicks() const;
 
 private:
-    int amount;
+    bool active;
+
+    int respawnTicks;
+    int remainingRespawnTicks;
 };

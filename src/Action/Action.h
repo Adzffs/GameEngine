@@ -5,16 +5,25 @@
 class Action
 {
 public:
-    Action(std::string name, int duration);
+    Action(
+        std::string name,
+        int duration,
+        int entityID,
+        int targetID);
 
     void Update();
 
-    bool IsComplete();
+    bool IsComplete() const;
+
+    int GetEntityID() const;
+    int GetTargetID() const;
 
 private:
     std::string name;
 
     int duration;
-
     int currentTick;
+
+    int entityID;
+    int targetID;
 };

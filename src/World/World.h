@@ -54,7 +54,8 @@ private:
     void ProcessMovementDestinationRequests();
     void ProcessActiveMovementPaths();
     void ProcessResourceInteractions();
-
+    void ProcessCompletedActions(
+        const std::vector<Action> &completedActions);
     std::queue<MovementRequest> movementRequests;
 
     std::queue<MovementDestinationRequest>

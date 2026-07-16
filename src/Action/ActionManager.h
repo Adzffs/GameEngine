@@ -1,14 +1,17 @@
 #pragma once
 
 #include "Action.h"
+
 #include <vector>
 
 class ActionManager
 {
 public:
-    void AddAction(Action action);
+    void AddAction(const Action &action);
 
-    void Update();
+    bool HasActionForEntity(int entityID) const;
+
+    std::vector<Action> Update();
 
 private:
     std::vector<Action> actions;

@@ -62,13 +62,20 @@ void World::ClearPendingResourceInteraction(
 void World::Update()
 {
     Logger::Debug("Updating World");
-    actionManager.Update();
+
     ProcessMovementDestinationRequests();
     ProcessActiveMovementPaths();
     ProcessResourceInteractions();
+
+    objectManager.Update();
+
+    std::vector<Action> completedActions =
+        actionManager.Update();
+
+    ProcessCompletedActions(completedActions);
+
     entityManager.Update(*this);
     ProcessMovementRequests();
-    objectManager.Update();
 }
 
 Map &World::GetMap()
@@ -282,6 +289,20 @@ void World::ProcessResourceInteractions()
 
             continue;
         }
+        if (!resource->IsActive())
+        {
+            std::cout
+                << "Resource "
+                << resourceID
+                << " is currently depleted."
+                << std::endl;
+
+            interactionIterator =
+                pendingResourceInteractions.erase(
+                    interactionIterator);
+
+            continue;
+        }
 
         int distanceX = std::abs(
             entity->GetPosition().GetX() -
@@ -301,17 +322,49 @@ void World::ProcessResourceInteractions()
             continue;
         }
 
-        std::cout
-            << "Entity "
-            << entityID
-            << " reached Resource "
-            << resourceID
-            << ". Chopping can begin."
-            << std::endl;
+        if (!actionManager.HasActionForEntity(entityID))
+        {
+            actionManager.AddAction(
+                Action(
+                    "Chopping Tree",
+                    5,
+                    entityID,
+                    resourceID));
+
+            std::cout
+                << "Entity "
+                << entityID
+                << " started chopping Resource "
+                << resourceID
+                << "."
+                << std::endl;
+        }
 
         interactionIterator =
             pendingResourceInteractions.erase(
                 interactionIterator);
+    }
+}
+void World::ProcessCompletedActions(
+    const std::vector<Action> &completedActions)
+{
+    for (const Action &action : completedActions)
+    {
+        ResourceNode *resource =
+            objectManager.GetResourceByID(
+                action.GetTargetID());
+
+        if (resource == nullptr)
+        {
+            continue;
+        }
+
+        if (!resource->IsActive())
+        {
+            continue;
+        }
+
+        resource->Deplete();
     }
 }
 void World::ProcessMovementRequests()

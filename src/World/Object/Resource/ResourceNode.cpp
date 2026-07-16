@@ -1,32 +1,74 @@
 #include "ResourceNode.h"
+
 #include <iostream>
 
-ResourceNode::ResourceNode(int id, int x, int y)
-    : WorldObject(id, x, y)
+ResourceNode::ResourceNode(
+    int id,
+    int x,
+    int y,
+    int respawnTicks)
+    : WorldObject(id, x, y),
+      active(true),
+      respawnTicks(respawnTicks),
+      remainingRespawnTicks(0)
 {
-    amount = 10;
 }
 
-void ResourceNode::Gather()
+void ResourceNode::Update()
 {
-    if (amount > 0)
+    if (active)
     {
-        amount--;
+        return;
+    }
+
+    if (remainingRespawnTicks > 0)
+    {
+        remainingRespawnTicks--;
 
         std::cout
-            << "Gathered resource. Remaining: "
-            << amount
+            << "Resource "
+            << GetID()
+            << " respawning in "
+            << remainingRespawnTicks
+            << " ticks."
             << std::endl;
     }
-    else
+
+    if (remainingRespawnTicks == 0)
     {
+        active = true;
+
         std::cout
-            << "Resource depleted"
+            << "Resource "
+            << GetID()
+            << " has respawned."
             << std::endl;
     }
 }
 
-void ResourceNode::Interact()
+void ResourceNode::Deplete()
 {
-    Gather();
+    if (!active)
+    {
+        return;
+    }
+
+    active = false;
+    remainingRespawnTicks = respawnTicks;
+
+    std::cout
+        << "Resource "
+        << GetID()
+        << " has been depleted."
+        << std::endl;
+}
+
+bool ResourceNode::IsActive() const
+{
+    return active;
+}
+
+int ResourceNode::GetRemainingRespawnTicks() const
+{
+    return remainingRespawnTicks;
 }

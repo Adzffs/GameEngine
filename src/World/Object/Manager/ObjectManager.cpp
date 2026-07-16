@@ -55,6 +55,7 @@ void ObjectManager::Update()
 
     for (auto &resource : resources)
     {
+        resource.Update();
         std::cout
             << "Resource ID: "
             << resource.GetID()

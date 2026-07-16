@@ -260,24 +260,48 @@ void Graphics::DrawResources(
 {
     for (const ResourceNode &resource : resources)
     {
-        SDL_FRect resourceRectangle{
-            static_cast<float>(
-                resource.GetX() * TileSize + 7),
-            static_cast<float>(
-                resource.GetY() * TileSize + 7),
-            static_cast<float>(TileSize - 14),
-            static_cast<float>(TileSize - 14)};
+        if (resource.IsActive())
+        {
+            SDL_FRect resourceRectangle{
+                static_cast<float>(
+                    resource.GetX() * TileSize + 7),
+                static_cast<float>(
+                    resource.GetY() * TileSize + 7),
+                static_cast<float>(TileSize - 14),
+                static_cast<float>(TileSize - 14)};
 
-        SDL_SetRenderDrawColor(
-            renderer,
-            140,
-            90,
-            40,
-            255);
+            SDL_SetRenderDrawColor(
+                renderer,
+                140,
+                90,
+                40,
+                255);
 
-        SDL_RenderFillRect(
-            renderer,
-            &resourceRectangle);
+            SDL_RenderFillRect(
+                renderer,
+                &resourceRectangle);
+        }
+        else
+        {
+            SDL_FRect stumpRectangle{
+                static_cast<float>(
+                    resource.GetX() * TileSize + 9),
+                static_cast<float>(
+                    resource.GetY() * TileSize + 18),
+                static_cast<float>(TileSize - 18),
+                static_cast<float>(TileSize - 21)};
+
+            SDL_SetRenderDrawColor(
+                renderer,
+                85,
+                55,
+                30,
+                255);
+
+            SDL_RenderFillRect(
+                renderer,
+                &stumpRectangle);
+        }
     }
 }
 void Graphics::Render(
