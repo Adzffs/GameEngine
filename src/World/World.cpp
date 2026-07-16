@@ -9,7 +9,16 @@ World::World()
     : map(100, 100)
 {
     entityManager.CreateNPC(3, 3);
-    objectManager.CreateResource(5, 5);
+    CreateResource(5, 5);
+}
+void World::CreateResource(int x, int y)
+{
+    objectManager.CreateResource(x, y);
+
+    map.SetTileType(
+        x,
+        y,
+        TileType::TREE);
 }
 int World::CreatePlayer()
 {
@@ -113,6 +122,20 @@ void World::ProcessMovementDestinationRequests()
             }
 
             continue;
+        }
+        const PathStep &finalStep = path.back();
+
+        if (finalStep.x != request.GetDestinationX() ||
+            finalStep.y != request.GetDestinationY())
+        {
+            std::cout
+                << "Destination was blocked or unreachable."
+                << " Using nearest reachable tile: ("
+                << finalStep.x
+                << ", "
+                << finalStep.y
+                << ")"
+                << std::endl;
         }
 
         std::cout

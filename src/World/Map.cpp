@@ -7,15 +7,14 @@ Map::Map(int width, int height)
 
     tiles.resize(static_cast<size_t>(width) * height);
 
-    if (width > 5 && height > 5)
-    {
-        GetTile(5, 5).SetType(TileType::TREE);
-    }
-
     if (width > 10 && height > 10)
     {
         GetTile(10, 10).SetType(TileType::WATER);
     }
+}
+void Map::SetTileType(int x, int y, TileType type)
+{
+    GetTile(x, y).SetType(type);
 }
 
 Tile &Map::GetTile(int x, int y)

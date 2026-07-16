@@ -2,6 +2,7 @@
 #include "../World/Map.h"
 
 #include <algorithm>
+#include <limits>
 #include <map>
 #include <queue>
 #include <set>
@@ -24,13 +25,6 @@ std::vector<PathStep> Pathfinder::FindPath(
         return path;
     }
 
-    if (!map.IsValidPosition(
-            destinationX,
-            destinationY))
-    {
-        return path;
-    }
-
     const Coordinate start{
         startX,
         startY};
@@ -41,10 +35,21 @@ std::vector<PathStep> Pathfinder::FindPath(
 
     std::queue<Coordinate> frontier;
     std::set<Coordinate> visited;
+
     std::map<Coordinate, Coordinate> cameFrom;
+    std::map<Coordinate, int> distanceFromStart;
 
     frontier.push(start);
     visited.insert(start);
+    distanceFromStart[start] = 0;
+
+    Coordinate bestDestination = start;
+
+    int bestDistanceSquared =
+        std::numeric_limits<int>::max();
+
+    int bestPathLength =
+        std::numeric_limits<int>::max();
 
     const int directions[8][2]{
         {0, -1},
@@ -56,16 +61,39 @@ std::vector<PathStep> Pathfinder::FindPath(
         {-1, 0},
         {-1, -1}};
 
-    bool pathFound = false;
+    bool exactPathFound = false;
 
     while (!frontier.empty())
     {
         Coordinate current = frontier.front();
         frontier.pop();
 
+        int differenceX =
+            current.first - destinationX;
+
+        int differenceY =
+            current.second - destinationY;
+
+        int distanceSquared =
+            differenceX * differenceX +
+            differenceY * differenceY;
+
+        int currentPathLength =
+            distanceFromStart[current];
+
+        if (distanceSquared < bestDistanceSquared ||
+            (distanceSquared == bestDistanceSquared &&
+             currentPathLength < bestPathLength))
+        {
+            bestDestination = current;
+            bestDistanceSquared = distanceSquared;
+            bestPathLength = currentPathLength;
+        }
+
         if (current == destination)
         {
-            pathFound = true;
+            exactPathFound = true;
+            bestDestination = destination;
             break;
         }
 
@@ -85,15 +113,20 @@ std::vector<PathStep> Pathfinder::FindPath(
                 continue;
             }
 
-            // Prevent diagonal movement through blocked corners.
             if (changeX != 0 && changeY != 0)
             {
-                if (!map.IsValidPosition(
+                bool horizontalTileIsValid =
+                    map.IsValidPosition(
                         current.first + changeX,
-                        current.second) ||
-                    !map.IsValidPosition(
+                        current.second);
+
+                bool verticalTileIsValid =
+                    map.IsValidPosition(
                         current.first,
-                        current.second + changeY))
+                        current.second + changeY);
+
+                if (!horizontalTileIsValid ||
+                    !verticalTileIsValid)
                 {
                     continue;
                 }
@@ -110,16 +143,31 @@ std::vector<PathStep> Pathfinder::FindPath(
 
             visited.insert(next);
             cameFrom[next] = current;
+
+            distanceFromStart[next] =
+                currentPathLength + 1;
+
             frontier.push(next);
         }
     }
 
-    if (!pathFound)
+    Coordinate routeDestination;
+
+    if (exactPathFound)
+    {
+        routeDestination = destination;
+    }
+    else
+    {
+        routeDestination = bestDestination;
+    }
+
+    if (routeDestination == start)
     {
         return path;
     }
 
-    Coordinate current = destination;
+    Coordinate current = routeDestination;
 
     while (current != start)
     {

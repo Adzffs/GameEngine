@@ -10,6 +10,8 @@ public:
 
     bool IsValidPosition(int x, int y);
 
+    void SetTileType(int x, int y, TileType type);
+
 private:
     int width;
 

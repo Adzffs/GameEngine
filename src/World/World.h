@@ -39,6 +39,8 @@ private:
 
     Map map;
 
+    void CreateResource(int x, int y);
+
     void ProcessMovementRequests();
     void ProcessMovementDestinationRequests();
     void ProcessActiveMovementPaths();
