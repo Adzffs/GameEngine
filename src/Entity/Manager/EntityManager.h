@@ -1,9 +1,10 @@
 #pragma once
-
+#include <memory>
 #include "../Entity.h"
 #include <vector>
 #include "../../World/Map.h"
 #include "../../Input/InputManager.h"
+#include "../../Player/Player.h"
 
 class EntityManager
 {
@@ -14,8 +15,10 @@ public:
 
     void CreateEntity(EntityType type);
 
+    void CreatePlayer();
+
 private:
-    std::vector<Entity> entities;
+    std::vector<std::unique_ptr<Entity>> entities;
 
     int nextID = 1;
 

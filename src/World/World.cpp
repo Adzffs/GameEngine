@@ -13,6 +13,7 @@ World::World()
     entityManager.CreateEntity(EntityType::RESOURCE);
     actionManager.AddAction(
         Action("Chopping Tree", 5));
+    entityManager.CreatePlayer();
 }
 
 void World::Update()

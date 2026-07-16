@@ -24,5 +24,6 @@ add_executable(GameEngine
 	src/Movement/Movement.cpp
     src/Movement/MovementRequest.cpp
     src/Input/InputManager.cpp
+    src/Player/Player.cpp
 )
 target_include_directories(GameEngine PRIVATE src)

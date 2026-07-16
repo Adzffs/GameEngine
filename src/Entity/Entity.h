@@ -8,13 +8,15 @@ class Entity
 public:
     Entity(int id, EntityType type);
 
+    virtual ~Entity() = default;
+
     int GetID();
 
     EntityType GetType();
 
     Position &GetPosition();
 
-    void Update();
+    virtual void Update();
 
     void StartAction();
 
