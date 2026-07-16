@@ -25,10 +25,17 @@ public:
 
     const std::vector<ResourceNode> &
     GetResources() const;
+    ResourceNode *GetResourceAt(int x, int y);
     void QueueMovementRequest(
         const MovementRequest &request);
     void QueueMovementDestination(
         const MovementDestinationRequest &request);
+    void QueueResourceInteraction(
+        int entityID,
+        int resourceID);
+
+    void ClearPendingResourceInteraction(
+        int entityID);
 
 private:
     EntityManager entityManager;
@@ -39,13 +46,14 @@ private:
 
     Map map;
 
+    Pathfinder pathfinder;
+
     void CreateResource(int x, int y);
 
     void ProcessMovementRequests();
     void ProcessMovementDestinationRequests();
     void ProcessActiveMovementPaths();
-
-    Pathfinder pathfinder;
+    void ProcessResourceInteractions();
 
     std::queue<MovementRequest> movementRequests;
 
@@ -54,4 +62,6 @@ private:
 
     std::map<int, std::queue<PathStep>>
         activeMovementPaths;
+
+    std::map<int, int> pendingResourceInteractions;
 };

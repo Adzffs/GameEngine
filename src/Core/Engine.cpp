@@ -36,22 +36,36 @@ void Engine::Run()
                 clickedTileX,
                 clickedTileY))
         {
+            ResourceNode *resource =
+                world.GetResourceAt(
+                    clickedTileX,
+                    clickedTileY);
+
+            if (resource != nullptr)
+            {
+                world.QueueResourceInteraction(
+                    playerID,
+                    resource->GetID());
+
+                std::cout
+                    << "Resource interaction queued for Entity "
+                    << playerID
+                    << " and Resource "
+                    << resource->GetID()
+                    << std::endl;
+            }
+            else
+            {
+                world.ClearPendingResourceInteraction(
+                    playerID);
+            }
+
             MovementDestinationRequest request(
                 playerID,
                 clickedTileX,
                 clickedTileY);
 
             world.QueueMovementDestination(request);
-
-            std::cout
-                << "Destination queued for Entity ID: "
-                << playerID
-                << " Destination: ("
-                << clickedTileX
-                << ", "
-                << clickedTileY
-                << ")"
-                << std::endl;
         }
 
         if (clock.ShouldTick())

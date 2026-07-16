@@ -4,6 +4,7 @@
 #include "../Core/Logger.h"
 #include "../Action/Action.h"
 #include "../Movement/Movement.h"
+#include <cstdlib>
 
 World::World()
     : map(100, 100)
@@ -39,12 +40,32 @@ World::GetResources() const
 {
     return objectManager.GetResources();
 }
+ResourceNode *World::GetResourceAt(
+    int x,
+    int y)
+{
+    return objectManager.GetResourceAt(x, y);
+}
+void World::QueueResourceInteraction(
+    int entityID,
+    int resourceID)
+{
+    pendingResourceInteractions[entityID] =
+        resourceID;
+}
+
+void World::ClearPendingResourceInteraction(
+    int entityID)
+{
+    pendingResourceInteractions.erase(entityID);
+}
 void World::Update()
 {
     Logger::Debug("Updating World");
     actionManager.Update();
     ProcessMovementDestinationRequests();
     ProcessActiveMovementPaths();
+    ProcessResourceInteractions();
     entityManager.Update(*this);
     ProcessMovementRequests();
     objectManager.Update();
@@ -230,6 +251,67 @@ void World::ProcessActiveMovementPaths()
         {
             ++pathIterator;
         }
+    }
+}
+void World::ProcessResourceInteractions()
+{
+    auto interactionIterator =
+        pendingResourceInteractions.begin();
+
+    while (interactionIterator !=
+           pendingResourceInteractions.end())
+    {
+        int entityID =
+            interactionIterator->first;
+
+        int resourceID =
+            interactionIterator->second;
+
+        Entity *entity =
+            entityManager.GetEntityByID(entityID);
+
+        ResourceNode *resource =
+            objectManager.GetResourceByID(resourceID);
+
+        if (entity == nullptr ||
+            resource == nullptr)
+        {
+            interactionIterator =
+                pendingResourceInteractions.erase(
+                    interactionIterator);
+
+            continue;
+        }
+
+        int distanceX = std::abs(
+            entity->GetPosition().GetX() -
+            resource->GetX());
+
+        int distanceY = std::abs(
+            entity->GetPosition().GetY() -
+            resource->GetY());
+
+        bool isAdjacent =
+            distanceX <= 1 &&
+            distanceY <= 1;
+
+        if (!isAdjacent)
+        {
+            ++interactionIterator;
+            continue;
+        }
+
+        std::cout
+            << "Entity "
+            << entityID
+            << " reached Resource "
+            << resourceID
+            << ". Chopping can begin."
+            << std::endl;
+
+        interactionIterator =
+            pendingResourceInteractions.erase(
+                interactionIterator);
     }
 }
 void World::ProcessMovementRequests()
