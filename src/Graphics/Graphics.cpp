@@ -1,6 +1,7 @@
 #include "Graphics.h"
 #include <iostream>
 #include "../World/Map.h"
+#include <string>
 
 Graphics::Graphics()
     : window(nullptr),
@@ -304,12 +305,65 @@ void Graphics::DrawResources(
         }
     }
 }
+void Graphics::DrawInventory(int logCount)
+{
+    SDL_FRect panelRectangle{
+        1040.0f,
+        20.0f,
+        220.0f,
+        140.0f};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        30,
+        30,
+        30,
+        240);
+
+    SDL_RenderFillRect(
+        renderer,
+        &panelRectangle);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        180,
+        180,
+        180,
+        255);
+
+    SDL_RenderRect(
+        renderer,
+        &panelRectangle);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        255,
+        255,
+        255,
+        255);
+
+    SDL_RenderDebugText(
+        renderer,
+        1060.0f,
+        40.0f,
+        "INVENTORY");
+
+    std::string logText =
+        "Logs: " + std::to_string(logCount);
+
+    SDL_RenderDebugText(
+        renderer,
+        1060.0f,
+        70.0f,
+        logText.c_str());
+}
 void Graphics::Render(
     Map &map,
     const std::vector<std::unique_ptr<Entity>> &entities,
     const std::vector<ResourceNode> &resources,
     int playerX,
-    int playerY)
+    int playerY,
+    int logCount)
 {
     SDL_SetRenderDrawColor(
         renderer,
@@ -326,6 +380,7 @@ void Graphics::Render(
     DrawResources(resources);
     DrawNPCs(entities);
     DrawPlayer(playerX, playerY);
+    DrawInventory(logCount);
 
     SDL_RenderPresent(renderer);
 }

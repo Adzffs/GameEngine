@@ -14,6 +14,8 @@ public:
 
     Inventory &GetInventory();
 
+    const Inventory &GetInventory() const;
+
 private:
     Inventory inventory;
 };

@@ -24,7 +24,8 @@ public:
         const std::vector<std::unique_ptr<Entity>> &entities,
         const std::vector<ResourceNode> &resources,
         int playerX,
-        int playerY);
+        int playerY,
+        int logCount);
 
 private:
     void DrawMap(Map &map);
@@ -35,7 +36,7 @@ private:
         const std::vector<std::unique_ptr<Entity>> &entities);
     void DrawResources(
         const std::vector<ResourceNode> &resources);
-
+    void DrawInventory(int logCount);
     SDL_Window *window;
     SDL_Renderer *renderer;
 

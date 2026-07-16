@@ -4,6 +4,8 @@
 #include <thread>
 #include "Core/Logger.h"
 #include "../Movement/MovementDestinationRequest.h"
+#include "../Player/Player.h"
+#include "../Inventory/ItemType.h"
 
 Engine::Engine()
     : playerID(-1)
@@ -88,17 +90,23 @@ void Engine::Run()
                 std::chrono::milliseconds(1));
         }
 
-        Entity *player =
-            world.GetEntityByID(playerID);
+        Player *player =
+            dynamic_cast<Player *>(
+                world.GetEntityByID(playerID));
 
         if (player != nullptr)
         {
+            int logCount =
+                player->GetInventory().GetItemAmount(
+                    ItemType::LOG);
+
             graphics.Render(
                 world.GetMap(),
                 world.GetEntities(),
                 world.GetResources(),
                 player->GetPosition().GetX(),
-                player->GetPosition().GetY());
+                player->GetPosition().GetY(),
+                logCount);
         }
     }
 }

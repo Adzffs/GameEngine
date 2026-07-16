@@ -16,3 +16,7 @@ Inventory &Player::GetInventory()
 {
     return inventory;
 }
+const Inventory &Player::GetInventory() const
+{
+    return inventory;
+}
