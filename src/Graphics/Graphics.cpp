@@ -854,22 +854,25 @@ void Graphics::DrawInventory(
                 &logRectangle);
         }
 
-        std::string amountText =
-            std::to_string(
-                slot.GetAmount());
+        if (slot.GetAmount() > 1)
+        {
+            std::string amountText =
+                std::to_string(
+                    slot.GetAmount());
 
-        SDL_SetRenderDrawColor(
-            renderer,
-            255,
-            255,
-            255,
-            255);
+            SDL_SetRenderDrawColor(
+                renderer,
+                255,
+                255,
+                255,
+                255);
 
-        SDL_RenderDebugText(
-            renderer,
-            slotX + 4.0f,
-            slotY + 27.0f,
-            amountText.c_str());
+            SDL_RenderDebugText(
+                renderer,
+                slotX + 4.0f,
+                slotY + 27.0f,
+                amountText.c_str());
+        }
     }
 }
 

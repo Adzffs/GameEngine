@@ -1,5 +1,7 @@
 #include "Inventory.h"
 
+#include "../Item/ItemDatabase.h"
+
 bool Inventory::AddItem(
     ItemType itemType,
     int amount)
@@ -10,26 +12,69 @@ bool Inventory::AddItem(
         return false;
     }
 
-    // Stack the item if it already exists.
-    for (InventorySlot &slot : slots)
+    const ItemDefinition &definition =
+        ItemDatabase::Get(itemType);
+
+    if (definition.IsStackable())
     {
-        if (!slot.IsEmpty() &&
-            slot.GetItemType() == itemType)
+        for (InventorySlot &slot : slots)
         {
-            slot.AddAmount(amount);
-            return true;
+            if (!slot.IsEmpty() &&
+                slot.GetItemType() == itemType)
+            {
+                slot.AddAmount(amount);
+                return true;
+            }
         }
+
+        for (InventorySlot &slot : slots)
+        {
+            if (slot.IsEmpty())
+            {
+                slot.SetItem(
+                    itemType,
+                    amount);
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    // Otherwise use the first empty slot.
-    for (InventorySlot &slot : slots)
+    int emptySlotCount = 0;
+
+    for (const InventorySlot &slot : slots)
     {
         if (slot.IsEmpty())
         {
-            slot.SetItem(
-                itemType,
-                amount);
+            emptySlotCount++;
+        }
+    }
 
+    // Prevent partially adding an item request.
+    if (emptySlotCount < amount)
+    {
+        return false;
+    }
+
+    int remainingAmount = amount;
+
+    for (InventorySlot &slot : slots)
+    {
+        if (!slot.IsEmpty())
+        {
+            continue;
+        }
+
+        slot.SetItem(
+            itemType,
+            1);
+
+        remainingAmount--;
+
+        if (remainingAmount == 0)
+        {
             return true;
         }
     }

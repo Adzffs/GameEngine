@@ -3,5 +3,6 @@
 enum class ItemType
 {
     NONE,
-    LOG
+    LOG,
+    COINS
 };

@@ -34,6 +34,8 @@ add_executable(GameEngine
     src/Inventory/InventorySlot.cpp
     src/Skills/Skill.cpp
     src/Skills/SkillSet.cpp
+    src/Item/ItemDefinition.cpp
+    src/Item/ItemDatabase.cpp
 )
 target_include_directories(GameEngine PRIVATE src)
 target_link_libraries(GameEngine PRIVATE SDL3::SDL3)
