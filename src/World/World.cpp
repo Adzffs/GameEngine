@@ -5,6 +5,8 @@
 #include "../Action/Action.h"
 #include "../Movement/Movement.h"
 #include <cstdlib>
+#include "../Player/Player.h"
+#include "../Inventory/ItemType.h"
 
 World::World()
     : map(100, 100)
@@ -363,6 +365,30 @@ void World::ProcessCompletedActions(
         {
             continue;
         }
+
+        Entity *entity =
+            entityManager.GetEntityByID(
+                action.GetEntityID());
+
+        Player *player =
+            dynamic_cast<Player *>(entity);
+
+        if (player == nullptr)
+        {
+            continue;
+        }
+
+        player->GetInventory().AddItem(
+            ItemType::LOG,
+            1);
+
+        std::cout
+            << "Player "
+            << player->GetID()
+            << " received 1 log. Total logs: "
+            << player->GetInventory().GetItemAmount(
+                   ItemType::LOG)
+            << std::endl;
 
         resource->Deplete();
     }

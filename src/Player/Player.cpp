@@ -12,3 +12,7 @@ void Player::Update(World &world)
 {
     (void)world;
 }
+Inventory &Player::GetInventory()
+{
+    return inventory;
+}
