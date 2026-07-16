@@ -1,5 +1,6 @@
 #include "Graphics.h"
 #include <iostream>
+#include "../World/Map.h"
 
 Graphics::Graphics()
     : window(nullptr),
@@ -98,6 +99,49 @@ bool Graphics::ConsumeClickedTile(
 
     return true;
 }
+void Graphics::DrawMap(Map &map)
+{
+    int visibleColumns =
+        WindowWidth / TileSize;
+
+    int visibleRows =
+        WindowHeight / TileSize;
+
+    for (int y = 0; y < visibleRows; y++)
+    {
+        for (int x = 0; x < visibleColumns; x++)
+        {
+            SDL_FRect tileRectangle{
+                static_cast<float>(x * TileSize),
+                static_cast<float>(y * TileSize),
+                static_cast<float>(TileSize),
+                static_cast<float>(TileSize)};
+
+            if (map.IsValidPosition(x, y))
+            {
+                SDL_SetRenderDrawColor(
+                    renderer,
+                    45,
+                    85,
+                    45,
+                    255);
+            }
+            else
+            {
+                SDL_SetRenderDrawColor(
+                    renderer,
+                    35,
+                    45,
+                    70,
+                    255);
+            }
+
+            SDL_RenderFillRect(
+                renderer,
+                &tileRectangle);
+        }
+    }
+}
 void Graphics::DrawGrid()
 
 {
@@ -182,6 +226,7 @@ void Graphics::DrawPlayer(
         &playerRectangle);
 }
 void Graphics::Render(
+    Map &map,
     int playerX,
     int playerY)
 {
@@ -194,6 +239,7 @@ void Graphics::Render(
 
     SDL_RenderClear(renderer);
 
+    DrawMap(map);
     DrawGrid();
     DrawClickedTile();
     DrawPlayer(playerX, playerY);

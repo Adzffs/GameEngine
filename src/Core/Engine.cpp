@@ -70,6 +70,7 @@ void Engine::Run()
         if (player != nullptr)
         {
             graphics.Render(
+                world.GetMap(),
                 player->GetPosition().GetX(),
                 player->GetPosition().GetY());
         }

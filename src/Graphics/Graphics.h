@@ -2,6 +2,8 @@
 
 #include <SDL3/SDL.h>
 
+class Map;
+
 class Graphics
 {
 public:
@@ -11,9 +13,14 @@ public:
     bool Initialize();
     void ProcessEvents(bool &running);
     bool ConsumeClickedTile(int &tileX, int &tileY);
-    void Render(int playerX, int playerY);
+
+    void Render(
+        Map &map,
+        int playerX,
+        int playerY);
 
 private:
+    void DrawMap(Map &map);
     void DrawGrid();
     void DrawClickedTile();
     void DrawPlayer(int playerX, int playerY);
