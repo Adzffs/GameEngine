@@ -8,14 +8,16 @@
 World::World()
     : map(100, 100)
 {
-    entityManager.CreatePlayer();
 
     objectManager.CreateResource(5, 5);
 
     actionManager.AddAction(
         Action("Chopping Tree", 5));
 }
-
+int World::CreatePlayer()
+{
+    return entityManager.CreatePlayer();
+}
 void World::Update()
 {
     Logger::Debug("Updating World");

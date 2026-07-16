@@ -15,6 +15,7 @@ public:
 
     Map &GetMap();
 
+    int CreatePlayer();
     void QueueMovementRequest(const MovementRequest &request);
 
 private:
@@ -28,5 +29,5 @@ private:
 
     void ProcessMovementRequests();
 
-        std::queue<MovementRequest> movementRequests;
+    std::queue<MovementRequest> movementRequests;
 };

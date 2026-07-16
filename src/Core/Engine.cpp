@@ -2,7 +2,12 @@
 #include <iostream>
 #include <thread>
 #include "Core/Logger.h"
-
+#include <iostream>
+Engine::Engine()
+    : playerID(-1)
+{
+    playerID = world.CreatePlayer();
+}
 void Engine::Run()
 {
     Logger::Info("Server Started");
