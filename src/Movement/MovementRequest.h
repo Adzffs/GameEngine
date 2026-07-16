@@ -1,21 +1,16 @@
 #pragma once
 
-
 class MovementRequest
 {
 public:
+    MovementRequest(int entityID, int x, int y);
 
-    MovementRequest(int x, int y);
-
-
-    int GetX();
-
-    int GetY();
-
+    int GetEntityID() const;
+    int GetX() const;
+    int GetY() const;
 
 private:
-
+    int entityID;
     int x;
-
     int y;
 };

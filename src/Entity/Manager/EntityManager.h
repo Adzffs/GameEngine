@@ -11,9 +11,10 @@ class EntityManager
 public:
     EntityManager();
 
+    int CreatePlayer();
     void Update(World &world);
 
-    void CreatePlayer();
+    Entity *GetEntityByID(int id);
 
 private:
     std::vector<std::unique_ptr<Entity>> entities;

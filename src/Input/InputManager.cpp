@@ -1,9 +1,6 @@
 #include "InputManager.h"
 
-MovementRequest InputManager::GetMovementRequest()
+MovementRequest InputManager::GetMovementRequest(int entityID)
 {
-    // Temporary test input
-    // Move east
-
-    return MovementRequest(1, 0);
+    return MovementRequest(entityID, 1, 0);
 }

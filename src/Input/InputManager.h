@@ -5,5 +5,5 @@
 class InputManager
 {
 public:
-    MovementRequest GetMovementRequest();
+    MovementRequest GetMovementRequest(int entityID);
 };

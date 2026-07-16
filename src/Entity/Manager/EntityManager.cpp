@@ -9,15 +9,29 @@
 EntityManager::EntityManager()
 {
 }
-
-void EntityManager::CreatePlayer()
+int EntityManager::CreatePlayer()
 {
+    int playerID = nextID;
+
     entities.push_back(
-        std::make_unique<Player>(nextID));
+        std::make_unique<Player>(playerID));
 
     nextID++;
-}
 
+    return playerID;
+}
+Entity *EntityManager::GetEntityByID(int id)
+{
+    for (const auto &entity : entities)
+    {
+        if (entity->GetID() == id)
+        {
+            return entity.get();
+        }
+    }
+
+    return nullptr;
+}
 void EntityManager::Update(World &world)
 {
     Logger::Debug(

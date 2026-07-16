@@ -1,5 +1,6 @@
 #pragma once
-
+#include <queue>
+#include "../Movement/MovementRequest.h"
 #include "../Entity/Manager/EntityManager.h"
 #include "Map.h"
 #include "Object/Manager/ObjectManager.h"
@@ -14,6 +15,8 @@ public:
 
     Map &GetMap();
 
+    void QueueMovementRequest(const MovementRequest &request);
+
 private:
     EntityManager entityManager;
 
@@ -22,4 +25,8 @@ private:
     ActionManager actionManager;
 
     Map map;
+
+    void ProcessMovementRequests();
+
+        std::queue<MovementRequest> movementRequests;
 };

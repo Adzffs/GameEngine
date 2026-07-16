@@ -1,20 +1,23 @@
 #include "MovementRequest.h"
 
-
-MovementRequest::MovementRequest(int x, int y)
+MovementRequest::MovementRequest(int entityID, int x, int y)
+    : entityID(entityID),
+      x(x),
+      y(y)
 {
-    this->x = x;
-    this->y = y;
 }
 
+int MovementRequest::GetEntityID() const
+{
+    return entityID;
+}
 
-int MovementRequest::GetX()
+int MovementRequest::GetX() const
 {
     return x;
 }
 
-
-int MovementRequest::GetY()
+int MovementRequest::GetY() const
 {
     return y;
 }
