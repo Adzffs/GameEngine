@@ -2,5 +2,6 @@
 
 enum class SkillType
 {
+    NONE,
     WOODCUTTING
 };

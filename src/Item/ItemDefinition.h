@@ -2,6 +2,7 @@
 
 #include "../Inventory/ItemType.h"
 #include "../Equipment/EquipmentSlotType.h"
+#include "../Skills/SkillType.h"
 #include "ToolType.h"
 
 #include <string>
@@ -15,6 +16,8 @@ public:
         bool stackable,
         EquipmentSlotType equipmentSlot,
         ToolType toolType,
+        SkillType requiredSkill,
+        int requiredSkillLevel,
         int actionDurationTicks);
 
     ItemType GetItemType() const;
@@ -22,9 +25,13 @@ public:
 
     bool IsStackable() const;
     bool IsEquippable() const;
+    bool HasSkillRequirement() const;
 
     EquipmentSlotType GetEquipmentSlot() const;
     ToolType GetToolType() const;
+
+    SkillType GetRequiredSkill() const;
+    int GetRequiredSkillLevel() const;
 
     int GetActionDurationTicks() const;
 
@@ -35,6 +42,9 @@ private:
 
     EquipmentSlotType equipmentSlot;
     ToolType toolType;
+
+    SkillType requiredSkill;
+    int requiredSkillLevel;
 
     int actionDurationTicks;
 };

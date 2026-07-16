@@ -11,6 +11,7 @@
 #include "../Equipment/EquipmentSlotType.h"
 #include "../Item/ItemDatabase.h"
 #include "../Item/ToolType.h"
+#include <string>
 
 World::World()
     : map(100, 100)
@@ -301,6 +302,33 @@ void World::ProcessResourceInteractions()
 
             continue;
         }
+        if (weaponDefinition.HasSkillRequirement())
+        {
+            int playerLevel =
+                player->GetSkills()
+                    .GetSkill(
+                        SkillType::WOODCUTTING)
+                    .GetLevel();
+
+            int requiredLevel =
+                weaponDefinition
+                    .GetRequiredSkillLevel();
+
+            if (playerLevel < requiredLevel)
+            {
+                Logger::Game(
+                    "You need Woodcutting level " +
+                    std::to_string(requiredLevel) +
+                    " to use a " +
+                    weaponDefinition.GetName());
+
+                interactionIterator =
+                    pendingResourceInteractions.erase(
+                        interactionIterator);
+
+                continue;
+            }
+        }
 
         if (!actionManager.HasActionForEntity(
                 entityID))
@@ -468,6 +496,35 @@ bool World::TryEquipInventoryItem(
     if (!newDefinition.IsEquippable())
     {
         return false;
+    }
+    if (newDefinition.HasSkillRequirement())
+    {
+        SkillType requiredSkill =
+            newDefinition.GetRequiredSkill();
+
+        int requiredLevel =
+            newDefinition.GetRequiredSkillLevel();
+
+        if (requiredSkill ==
+            SkillType::WOODCUTTING)
+        {
+            int playerLevel =
+                player->GetSkills()
+                    .GetSkill(
+                        SkillType::WOODCUTTING)
+                    .GetLevel();
+
+            if (playerLevel < requiredLevel)
+            {
+                Logger::Game(
+                    "You need Woodcutting level " +
+                    std::to_string(requiredLevel) +
+                    " to equip a " +
+                    newDefinition.GetName());
+
+                return false;
+            }
+        }
     }
 
     EquipmentSlotType equipmentSlot =

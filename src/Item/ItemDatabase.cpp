@@ -9,6 +9,8 @@ const ItemDefinition &ItemDatabase::Get(
         false,
         EquipmentSlotType::NONE,
         ToolType::NONE,
+        SkillType::NONE,
+        0,
         0};
 
     static const ItemDefinition log{
@@ -17,6 +19,8 @@ const ItemDefinition &ItemDatabase::Get(
         false,
         EquipmentSlotType::NONE,
         ToolType::NONE,
+        SkillType::NONE,
+        0,
         0};
 
     static const ItemDefinition coins{
@@ -25,6 +29,8 @@ const ItemDefinition &ItemDatabase::Get(
         true,
         EquipmentSlotType::NONE,
         ToolType::NONE,
+        SkillType::NONE,
+        0,
         0};
 
     static const ItemDefinition bronzeAxe{
@@ -33,6 +39,8 @@ const ItemDefinition &ItemDatabase::Get(
         false,
         EquipmentSlotType::WEAPON,
         ToolType::AXE,
+        SkillType::WOODCUTTING,
+        1,
         5};
 
     static const ItemDefinition ironAxe{
@@ -41,6 +49,8 @@ const ItemDefinition &ItemDatabase::Get(
         false,
         EquipmentSlotType::WEAPON,
         ToolType::AXE,
+        SkillType::WOODCUTTING,
+        5,
         4};
 
     static const ItemDefinition steelAxe{
@@ -49,6 +59,8 @@ const ItemDefinition &ItemDatabase::Get(
         false,
         EquipmentSlotType::WEAPON,
         ToolType::AXE,
+        SkillType::WOODCUTTING,
+        10,
         3};
 
     switch (itemType)
