@@ -3,6 +3,7 @@
 #include <iostream>
 #include <thread>
 #include "Core/Logger.h"
+#include "../Movement/MovementDestinationRequest.h"
 
 Engine::Engine()
     : playerID(-1)
@@ -27,6 +28,30 @@ void Engine::Run()
         if (!running)
         {
             break;
+        }
+        int clickedTileX;
+        int clickedTileY;
+
+        if (graphics.ConsumeClickedTile(
+                clickedTileX,
+                clickedTileY))
+        {
+            MovementDestinationRequest request(
+                playerID,
+                clickedTileX,
+                clickedTileY);
+
+            world.QueueMovementDestination(request);
+
+            std::cout
+                << "Destination queued for Entity ID: "
+                << playerID
+                << " Destination: ("
+                << clickedTileX
+                << ", "
+                << clickedTileY
+                << ")"
+                << std::endl;
         }
 
         if (clock.ShouldTick())
@@ -54,17 +79,5 @@ void Engine::Run()
 void Engine::Update()
 {
     tick++;
-
-    std::cout
-        << "Server Tick: "
-        << tick
-        << std::endl;
-
     world.Update();
-
-    // Remove later when the engine should run continuously.
-    if (tick >= 10)
-    {
-        running = false;
-    }
 }

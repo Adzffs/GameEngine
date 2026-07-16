@@ -26,6 +26,8 @@ void World::Update()
 {
     Logger::Debug("Updating World");
     actionManager.Update();
+    ProcessMovementDestinationRequests();
+    ProcessActiveMovementPaths();
     entityManager.Update(*this);
     ProcessMovementRequests();
     objectManager.Update();
@@ -38,6 +40,166 @@ Map &World::GetMap()
 void World::QueueMovementRequest(const MovementRequest &request)
 {
     movementRequests.push(request);
+}
+void World::QueueMovementDestination(
+    const MovementDestinationRequest &request)
+{
+    movementDestinationRequests.push(request);
+}
+void World::ProcessMovementDestinationRequests()
+{
+    while (!movementDestinationRequests.empty())
+    {
+        MovementDestinationRequest request =
+            movementDestinationRequests.front();
+
+        movementDestinationRequests.pop();
+
+        Entity *entity =
+            entityManager.GetEntityByID(
+                request.GetEntityID());
+
+        if (entity == nullptr)
+        {
+            std::cout
+                << "Cannot calculate path: Entity "
+                << request.GetEntityID()
+                << " was not found."
+                << std::endl;
+
+            continue;
+        }
+
+        int startX =
+            entity->GetPosition().GetX();
+
+        int startY =
+            entity->GetPosition().GetY();
+
+        std::vector<PathStep> path =
+            pathfinder.FindPath(
+                map,
+                startX,
+                startY,
+                request.GetDestinationX(),
+                request.GetDestinationY());
+
+        if (path.empty())
+        {
+            if (startX == request.GetDestinationX() &&
+                startY == request.GetDestinationY())
+            {
+                std::cout
+                    << "Entity is already at destination."
+                    << std::endl;
+            }
+            else
+            {
+                std::cout
+                    << "No path found to destination: ("
+                    << request.GetDestinationX()
+                    << ", "
+                    << request.GetDestinationY()
+                    << ")"
+                    << std::endl;
+            }
+
+            continue;
+        }
+
+        std::cout
+            << "Path found for Entity ID: "
+            << request.GetEntityID()
+            << " Steps: "
+            << path.size()
+            << std::endl;
+
+        std::queue<PathStep> storedPath;
+
+        for (const PathStep &step : path)
+        {
+            storedPath.push(step);
+        }
+
+        activeMovementPaths[request.GetEntityID()] =
+            storedPath;
+
+        std::cout
+            << "Path stored for Entity ID: "
+            << request.GetEntityID()
+            << std::endl;
+    }
+}
+void World::ProcessActiveMovementPaths()
+{
+    auto pathIterator =
+        activeMovementPaths.begin();
+
+    while (pathIterator !=
+           activeMovementPaths.end())
+    {
+        int entityID = pathIterator->first;
+
+        std::queue<PathStep> &path =
+            pathIterator->second;
+
+        Entity *entity =
+            entityManager.GetEntityByID(entityID);
+
+        if (entity == nullptr || path.empty())
+        {
+            pathIterator =
+                activeMovementPaths.erase(
+                    pathIterator);
+
+            continue;
+        }
+
+        PathStep nextStep = path.front();
+
+        int changeX =
+            nextStep.x -
+            entity->GetPosition().GetX();
+
+        int changeY =
+            nextStep.y -
+            entity->GetPosition().GetY();
+
+        Movement::Move(
+            *entity,
+            map,
+            changeX,
+            changeY);
+
+        path.pop();
+
+        std::cout
+            << "Entity "
+            << entityID
+            << " moved to: ("
+            << entity->GetPosition().GetX()
+            << ", "
+            << entity->GetPosition().GetY()
+            << ")"
+            << std::endl;
+
+        if (path.empty())
+        {
+            std::cout
+                << "Entity "
+                << entityID
+                << " reached its destination."
+                << std::endl;
+
+            pathIterator =
+                activeMovementPaths.erase(
+                    pathIterator);
+        }
+        else
+        {
+            ++pathIterator;
+        }
+    }
 }
 void World::ProcessMovementRequests()
 {

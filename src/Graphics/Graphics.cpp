@@ -3,7 +3,11 @@
 
 Graphics::Graphics()
     : window(nullptr),
-      renderer(nullptr)
+      renderer(nullptr),
+      clickPending(false),
+      hasClickedTile(false),
+      clickedTileX(0),
+      clickedTileY(0)
 {
 }
 
@@ -63,7 +67,36 @@ void Graphics::ProcessEvents(bool &running)
         {
             running = false;
         }
+
+        if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
+            event.button.button == SDL_BUTTON_LEFT)
+        {
+            clickedTileX =
+                static_cast<int>(event.button.x) / TileSize;
+
+            clickedTileY =
+                static_cast<int>(event.button.y) / TileSize;
+
+            hasClickedTile = true;
+            clickPending = true;
+        }
     }
+}
+bool Graphics::ConsumeClickedTile(
+    int &tileX,
+    int &tileY)
+{
+    if (!clickPending)
+    {
+        return false;
+    }
+
+    tileX = clickedTileX;
+    tileY = clickedTileY;
+
+    clickPending = false;
+
+    return true;
 }
 void Graphics::DrawGrid()
 
@@ -94,6 +127,34 @@ void Graphics::DrawGrid()
             static_cast<float>(WindowWidth),
             static_cast<float>(y));
     }
+}
+void Graphics::DrawClickedTile()
+{
+    if (!hasClickedTile)
+    {
+        return;
+    }
+
+    SDL_FRect clickedRectangle{
+        static_cast<float>(
+            clickedTileX * TileSize + 2),
+        static_cast<float>(
+            clickedTileY * TileSize + 2),
+        static_cast<float>(
+            TileSize - 4),
+        static_cast<float>(
+            TileSize - 4)};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        255,
+        215,
+        0,
+        255);
+
+    SDL_RenderRect(
+        renderer,
+        &clickedRectangle);
 }
 void Graphics::DrawPlayer(
     int playerX,
@@ -134,6 +195,7 @@ void Graphics::Render(
     SDL_RenderClear(renderer);
 
     DrawGrid();
+    DrawClickedTile();
     DrawPlayer(playerX, playerY);
 
     SDL_RenderPresent(renderer);

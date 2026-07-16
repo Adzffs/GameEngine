@@ -23,6 +23,8 @@ add_executable(GameEngine
     src/Action/Action.cpp
     src/Action/ActionManager.cpp
     src/Movement/MovementRequest.cpp
+    src/Movement/MovementDestinationRequest.cpp
+    src/Pathfinding/Pathfinder.cpp
     src/Input/InputManager.cpp
     src/Player/Player.cpp
     src/NPC/NPC.cpp
