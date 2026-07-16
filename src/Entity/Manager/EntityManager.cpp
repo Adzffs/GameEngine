@@ -20,6 +20,17 @@ int EntityManager::CreatePlayer()
 
     return playerID;
 }
+int EntityManager::CreateNPC()
+{
+    int npcID = nextID;
+
+    entities.push_back(
+        std::make_unique<NPC>(npcID));
+
+    nextID++;
+
+    return npcID;
+}
 Entity *EntityManager::GetEntityByID(int id)
 {
     for (const auto &entity : entities)

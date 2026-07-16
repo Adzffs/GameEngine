@@ -8,7 +8,7 @@
 World::World()
     : map(100, 100)
 {
-
+    entityManager.CreateNPC();
     objectManager.CreateResource(5, 5);
 
     actionManager.AddAction(

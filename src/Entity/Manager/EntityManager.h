@@ -4,6 +4,7 @@
 #include <vector>
 #include "../../Input/InputManager.h"
 #include "../../Player/Player.h"
+#include "../../NPC/NPC.h"
 class World;
 
 class EntityManager
@@ -12,6 +13,9 @@ public:
     EntityManager();
 
     int CreatePlayer();
+
+    int CreateNPC();
+
     void Update(World &world);
 
     Entity *GetEntityByID(int id);
