@@ -99,6 +99,12 @@ int Inventory::GetItemAmount(
     return totalAmount;
 }
 
+bool Inventory::HasItem(
+    ItemType itemType) const
+{
+    return GetItemAmount(itemType) > 0;
+}
+
 const std::array<
     InventorySlot,
     Inventory::SlotCount> &

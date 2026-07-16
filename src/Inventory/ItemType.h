@@ -4,5 +4,6 @@ enum class ItemType
 {
     NONE,
     LOG,
-    COINS
+    COINS,
+    BRONZE_AXE
 };

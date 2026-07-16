@@ -16,6 +16,9 @@ public:
     int GetItemAmount(
         ItemType itemType) const;
 
+    bool HasItem(
+        ItemType itemType) const;
+
     const std::array<
         InventorySlot,
         SlotCount> &

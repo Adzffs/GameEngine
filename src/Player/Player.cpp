@@ -6,6 +6,9 @@
 Player::Player(int id)
     : Entity(id, EntityType::PLAYER)
 {
+    inventory.AddItem(
+        ItemType::BRONZE_AXE,
+        1);
 }
 
 void Player::Update(World &world)

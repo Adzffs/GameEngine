@@ -233,14 +233,9 @@ void World::ProcessResourceInteractions()
 
             continue;
         }
+
         if (!resource->IsActive())
         {
-            std::cout
-                << "Resource "
-                << resourceID
-                << " is currently depleted."
-                << std::endl;
-
             interactionIterator =
                 pendingResourceInteractions.erase(
                     interactionIterator);
@@ -248,13 +243,15 @@ void World::ProcessResourceInteractions()
             continue;
         }
 
-        int distanceX = std::abs(
-            entity->GetPosition().GetX() -
-            resource->GetX());
+        int distanceX =
+            std::abs(
+                entity->GetPosition().GetX() -
+                resource->GetX());
 
-        int distanceY = std::abs(
-            entity->GetPosition().GetY() -
-            resource->GetY());
+        int distanceY =
+            std::abs(
+                entity->GetPosition().GetY() -
+                resource->GetY());
 
         bool isAdjacent =
             distanceX <= 1 &&
@@ -266,6 +263,31 @@ void World::ProcessResourceInteractions()
             continue;
         }
 
+        Player *player =
+            dynamic_cast<Player *>(entity);
+
+        if (player == nullptr)
+        {
+            interactionIterator =
+                pendingResourceInteractions.erase(
+                    interactionIterator);
+
+            continue;
+        }
+
+        if (!player->GetInventory().HasItem(
+                ItemType::BRONZE_AXE))
+        {
+            Logger::Game(
+                "You need a bronze axe to chop this tree");
+
+            interactionIterator =
+                pendingResourceInteractions.erase(
+                    interactionIterator);
+
+            continue;
+        }
+
         if (!actionManager.HasActionForEntity(entityID))
         {
             actionManager.AddAction(
@@ -274,14 +296,6 @@ void World::ProcessResourceInteractions()
                     5,
                     entityID,
                     resourceID));
-
-            std::cout
-                << "Entity "
-                << entityID
-                << " started chopping Resource "
-                << resourceID
-                << "."
-                << std::endl;
         }
 
         interactionIterator =

@@ -18,6 +18,11 @@ const ItemDefinition &ItemDatabase::Get(
         "Coins",
         true};
 
+    static const ItemDefinition bronzeAxe{
+        ItemType::BRONZE_AXE,
+        "Bronze axe",
+        false};
+
     switch (itemType)
     {
     case ItemType::LOG:
@@ -25,6 +30,9 @@ const ItemDefinition &ItemDatabase::Get(
 
     case ItemType::COINS:
         return coins;
+
+    case ItemType::BRONZE_AXE:
+        return bronzeAxe;
 
     case ItemType::NONE:
     default:
