@@ -5,7 +5,6 @@
 #include "Core/Logger.h"
 #include "../Movement/MovementDestinationRequest.h"
 #include "../Player/Player.h"
-#include "../Inventory/ItemType.h"
 
 Engine::Engine()
     : playerID(-1)
@@ -96,17 +95,13 @@ void Engine::Run()
 
         if (player != nullptr)
         {
-            int logCount =
-                player->GetInventory().GetItemAmount(
-                    ItemType::LOG);
-
             graphics.Render(
                 world.GetMap(),
                 world.GetEntities(),
                 world.GetResources(),
                 player->GetPosition().GetX(),
                 player->GetPosition().GetY(),
-                logCount);
+                player->GetInventory());
         }
     }
 }

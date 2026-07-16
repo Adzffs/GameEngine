@@ -305,13 +305,43 @@ void Graphics::DrawResources(
         }
     }
 }
-void Graphics::DrawInventory(int logCount)
+void Graphics::DrawInventory(
+    const Inventory &inventory)
 {
+    constexpr int columns = 4;
+    constexpr int rows = 7;
+
+    constexpr float slotSize = 40.0f;
+    constexpr float slotGap = 4.0f;
+    constexpr float padding = 10.0f;
+    constexpr float headerHeight = 24.0f;
+
+    constexpr float panelWidth =
+        padding * 2.0f +
+        columns * slotSize +
+        (columns - 1) * slotGap;
+
+    constexpr float panelHeight =
+        padding * 2.0f +
+        headerHeight +
+        rows * slotSize +
+        (rows - 1) * slotGap;
+
+    const float panelX =
+        static_cast<float>(WindowWidth) -
+        panelWidth -
+        20.0f;
+
+    const float panelY =
+        static_cast<float>(WindowHeight) -
+        panelHeight -
+        20.0f;
+
     SDL_FRect panelRectangle{
-        1040.0f,
-        20.0f,
-        220.0f,
-        140.0f};
+        panelX,
+        panelY,
+        panelWidth,
+        panelHeight};
 
     SDL_SetRenderDrawColor(
         renderer,
@@ -344,26 +374,117 @@ void Graphics::DrawInventory(int logCount)
 
     SDL_RenderDebugText(
         renderer,
-        1060.0f,
-        40.0f,
+        panelX + padding,
+        panelY + 8.0f,
         "INVENTORY");
 
-    std::string logText =
-        "Logs: " + std::to_string(logCount);
+    const auto &slots =
+        inventory.GetSlots();
 
-    SDL_RenderDebugText(
-        renderer,
-        1060.0f,
-        70.0f,
-        logText.c_str());
+    for (int slotIndex = 0;
+         slotIndex < Inventory::SlotCount;
+         slotIndex++)
+    {
+        int column =
+            slotIndex % columns;
+
+        int row =
+            slotIndex / columns;
+
+        float slotX =
+            panelX +
+            padding +
+            column * (slotSize + slotGap);
+
+        float slotY =
+            panelY +
+            padding +
+            headerHeight +
+            row * (slotSize + slotGap);
+
+        SDL_FRect slotRectangle{
+            slotX,
+            slotY,
+            slotSize,
+            slotSize};
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            55,
+            55,
+            55,
+            255);
+
+        SDL_RenderFillRect(
+            renderer,
+            &slotRectangle);
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            120,
+            120,
+            120,
+            255);
+
+        SDL_RenderRect(
+            renderer,
+            &slotRectangle);
+
+        const InventorySlot &slot =
+            slots[slotIndex];
+
+        if (slot.IsEmpty())
+        {
+            continue;
+        }
+
+        if (slot.GetItemType() ==
+            ItemType::LOG)
+        {
+            SDL_FRect logRectangle{
+                slotX + 9.0f,
+                slotY + 8.0f,
+                slotSize - 18.0f,
+                slotSize - 18.0f};
+
+            SDL_SetRenderDrawColor(
+                renderer,
+                140,
+                90,
+                40,
+                255);
+
+            SDL_RenderFillRect(
+                renderer,
+                &logRectangle);
+        }
+
+        std::string amountText =
+            std::to_string(
+                slot.GetAmount());
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            255,
+            255,
+            255,
+            255);
+
+        SDL_RenderDebugText(
+            renderer,
+            slotX + 4.0f,
+            slotY + 27.0f,
+            amountText.c_str());
+    }
 }
+
 void Graphics::Render(
     Map &map,
     const std::vector<std::unique_ptr<Entity>> &entities,
     const std::vector<ResourceNode> &resources,
     int playerX,
     int playerY,
-    int logCount)
+    const Inventory &inventory)
 {
     SDL_SetRenderDrawColor(
         renderer,
@@ -380,7 +501,7 @@ void Graphics::Render(
     DrawResources(resources);
     DrawNPCs(entities);
     DrawPlayer(playerX, playerY);
-    DrawInventory(logCount);
+    DrawInventory(inventory);
 
     SDL_RenderPresent(renderer);
 }

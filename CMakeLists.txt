@@ -31,6 +31,7 @@ add_executable(GameEngine
     src/Graphics/Graphics.cpp
     src/Player/Player.cpp
     src/Inventory/Inventory.cpp
+    src/Inventory/InventorySlot.cpp
 )
 target_include_directories(GameEngine PRIVATE src)
 target_link_libraries(GameEngine PRIVATE SDL3::SDL3)

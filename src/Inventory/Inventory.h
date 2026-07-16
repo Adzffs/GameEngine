@@ -1,19 +1,29 @@
 #pragma once
 
-#include "ItemType.h"
+#include "InventorySlot.h"
 
-#include <map>
+#include <array>
 
 class Inventory
 {
 public:
-    void AddItem(
+    static constexpr int SlotCount = 28;
+
+    bool AddItem(
         ItemType itemType,
         int amount);
 
     int GetItemAmount(
         ItemType itemType) const;
 
+    const std::array<
+        InventorySlot,
+        SlotCount> &
+    GetSlots() const;
+
 private:
-    std::map<ItemType, int> items;
+    std::array<
+        InventorySlot,
+        SlotCount>
+        slots;
 };

@@ -2,5 +2,6 @@
 
 enum class ItemType
 {
+    NONE,
     LOG
 };

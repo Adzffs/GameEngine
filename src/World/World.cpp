@@ -378,9 +378,21 @@ void World::ProcessCompletedActions(
             continue;
         }
 
-        player->GetInventory().AddItem(
-            ItemType::LOG,
-            1);
+        bool itemAdded =
+            player->GetInventory().AddItem(
+                ItemType::LOG,
+                1);
+
+        if (!itemAdded)
+        {
+            std::cout
+                << "Player "
+                << player->GetID()
+                << " inventory is full."
+                << std::endl;
+
+            continue;
+        }
 
         std::cout
             << "Player "

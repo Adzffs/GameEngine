@@ -7,6 +7,8 @@
 #include "../Entity/Entity.h"
 #include "../World/Object/Resource/ResourceNode.h"
 
+#include "../Inventory/Inventory.h"
+
 class Map;
 
 class Graphics
@@ -25,7 +27,7 @@ public:
         const std::vector<ResourceNode> &resources,
         int playerX,
         int playerY,
-        int logCount);
+        const Inventory &inventory);
 
 private:
     void DrawMap(Map &map);
@@ -36,7 +38,8 @@ private:
         const std::vector<std::unique_ptr<Entity>> &entities);
     void DrawResources(
         const std::vector<ResourceNode> &resources);
-    void DrawInventory(int logCount);
+    void DrawInventory(
+        const Inventory &inventory);
     SDL_Window *window;
     SDL_Renderer *renderer;
 

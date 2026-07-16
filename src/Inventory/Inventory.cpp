@@ -1,27 +1,63 @@
 #include "Inventory.h"
 
-void Inventory::AddItem(
+bool Inventory::AddItem(
     ItemType itemType,
     int amount)
 {
-    if (amount <= 0)
+    if (itemType == ItemType::NONE ||
+        amount <= 0)
     {
-        return;
+        return false;
     }
 
-    items[itemType] += amount;
+    // Stack the item if it already exists.
+    for (InventorySlot &slot : slots)
+    {
+        if (!slot.IsEmpty() &&
+            slot.GetItemType() == itemType)
+        {
+            slot.AddAmount(amount);
+            return true;
+        }
+    }
+
+    // Otherwise use the first empty slot.
+    for (InventorySlot &slot : slots)
+    {
+        if (slot.IsEmpty())
+        {
+            slot.SetItem(
+                itemType,
+                amount);
+
+            return true;
+        }
+    }
+
+    return false;
 }
 
 int Inventory::GetItemAmount(
     ItemType itemType) const
 {
-    auto itemIterator =
-        items.find(itemType);
+    int totalAmount = 0;
 
-    if (itemIterator == items.end())
+    for (const InventorySlot &slot : slots)
     {
-        return 0;
+        if (!slot.IsEmpty() &&
+            slot.GetItemType() == itemType)
+        {
+            totalAmount += slot.GetAmount();
+        }
     }
 
-    return itemIterator->second;
+    return totalAmount;
+}
+
+const std::array<
+    InventorySlot,
+    Inventory::SlotCount> &
+Inventory::GetSlots() const
+{
+    return slots;
 }
