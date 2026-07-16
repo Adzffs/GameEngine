@@ -225,8 +225,65 @@ void Graphics::DrawPlayer(
         renderer,
         &playerRectangle);
 }
+void Graphics::DrawNPCs(
+    const std::vector<std::unique_ptr<Entity>> &entities)
+{
+    for (const auto &entity : entities)
+    {
+        if (entity->GetType() != EntityType::NPC)
+        {
+            continue;
+        }
+
+        SDL_FRect npcRectangle{
+            static_cast<float>(
+                entity->GetPosition().GetX() * TileSize + 5),
+            static_cast<float>(
+                entity->GetPosition().GetY() * TileSize + 5),
+            static_cast<float>(TileSize - 10),
+            static_cast<float>(TileSize - 10)};
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            255,
+            150,
+            50,
+            255);
+
+        SDL_RenderFillRect(
+            renderer,
+            &npcRectangle);
+    }
+}
+void Graphics::DrawResources(
+    const std::vector<ResourceNode> &resources)
+{
+    for (const ResourceNode &resource : resources)
+    {
+        SDL_FRect resourceRectangle{
+            static_cast<float>(
+                resource.GetX() * TileSize + 7),
+            static_cast<float>(
+                resource.GetY() * TileSize + 7),
+            static_cast<float>(TileSize - 14),
+            static_cast<float>(TileSize - 14)};
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            140,
+            90,
+            40,
+            255);
+
+        SDL_RenderFillRect(
+            renderer,
+            &resourceRectangle);
+    }
+}
 void Graphics::Render(
     Map &map,
+    const std::vector<std::unique_ptr<Entity>> &entities,
+    const std::vector<ResourceNode> &resources,
     int playerX,
     int playerY)
 {
@@ -242,6 +299,8 @@ void Graphics::Render(
     DrawMap(map);
     DrawGrid();
     DrawClickedTile();
+    DrawResources(resources);
+    DrawNPCs(entities);
     DrawPlayer(playerX, playerY);
 
     SDL_RenderPresent(renderer);

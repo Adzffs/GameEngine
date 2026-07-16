@@ -14,11 +14,13 @@ public:
 
     int CreatePlayer();
 
-    int CreateNPC();
+    int CreateNPC(int x, int y);
 
     void Update(World &world);
 
     Entity *GetEntityByID(int id);
+
+    const std::vector<std::unique_ptr<Entity>> &GetEntities() const;
 
 private:
     std::vector<std::unique_ptr<Entity>> entities;

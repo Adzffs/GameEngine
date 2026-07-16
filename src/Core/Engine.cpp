@@ -71,6 +71,8 @@ void Engine::Run()
         {
             graphics.Render(
                 world.GetMap(),
+                world.GetEntities(),
+                world.GetResources(),
                 player->GetPosition().GetX(),
                 player->GetPosition().GetY());
         }

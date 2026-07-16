@@ -20,12 +20,16 @@ int EntityManager::CreatePlayer()
 
     return playerID;
 }
-int EntityManager::CreateNPC()
+int EntityManager::CreateNPC(int x, int y)
 {
     int npcID = nextID;
 
     entities.push_back(
         std::make_unique<NPC>(npcID));
+
+    entities.back()
+        ->GetPosition()
+        .SetPosition(x, y);
 
     nextID++;
 
@@ -42,6 +46,11 @@ Entity *EntityManager::GetEntityByID(int id)
     }
 
     return nullptr;
+}
+const std::vector<std::unique_ptr<Entity>> &
+EntityManager::GetEntities() const
+{
+    return entities;
 }
 void EntityManager::Update(World &world)
 {

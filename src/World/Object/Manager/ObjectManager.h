@@ -12,6 +12,8 @@ public:
 
     void CreateResource(int x, int y);
 
+    const std::vector<ResourceNode> &GetResources() const;
+
 private:
     std::vector<ResourceNode> resources;
 

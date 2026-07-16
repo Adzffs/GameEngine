@@ -13,6 +13,11 @@ void ObjectManager::CreateResource(int x, int y)
 
     nextID++;
 }
+const std::vector<ResourceNode> &
+ObjectManager::GetResources() const
+{
+    return resources;
+}
 
 void ObjectManager::Update()
 {

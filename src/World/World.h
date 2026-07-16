@@ -20,7 +20,11 @@ public:
 
     int CreatePlayer();
     Entity *GetEntityByID(int id);
+    const std::vector<std::unique_ptr<Entity>> &
+    GetEntities() const;
 
+    const std::vector<ResourceNode> &
+    GetResources() const;
     void QueueMovementRequest(
         const MovementRequest &request);
     void QueueMovementDestination(

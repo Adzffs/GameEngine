@@ -8,11 +8,8 @@
 World::World()
     : map(100, 100)
 {
-    entityManager.CreateNPC();
+    entityManager.CreateNPC(3, 3);
     objectManager.CreateResource(5, 5);
-
-    actionManager.AddAction(
-        Action("Chopping Tree", 5));
 }
 int World::CreatePlayer()
 {
@@ -21,6 +18,17 @@ int World::CreatePlayer()
 Entity *World::GetEntityByID(int id)
 {
     return entityManager.GetEntityByID(id);
+}
+const std::vector<std::unique_ptr<Entity>> &
+World::GetEntities() const
+{
+    return entityManager.GetEntities();
+}
+
+const std::vector<ResourceNode> &
+World::GetResources() const
+{
+    return objectManager.GetResources();
 }
 void World::Update()
 {

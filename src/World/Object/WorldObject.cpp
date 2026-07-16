@@ -7,17 +7,17 @@ WorldObject::WorldObject(int id, int x, int y)
     this->y = y;
 }
 
-int WorldObject::GetID()
+int WorldObject::GetID() const
 {
     return id;
 }
 
-int WorldObject::GetX()
+int WorldObject::GetX() const
 {
     return x;
 }
 
-int WorldObject::GetY()
+int WorldObject::GetY() const
 {
     return y;
 }

@@ -1,6 +1,11 @@
 #pragma once
 
 #include <SDL3/SDL.h>
+#include <memory>
+#include <vector>
+
+#include "../Entity/Entity.h"
+#include "../World/Object/Resource/ResourceNode.h"
 
 class Map;
 
@@ -16,6 +21,8 @@ public:
 
     void Render(
         Map &map,
+        const std::vector<std::unique_ptr<Entity>> &entities,
+        const std::vector<ResourceNode> &resources,
         int playerX,
         int playerY);
 
@@ -24,6 +31,10 @@ private:
     void DrawGrid();
     void DrawClickedTile();
     void DrawPlayer(int playerX, int playerY);
+    void DrawNPCs(
+        const std::vector<std::unique_ptr<Entity>> &entities);
+    void DrawResources(
+        const std::vector<ResourceNode> &resources);
 
     SDL_Window *window;
     SDL_Renderer *renderer;
