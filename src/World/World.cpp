@@ -14,6 +14,8 @@
 #include <string>
 #include "Object/Resource/ResourceDatabase.h"
 #include "../Core/Random.h"
+#include "../Recipe/RecipeSystem.h"
+#include "../Recipe/RecipeDatabase.h"
 
 World::World()
     : map(100, 100)
@@ -177,6 +179,61 @@ bool World::ConsumeOpenedStation(
 
     stationType = stationIterator->second;
     openedStations.erase(stationIterator);
+
+    return true;
+}
+
+bool World::TryStartRecipeAction(
+    int entityID,
+    RecipeType recipeType)
+{
+    Entity *entity =
+        entityManager.GetEntityByID(
+            entityID);
+
+    Player *player =
+        dynamic_cast<Player *>(entity);
+
+    if (player == nullptr)
+    {
+        return false;
+    }
+
+    if (actionManager.HasActionForEntity(
+            entityID))
+    {
+        Logger::Game(
+            "You are already performing an action");
+
+        return false;
+    }
+
+    if (!RecipeSystem::CanCreateRecipe(
+            *player,
+            recipeType))
+    {
+        Logger::Game(
+            "You do not meet the recipe requirements");
+
+        return false;
+    }
+
+    const RecipeDefinition &recipe =
+        RecipeDatabase::Get(
+            recipeType);
+
+    actionManager.AddAction(
+        Action(
+            ActionType::RECIPE,
+            recipe.GetName(),
+            recipe.GetActionDurationTicks(),
+            entityID,
+            static_cast<int>(
+                recipeType)));
+
+    Logger::Game(
+        "You begin " +
+        recipe.GetName());
 
     return true;
 }
@@ -538,6 +595,7 @@ void World::ProcessResourceInteractions()
         {
             actionManager.AddAction(
                 Action(
+                    ActionType::GATHERING,
                     "Gathering " +
                         resourceDefinition.GetName(),
                     weaponDefinition
@@ -554,6 +612,49 @@ void World::ProcessCompletedActions(
 {
     for (const Action &action : completedActions)
     {
+        if (action.GetType() ==
+            ActionType::RECIPE)
+        {
+            Entity *entity =
+                entityManager.GetEntityByID(
+                    action.GetEntityID());
+
+            Player *player =
+                dynamic_cast<Player *>(entity);
+
+            if (player == nullptr)
+            {
+                continue;
+            }
+
+            RecipeType recipeType =
+                static_cast<RecipeType>(
+                    action.GetTargetID());
+
+            const RecipeDefinition &recipe =
+                RecipeDatabase::Get(
+                    recipeType);
+
+            bool created =
+                RecipeSystem::TryCreateRecipe(
+                    *player,
+                    recipeType);
+
+            if (created)
+            {
+                Logger::Game(
+                    "Created: " +
+                    recipe.GetName());
+            }
+            else
+            {
+                Logger::Game(
+                    "The recipe could not be completed");
+            }
+
+            continue;
+        }
+
         ResourceNode *resource =
             objectManager.GetResourceByID(
                 action.GetTargetID());
@@ -744,6 +845,7 @@ void World::ProcessCompletedActions(
         // Start another attempt after either success or failure.
         actionManager.AddAction(
             Action(
+                ActionType::GATHERING,
                 "Gathering " +
                     resourceDefinition.GetName(),
                 weaponDefinition

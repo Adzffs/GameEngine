@@ -17,6 +17,7 @@ public:
         SkillType requiredSkill,
         int requiredLevel,
         int xpReward,
+        int actionDurationTicks,
         std::vector<RecipeIngredient> ingredients,
         ItemType outputItem,
         int outputAmount);
@@ -27,6 +28,7 @@ public:
     SkillType GetRequiredSkill() const;
     int GetRequiredLevel() const;
     int GetXPReward() const;
+    int GetActionDurationTicks() const;
 
     const std::vector<RecipeIngredient> &
     GetIngredients() const;
@@ -41,6 +43,7 @@ private:
     SkillType requiredSkill;
     int requiredLevel;
     int xpReward;
+    int actionDurationTicks;
 
     std::vector<RecipeIngredient> ingredients;
 

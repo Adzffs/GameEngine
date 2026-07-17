@@ -22,7 +22,8 @@ Graphics::Graphics()
       recipeRequestPending(false),
       requestedRecipeType(RecipeType::NONE),
       stationMenuOpen(false),
-      openStationType(StationType::NONE)
+      openStationType(StationType::NONE),
+      stationMenuClosePending(false)
 {
 }
 
@@ -456,9 +457,15 @@ void Graphics::ProcessEvents(bool &running)
             if (event.key.scancode ==
                 SDL_SCANCODE_ESCAPE)
             {
-                stationMenuOpen = false;
-                openStationType =
-                    StationType::NONE;
+                if (stationMenuOpen)
+                {
+                    stationMenuOpen = false;
+
+                    openStationType =
+                        StationType::NONE;
+
+                    stationMenuClosePending = true;
+                }
 
                 continue;
             }
@@ -528,6 +535,18 @@ bool Graphics::ConsumeRecipeRequest(
         RecipeType::NONE;
 
     recipeRequestPending = false;
+
+    return true;
+}
+
+bool Graphics::ConsumeStationMenuClose()
+{
+    if (!stationMenuClosePending)
+    {
+        return false;
+    }
+
+    stationMenuClosePending = false;
 
     return true;
 }

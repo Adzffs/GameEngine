@@ -8,6 +8,7 @@ RecipeDefinition::RecipeDefinition(
     SkillType requiredSkill,
     int requiredLevel,
     int xpReward,
+    int actionDurationTicks,
     std::vector<RecipeIngredient> ingredients,
     ItemType outputItem,
     int outputAmount)
@@ -16,6 +17,7 @@ RecipeDefinition::RecipeDefinition(
       requiredSkill(requiredSkill),
       requiredLevel(requiredLevel),
       xpReward(xpReward),
+      actionDurationTicks(actionDurationTicks),
       ingredients(std::move(ingredients)),
       outputItem(outputItem),
       outputAmount(outputAmount)
@@ -46,6 +48,11 @@ int RecipeDefinition::GetRequiredLevel() const
 int RecipeDefinition::GetXPReward() const
 {
     return xpReward;
+}
+
+int RecipeDefinition::GetActionDurationTicks() const
+{
+    return actionDurationTicks;
 }
 
 const std::vector<RecipeIngredient> &

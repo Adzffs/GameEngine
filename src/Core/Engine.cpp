@@ -5,8 +5,7 @@
 #include "../Movement/MovementDestinationRequest.h"
 #include "../Player/Player.h"
 #include "../Skills/SkillType.h"
-#include "../Recipe/RecipeSystem.h"
-#include "../Recipe/RecipeDatabase.h"
+#include "../Recipe/RecipeType.h"
 
 Engine::Engine()
     : playerID(-1)
@@ -39,33 +38,9 @@ void Engine::Run()
         if (graphics.ConsumeRecipeRequest(
                 requestedRecipe))
         {
-            Player *player =
-                dynamic_cast<Player *>(
-                    world.GetEntityByID(playerID));
-
-            if (player != nullptr)
-            {
-                bool created =
-                    RecipeSystem::TryCreateRecipe(
-                        *player,
-                        requestedRecipe);
-
-                if (created)
-                {
-                    const RecipeDefinition &recipe =
-                        RecipeDatabase::Get(
-                            requestedRecipe);
-
-                    Logger::Game(
-                        std::string("Created: ") +
-                        recipe.GetName());
-                }
-                else
-                {
-                    Logger::Game(
-                        "You do not meet the recipe requirements");
-                }
-            }
+            world.TryStartRecipeAction(
+                playerID,
+                requestedRecipe);
         }
 
         int clickedInventorySlot = -1;
@@ -128,6 +103,12 @@ void Engine::Run()
                 clickedTileY);
 
             world.QueueMovementDestination(request);
+        }
+
+        if (graphics.ConsumeStationMenuClose())
+        {
+            world.CancelActionsForEntity(
+                playerID);
         }
 
         if (clock.ShouldTick())

@@ -31,6 +31,7 @@ public:
     bool ConsumeWeaponSlotClick();
     bool ConsumeRecipeRequest(
         RecipeType &recipeType);
+    bool ConsumeStationMenuClose();
 
     void OpenStationMenu(
         StationType stationType);
@@ -139,4 +140,5 @@ private:
 
     bool stationMenuOpen;
     StationType openStationType;
+    bool stationMenuClosePending;
 };

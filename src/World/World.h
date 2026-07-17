@@ -7,6 +7,7 @@
 #include "../Action/ActionManager.h"
 #include "../Movement/MovementDestinationRequest.h"
 #include "../Pathfinding/Pathfinder.h"
+#include "../Recipe/RecipeType.h"
 #include <map>
 
 class World
@@ -60,6 +61,10 @@ public:
 
     bool TryUnequipWeapon(
         int entityID);
+
+    bool TryStartRecipeAction(
+        int entityID,
+        RecipeType recipeType);
 
 private:
     EntityManager entityManager;

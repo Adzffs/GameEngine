@@ -1,11 +1,13 @@
 #include "Action.h"
 
 Action::Action(
+    ActionType type,
     std::string name,
     int duration,
     int entityID,
     int targetID)
-    : name(name),
+    : type(type),
+      name(name),
       duration(duration),
       currentTick(0),
       entityID(entityID),
@@ -26,6 +28,11 @@ void Action::Update()
 bool Action::IsComplete() const
 {
     return currentTick >= duration;
+}
+
+ActionType Action::GetType() const
+{
+    return type;
 }
 
 int Action::GetEntityID() const

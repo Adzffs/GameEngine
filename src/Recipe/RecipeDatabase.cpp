@@ -12,6 +12,7 @@ RecipeDatabase::Get(
         SkillType::SMITHING,
         1,
         6,
+        3,
         {
             {ItemType::COPPER_ORE, 1},
             {ItemType::TIN_ORE, 1},
@@ -25,6 +26,7 @@ RecipeDatabase::Get(
         SkillType::SMITHING,
         10,
         13,
+        3,
         {
             {ItemType::IRON_ORE, 1},
         },
