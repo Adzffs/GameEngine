@@ -14,6 +14,7 @@ const ResourceDefinition &ResourceDatabase::Get(
         1,
         70,
         1,
+        DepletedVisualType::STUMP,
         10};
 
     static const ResourceDefinition oakTree{
@@ -27,6 +28,7 @@ const ResourceDefinition &ResourceDatabase::Get(
         1,
         55,
         3,
+        DepletedVisualType::STUMP,
         15};
 
     static const ResourceDefinition willowTree{
@@ -40,6 +42,7 @@ const ResourceDefinition &ResourceDatabase::Get(
         1,
         45,
         5,
+        DepletedVisualType::STUMP,
         20};
 
     static const ResourceDefinition copperRock{
@@ -53,6 +56,7 @@ const ResourceDefinition &ResourceDatabase::Get(
         1,
         70,
         1,
+        DepletedVisualType::ROCK_RUBBLE,
         8};
 
     static const ResourceDefinition tinRock{
@@ -66,6 +70,7 @@ const ResourceDefinition &ResourceDatabase::Get(
         1,
         65,
         1,
+        DepletedVisualType::ROCK_RUBBLE,
         8};
 
     switch (resourceType)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ResourceType.h"
+#include "DepletedVisualType.h"
 #include "../../../Inventory/ItemType.h"
 #include "../../../Skills/SkillType.h"
 #include "../../../Item/ToolType.h"
@@ -20,6 +21,7 @@ public:
         int itemAmount,
         int baseSuccessChance,
         int maxUses,
+        DepletedVisualType depletedVisualType,
         int respawnTicks);
 
     ResourceType GetResourceType() const;
@@ -36,6 +38,7 @@ public:
     int GetBaseSuccessChance() const;
 
     int GetMaxUses() const;
+    DepletedVisualType GetDepletedVisualType() const;
 
     int GetRespawnTicks() const;
 
@@ -55,6 +58,7 @@ private:
     int baseSuccessChance;
 
     int maxUses;
+    DepletedVisualType depletedVisualType;
 
     int respawnTicks;
 };

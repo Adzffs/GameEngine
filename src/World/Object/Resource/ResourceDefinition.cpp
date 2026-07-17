@@ -13,6 +13,7 @@ ResourceDefinition::ResourceDefinition(
     int itemAmount,
     int baseSuccessChance,
     int maxUses,
+    DepletedVisualType depletedVisualType,
     int respawnTicks)
     : resourceType(resourceType),
       name(std::move(name)),
@@ -24,6 +25,7 @@ ResourceDefinition::ResourceDefinition(
       itemAmount(itemAmount),
       baseSuccessChance(baseSuccessChance),
       maxUses(maxUses),
+      depletedVisualType(depletedVisualType),
       respawnTicks(respawnTicks)
 {
 }
@@ -79,6 +81,12 @@ int ResourceDefinition::GetBaseSuccessChance() const
 int ResourceDefinition::GetMaxUses() const
 {
     return maxUses;
+}
+
+DepletedVisualType
+ResourceDefinition::GetDepletedVisualType() const
+{
+    return depletedVisualType;
 }
 
 int ResourceDefinition::GetRespawnTicks() const

@@ -2,6 +2,8 @@
 #include <iostream>
 #include "../World/Map.h"
 #include "../Player/Player.h"
+#include "../World/Object/Resource/ResourceDatabase.h"
+#include "../World/Object/Resource/DepletedVisualType.h"
 #include <string>
 #include <array>
 
@@ -446,22 +448,80 @@ void Graphics::DrawResources(
 
         if (!resource.IsActive())
         {
-            SDL_FRect stumpRectangle{
-                tileX + 11.0f,
-                tileY + 19.0f,
-                10.0f,
-                9.0f};
+            const ResourceDefinition &definition =
+                ResourceDatabase::Get(
+                    resource.GetResourceType());
 
-            SDL_SetRenderDrawColor(
-                renderer,
-                85,
-                55,
-                30,
-                255);
+            switch (definition.GetDepletedVisualType())
+            {
+            case DepletedVisualType::STUMP:
+            {
+                SDL_SetRenderDrawColor(
+                    renderer,
+                    105,
+                    65,
+                    30,
+                    255);
 
-            SDL_RenderFillRect(
-                renderer,
-                &stumpRectangle);
+                SDL_FRect stump{
+                    tileX + TileSize * 0.30f,
+                    tileY + TileSize * 0.58f,
+                    TileSize * 0.40f,
+                    TileSize * 0.25f};
+
+                SDL_RenderFillRect(
+                    renderer,
+                    &stump);
+
+                break;
+            }
+
+            case DepletedVisualType::ROCK_RUBBLE:
+            {
+                SDL_SetRenderDrawColor(
+                    renderer,
+                    85,
+                    85,
+                    90,
+                    255);
+
+                SDL_FRect leftRock{
+                    tileX + TileSize * 0.18f,
+                    tileY + TileSize * 0.68f,
+                    TileSize * 0.25f,
+                    TileSize * 0.16f};
+
+                SDL_FRect middleRock{
+                    tileX + TileSize * 0.40f,
+                    tileY + TileSize * 0.61f,
+                    TileSize * 0.28f,
+                    TileSize * 0.22f};
+
+                SDL_FRect rightRock{
+                    tileX + TileSize * 0.66f,
+                    tileY + TileSize * 0.70f,
+                    TileSize * 0.18f,
+                    TileSize * 0.13f};
+
+                SDL_RenderFillRect(
+                    renderer,
+                    &leftRock);
+
+                SDL_RenderFillRect(
+                    renderer,
+                    &middleRock);
+
+                SDL_RenderFillRect(
+                    renderer,
+                    &rightRock);
+
+                break;
+            }
+
+            case DepletedVisualType::NONE:
+            default:
+                break;
+            }
 
             continue;
         }
@@ -526,6 +586,46 @@ void Graphics::DrawResources(
             SDL_RenderFillRect(
                 renderer,
                 &copperDeposit);
+
+            drawDefaultTree = false;
+            break;
+        }
+
+        case ResourceType::TIN_ROCK:
+        {
+            SDL_SetRenderDrawColor(
+                renderer,
+                105,
+                105,
+                115,
+                255);
+
+            SDL_FRect rockBody{
+                tileX + TileSize * 0.15f,
+                tileY + TileSize * 0.35f,
+                TileSize * 0.70f,
+                TileSize * 0.50f};
+
+            SDL_RenderFillRect(
+                renderer,
+                &rockBody);
+
+            SDL_SetRenderDrawColor(
+                renderer,
+                190,
+                190,
+                200,
+                255);
+
+            SDL_FRect tinDeposit{
+                tileX + TileSize * 0.32f,
+                tileY + TileSize * 0.43f,
+                TileSize * 0.20f,
+                TileSize * 0.15f};
+
+            SDL_RenderFillRect(
+                renderer,
+                &tinDeposit);
 
             drawDefaultTree = false;
             break;
@@ -1050,8 +1150,25 @@ void Graphics::DrawOreIcon(
     float y,
     float size)
 {
-    if (itemType != ItemType::COPPER_ORE)
+    int oreRed = 0;
+    int oreGreen = 0;
+    int oreBlue = 0;
+
+    switch (itemType)
     {
+    case ItemType::COPPER_ORE:
+        oreRed = 190;
+        oreGreen = 105;
+        oreBlue = 55;
+        break;
+
+    case ItemType::TIN_ORE:
+        oreRed = 190;
+        oreGreen = 190;
+        oreBlue = 200;
+        break;
+
+    default:
         return;
     }
 
@@ -1074,12 +1191,12 @@ void Graphics::DrawOreIcon(
 
     SDL_SetRenderDrawColor(
         renderer,
-        190,
-        105,
-        55,
+        oreRed,
+        oreGreen,
+        oreBlue,
         255);
 
-    SDL_FRect copper{
+    SDL_FRect oreDeposit{
         x + size * 0.34f,
         y + size * 0.40f,
         size * 0.22f,
@@ -1087,7 +1204,7 @@ void Graphics::DrawOreIcon(
 
     SDL_RenderFillRect(
         renderer,
-        &copper);
+        &oreDeposit);
 }
 
 void Graphics::DrawInventory(
