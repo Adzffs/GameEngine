@@ -95,9 +95,16 @@ void Engine::Run()
 
             world.ClearPendingResourceInteraction(
                 playerID);
+            world.ClearPendingStationInteraction(
+                playerID);
 
             ResourceNode *resource =
                 world.GetResourceAt(
+                    clickedTileX,
+                    clickedTileY);
+
+            CraftingStation *station =
+                world.GetStationAt(
                     clickedTileX,
                     clickedTileY);
 
@@ -107,6 +114,12 @@ void Engine::Run()
                 world.QueueResourceInteraction(
                     playerID,
                     resource->GetID());
+            }
+            else if (station != nullptr)
+            {
+                world.QueueStationInteraction(
+                    playerID,
+                    station->GetID());
             }
 
             MovementDestinationRequest request(
@@ -131,6 +144,17 @@ void Engine::Run()
             dynamic_cast<Player *>(
                 world.GetEntityByID(playerID));
 
+        StationType openedStationType =
+            StationType::NONE;
+
+        if (world.ConsumeOpenedStation(
+                playerID,
+                openedStationType))
+        {
+            graphics.OpenStationMenu(
+                openedStationType);
+        }
+
         if (player != nullptr)
         {
             const Skill &woodcutting =
@@ -145,6 +169,7 @@ void Engine::Run()
                 world.GetMap(),
                 world.GetEntities(),
                 world.GetResources(),
+                world.GetStations(),
                 player->GetPosition().GetX(),
                 player->GetPosition().GetY(),
                 player->GetInventory(),

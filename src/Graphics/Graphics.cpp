@@ -20,7 +20,9 @@ Graphics::Graphics()
       clickedInventorySlotIndex(-1),
       weaponSlotClickPending(false),
       recipeRequestPending(false),
-      requestedRecipeType(RecipeType::NONE)
+      requestedRecipeType(RecipeType::NONE),
+      stationMenuOpen(false),
+      openStationType(StationType::NONE)
 {
 }
 
@@ -69,6 +71,89 @@ bool Graphics::Initialize()
 
     return true;
 }
+void Graphics::OpenStationMenu(
+    StationType stationType)
+{
+    openStationType = stationType;
+    stationMenuOpen =
+        stationType != StationType::NONE;
+}
+
+void Graphics::DrawStationMenu()
+{
+    if (!stationMenuOpen)
+    {
+        return;
+    }
+
+    constexpr float menuWidth = 360.0f;
+    constexpr float menuHeight = 220.0f;
+
+    const float menuX =
+        (WindowWidth - menuWidth) / 2.0f;
+
+    const float menuY =
+        (WindowHeight - menuHeight) / 2.0f;
+
+    SDL_FRect menuRectangle{
+        menuX,
+        menuY,
+        menuWidth,
+        menuHeight};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        28,
+        28,
+        28,
+        245);
+
+    SDL_RenderFillRect(renderer, &menuRectangle);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        190,
+        190,
+        190,
+        255);
+
+    SDL_RenderRect(renderer, &menuRectangle);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        255,
+        255,
+        255,
+        255);
+
+    if (openStationType == StationType::FURNACE)
+    {
+        SDL_RenderDebugText(
+            renderer,
+            menuX + 18.0f,
+            menuY + 18.0f,
+            "FURNACE");
+
+        SDL_RenderDebugText(
+            renderer,
+            menuX + 18.0f,
+            menuY + 65.0f,
+            "BRONZE BAR");
+
+        SDL_RenderDebugText(
+            renderer,
+            menuX + 18.0f,
+            menuY + 105.0f,
+            "IRON BAR");
+
+        SDL_RenderDebugText(
+            renderer,
+            menuX + 18.0f,
+            menuY + 175.0f,
+            "PRESS ESC TO CLOSE");
+    }
+}
+
 bool Graphics::HandleSidePanelClick(
     float mouseX,
     float mouseY)
@@ -243,6 +328,16 @@ void Graphics::ProcessEvents(bool &running)
             !event.key.repeat)
         {
             if (event.key.scancode ==
+                SDL_SCANCODE_ESCAPE)
+            {
+                stationMenuOpen = false;
+                openStationType =
+                    StationType::NONE;
+
+                continue;
+            }
+
+            if (event.key.scancode ==
                 SDL_SCANCODE_B)
             {
                 requestedRecipeType =
@@ -261,6 +356,11 @@ void Graphics::ProcessEvents(bool &running)
             if (HandleSidePanelClick(
                     mouseX,
                     mouseY))
+            {
+                continue;
+            }
+
+            if (stationMenuOpen)
             {
                 continue;
             }
@@ -467,6 +567,102 @@ void Graphics::DrawNPCs(
             &npcRectangle);
     }
 }
+void Graphics::DrawStations(
+    const std::vector<CraftingStation> &stations)
+{
+    for (const CraftingStation &station :
+         stations)
+    {
+        float tileX =
+            static_cast<float>(
+                station.GetX() * TileSize);
+
+        float tileY =
+            static_cast<float>(
+                station.GetY() * TileSize);
+
+        switch (station.GetStationType())
+        {
+        case StationType::FURNACE:
+        {
+            SDL_SetRenderDrawColor(
+                renderer,
+                80,
+                80,
+                85,
+                255);
+
+            SDL_FRect furnaceBody{
+                tileX + TileSize * 0.15f,
+                tileY + TileSize * 0.18f,
+                TileSize * 0.70f,
+                TileSize * 0.68f};
+
+            SDL_RenderFillRect(
+                renderer,
+                &furnaceBody);
+
+            SDL_SetRenderDrawColor(
+                renderer,
+                40,
+                40,
+                45,
+                255);
+
+            SDL_FRect opening{
+                tileX + TileSize * 0.30f,
+                tileY + TileSize * 0.52f,
+                TileSize * 0.40f,
+                TileSize * 0.25f};
+
+            SDL_RenderFillRect(
+                renderer,
+                &opening);
+
+            SDL_SetRenderDrawColor(
+                renderer,
+                240,
+                105,
+                25,
+                255);
+
+            SDL_FRect fire{
+                tileX + TileSize * 0.38f,
+                tileY + TileSize * 0.60f,
+                TileSize * 0.24f,
+                TileSize * 0.12f};
+
+            SDL_RenderFillRect(
+                renderer,
+                &fire);
+
+            SDL_SetRenderDrawColor(
+                renderer,
+                65,
+                65,
+                70,
+                255);
+
+            SDL_FRect chimney{
+                tileX + TileSize * 0.58f,
+                tileY + TileSize * 0.05f,
+                TileSize * 0.20f,
+                TileSize * 0.25f};
+
+            SDL_RenderFillRect(
+                renderer,
+                &chimney);
+
+            break;
+        }
+
+        case StationType::NONE:
+        default:
+            break;
+        }
+    }
+}
+
 void Graphics::DrawResources(
     const std::vector<ResourceNode> &resources)
 {
@@ -1749,6 +1945,7 @@ void Graphics::Render(
     Map &map,
     const std::vector<std::unique_ptr<Entity>> &entities,
     const std::vector<ResourceNode> &resources,
+    const std::vector<CraftingStation> &stations,
     int playerX,
     int playerY,
     const Inventory &inventory,
@@ -1768,6 +1965,7 @@ void Graphics::Render(
     DrawGrid();
     DrawClickedTile();
     DrawResources(resources);
+    DrawStations(stations);
     DrawNPCs(entities);
     DrawPlayer(playerX, playerY);
 

@@ -27,6 +27,7 @@ void Tile::SetType(TileType type)
     case TileType::WATER:
     case TileType::TREE:
     case TileType::WALL:
+    case TileType::STATION:
         blocked = true;
         break;
     }

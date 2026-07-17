@@ -28,6 +28,8 @@ public:
     const std::vector<CraftingStation> &
     GetStations() const;
 
+    CraftingStation *GetStationByID(int id);
+
     CraftingStation *GetStationAt(
         int x,
         int y);

@@ -7,5 +7,6 @@ enum class TileType
     STONE,
     WATER,
     TREE,
-    WALL
+    WALL,
+    STATION
 };

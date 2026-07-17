@@ -49,6 +49,11 @@ World::World()
         ResourceType::IRON_ROCK,
         11,
         9);
+
+    CreateStation(
+        StationType::FURNACE,
+        14,
+        9);
 }
 void World::CreateResource(
     ResourceType resourceType,
@@ -64,6 +69,22 @@ void World::CreateResource(
         x,
         y,
         TileType::TREE);
+}
+
+void World::CreateStation(
+    StationType stationType,
+    int x,
+    int y)
+{
+    objectManager.CreateStation(
+        stationType,
+        x,
+        y);
+
+    map.SetTileType(
+        x,
+        y,
+        TileType::STATION);
 }
 int World::CreatePlayer()
 {
@@ -84,6 +105,22 @@ World::GetResources() const
 {
     return objectManager.GetResources();
 }
+
+const std::vector<CraftingStation> &
+World::GetStations() const
+{
+    return objectManager.GetStations();
+}
+
+CraftingStation *World::GetStationAt(
+    int x,
+    int y)
+{
+    return objectManager.GetStationAt(
+        x,
+        y);
+}
+
 ResourceNode *World::GetResourceAt(
     int x,
     int y)
@@ -98,6 +135,14 @@ void World::QueueResourceInteraction(
         resourceID;
 }
 
+void World::QueueStationInteraction(
+    int entityID,
+    int stationID)
+{
+    pendingStationInteractions[entityID] =
+        stationID;
+}
+
 void World::CancelActionsForEntity(
     int entityID)
 {
@@ -110,6 +155,32 @@ void World::ClearPendingResourceInteraction(
 {
     pendingResourceInteractions.erase(entityID);
 }
+
+void World::ClearPendingStationInteraction(
+    int entityID)
+{
+    pendingStationInteractions.erase(entityID);
+}
+
+bool World::ConsumeOpenedStation(
+    int entityID,
+    StationType &stationType)
+{
+    auto stationIterator =
+        openedStations.find(entityID);
+
+    if (stationIterator ==
+        openedStations.end())
+    {
+        return false;
+    }
+
+    stationType = stationIterator->second;
+    openedStations.erase(stationIterator);
+
+    return true;
+}
+
 void World::Update()
 {
     Logger::Debug("Updating World");
@@ -117,6 +188,7 @@ void World::Update()
     ProcessMovementDestinationRequests();
     ProcessActiveMovementPaths();
     ProcessResourceInteractions();
+    ProcessStationInteractions();
 
     objectManager.Update();
 
@@ -252,6 +324,57 @@ void World::ProcessActiveMovementPaths()
         }
     }
 }
+void World::ProcessStationInteractions()
+{
+    auto interactionIterator =
+        pendingStationInteractions.begin();
+
+    while (interactionIterator !=
+           pendingStationInteractions.end())
+    {
+        int entityID = interactionIterator->first;
+        int stationID = interactionIterator->second;
+
+        Entity *entity =
+            entityManager.GetEntityByID(entityID);
+
+        CraftingStation *station =
+            objectManager.GetStationByID(stationID);
+
+        if (entity == nullptr || station == nullptr)
+        {
+            interactionIterator =
+                pendingStationInteractions.erase(
+                    interactionIterator);
+            continue;
+        }
+
+        int distanceX = std::abs(
+            entity->GetPosition().GetX() -
+            station->GetX());
+
+        int distanceY = std::abs(
+            entity->GetPosition().GetY() -
+            station->GetY());
+
+        bool isAdjacent =
+            distanceX <= 1 && distanceY <= 1;
+
+        if (!isAdjacent)
+        {
+            ++interactionIterator;
+            continue;
+        }
+
+        openedStations[entityID] =
+            station->GetStationType();
+
+        interactionIterator =
+            pendingStationInteractions.erase(
+                interactionIterator);
+    }
+}
+
 void World::ProcessResourceInteractions()
 {
     auto interactionIterator =

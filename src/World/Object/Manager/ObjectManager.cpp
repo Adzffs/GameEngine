@@ -73,6 +73,20 @@ ObjectManager::GetStations() const
 }
 
 CraftingStation *
+ObjectManager::GetStationByID(int id)
+{
+    for (CraftingStation &station : stations)
+    {
+        if (station.GetID() == id)
+        {
+            return &station;
+        }
+    }
+
+    return nullptr;
+}
+
+CraftingStation *
 ObjectManager::GetStationAt(
     int x,
     int y)

@@ -6,6 +6,8 @@
 
 #include "../Entity/Entity.h"
 #include "../World/Object/Resource/ResourceNode.h"
+#include "../World/Object/Station/CraftingStation.h"
+#include "../World/Object/Station/StationType.h"
 
 #include "../Inventory/Inventory.h"
 #include "../Equipment/Equipment.h"
@@ -30,10 +32,15 @@ public:
     bool ConsumeRecipeRequest(
         RecipeType &recipeType);
 
+    void OpenStationMenu(
+        StationType stationType);
+    void DrawStationMenu();
+
     void Render(
         Map &map,
         const std::vector<std::unique_ptr<Entity>> &entities,
         const std::vector<ResourceNode> &resources,
+        const std::vector<CraftingStation> &stations,
         int playerX,
         int playerY,
         const Inventory &inventory,
@@ -67,6 +74,8 @@ public:
         const std::vector<std::unique_ptr<Entity>> &entities);
     void DrawResources(
         const std::vector<ResourceNode> &resources);
+    void DrawStations(
+        const std::vector<CraftingStation> &stations);
     void DrawInventory(
         const Inventory &inventory);
     void DrawSkills(const Player &player);
@@ -118,4 +127,7 @@ private:
     bool weaponSlotClickPending;
     bool recipeRequestPending;
     RecipeType requestedRecipeType;
+
+    bool stationMenuOpen;
+    StationType openStationType;
 };

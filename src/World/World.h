@@ -26,6 +26,14 @@ public:
     const std::vector<ResourceNode> &
     GetResources() const;
     ResourceNode *GetResourceAt(int x, int y);
+
+    const std::vector<CraftingStation> &
+    GetStations() const;
+
+    CraftingStation *GetStationAt(
+        int x,
+        int y);
+
     void QueueMovementRequest(
         const MovementRequest &request);
     void QueueMovementDestination(
@@ -33,9 +41,18 @@ public:
     void QueueResourceInteraction(
         int entityID,
         int resourceID);
+    void QueueStationInteraction(
+        int entityID,
+        int stationID);
     void CancelActionsForEntity(int entityID);
     void ClearPendingResourceInteraction(
         int entityID);
+    void ClearPendingStationInteraction(
+        int entityID);
+
+    bool ConsumeOpenedStation(
+        int entityID,
+        StationType &stationType);
 
     bool TryEquipInventoryItem(
         int entityID,
@@ -60,10 +77,16 @@ private:
         int x,
         int y);
 
+    void CreateStation(
+        StationType stationType,
+        int x,
+        int y);
+
     void ProcessMovementRequests();
     void ProcessMovementDestinationRequests();
     void ProcessActiveMovementPaths();
     void ProcessResourceInteractions();
+    void ProcessStationInteractions();
     void ProcessCompletedActions(
         const std::vector<Action> &completedActions);
     std::queue<MovementRequest> movementRequests;
@@ -75,4 +98,6 @@ private:
         activeMovementPaths;
 
     std::map<int, int> pendingResourceInteractions;
+    std::map<int, int> pendingStationInteractions;
+    std::map<int, StationType> openedStations;
 };
