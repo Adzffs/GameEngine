@@ -11,6 +11,9 @@ public:
 
     bool HasActionForEntity(int entityID) const;
 
+    const Action *GetActionForEntity(
+        int entityID) const;
+
     void CancelActionsForEntity(int entityID);
 
     std::vector<Action> Update();

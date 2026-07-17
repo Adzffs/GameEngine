@@ -281,6 +281,103 @@ void Graphics::DrawStationMenu()
         "PRESS ESC TO CLOSE");
 }
 
+void Graphics::DrawActionProgress(
+    const Action *activeAction)
+{
+    if (activeAction == nullptr)
+    {
+        return;
+    }
+
+    constexpr float panelWidth = 320.0f;
+    constexpr float panelHeight = 42.0f;
+    constexpr float barPadding = 10.0f;
+    constexpr float barHeight = 10.0f;
+
+    const float panelX =
+        (static_cast<float>(WindowWidth) -
+         panelWidth) /
+        2.0f;
+
+    const float panelY =
+        static_cast<float>(WindowHeight) -
+        panelHeight -
+        18.0f;
+
+    SDL_FRect panel{panelX, panelY, panelWidth, panelHeight};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        25,
+        25,
+        25,
+        235);
+
+    SDL_RenderFillRect(renderer, &panel);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        180,
+        180,
+        180,
+        255);
+
+    SDL_RenderRect(renderer, &panel);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        255,
+        255,
+        255,
+        255);
+
+    SDL_RenderDebugText(
+        renderer,
+        panelX + barPadding,
+        panelY + 7.0f,
+        activeAction->GetName().c_str());
+
+    SDL_FRect barBackground{
+        panelX + barPadding,
+        panelY + 25.0f,
+        panelWidth - barPadding * 2.0f,
+        barHeight};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        65,
+        65,
+        65,
+        255);
+
+    SDL_RenderFillRect(renderer, &barBackground);
+
+    SDL_FRect barFill{
+        barBackground.x,
+        barBackground.y,
+        barBackground.w *
+            activeAction->GetProgress(),
+        barBackground.h};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        80,
+        190,
+        90,
+        255);
+
+    SDL_RenderFillRect(renderer, &barFill);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        210,
+        210,
+        210,
+        255);
+
+    SDL_RenderRect(renderer, &barBackground);
+}
+
 bool Graphics::HandleSidePanelClick(
     float mouseX,
     float mouseY)
@@ -2090,7 +2187,8 @@ void Graphics::Render(
     int playerY,
     const Inventory &inventory,
     const Equipment &equipment,
-    const Player &player)
+    const Player &player,
+    const Action *activeAction)
 {
     SDL_SetRenderDrawColor(
         renderer,
@@ -2141,6 +2239,9 @@ void Graphics::Render(
         DrawPlaceholderPanel("SETTINGS");
         break;
     }
+
+    DrawActionProgress(
+        activeAction);
 
     DrawStationMenu();
 

@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 
+#include "../Action/Action.h"
 #include "../Entity/Entity.h"
 #include "../World/Object/Resource/ResourceNode.h"
 #include "../World/Object/Station/CraftingStation.h"
@@ -36,6 +37,8 @@ public:
     void OpenStationMenu(
         StationType stationType);
     void DrawStationMenu();
+    void DrawActionProgress(
+        const Action *activeAction);
 
     void Render(
         Map &map,
@@ -46,7 +49,8 @@ public:
         int playerY,
         const Inventory &inventory,
         const Equipment &equipment,
-        const Player &player);
+        const Player &player,
+        const Action *activeAction);
 
     enum class SidePanelTab
     {

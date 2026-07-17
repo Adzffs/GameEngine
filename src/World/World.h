@@ -55,6 +55,9 @@ public:
         int entityID,
         StationType &stationType);
 
+    const Action *GetActionForEntity(
+        int entityID) const;
+
     bool TryEquipInventoryItem(
         int entityID,
         int slotIndex);

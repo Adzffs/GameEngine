@@ -18,6 +18,13 @@ public:
 
     bool IsComplete() const;
 
+    const std::string &GetName() const;
+
+    int GetDuration() const;
+    int GetCurrentTick() const;
+
+    float GetProgress() const;
+
     ActionType GetType() const;
 
     int GetEntityID() const;

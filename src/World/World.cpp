@@ -167,6 +167,14 @@ void World::ClearPendingStationInteraction(
     pendingStationInteractions.erase(entityID);
 }
 
+const Action *
+World::GetActionForEntity(
+    int entityID) const
+{
+    return actionManager
+        .GetActionForEntity(entityID);
+}
+
 bool World::ConsumeOpenedStation(
     int entityID,
     StationType &stationType)
@@ -621,9 +629,12 @@ void World::ProcessCompletedActions(
         if (action.GetType() ==
             ActionType::RECIPE)
         {
+            const int entityID =
+                action.GetEntityID();
+
             Entity *entity =
                 entityManager.GetEntityByID(
-                    action.GetEntityID());
+                    entityID);
 
             Player *player =
                 dynamic_cast<Player *>(entity);
@@ -631,7 +642,7 @@ void World::ProcessCompletedActions(
             if (player == nullptr)
             {
                 activeRecipeLoops.erase(
-                    action.GetEntityID());
+                    entityID);
 
                 continue;
             }
@@ -652,7 +663,7 @@ void World::ProcessCompletedActions(
             if (!created)
             {
                 activeRecipeLoops.erase(
-                    action.GetEntityID());
+                    entityID);
 
                 Logger::Game(
                     "The recipe could not be completed");
@@ -666,7 +677,7 @@ void World::ProcessCompletedActions(
 
             auto loopIterator =
                 activeRecipeLoops.find(
-                    action.GetEntityID());
+                    entityID);
 
             bool shouldRepeat =
                 loopIterator !=
@@ -697,7 +708,7 @@ void World::ProcessCompletedActions(
                     ActionType::RECIPE,
                     recipe.GetName(),
                     recipe.GetActionDurationTicks(),
-                    action.GetEntityID(),
+                    entityID,
                     static_cast<int>(
                         recipeType)));
 

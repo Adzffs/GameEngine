@@ -20,6 +20,22 @@ bool ActionManager::HasActionForEntity(
     return false;
 }
 
+const Action *
+ActionManager::GetActionForEntity(
+    int entityID) const
+{
+    for (const Action &action : actions)
+    {
+        if (action.GetEntityID() ==
+            entityID)
+        {
+            return &action;
+        }
+    }
+
+    return nullptr;
+}
+
 std::vector<Action> ActionManager::Update()
 {
     std::vector<Action> completedActions;

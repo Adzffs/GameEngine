@@ -155,7 +155,9 @@ void Engine::Run()
                 player->GetPosition().GetY(),
                 player->GetInventory(),
                 player->GetEquipment(),
-                *player);
+                *player,
+                world.GetActionForEntity(
+                    playerID));
         }
     }
     Logger::Info("Server stopped");
