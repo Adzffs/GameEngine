@@ -51,6 +51,45 @@ ResourceNode *ObjectManager::GetResourceByID(int id)
 
     return nullptr;
 }
+
+void ObjectManager::CreateStation(
+    StationType stationType,
+    int x,
+    int y)
+{
+    stations.emplace_back(
+        nextID,
+        stationType,
+        x,
+        y);
+
+    nextID++;
+}
+
+const std::vector<CraftingStation> &
+ObjectManager::GetStations() const
+{
+    return stations;
+}
+
+CraftingStation *
+ObjectManager::GetStationAt(
+    int x,
+    int y)
+{
+    for (CraftingStation &station :
+         stations)
+    {
+        if (station.GetX() == x &&
+            station.GetY() == y)
+        {
+            return &station;
+        }
+    }
+
+    return nullptr;
+}
+
 void ObjectManager::Update()
 {
 
