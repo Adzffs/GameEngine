@@ -6,6 +6,7 @@
 #include "../World/Object/Resource/DepletedVisualType.h"
 #include <string>
 #include <array>
+#include <algorithm>
 
 Graphics::Graphics()
     : window(nullptr),
@@ -17,7 +18,9 @@ Graphics::Graphics()
       selectedTab(SidePanelTab::INVENTORY),
       inventorySlotClickPending(false),
       clickedInventorySlotIndex(-1),
-      weaponSlotClickPending(false)
+      weaponSlotClickPending(false),
+      recipeRequestPending(false),
+      requestedRecipeType(RecipeType::NONE)
 {
 }
 
@@ -236,6 +239,19 @@ void Graphics::ProcessEvents(bool &running)
             running = false;
         }
 
+        if (event.type == SDL_EVENT_KEY_DOWN &&
+            !event.key.repeat)
+        {
+            if (event.key.scancode ==
+                SDL_SCANCODE_B)
+            {
+                requestedRecipeType =
+                    RecipeType::BRONZE_BAR;
+
+                recipeRequestPending = true;
+            }
+        }
+
         if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
             event.button.button == SDL_BUTTON_LEFT)
         {
@@ -276,6 +292,25 @@ bool Graphics::ConsumeClickedTile(
 
     return true;
 }
+
+bool Graphics::ConsumeRecipeRequest(
+    RecipeType &recipeType)
+{
+    if (!recipeRequestPending)
+    {
+        return false;
+    }
+
+    recipeType = requestedRecipeType;
+
+    requestedRecipeType =
+        RecipeType::NONE;
+
+    recipeRequestPending = false;
+
+    return true;
+}
+
 void Graphics::DrawMap(Map &map)
 {
     int visibleColumns =
@@ -1128,6 +1163,75 @@ void Graphics::DrawPickaxeIcon(
         &pickaxeHeadRectangle);
 }
 
+void Graphics::DrawBarIcon(
+    ItemType itemType,
+    float x,
+    float y,
+    float size)
+{
+    int red = 0;
+    int green = 0;
+    int blue = 0;
+
+    switch (itemType)
+    {
+    case ItemType::BRONZE_BAR:
+        red = 175;
+        green = 105;
+        blue = 55;
+        break;
+
+    case ItemType::IRON_BAR:
+        red = 125;
+        green = 125;
+        blue = 130;
+        break;
+
+    case ItemType::STEEL_BAR:
+        red = 185;
+        green = 195;
+        blue = 205;
+        break;
+
+    default:
+        return;
+    }
+
+    SDL_FRect bar{
+        x + size * 0.16f,
+        y + size * 0.34f,
+        size * 0.68f,
+        size * 0.34f};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        red,
+        green,
+        blue,
+        255);
+
+    SDL_RenderFillRect(
+        renderer,
+        &bar);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        std::min(red + 25, 255),
+        std::min(green + 25, 255),
+        std::min(blue + 25, 255),
+        255);
+
+    SDL_FRect highlight{
+        x + size * 0.22f,
+        y + size * 0.38f,
+        size * 0.48f,
+        size * 0.08f};
+
+    SDL_RenderFillRect(
+        renderer,
+        &highlight);
+}
+
 void Graphics::DrawLogIcon(
     ItemType itemType,
     float x,
@@ -1418,6 +1522,12 @@ void Graphics::DrawInventory(
             slotSize);
 
         DrawPickaxeIcon(
+            slot.GetItemType(),
+            slotX,
+            slotY,
+            slotSize);
+
+        DrawBarIcon(
             slot.GetItemType(),
             slotX,
             slotY,

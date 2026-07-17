@@ -5,6 +5,8 @@
 #include "../Movement/MovementDestinationRequest.h"
 #include "../Player/Player.h"
 #include "../Skills/SkillType.h"
+#include "../Recipe/RecipeSystem.h"
+#include "../Recipe/RecipeDatabase.h"
 
 Engine::Engine()
     : playerID(-1)
@@ -30,6 +32,42 @@ void Engine::Run()
         {
             break;
         }
+
+        RecipeType requestedRecipe =
+            RecipeType::NONE;
+
+        if (graphics.ConsumeRecipeRequest(
+                requestedRecipe))
+        {
+            Player *player =
+                dynamic_cast<Player *>(
+                    world.GetEntityByID(playerID));
+
+            if (player != nullptr)
+            {
+                bool created =
+                    RecipeSystem::TryCreateRecipe(
+                        *player,
+                        requestedRecipe);
+
+                if (created)
+                {
+                    const RecipeDefinition &recipe =
+                        RecipeDatabase::Get(
+                            requestedRecipe);
+
+                    Logger::Game(
+                        std::string("Created: ") +
+                        recipe.GetName());
+                }
+                else
+                {
+                    Logger::Game(
+                        "You do not meet the recipe requirements");
+                }
+            }
+        }
+
         int clickedInventorySlot = -1;
 
         if (graphics.ConsumeInventorySlotClick(

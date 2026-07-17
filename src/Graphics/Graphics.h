@@ -9,6 +9,7 @@
 
 #include "../Inventory/Inventory.h"
 #include "../Equipment/Equipment.h"
+#include "../Recipe/RecipeType.h"
 
 class Map;
 class Player;
@@ -26,6 +27,8 @@ public:
         int &slotIndex);
 
     bool ConsumeWeaponSlotClick();
+    bool ConsumeRecipeRequest(
+        RecipeType &recipeType);
 
     void Render(
         Map &map,
@@ -79,6 +82,11 @@ public:
         float x,
         float y,
         float size);
+    void DrawBarIcon(
+        ItemType itemType,
+        float x,
+        float y,
+        float size);
     void DrawLogIcon(
         ItemType itemType,
         float x,
@@ -108,4 +116,6 @@ private:
     int clickedInventorySlotIndex;
 
     bool weaponSlotClickPending;
+    bool recipeRequestPending;
+    RecipeType requestedRecipeType;
 };
