@@ -11,6 +11,7 @@ const ResourceDefinition &ResourceDatabase::Get(
         25,
         ItemType::LOG,
         1,
+        1,
         10};
 
     static const ResourceDefinition oakTree{
@@ -21,6 +22,7 @@ const ResourceDefinition &ResourceDatabase::Get(
         38,
         ItemType::OAK_LOG,
         1,
+        3,
         15};
 
     static const ResourceDefinition willowTree{
@@ -31,6 +33,7 @@ const ResourceDefinition &ResourceDatabase::Get(
         68,
         ItemType::WILLOW_LOG,
         1,
+        5,
         20};
 
     switch (resourceType)

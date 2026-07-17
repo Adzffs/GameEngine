@@ -17,6 +17,7 @@ public:
         int xpReward,
         ItemType itemReward,
         int itemAmount,
+        int maxUses,
         int respawnTicks);
 
     ResourceType GetResourceType() const;
@@ -29,6 +30,8 @@ public:
 
     ItemType GetItemReward() const;
     int GetItemAmount() const;
+
+    int GetMaxUses() const;
 
     int GetRespawnTicks() const;
 
@@ -43,6 +46,8 @@ private:
 
     ItemType itemReward;
     int itemAmount;
+
+    int maxUses;
 
     int respawnTicks;
 };

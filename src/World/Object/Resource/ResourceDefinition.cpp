@@ -10,6 +10,7 @@ ResourceDefinition::ResourceDefinition(
     int xpReward,
     ItemType itemReward,
     int itemAmount,
+    int maxUses,
     int respawnTicks)
     : resourceType(resourceType),
       name(std::move(name)),
@@ -18,6 +19,7 @@ ResourceDefinition::ResourceDefinition(
       xpReward(xpReward),
       itemReward(itemReward),
       itemAmount(itemAmount),
+      maxUses(maxUses),
       respawnTicks(respawnTicks)
 {
 }
@@ -58,6 +60,11 @@ ItemType ResourceDefinition::GetItemReward() const
 int ResourceDefinition::GetItemAmount() const
 {
     return itemAmount;
+}
+
+int ResourceDefinition::GetMaxUses() const
+{
+    return maxUses;
 }
 
 int ResourceDefinition::GetRespawnTicks() const
