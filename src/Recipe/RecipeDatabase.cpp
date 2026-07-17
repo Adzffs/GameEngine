@@ -35,6 +35,21 @@ RecipeDatabase::Get(
         ItemType::IRON_BAR,
         1};
 
+    static const RecipeDefinition steelBarRecipe{
+        RecipeType::STEEL_BAR,
+        "Smelt Steel bar",
+        StationType::FURNACE,
+        SkillType::SMITHING,
+        20,
+        20,
+        4,
+        {
+            {ItemType::IRON_ORE, 1},
+            {ItemType::COAL, 2},
+        },
+        ItemType::STEEL_BAR,
+        1};
+
     switch (recipeType)
     {
     case RecipeType::BRONZE_BAR:
@@ -42,6 +57,9 @@ RecipeDatabase::Get(
 
     case RecipeType::IRON_BAR:
         return ironBarRecipe;
+
+    case RecipeType::STEEL_BAR:
+        return steelBarRecipe;
 
     case RecipeType::NONE:
     default:

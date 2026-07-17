@@ -106,7 +106,7 @@ void Graphics::HandleStationMenuClick(
         360.0f;
 
     constexpr float menuHeight =
-        220.0f;
+        280.0f;
 
     const float menuX =
         (WindowWidth - menuWidth) /
@@ -125,6 +125,12 @@ void Graphics::HandleStationMenuClick(
     SDL_FRect ironButton{
         menuX + 18.0f,
         menuY + 104.0f,
+        menuWidth - 36.0f,
+        42.0f};
+
+    SDL_FRect steelButton{
+        menuX + 18.0f,
+        menuY + 156.0f,
         menuWidth - 36.0f,
         42.0f};
 
@@ -149,6 +155,18 @@ void Graphics::HandleStationMenuClick(
             RecipeType::IRON_BAR;
 
         recipeRequestPending = true;
+        return;
+    }
+
+    if (IsPointInsideRectangle(
+            mouseX,
+            mouseY,
+            steelButton))
+    {
+        requestedRecipeType =
+            RecipeType::STEEL_BAR;
+
+        recipeRequestPending = true;
     }
 }
 
@@ -163,7 +181,7 @@ void Graphics::DrawStationMenu()
         360.0f;
 
     constexpr float menuHeight =
-        220.0f;
+        280.0f;
 
     const float menuX =
         (WindowWidth - menuWidth) /
@@ -219,6 +237,12 @@ void Graphics::DrawStationMenu()
         menuWidth - 36.0f,
         42.0f};
 
+    SDL_FRect steelButton{
+        menuX + 18.0f,
+        menuY + 156.0f,
+        menuWidth - 36.0f,
+        42.0f};
+
     SDL_SetRenderDrawColor(
         renderer,
         60,
@@ -234,6 +258,10 @@ void Graphics::DrawStationMenu()
         renderer,
         &ironButton);
 
+    SDL_RenderFillRect(
+        renderer,
+        &steelButton);
+
     SDL_SetRenderDrawColor(
         renderer,
         175,
@@ -248,6 +276,10 @@ void Graphics::DrawStationMenu()
     SDL_RenderRect(
         renderer,
         &ironButton);
+
+    SDL_RenderRect(
+        renderer,
+        &steelButton);
 
     SDL_SetRenderDrawColor(
         renderer,
@@ -276,8 +308,14 @@ void Graphics::DrawStationMenu()
 
     SDL_RenderDebugText(
         renderer,
+        steelButton.x + 12.0f,
+        steelButton.y + 14.0f,
+        "STEEL BAR - 1 IRON + 2 COAL");
+
+    SDL_RenderDebugText(
+        renderer,
         menuX + 18.0f,
-        menuY + 180.0f,
+        menuY + 240.0f,
         "PRESS ESC TO CLOSE");
 }
 
@@ -1138,6 +1176,46 @@ void Graphics::DrawResources(
             drawDefaultTree = false;
             break;
         }
+
+        case ResourceType::COAL_ROCK:
+        {
+            SDL_SetRenderDrawColor(
+                renderer,
+                45,
+                45,
+                50,
+                255);
+
+            SDL_FRect rockBody{
+                tileX + TileSize * 0.15f,
+                tileY + TileSize * 0.35f,
+                TileSize * 0.70f,
+                TileSize * 0.50f};
+
+            SDL_RenderFillRect(
+                renderer,
+                &rockBody);
+
+            SDL_SetRenderDrawColor(
+                renderer,
+                35,
+                35,
+                40,
+                255);
+
+            SDL_FRect coalDeposit{
+                tileX + TileSize * 0.32f,
+                tileY + TileSize * 0.43f,
+                TileSize * 0.20f,
+                TileSize * 0.15f};
+
+            SDL_RenderFillRect(
+                renderer,
+                &coalDeposit);
+
+            drawDefaultTree = false;
+            break;
+        }
         }
 
         if (!drawDefaultTree)
@@ -1762,6 +1840,12 @@ void Graphics::DrawOreIcon(
         oreRed = 135;
         oreGreen = 85;
         oreBlue = 65;
+        break;
+
+    case ItemType::COAL:
+        oreRed = 35;
+        oreGreen = 35;
+        oreBlue = 40;
         break;
 
     default:

@@ -87,6 +87,20 @@ const ResourceDefinition &ResourceDatabase::Get(
         DepletedVisualType::ROCK_RUBBLE,
         12};
 
+    static const ResourceDefinition coalRock{
+        ResourceType::COAL_ROCK,
+        "Coal rock",
+        SkillType::MINING,
+        20,
+        ToolType::PICKAXE,
+        50,
+        ItemType::COAL,
+        1,
+        40,
+        1,
+        DepletedVisualType::ROCK_RUBBLE,
+        15};
+
     switch (resourceType)
     {
     case ResourceType::OAK_TREE:
@@ -103,6 +117,9 @@ const ResourceDefinition &ResourceDatabase::Get(
 
     case ResourceType::IRON_ROCK:
         return ironRock;
+
+    case ResourceType::COAL_ROCK:
+        return coalRock;
 
     case ResourceType::NORMAL_TREE:
     default:

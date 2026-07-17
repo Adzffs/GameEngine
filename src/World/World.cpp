@@ -52,6 +52,11 @@ World::World()
         11,
         9);
 
+    CreateResource(
+        ResourceType::COAL_ROCK,
+        14,
+        12);
+
     CreateStation(
         StationType::FURNACE,
         14,

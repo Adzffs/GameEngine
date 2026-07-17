@@ -32,6 +32,10 @@ Player::Player(int id)
         skills.AddXP(
             SkillType::MINING,
             DevelopmentConfig::TEST_MINING_XP);
+
+        skills.AddXP(
+            SkillType::SMITHING,
+            DevelopmentConfig::TEST_SMITHING_XP);
     }
 }
 

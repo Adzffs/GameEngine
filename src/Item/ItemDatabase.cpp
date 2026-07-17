@@ -73,6 +73,16 @@ const ItemDefinition &ItemDatabase::Get(
         0,
         0};
 
+    static const ItemDefinition coal{
+        ItemType::COAL,
+        "Coal",
+        true,
+        EquipmentSlotType::NONE,
+        ToolType::NONE,
+        SkillType::NONE,
+        0,
+        0};
+
     static const ItemDefinition bronzeBar{
         ItemType::BRONZE_BAR,
         "Bronze bar",
@@ -192,6 +202,9 @@ const ItemDefinition &ItemDatabase::Get(
 
     case ItemType::IRON_ORE:
         return ironOre;
+
+    case ItemType::COAL:
+        return coal;
 
     case ItemType::BRONZE_BAR:
         return bronzeBar;

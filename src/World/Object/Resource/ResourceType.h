@@ -8,5 +8,6 @@ enum class ResourceType
 
     COPPER_ROCK,
     TIN_ROCK,
-    IRON_ROCK
+    IRON_ROCK,
+    COAL_ROCK
 };
