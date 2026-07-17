@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "../World/World.h"
-
+#include "../Core/DevelopmentConfig.h"
+#include "../Skills/SkillType.h"
 #include <iostream>
 
 Player::Player(int id)
@@ -9,6 +10,12 @@ Player::Player(int id)
     inventory.AddItem(
         ItemType::BRONZE_AXE,
         1);
+    if (DevelopmentConfig::ENABLE_TEST_PLAYER)
+    {
+        skills.AddXP(
+            SkillType::WOODCUTTING,
+            DevelopmentConfig::TEST_WOODCUTTING_XP);
+    }
 }
 
 void Player::Update(World &world)
