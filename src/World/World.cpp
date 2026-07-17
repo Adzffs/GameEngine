@@ -396,9 +396,7 @@ void World::ProcessResourceInteractions()
                     resourceID));
         }
 
-        interactionIterator =
-            pendingResourceInteractions.erase(
-                interactionIterator);
+        ++interactionIterator;
     }
 }
 void World::ProcessCompletedActions(
@@ -452,6 +450,9 @@ void World::ProcessCompletedActions(
         {
             Logger::Game(
                 "Player inventory is full");
+
+            pendingResourceInteractions.erase(
+                action.GetEntityID());
 
             continue;
         }
@@ -509,6 +510,60 @@ void World::ProcessCompletedActions(
             " uses remaining: " +
             std::to_string(
                 resource->GetRemainingUses()));
+
+        if (!resource->IsActive())
+        {
+            pendingResourceInteractions.erase(
+                action.GetEntityID());
+
+            Logger::Game(
+                resourceDefinition.GetName() +
+                " has been depleted");
+
+            continue;
+        }
+
+        auto interactionIterator =
+            pendingResourceInteractions.find(
+                action.GetEntityID());
+
+        bool stillInteractingWithResource =
+            interactionIterator !=
+                pendingResourceInteractions.end() &&
+            interactionIterator->second ==
+                action.GetTargetID();
+
+        if (!stillInteractingWithResource)
+        {
+            continue;
+        }
+
+        ItemType equippedWeapon =
+            player->GetEquipment()
+                .GetEquippedItem(
+                    EquipmentSlotType::WEAPON);
+
+        const ItemDefinition &weaponDefinition =
+            ItemDatabase::Get(
+                equippedWeapon);
+
+        if (weaponDefinition.GetToolType() !=
+            ToolType::AXE)
+        {
+            pendingResourceInteractions.erase(
+                action.GetEntityID());
+
+            continue;
+        }
+
+        actionManager.AddAction(
+            Action(
+                "Chopping " +
+                    resourceDefinition.GetName(),
+                weaponDefinition
+                    .GetActionDurationTicks(),
+                action.GetEntityID(),
+                action.GetTargetID()));
     }
 }
 void World::ProcessMovementRequests()
