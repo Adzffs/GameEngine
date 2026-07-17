@@ -42,6 +42,19 @@ const ResourceDefinition &ResourceDatabase::Get(
         5,
         20};
 
+    static const ResourceDefinition copperRock{
+        ResourceType::COPPER_ROCK,
+        "Copper rock",
+        SkillType::MINING,
+        1,
+        ToolType::PICKAXE,
+        18,
+        ItemType::COPPER_ORE,
+        1,
+        70,
+        1,
+        8};
+
     switch (resourceType)
     {
     case ResourceType::OAK_TREE:
@@ -49,6 +62,9 @@ const ResourceDefinition &ResourceDatabase::Get(
 
     case ResourceType::WILLOW_TREE:
         return willowTree;
+
+    case ResourceType::COPPER_ROCK:
+        return copperRock;
 
     case ResourceType::NORMAL_TREE:
     default:

@@ -43,6 +43,16 @@ const ItemDefinition &ItemDatabase::Get(
         0,
         0};
 
+    static const ItemDefinition copperOre{
+        ItemType::COPPER_ORE,
+        "Copper ore",
+        false,
+        EquipmentSlotType::NONE,
+        ToolType::NONE,
+        SkillType::NONE,
+        0,
+        0};
+
     static const ItemDefinition coins{
         ItemType::COINS,
         "Coins",
@@ -103,6 +113,9 @@ const ItemDefinition &ItemDatabase::Get(
 
     case ItemType::WILLOW_LOG:
         return willowLog;
+
+    case ItemType::COPPER_ORE:
+        return copperOre;
 
     case ItemType::COINS:
         return coins;

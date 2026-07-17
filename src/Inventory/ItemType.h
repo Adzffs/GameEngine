@@ -8,6 +8,8 @@ enum class ItemType
     OAK_LOG,
     WILLOW_LOG,
 
+    COPPER_ORE,
+
     COINS,
 
     BRONZE_AXE,
