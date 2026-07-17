@@ -63,6 +63,15 @@ public:
 
     void DrawSidePanelTabs();
 
+    void HandleStationMenuClick(
+        float mouseX,
+        float mouseY);
+
+    bool IsPointInsideRectangle(
+        float pointX,
+        float pointY,
+        const SDL_FRect &rectangle) const;
+
     void DrawPlaceholderPanel(
         const char *title);
 

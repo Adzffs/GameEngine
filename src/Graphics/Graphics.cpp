@@ -79,6 +79,78 @@ void Graphics::OpenStationMenu(
         stationType != StationType::NONE;
 }
 
+bool Graphics::IsPointInsideRectangle(
+    float pointX,
+    float pointY,
+    const SDL_FRect &rectangle) const
+{
+    return pointX >= rectangle.x &&
+           pointX <= rectangle.x + rectangle.w &&
+           pointY >= rectangle.y &&
+           pointY <= rectangle.y + rectangle.h;
+}
+
+void Graphics::HandleStationMenuClick(
+    float mouseX,
+    float mouseY)
+{
+    if (!stationMenuOpen ||
+        openStationType !=
+            StationType::FURNACE)
+    {
+        return;
+    }
+
+    constexpr float menuWidth =
+        360.0f;
+
+    constexpr float menuHeight =
+        220.0f;
+
+    const float menuX =
+        (WindowWidth - menuWidth) /
+        2.0f;
+
+    const float menuY =
+        (WindowHeight - menuHeight) /
+        2.0f;
+
+    SDL_FRect bronzeButton{
+        menuX + 18.0f,
+        menuY + 52.0f,
+        menuWidth - 36.0f,
+        42.0f};
+
+    SDL_FRect ironButton{
+        menuX + 18.0f,
+        menuY + 104.0f,
+        menuWidth - 36.0f,
+        42.0f};
+
+    if (IsPointInsideRectangle(
+            mouseX,
+            mouseY,
+            bronzeButton))
+    {
+        requestedRecipeType =
+            RecipeType::BRONZE_BAR;
+
+        recipeRequestPending = true;
+        return;
+    }
+
+    if (IsPointInsideRectangle(
+            mouseX,
+            mouseY,
+            ironButton))
+    {
+        requestedRecipeType =
+            RecipeType::IRON_BAR;
+
+        recipeRequestPending = true;
+    }
+}
+
 void Graphics::DrawStationMenu()
 {
     if (!stationMenuOpen)
@@ -86,14 +158,19 @@ void Graphics::DrawStationMenu()
         return;
     }
 
-    constexpr float menuWidth = 360.0f;
-    constexpr float menuHeight = 220.0f;
+    constexpr float menuWidth =
+        360.0f;
+
+    constexpr float menuHeight =
+        220.0f;
 
     const float menuX =
-        (WindowWidth - menuWidth) / 2.0f;
+        (WindowWidth - menuWidth) /
+        2.0f;
 
     const float menuY =
-        (WindowHeight - menuHeight) / 2.0f;
+        (WindowHeight - menuHeight) /
+        2.0f;
 
     SDL_FRect menuRectangle{
         menuX,
@@ -108,7 +185,9 @@ void Graphics::DrawStationMenu()
         28,
         245);
 
-    SDL_RenderFillRect(renderer, &menuRectangle);
+    SDL_RenderFillRect(
+        renderer,
+        &menuRectangle);
 
     SDL_SetRenderDrawColor(
         renderer,
@@ -117,41 +196,88 @@ void Graphics::DrawStationMenu()
         190,
         255);
 
-    SDL_RenderRect(renderer, &menuRectangle);
-
-    SDL_SetRenderDrawColor(
+    SDL_RenderRect(
         renderer,
-        255,
-        255,
-        255,
-        255);
+        &menuRectangle);
 
-    if (openStationType == StationType::FURNACE)
+    if (openStationType !=
+        StationType::FURNACE)
     {
-        SDL_RenderDebugText(
-            renderer,
-            menuX + 18.0f,
-            menuY + 18.0f,
-            "FURNACE");
-
-        SDL_RenderDebugText(
-            renderer,
-            menuX + 18.0f,
-            menuY + 65.0f,
-            "BRONZE BAR");
-
-        SDL_RenderDebugText(
-            renderer,
-            menuX + 18.0f,
-            menuY + 105.0f,
-            "IRON BAR");
-
-        SDL_RenderDebugText(
-            renderer,
-            menuX + 18.0f,
-            menuY + 175.0f,
-            "PRESS ESC TO CLOSE");
+        return;
     }
+
+    SDL_FRect bronzeButton{
+        menuX + 18.0f,
+        menuY + 52.0f,
+        menuWidth - 36.0f,
+        42.0f};
+
+    SDL_FRect ironButton{
+        menuX + 18.0f,
+        menuY + 104.0f,
+        menuWidth - 36.0f,
+        42.0f};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        60,
+        60,
+        65,
+        255);
+
+    SDL_RenderFillRect(
+        renderer,
+        &bronzeButton);
+
+    SDL_RenderFillRect(
+        renderer,
+        &ironButton);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        175,
+        175,
+        180,
+        255);
+
+    SDL_RenderRect(
+        renderer,
+        &bronzeButton);
+
+    SDL_RenderRect(
+        renderer,
+        &ironButton);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        255,
+        255,
+        255,
+        255);
+
+    SDL_RenderDebugText(
+        renderer,
+        menuX + 18.0f,
+        menuY + 18.0f,
+        "FURNACE");
+
+    SDL_RenderDebugText(
+        renderer,
+        bronzeButton.x + 12.0f,
+        bronzeButton.y + 14.0f,
+        "BRONZE BAR - 1 COPPER + 1 TIN");
+
+    SDL_RenderDebugText(
+        renderer,
+        ironButton.x + 12.0f,
+        ironButton.y + 14.0f,
+        "IRON BAR - 1 IRON ORE");
+
+    SDL_RenderDebugText(
+        renderer,
+        menuX + 18.0f,
+        menuY + 180.0f,
+        "PRESS ESC TO CLOSE");
 }
 
 bool Graphics::HandleSidePanelClick(
@@ -336,15 +462,6 @@ void Graphics::ProcessEvents(bool &running)
 
                 continue;
             }
-
-            if (event.key.scancode ==
-                SDL_SCANCODE_B)
-            {
-                requestedRecipeType =
-                    RecipeType::BRONZE_BAR;
-
-                recipeRequestPending = true;
-            }
         }
 
         if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
@@ -362,6 +479,10 @@ void Graphics::ProcessEvents(bool &running)
 
             if (stationMenuOpen)
             {
+                HandleStationMenuClick(
+                    event.button.x,
+                    event.button.y);
+
                 continue;
             }
 
@@ -2001,6 +2122,8 @@ void Graphics::Render(
         DrawPlaceholderPanel("SETTINGS");
         break;
     }
+
+    DrawStationMenu();
 
     SDL_RenderPresent(renderer);
 }
