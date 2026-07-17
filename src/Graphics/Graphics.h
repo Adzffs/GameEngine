@@ -80,6 +80,11 @@ public:
         float x,
         float y,
         float size);
+    void DrawPickaxeIcon(
+        ItemType itemType,
+        float x,
+        float y,
+        float size);
     void DrawLogIcon(
         ItemType itemType,
         float x,

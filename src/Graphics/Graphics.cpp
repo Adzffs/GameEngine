@@ -917,6 +917,63 @@ void Graphics::DrawAxeIcon(
         &axeHeadRectangle);
 }
 
+void Graphics::DrawPickaxeIcon(
+    ItemType itemType,
+    float x,
+    float y,
+    float size)
+{
+    int headRed = 0;
+    int headGreen = 0;
+    int headBlue = 0;
+
+    switch (itemType)
+    {
+    case ItemType::BRONZE_PICKAXE:
+        headRed = 170;
+        headGreen = 110;
+        headBlue = 60;
+        break;
+
+    default:
+        return;
+    }
+
+    SDL_FRect handleRectangle{
+        x + size * 0.46f,
+        y + size * 0.24f,
+        size * 0.12f,
+        size * 0.60f};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        130,
+        80,
+        35,
+        255);
+
+    SDL_RenderFillRect(
+        renderer,
+        &handleRectangle);
+
+    SDL_FRect pickaxeHeadRectangle{
+        x + size * 0.16f,
+        y + size * 0.16f,
+        size * 0.68f,
+        size * 0.18f};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        headRed,
+        headGreen,
+        headBlue,
+        255);
+
+    SDL_RenderFillRect(
+        renderer,
+        &pickaxeHeadRectangle);
+}
+
 void Graphics::DrawLogIcon(
     ItemType itemType,
     float x,
@@ -1131,6 +1188,12 @@ void Graphics::DrawInventory(
             slotY,
             slotSize);
 
+        DrawPickaxeIcon(
+            slot.GetItemType(),
+            slotX,
+            slotY,
+            slotSize);
+
         if (slot.GetAmount() > 1)
         {
             std::string amountText =
@@ -1303,6 +1366,12 @@ void Graphics::DrawEquipment(
                 slot.slotType);
 
         DrawAxeIcon(
+            equippedItem,
+            slot.x,
+            slot.y,
+            slotSize);
+
+        DrawPickaxeIcon(
             equippedItem,
             slot.x,
             slot.y,
