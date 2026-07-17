@@ -7,6 +7,7 @@ ResourceDefinition::ResourceDefinition(
     std::string name,
     SkillType requiredSkill,
     int requiredSkillLevel,
+    ToolType requiredToolType,
     int xpReward,
     ItemType itemReward,
     int itemAmount,
@@ -17,6 +18,7 @@ ResourceDefinition::ResourceDefinition(
       name(std::move(name)),
       requiredSkill(requiredSkill),
       requiredSkillLevel(requiredSkillLevel),
+      requiredToolType(requiredToolType),
       xpReward(xpReward),
       itemReward(itemReward),
       itemAmount(itemAmount),
@@ -47,6 +49,11 @@ ResourceDefinition::GetRequiredSkill() const
 int ResourceDefinition::GetRequiredSkillLevel() const
 {
     return requiredSkillLevel;
+}
+
+ToolType ResourceDefinition::GetRequiredToolType() const
+{
+    return requiredToolType;
 }
 
 int ResourceDefinition::GetXPReward() const

@@ -3,7 +3,7 @@
 #include "ResourceType.h"
 #include "../../../Inventory/ItemType.h"
 #include "../../../Skills/SkillType.h"
-
+#include "../../../Item/ToolType.h"
 #include <string>
 
 class ResourceDefinition
@@ -14,6 +14,7 @@ public:
         std::string name,
         SkillType requiredSkill,
         int requiredSkillLevel,
+        ToolType requiredToolType,
         int xpReward,
         ItemType itemReward,
         int itemAmount,
@@ -26,7 +27,7 @@ public:
 
     SkillType GetRequiredSkill() const;
     int GetRequiredSkillLevel() const;
-
+    ToolType GetRequiredToolType() const;
     int GetXPReward() const;
 
     ItemType GetItemReward() const;
@@ -44,6 +45,7 @@ private:
 
     SkillType requiredSkill;
     int requiredSkillLevel;
+    ToolType requiredToolType;
 
     int xpReward;
 
