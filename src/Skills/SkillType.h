@@ -3,5 +3,6 @@
 enum class SkillType
 {
     NONE,
-    WOODCUTTING
+    WOODCUTTING,
+    MINING
 };

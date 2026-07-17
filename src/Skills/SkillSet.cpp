@@ -5,6 +5,10 @@ SkillSet::SkillSet()
     skills.emplace(
         SkillType::WOODCUTTING,
         Skill());
+
+    skills.emplace(
+        SkillType::MINING,
+        Skill());
 }
 
 void SkillSet::AddXP(
