@@ -12,6 +12,10 @@ enum class ItemType
     TIN_ORE,
     IRON_ORE,
 
+    BRONZE_BAR,
+    IRON_BAR,
+    STEEL_BAR,
+
     COINS,
 
     BRONZE_AXE,

@@ -720,10 +720,11 @@ void Graphics::DrawSkills(const Player &player)
         const char *name;
     };
 
-    static constexpr std::array<SkillDisplayEntry, 2>
+    static constexpr std::array<SkillDisplayEntry, 3>
         displayedSkills{{
             {SkillType::WOODCUTTING, "WOODCUTTING"},
             {SkillType::MINING, "MINING"},
+            {SkillType::SMITHING, "SMITHING"},
         }};
 
     constexpr float panelWidth = 192.0f;

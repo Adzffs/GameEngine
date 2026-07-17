@@ -9,6 +9,10 @@ SkillSet::SkillSet()
     skills.emplace(
         SkillType::MINING,
         Skill());
+
+    skills.emplace(
+        SkillType::SMITHING,
+        Skill());
 }
 
 void SkillSet::AddXP(
