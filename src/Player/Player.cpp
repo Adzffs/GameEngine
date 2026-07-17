@@ -15,11 +15,23 @@ Player::Player(int id)
         ItemType::BRONZE_PICKAXE,
         1);
 
+    inventory.AddItem(
+        ItemType::IRON_PICKAXE,
+        1);
+
+    inventory.AddItem(
+        ItemType::STEEL_PICKAXE,
+        1);
+
     if (DevelopmentConfig::ENABLE_TEST_PLAYER)
     {
         skills.AddXP(
             SkillType::WOODCUTTING,
             DevelopmentConfig::TEST_WOODCUTTING_XP);
+
+        skills.AddXP(
+            SkillType::MINING,
+            DevelopmentConfig::TEST_MINING_XP);
     }
 }
 

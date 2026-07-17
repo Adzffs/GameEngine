@@ -17,5 +17,7 @@ enum class ItemType
     IRON_AXE,
     STEEL_AXE,
 
-    BRONZE_PICKAXE
+    BRONZE_PICKAXE,
+    IRON_PICKAXE,
+    STEEL_PICKAXE
 };

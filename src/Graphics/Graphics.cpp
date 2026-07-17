@@ -1036,6 +1036,18 @@ void Graphics::DrawPickaxeIcon(
         headBlue = 60;
         break;
 
+    case ItemType::IRON_PICKAXE:
+        headRed = 145;
+        headGreen = 150;
+        headBlue = 155;
+        break;
+
+    case ItemType::STEEL_PICKAXE:
+        headRed = 195;
+        headGreen = 205;
+        headBlue = 215;
+        break;
+
     default:
         return;
     }
