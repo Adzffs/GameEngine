@@ -468,6 +468,7 @@ void Graphics::DrawResources(
         int leafRed = 55;
         int leafGreen = 140;
         int leafBlue = 55;
+        bool drawDefaultTree = true;
 
         switch (resource.GetResourceType())
         {
@@ -488,6 +489,51 @@ void Graphics::DrawResources(
             leafGreen = 135;
             leafBlue = 95;
             break;
+
+        case ResourceType::COPPER_ROCK:
+        {
+            SDL_SetRenderDrawColor(
+                renderer,
+                105,
+                105,
+                115,
+                255);
+
+            SDL_FRect rockBody{
+                tileX + TileSize * 0.15f,
+                tileY + TileSize * 0.35f,
+                TileSize * 0.70f,
+                TileSize * 0.50f};
+
+            SDL_RenderFillRect(
+                renderer,
+                &rockBody);
+
+            SDL_SetRenderDrawColor(
+                renderer,
+                190,
+                105,
+                55,
+                255);
+
+            SDL_FRect copperDeposit{
+                tileX + TileSize * 0.32f,
+                tileY + TileSize * 0.43f,
+                TileSize * 0.20f,
+                TileSize * 0.15f};
+
+            SDL_RenderFillRect(
+                renderer,
+                &copperDeposit);
+
+            drawDefaultTree = false;
+            break;
+        }
+        }
+
+        if (!drawDefaultTree)
+        {
+            continue;
         }
 
         SDL_FRect trunkRectangle{

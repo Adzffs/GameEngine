@@ -34,6 +34,11 @@ World::World()
         ResourceType::WILLOW_TREE,
         11,
         5);
+
+    CreateResource(
+        ResourceType::COPPER_ROCK,
+        5,
+        9);
 }
 void World::CreateResource(
     ResourceType resourceType,
