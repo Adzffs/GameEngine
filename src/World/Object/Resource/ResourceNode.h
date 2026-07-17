@@ -13,18 +13,23 @@ public:
         int y);
 
     void Update();
-    void Deplete();
+    void ConsumeUse();
 
     bool IsActive() const;
 
     ResourceType GetResourceType() const;
 
+    int GetMaxUses() const;
+    int GetRemainingUses() const;
     int GetRemainingRespawnTicks() const;
 
 private:
     ResourceType resourceType;
 
     bool active;
+
+    int maxUses;
+    int remainingUses;
 
     int respawnTicks;
     int remainingRespawnTicks;

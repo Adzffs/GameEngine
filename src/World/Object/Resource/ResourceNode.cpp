@@ -9,6 +9,10 @@ ResourceNode::ResourceNode(
     : WorldObject(id, x, y),
       resourceType(resourceType),
       active(true),
+      maxUses(
+          ResourceDatabase::Get(resourceType)
+              .GetMaxUses()),
+      remainingUses(maxUses),
       respawnTicks(
           ResourceDatabase::Get(resourceType)
               .GetRespawnTicks()),
@@ -31,20 +35,29 @@ void ResourceNode::Update()
     if (remainingRespawnTicks == 0)
     {
         active = true;
+        remainingUses = maxUses;
     }
 }
 
-void ResourceNode::Deplete()
+void ResourceNode::ConsumeUse()
 {
     if (!active)
     {
         return;
     }
 
-    active = false;
+    if (remainingUses > 0)
+    {
+        remainingUses--;
+    }
 
-    remainingRespawnTicks =
-        respawnTicks;
+    if (remainingUses > 0)
+    {
+        return;
+    }
+
+    active = false;
+    remainingRespawnTicks = respawnTicks;
 }
 
 bool ResourceNode::IsActive() const
@@ -60,4 +73,13 @@ ResourceType ResourceNode::GetResourceType() const
 int ResourceNode::GetRemainingRespawnTicks() const
 {
     return remainingRespawnTicks;
+}
+int ResourceNode::GetMaxUses() const
+{
+    return maxUses;
+}
+
+int ResourceNode::GetRemainingUses() const
+{
+    return remainingUses;
 }

@@ -502,7 +502,13 @@ void World::ProcessCompletedActions(
                     woodcutting.GetLevel()));
         }
 
-        resource->Deplete();
+        resource->ConsumeUse();
+
+        Logger::Debug(
+            resourceDefinition.GetName() +
+            " uses remaining: " +
+            std::to_string(
+                resource->GetRemainingUses()));
     }
 }
 void World::ProcessMovementRequests()
