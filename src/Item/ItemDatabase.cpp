@@ -83,6 +83,16 @@ const ItemDefinition &ItemDatabase::Get(
         10,
         3};
 
+    static const ItemDefinition bronzePickaxe{
+        ItemType::BRONZE_PICKAXE,
+        "Bronze pickaxe",
+        false,
+        EquipmentSlotType::WEAPON,
+        ToolType::PICKAXE,
+        SkillType::MINING,
+        1,
+        5};
+
     switch (itemType)
     {
     case ItemType::LOG:
@@ -105,6 +115,9 @@ const ItemDefinition &ItemDatabase::Get(
 
     case ItemType::STEEL_AXE:
         return steelAxe;
+
+    case ItemType::BRONZE_PICKAXE:
+        return bronzePickaxe;
 
     case ItemType::NONE:
     default:

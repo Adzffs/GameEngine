@@ -10,6 +10,11 @@ Player::Player(int id)
     inventory.AddItem(
         ItemType::BRONZE_AXE,
         1);
+
+    inventory.AddItem(
+        ItemType::BRONZE_PICKAXE,
+        1);
+
     if (DevelopmentConfig::ENABLE_TEST_PLAYER)
     {
         skills.AddXP(
