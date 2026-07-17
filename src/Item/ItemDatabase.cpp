@@ -73,6 +73,36 @@ const ItemDefinition &ItemDatabase::Get(
         0,
         0};
 
+    static const ItemDefinition bronzeBar{
+        ItemType::BRONZE_BAR,
+        "Bronze bar",
+        true,
+        EquipmentSlotType::NONE,
+        ToolType::NONE,
+        SkillType::NONE,
+        0,
+        0};
+
+    static const ItemDefinition ironBar{
+        ItemType::IRON_BAR,
+        "Iron bar",
+        true,
+        EquipmentSlotType::NONE,
+        ToolType::NONE,
+        SkillType::NONE,
+        0,
+        0};
+
+    static const ItemDefinition steelBar{
+        ItemType::STEEL_BAR,
+        "Steel bar",
+        true,
+        EquipmentSlotType::NONE,
+        ToolType::NONE,
+        SkillType::NONE,
+        0,
+        0};
+
     static const ItemDefinition coins{
         ItemType::COINS,
         "Coins",
@@ -162,6 +192,15 @@ const ItemDefinition &ItemDatabase::Get(
 
     case ItemType::IRON_ORE:
         return ironOre;
+
+    case ItemType::BRONZE_BAR:
+        return bronzeBar;
+
+    case ItemType::IRON_BAR:
+        return ironBar;
+
+    case ItemType::STEEL_BAR:
+        return steelBar;
 
     case ItemType::COINS:
         return coins;
