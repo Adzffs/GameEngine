@@ -7,6 +7,7 @@
 #include "RecipeType.h"
 #include "../Inventory/ItemType.h"
 #include "../Skills/SkillType.h"
+#include "../World/Object/Station/StationType.h"
 
 class RecipeDefinition
 {
@@ -14,6 +15,7 @@ public:
     RecipeDefinition(
         RecipeType recipeType,
         std::string name,
+        StationType requiredStationType,
         SkillType requiredSkill,
         int requiredLevel,
         int xpReward,
@@ -25,6 +27,7 @@ public:
     RecipeType GetRecipeType() const;
     const std::string &GetName() const;
 
+    StationType GetRequiredStationType() const;
     SkillType GetRequiredSkill() const;
     int GetRequiredLevel() const;
     int GetXPReward() const;
@@ -40,6 +43,7 @@ private:
     RecipeType recipeType;
     std::string name;
 
+    StationType requiredStationType;
     SkillType requiredSkill;
     int requiredLevel;
     int xpReward;

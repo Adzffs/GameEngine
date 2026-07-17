@@ -46,6 +46,8 @@ public:
         int entityID,
         int stationID);
     void CancelActionsForEntity(int entityID);
+    void CloseStationInteraction(
+        int entityID);
     void ClearPendingResourceInteraction(
         int entityID);
     void ClearPendingStationInteraction(
@@ -97,6 +99,9 @@ private:
     void ProcessStationInteractions();
     void ProcessCompletedActions(
         const std::vector<Action> &completedActions);
+    bool CanUseStation(
+        int entityID,
+        StationType requiredStationType);
     std::queue<MovementRequest> movementRequests;
 
     std::queue<MovementDestinationRequest>
@@ -108,5 +113,6 @@ private:
     std::map<int, int> pendingResourceInteractions;
     std::map<int, int> pendingStationInteractions;
     std::map<int, StationType> openedStations;
+    std::map<int, int> activeStations;
     std::map<int, RecipeType> activeRecipeLoops;
 };

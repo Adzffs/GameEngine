@@ -9,6 +9,7 @@ RecipeDatabase::Get(
     static const RecipeDefinition bronzeBarRecipe{
         RecipeType::BRONZE_BAR,
         "Smelt Bronze bar",
+        StationType::FURNACE,
         SkillType::SMITHING,
         1,
         6,
@@ -23,6 +24,7 @@ RecipeDatabase::Get(
     static const RecipeDefinition ironBarRecipe{
         RecipeType::IRON_BAR,
         "Smelt Iron bar",
+        StationType::FURNACE,
         SkillType::SMITHING,
         10,
         13,

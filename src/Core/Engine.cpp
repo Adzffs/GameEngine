@@ -68,9 +68,10 @@ void Engine::Run()
         {
             world.CancelActionsForEntity(playerID);
 
-            world.ClearPendingResourceInteraction(
+            world.CloseStationInteraction(
                 playerID);
-            world.ClearPendingStationInteraction(
+
+            world.ClearPendingResourceInteraction(
                 playerID);
 
             ResourceNode *resource =
@@ -108,6 +109,9 @@ void Engine::Run()
         if (graphics.ConsumeStationMenuClose())
         {
             world.CancelActionsForEntity(
+                playerID);
+
+            world.CloseStationInteraction(
                 playerID);
         }
 

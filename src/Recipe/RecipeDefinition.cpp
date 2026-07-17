@@ -5,6 +5,7 @@
 RecipeDefinition::RecipeDefinition(
     RecipeType recipeType,
     std::string name,
+    StationType requiredStationType,
     SkillType requiredSkill,
     int requiredLevel,
     int xpReward,
@@ -14,6 +15,7 @@ RecipeDefinition::RecipeDefinition(
     int outputAmount)
     : recipeType(recipeType),
       name(std::move(name)),
+      requiredStationType(requiredStationType),
       requiredSkill(requiredSkill),
       requiredLevel(requiredLevel),
       xpReward(xpReward),
@@ -33,6 +35,12 @@ const std::string &
 RecipeDefinition::GetName() const
 {
     return name;
+}
+
+StationType
+RecipeDefinition::GetRequiredStationType() const
+{
+    return requiredStationType;
 }
 
 SkillType RecipeDefinition::GetRequiredSkill() const

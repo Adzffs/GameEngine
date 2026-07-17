@@ -194,6 +194,75 @@ bool World::ConsumeOpenedStation(
     return true;
 }
 
+bool World::CanUseStation(
+    int entityID,
+    StationType requiredStationType)
+{
+    auto activeStationIterator =
+        activeStations.find(entityID);
+
+    if (activeStationIterator ==
+        activeStations.end())
+    {
+        return false;
+    }
+
+    Entity *entity =
+        entityManager.GetEntityByID(
+            entityID);
+
+    CraftingStation *station =
+        objectManager.GetStationByID(
+            activeStationIterator->second);
+
+    if (entity == nullptr ||
+        station == nullptr)
+    {
+        activeStations.erase(
+            activeStationIterator);
+
+        return false;
+    }
+
+    if (station->GetStationType() !=
+        requiredStationType)
+    {
+        return false;
+    }
+
+    int distanceX = std::abs(
+        entity->GetPosition().GetX() -
+        station->GetX());
+
+    int distanceY = std::abs(
+        entity->GetPosition().GetY() -
+        station->GetY());
+
+    bool isAdjacent =
+        distanceX <= 1 && distanceY <= 1;
+
+    if (!isAdjacent)
+    {
+        activeStations.erase(
+            activeStationIterator);
+
+        return false;
+    }
+
+    return true;
+}
+
+void World::CloseStationInteraction(
+    int entityID)
+{
+    pendingStationInteractions.erase(
+        entityID);
+
+    openedStations.erase(entityID);
+
+    activeStations.erase(entityID);
+}
+
 bool World::TryStartRecipeAction(
     int entityID,
     RecipeType recipeType)
@@ -219,6 +288,20 @@ bool World::TryStartRecipeAction(
         return false;
     }
 
+    const RecipeDefinition &recipe =
+        RecipeDatabase::Get(
+            recipeType);
+
+    if (!CanUseStation(
+            entityID,
+            recipe.GetRequiredStationType()))
+    {
+        Logger::Game(
+            "You must be beside the correct crafting station");
+
+        return false;
+    }
+
     if (!RecipeSystem::CanCreateRecipe(
             *player,
             recipeType))
@@ -228,10 +311,6 @@ bool World::TryStartRecipeAction(
 
         return false;
     }
-
-    const RecipeDefinition &recipe =
-        RecipeDatabase::Get(
-            recipeType);
 
     activeRecipeLoops[entityID] =
         recipeType;
@@ -436,6 +515,9 @@ void World::ProcessStationInteractions()
             ++interactionIterator;
             continue;
         }
+
+        activeStations[entityID] =
+            stationID;
 
         openedStations[entityID] =
             station->GetStationType();
@@ -654,6 +736,19 @@ void World::ProcessCompletedActions(
             const RecipeDefinition &recipe =
                 RecipeDatabase::Get(
                     recipeType);
+
+            if (!CanUseStation(
+                    entityID,
+                    recipe.GetRequiredStationType()))
+            {
+                activeRecipeLoops.erase(
+                    entityID);
+
+                Logger::Game(
+                    "You are no longer beside the required station");
+
+                continue;
+            }
 
             bool created =
                 RecipeSystem::TryCreateRecipe(
