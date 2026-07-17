@@ -40,6 +40,7 @@ add_executable(GameEngine
     src/World/Object/Resource/ResourceDatabase.cpp
     src/Recipe/RecipeDefinition.cpp
     src/Recipe/RecipeDatabase.cpp
+    src/Recipe/RecipeSystem.cpp
 
 )
 target_include_directories(GameEngine PRIVATE src)
