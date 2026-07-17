@@ -150,6 +150,9 @@ void World::CancelActionsForEntity(
 {
     actionManager.CancelActionsForEntity(
         entityID);
+
+    activeRecipeLoops.erase(
+        entityID);
 }
 
 void World::ClearPendingResourceInteraction(
@@ -221,6 +224,9 @@ bool World::TryStartRecipeAction(
     const RecipeDefinition &recipe =
         RecipeDatabase::Get(
             recipeType);
+
+    activeRecipeLoops[entityID] =
+        recipeType;
 
     actionManager.AddAction(
         Action(
@@ -624,6 +630,9 @@ void World::ProcessCompletedActions(
 
             if (player == nullptr)
             {
+                activeRecipeLoops.erase(
+                    action.GetEntityID());
+
                 continue;
             }
 
@@ -640,17 +649,57 @@ void World::ProcessCompletedActions(
                     *player,
                     recipeType);
 
-            if (created)
+            if (!created)
             {
-                Logger::Game(
-                    "Created: " +
-                    recipe.GetName());
-            }
-            else
-            {
+                activeRecipeLoops.erase(
+                    action.GetEntityID());
+
                 Logger::Game(
                     "The recipe could not be completed");
+
+                continue;
             }
+
+            Logger::Game(
+                "Created: " +
+                recipe.GetName());
+
+            auto loopIterator =
+                activeRecipeLoops.find(
+                    action.GetEntityID());
+
+            bool shouldRepeat =
+                loopIterator !=
+                    activeRecipeLoops.end() &&
+                loopIterator->second ==
+                    recipeType;
+
+            if (!shouldRepeat)
+            {
+                continue;
+            }
+
+            if (!RecipeSystem::CanCreateRecipe(
+                    *player,
+                    recipeType))
+            {
+                activeRecipeLoops.erase(
+                    loopIterator);
+
+                Logger::Game(
+                    "You do not have enough materials to continue");
+
+                continue;
+            }
+
+            actionManager.AddAction(
+                Action(
+                    ActionType::RECIPE,
+                    recipe.GetName(),
+                    recipe.GetActionDurationTicks(),
+                    action.GetEntityID(),
+                    static_cast<int>(
+                        recipeType)));
 
             continue;
         }
