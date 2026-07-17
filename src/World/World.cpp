@@ -13,6 +13,7 @@
 #include "../Item/ToolType.h"
 #include <string>
 #include "Object/Resource/ResourceDatabase.h"
+#include "../Core/Random.h"
 
 World::World()
     : map(100, 100)
@@ -409,8 +410,7 @@ void World::ProcessResourceInteractions()
 void World::ProcessCompletedActions(
     const std::vector<Action> &completedActions)
 {
-    for (const Action &action :
-         completedActions)
+    for (const Action &action : completedActions)
     {
         ResourceNode *resource =
             objectManager.GetResourceByID(
@@ -442,82 +442,118 @@ void World::ProcessCompletedActions(
             ResourceDatabase::Get(
                 resource->GetResourceType());
 
-        ItemType rewardItem =
-            resourceDefinition.GetItemReward();
-
-        int rewardAmount =
-            resourceDefinition.GetItemAmount();
-
-        bool itemAdded =
-            player->GetInventory().AddItem(
-                rewardItem,
-                rewardAmount);
-
-        if (!itemAdded)
-        {
-            Logger::Game(
-                "Player inventory is full");
-
-            pendingResourceInteractions.erase(
-                action.GetEntityID());
-
-            continue;
-        }
-
-        int previousLevel =
+        int playerWoodcuttingLevel =
             player->GetSkills()
                 .GetSkill(
                     SkillType::WOODCUTTING)
                 .GetLevel();
 
-        player->GetSkills().AddXP(
-            SkillType::WOODCUTTING,
-            resourceDefinition.GetXPReward());
+        int levelsAboveRequirement =
+            playerWoodcuttingLevel -
+            resourceDefinition
+                .GetRequiredSkillLevel();
 
-        const Skill &woodcutting =
-            player->GetSkills()
-                .GetSkill(
-                    SkillType::WOODCUTTING);
+        int successChance =
+            resourceDefinition
+                .GetBaseSuccessChance() +
+            levelsAboveRequirement * 2;
 
-        const ItemDefinition &rewardDefinition =
-            ItemDatabase::Get(
-                rewardItem);
-
-        Logger::Game(
-            "Player " +
-            std::to_string(
-                player->GetID()) +
-            " chopped " +
-            resourceDefinition.GetName() +
-            " | Received: " +
-            std::to_string(rewardAmount) +
-            " " +
-            rewardDefinition.GetName() +
-            " | Woodcutting: " +
-            std::to_string(
-                woodcutting.GetXP()) +
-            " XP (Level " +
-            std::to_string(
-                woodcutting.GetLevel()) +
-            ")");
-
-        if (woodcutting.GetLevel() >
-            previousLevel)
+        if (successChance > 95)
         {
-            Logger::Game(
-                "Woodcutting level increased to " +
-                std::to_string(
-                    woodcutting.GetLevel()));
+            successChance = 95;
         }
 
-        resource->ConsumeUse();
+        bool successfulChop =
+            Random::RollPercentage(
+                successChance);
 
-        Logger::Debug(
-            resourceDefinition.GetName() +
-            " uses remaining: " +
-            std::to_string(
-                resource->GetRemainingUses()));
+        if (successfulChop)
+        {
+            ItemType rewardItem =
+                resourceDefinition.GetItemReward();
 
+            int rewardAmount =
+                resourceDefinition.GetItemAmount();
+
+            bool itemAdded =
+                player->GetInventory().AddItem(
+                    rewardItem,
+                    rewardAmount);
+
+            if (!itemAdded)
+            {
+                Logger::Game(
+                    "Player inventory is full");
+
+                pendingResourceInteractions.erase(
+                    action.GetEntityID());
+
+                continue;
+            }
+
+            int previousLevel =
+                player->GetSkills()
+                    .GetSkill(
+                        SkillType::WOODCUTTING)
+                    .GetLevel();
+
+            player->GetSkills().AddXP(
+                SkillType::WOODCUTTING,
+                resourceDefinition.GetXPReward());
+
+            const Skill &woodcutting =
+                player->GetSkills()
+                    .GetSkill(
+                        SkillType::WOODCUTTING);
+
+            const ItemDefinition &rewardDefinition =
+                ItemDatabase::Get(
+                    rewardItem);
+
+            Logger::Game(
+                "Player " +
+                std::to_string(
+                    player->GetID()) +
+                " chopped " +
+                resourceDefinition.GetName() +
+                " | Received: " +
+                std::to_string(rewardAmount) +
+                " " +
+                rewardDefinition.GetName() +
+                " | Woodcutting: " +
+                std::to_string(
+                    woodcutting.GetXP()) +
+                " XP (Level " +
+                std::to_string(
+                    woodcutting.GetLevel()) +
+                ")");
+
+            if (woodcutting.GetLevel() >
+                previousLevel)
+            {
+                Logger::Game(
+                    "Woodcutting level increased to " +
+                    std::to_string(
+                        woodcutting.GetLevel()));
+            }
+
+            resource->ConsumeUse();
+
+            Logger::Debug(
+                resourceDefinition.GetName() +
+                " uses remaining: " +
+                std::to_string(
+                    resource->GetRemainingUses()));
+        }
+        else
+        {
+            Logger::Game(
+                "You swing at the " +
+                resourceDefinition.GetName() +
+                " but receive no logs");
+        }
+
+        // Only stop after a successful chop depleted the tree.
         if (!resource->IsActive())
         {
             pendingResourceInteractions.erase(
@@ -563,6 +599,7 @@ void World::ProcessCompletedActions(
             continue;
         }
 
+        // Start another attempt after either success or failure.
         actionManager.AddAction(
             Action(
                 "Chopping " +

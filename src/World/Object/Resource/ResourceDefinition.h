@@ -17,6 +17,7 @@ public:
         int xpReward,
         ItemType itemReward,
         int itemAmount,
+        int baseSuccessChance,
         int maxUses,
         int respawnTicks);
 
@@ -30,6 +31,8 @@ public:
 
     ItemType GetItemReward() const;
     int GetItemAmount() const;
+
+    int GetBaseSuccessChance() const;
 
     int GetMaxUses() const;
 
@@ -46,6 +49,8 @@ private:
 
     ItemType itemReward;
     int itemAmount;
+
+    int baseSuccessChance;
 
     int maxUses;
 

@@ -10,6 +10,7 @@ ResourceDefinition::ResourceDefinition(
     int xpReward,
     ItemType itemReward,
     int itemAmount,
+    int baseSuccessChance,
     int maxUses,
     int respawnTicks)
     : resourceType(resourceType),
@@ -19,6 +20,7 @@ ResourceDefinition::ResourceDefinition(
       xpReward(xpReward),
       itemReward(itemReward),
       itemAmount(itemAmount),
+      baseSuccessChance(baseSuccessChance),
       maxUses(maxUses),
       respawnTicks(respawnTicks)
 {
@@ -60,6 +62,11 @@ ItemType ResourceDefinition::GetItemReward() const
 int ResourceDefinition::GetItemAmount() const
 {
     return itemAmount;
+}
+
+int ResourceDefinition::GetBaseSuccessChance() const
+{
+    return baseSuccessChance;
 }
 
 int ResourceDefinition::GetMaxUses() const

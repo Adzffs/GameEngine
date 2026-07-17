@@ -11,6 +11,7 @@ const ResourceDefinition &ResourceDatabase::Get(
         25,
         ItemType::LOG,
         1,
+        70,
         1,
         10};
 
@@ -22,6 +23,7 @@ const ResourceDefinition &ResourceDatabase::Get(
         38,
         ItemType::OAK_LOG,
         1,
+        55,
         3,
         15};
 
@@ -33,6 +35,7 @@ const ResourceDefinition &ResourceDatabase::Get(
         68,
         ItemType::WILLOW_LOG,
         1,
+        45,
         5,
         20};
 
