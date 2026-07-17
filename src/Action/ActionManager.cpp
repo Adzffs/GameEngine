@@ -45,3 +45,23 @@ std::vector<Action> ActionManager::Update()
 
     return completedActions;
 }
+
+void ActionManager::CancelActionsForEntity(
+    int entityID)
+{
+    auto actionIterator = actions.begin();
+
+    while (actionIterator != actions.end())
+    {
+        if (actionIterator->GetEntityID() ==
+            entityID)
+        {
+            actionIterator =
+                actions.erase(actionIterator);
+        }
+        else
+        {
+            ++actionIterator;
+        }
+    }
+}

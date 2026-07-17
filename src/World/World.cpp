@@ -82,6 +82,13 @@ void World::QueueResourceInteraction(
         resourceID;
 }
 
+void World::CancelActionsForEntity(
+    int entityID)
+{
+    actionManager.CancelActionsForEntity(
+        entityID);
+}
+
 void World::ClearPendingResourceInteraction(
     int entityID)
 {

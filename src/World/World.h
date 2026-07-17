@@ -33,7 +33,7 @@ public:
     void QueueResourceInteraction(
         int entityID,
         int resourceID);
-
+    void CancelActionsForEntity(int entityID);
     void ClearPendingResourceInteraction(
         int entityID);
 

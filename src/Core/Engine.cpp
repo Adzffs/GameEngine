@@ -53,6 +53,11 @@ void Engine::Run()
                 clickedTileX,
                 clickedTileY))
         {
+            world.CancelActionsForEntity(playerID);
+
+            world.ClearPendingResourceInteraction(
+                playerID);
+
             ResourceNode *resource =
                 world.GetResourceAt(
                     clickedTileX,
@@ -64,11 +69,6 @@ void Engine::Run()
                 world.QueueResourceInteraction(
                     playerID,
                     resource->GetID());
-            }
-            else
-            {
-                world.ClearPendingResourceInteraction(
-                    playerID);
             }
 
             MovementDestinationRequest request(
