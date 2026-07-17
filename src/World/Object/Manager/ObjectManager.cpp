@@ -4,9 +4,16 @@ ObjectManager::ObjectManager()
 {
 }
 
-void ObjectManager::CreateResource(int x, int y)
+void ObjectManager::CreateResource(
+    ResourceType resourceType,
+    int x,
+    int y)
 {
-    ResourceNode resource(nextID, x, y);
+    ResourceNode resource(
+        nextID,
+        resourceType,
+        x,
+        y);
 
     resources.push_back(resource);
 

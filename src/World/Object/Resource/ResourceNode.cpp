@@ -1,13 +1,17 @@
 #include "ResourceNode.h"
+#include "ResourceDatabase.h"
 
 ResourceNode::ResourceNode(
     int id,
+    ResourceType resourceType,
     int x,
-    int y,
-    int respawnTicks)
+    int y)
     : WorldObject(id, x, y),
+      resourceType(resourceType),
       active(true),
-      respawnTicks(respawnTicks),
+      respawnTicks(
+          ResourceDatabase::Get(resourceType)
+              .GetRespawnTicks()),
       remainingRespawnTicks(0)
 {
 }
@@ -38,12 +42,19 @@ void ResourceNode::Deplete()
     }
 
     active = false;
-    remainingRespawnTicks = respawnTicks;
+
+    remainingRespawnTicks =
+        respawnTicks;
 }
 
 bool ResourceNode::IsActive() const
 {
     return active;
+}
+
+ResourceType ResourceNode::GetResourceType() const
+{
+    return resourceType;
 }
 
 int ResourceNode::GetRemainingRespawnTicks() const

@@ -12,16 +12,37 @@
 #include "../Item/ItemDatabase.h"
 #include "../Item/ToolType.h"
 #include <string>
+#include "Object/Resource/ResourceDatabase.h"
 
 World::World()
     : map(100, 100)
 {
     entityManager.CreateNPC(3, 3);
-    CreateResource(5, 5);
+
+    CreateResource(
+        ResourceType::NORMAL_TREE,
+        5,
+        5);
+
+    CreateResource(
+        ResourceType::OAK_TREE,
+        8,
+        5);
+
+    CreateResource(
+        ResourceType::WILLOW_TREE,
+        11,
+        5);
 }
-void World::CreateResource(int x, int y)
+void World::CreateResource(
+    ResourceType resourceType,
+    int x,
+    int y)
 {
-    objectManager.CreateResource(x, y);
+    objectManager.CreateResource(
+        resourceType,
+        x,
+        y);
 
     map.SetTileType(
         x,
@@ -302,6 +323,7 @@ void World::ProcessResourceInteractions()
 
             continue;
         }
+
         if (weaponDefinition.HasSkillRequirement())
         {
             int playerLevel =
@@ -310,16 +332,18 @@ void World::ProcessResourceInteractions()
                         SkillType::WOODCUTTING)
                     .GetLevel();
 
-            int requiredLevel =
+            int toolLevelRequirement =
                 weaponDefinition
                     .GetRequiredSkillLevel();
 
-            if (playerLevel < requiredLevel)
+            if (playerLevel <
+                toolLevelRequirement)
             {
                 Logger::Game(
                     "You need Woodcutting level " +
-                    std::to_string(requiredLevel) +
-                    " to use a " +
+                    std::to_string(
+                        toolLevelRequirement) +
+                    " to use " +
                     weaponDefinition.GetName());
 
                 interactionIterator =
@@ -330,12 +354,42 @@ void World::ProcessResourceInteractions()
             }
         }
 
+        const ResourceDefinition &resourceDefinition =
+            ResourceDatabase::Get(
+                resource->GetResourceType());
+
+        int playerWoodcuttingLevel =
+            player->GetSkills()
+                .GetSkill(
+                    SkillType::WOODCUTTING)
+                .GetLevel();
+
+        if (playerWoodcuttingLevel <
+            resourceDefinition
+                .GetRequiredSkillLevel())
+        {
+            Logger::Game(
+                "You need Woodcutting level " +
+                std::to_string(
+                    resourceDefinition
+                        .GetRequiredSkillLevel()) +
+                " to chop " +
+                resourceDefinition.GetName());
+
+            interactionIterator =
+                pendingResourceInteractions.erase(
+                    interactionIterator);
+
+            continue;
+        }
+
         if (!actionManager.HasActionForEntity(
                 entityID))
         {
             actionManager.AddAction(
                 Action(
-                    "Chopping Tree",
+                    "Chopping " +
+                        resourceDefinition.GetName(),
                     weaponDefinition
                         .GetActionDurationTicks(),
                     entityID,
@@ -350,7 +404,8 @@ void World::ProcessResourceInteractions()
 void World::ProcessCompletedActions(
     const std::vector<Action> &completedActions)
 {
-    for (const Action &action : completedActions)
+    for (const Action &action :
+         completedActions)
     {
         ResourceNode *resource =
             objectManager.GetResourceByID(
@@ -378,10 +433,20 @@ void World::ProcessCompletedActions(
             continue;
         }
 
+        const ResourceDefinition &resourceDefinition =
+            ResourceDatabase::Get(
+                resource->GetResourceType());
+
+        ItemType rewardItem =
+            resourceDefinition.GetItemReward();
+
+        int rewardAmount =
+            resourceDefinition.GetItemAmount();
+
         bool itemAdded =
             player->GetInventory().AddItem(
-                ItemType::LOG,
-                1);
+                rewardItem,
+                rewardAmount);
 
         if (!itemAdded)
         {
@@ -393,31 +458,43 @@ void World::ProcessCompletedActions(
 
         int previousLevel =
             player->GetSkills()
-                .GetSkill(SkillType::WOODCUTTING)
+                .GetSkill(
+                    SkillType::WOODCUTTING)
                 .GetLevel();
 
         player->GetSkills().AddXP(
             SkillType::WOODCUTTING,
-            25);
+            resourceDefinition.GetXPReward());
 
         const Skill &woodcutting =
             player->GetSkills()
-                .GetSkill(SkillType::WOODCUTTING);
+                .GetSkill(
+                    SkillType::WOODCUTTING);
+
+        const ItemDefinition &rewardDefinition =
+            ItemDatabase::Get(
+                rewardItem);
 
         Logger::Game(
             "Player " +
-            std::to_string(player->GetID()) +
-            " chopped 1 log | Logs: " +
             std::to_string(
-                player->GetInventory().GetItemAmount(
-                    ItemType::LOG)) +
+                player->GetID()) +
+            " chopped " +
+            resourceDefinition.GetName() +
+            " | Received: " +
+            std::to_string(rewardAmount) +
+            " " +
+            rewardDefinition.GetName() +
             " | Woodcutting: " +
-            std::to_string(woodcutting.GetXP()) +
+            std::to_string(
+                woodcutting.GetXP()) +
             " XP (Level " +
-            std::to_string(woodcutting.GetLevel()) +
+            std::to_string(
+                woodcutting.GetLevel()) +
             ")");
 
-        if (woodcutting.GetLevel() > previousLevel)
+        if (woodcutting.GetLevel() >
+            previousLevel)
         {
             Logger::Game(
                 "Woodcutting level increased to " +

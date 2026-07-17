@@ -23,6 +23,26 @@ const ItemDefinition &ItemDatabase::Get(
         0,
         0};
 
+    static const ItemDefinition oakLog{
+        ItemType::OAK_LOG,
+        "Oak log",
+        false,
+        EquipmentSlotType::NONE,
+        ToolType::NONE,
+        SkillType::NONE,
+        0,
+        0};
+
+    static const ItemDefinition willowLog{
+        ItemType::WILLOW_LOG,
+        "Willow log",
+        false,
+        EquipmentSlotType::NONE,
+        ToolType::NONE,
+        SkillType::NONE,
+        0,
+        0};
+
     static const ItemDefinition coins{
         ItemType::COINS,
         "Coins",
@@ -67,6 +87,12 @@ const ItemDefinition &ItemDatabase::Get(
     {
     case ItemType::LOG:
         return log;
+
+    case ItemType::OAK_LOG:
+        return oakLog;
+
+    case ItemType::WILLOW_LOG:
+        return willowLog;
 
     case ItemType::COINS:
         return coins;

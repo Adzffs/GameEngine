@@ -432,38 +432,24 @@ void Graphics::DrawNPCs(
 void Graphics::DrawResources(
     const std::vector<ResourceNode> &resources)
 {
-    for (const ResourceNode &resource : resources)
+    for (const ResourceNode &resource :
+         resources)
     {
-        if (resource.IsActive())
-        {
-            SDL_FRect resourceRectangle{
-                static_cast<float>(
-                    resource.GetX() * TileSize + 7),
-                static_cast<float>(
-                    resource.GetY() * TileSize + 7),
-                static_cast<float>(TileSize - 14),
-                static_cast<float>(TileSize - 14)};
+        float tileX =
+            static_cast<float>(
+                resource.GetX() * TileSize);
 
-            SDL_SetRenderDrawColor(
-                renderer,
-                140,
-                90,
-                40,
-                255);
+        float tileY =
+            static_cast<float>(
+                resource.GetY() * TileSize);
 
-            SDL_RenderFillRect(
-                renderer,
-                &resourceRectangle);
-        }
-        else
+        if (!resource.IsActive())
         {
             SDL_FRect stumpRectangle{
-                static_cast<float>(
-                    resource.GetX() * TileSize + 9),
-                static_cast<float>(
-                    resource.GetY() * TileSize + 18),
-                static_cast<float>(TileSize - 18),
-                static_cast<float>(TileSize - 21)};
+                tileX + 11.0f,
+                tileY + 19.0f,
+                10.0f,
+                9.0f};
 
             SDL_SetRenderDrawColor(
                 renderer,
@@ -475,7 +461,68 @@ void Graphics::DrawResources(
             SDL_RenderFillRect(
                 renderer,
                 &stumpRectangle);
+
+            continue;
         }
+
+        int leafRed = 55;
+        int leafGreen = 140;
+        int leafBlue = 55;
+
+        switch (resource.GetResourceType())
+        {
+        case ResourceType::NORMAL_TREE:
+            leafRed = 55;
+            leafGreen = 140;
+            leafBlue = 55;
+            break;
+
+        case ResourceType::OAK_TREE:
+            leafRed = 75;
+            leafGreen = 110;
+            leafBlue = 40;
+            break;
+
+        case ResourceType::WILLOW_TREE:
+            leafRed = 65;
+            leafGreen = 135;
+            leafBlue = 95;
+            break;
+        }
+
+        SDL_FRect trunkRectangle{
+            tileX + 13.0f,
+            tileY + 14.0f,
+            6.0f,
+            15.0f};
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            125,
+            80,
+            40,
+            255);
+
+        SDL_RenderFillRect(
+            renderer,
+            &trunkRectangle);
+
+        SDL_FRect leavesRectangle{
+            tileX + 5.0f,
+            tileY + 3.0f,
+            22.0f,
+            18.0f};
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            leafRed,
+            leafGreen,
+            leafBlue,
+            255);
+
+        SDL_RenderFillRect(
+            renderer,
+            &leavesRectangle);
     }
 }
 void Graphics::DrawSkills(
@@ -870,6 +917,75 @@ void Graphics::DrawAxeIcon(
         &axeHeadRectangle);
 }
 
+void Graphics::DrawLogIcon(
+    ItemType itemType,
+    float x,
+    float y,
+    float size)
+{
+    int red = 0;
+    int green = 0;
+    int blue = 0;
+
+    switch (itemType)
+    {
+    case ItemType::LOG:
+        red = 140;
+        green = 90;
+        blue = 40;
+        break;
+
+    case ItemType::OAK_LOG:
+        red = 105;
+        green = 70;
+        blue = 35;
+        break;
+
+    case ItemType::WILLOW_LOG:
+        red = 90;
+        green = 115;
+        blue = 70;
+        break;
+
+    default:
+        return;
+    }
+
+    SDL_FRect logRectangle{
+        x + size * 0.20f,
+        y + size * 0.28f,
+        size * 0.60f,
+        size * 0.42f};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        red,
+        green,
+        blue,
+        255);
+
+    SDL_RenderFillRect(
+        renderer,
+        &logRectangle);
+
+    SDL_FRect logEndRectangle{
+        x + size * 0.64f,
+        y + size * 0.28f,
+        size * 0.16f,
+        size * 0.42f};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        red + 25,
+        green + 20,
+        blue + 10,
+        255);
+
+    SDL_RenderFillRect(
+        renderer,
+        &logEndRectangle);
+}
+
 void Graphics::DrawInventory(
     const Inventory &inventory)
 {
@@ -1003,26 +1119,12 @@ void Graphics::DrawInventory(
             continue;
         }
 
-        if (slot.GetItemType() ==
-            ItemType::LOG)
-        {
-            SDL_FRect logRectangle{
-                slotX + 9.0f,
-                slotY + 8.0f,
-                slotSize - 18.0f,
-                slotSize - 18.0f};
+        DrawLogIcon(
+            slot.GetItemType(),
+            slotX,
+            slotY,
+            slotSize);
 
-            SDL_SetRenderDrawColor(
-                renderer,
-                140,
-                90,
-                40,
-                255);
-
-            SDL_RenderFillRect(
-                renderer,
-                &logRectangle);
-        }
         DrawAxeIcon(
             slot.GetItemType(),
             slotX,

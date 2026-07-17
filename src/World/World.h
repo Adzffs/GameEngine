@@ -55,7 +55,10 @@ private:
 
     Pathfinder pathfinder;
 
-    void CreateResource(int x, int y);
+    void CreateResource(
+        ResourceType resourceType,
+        int x,
+        int y);
 
     void ProcessMovementRequests();
     void ProcessMovementDestinationRequests();

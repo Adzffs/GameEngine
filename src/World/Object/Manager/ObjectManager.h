@@ -10,7 +10,10 @@ public:
 
     void Update();
 
-    void CreateResource(int x, int y);
+    void CreateResource(
+        ResourceType resourceType,
+        int x,
+        int y);
 
     const std::vector<ResourceNode> &GetResources() const;
     ResourceNode *GetResourceAt(int x, int y);

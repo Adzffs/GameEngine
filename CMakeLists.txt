@@ -36,6 +36,8 @@ add_executable(GameEngine
     src/Equipment/Equipment.cpp
     src/Item/ItemDefinition.cpp
     src/Item/ItemDatabase.cpp
+    src/World/Object/Resource/ResourceDefinition.cpp
+    src/World/Object/Resource/ResourceDatabase.cpp
 
 )
 target_include_directories(GameEngine PRIVATE src)
