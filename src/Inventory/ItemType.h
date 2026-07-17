@@ -9,6 +9,7 @@ enum class ItemType
     WILLOW_LOG,
 
     COPPER_ORE,
+    TIN_ORE,
 
     COINS,
 

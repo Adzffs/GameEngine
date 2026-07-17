@@ -6,5 +6,6 @@ enum class ResourceType
     OAK_TREE,
     WILLOW_TREE,
 
-    COPPER_ROCK
+    COPPER_ROCK,
+    TIN_ROCK
 };

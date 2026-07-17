@@ -53,6 +53,16 @@ const ItemDefinition &ItemDatabase::Get(
         0,
         0};
 
+    static const ItemDefinition tinOre{
+        ItemType::TIN_ORE,
+        "Tin ore",
+        false,
+        EquipmentSlotType::NONE,
+        ToolType::NONE,
+        SkillType::NONE,
+        0,
+        0};
+
     static const ItemDefinition coins{
         ItemType::COINS,
         "Coins",
@@ -116,6 +126,9 @@ const ItemDefinition &ItemDatabase::Get(
 
     case ItemType::COPPER_ORE:
         return copperOre;
+
+    case ItemType::TIN_ORE:
+        return tinOre;
 
     case ItemType::COINS:
         return coins;
