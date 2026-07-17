@@ -99,6 +99,10 @@ void Engine::Run()
                 player->GetSkills().GetSkill(
                     SkillType::WOODCUTTING);
 
+            const Skill &mining =
+                player->GetSkills().GetSkill(
+                    SkillType::MINING);
+
             graphics.Render(
                 world.GetMap(),
                 world.GetEntities(),
@@ -107,10 +111,7 @@ void Engine::Run()
                 player->GetPosition().GetY(),
                 player->GetInventory(),
                 player->GetEquipment(),
-                woodcutting.GetLevel(),
-                woodcutting.GetXP(),
-                woodcutting.GetXPForCurrentLevel(),
-                woodcutting.GetXPForNextLevel());
+                *player);
         }
     }
     Logger::Info("Server stopped");

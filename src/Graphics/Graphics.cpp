@@ -1,6 +1,7 @@
 #include "Graphics.h"
 #include <iostream>
 #include "../World/Map.h"
+#include "../Player/Player.h"
 #include <string>
 #include <array>
 
@@ -571,12 +572,20 @@ void Graphics::DrawResources(
             &leavesRectangle);
     }
 }
-void Graphics::DrawSkills(
-    int woodcuttingLevel,
-    int woodcuttingXP,
-    int currentLevelXP,
-    int nextLevelXP)
+void Graphics::DrawSkills(const Player &player)
 {
+    struct SkillDisplayEntry
+    {
+        SkillType type;
+        const char *name;
+    };
+
+    static constexpr std::array<SkillDisplayEntry, 2>
+        displayedSkills{{
+            {SkillType::WOODCUTTING, "WOODCUTTING"},
+            {SkillType::MINING, "MINING"},
+        }};
+
     constexpr float panelWidth = 192.0f;
     constexpr float panelHeight = 348.0f;
 
@@ -631,99 +640,45 @@ void Graphics::DrawSkills(
         panelY + 10.0f,
         "SKILLS");
 
-    SDL_RenderDebugText(
-        renderer,
-        panelX + 10.0f,
-        panelY + 42.0f,
-        "WOODCUTTING");
+    float skillX =
+        panelX + 14.0f;
 
-    std::string levelText =
-        "Level: " +
-        std::to_string(woodcuttingLevel);
+    float skillY =
+        panelY + 62.0f;
 
-    SDL_RenderDebugText(
-        renderer,
-        panelX + 10.0f,
-        panelY + 64.0f,
-        levelText.c_str());
+    constexpr float skillRowHeight =
+        56.0f;
 
-    std::string xpText =
-        "XP: " +
-        std::to_string(woodcuttingXP) +
-        " / " +
-        std::to_string(nextLevelXP);
-
-    SDL_RenderDebugText(
-        renderer,
-        panelX + 10.0f,
-        panelY + 84.0f,
-        xpText.c_str());
-
-    float progress = 1.0f;
-
-    if (nextLevelXP > currentLevelXP)
+    for (const SkillDisplayEntry &entry :
+         displayedSkills)
     {
-        progress =
-            static_cast<float>(
-                woodcuttingXP - currentLevelXP) /
-            static_cast<float>(
-                nextLevelXP - currentLevelXP);
+        const Skill &skill =
+            player.GetSkills()
+                .GetSkill(entry.type);
+
+        SDL_RenderDebugText(
+            renderer,
+            skillX,
+            skillY,
+            entry.name);
+
+        std::string detailsText =
+            "Level " +
+            std::to_string(
+                skill.GetLevel()) +
+            "    " +
+            std::to_string(
+                skill.GetXP()) +
+            " XP";
+
+        SDL_RenderDebugText(
+            renderer,
+            skillX,
+            skillY + 20.0f,
+            detailsText.c_str());
+
+        skillY += skillRowHeight;
     }
-
-    if (progress < 0.0f)
-    {
-        progress = 0.0f;
-    }
-
-    if (progress > 1.0f)
-    {
-        progress = 1.0f;
-    }
-
-    SDL_FRect progressBackground{
-        panelX + 10.0f,
-        panelY + 110.0f,
-        panelWidth - 20.0f,
-        16.0f};
-
-    SDL_SetRenderDrawColor(
-        renderer,
-        55,
-        55,
-        55,
-        255);
-
-    SDL_RenderFillRect(
-        renderer,
-        &progressBackground);
-
-    SDL_FRect progressFill{
-        progressBackground.x,
-        progressBackground.y,
-        progressBackground.w * progress,
-        progressBackground.h};
-
-    SDL_SetRenderDrawColor(
-        renderer,
-        70,
-        160,
-        70,
-        255);
-
-    SDL_RenderFillRect(
-        renderer,
-        &progressFill);
-
-    SDL_SetRenderDrawColor(
-        renderer,
-        130,
-        130,
-        130,
-        255);
-
-    SDL_RenderRect(
-        renderer,
-        &progressBackground);
 }
 void Graphics::DrawPlaceholderPanel(
     const char *title)
@@ -1089,6 +1044,52 @@ void Graphics::DrawLogIcon(
         &logEndRectangle);
 }
 
+void Graphics::DrawOreIcon(
+    ItemType itemType,
+    float x,
+    float y,
+    float size)
+{
+    if (itemType != ItemType::COPPER_ORE)
+    {
+        return;
+    }
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        105,
+        105,
+        115,
+        255);
+
+    SDL_FRect rock{
+        x + size * 0.18f,
+        y + size * 0.28f,
+        size * 0.64f,
+        size * 0.50f};
+
+    SDL_RenderFillRect(
+        renderer,
+        &rock);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        190,
+        105,
+        55,
+        255);
+
+    SDL_FRect copper{
+        x + size * 0.34f,
+        y + size * 0.40f,
+        size * 0.22f,
+        size * 0.18f};
+
+    SDL_RenderFillRect(
+        renderer,
+        &copper);
+}
+
 void Graphics::DrawInventory(
     const Inventory &inventory)
 {
@@ -1223,6 +1224,12 @@ void Graphics::DrawInventory(
         }
 
         DrawLogIcon(
+            slot.GetItemType(),
+            slotX,
+            slotY,
+            slotSize);
+
+        DrawOreIcon(
             slot.GetItemType(),
             slotX,
             slotY,
@@ -1460,10 +1467,7 @@ void Graphics::Render(
     int playerY,
     const Inventory &inventory,
     const Equipment &equipment,
-    int woodcuttingLevel,
-    int woodcuttingXP,
-    int currentLevelXP,
-    int nextLevelXP)
+    const Player &player)
 {
     SDL_SetRenderDrawColor(
         renderer,
@@ -1494,11 +1498,7 @@ void Graphics::Render(
         break;
 
     case SidePanelTab::SKILLS:
-        DrawSkills(
-            woodcuttingLevel,
-            woodcuttingXP,
-            currentLevelXP,
-            nextLevelXP);
+        DrawSkills(player);
         break;
 
     case SidePanelTab::QUESTS:

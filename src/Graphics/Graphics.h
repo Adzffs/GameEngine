@@ -11,6 +11,7 @@
 #include "../Equipment/Equipment.h"
 
 class Map;
+class Player;
 
 class Graphics
 {
@@ -34,10 +35,7 @@ public:
         int playerY,
         const Inventory &inventory,
         const Equipment &equipment,
-        int woodcuttingLevel,
-        int woodcuttingXP,
-        int currentLevelXP,
-        int nextLevelXP);
+        const Player &player);
 
     enum class SidePanelTab
     {
@@ -68,11 +66,7 @@ public:
         const std::vector<ResourceNode> &resources);
     void DrawInventory(
         const Inventory &inventory);
-    void DrawSkills(
-        int woodcuttingLevel,
-        int woodcuttingXP,
-        int currentLevelXP,
-        int nextLevelXP);
+    void DrawSkills(const Player &player);
     void DrawEquipment(
         const Equipment &equipment);
     void DrawAxeIcon(
@@ -86,6 +80,11 @@ public:
         float y,
         float size);
     void DrawLogIcon(
+        ItemType itemType,
+        float x,
+        float y,
+        float size);
+    void DrawOreIcon(
         ItemType itemType,
         float x,
         float y,
