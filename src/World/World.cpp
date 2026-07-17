@@ -44,6 +44,11 @@ World::World()
         ResourceType::TIN_ROCK,
         8,
         9);
+
+    CreateResource(
+        ResourceType::IRON_ROCK,
+        11,
+        9);
 }
 void World::CreateResource(
     ResourceType resourceType,

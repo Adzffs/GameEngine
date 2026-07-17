@@ -10,6 +10,7 @@ enum class ItemType
 
     COPPER_ORE,
     TIN_ORE,
+    IRON_ORE,
 
     COINS,
 

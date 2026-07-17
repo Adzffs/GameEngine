@@ -630,6 +630,46 @@ void Graphics::DrawResources(
             drawDefaultTree = false;
             break;
         }
+
+        case ResourceType::IRON_ROCK:
+        {
+            SDL_SetRenderDrawColor(
+                renderer,
+                105,
+                105,
+                115,
+                255);
+
+            SDL_FRect rockBody{
+                tileX + TileSize * 0.15f,
+                tileY + TileSize * 0.35f,
+                TileSize * 0.70f,
+                TileSize * 0.50f};
+
+            SDL_RenderFillRect(
+                renderer,
+                &rockBody);
+
+            SDL_SetRenderDrawColor(
+                renderer,
+                135,
+                85,
+                65,
+                255);
+
+            SDL_FRect ironDeposit{
+                tileX + TileSize * 0.32f,
+                tileY + TileSize * 0.43f,
+                TileSize * 0.20f,
+                TileSize * 0.15f};
+
+            SDL_RenderFillRect(
+                renderer,
+                &ironDeposit);
+
+            drawDefaultTree = false;
+            break;
+        }
         }
 
         if (!drawDefaultTree)
@@ -1178,6 +1218,12 @@ void Graphics::DrawOreIcon(
         oreRed = 190;
         oreGreen = 190;
         oreBlue = 200;
+        break;
+
+    case ItemType::IRON_ORE:
+        oreRed = 135;
+        oreGreen = 85;
+        oreBlue = 65;
         break;
 
     default:
