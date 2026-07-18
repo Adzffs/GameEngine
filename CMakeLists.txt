@@ -32,6 +32,9 @@ set(GAMEENGINE_CORE_SOURCES
     src/Skills/Skill.cpp
     src/Skills/SkillSet.cpp
     src/Equipment/Equipment.cpp
+    src/Combat/CombatFormulas.cpp
+    src/Combat/MeleeAttackResolver.cpp
+    src/Core/SeededRandom.cpp
     src/Item/ItemDefinition.cpp
     src/Item/ItemDatabase.cpp
     src/World/Object/Resource/ResourceDefinition.cpp
@@ -102,5 +105,27 @@ if(BUILD_TESTING)
     add_test(
         NAME PlayerHealthTests
         COMMAND PlayerHealthTests
+    )
+
+    add_executable(CombatFormulaTests
+        tests/CombatFormulaTests.cpp
+    )
+
+    target_link_libraries(CombatFormulaTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME CombatFormulaTests
+        COMMAND CombatFormulaTests
+    )
+
+    add_executable(MeleeAttackResolverTests
+        tests/MeleeAttackResolverTests.cpp
+    )
+
+    target_link_libraries(MeleeAttackResolverTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME MeleeAttackResolverTests
+        COMMAND MeleeAttackResolverTests
     )
 endif()

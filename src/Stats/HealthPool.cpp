@@ -45,19 +45,28 @@ void HealthPool::SetMaximumHealth(int newMaximumHealth)
     }
 }
 
-void HealthPool::ApplyDamage(int amount)
+int HealthPool::ApplyDamage(int amount)
 {
     if (amount <= 0)
     {
-        return;
+        return 0;
     }
 
-    currentHealth -= amount;
+    int actualDamage = amount;
+
+    if (actualDamage > currentHealth)
+    {
+        actualDamage = currentHealth;
+    }
+
+    currentHealth -= actualDamage;
 
     if (currentHealth < 0)
     {
         currentHealth = 0;
     }
+
+    return actualDamage;
 }
 
 void HealthPool::Heal(int amount)

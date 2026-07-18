@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Entity/Entity.h"
+#include "../Combat/CombatFormulas.h"
 #include "../Inventory/Inventory.h"
 #include "../Skills/SkillSet.h"
 #include "../Equipment/Equipment.h"
@@ -34,11 +35,12 @@ public:
     int GetMaximumHealth() const;
     bool IsAlive() const;
 
-    void ApplyDamage(int amount);
+    int ApplyDamage(int amount);
     void Heal(int amount);
     void RestoreHealthToFull();
 
     CombatRatings GetCombatRatings() const;
+    CombatFormulas::MeleeCombatProfile GetMeleeCombatProfile() const;
 
     // Call after changes that can affect derived stats such as maximum health.
     void RefreshDerivedState();

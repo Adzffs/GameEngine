@@ -137,9 +137,9 @@ bool Player::IsAlive() const
     return healthPool.IsAlive();
 }
 
-void Player::ApplyDamage(int amount)
+int Player::ApplyDamage(int amount)
 {
-    healthPool.ApplyDamage(amount);
+    return healthPool.ApplyDamage(amount);
 }
 
 void Player::Heal(int amount)
@@ -159,6 +159,12 @@ CombatRatings Player::GetCombatRatings() const
         GetTotalStat(StatType::MELEE_STRENGTH),
         GetTotalStat(StatType::DEFENCE),
         GetTotalStat(StatType::MAX_HEALTH)};
+}
+
+CombatFormulas::MeleeCombatProfile Player::GetMeleeCombatProfile() const
+{
+    return CombatFormulas::BuildMeleeCombatProfile(
+        GetCombatRatings());
 }
 
 void Player::RefreshDerivedState()

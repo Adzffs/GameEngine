@@ -10,7 +10,7 @@ public:
     bool IsAlive() const;
 
     void SetMaximumHealth(int newMaximumHealth);
-    void ApplyDamage(int amount);
+    int ApplyDamage(int amount);
     void Heal(int amount);
     void RestoreToFull();
 
