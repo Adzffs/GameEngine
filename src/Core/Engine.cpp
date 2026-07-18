@@ -7,6 +7,7 @@
 #include "../Player/Player.h"
 #include "../Skills/SkillType.h"
 #include "../Recipe/RecipeType.h"
+#include "EngineClickRouting.h"
 
 Engine::Engine()
     : playerID(-1)
@@ -62,51 +63,23 @@ void Engine::Run()
 
         int clickedTileX;
         int clickedTileY;
+        int clickedMouseX;
+        int clickedMouseY;
 
         if (graphics.ConsumeClickedTile(
                 clickedTileX,
-                clickedTileY))
+                clickedTileY,
+                clickedMouseX,
+                clickedMouseY))
         {
-            world.CancelActionsForEntity(
-                playerID,
-                ActionCancelReason::PLAYER_MOVED);
-
-            world.CloseStationInteraction(
-                playerID);
-
-            world.ClearPendingResourceInteraction(
-                playerID);
-
-            ResourceNode *resource =
-                world.GetResourceAt(
-                    clickedTileX,
-                    clickedTileY);
-
-            CraftingStation *station =
-                world.GetStationAt(
-                    clickedTileX,
-                    clickedTileY);
-
-            if (resource != nullptr &&
-                resource->IsActive())
-            {
-                world.QueueResourceInteraction(
-                    playerID,
-                    resource->GetID());
-            }
-            else if (station != nullptr)
-            {
-                world.QueueStationInteraction(
-                    playerID,
-                    station->GetID());
-            }
-
-            MovementDestinationRequest request(
+            EngineClickRouting::HandleWorldClick(
+                graphics,
+                world,
                 playerID,
                 clickedTileX,
-                clickedTileY);
-
-            world.QueueMovementDestination(request);
+                clickedTileY,
+                clickedMouseX,
+                clickedMouseY);
         }
 
         if (graphics.ConsumeStationMenuClose())

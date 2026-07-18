@@ -165,6 +165,18 @@ if(BUILD_TESTING)
         COMMAND MonsterGraphicsTests
     )
 
+    add_executable(MeleeClickIntegrationTests
+        tests/MeleeClickIntegrationTests.cpp
+        src/Graphics/Graphics.cpp
+    )
+
+    target_link_libraries(MeleeClickIntegrationTests PRIVATE GameEngineCore SDL3::SDL3)
+
+    add_test(
+        NAME MeleeClickIntegrationTests
+        COMMAND MeleeClickIntegrationTests
+    )
+
     add_executable(PendingMeleeInteractionTests
         tests/PendingMeleeInteractionTests.cpp
     )

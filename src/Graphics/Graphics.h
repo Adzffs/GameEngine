@@ -28,6 +28,11 @@ public:
     bool Initialize();
     void ProcessEvents(bool &running);
     bool ConsumeClickedTile(int &tileX, int &tileY);
+    bool ConsumeClickedTile(
+        int &tileX,
+        int &tileY,
+        int &mouseX,
+        int &mouseY);
     bool ConsumeInventorySlotClick(
         int &slotIndex);
 
@@ -142,6 +147,8 @@ public:
 
     int clickedTileX;
     int clickedTileY;
+    int clickedMouseX;
+    int clickedMouseY;
 
     static constexpr int WindowWidth = 1280;
     static constexpr int WindowHeight = 720;

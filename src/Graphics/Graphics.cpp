@@ -37,6 +37,8 @@ Graphics::Graphics()
       hasClickedTile(false),
       clickedTileX(0),
       clickedTileY(0),
+      clickedMouseX(0),
+      clickedMouseY(0),
       selectedTab(SidePanelTab::INVENTORY),
       inventorySlotClickPending(false),
       clickedInventorySlotIndex(-1),
@@ -656,6 +658,12 @@ void Graphics::ProcessEvents(bool &running)
             clickedTileY =
                 static_cast<int>(mouseY) / TileSize;
 
+            clickedMouseX =
+                static_cast<int>(mouseX);
+
+            clickedMouseY =
+                static_cast<int>(mouseY);
+
             hasClickedTile = true;
             clickPending = true;
         }
@@ -665,6 +673,22 @@ bool Graphics::ConsumeClickedTile(
     int &tileX,
     int &tileY)
 {
+    int mouseX;
+    int mouseY;
+
+    return ConsumeClickedTile(
+        tileX,
+        tileY,
+        mouseX,
+        mouseY);
+}
+
+bool Graphics::ConsumeClickedTile(
+    int &tileX,
+    int &tileY,
+    int &mouseX,
+    int &mouseY)
+{
     if (!clickPending)
     {
         return false;
@@ -672,6 +696,8 @@ bool Graphics::ConsumeClickedTile(
 
     tileX = clickedTileX;
     tileY = clickedTileY;
+    mouseX = clickedMouseX;
+    mouseY = clickedMouseY;
 
     clickPending = false;
 
