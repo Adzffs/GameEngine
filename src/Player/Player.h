@@ -4,6 +4,7 @@
 #include "../Inventory/Inventory.h"
 #include "../Skills/SkillSet.h"
 #include "../Equipment/Equipment.h"
+#include "../Stats/StatType.h"
 
 class World;
 
@@ -22,6 +23,10 @@ public:
 
     Equipment &GetEquipment();
     const Equipment &GetEquipment() const;
+
+    int GetBaseStat(StatType stat) const;
+    int GetEquipmentBonus(StatType stat) const;
+    int GetTotalStat(StatType stat) const;
 
 private:
     Inventory inventory;

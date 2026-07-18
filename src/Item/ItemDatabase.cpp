@@ -183,6 +183,48 @@ const ItemDefinition &ItemDatabase::Get(
         10,
         3};
 
+    static const ItemDefinition bronzeSword{
+        ItemType::BRONZE_SWORD,
+        "Bronze sword",
+        false,
+        EquipmentSlotType::WEAPON,
+        ToolType::NONE,
+        SkillType::NONE,
+        0,
+        0,
+        []
+        {
+            StatBlock bonuses;
+            bonuses.Set(
+                StatType::ATTACK_ACCURACY,
+                3);
+            bonuses.Set(
+                StatType::MELEE_STRENGTH,
+                4);
+            return bonuses;
+        }()};
+
+    static const ItemDefinition woodenShield{
+        ItemType::WOODEN_SHIELD,
+        "Wooden shield",
+        false,
+        EquipmentSlotType::SHIELD,
+        ToolType::NONE,
+        SkillType::NONE,
+        0,
+        0,
+        []
+        {
+            StatBlock bonuses;
+            bonuses.Set(
+                StatType::DEFENCE,
+                3);
+            bonuses.Set(
+                StatType::MAX_HEALTH,
+                5);
+            return bonuses;
+        }()};
+
     switch (itemType)
     {
     case ItemType::LOG:
@@ -235,6 +277,12 @@ const ItemDefinition &ItemDatabase::Get(
 
     case ItemType::STEEL_PICKAXE:
         return steelPickaxe;
+
+    case ItemType::BRONZE_SWORD:
+        return bronzeSword;
+
+    case ItemType::WOODEN_SHIELD:
+        return woodenShield;
 
     case ItemType::NONE:
     default:

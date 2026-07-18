@@ -10,7 +10,8 @@ ItemDefinition::ItemDefinition(
     ToolType toolType,
     SkillType requiredSkill,
     int requiredSkillLevel,
-    int actionDurationTicks)
+    int actionDurationTicks,
+    StatBlock equipmentStatBonuses)
     : itemType(itemType),
       name(std::move(name)),
       stackable(stackable),
@@ -18,7 +19,8 @@ ItemDefinition::ItemDefinition(
       toolType(toolType),
       requiredSkill(requiredSkill),
       requiredSkillLevel(requiredSkillLevel),
-      actionDurationTicks(actionDurationTicks)
+      actionDurationTicks(actionDurationTicks),
+      equipmentStatBonuses(equipmentStatBonuses)
 {
 }
 
@@ -73,4 +75,9 @@ int ItemDefinition::GetRequiredSkillLevel() const
 int ItemDefinition::GetActionDurationTicks() const
 {
     return actionDurationTicks;
+}
+
+const StatBlock &ItemDefinition::GetEquipmentStatBonuses() const
+{
+    return equipmentStatBonuses;
 }

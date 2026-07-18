@@ -3,6 +3,7 @@
 #include "../Inventory/ItemType.h"
 #include "../Equipment/EquipmentSlotType.h"
 #include "../Skills/SkillType.h"
+#include "../Stats/StatBlock.h"
 #include "ToolType.h"
 
 #include <string>
@@ -18,7 +19,8 @@ public:
         ToolType toolType,
         SkillType requiredSkill,
         int requiredSkillLevel,
-        int actionDurationTicks);
+        int actionDurationTicks,
+        StatBlock equipmentStatBonuses = StatBlock());
 
     ItemType GetItemType() const;
     const std::string &GetName() const;
@@ -35,6 +37,8 @@ public:
 
     int GetActionDurationTicks() const;
 
+    const StatBlock &GetEquipmentStatBonuses() const;
+
 private:
     ItemType itemType;
     std::string name;
@@ -47,4 +51,6 @@ private:
     int requiredSkillLevel;
 
     int actionDurationTicks;
+
+    StatBlock equipmentStatBonuses;
 };

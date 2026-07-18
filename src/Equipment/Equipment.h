@@ -2,6 +2,7 @@
 
 #include "EquipmentSlotType.h"
 #include "../Inventory/ItemType.h"
+#include "../Stats/StatBlock.h"
 
 #include <array>
 #include <cstddef>
@@ -30,6 +31,8 @@ public:
 
     bool IsEquipped(
         ItemType itemType) const;
+
+    StatBlock GetTotalStatBonuses() const;
 
 private:
     std::array<ItemType, SlotCount> equippedItems;

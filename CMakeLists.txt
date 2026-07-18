@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(GAMEENGINE_CORE_SOURCES
+    src/Stats/StatBlock.cpp
     src/World/World.cpp
     src/World/Position.cpp
     src/Entity/Entity.cpp
@@ -78,5 +79,16 @@ if(BUILD_TESTING)
     add_test(
         NAME GameplayActionIntegrationTests
         COMMAND GameplayActionIntegrationTests
+    )
+
+    add_executable(EquipmentStatsTests
+        tests/EquipmentStatsTests.cpp
+    )
+
+    target_link_libraries(EquipmentStatsTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME EquipmentStatsTests
+        COMMAND EquipmentStatsTests
     )
 endif()

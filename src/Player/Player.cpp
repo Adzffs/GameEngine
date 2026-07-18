@@ -69,3 +69,51 @@ const Equipment &Player::GetEquipment() const
 {
     return equipment;
 }
+
+int Player::GetBaseStat(StatType stat) const
+{
+    switch (stat)
+    {
+    case StatType::ATTACK_ACCURACY:
+        return skills.GetSkill(
+                         SkillType::ATTACK)
+            .GetLevel();
+
+    case StatType::MELEE_STRENGTH:
+        return skills.GetSkill(
+                         SkillType::ATTACK)
+            .GetLevel();
+
+    case StatType::DEFENCE:
+        return skills.GetSkill(
+                         SkillType::DEFENCE)
+            .GetLevel();
+
+    case StatType::MAX_HEALTH:
+        return 100;
+
+    case StatType::COUNT:
+    default:
+        return 0;
+    }
+}
+
+int Player::GetEquipmentBonus(StatType stat) const
+{
+    return equipment.GetTotalStatBonuses().Get(stat);
+}
+
+int Player::GetTotalStat(StatType stat) const
+{
+    int total =
+        GetBaseStat(stat) +
+        GetEquipmentBonus(stat);
+
+    if (stat == StatType::MAX_HEALTH &&
+        total < 1)
+    {
+        return 1;
+    }
+
+    return total;
+}

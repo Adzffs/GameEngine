@@ -3,6 +3,14 @@
 SkillSet::SkillSet()
 {
     skills.emplace(
+        SkillType::ATTACK,
+        Skill());
+
+    skills.emplace(
+        SkillType::DEFENCE,
+        Skill());
+
+    skills.emplace(
         SkillType::WOODCUTTING,
         Skill());
 

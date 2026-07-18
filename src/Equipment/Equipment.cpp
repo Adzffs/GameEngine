@@ -1,5 +1,7 @@
 #include "Equipment.h"
 
+#include "../Item/ItemDatabase.h"
+
 Equipment::Equipment()
 {
     equippedItems.fill(ItemType::NONE);
@@ -86,4 +88,26 @@ bool Equipment::IsEquipped(
     }
 
     return false;
+}
+
+StatBlock Equipment::GetTotalStatBonuses() const
+{
+    StatBlock totalBonuses;
+
+    for (ItemType equippedItem :
+         equippedItems)
+    {
+        if (equippedItem == ItemType::NONE)
+        {
+            continue;
+        }
+
+        const ItemDefinition &itemDefinition =
+            ItemDatabase::Get(equippedItem);
+
+        totalBonuses +=
+            itemDefinition.GetEquipmentStatBonuses();
+    }
+
+    return totalBonuses;
 }
