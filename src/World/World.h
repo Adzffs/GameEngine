@@ -11,6 +11,7 @@
 #include "../Action/ActionValidationResult.h"
 #include "../Movement/MovementDestinationRequest.h"
 #include "../Pathfinding/Pathfinder.h"
+#include "../Equipment/EquipmentSlotType.h"
 #include "../Recipe/RecipeType.h"
 #include <map>
 #include "../Combat/CombatService.h"
@@ -104,8 +105,9 @@ public:
         int entityID,
         int slotIndex);
 
-    bool TryUnequipWeapon(
-        int entityID);
+    bool TryUnequipItem(
+        int entityID,
+        EquipmentSlotType equipmentSlot);
 
     bool TryStartRecipeAction(
         int entityID,

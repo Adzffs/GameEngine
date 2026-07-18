@@ -294,6 +294,17 @@ if(BUILD_TESTING)
         COMMAND MonsterRespawnTests
     )
 
+    add_executable(EquipmentUnequipTests
+        tests/EquipmentUnequipTests.cpp
+    )
+
+    target_link_libraries(EquipmentUnequipTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME EquipmentUnequipTests
+        COMMAND EquipmentUnequipTests
+    )
+
     add_executable(RequirementSystemTests
         tests/RequirementSystemTests.cpp
     )

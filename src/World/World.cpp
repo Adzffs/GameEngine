@@ -50,6 +50,24 @@ namespace
 
         return dynamic_cast<Combatant *>(entity);
     }
+
+    bool IsValidEquipmentSlot(EquipmentSlotType equipmentSlot)
+    {
+        switch (equipmentSlot)
+        {
+        case EquipmentSlotType::HEAD:
+        case EquipmentSlotType::BODY:
+        case EquipmentSlotType::LEGS:
+        case EquipmentSlotType::WEAPON:
+        case EquipmentSlotType::SHIELD:
+            return true;
+
+        case EquipmentSlotType::NONE:
+        case EquipmentSlotType::COUNT:
+        default:
+            return false;
+        }
+    }
 }
 
 World::World(
@@ -2259,8 +2277,9 @@ bool World::TryEquipInventoryItem(
     return true;
 }
 
-bool World::TryUnequipWeapon(
-    int entityID)
+bool World::TryUnequipItem(
+    int entityID,
+    EquipmentSlotType equipmentSlot)
 {
     Entity *entity =
         entityManager.GetEntityByID(
@@ -2274,42 +2293,61 @@ bool World::TryUnequipWeapon(
         return false;
     }
 
-    Equipment &equipment =
+    if (!IsValidEquipmentSlot(equipmentSlot))
+    {
+        return false;
+    }
+
+    Inventory simulatedInventory =
+        player->GetInventory();
+
+    Equipment simulatedEquipment =
         player->GetEquipment();
 
-    ItemType equippedItem =
-        equipment.GetEquippedItem(
-            EquipmentSlotType::WEAPON);
+    ItemType removedItem =
+        simulatedEquipment.Unequip(
+            equipmentSlot);
 
-    if (equippedItem ==
-        ItemType::NONE)
+    if (removedItem == ItemType::NONE)
     {
         return false;
     }
 
-    bool added =
-        player->GetInventory().AddItem(
-            equippedItem,
-            1);
+    const ItemDefinition &removedDefinition =
+        ItemDatabase::Get(removedItem);
 
-    if (!added)
+    if (removedDefinition.GetItemType() != removedItem)
     {
-        Logger::Game(
-            "Your inventory is full");
-
         return false;
     }
 
-    equipment.Unequip(
-        EquipmentSlotType::WEAPON);
+    if (!simulatedInventory.CanAddItem(
+            removedItem,
+            1))
+    {
+        return false;
+    }
 
+    if (!simulatedInventory.AddItem(
+            removedItem,
+            1))
+    {
+        return false;
+    }
+
+    player->GetInventory() = simulatedInventory;
+    player->GetEquipment() = simulatedEquipment;
     player->RefreshDerivedState();
 
-    CancelGatheringForToolChange(
-        entityID);
+    if (removedDefinition.GetToolType() != ToolType::NONE)
+    {
+        CancelGatheringForToolChange(
+            entityID);
+    }
 
     Logger::Game(
-        "Weapon unequipped");
+        removedDefinition.GetName() +
+        " unequipped");
 
     return true;
 }

@@ -3,6 +3,7 @@
 #include <thread>
 #include "Core/Logger.h"
 #include "../Action/ActionCancelReason.h"
+#include "../Equipment/EquipmentSlotType.h"
 #include "../Movement/MovementDestinationRequest.h"
 #include "../Inventory/ItemType.h"
 #include "../Player/Player.h"
@@ -102,8 +103,9 @@ void Engine::Run()
 
         if (graphics.ConsumeWeaponSlotClick())
         {
-            world.TryUnequipWeapon(
-                playerID);
+            world.TryUnequipItem(
+                playerID,
+                EquipmentSlotType::WEAPON);
         }
 
         int clickedTileX;
