@@ -8,6 +8,7 @@ class ActionManager
 {
 public:
     void StartAction(const Action &action);
+    void RestartAction(const Action &action);
 
     // Temporary compatibility function.
     // Existing World code still calls AddAction.

@@ -11,6 +11,24 @@ void ActionManager::StartAction(
     actions.back().Start(currentTick);
 }
 
+void ActionManager::RestartAction(
+    const Action &action)
+{
+    if (!action.IsRepeating())
+    {
+        return;
+    }
+
+    CancelActionsForEntity(
+        action.GetEntityID(),
+        ActionCancelReason::NEW_ACTION_STARTED);
+
+    Action restartedAction = action;
+    restartedAction.Restart(currentTick);
+
+    actions.push_back(restartedAction);
+}
+
 void ActionManager::AddAction(
     const Action &action)
 {
