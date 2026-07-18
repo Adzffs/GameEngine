@@ -5,6 +5,7 @@
 #include "Map.h"
 #include "Object/Manager/ObjectManager.h"
 #include "../Action/ActionManager.h"
+#include "../Action/ActionCancelReason.h"
 #include "../Action/ActionValidationResult.h"
 #include "../Movement/MovementDestinationRequest.h"
 #include "../Pathfinding/Pathfinder.h"
