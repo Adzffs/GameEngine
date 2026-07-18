@@ -34,6 +34,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/Equipment/Equipment.cpp
     src/Combat/CombatFormulas.cpp
     src/Combat/MeleeAttackResolver.cpp
+    src/Combat/CombatService.cpp
     src/Core/SeededRandom.cpp
     src/Item/ItemDefinition.cpp
     src/Item/ItemDatabase.cpp
@@ -127,5 +128,16 @@ if(BUILD_TESTING)
     add_test(
         NAME MeleeAttackResolverTests
         COMMAND MeleeAttackResolverTests
+    )
+
+    add_executable(CombatServiceTests
+        tests/CombatServiceTests.cpp
+    )
+
+    target_link_libraries(CombatServiceTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME CombatServiceTests
+        COMMAND CombatServiceTests
     )
 endif()
