@@ -28,6 +28,14 @@ ResourceDefinition::ResourceDefinition(
       depletedVisualType(depletedVisualType),
       respawnTicks(respawnTicks)
 {
+    if (requiredSkill != SkillType::NONE ||
+        requiredSkillLevel != 0)
+    {
+        requirements.emplace_back(
+            RequirementSystem::SkillLevelRequirement{
+                requiredSkill,
+                requiredSkillLevel});
+    }
 }
 
 ResourceType
@@ -92,4 +100,10 @@ ResourceDefinition::GetDepletedVisualType() const
 int ResourceDefinition::GetRespawnTicks() const
 {
     return respawnTicks;
+}
+
+const std::vector<RequirementSystem::Requirement> &
+ResourceDefinition::GetRequirements() const
+{
+    return requirements;
 }

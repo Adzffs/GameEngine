@@ -4,8 +4,10 @@
 #include "../Equipment/EquipmentSlotType.h"
 #include "../Skills/SkillType.h"
 #include "../Stats/StatBlock.h"
+#include "../Requirement/Requirement.h"
 #include "ToolType.h"
 
+#include <vector>
 #include <string>
 
 class ItemDefinition
@@ -37,6 +39,9 @@ public:
 
     int GetActionDurationTicks() const;
 
+    const std::vector<RequirementSystem::Requirement> &
+    GetRequirements() const;
+
     const StatBlock &GetEquipmentStatBonuses() const;
 
 private:
@@ -51,6 +56,8 @@ private:
     int requiredSkillLevel;
 
     int actionDurationTicks;
+
+    std::vector<RequirementSystem::Requirement> requirements;
 
     StatBlock equipmentStatBonuses;
 };

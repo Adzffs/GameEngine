@@ -22,6 +22,7 @@
 #include "../Reward/RewardTableRegistry.h"
 #include "../Combat/Combatant.h"
 #include "../Combat/MeleeCombatFeedback.h"
+#include "../Requirement/RequirementEvaluator.h"
 #include <array>
 #include <limits>
 #include <stdexcept>
@@ -1282,10 +1283,6 @@ ActionValidationResult World::ValidateGatheringAction(
             "You are too far away from the resource"};
     }
 
-    const ResourceDefinition &resourceDefinition =
-        ResourceDatabase::Get(
-            resource->GetResourceType());
-
     ItemType equippedWeapon =
         player->GetEquipment().GetEquippedItem(
             EquipmentSlotType::WEAPON);
@@ -1297,6 +1294,10 @@ ActionValidationResult World::ValidateGatheringAction(
             ActionCancelReason::INVALID_TOOL,
             "You need to equip the correct tool"};
     }
+
+    const ResourceDefinition &resourceDefinition =
+        ResourceDatabase::Get(
+            resource->GetResourceType());
 
     const ItemDefinition &weaponDefinition =
         ItemDatabase::Get(equippedWeapon);
@@ -1310,74 +1311,30 @@ ActionValidationResult World::ValidateGatheringAction(
             "You need to equip the correct tool"};
     }
 
-    if (weaponDefinition.HasSkillRequirement())
+    RequirementSystem::RequirementResult weaponRequirements =
+        RequirementSystem::RequirementEvaluator::EvaluateAll(
+            *player,
+            weaponDefinition.GetRequirements());
+
+    if (!weaponRequirements.satisfied)
     {
-        SkillType toolSkill =
-            weaponDefinition.GetRequiredSkill();
-
-        int playerLevel =
-            player->GetSkills()
-                .GetSkill(toolSkill)
-                .GetLevel();
-
-        int requiredLevel =
-            weaponDefinition.GetRequiredSkillLevel();
-
-        if (playerLevel < requiredLevel)
-        {
-            return {
-                false,
-                ActionCancelReason::REQUIREMENTS_FAILED,
-                "You need level " +
-                    std::to_string(requiredLevel) +
-                    " in the required skill to use " +
-                    weaponDefinition.GetName()};
-        }
-    }
-
-    SkillType requiredSkill =
-        resourceDefinition.GetRequiredSkill();
-
-    int playerSkillLevel =
-        player->GetSkills()
-            .GetSkill(requiredSkill)
-            .GetLevel();
-
-    int requiredSkillLevel =
-        resourceDefinition.GetRequiredSkillLevel();
-
-    if (playerSkillLevel < requiredSkillLevel)
-    {
-        std::string skillName =
-            "the required skill";
-
-        switch (requiredSkill)
-        {
-        case SkillType::WOODCUTTING:
-            skillName = "Woodcutting";
-            break;
-
-        case SkillType::MINING:
-            skillName = "Mining";
-            break;
-
-        case SkillType::SMITHING:
-            skillName = "Smithing";
-            break;
-
-        default:
-            break;
-        }
-
         return {
             false,
             ActionCancelReason::REQUIREMENTS_FAILED,
-            "You need " +
-                skillName +
-                " level " +
-                std::to_string(requiredSkillLevel) +
-                " to gather from " +
-                resourceDefinition.GetName()};
+            weaponRequirements.message};
+    }
+
+    RequirementSystem::RequirementResult resourceRequirements =
+        RequirementSystem::RequirementEvaluator::EvaluateAll(
+            *player,
+            resourceDefinition.GetRequirements());
+
+    if (!resourceRequirements.satisfied)
+    {
+        return {
+            false,
+            ActionCancelReason::REQUIREMENTS_FAILED,
+            resourceRequirements.message};
     }
 
     if (checkInventorySpace)
@@ -1458,43 +1415,21 @@ ActionValidationResult World::ValidateRecipeAction(
             "You must be beside the correct crafting station"};
     }
 
-    int playerLevel =
-        player->GetSkills()
-            .GetSkill(
-                recipe.GetRequiredSkill())
-            .GetLevel();
+    RequirementSystem::RequirementResult requirements =
+        RequirementSystem::RequirementEvaluator::EvaluateAll(
+            *player,
+            recipe.GetRequirements());
 
-    if (playerLevel <
-        recipe.GetRequiredLevel())
+    if (!requirements.satisfied)
     {
         return {
             false,
             ActionCancelReason::REQUIREMENTS_FAILED,
-            "You need Smithing level " +
-                std::to_string(
-                    recipe.GetRequiredLevel()) +
-                " to create this item"};
-    }
-
-    const Inventory &inventory =
-        player->GetInventory();
-
-    for (const RecipeIngredient &ingredient :
-         recipe.GetIngredients())
-    {
-        if (inventory.GetItemAmount(
-                ingredient.itemType) <
-            ingredient.amount)
-        {
-            return {
-                false,
-                ActionCancelReason::REQUIREMENTS_FAILED,
-                "You do not have enough materials"};
-        }
+            requirements.message};
     }
 
     Inventory simulatedInventory =
-        inventory;
+        player->GetInventory();
 
     for (const RecipeIngredient &ingredient :
          recipe.GetIngredients())
@@ -2188,29 +2123,17 @@ bool World::TryEquipInventoryItem(
     {
         return false;
     }
-    if (newDefinition.HasSkillRequirement())
+    RequirementSystem::RequirementResult equipmentRequirements =
+        RequirementSystem::RequirementEvaluator::EvaluateAll(
+            *player,
+            newDefinition.GetRequirements());
+
+    if (!equipmentRequirements.satisfied)
     {
-        SkillType requiredSkill =
-            newDefinition.GetRequiredSkill();
+        Logger::Game(
+            equipmentRequirements.message);
 
-        int requiredLevel =
-            newDefinition.GetRequiredSkillLevel();
-
-        int playerLevel =
-            player->GetSkills()
-                .GetSkill(requiredSkill)
-                .GetLevel();
-
-        if (playerLevel < requiredLevel)
-        {
-            Logger::Game(
-                "You need level " +
-                std::to_string(requiredLevel) +
-                " in the required skill to equip " +
-                newDefinition.GetName());
-
-            return false;
-        }
+        return false;
     }
 
     EquipmentSlotType equipmentSlot =

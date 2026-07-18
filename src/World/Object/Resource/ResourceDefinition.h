@@ -5,6 +5,9 @@
 #include "../../../Inventory/ItemType.h"
 #include "../../../Skills/SkillType.h"
 #include "../../../Item/ToolType.h"
+#include "../../../Requirement/Requirement.h"
+
+#include <vector>
 #include <string>
 
 class ResourceDefinition
@@ -42,6 +45,9 @@ public:
 
     int GetRespawnTicks() const;
 
+    const std::vector<RequirementSystem::Requirement> &
+    GetRequirements() const;
+
 private:
     ResourceType resourceType;
     std::string name;
@@ -61,4 +67,6 @@ private:
     DepletedVisualType depletedVisualType;
 
     int respawnTicks;
+
+    std::vector<RequirementSystem::Requirement> requirements;
 };

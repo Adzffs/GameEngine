@@ -1,5 +1,6 @@
 #include "TestSupport.h"
 
+#include "../src/Equipment/EquipmentSlotType.h"
 #include "../src/Inventory/ItemType.h"
 #include "../src/Item/ItemDatabase.h"
 #include "../src/Player/Player.h"
@@ -141,7 +142,7 @@ int main()
             world.GetActionForEntity(playerID) != nullptr,
             "Valid gathering interaction starts an action");
 
-        player->GetPosition().SetPosition(0, 0);
+        player->GetEquipment().Unequip(EquipmentSlotType::WEAPON);
 
         AdvanceWorldTicks(
             world,
@@ -151,10 +152,10 @@ int main()
         test.ExpectEqual(
             player->GetInventory().GetItemAmount(ItemType::LOG),
             initialLogCount,
-            "Gathering completion awards only after validation succeeds");
+            "Removing the tool before completion prevents gathering rewards");
         test.Expect(
             world.GetActionForEntity(playerID) == nullptr,
-            "Failed completion validation does not restart gathering");
+            "Tool removal before completion stops gathering repetition");
     }
 
     {
@@ -231,6 +232,44 @@ int main()
         test.Expect(
             world.GetActionForEntity(playerID) == nullptr,
             "Depleted resources prevent gathering repetition");
+    }
+
+    {
+        World world;
+        int playerID = world.CreatePlayer();
+        Player *player = GetPlayer(world, playerID);
+
+        player->GetPosition().SetPosition(13, 9);
+        OpenFurnace(
+            test,
+            world,
+            playerID);
+
+        player->GetInventory().AddItem(ItemType::COPPER_ORE, 1);
+        player->GetInventory().AddItem(ItemType::TIN_ORE, 1);
+
+        test.Expect(
+            world.TryStartRecipeAction(
+                playerID,
+                RecipeType::BRONZE_BAR),
+            "Recipe starts before ingredient revalidation");
+
+        player->GetInventory().RemoveItem(
+            ItemType::TIN_ORE,
+            1);
+
+        AdvanceWorldTicks(
+            world,
+            RecipeDatabase::Get(RecipeType::BRONZE_BAR)
+                .GetActionDurationTicks());
+
+        test.ExpectEqual(
+            player->GetInventory().GetItemAmount(ItemType::BRONZE_BAR),
+            0,
+            "Removing an ingredient before completion prevents smithing output");
+        test.Expect(
+            world.GetActionForEntity(playerID) == nullptr,
+            "Ingredient revalidation stops the recipe action after completion");
     }
 
     {

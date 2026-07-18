@@ -24,6 +24,22 @@ RecipeDefinition::RecipeDefinition(
       outputItem(outputItem),
       outputAmount(outputAmount)
 {
+    if (requiredSkill != SkillType::NONE ||
+        requiredLevel != 0)
+    {
+        requirements.emplace_back(
+            RequirementSystem::SkillLevelRequirement{
+                requiredSkill,
+                requiredLevel});
+    }
+
+    for (const RecipeIngredient &ingredient : this->ingredients)
+    {
+        requirements.emplace_back(
+            RequirementSystem::HeldItemRequirement{
+                ingredient.itemType,
+                ingredient.amount});
+    }
 }
 
 RecipeType RecipeDefinition::GetRecipeType() const
@@ -67,6 +83,12 @@ const std::vector<RecipeIngredient> &
 RecipeDefinition::GetIngredients() const
 {
     return ingredients;
+}
+
+const std::vector<RequirementSystem::Requirement> &
+RecipeDefinition::GetRequirements() const
+{
+    return requirements;
 }
 
 ItemType RecipeDefinition::GetOutputItem() const

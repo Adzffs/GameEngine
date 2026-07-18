@@ -22,6 +22,14 @@ ItemDefinition::ItemDefinition(
       actionDurationTicks(actionDurationTicks),
       equipmentStatBonuses(equipmentStatBonuses)
 {
+    if (requiredSkill != SkillType::NONE ||
+        requiredSkillLevel != 0)
+    {
+        requirements.emplace_back(
+            RequirementSystem::SkillLevelRequirement{
+                requiredSkill,
+                requiredSkillLevel});
+    }
 }
 
 ItemType ItemDefinition::GetItemType() const
@@ -75,6 +83,12 @@ int ItemDefinition::GetRequiredSkillLevel() const
 int ItemDefinition::GetActionDurationTicks() const
 {
     return actionDurationTicks;
+}
+
+const std::vector<RequirementSystem::Requirement> &
+ItemDefinition::GetRequirements() const
+{
+    return requirements;
 }
 
 const StatBlock &ItemDefinition::GetEquipmentStatBonuses() const

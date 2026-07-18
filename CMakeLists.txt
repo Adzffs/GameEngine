@@ -44,6 +44,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/Recipe/RecipeDefinition.cpp
     src/Recipe/RecipeDatabase.cpp
     src/Recipe/RecipeSystem.cpp
+    src/Requirement/RequirementEvaluator.cpp
     src/Reward/RewardTable.cpp
     src/Reward/RewardTableRoller.cpp
     src/Reward/DevelopmentRewardTables.cpp
@@ -291,5 +292,16 @@ if(BUILD_TESTING)
     add_test(
         NAME MonsterRespawnTests
         COMMAND MonsterRespawnTests
+    )
+
+    add_executable(RequirementSystemTests
+        tests/RequirementSystemTests.cpp
+    )
+
+    target_link_libraries(RequirementSystemTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME RequirementSystemTests
+        COMMAND RequirementSystemTests
     )
 endif()

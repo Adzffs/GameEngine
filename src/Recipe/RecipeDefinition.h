@@ -8,6 +8,7 @@
 #include "../Inventory/ItemType.h"
 #include "../Skills/SkillType.h"
 #include "../World/Object/Station/StationType.h"
+#include "../Requirement/Requirement.h"
 
 class RecipeDefinition
 {
@@ -36,6 +37,9 @@ public:
     const std::vector<RecipeIngredient> &
     GetIngredients() const;
 
+    const std::vector<RequirementSystem::Requirement> &
+    GetRequirements() const;
+
     ItemType GetOutputItem() const;
     int GetOutputAmount() const;
 
@@ -50,6 +54,8 @@ private:
     int actionDurationTicks;
 
     std::vector<RecipeIngredient> ingredients;
+
+    std::vector<RequirementSystem::Requirement> requirements;
 
     ItemType outputItem;
     int outputAmount;
