@@ -20,6 +20,11 @@ public:
         ActionCancelReason reason =
             ActionCancelReason::NONE);
 
+    void CancelMeleeActionsTargetingEntity(
+        int targetEntityID,
+        ActionCancelReason reason =
+            ActionCancelReason::TARGET_DEPLETED);
+
     std::vector<Action> Update();
 
 private:

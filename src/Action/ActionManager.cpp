@@ -106,3 +106,24 @@ void ActionManager::CancelActionsForEntity(
         }
     }
 }
+
+void ActionManager::CancelMeleeActionsTargetingEntity(
+    int targetEntityID,
+    ActionCancelReason reason)
+{
+    auto actionIterator = actions.begin();
+
+    while (actionIterator != actions.end())
+    {
+        if (actionIterator->GetType() == ActionType::MELEE_ATTACK &&
+            actionIterator->GetTargetID() == targetEntityID)
+        {
+            actionIterator->Cancel(reason);
+            actionIterator = actions.erase(actionIterator);
+        }
+        else
+        {
+            ++actionIterator;
+        }
+    }
+}

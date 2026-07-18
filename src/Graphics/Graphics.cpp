@@ -703,6 +703,72 @@ float Graphics::CalculateHealthRatio(
     return std::clamp(ratio, 0.0f, 1.0f);
 }
 
+SDL_FRect Graphics::GetPlayerScreenRectangle(
+    const Player &player,
+    int cameraTileX,
+    int cameraTileY) const
+{
+    return MakeEntityTileRectangle(
+        player.GetPosition().GetX(),
+        player.GetPosition().GetY(),
+        4.0f,
+        cameraTileX,
+        cameraTileY);
+}
+
+SDL_FRect Graphics::GetPlayerHealthBarBackgroundRectangle(
+    const Player &player,
+    int cameraTileX,
+    int cameraTileY) const
+{
+    SDL_FRect playerRectangle = GetPlayerScreenRectangle(
+        player,
+        cameraTileX,
+        cameraTileY);
+
+    return SDL_FRect{
+        playerRectangle.x,
+        playerRectangle.y - 9.0f,
+        playerRectangle.w,
+        5.0f};
+}
+
+SDL_FRect Graphics::GetPlayerHealthBarFillRectangle(
+    const Player &player,
+    int cameraTileX,
+    int cameraTileY) const
+{
+    const Combatant &combatant = player;
+
+    SDL_FRect background = GetPlayerHealthBarBackgroundRectangle(
+        player,
+        cameraTileX,
+        cameraTileY);
+
+    return SDL_FRect{
+        background.x,
+        background.y,
+        background.w * CalculateHealthRatio(
+                           combatant.GetCurrentHealth(),
+                           combatant.GetMaximumHealth()),
+        background.h};
+}
+
+SDL_FPoint Graphics::GetPlayerCombatFeedbackPosition(
+    const Player &player,
+    int cameraTileX,
+    int cameraTileY) const
+{
+    SDL_FRect playerRectangle = GetPlayerScreenRectangle(
+        player,
+        cameraTileX,
+        cameraTileY);
+
+    return SDL_FPoint{
+        playerRectangle.x + 3.0f,
+        playerRectangle.y - 18.0f};
+}
+
 SDL_FRect Graphics::GetMonsterHealthBarBackgroundRectangle(
     const Monster &monster,
     int cameraTileX,
@@ -962,6 +1028,67 @@ void Graphics::DrawPlayer(
         &playerRectangle);
 }
 
+void Graphics::DrawPlayerHealthBar(
+    const Player &player)
+{
+    SDL_FRect background =
+        GetPlayerHealthBarBackgroundRectangle(player);
+
+    SDL_FRect fill =
+        GetPlayerHealthBarFillRectangle(player);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        55,
+        55,
+        55,
+        255);
+
+    SDL_RenderFillRect(
+        renderer,
+        &background);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        70,
+        170,
+        255,
+        255);
+
+    SDL_RenderFillRect(
+        renderer,
+        &fill);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        player.IsAlive() ? 20 : 150,
+        player.IsAlive() ? 20 : 35,
+        player.IsAlive() ? 20 : 35,
+        255);
+
+    SDL_RenderRect(
+        renderer,
+        &background);
+
+    std::string healthText =
+        std::to_string(player.GetCurrentHealth()) +
+        "/" +
+        std::to_string(player.GetMaximumHealth());
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        230,
+        230,
+        230,
+        255);
+
+    SDL_RenderDebugText(
+        renderer,
+        background.x,
+        background.y - 12.0f,
+        healthText.c_str());
+}
+
 SDL_FRect Graphics::GetMonsterScreenRectangle(
     const Monster &monster,
     int cameraTileX,
@@ -1195,15 +1322,27 @@ void Graphics::DrawMonsterCombatFeedback(
             entities,
             feedback.defenderEntityID);
 
-        Monster *monster = dynamic_cast<Monster *>(entity);
-
-        if (monster == nullptr)
+        if (entity == nullptr)
         {
             continue;
         }
 
-        SDL_FPoint textPosition = GetMonsterCombatFeedbackPosition(
-            *monster);
+        SDL_FPoint textPosition{};
+
+        if (Monster *monster = dynamic_cast<Monster *>(entity))
+        {
+            textPosition = GetMonsterCombatFeedbackPosition(
+                *monster);
+        }
+        else if (Player *player = dynamic_cast<Player *>(entity))
+        {
+            textPosition = GetPlayerCombatFeedbackPosition(
+                *player);
+        }
+        else
+        {
+            continue;
+        }
 
         SDL_SetRenderDrawColor(
             renderer,
@@ -2817,6 +2956,7 @@ void Graphics::Render(
     DrawMonsters(entities);
     DrawNPCs(entities);
     DrawPlayer(playerX, playerY);
+    DrawPlayerHealthBar(player);
     DrawMonsterHealthBars(entities);
     DrawMonsterCombatFeedback(entities, combatFeedbacks);
 

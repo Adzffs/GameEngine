@@ -213,4 +213,26 @@ private:
         int attackerEntityID,
         int defenderEntityID,
         const MeleeAttackResult &result);
+
+    static constexpr int DefaultMonsterAttackDurationTicks = 5;
+
+    void TryStartMonsterRetaliation(
+        int monsterEntityID,
+        int playerEntityID);
+
+    void CancelMeleeActionsTargetingEntity(
+        int targetEntityID,
+        ActionCancelReason reason =
+            ActionCancelReason::TARGET_DEPLETED);
+
+    void ClearPendingMeleeInteractionsInvolvingEntity(
+        int entityID);
+
+    void ClearPendingMovementForEntity(
+        int entityID);
+
+    void HandleCombatantDeath(
+        int deadEntityID);
+
+    void ProcessDeadCombatantCleanup();
 };

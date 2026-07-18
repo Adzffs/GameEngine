@@ -6,6 +6,7 @@
 #include "../Movement/Movement.h"
 #include <cstdlib>
 #include "../Player/Player.h"
+#include "../Entity/Monster/Monster.h"
 #include "../Inventory/ItemType.h"
 #include "../Skills/SkillType.h"
 #include "../Equipment/EquipmentSlotType.h"
@@ -193,6 +194,18 @@ void World::QueueResourceInteraction(
     int entityID,
     int resourceID)
 {
+    Entity *entity =
+        entityManager.GetEntityByID(entityID);
+
+    Player *player =
+        dynamic_cast<Player *>(entity);
+
+    if (player != nullptr &&
+        !player->IsAlive())
+    {
+        return;
+    }
+
     pendingMeleeInteractions.erase(entityID);
 
     pendingResourceInteractions[entityID] =
@@ -203,6 +216,18 @@ void World::QueueStationInteraction(
     int entityID,
     int stationID)
 {
+    Entity *entity =
+        entityManager.GetEntityByID(entityID);
+
+    Player *player =
+        dynamic_cast<Player *>(entity);
+
+    if (player != nullptr &&
+        !player->IsAlive())
+    {
+        return;
+    }
+
     pendingMeleeInteractions.erase(entityID);
 
     pendingStationInteractions[entityID] =
@@ -573,6 +598,29 @@ bool World::TryStartRecipeAction(
     int entityID,
     RecipeType recipeType)
 {
+    Entity *entity =
+        entityManager.GetEntityByID(
+            entityID);
+
+    Player *player =
+        dynamic_cast<Player *>(entity);
+
+    if (player == nullptr)
+    {
+        Logger::Game(
+            "Player could not be found");
+
+        return false;
+    }
+
+    if (!player->IsAlive())
+    {
+        Logger::Game(
+            "Attacker is not alive");
+
+        return false;
+    }
+
     if (actionManager.HasActionForEntity(
             entityID))
     {
@@ -636,11 +684,40 @@ bool World::TryStartMeleeEngagement(
     int defenderEntityID,
     int durationTicks)
 {
-    return TryStartMeleeAction(
+    bool started = TryStartMeleeAction(
         attackerEntityID,
         defenderEntityID,
         durationTicks,
         true);
+
+    if (!started)
+    {
+        return false;
+    }
+
+    Entity *attackerEntity =
+        entityManager.GetEntityByID(
+            attackerEntityID);
+
+    Entity *defenderEntity =
+        entityManager.GetEntityByID(
+            defenderEntityID);
+
+    Player *attacker =
+        dynamic_cast<Player *>(attackerEntity);
+
+    Monster *defender =
+        dynamic_cast<Monster *>(defenderEntity);
+
+    if (attacker != nullptr &&
+        defender != nullptr)
+    {
+        TryStartMonsterRetaliation(
+            defenderEntityID,
+            attackerEntityID);
+    }
+
+    return true;
 }
 
 ActionValidationResult World::ValidateMeleeStartAction(
@@ -826,6 +903,7 @@ void World::Update()
     currentTick++;
 
     UpdateMeleeCombatFeedback();
+    ProcessDeadCombatantCleanup();
 
     ProcessMovementDestinationRequests();
     ProcessActiveMovementPaths();
@@ -850,6 +928,19 @@ Map &World::GetMap()
 }
 void World::QueueMovementRequest(const MovementRequest &request)
 {
+    Entity *entity =
+        entityManager.GetEntityByID(
+            request.GetEntityID());
+
+    Player *player =
+        dynamic_cast<Player *>(entity);
+
+    if (player != nullptr &&
+        !player->IsAlive())
+    {
+        return;
+    }
+
     CancelActionsForEntity(
         request.GetEntityID(),
         ActionCancelReason::PLAYER_MOVED);
@@ -862,6 +953,19 @@ void World::QueueMovementRequest(const MovementRequest &request)
 void World::QueueMovementDestination(
     const MovementDestinationRequest &request)
 {
+    Entity *entity =
+        entityManager.GetEntityByID(
+            request.GetEntityID());
+
+    Player *player =
+        dynamic_cast<Player *>(entity);
+
+    if (player != nullptr &&
+        !player->IsAlive())
+    {
+        return;
+    }
+
     CancelActionsForEntity(
         request.GetEntityID(),
         ActionCancelReason::PLAYER_MOVED);
@@ -1242,6 +1346,14 @@ ActionValidationResult World::ValidateRecipeAction(
             "Player could not be found"};
     }
 
+    if (!player->IsAlive())
+    {
+        return {
+            false,
+            ActionCancelReason::REQUIREMENTS_FAILED,
+            "Attacker is not alive"};
+    }
+
     switch (recipeType)
     {
     case RecipeType::BRONZE_BAR:
@@ -1608,6 +1720,9 @@ void World::ProcessCompletedActions(
 
             if (!defender->IsAlive())
             {
+                HandleCombatantDeath(
+                    action.GetTargetID());
+
                 continue;
             }
 
@@ -2184,4 +2299,202 @@ bool World::TryUnequipWeapon(
         "Weapon unequipped");
 
     return true;
+}
+
+void World::TryStartMonsterRetaliation(
+    int monsterEntityID,
+    int playerEntityID)
+{
+    Entity *monsterEntity =
+        entityManager.GetEntityByID(
+            monsterEntityID);
+
+    Entity *playerEntity =
+        entityManager.GetEntityByID(
+            playerEntityID);
+
+    Monster *monster =
+        dynamic_cast<Monster *>(monsterEntity);
+
+    Player *player =
+        dynamic_cast<Player *>(playerEntity);
+
+    if (monster == nullptr ||
+        player == nullptr)
+    {
+        return;
+    }
+
+    if (!monster->IsAlive() ||
+        !player->IsAlive())
+    {
+        return;
+    }
+
+    int distanceX = std::abs(
+        monster->GetPosition().GetX() -
+        player->GetPosition().GetX());
+
+    int distanceY = std::abs(
+        monster->GetPosition().GetY() -
+        player->GetPosition().GetY());
+
+    bool isAdjacent =
+        distanceX <= 1 &&
+        distanceY <= 1;
+
+    if (!isAdjacent)
+    {
+        return;
+    }
+
+    if (actionManager.HasActionForEntity(
+            monsterEntityID))
+    {
+        return;
+    }
+
+    TryStartMeleeEngagement(
+        monsterEntityID,
+        playerEntityID,
+        DefaultMonsterAttackDurationTicks);
+}
+
+void World::CancelMeleeActionsTargetingEntity(
+    int targetEntityID,
+    ActionCancelReason reason)
+{
+    actionManager.CancelMeleeActionsTargetingEntity(
+        targetEntityID,
+        reason);
+}
+
+void World::ClearPendingMeleeInteractionsInvolvingEntity(
+    int entityID)
+{
+    auto iterator =
+        pendingMeleeInteractions.begin();
+
+    while (iterator != pendingMeleeInteractions.end())
+    {
+        if (iterator->second.attackerEntityID == entityID ||
+            iterator->second.defenderEntityID == entityID)
+        {
+            iterator = pendingMeleeInteractions.erase(
+                iterator);
+            continue;
+        }
+
+        ++iterator;
+    }
+}
+
+void World::ClearPendingMovementForEntity(
+    int entityID)
+{
+    std::queue<MovementRequest> remainingMovementRequests;
+
+    while (!movementRequests.empty())
+    {
+        MovementRequest request = movementRequests.front();
+        movementRequests.pop();
+
+        if (request.GetEntityID() != entityID)
+        {
+            remainingMovementRequests.push(request);
+        }
+    }
+
+    movementRequests = std::move(
+        remainingMovementRequests);
+
+    std::queue<MovementDestinationRequest>
+        remainingDestinationRequests;
+
+    while (!movementDestinationRequests.empty())
+    {
+        MovementDestinationRequest request =
+            movementDestinationRequests.front();
+        movementDestinationRequests.pop();
+
+        if (request.GetEntityID() != entityID)
+        {
+            remainingDestinationRequests.push(
+                request);
+        }
+    }
+
+    movementDestinationRequests = std::move(
+        remainingDestinationRequests);
+
+    activeMovementPaths.erase(entityID);
+}
+
+void World::HandleCombatantDeath(
+    int deadEntityID)
+{
+    Entity *entity =
+        entityManager.GetEntityByID(
+            deadEntityID);
+
+    Combatant *combatant =
+        TryGetCombatant(entity);
+
+    if (combatant == nullptr ||
+        combatant->IsAlive())
+    {
+        return;
+    }
+
+    CancelActionsForEntity(
+        deadEntityID,
+        ActionCancelReason::TARGET_DEPLETED);
+
+    CancelMeleeActionsTargetingEntity(
+        deadEntityID,
+        ActionCancelReason::TARGET_DEPLETED);
+
+    ClearPendingMeleeInteractionsInvolvingEntity(
+        deadEntityID);
+
+    Player *player =
+        dynamic_cast<Player *>(entity);
+
+    if (player == nullptr)
+    {
+        return;
+    }
+
+    pendingResourceInteractions.erase(
+        deadEntityID);
+
+    pendingStationInteractions.erase(
+        deadEntityID);
+
+    openedStations.erase(
+        deadEntityID);
+
+    activeStations.erase(
+        deadEntityID);
+
+    ClearPendingMovementForEntity(
+        deadEntityID);
+}
+
+void World::ProcessDeadCombatantCleanup()
+{
+    for (const auto &entity : entityManager.GetEntities())
+    {
+        Combatant *combatant =
+            TryGetCombatant(entity.get());
+
+        if (combatant == nullptr ||
+            combatant->IsAlive())
+        {
+            continue;
+        }
+
+        HandleCombatantDeath(
+            entity->GetID());
+    }
 }

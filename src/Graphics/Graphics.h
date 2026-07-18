@@ -58,6 +58,26 @@ public:
         int cameraTileX = 0,
         int cameraTileY = 0) const;
 
+    SDL_FRect GetPlayerScreenRectangle(
+        const Player &player,
+        int cameraTileX = 0,
+        int cameraTileY = 0) const;
+
+    SDL_FRect GetPlayerHealthBarBackgroundRectangle(
+        const Player &player,
+        int cameraTileX = 0,
+        int cameraTileY = 0) const;
+
+    SDL_FRect GetPlayerHealthBarFillRectangle(
+        const Player &player,
+        int cameraTileX = 0,
+        int cameraTileY = 0) const;
+
+    SDL_FPoint GetPlayerCombatFeedbackPosition(
+        const Player &player,
+        int cameraTileX = 0,
+        int cameraTileY = 0) const;
+
     SDL_FRect GetMonsterHealthBarFillRectangle(
         const Monster &monster,
         int cameraTileX = 0,
@@ -118,6 +138,8 @@ public:
     void DrawGrid();
     void DrawClickedTile();
     void DrawPlayer(int playerX, int playerY);
+    void DrawPlayerHealthBar(
+        const Player &player);
     SDL_FRect GetMonsterScreenRectangle(
         const Monster &monster,
         int cameraTileX = 0,

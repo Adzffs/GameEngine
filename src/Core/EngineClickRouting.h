@@ -5,6 +5,7 @@
 #include "../Action/ActionCancelReason.h"
 #include "../Graphics/Graphics.h"
 #include "../Movement/MovementDestinationRequest.h"
+#include "../Player/Player.h"
 #include "../World/World.h"
 
 namespace EngineClickRouting
@@ -20,6 +21,18 @@ namespace EngineClickRouting
         int mouseX,
         int mouseY)
     {
+        Entity *entity =
+            world.GetEntityByID(playerID);
+
+        Player *player =
+            dynamic_cast<Player *>(entity);
+
+        if (player == nullptr ||
+            !player->IsAlive())
+        {
+            return true;
+        }
+
         ResourceNode *resource =
             world.GetResourceAt(
                 clickedTileX,
