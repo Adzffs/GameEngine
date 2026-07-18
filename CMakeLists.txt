@@ -233,4 +233,15 @@ if(BUILD_TESTING)
         NAME MonsterRetaliationTests
         COMMAND MonsterRetaliationTests
     )
+
+    add_executable(EntityDeathEventTests
+        tests/EntityDeathEventTests.cpp
+    )
+
+    target_link_libraries(EntityDeathEventTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME EntityDeathEventTests
+        COMMAND EntityDeathEventTests
+    )
 endif()

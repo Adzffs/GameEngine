@@ -854,6 +854,12 @@ World::GetMeleeCombatFeedbacks() const
     return meleeCombatFeedbacks;
 }
 
+const std::vector<EntityDiedEvent> &
+World::GetEntityDiedEvents() const
+{
+    return entityDiedEvents;
+}
+
 int World::GetCurrentTick() const
 {
     return currentTick;
@@ -899,6 +905,8 @@ void World::RecordMeleeCombatFeedback(
 void World::Update()
 {
     Logger::Debug("Updating World");
+
+    entityDiedEvents.clear();
 
     currentTick++;
 
@@ -1510,7 +1518,7 @@ ActionValidationResult World::ValidateMeleeAttackAction(
     {
         return {
             false,
-            ActionCancelReason::TARGET_DEPLETED,
+            ActionCancelReason::ENTITY_DIED,
             "Defender is not alive"};
     }
 
@@ -1707,6 +1715,9 @@ void World::ProcessCompletedActions(
                 continue;
             }
 
+            const bool defenderWasAliveBeforeAttack =
+                defender->IsAlive();
+
             lastMeleeAttackResult =
                 combatService.ResolveMeleeAttack(
                     attacker->GetCombatRatings(),
@@ -1720,8 +1731,20 @@ void World::ProcessCompletedActions(
 
             if (!defender->IsAlive())
             {
+                int killerEntityID =
+                    EntityDiedEvent::InvalidKillerEntityID;
+
+                if (defenderWasAliveBeforeAttack &&
+                    lastMeleeAttackResult->didHit &&
+                    lastMeleeAttackResult->actualDamageApplied > 0)
+                {
+                    killerEntityID =
+                        action.GetOwnerID();
+                }
+
                 HandleCombatantDeath(
-                    action.GetTargetID());
+                    action.GetTargetID(),
+                    killerEntityID);
 
                 continue;
             }
@@ -2431,7 +2454,8 @@ void World::ClearPendingMovementForEntity(
 }
 
 void World::HandleCombatantDeath(
-    int deadEntityID)
+    int deadEntityID,
+    int killerEntityID)
 {
     Entity *entity =
         entityManager.GetEntityByID(
@@ -2446,13 +2470,25 @@ void World::HandleCombatantDeath(
         return;
     }
 
+    const bool firstProcessedDeath =
+        processedDeathEntityIDs.insert(
+                                   deadEntityID)
+            .second;
+
+    if (firstProcessedDeath)
+    {
+        RecordEntityDiedEvent(
+            deadEntityID,
+            killerEntityID);
+    }
+
     CancelActionsForEntity(
         deadEntityID,
-        ActionCancelReason::TARGET_DEPLETED);
+        ActionCancelReason::ENTITY_DIED);
 
     CancelMeleeActionsTargetingEntity(
         deadEntityID,
-        ActionCancelReason::TARGET_DEPLETED);
+        ActionCancelReason::ENTITY_DIED);
 
     ClearPendingMeleeInteractionsInvolvingEntity(
         deadEntityID);
@@ -2481,6 +2517,33 @@ void World::HandleCombatantDeath(
         deadEntityID);
 }
 
+void World::RecordEntityDiedEvent(
+    int deadEntityID,
+    int killerEntityID)
+{
+    entityDiedEvents.emplace_back(
+        deadEntityID,
+        killerEntityID,
+        currentTick);
+
+    if (killerEntityID ==
+        EntityDiedEvent::InvalidKillerEntityID)
+    {
+        Logger::Game(
+            "[COMBAT] Entity " +
+            std::to_string(deadEntityID) +
+            " died");
+
+        return;
+    }
+
+    Logger::Game(
+        "[COMBAT] Entity " +
+        std::to_string(killerEntityID) +
+        " killed entity " +
+        std::to_string(deadEntityID));
+}
+
 void World::ProcessDeadCombatantCleanup()
 {
     for (const auto &entity : entityManager.GetEntities())
@@ -2488,9 +2551,16 @@ void World::ProcessDeadCombatantCleanup()
         Combatant *combatant =
             TryGetCombatant(entity.get());
 
-        if (combatant == nullptr ||
-            combatant->IsAlive())
+        if (combatant == nullptr)
         {
+            continue;
+        }
+
+        if (combatant->IsAlive())
+        {
+            processedDeathEntityIDs.erase(
+                entity->GetID());
+
             continue;
         }
 

@@ -22,6 +22,7 @@ public:
     bool IsAlive() const override;
 
     int ApplyDamage(int amount) override;
+    void RestoreHealthToFull();
 
 private:
     CombatRatings combatRatings;

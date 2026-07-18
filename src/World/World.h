@@ -5,6 +5,7 @@
 #include "../Entity/Manager/EntityManager.h"
 #include "Map.h"
 #include "Object/Manager/ObjectManager.h"
+#include "Event/EntityDiedEvent.h"
 #include "../Action/ActionManager.h"
 #include "../Action/ActionCancelReason.h"
 #include "../Action/ActionValidationResult.h"
@@ -16,6 +17,8 @@
 #include "../Combat/MeleeCombatFeedback.h"
 #include "../Stats/CombatRatings.h"
 #include <optional>
+#include <set>
+#include <vector>
 
 class RandomSource;
 
@@ -114,6 +117,9 @@ public:
 
     const std::map<int, MeleeCombatFeedback> &
     GetMeleeCombatFeedbacks() const;
+
+    const std::vector<EntityDiedEvent> &
+    GetEntityDiedEvents() const;
 
 private:
     EntityManager entityManager;
@@ -223,7 +229,7 @@ private:
     void CancelMeleeActionsTargetingEntity(
         int targetEntityID,
         ActionCancelReason reason =
-            ActionCancelReason::TARGET_DEPLETED);
+            ActionCancelReason::ENTITY_DIED);
 
     void ClearPendingMeleeInteractionsInvolvingEntity(
         int entityID);
@@ -232,7 +238,16 @@ private:
         int entityID);
 
     void HandleCombatantDeath(
-        int deadEntityID);
+        int deadEntityID,
+        int killerEntityID =
+            EntityDiedEvent::InvalidKillerEntityID);
+
+    void RecordEntityDiedEvent(
+        int deadEntityID,
+        int killerEntityID);
 
     void ProcessDeadCombatantCleanup();
+
+    std::set<int> processedDeathEntityIDs;
+    std::vector<EntityDiedEvent> entityDiedEvents;
 };

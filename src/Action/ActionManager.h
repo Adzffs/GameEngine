@@ -23,7 +23,7 @@ public:
     void CancelMeleeActionsTargetingEntity(
         int targetEntityID,
         ActionCancelReason reason =
-            ActionCancelReason::TARGET_DEPLETED);
+            ActionCancelReason::ENTITY_DIED);
 
     std::vector<Action> Update();
 

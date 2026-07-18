@@ -46,3 +46,8 @@ int Monster::ApplyDamage(int amount)
 {
     return healthPool.ApplyDamage(amount);
 }
+
+void Monster::RestoreHealthToFull()
+{
+    healthPool.RestoreToFull();
+}
