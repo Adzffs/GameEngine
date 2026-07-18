@@ -1,11 +1,20 @@
 #include "ActionManager.h"
 
+void ActionManager::StartAction(
+    const Action &action)
+{
+    CancelActionsForEntity(
+        action.GetEntityID(),
+        ActionCancelReason::NEW_ACTION_STARTED);
+
+    actions.push_back(action);
+    actions.back().Start(currentTick);
+}
+
 void ActionManager::AddAction(
     const Action &action)
 {
-    actions.push_back(action);
-
-    actions.back().Start(currentTick);
+    StartAction(action);
 }
 
 bool ActionManager::HasActionForEntity(
@@ -22,14 +31,12 @@ bool ActionManager::HasActionForEntity(
     return false;
 }
 
-const Action *
-ActionManager::GetActionForEntity(
+const Action *ActionManager::GetActionForEntity(
     int entityID) const
 {
     for (const Action &action : actions)
     {
-        if (action.GetEntityID() ==
-            entityID)
+        if (action.GetEntityID() == entityID)
         {
             return &action;
         }
@@ -51,11 +58,12 @@ std::vector<Action> ActionManager::Update()
 
         if (actionIterator->IsComplete())
         {
-            completedActions.push_back(
-                *actionIterator);
-
-            actionIterator =
-                actions.erase(actionIterator);
+            completedActions.push_back(*actionIterator);
+            actionIterator = actions.erase(actionIterator);
+        }
+        else if (actionIterator->IsCancelled())
+        {
+            actionIterator = actions.erase(actionIterator);
         }
         else
         {
@@ -67,20 +75,17 @@ std::vector<Action> ActionManager::Update()
 }
 
 void ActionManager::CancelActionsForEntity(
-    int entityID)
+    int entityID,
+    ActionCancelReason reason)
 {
     auto actionIterator = actions.begin();
 
     while (actionIterator != actions.end())
     {
-        if (actionIterator->GetEntityID() ==
-            entityID)
+        if (actionIterator->GetEntityID() == entityID)
         {
-            actionIterator->Cancel(
-                ActionCancelReason::NONE);
-
-            actionIterator =
-                actions.erase(actionIterator);
+            actionIterator->Cancel(reason);
+            actionIterator = actions.erase(actionIterator);
         }
         else
         {

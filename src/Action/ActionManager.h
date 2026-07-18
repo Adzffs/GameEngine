@@ -7,6 +7,10 @@
 class ActionManager
 {
 public:
+    void StartAction(const Action &action);
+
+    // Temporary compatibility function.
+    // Existing World code still calls AddAction.
     void AddAction(const Action &action);
 
     bool HasActionForEntity(int entityID) const;
@@ -14,7 +18,10 @@ public:
     const Action *GetActionForEntity(
         int entityID) const;
 
-    void CancelActionsForEntity(int entityID);
+    void CancelActionsForEntity(
+        int entityID,
+        ActionCancelReason reason =
+            ActionCancelReason::NONE);
 
     std::vector<Action> Update();
 
