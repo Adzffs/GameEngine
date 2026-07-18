@@ -44,10 +44,6 @@ public:
 
     int GetOwnerID() const;
 
-    // Temporary compatibility function.
-    // Existing World and ActionManager code still uses this name.
-    int GetEntityID() const;
-
     int GetTargetID() const;
 
 private:

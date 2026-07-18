@@ -4,7 +4,7 @@ void ActionManager::StartAction(
     const Action &action)
 {
     CancelActionsForEntity(
-        action.GetEntityID(),
+        action.GetOwnerID(),
         ActionCancelReason::NEW_ACTION_STARTED);
 
     actions.push_back(action);
@@ -14,13 +14,14 @@ void ActionManager::StartAction(
 void ActionManager::RestartAction(
     const Action &action)
 {
-    if (!action.IsRepeating())
+    if (!action.IsRepeating() ||
+        !action.IsComplete())
     {
         return;
     }
 
     CancelActionsForEntity(
-        action.GetEntityID(),
+        action.GetOwnerID(),
         ActionCancelReason::NEW_ACTION_STARTED);
 
     Action restartedAction = action;
@@ -29,18 +30,12 @@ void ActionManager::RestartAction(
     actions.push_back(restartedAction);
 }
 
-void ActionManager::AddAction(
-    const Action &action)
-{
-    StartAction(action);
-}
-
 bool ActionManager::HasActionForEntity(
     int entityID) const
 {
     for (const Action &action : actions)
     {
-        if (action.GetEntityID() == entityID)
+        if (action.GetOwnerID() == entityID)
         {
             return true;
         }
@@ -54,7 +49,7 @@ const Action *ActionManager::GetActionForEntity(
 {
     for (const Action &action : actions)
     {
-        if (action.GetEntityID() == entityID)
+        if (action.GetOwnerID() == entityID)
         {
             return &action;
         }
@@ -100,7 +95,7 @@ void ActionManager::CancelActionsForEntity(
 
     while (actionIterator != actions.end())
     {
-        if (actionIterator->GetEntityID() == entityID)
+        if (actionIterator->GetOwnerID() == entityID)
         {
             actionIterator->Cancel(reason);
             actionIterator = actions.erase(actionIterator);

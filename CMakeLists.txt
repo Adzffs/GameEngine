@@ -6,10 +6,7 @@ find_package(SDL3 REQUIRED CONFIG)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(GameEngine
-    src/main.cpp
-    src/Core/Engine.cpp
-    src/Time/Clock.cpp
+set(GAMEENGINE_CORE_SOURCES
     src/World/World.cpp
     src/World/Position.cpp
     src/Entity/Entity.cpp
@@ -26,10 +23,8 @@ add_executable(GameEngine
     src/Movement/MovementRequest.cpp
     src/Movement/MovementDestinationRequest.cpp
     src/Pathfinding/Pathfinder.cpp
-    src/Input/InputManager.cpp
     src/Player/Player.cpp
     src/NPC/NPC.cpp
-    src/Graphics/Graphics.cpp
     src/Inventory/Inventory.cpp
     src/Inventory/InventorySlot.cpp
     src/Skills/Skill.cpp
@@ -42,7 +37,46 @@ add_executable(GameEngine
     src/Recipe/RecipeDefinition.cpp
     src/Recipe/RecipeDatabase.cpp
     src/Recipe/RecipeSystem.cpp
-
 )
-target_include_directories(GameEngine PRIVATE src)
-target_link_libraries(GameEngine PRIVATE SDL3::SDL3)
+
+add_library(GameEngineCore
+    ${GAMEENGINE_CORE_SOURCES}
+)
+
+target_include_directories(GameEngineCore PUBLIC src)
+
+add_executable(GameEngine
+    src/main.cpp
+    src/Core/Engine.cpp
+    src/Time/Clock.cpp
+    src/Input/InputManager.cpp
+    src/Graphics/Graphics.cpp
+)
+
+target_link_libraries(GameEngine PRIVATE GameEngineCore SDL3::SDL3)
+
+include(CTest)
+
+if(BUILD_TESTING)
+    add_executable(ActionFrameworkTests
+        tests/ActionFrameworkTests.cpp
+    )
+
+    target_link_libraries(ActionFrameworkTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME ActionFrameworkTests
+        COMMAND ActionFrameworkTests
+    )
+
+    add_executable(GameplayActionIntegrationTests
+        tests/GameplayActionIntegrationTests.cpp
+    )
+
+    target_link_libraries(GameplayActionIntegrationTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME GameplayActionIntegrationTests
+        COMMAND GameplayActionIntegrationTests
+    )
+endif()

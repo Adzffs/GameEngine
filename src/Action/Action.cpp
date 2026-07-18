@@ -165,11 +165,6 @@ int Action::GetOwnerID() const
     return ownerID;
 }
 
-int Action::GetEntityID() const
-{
-    return ownerID;
-}
-
 int Action::GetTargetID() const
 {
     return targetID;

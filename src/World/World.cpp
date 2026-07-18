@@ -971,7 +971,7 @@ void World::ProcessCompletedActions(
             ActionType::RECIPE)
         {
             const int entityID =
-                action.GetEntityID();
+                action.GetOwnerID();
 
             Entity *entity =
                 entityManager.GetEntityByID(
@@ -1063,7 +1063,7 @@ void World::ProcessCompletedActions(
 
         Entity *entity =
             entityManager.GetEntityByID(
-                action.GetEntityID());
+                action.GetOwnerID());
 
         Player *player =
             dynamic_cast<Player *>(entity);
@@ -1075,7 +1075,7 @@ void World::ProcessCompletedActions(
 
         ActionValidationResult validation =
             ValidateGatheringAction(
-                action.GetEntityID(),
+                action.GetOwnerID(),
                 action.GetTargetID(),
                 true);
 
@@ -1087,10 +1087,10 @@ void World::ProcessCompletedActions(
             }
 
             pendingResourceInteractions.erase(
-                action.GetEntityID());
+                action.GetOwnerID());
 
             actionManager.CancelActionsForEntity(
-                action.GetEntityID(),
+                action.GetOwnerID(),
                 validation.reason);
 
             continue;
@@ -1146,7 +1146,7 @@ void World::ProcessCompletedActions(
                     "Player inventory is full");
 
                 pendingResourceInteractions.erase(
-                    action.GetEntityID());
+                    action.GetOwnerID());
 
                 continue;
             }
@@ -1215,7 +1215,7 @@ void World::ProcessCompletedActions(
         if (!resource->IsActive())
         {
             pendingResourceInteractions.erase(
-                action.GetEntityID());
+                action.GetOwnerID());
 
             Logger::Game(
                 resourceDefinition.GetName() +
@@ -1226,7 +1226,7 @@ void World::ProcessCompletedActions(
 
         ActionValidationResult repeatValidation =
             ValidateGatheringAction(
-                action.GetEntityID(),
+                action.GetOwnerID(),
                 action.GetTargetID(),
                 true);
 
