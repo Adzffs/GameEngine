@@ -294,18 +294,6 @@ bool World::TryStartRecipeAction(
     int entityID,
     RecipeType recipeType)
 {
-    Entity *entity =
-        entityManager.GetEntityByID(
-            entityID);
-
-    Player *player =
-        dynamic_cast<Player *>(entity);
-
-    if (player == nullptr)
-    {
-        return false;
-    }
-
     if (actionManager.HasActionForEntity(
             entityID))
     {
@@ -315,29 +303,25 @@ bool World::TryStartRecipeAction(
         return false;
     }
 
+    ActionValidationResult validation =
+        ValidateRecipeAction(
+            entityID,
+            recipeType);
+
+    if (!validation.valid)
+    {
+        if (!validation.message.empty())
+        {
+            Logger::Game(
+                validation.message);
+        }
+
+        return false;
+    }
+
     const RecipeDefinition &recipe =
         RecipeDatabase::Get(
             recipeType);
-
-    if (!CanUseStation(
-            entityID,
-            recipe.GetRequiredStationType()))
-    {
-        Logger::Game(
-            "You must be beside the correct crafting station");
-
-        return false;
-    }
-
-    if (!RecipeSystem::CanCreateRecipe(
-            *player,
-            recipeType))
-    {
-        Logger::Game(
-            "You do not meet the recipe requirements");
-
-        return false;
-    }
 
     activeRecipeLoops[entityID] =
         recipeType;
@@ -735,6 +719,125 @@ ActionValidationResult World::ValidateGatheringAction(
                 ActionCancelReason::INVENTORY_FULL,
                 "Your inventory is full"};
         }
+    }
+
+    return {
+        true,
+        ActionCancelReason::NONE,
+        ""};
+}
+
+ActionValidationResult World::ValidateRecipeAction(
+    int entityID,
+    RecipeType recipeType)
+{
+    Entity *entity =
+        entityManager.GetEntityByID(
+            entityID);
+
+    Player *player =
+        dynamic_cast<Player *>(entity);
+
+    if (player == nullptr)
+    {
+        return {
+            false,
+            ActionCancelReason::REQUIREMENTS_FAILED,
+            "Player could not be found"};
+    }
+
+    switch (recipeType)
+    {
+    case RecipeType::BRONZE_BAR:
+    case RecipeType::IRON_BAR:
+    case RecipeType::STEEL_BAR:
+        break;
+
+    case RecipeType::NONE:
+    default:
+        return {
+            false,
+            ActionCancelReason::REQUIREMENTS_FAILED,
+            "The selected recipe is invalid"};
+    }
+
+    const RecipeDefinition &recipe =
+        RecipeDatabase::Get(
+            recipeType);
+
+    if (!CanUseStation(
+            entityID,
+            recipe.GetRequiredStationType()))
+    {
+        return {
+            false,
+            ActionCancelReason::OUT_OF_RANGE,
+            "You must be beside the correct crafting station"};
+    }
+
+    int playerLevel =
+        player->GetSkills()
+            .GetSkill(
+                recipe.GetRequiredSkill())
+            .GetLevel();
+
+    if (playerLevel <
+        recipe.GetRequiredLevel())
+    {
+        return {
+            false,
+            ActionCancelReason::REQUIREMENTS_FAILED,
+            "You need Smithing level " +
+                std::to_string(
+                    recipe.GetRequiredLevel()) +
+                " to create this item"};
+    }
+
+    const Inventory &inventory =
+        player->GetInventory();
+
+    for (const RecipeIngredient &ingredient :
+         recipe.GetIngredients())
+    {
+        if (inventory.GetItemAmount(
+                ingredient.itemType) <
+            ingredient.amount)
+        {
+            return {
+                false,
+                ActionCancelReason::REQUIREMENTS_FAILED,
+                "You do not have enough materials"};
+        }
+    }
+
+    Inventory simulatedInventory =
+        inventory;
+
+    for (const RecipeIngredient &ingredient :
+         recipe.GetIngredients())
+    {
+        bool removed =
+            simulatedInventory.RemoveItem(
+                ingredient.itemType,
+                ingredient.amount);
+
+        if (!removed)
+        {
+            return {
+                false,
+                ActionCancelReason::REQUIREMENTS_FAILED,
+                "The required materials could not be removed"};
+        }
+    }
+
+    if (!simulatedInventory.CanAddItem(
+            recipe.GetOutputItem(),
+            recipe.GetOutputAmount()))
+    {
+        return {
+            false,
+            ActionCancelReason::INVENTORY_FULL,
+            "Your inventory does not have enough space"};
     }
 
     return {

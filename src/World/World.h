@@ -108,6 +108,9 @@ private:
         int entityID,
         int resourceID,
         bool checkInventorySpace);
+    ActionValidationResult ValidateRecipeAction(
+        int entityID,
+        RecipeType recipeType);
     void CancelGatheringForToolChange(
         int entityID);
     bool CanUseStation(
