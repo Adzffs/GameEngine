@@ -369,27 +369,63 @@ bool World::TryStartMeleeAttack(
     int defenderEntityID,
     int durationTicks)
 {
+    return TryStartMeleeAction(
+        attackerEntityID,
+        defenderEntityID,
+        durationTicks,
+        false);
+}
+
+bool World::TryStartMeleeEngagement(
+    int attackerEntityID,
+    int defenderEntityID,
+    int durationTicks)
+{
+    return TryStartMeleeAction(
+        attackerEntityID,
+        defenderEntityID,
+        durationTicks,
+        true);
+}
+
+ActionValidationResult World::ValidateMeleeStartAction(
+    int attackerEntityID,
+    int defenderEntityID,
+    int durationTicks)
+{
     if (durationTicks < 1)
     {
-        Logger::Game(
-            "Melee attack duration must be at least one tick");
-
-        return false;
+        return {
+            false,
+            ActionCancelReason::REQUIREMENTS_FAILED,
+            "Melee attack duration must be at least one tick"};
     }
 
     if (actionManager.HasActionForEntity(
             attackerEntityID))
     {
-        Logger::Game(
-            "You are already performing an action");
-
-        return false;
+        return {
+            false,
+            ActionCancelReason::REQUIREMENTS_FAILED,
+            "You are already performing an action"};
     }
 
+    return ValidateMeleeAttackAction(
+        attackerEntityID,
+        defenderEntityID);
+}
+
+bool World::TryStartMeleeAction(
+    int attackerEntityID,
+    int defenderEntityID,
+    int durationTicks,
+    bool repeating)
+{
     ActionValidationResult validation =
-        ValidateMeleeAttackAction(
+        ValidateMeleeStartAction(
             attackerEntityID,
-            defenderEntityID);
+            defenderEntityID,
+            durationTicks);
 
     if (!validation.valid)
     {
@@ -411,7 +447,7 @@ bool World::TryStartMeleeAttack(
             durationTicks,
             attackerEntityID,
             defenderEntityID,
-            false));
+            repeating));
 
     return true;
 }
@@ -1192,6 +1228,29 @@ void World::ProcessCompletedActions(
                     attacker->GetCombatRatings(),
                     defender->GetCombatRatings(),
                     *defender);
+
+            if (!action.IsRepeating())
+            {
+                continue;
+            }
+
+            ActionValidationResult repeatValidation =
+                ValidateMeleeAttackAction(
+                    action.GetOwnerID(),
+                    action.GetTargetID());
+
+            if (!repeatValidation.valid)
+            {
+                if (!repeatValidation.message.empty())
+                {
+                    Logger::Game(
+                        repeatValidation.message);
+                }
+
+                continue;
+            }
+
+            actionManager.RestartAction(action);
 
             continue;
         }

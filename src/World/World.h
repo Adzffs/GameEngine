@@ -88,6 +88,11 @@ public:
         int defenderEntityID,
         int durationTicks);
 
+    bool TryStartMeleeEngagement(
+        int attackerEntityID,
+        int defenderEntityID,
+        int durationTicks);
+
     // Temporary global seam used by tests and manual debugging.
     // This is not intended as the long-term per-entity combat event model.
     const std::optional<MeleeAttackResult> &
@@ -133,6 +138,15 @@ private:
     ActionValidationResult ValidateMeleeAttackAction(
         int attackerEntityID,
         int defenderEntityID);
+    ActionValidationResult ValidateMeleeStartAction(
+        int attackerEntityID,
+        int defenderEntityID,
+        int durationTicks);
+    bool TryStartMeleeAction(
+        int attackerEntityID,
+        int defenderEntityID,
+        int durationTicks,
+        bool repeating);
     void CancelGatheringForToolChange(
         int entityID);
     bool CanUseStation(

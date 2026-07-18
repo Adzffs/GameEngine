@@ -153,6 +153,17 @@ if(BUILD_TESTING)
         COMMAND MeleeCombatActionTests
     )
 
+    add_executable(MeleeEngagementTests
+        tests/MeleeEngagementTests.cpp
+    )
+
+    target_link_libraries(MeleeEngagementTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME MeleeEngagementTests
+        COMMAND MeleeEngagementTests
+    )
+
     add_executable(CombatantMonsterTests
         tests/CombatantMonsterTests.cpp
     )
