@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(GAMEENGINE_CORE_SOURCES
     src/Stats/StatBlock.cpp
+    src/Stats/HealthPool.cpp
     src/World/World.cpp
     src/World/Position.cpp
     src/Entity/Entity.cpp
@@ -90,5 +91,16 @@ if(BUILD_TESTING)
     add_test(
         NAME EquipmentStatsTests
         COMMAND EquipmentStatsTests
+    )
+
+    add_executable(PlayerHealthTests
+        tests/PlayerHealthTests.cpp
+    )
+
+    target_link_libraries(PlayerHealthTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME PlayerHealthTests
+        COMMAND PlayerHealthTests
     )
 endif()

@@ -5,7 +5,8 @@
 #include <iostream>
 
 Player::Player(int id)
-    : Entity(id, EntityType::PLAYER)
+    : Entity(id, EntityType::PLAYER),
+      healthPool(1)
 {
     inventory.AddItem(
         ItemType::BRONZE_AXE,
@@ -37,6 +38,9 @@ Player::Player(int id)
             SkillType::SMITHING,
             DevelopmentConfig::TEST_SMITHING_XP);
     }
+
+    RefreshDerivedState();
+    RestoreHealthToFull();
 }
 
 void Player::Update(World &world)
@@ -116,4 +120,49 @@ int Player::GetTotalStat(StatType stat) const
     }
 
     return total;
+}
+
+int Player::GetCurrentHealth() const
+{
+    return healthPool.GetCurrentHealth();
+}
+
+int Player::GetMaximumHealth() const
+{
+    return healthPool.GetMaximumHealth();
+}
+
+bool Player::IsAlive() const
+{
+    return healthPool.IsAlive();
+}
+
+void Player::ApplyDamage(int amount)
+{
+    healthPool.ApplyDamage(amount);
+}
+
+void Player::Heal(int amount)
+{
+    healthPool.Heal(amount);
+}
+
+void Player::RestoreHealthToFull()
+{
+    healthPool.RestoreToFull();
+}
+
+CombatRatings Player::GetCombatRatings() const
+{
+    return CombatRatings{
+        GetTotalStat(StatType::ATTACK_ACCURACY),
+        GetTotalStat(StatType::MELEE_STRENGTH),
+        GetTotalStat(StatType::DEFENCE),
+        GetTotalStat(StatType::MAX_HEALTH)};
+}
+
+void Player::RefreshDerivedState()
+{
+    healthPool.SetMaximumHealth(
+        GetTotalStat(StatType::MAX_HEALTH));
 }

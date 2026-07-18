@@ -1266,8 +1266,10 @@ void Graphics::DrawSkills(const Player &player)
         const char *name;
     };
 
-    static constexpr std::array<SkillDisplayEntry, 3>
+    static constexpr std::array<SkillDisplayEntry, 5>
         displayedSkills{{
+            {SkillType::ATTACK, "ATTACK"},
+            {SkillType::DEFENCE, "DEFENCE"},
             {SkillType::WOODCUTTING, "WOODCUTTING"},
             {SkillType::MINING, "MINING"},
             {SkillType::SMITHING, "SMITHING"},
@@ -1327,14 +1329,28 @@ void Graphics::DrawSkills(const Player &player)
         panelY + 10.0f,
         "SKILLS");
 
+    std::string healthText =
+        "HEALTH " +
+        std::to_string(
+            player.GetCurrentHealth()) +
+        " / " +
+        std::to_string(
+            player.GetMaximumHealth());
+
+    SDL_RenderDebugText(
+        renderer,
+        panelX + 10.0f,
+        panelY + 30.0f,
+        healthText.c_str());
+
     float skillX =
         panelX + 14.0f;
 
     float skillY =
-        panelY + 62.0f;
+        panelY + 74.0f;
 
     constexpr float skillRowHeight =
-        56.0f;
+        48.0f;
 
     for (const SkillDisplayEntry &entry :
          displayedSkills)

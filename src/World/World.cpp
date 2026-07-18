@@ -1440,6 +1440,8 @@ bool World::TryEquipInventoryItem(
                 entityID);
         }
 
+        player->RefreshDerivedState();
+
         return true;
     }
 
@@ -1453,6 +1455,8 @@ bool World::TryEquipInventoryItem(
         CancelGatheringForToolChange(
             entityID);
     }
+
+    player->RefreshDerivedState();
 
     return true;
 }
@@ -1500,6 +1504,8 @@ bool World::TryUnequipWeapon(
 
     equipment.Unequip(
         EquipmentSlotType::WEAPON);
+
+    player->RefreshDerivedState();
 
     CancelGatheringForToolChange(
         entityID);
