@@ -128,5 +128,4 @@ private:
     std::map<int, int> pendingStationInteractions;
     std::map<int, StationType> openedStations;
     std::map<int, int> activeStations;
-    std::map<int, RecipeType> activeRecipeLoops;
 };

@@ -157,9 +157,6 @@ void World::CancelActionsForEntity(
     actionManager.CancelActionsForEntity(
         entityID,
         reason);
-
-    activeRecipeLoops.erase(
-        entityID);
 }
 
 void World::CancelGatheringForToolChange(
@@ -323,17 +320,15 @@ bool World::TryStartRecipeAction(
         RecipeDatabase::Get(
             recipeType);
 
-    activeRecipeLoops[entityID] =
-        recipeType;
-
-    actionManager.AddAction(
+    actionManager.StartAction(
         Action(
             ActionType::RECIPE,
             recipe.GetName(),
             recipe.GetActionDurationTicks(),
             entityID,
             static_cast<int>(
-                recipeType)));
+                recipeType),
+            true));
 
     Logger::Game(
         "You begin " +
@@ -987,9 +982,6 @@ void World::ProcessCompletedActions(
 
             if (player == nullptr)
             {
-                activeRecipeLoops.erase(
-                    entityID);
-
                 continue;
             }
 
@@ -997,22 +989,25 @@ void World::ProcessCompletedActions(
                 static_cast<RecipeType>(
                     action.GetTargetID());
 
-            const RecipeDefinition &recipe =
-                RecipeDatabase::Get(
+            ActionValidationResult validation =
+                ValidateRecipeAction(
+                    entityID,
                     recipeType);
 
-            if (!CanUseStation(
-                    entityID,
-                    recipe.GetRequiredStationType()))
+            if (!validation.valid)
             {
-                activeRecipeLoops.erase(
-                    entityID);
-
-                Logger::Game(
-                    "You are no longer beside the required station");
+                if (!validation.message.empty())
+                {
+                    Logger::Game(
+                        validation.message);
+                }
 
                 continue;
             }
+
+            const RecipeDefinition &recipe =
+                RecipeDatabase::Get(
+                    recipeType);
 
             bool created =
                 RecipeSystem::TryCreateRecipe(
@@ -1021,9 +1016,6 @@ void World::ProcessCompletedActions(
 
             if (!created)
             {
-                activeRecipeLoops.erase(
-                    entityID);
-
                 Logger::Game(
                     "The recipe could not be completed");
 
@@ -1034,42 +1026,23 @@ void World::ProcessCompletedActions(
                 "Created: " +
                 recipe.GetName());
 
-            auto loopIterator =
-                activeRecipeLoops.find(
-                    entityID);
-
-            bool shouldRepeat =
-                loopIterator !=
-                    activeRecipeLoops.end() &&
-                loopIterator->second ==
-                    recipeType;
-
-            if (!shouldRepeat)
-            {
-                continue;
-            }
-
-            if (!RecipeSystem::CanCreateRecipe(
-                    *player,
-                    recipeType))
-            {
-                activeRecipeLoops.erase(
-                    loopIterator);
-
-                Logger::Game(
-                    "You do not have enough materials to continue");
-
-                continue;
-            }
-
-            actionManager.AddAction(
-                Action(
-                    ActionType::RECIPE,
-                    recipe.GetName(),
-                    recipe.GetActionDurationTicks(),
+            ActionValidationResult repeatValidation =
+                ValidateRecipeAction(
                     entityID,
-                    static_cast<int>(
-                        recipeType)));
+                    recipeType);
+
+            if (!repeatValidation.valid)
+            {
+                if (!repeatValidation.message.empty())
+                {
+                    Logger::Game(
+                        repeatValidation.message);
+                }
+
+                continue;
+            }
+
+            actionManager.RestartAction(action);
 
             continue;
         }
