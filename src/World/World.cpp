@@ -533,6 +533,194 @@ void World::ProcessStationInteractions()
     }
 }
 
+ActionValidationResult World::ValidateGatheringAction(
+    int entityID,
+    int resourceID,
+    bool checkInventorySpace)
+{
+    Entity *entity =
+        entityManager.GetEntityByID(entityID);
+
+    if (entity == nullptr)
+    {
+        return {
+            false,
+            ActionCancelReason::REQUIREMENTS_FAILED,
+            "Player could not be found"};
+    }
+
+    Player *player =
+        dynamic_cast<Player *>(entity);
+
+    if (player == nullptr)
+    {
+        return {
+            false,
+            ActionCancelReason::REQUIREMENTS_FAILED,
+            "Only players can gather resources"};
+    }
+
+    ResourceNode *resource =
+        objectManager.GetResourceByID(resourceID);
+
+    if (resource == nullptr)
+    {
+        return {
+            false,
+            ActionCancelReason::TARGET_MISSING,
+            "The resource no longer exists"};
+    }
+
+    if (!resource->IsActive())
+    {
+        return {
+            false,
+            ActionCancelReason::TARGET_DEPLETED,
+            "The resource has been depleted"};
+    }
+
+    int distanceX =
+        std::abs(
+            player->GetPosition().GetX() -
+            resource->GetX());
+
+    int distanceY =
+        std::abs(
+            player->GetPosition().GetY() -
+            resource->GetY());
+
+    bool isAdjacent =
+        distanceX <= 1 &&
+        distanceY <= 1;
+
+    if (!isAdjacent)
+    {
+        return {
+            false,
+            ActionCancelReason::OUT_OF_RANGE,
+            "You are too far away from the resource"};
+    }
+
+    const ResourceDefinition &resourceDefinition =
+        ResourceDatabase::Get(
+            resource->GetResourceType());
+
+    ItemType equippedWeapon =
+        player->GetEquipment().GetEquippedItem(
+            EquipmentSlotType::WEAPON);
+
+    if (equippedWeapon == ItemType::NONE)
+    {
+        return {
+            false,
+            ActionCancelReason::INVALID_TOOL,
+            "You need to equip the correct tool"};
+    }
+
+    const ItemDefinition &weaponDefinition =
+        ItemDatabase::Get(equippedWeapon);
+
+    if (weaponDefinition.GetToolType() !=
+        resourceDefinition.GetRequiredToolType())
+    {
+        return {
+            false,
+            ActionCancelReason::INVALID_TOOL,
+            "You need to equip the correct tool"};
+    }
+
+    if (weaponDefinition.HasSkillRequirement())
+    {
+        SkillType toolSkill =
+            weaponDefinition.GetRequiredSkill();
+
+        int playerLevel =
+            player->GetSkills()
+                .GetSkill(toolSkill)
+                .GetLevel();
+
+        int requiredLevel =
+            weaponDefinition.GetRequiredSkillLevel();
+
+        if (playerLevel < requiredLevel)
+        {
+            return {
+                false,
+                ActionCancelReason::REQUIREMENTS_FAILED,
+                "You need level " +
+                    std::to_string(requiredLevel) +
+                    " in the required skill to use " +
+                    weaponDefinition.GetName()};
+        }
+    }
+
+    SkillType requiredSkill =
+        resourceDefinition.GetRequiredSkill();
+
+    int playerSkillLevel =
+        player->GetSkills()
+            .GetSkill(requiredSkill)
+            .GetLevel();
+
+    int requiredSkillLevel =
+        resourceDefinition.GetRequiredSkillLevel();
+
+    if (playerSkillLevel < requiredSkillLevel)
+    {
+        std::string skillName =
+            "the required skill";
+
+        switch (requiredSkill)
+        {
+        case SkillType::WOODCUTTING:
+            skillName = "Woodcutting";
+            break;
+
+        case SkillType::MINING:
+            skillName = "Mining";
+            break;
+
+        case SkillType::SMITHING:
+            skillName = "Smithing";
+            break;
+
+        default:
+            break;
+        }
+
+        return {
+            false,
+            ActionCancelReason::REQUIREMENTS_FAILED,
+            "You need " +
+                skillName +
+                " level " +
+                std::to_string(requiredSkillLevel) +
+                " to gather from " +
+                resourceDefinition.GetName()};
+    }
+
+    if (checkInventorySpace)
+    {
+        bool canAddReward =
+            player->GetInventory().CanAddItem(
+                resourceDefinition.GetItemReward(),
+                resourceDefinition.GetItemAmount());
+
+        if (!canAddReward)
+        {
+            return {
+                false,
+                ActionCancelReason::INVENTORY_FULL,
+                "Your inventory is full"};
+        }
+    }
+
+    return {
+        true,
+        ActionCancelReason::NONE,
+        ""};
+}
+
 void World::ProcessResourceInteractions()
 {
     auto interactionIterator =
@@ -594,17 +782,32 @@ void World::ProcessResourceInteractions()
             continue;
         }
 
-        Player *player =
-            dynamic_cast<Player *>(entity);
+        ActionValidationResult validation =
+            ValidateGatheringAction(
+                entityID,
+                resourceID,
+                false);
 
-        if (player == nullptr)
+        if (!validation.valid)
         {
+            if (!validation.message.empty())
+            {
+                Logger::Game(validation.message);
+            }
+
+            actionManager.CancelActionsForEntity(
+                entityID,
+                validation.reason);
+
             interactionIterator =
                 pendingResourceInteractions.erase(
                     interactionIterator);
 
             continue;
         }
+
+        Player *player =
+            dynamic_cast<Player *>(entity);
 
         const ResourceDefinition &resourceDefinition =
             ResourceDatabase::Get(
@@ -618,78 +821,6 @@ void World::ProcessResourceInteractions()
         const ItemDefinition &weaponDefinition =
             ItemDatabase::Get(
                 equippedWeapon);
-
-        if (weaponDefinition.GetToolType() !=
-            resourceDefinition.GetRequiredToolType())
-        {
-            Logger::Game(
-                "You need to equip the correct tool");
-
-            interactionIterator =
-                pendingResourceInteractions.erase(
-                    interactionIterator);
-
-            continue;
-        }
-
-        if (weaponDefinition.HasSkillRequirement())
-        {
-            SkillType toolSkill =
-                weaponDefinition.GetRequiredSkill();
-
-            int playerLevel =
-                player->GetSkills()
-                    .GetSkill(toolSkill)
-                    .GetLevel();
-
-            int toolLevelRequirement =
-                weaponDefinition
-                    .GetRequiredSkillLevel();
-
-            if (playerLevel <
-                toolLevelRequirement)
-            {
-                Logger::Game(
-                    "You need level " +
-                    std::to_string(
-                        toolLevelRequirement) +
-                    " in the required skill to use " +
-                    weaponDefinition.GetName());
-
-                interactionIterator =
-                    pendingResourceInteractions.erase(
-                        interactionIterator);
-
-                continue;
-            }
-        }
-
-        SkillType requiredSkill =
-            resourceDefinition.GetRequiredSkill();
-
-        int playerSkillLevel =
-            player->GetSkills()
-                .GetSkill(requiredSkill)
-                .GetLevel();
-
-        if (playerSkillLevel <
-            resourceDefinition
-                .GetRequiredSkillLevel())
-        {
-            Logger::Game(
-                "You need Woodcutting level " +
-                std::to_string(
-                    resourceDefinition
-                        .GetRequiredSkillLevel()) +
-                " to chop " +
-                resourceDefinition.GetName());
-
-            interactionIterator =
-                pendingResourceInteractions.erase(
-                    interactionIterator);
-
-            continue;
-        }
 
         if (!actionManager.HasActionForEntity(
                 entityID))

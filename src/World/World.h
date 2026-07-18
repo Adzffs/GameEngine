@@ -5,6 +5,7 @@
 #include "Map.h"
 #include "Object/Manager/ObjectManager.h"
 #include "../Action/ActionManager.h"
+#include "../Action/ActionValidationResult.h"
 #include "../Movement/MovementDestinationRequest.h"
 #include "../Pathfinding/Pathfinder.h"
 #include "../Recipe/RecipeType.h"
@@ -99,6 +100,10 @@ private:
     void ProcessStationInteractions();
     void ProcessCompletedActions(
         const std::vector<Action> &completedActions);
+    ActionValidationResult ValidateGatheringAction(
+        int entityID,
+        int resourceID,
+        bool checkInventorySpace);
     bool CanUseStation(
         int entityID,
         StationType requiredStationType);

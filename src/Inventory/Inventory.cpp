@@ -81,6 +81,54 @@ bool Inventory::AddItem(
     return false;
 }
 
+bool Inventory::CanAddItem(
+    ItemType itemType,
+    int amount) const
+{
+    if (itemType == ItemType::NONE ||
+        amount <= 0)
+    {
+        return false;
+    }
+
+    const ItemDefinition &definition =
+        ItemDatabase::Get(itemType);
+
+    if (definition.IsStackable())
+    {
+        for (const InventorySlot &slot : slots)
+        {
+            if (!slot.IsEmpty() &&
+                slot.GetItemType() == itemType)
+            {
+                return true;
+            }
+        }
+
+        for (const InventorySlot &slot : slots)
+        {
+            if (slot.IsEmpty())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    int emptySlotCount = 0;
+
+    for (const InventorySlot &slot : slots)
+    {
+        if (slot.IsEmpty())
+        {
+            emptySlotCount++;
+        }
+    }
+
+    return emptySlotCount >= amount;
+}
+
 bool Inventory::RemoveItem(
     ItemType itemType,
     int amount)

@@ -13,6 +13,10 @@ public:
         ItemType itemType,
         int amount);
 
+    bool CanAddItem(
+        ItemType itemType,
+        int amount) const;
+
     bool RemoveItem(
         ItemType itemType,
         int amount);
