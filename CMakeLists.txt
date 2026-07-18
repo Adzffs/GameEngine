@@ -44,6 +44,9 @@ set(GAMEENGINE_CORE_SOURCES
     src/Recipe/RecipeDefinition.cpp
     src/Recipe/RecipeDatabase.cpp
     src/Recipe/RecipeSystem.cpp
+    src/Reward/RewardTable.cpp
+    src/Reward/RewardTableRoller.cpp
+    src/Reward/DevelopmentRewardTables.cpp
 )
 
 add_library(GameEngineCore
@@ -243,5 +246,16 @@ if(BUILD_TESTING)
     add_test(
         NAME EntityDeathEventTests
         COMMAND EntityDeathEventTests
+    )
+
+    add_executable(RewardTableTests
+        tests/RewardTableTests.cpp
+    )
+
+    target_link_libraries(RewardTableTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME RewardTableTests
+        COMMAND RewardTableTests
     )
 endif()
