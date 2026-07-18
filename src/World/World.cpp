@@ -972,6 +972,29 @@ void World::ProcessCompletedActions(
             continue;
         }
 
+        ActionValidationResult validation =
+            ValidateGatheringAction(
+                action.GetEntityID(),
+                action.GetTargetID(),
+                true);
+
+        if (!validation.valid)
+        {
+            if (!validation.message.empty())
+            {
+                Logger::Game(validation.message);
+            }
+
+            pendingResourceInteractions.erase(
+                action.GetEntityID());
+
+            actionManager.CancelActionsForEntity(
+                action.GetEntityID(),
+                validation.reason);
+
+            continue;
+        }
+
         const ResourceDefinition &resourceDefinition =
             ResourceDatabase::Get(
                 resource->GetResourceType());
