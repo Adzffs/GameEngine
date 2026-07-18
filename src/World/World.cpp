@@ -825,7 +825,7 @@ void World::ProcessResourceInteractions()
         if (!actionManager.HasActionForEntity(
                 entityID))
         {
-            actionManager.AddAction(
+            actionManager.StartAction(
                 Action(
                     ActionType::GATHERING,
                     "Gathering " +
@@ -833,10 +833,13 @@ void World::ProcessResourceInteractions()
                     weaponDefinition
                         .GetActionDurationTicks(),
                     entityID,
-                    resourceID));
+                    resourceID,
+                    true));
         }
 
-        ++interactionIterator;
+        interactionIterator =
+            pendingResourceInteractions.erase(
+                interactionIterator);
     }
 }
 void World::ProcessCompletedActions(
@@ -1123,49 +1126,24 @@ void World::ProcessCompletedActions(
             continue;
         }
 
-        auto interactionIterator =
-            pendingResourceInteractions.find(
-                action.GetEntityID());
-
-        bool stillInteractingWithResource =
-            interactionIterator !=
-                pendingResourceInteractions.end() &&
-            interactionIterator->second ==
-                action.GetTargetID();
-
-        if (!stillInteractingWithResource)
-        {
-            continue;
-        }
-
-        ItemType equippedWeapon =
-            player->GetEquipment()
-                .GetEquippedItem(
-                    EquipmentSlotType::WEAPON);
-
-        const ItemDefinition &weaponDefinition =
-            ItemDatabase::Get(
-                equippedWeapon);
-
-        if (weaponDefinition.GetToolType() !=
-            resourceDefinition.GetRequiredToolType())
-        {
-            pendingResourceInteractions.erase(
-                action.GetEntityID());
-
-            continue;
-        }
-
-        // Start another attempt after either success or failure.
-        actionManager.AddAction(
-            Action(
-                ActionType::GATHERING,
-                "Gathering " +
-                    resourceDefinition.GetName(),
-                weaponDefinition
-                    .GetActionDurationTicks(),
+        ActionValidationResult repeatValidation =
+            ValidateGatheringAction(
                 action.GetEntityID(),
-                action.GetTargetID()));
+                action.GetTargetID(),
+                true);
+
+        if (!repeatValidation.valid)
+        {
+            if (!repeatValidation.message.empty())
+            {
+                Logger::Game(
+                    repeatValidation.message);
+            }
+
+            continue;
+        }
+
+        actionManager.RestartAction(action);
     }
 }
 void World::ProcessMovementRequests()
