@@ -156,6 +156,11 @@ public:
         float x,
         float y,
         float size);
+    void DrawSwordIcon(
+        ItemType itemType,
+        float x,
+        float y,
+        float size);
     void DrawBarIcon(
         ItemType itemType,
         float x,

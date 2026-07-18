@@ -2002,6 +2002,122 @@ void Graphics::DrawAxeIcon(
         &axeHeadRectangle);
 }
 
+void Graphics::DrawSwordIcon(
+    ItemType itemType,
+    float x,
+    float y,
+    float size)
+{
+    int bladeRed = 0;
+    int bladeGreen = 0;
+    int bladeBlue = 0;
+
+    bool isDeveloperSword = false;
+
+    switch (itemType)
+    {
+    case ItemType::BRONZE_SWORD:
+        bladeRed = 185;
+        bladeGreen = 120;
+        bladeBlue = 70;
+        break;
+
+    case ItemType::DEVELOPER_GODSWORD:
+        bladeRed = 240;
+        bladeGreen = 210;
+        bladeBlue = 75;
+        isDeveloperSword = true;
+        break;
+
+    default:
+        return;
+    }
+
+    SDL_FRect guardRectangle{
+        x + size * 0.22f,
+        y + size * 0.52f,
+        size * 0.56f,
+        size * 0.08f};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        100,
+        75,
+        35,
+        255);
+
+    SDL_RenderFillRect(
+        renderer,
+        &guardRectangle);
+
+    SDL_FRect gripRectangle{
+        x + size * 0.43f,
+        y + size * 0.60f,
+        size * 0.14f,
+        size * 0.22f};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        65,
+        45,
+        25,
+        255);
+
+    SDL_RenderFillRect(
+        renderer,
+        &gripRectangle);
+
+    SDL_FRect bladeRectangle{
+        x + size * 0.45f,
+        y + size * 0.10f,
+        size * 0.10f,
+        size * 0.42f};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        bladeRed,
+        bladeGreen,
+        bladeBlue,
+        255);
+
+    SDL_RenderFillRect(
+        renderer,
+        &bladeRectangle);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        std::min(bladeRed + 20, 255),
+        std::min(bladeGreen + 20, 255),
+        std::min(bladeBlue + 20, 255),
+        255);
+
+    SDL_FRect edgeHighlight{
+        x + size * 0.48f,
+        y + size * 0.12f,
+        size * 0.04f,
+        size * 0.36f};
+
+    SDL_RenderFillRect(
+        renderer,
+        &edgeHighlight);
+
+    if (isDeveloperSword)
+    {
+        SDL_SetRenderDrawColor(
+            renderer,
+            255,
+            255,
+            255,
+            255);
+
+        SDL_RenderDebugText(
+            renderer,
+            x + 1.0f,
+            y + size - 10.0f,
+            "DEV");
+    }
+}
+
 void Graphics::DrawPickaxeIcon(
     ItemType itemType,
     float x,
@@ -2435,6 +2551,12 @@ void Graphics::DrawInventory(
             slotY,
             slotSize);
 
+        DrawSwordIcon(
+            slot.GetItemType(),
+            slotX,
+            slotY,
+            slotSize);
+
         DrawPickaxeIcon(
             slot.GetItemType(),
             slotX,
@@ -2619,6 +2741,12 @@ void Graphics::DrawEquipment(
                 slot.slotType);
 
         DrawAxeIcon(
+            equippedItem,
+            slot.x,
+            slot.y,
+            slotSize);
+
+        DrawSwordIcon(
             equippedItem,
             slot.x,
             slot.y,

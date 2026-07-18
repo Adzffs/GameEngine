@@ -2,11 +2,16 @@
 
 #include "../src/Equipment/Equipment.h"
 #include "../src/Equipment/EquipmentSlotType.h"
+#include "../src/Combat/CombatFormulas.h"
+#include "../src/Item/ItemDatabase.h"
 #include "../src/Inventory/ItemType.h"
 #include "../src/Player/Player.h"
 #include "../src/Skills/SkillType.h"
 #include "../src/Stats/StatBlock.h"
 #include "../src/Stats/StatType.h"
+#include "../src/World/World.h"
+
+#include <memory>
 
 #include <array>
 
@@ -194,6 +199,66 @@ int main()
     }
 
     {
+        const ItemDefinition &developerGodsword =
+            ItemDatabase::Get(ItemType::DEVELOPER_GODSWORD);
+
+        test.ExpectEqual(
+            static_cast<int>(developerGodsword.GetItemType()),
+            static_cast<int>(ItemType::DEVELOPER_GODSWORD),
+            "Developer Godsword exists in ItemDatabase");
+        test.ExpectEqual(
+            developerGodsword.GetName(),
+            std::string("Developer Godsword"),
+            "Developer Godsword has the expected name");
+        test.Expect(
+            developerGodsword.IsEquippable(),
+            "Developer Godsword is equippable");
+        test.Expect(
+            !developerGodsword.IsStackable(),
+            "Developer Godsword is non-stackable");
+        test.ExpectEqual(
+            static_cast<int>(developerGodsword.GetEquipmentSlot()),
+            static_cast<int>(EquipmentSlotType::WEAPON),
+            "Developer Godsword equips in the weapon slot");
+        test.ExpectEqual(
+            static_cast<int>(developerGodsword.GetToolType()),
+            static_cast<int>(ToolType::NONE),
+            "Developer Godsword has no gathering-tool behavior");
+        test.ExpectEqual(
+            static_cast<int>(developerGodsword.GetRequiredSkill()),
+            static_cast<int>(SkillType::NONE),
+            "Developer Godsword has no skill requirement");
+        test.ExpectEqual(
+            developerGodsword.GetRequiredSkillLevel(),
+            0,
+            "Developer Godsword has no skill level requirement");
+        test.ExpectEqual(
+            developerGodsword.GetActionDurationTicks(),
+            0,
+            "Developer Godsword has no action duration");
+        test.ExpectEqual(
+            developerGodsword.GetEquipmentStatBonuses().Get(
+                StatType::ATTACK_ACCURACY),
+            150,
+            "Developer Godsword grants +150 attack accuracy");
+        test.ExpectEqual(
+            developerGodsword.GetEquipmentStatBonuses().Get(
+                StatType::MELEE_STRENGTH),
+            140,
+            "Developer Godsword grants +140 melee strength");
+        test.ExpectEqual(
+            developerGodsword.GetEquipmentStatBonuses().Get(
+                StatType::DEFENCE),
+            0,
+            "Developer Godsword grants no defence");
+        test.ExpectEqual(
+            developerGodsword.GetEquipmentStatBonuses().Get(
+                StatType::MAX_HEALTH),
+            0,
+            "Developer Godsword grants no max-health bonus");
+    }
+
+    {
         Equipment equipment;
 
         equipment.Equip(
@@ -274,6 +339,103 @@ int main()
                 player.GetTotalStat(stat),
                 player.GetBaseStat(stat),
                 "Removing equipment returns player totals to base values");
+        }
+
+        {
+            World world;
+
+            int playerID = world.CreatePlayer();
+            Player *player = dynamic_cast<Player *>(
+                world.GetEntityByID(playerID));
+
+            test.Expect(
+                player != nullptr,
+                "World creates a player for the equipment swap test");
+
+            if (player != nullptr)
+            {
+                player->GetInventory().AddItem(
+                    ItemType::BRONZE_SWORD,
+                    1);
+                player->GetInventory().AddItem(
+                    ItemType::DEVELOPER_GODSWORD,
+                    1);
+
+                int bronzeSlot = -1;
+                int godswordSlot = -1;
+
+                const auto &slots = player->GetInventory().GetSlots();
+
+                for (int slotIndex = 0;
+                     slotIndex < static_cast<int>(slots.size());
+                     ++slotIndex)
+                {
+                    if (slots[slotIndex].IsEmpty())
+                    {
+                        continue;
+                    }
+
+                    if (slots[slotIndex].GetItemType() == ItemType::BRONZE_SWORD)
+                    {
+                        bronzeSlot = slotIndex;
+                    }
+
+                    if (slots[slotIndex].GetItemType() == ItemType::DEVELOPER_GODSWORD)
+                    {
+                        godswordSlot = slotIndex;
+                    }
+                }
+
+                test.Expect(
+                    bronzeSlot >= 0 && godswordSlot >= 0,
+                    "Both swords are present for the replacement test");
+
+                if (bronzeSlot >= 0 && godswordSlot >= 0)
+                {
+                    test.Expect(
+                        world.TryEquipInventoryItem(
+                            playerID,
+                            bronzeSlot),
+                        "Bronze sword equips through the normal inventory flow");
+
+                    int attackBefore = player->GetCombatRatings().attackAccuracy;
+                    int strengthBefore = player->GetCombatRatings().meleeStrength;
+
+                    test.Expect(
+                        world.TryEquipInventoryItem(
+                            playerID,
+                            godswordSlot),
+                        "Developer Godsword replaces the currently equipped weapon");
+
+                    test.ExpectEqual(
+                        static_cast<int>(
+                            player->GetEquipment().GetEquippedItem(
+                                EquipmentSlotType::WEAPON)),
+                        static_cast<int>(ItemType::DEVELOPER_GODSWORD),
+                        "Developer Godsword ends up equipped in the weapon slot");
+                    test.ExpectEqual(
+                        player->GetInventory().GetItemAmount(
+                            ItemType::BRONZE_SWORD),
+                        1,
+                        "Replacing the bronze sword returns it to inventory");
+                    test.ExpectEqual(
+                        player->GetCombatRatings().attackAccuracy,
+                        attackBefore + 150 - 3,
+                        "Developer Godsword increases attack accuracy by the expected amount");
+                    test.ExpectEqual(
+                        player->GetCombatRatings().meleeStrength,
+                        strengthBefore + 140 - 4,
+                        "Developer Godsword increases melee strength by the expected amount");
+                    test.ExpectEqual(
+                        player->GetCombatRatings().defence,
+                        player->GetBaseStat(StatType::DEFENCE),
+                        "Weapon swapping does not affect defence");
+                    test.ExpectEqual(
+                        player->GetCombatRatings().maximumHealth,
+                        player->GetBaseStat(StatType::MAX_HEALTH),
+                        "Weapon swapping does not affect maximum health");
+                }
+            }
         }
     }
 

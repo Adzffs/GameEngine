@@ -28,5 +28,6 @@ enum class ItemType
     STEEL_PICKAXE,
 
     BRONZE_SWORD,
+    DEVELOPER_GODSWORD,
     WOODEN_SHIELD
 };

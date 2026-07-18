@@ -376,5 +376,53 @@ int main()
             "Wooden shield does not change attacker strength or maximum hit");
     }
 
+    {
+        Player developmentPlayer(2003);
+
+        developmentPlayer.GetInventory().AddItem(
+            ItemType::DEVELOPER_GODSWORD,
+            1);
+
+        int godswordSlot = -1;
+        const auto &slots = developmentPlayer.GetInventory().GetSlots();
+
+        for (int slotIndex = 0;
+             slotIndex < static_cast<int>(slots.size());
+             ++slotIndex)
+        {
+            if (!slots[slotIndex].IsEmpty() &&
+                slots[slotIndex].GetItemType() == ItemType::DEVELOPER_GODSWORD)
+            {
+                godswordSlot = slotIndex;
+                break;
+            }
+        }
+
+        test.Expect(
+            godswordSlot >= 0,
+            "Developer Godsword is available for the formula path test");
+
+        if (godswordSlot >= 0)
+        {
+            Equipment &equipment = developmentPlayer.GetEquipment();
+
+            equipment.Equip(
+                EquipmentSlotType::WEAPON,
+                ItemType::DEVELOPER_GODSWORD);
+
+            CombatFormulas::MeleeCombatProfile developmentProfile =
+                developmentPlayer.GetMeleeCombatProfile();
+
+            test.ExpectEqual(
+                developmentProfile.attackRoll,
+                151,
+                "Developer Godsword raises the attack roll through the normal rating path");
+            test.ExpectEqual(
+                developmentProfile.maximumHit,
+                15,
+                "Developer Godsword raises the maximum hit through the normal rating path");
+        }
+    }
+
     return test.Finish();
 }

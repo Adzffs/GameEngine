@@ -204,6 +204,27 @@ const ItemDefinition &ItemDatabase::Get(
             return bonuses;
         }()};
 
+    static const ItemDefinition developerGodsword{
+        ItemType::DEVELOPER_GODSWORD,
+        "Developer Godsword",
+        false,
+        EquipmentSlotType::WEAPON,
+        ToolType::NONE,
+        SkillType::NONE,
+        0,
+        0,
+        []
+        {
+            StatBlock bonuses;
+            bonuses.Set(
+                StatType::ATTACK_ACCURACY,
+                150);
+            bonuses.Set(
+                StatType::MELEE_STRENGTH,
+                140);
+            return bonuses;
+        }()};
+
     static const ItemDefinition woodenShield{
         ItemType::WOODEN_SHIELD,
         "Wooden shield",
@@ -280,6 +301,9 @@ const ItemDefinition &ItemDatabase::Get(
 
     case ItemType::BRONZE_SWORD:
         return bronzeSword;
+
+    case ItemType::DEVELOPER_GODSWORD:
+        return developerGodsword;
 
     case ItemType::WOODEN_SHIELD:
         return woodenShield;

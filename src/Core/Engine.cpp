@@ -4,10 +4,34 @@
 #include "Core/Logger.h"
 #include "../Action/ActionCancelReason.h"
 #include "../Movement/MovementDestinationRequest.h"
+#include "../Inventory/ItemType.h"
 #include "../Player/Player.h"
 #include "../Skills/SkillType.h"
 #include "../Recipe/RecipeType.h"
 #include "EngineClickRouting.h"
+
+namespace
+{
+    int FindInventorySlot(
+        const Inventory &inventory,
+        ItemType itemType)
+    {
+        const auto &slots = inventory.GetSlots();
+
+        for (int slotIndex = 0;
+             slotIndex < static_cast<int>(slots.size());
+             ++slotIndex)
+        {
+            if (!slots[slotIndex].IsEmpty() &&
+                slots[slotIndex].GetItemType() == itemType)
+            {
+                return slotIndex;
+            }
+        }
+
+        return -1;
+    }
+}
 
 Engine::Engine()
     : playerID(-1)
@@ -19,6 +43,27 @@ Engine::Engine()
     }
 
     playerID = world.CreatePlayer();
+
+    Player *player =
+        dynamic_cast<Player *>(
+            world.GetEntityByID(playerID));
+
+    if (player != nullptr &&
+        player->GetInventory().AddItem(
+            ItemType::DEVELOPER_GODSWORD,
+            1))
+    {
+        int weaponSlotIndex = FindInventorySlot(
+            player->GetInventory(),
+            ItemType::DEVELOPER_GODSWORD);
+
+        if (weaponSlotIndex >= 0)
+        {
+            world.TryEquipInventoryItem(
+                playerID,
+                weaponSlotIndex);
+        }
+    }
 }
 
 void Engine::Run()
