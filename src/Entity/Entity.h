@@ -13,10 +13,13 @@ public:
     virtual ~Entity() = default;
 
     int GetID();
+    int GetID() const;
 
     EntityType GetType();
+    EntityType GetType() const;
 
     Position &GetPosition();
+    const Position &GetPosition() const;
 
     virtual void Update(World &world) = 0;
 

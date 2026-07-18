@@ -6,8 +6,10 @@ public:
     Position(int x, int y);
 
     int GetX();
+    int GetX() const;
 
     int GetY();
+    int GetY() const;
 
     void SetPosition(int x, int y);
 

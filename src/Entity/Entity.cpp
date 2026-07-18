@@ -14,12 +14,26 @@ Position &Entity::GetPosition()
 {
     return position;
 }
+const Position &Entity::GetPosition() const
+{
+    return position;
+}
 int Entity::GetID()
 {
     return id;
 }
 
+int Entity::GetID() const
+{
+    return id;
+}
+
 EntityType Entity::GetType()
+{
+    return type;
+}
+
+EntityType Entity::GetType() const
 {
     return type;
 }

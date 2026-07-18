@@ -11,7 +11,17 @@ int Position::GetX()
     return x;
 }
 
+int Position::GetX() const
+{
+    return x;
+}
+
 int Position::GetY()
+{
+    return y;
+}
+
+int Position::GetY() const
 {
     return y;
 }

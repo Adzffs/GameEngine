@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL.h>
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "../Action/Action.h"
@@ -16,6 +17,7 @@
 
 class Map;
 class Player;
+class Monster;
 
 class Graphics
 {
@@ -84,7 +86,19 @@ public:
     void DrawGrid();
     void DrawClickedTile();
     void DrawPlayer(int playerX, int playerY);
+    SDL_FRect GetMonsterScreenRectangle(
+        const Monster &monster,
+        int cameraTileX = 0,
+        int cameraTileY = 0) const;
+    std::optional<int> GetMonsterAtScreenPosition(
+        int mouseX,
+        int mouseY,
+        const std::vector<std::unique_ptr<Entity>> &entities,
+        int cameraTileX = 0,
+        int cameraTileY = 0) const;
     void DrawNPCs(
+        const std::vector<std::unique_ptr<Entity>> &entities);
+    void DrawMonsters(
         const std::vector<std::unique_ptr<Entity>> &entities);
     void DrawResources(
         const std::vector<ResourceNode> &resources);

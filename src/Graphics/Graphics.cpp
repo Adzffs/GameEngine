@@ -2,11 +2,33 @@
 #include <iostream>
 #include "../World/Map.h"
 #include "../Player/Player.h"
+#include "../Entity/Monster/Monster.h"
 #include "../World/Object/Resource/ResourceDatabase.h"
 #include "../World/Object/Resource/DepletedVisualType.h"
 #include <string>
 #include <array>
 #include <algorithm>
+
+namespace
+{
+    SDL_FRect MakeEntityTileRectangle(
+        int tileX,
+        int tileY,
+        float inset,
+        int cameraTileX,
+        int cameraTileY)
+    {
+        return SDL_FRect{
+            static_cast<float>(
+                (tileX - cameraTileX) * Graphics::TileSize) +
+                inset,
+            static_cast<float>(
+                (tileY - cameraTileY) * Graphics::TileSize) +
+                inset,
+            static_cast<float>(Graphics::TileSize) - inset * 2.0f,
+            static_cast<float>(Graphics::TileSize) - inset * 2.0f};
+    }
+}
 
 Graphics::Graphics()
     : window(nullptr),
@@ -791,15 +813,13 @@ void Graphics::DrawPlayer(
     int playerX,
     int playerY)
 {
-    SDL_FRect playerRectangle{
-        static_cast<float>(
-            playerX * TileSize + 4),
-        static_cast<float>(
-            playerY * TileSize + 4),
-        static_cast<float>(
-            TileSize - 8),
-        static_cast<float>(
-            TileSize - 8)};
+    SDL_FRect playerRectangle =
+        MakeEntityTileRectangle(
+            playerX,
+            playerY,
+            4.0f,
+            0,
+            0);
 
     SDL_SetRenderDrawColor(
         renderer,
@@ -811,6 +831,54 @@ void Graphics::DrawPlayer(
     SDL_RenderFillRect(
         renderer,
         &playerRectangle);
+}
+
+SDL_FRect Graphics::GetMonsterScreenRectangle(
+    const Monster &monster,
+    int cameraTileX,
+    int cameraTileY) const
+{
+    return MakeEntityTileRectangle(
+        monster.GetPosition().GetX(),
+        monster.GetPosition().GetY(),
+        5.0f,
+        cameraTileX,
+        cameraTileY);
+}
+
+std::optional<int> Graphics::GetMonsterAtScreenPosition(
+    int mouseX,
+    int mouseY,
+    const std::vector<std::unique_ptr<Entity>> &entities,
+    int cameraTileX,
+    int cameraTileY) const
+{
+    for (const auto &entity : entities)
+    {
+        Monster *monster =
+            dynamic_cast<Monster *>(entity.get());
+
+        if (monster == nullptr || !monster->IsAlive())
+        {
+            continue;
+        }
+
+        SDL_FRect monsterRectangle =
+            GetMonsterScreenRectangle(
+                *monster,
+                cameraTileX,
+                cameraTileY);
+
+        if (IsPointInsideRectangle(
+                static_cast<float>(mouseX),
+                static_cast<float>(mouseY),
+                monsterRectangle))
+        {
+            return monster->GetID();
+        }
+    }
+
+    return std::nullopt;
 }
 void Graphics::DrawNPCs(
     const std::vector<std::unique_ptr<Entity>> &entities)
@@ -840,6 +908,46 @@ void Graphics::DrawNPCs(
         SDL_RenderFillRect(
             renderer,
             &npcRectangle);
+    }
+}
+
+void Graphics::DrawMonsters(
+    const std::vector<std::unique_ptr<Entity>> &entities)
+{
+    for (const auto &entity : entities)
+    {
+        Monster *monster =
+            dynamic_cast<Monster *>(entity.get());
+
+        if (monster == nullptr || !monster->IsAlive())
+        {
+            continue;
+        }
+
+        SDL_FRect monsterRectangle =
+            GetMonsterScreenRectangle(*monster);
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            155,
+            50,
+            60,
+            255);
+
+        SDL_RenderFillRect(
+            renderer,
+            &monsterRectangle);
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            220,
+            110,
+            120,
+            255);
+
+        SDL_RenderRect(
+            renderer,
+            &monsterRectangle);
     }
 }
 void Graphics::DrawStations(
@@ -2304,6 +2412,7 @@ void Graphics::Render(
     DrawClickedTile();
     DrawResources(resources);
     DrawStations(stations);
+    DrawMonsters(entities);
     DrawNPCs(entities);
     DrawPlayer(playerX, playerY);
 
