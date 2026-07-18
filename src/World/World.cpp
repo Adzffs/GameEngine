@@ -162,6 +162,26 @@ void World::CancelActionsForEntity(
         entityID);
 }
 
+void World::CancelGatheringForToolChange(
+    int entityID)
+{
+    const Action *action =
+        actionManager.GetActionForEntity(
+            entityID);
+
+    if (action != nullptr &&
+        action->GetType() ==
+            ActionType::GATHERING)
+    {
+        actionManager.CancelActionsForEntity(
+            entityID,
+            ActionCancelReason::INVALID_TOOL);
+    }
+
+    pendingResourceInteractions.erase(
+        entityID);
+}
+
 void World::ClearPendingResourceInteraction(
     int entityID)
 {
@@ -1337,12 +1357,26 @@ bool World::TryEquipInventoryItem(
             previousDefinition.GetName() +
             " returned to inventory");
 
+        if (equipmentSlot ==
+            EquipmentSlotType::WEAPON)
+        {
+            CancelGatheringForToolChange(
+                entityID);
+        }
+
         return true;
     }
 
     Logger::Game(
         newDefinition.GetName() +
         " equipped");
+
+    if (equipmentSlot ==
+        EquipmentSlotType::WEAPON)
+    {
+        CancelGatheringForToolChange(
+            entityID);
+    }
 
     return true;
 }
@@ -1390,6 +1424,9 @@ bool World::TryUnequipWeapon(
 
     equipment.Unequip(
         EquipmentSlotType::WEAPON);
+
+    CancelGatheringForToolChange(
+        entityID);
 
     Logger::Game(
         "Weapon unequipped");

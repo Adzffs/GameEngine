@@ -108,6 +108,8 @@ private:
         int entityID,
         int resourceID,
         bool checkInventorySpace);
+    void CancelGatheringForToolChange(
+        int entityID);
     bool CanUseStation(
         int entityID,
         StationType requiredStationType);
