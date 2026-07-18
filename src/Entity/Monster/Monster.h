@@ -2,8 +2,10 @@
 
 #include "../../Combat/Combatant.h"
 #include "../Entity.h"
+#include "MonsterRespawnDefinition.h"
 #include "../../Reward/RewardTableType.h"
 #include "../../Stats/HealthPool.h"
+#include <optional>
 
 class Monster : public Entity, public Combatant
 {
@@ -14,7 +16,9 @@ public:
         int y,
         const CombatRatings &ratings,
         RewardTableType rewardTableType =
-            RewardTableType::NONE);
+            RewardTableType::NONE,
+        std::optional<MonsterRespawnDefinition> respawnDefinition =
+            std::nullopt);
 
     void Update(World &world) override;
 
@@ -28,9 +32,16 @@ public:
     void RestoreHealthToFull();
 
     RewardTableType GetRewardTableType() const;
+    bool HasRespawnDefinition() const;
+    std::optional<MonsterRespawnDefinition> GetRespawnDefinition() const;
+    int GetOriginalSpawnX() const;
+    int GetOriginalSpawnY() const;
 
 private:
     CombatRatings combatRatings;
     HealthPool healthPool;
     RewardTableType rewardTableType;
+    std::optional<MonsterRespawnDefinition> respawnDefinition;
+    const int originalSpawnX;
+    const int originalSpawnY;
 };

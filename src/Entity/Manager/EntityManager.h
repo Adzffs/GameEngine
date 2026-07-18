@@ -5,8 +5,10 @@
 #include "../../Input/InputManager.h"
 #include "../../Player/Player.h"
 #include "../../NPC/NPC.h"
+#include "../../Entity/Monster/MonsterRespawnDefinition.h"
 #include "../../Reward/RewardTableType.h"
 #include "../../Stats/CombatRatings.h"
+#include <optional>
 class World;
 
 class EntityManager
@@ -23,7 +25,9 @@ public:
         int y,
         const CombatRatings &ratings,
         RewardTableType rewardTableType =
-            RewardTableType::NONE);
+            RewardTableType::NONE,
+        std::optional<MonsterRespawnDefinition> respawnDefinition =
+            std::nullopt);
 
     void Update(World &world);
 

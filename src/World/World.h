@@ -19,12 +19,15 @@
 #include "../Reward/RewardTableRoller.h"
 #include "../Reward/RewardTableType.h"
 #include "../Stats/CombatRatings.h"
+#include "../Entity/Monster/MonsterRespawnDefinition.h"
 #include <optional>
 #include <set>
 #include <string>
 #include <vector>
 
 class RandomSource;
+class Monster;
+struct WorldTestAccess;
 
 class World
 {
@@ -47,7 +50,9 @@ public:
         int y,
         const CombatRatings &ratings,
         RewardTableType rewardTableType =
-            RewardTableType::NONE);
+            RewardTableType::NONE,
+        std::optional<MonsterRespawnDefinition> respawnDefinition =
+            std::nullopt);
     Entity *GetEntityByID(int id);
     const std::vector<std::unique_ptr<Entity>> &
     GetEntities() const;
@@ -132,7 +137,15 @@ public:
     const std::vector<EntityDiedEvent> &
     GetEntityDiedEvents() const;
 
+    int GetScheduledMonsterRespawnCount() const;
+    bool HasScheduledMonsterRespawn(
+        int monsterEntityID) const;
+    std::optional<int> GetScheduledMonsterRespawnTick(
+        int monsterEntityID) const;
+
 private:
+    friend struct WorldTestAccess;
+
     EntityManager entityManager;
 
     ObjectManager objectManager;
@@ -265,6 +278,18 @@ private:
 
     void ProcessDeadCombatantCleanup();
     void ProcessEntityDeathRewards();
+    void ScheduleMonsterRespawnsFromDeathEvents();
+    void ProcessDueMonsterRespawns();
+    bool TryCalculateRespawnTick(
+        int delayTicks,
+        int &respawnTick) const;
+    bool ScheduleMonsterRespawn(
+        int monsterEntityID,
+        int respawnTick);
+    void ExecuteMonsterRespawn(
+        Monster &monster);
+    void ClearCombatFeedbackInvolvingEntity(
+        int entityID);
 
     static bool TryBuildLootReceiptMessage(
         const std::vector<ItemReward> &rewards,
@@ -272,4 +297,8 @@ private:
 
     std::set<int> processedDeathEntityIDs;
     std::vector<EntityDiedEvent> entityDiedEvents;
+    std::map<int, int>
+        scheduledMonsterRespawnTicksByEntityID;
+    std::map<int, std::set<int>>
+        scheduledMonsterRespawnEntityIDsByTick;
 };

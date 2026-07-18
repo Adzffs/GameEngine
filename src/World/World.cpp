@@ -26,6 +26,7 @@
 #include <limits>
 #include <stdexcept>
 #include <utility>
+#include <set>
 
 namespace
 {
@@ -91,7 +92,8 @@ World::World(
             4,
             3,
             30},
-        RewardTableType::DEVELOPMENT_MONSTER);
+        RewardTableType::DEVELOPMENT_MONSTER,
+        MonsterRespawnDefinition{8});
 
     CreateResource(
         ResourceType::NORMAL_TREE,
@@ -173,13 +175,15 @@ int World::CreateMonster(
     int x,
     int y,
     const CombatRatings &ratings,
-    RewardTableType rewardTableType)
+    RewardTableType rewardTableType,
+    std::optional<MonsterRespawnDefinition> respawnDefinition)
 {
     return entityManager.CreateMonster(
         x,
         y,
         ratings,
-        rewardTableType);
+        rewardTableType,
+        respawnDefinition);
 }
 
 Entity *World::GetEntityByID(int id)
@@ -889,6 +893,36 @@ World::GetEntityDiedEvents() const
     return entityDiedEvents;
 }
 
+int World::GetScheduledMonsterRespawnCount() const
+{
+    return static_cast<int>(
+        scheduledMonsterRespawnTicksByEntityID.size());
+}
+
+bool World::HasScheduledMonsterRespawn(
+    int monsterEntityID) const
+{
+    return scheduledMonsterRespawnTicksByEntityID.find(
+               monsterEntityID) !=
+           scheduledMonsterRespawnTicksByEntityID.end();
+}
+
+std::optional<int> World::GetScheduledMonsterRespawnTick(
+    int monsterEntityID) const
+{
+    auto iterator =
+        scheduledMonsterRespawnTicksByEntityID.find(
+            monsterEntityID);
+
+    if (iterator ==
+        scheduledMonsterRespawnTicksByEntityID.end())
+    {
+        return std::nullopt;
+    }
+
+    return iterator->second;
+}
+
 int World::GetCurrentTick() const
 {
     return currentTick;
@@ -939,6 +973,8 @@ void World::Update()
 
     currentTick++;
 
+    ProcessDueMonsterRespawns();
+
     UpdateMeleeCombatFeedback();
     ProcessDeadCombatantCleanup();
 
@@ -958,6 +994,7 @@ void World::Update()
     ProcessMovementRequests();
     ProcessPendingMeleeInteractions();
     ProcessEntityDeathRewards();
+    ScheduleMonsterRespawnsFromDeathEvents();
 }
 
 Map &World::GetMap()
@@ -2743,5 +2780,242 @@ void World::ProcessEntityDeathRewards()
             std::to_string(killer->GetID()) +
             " received " +
             rewardReceipt);
+    }
+}
+
+void World::ScheduleMonsterRespawnsFromDeathEvents()
+{
+    for (const EntityDiedEvent &event : entityDiedEvents)
+    {
+        Entity *deadEntity =
+            entityManager.GetEntityByID(
+                event.deadEntityID);
+
+        Monster *monster =
+            dynamic_cast<Monster *>(deadEntity);
+
+        if (monster == nullptr)
+        {
+            continue;
+        }
+
+        if (!monster->HasRespawnDefinition())
+        {
+            continue;
+        }
+
+        if (!monster->IsAlive())
+        {
+            if (HasScheduledMonsterRespawn(
+                    monster->GetID()))
+            {
+                continue;
+            }
+
+            std::optional<MonsterRespawnDefinition>
+                respawnDefinition =
+                    monster->GetRespawnDefinition();
+
+            if (!respawnDefinition.has_value() ||
+                respawnDefinition->delayTicks <= 0)
+            {
+                continue;
+            }
+
+            int respawnTick = 0;
+
+            if (!TryCalculateRespawnTick(
+                    respawnDefinition->delayTicks,
+                    respawnTick))
+            {
+                continue;
+            }
+
+            ScheduleMonsterRespawn(
+                monster->GetID(),
+                respawnTick);
+        }
+    }
+}
+
+void World::ProcessDueMonsterRespawns()
+{
+    while (!scheduledMonsterRespawnEntityIDsByTick.empty())
+    {
+        auto bucketIterator =
+            scheduledMonsterRespawnEntityIDsByTick.begin();
+
+        const int dueTick =
+            bucketIterator->first;
+
+        if (dueTick > currentTick)
+        {
+            break;
+        }
+
+        std::set<int> dueMonsterEntityIDs =
+            bucketIterator->second;
+
+        scheduledMonsterRespawnEntityIDsByTick.erase(
+            bucketIterator);
+
+        for (int monsterEntityID : dueMonsterEntityIDs)
+        {
+            auto scheduledIterator =
+                scheduledMonsterRespawnTicksByEntityID.find(
+                    monsterEntityID);
+
+            if (scheduledIterator ==
+                    scheduledMonsterRespawnTicksByEntityID.end() ||
+                scheduledIterator->second != dueTick)
+            {
+                continue;
+            }
+
+            scheduledMonsterRespawnTicksByEntityID.erase(
+                scheduledIterator);
+
+            Entity *entity =
+                entityManager.GetEntityByID(
+                    monsterEntityID);
+
+            Monster *monster =
+                dynamic_cast<Monster *>(entity);
+
+            if (monster == nullptr)
+            {
+                continue;
+            }
+
+            if (monster->IsAlive())
+            {
+                processedDeathEntityIDs.erase(
+                    monsterEntityID);
+                continue;
+            }
+
+            ExecuteMonsterRespawn(*monster);
+        }
+    }
+}
+
+bool World::TryCalculateRespawnTick(
+    int delayTicks,
+    int &respawnTick) const
+{
+    if (delayTicks <= 0)
+    {
+        return false;
+    }
+
+    constexpr int MaxInt =
+        std::numeric_limits<int>::max();
+
+    if (currentTick > MaxInt - delayTicks)
+    {
+        return false;
+    }
+
+    respawnTick =
+        currentTick + delayTicks;
+
+    return true;
+}
+
+bool World::ScheduleMonsterRespawn(
+    int monsterEntityID,
+    int respawnTick)
+{
+    if (scheduledMonsterRespawnTicksByEntityID.find(
+            monsterEntityID) !=
+        scheduledMonsterRespawnTicksByEntityID.end())
+    {
+        return false;
+    }
+
+    scheduledMonsterRespawnTicksByEntityID[monsterEntityID] =
+        respawnTick;
+
+    scheduledMonsterRespawnEntityIDsByTick[respawnTick].insert(
+        monsterEntityID);
+
+    return true;
+}
+
+void World::ExecuteMonsterRespawn(
+    Monster &monster)
+{
+    const int monsterEntityID =
+        monster.GetID();
+
+    monster.RestoreHealthToFull();
+
+    monster.GetPosition().SetPosition(
+        monster.GetOriginalSpawnX(),
+        monster.GetOriginalSpawnY());
+
+    CancelActionsForEntity(
+        monsterEntityID,
+        ActionCancelReason::ENTITY_DIED);
+
+    CancelMeleeActionsTargetingEntity(
+        monsterEntityID,
+        ActionCancelReason::ENTITY_DIED);
+
+    ClearPendingMeleeInteractionsInvolvingEntity(
+        monsterEntityID);
+
+    ClearPendingMovementForEntity(
+        monsterEntityID);
+
+    ClearCombatFeedbackInvolvingEntity(
+        monsterEntityID);
+
+    pendingResourceInteractions.erase(
+        monsterEntityID);
+
+    pendingStationInteractions.erase(
+        monsterEntityID);
+
+    openedStations.erase(
+        monsterEntityID);
+
+    activeStations.erase(
+        monsterEntityID);
+
+    processedDeathEntityIDs.erase(
+        monsterEntityID);
+
+    Logger::Game(
+        "[SPAWN] Monster " +
+        std::to_string(monsterEntityID) +
+        " respawned at (" +
+        std::to_string(monster.GetOriginalSpawnX()) +
+        ", " +
+        std::to_string(monster.GetOriginalSpawnY()) +
+        ")");
+}
+
+void World::ClearCombatFeedbackInvolvingEntity(
+    int entityID)
+{
+    auto iterator =
+        meleeCombatFeedbacks.begin();
+
+    while (iterator != meleeCombatFeedbacks.end())
+    {
+        const MeleeCombatFeedback &feedback =
+            iterator->second;
+
+        if (iterator->first == entityID ||
+            feedback.attackerEntityID == entityID ||
+            feedback.defenderEntityID == entityID)
+        {
+            iterator = meleeCombatFeedbacks.erase(
+                iterator);
+            continue;
+        }
+
+        ++iterator;
     }
 }

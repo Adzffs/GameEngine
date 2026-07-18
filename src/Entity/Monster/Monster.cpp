@@ -7,11 +7,15 @@ Monster::Monster(
     int x,
     int y,
     const CombatRatings &ratings,
-    RewardTableType rewardTableType)
+    RewardTableType rewardTableType,
+    std::optional<MonsterRespawnDefinition> respawnDefinition)
     : Entity(id, EntityType::MONSTER),
       combatRatings(ratings),
       healthPool(ratings.maximumHealth),
-      rewardTableType(rewardTableType)
+      rewardTableType(rewardTableType),
+      respawnDefinition(respawnDefinition),
+      originalSpawnX(x),
+      originalSpawnY(y)
 {
     // Keep ratings and health cap internally consistent when health is clamped.
     combatRatings.maximumHealth = healthPool.GetMaximumHealth();
@@ -57,4 +61,29 @@ void Monster::RestoreHealthToFull()
 RewardTableType Monster::GetRewardTableType() const
 {
     return rewardTableType;
+}
+
+bool Monster::HasRespawnDefinition() const
+{
+    if (!respawnDefinition.has_value())
+    {
+        return false;
+    }
+
+    return respawnDefinition->delayTicks > 0;
+}
+
+std::optional<MonsterRespawnDefinition> Monster::GetRespawnDefinition() const
+{
+    return respawnDefinition;
+}
+
+int Monster::GetOriginalSpawnX() const
+{
+    return originalSpawnX;
+}
+
+int Monster::GetOriginalSpawnY() const
+{
+    return originalSpawnY;
 }

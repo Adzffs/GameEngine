@@ -281,4 +281,15 @@ if(BUILD_TESTING)
         NAME MonsterLootIntegrationTests
         COMMAND MonsterLootIntegrationTests
     )
+
+    add_executable(MonsterRespawnTests
+        tests/MonsterRespawnTests.cpp
+    )
+
+    target_link_libraries(MonsterRespawnTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME MonsterRespawnTests
+        COMMAND MonsterRespawnTests
+    )
 endif()
