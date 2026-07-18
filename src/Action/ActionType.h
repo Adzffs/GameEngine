@@ -4,5 +4,6 @@ enum class ActionType
 {
     NONE,
     GATHERING,
-    RECIPE
+    RECIPE,
+    MELEE_ATTACK
 };

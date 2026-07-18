@@ -35,6 +35,9 @@ public:
     int GetMaximumHealth() const;
     bool IsAlive() const;
 
+    HealthPool &GetHealthPool();
+    const HealthPool &GetHealthPool() const;
+
     int ApplyDamage(int amount);
     void Heal(int amount);
     void RestoreHealthToFull();

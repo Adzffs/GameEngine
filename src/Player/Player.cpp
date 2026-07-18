@@ -137,6 +137,16 @@ bool Player::IsAlive() const
     return healthPool.IsAlive();
 }
 
+HealthPool &Player::GetHealthPool()
+{
+    return healthPool;
+}
+
+const HealthPool &Player::GetHealthPool() const
+{
+    return healthPool;
+}
+
 int Player::ApplyDamage(int amount)
 {
     return healthPool.ApplyDamage(amount);

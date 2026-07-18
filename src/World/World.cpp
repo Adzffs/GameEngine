@@ -17,8 +17,9 @@
 #include "../Recipe/RecipeSystem.h"
 #include "../Recipe/RecipeDatabase.h"
 
-World::World()
-    : map(100, 100)
+World::World(unsigned int combatSeed)
+    : combatService(combatSeed),
+      map(100, 100)
 {
     entityManager.CreateNPC(3, 3);
 
@@ -335,6 +336,64 @@ bool World::TryStartRecipeAction(
         recipe.GetName());
 
     return true;
+}
+
+bool World::TryStartMeleeAttack(
+    int attackerEntityID,
+    int defenderEntityID,
+    int durationTicks)
+{
+    if (durationTicks < 1)
+    {
+        Logger::Game(
+            "Melee attack duration must be at least one tick");
+
+        return false;
+    }
+
+    if (actionManager.HasActionForEntity(
+            attackerEntityID))
+    {
+        Logger::Game(
+            "You are already performing an action");
+
+        return false;
+    }
+
+    ActionValidationResult validation =
+        ValidateMeleeAttackAction(
+            attackerEntityID,
+            defenderEntityID);
+
+    if (!validation.valid)
+    {
+        if (!validation.message.empty())
+        {
+            Logger::Game(
+                validation.message);
+        }
+
+        return false;
+    }
+
+    lastMeleeAttackResult.reset();
+
+    actionManager.StartAction(
+        Action(
+            ActionType::MELEE_ATTACK,
+            "Melee attack",
+            durationTicks,
+            attackerEntityID,
+            defenderEntityID,
+            false));
+
+    return true;
+}
+
+const std::optional<MeleeAttackResult> &
+World::GetLastMeleeAttackResult() const
+{
+    return lastMeleeAttackResult;
 }
 
 void World::Update()
@@ -841,6 +900,92 @@ ActionValidationResult World::ValidateRecipeAction(
         ""};
 }
 
+ActionValidationResult World::ValidateMeleeAttackAction(
+    int attackerEntityID,
+    int defenderEntityID)
+{
+    if (attackerEntityID == defenderEntityID)
+    {
+        return {
+            false,
+            ActionCancelReason::REQUIREMENTS_FAILED,
+            "You cannot target yourself"};
+    }
+
+    Entity *attackerEntity =
+        entityManager.GetEntityByID(
+            attackerEntityID);
+
+    Entity *defenderEntity =
+        entityManager.GetEntityByID(
+            defenderEntityID);
+
+    Player *attacker =
+        dynamic_cast<Player *>(
+            attackerEntity);
+
+    Player *defender =
+        dynamic_cast<Player *>(
+            defenderEntity);
+
+    if (attacker == nullptr)
+    {
+        return {
+            false,
+            ActionCancelReason::REQUIREMENTS_FAILED,
+            "Attacker could not be found"};
+    }
+
+    if (defender == nullptr)
+    {
+        return {
+            false,
+            ActionCancelReason::TARGET_MISSING,
+            "Defender could not be found"};
+    }
+
+    if (!attacker->IsAlive())
+    {
+        return {
+            false,
+            ActionCancelReason::REQUIREMENTS_FAILED,
+            "Attacker is not alive"};
+    }
+
+    if (!defender->IsAlive())
+    {
+        return {
+            false,
+            ActionCancelReason::TARGET_DEPLETED,
+            "Defender is not alive"};
+    }
+
+    int distanceX = std::abs(
+        attacker->GetPosition().GetX() -
+        defender->GetPosition().GetX());
+
+    int distanceY = std::abs(
+        attacker->GetPosition().GetY() -
+        defender->GetPosition().GetY());
+
+    bool isAdjacent =
+        distanceX <= 1 &&
+        distanceY <= 1;
+
+    if (!isAdjacent)
+    {
+        return {
+            false,
+            ActionCancelReason::OUT_OF_RANGE,
+            "You are too far away from the defender"};
+    }
+
+    return {
+        true,
+        ActionCancelReason::NONE,
+        ""};
+}
+
 void World::ProcessResourceInteractions()
 {
     auto interactionIterator =
@@ -967,6 +1112,50 @@ void World::ProcessCompletedActions(
 {
     for (const Action &action : completedActions)
     {
+        if (action.GetType() ==
+            ActionType::MELEE_ATTACK)
+        {
+            ActionValidationResult validation =
+                ValidateMeleeAttackAction(
+                    action.GetOwnerID(),
+                    action.GetTargetID());
+
+            if (!validation.valid)
+            {
+                if (!validation.message.empty())
+                {
+                    Logger::Game(
+                        validation.message);
+                }
+
+                continue;
+            }
+
+            Player *attacker =
+                dynamic_cast<Player *>(
+                    entityManager.GetEntityByID(
+                        action.GetOwnerID()));
+
+            Player *defender =
+                dynamic_cast<Player *>(
+                    entityManager.GetEntityByID(
+                        action.GetTargetID()));
+
+            if (attacker == nullptr ||
+                defender == nullptr)
+            {
+                continue;
+            }
+
+            lastMeleeAttackResult =
+                combatService.ResolveMeleeAttack(
+                    attacker->GetCombatRatings(),
+                    defender->GetCombatRatings(),
+                    defender->GetHealthPool());
+
+            continue;
+        }
+
         if (action.GetType() ==
             ActionType::RECIPE)
         {

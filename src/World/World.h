@@ -11,11 +11,13 @@
 #include "../Pathfinding/Pathfinder.h"
 #include "../Recipe/RecipeType.h"
 #include <map>
+#include "../Combat/CombatService.h"
+#include <optional>
 
 class World
 {
 public:
-    World();
+    explicit World(unsigned int combatSeed = 1337U);
 
     void Update();
 
@@ -76,12 +78,22 @@ public:
         int entityID,
         RecipeType recipeType);
 
+    bool TryStartMeleeAttack(
+        int attackerEntityID,
+        int defenderEntityID,
+        int durationTicks);
+
+    const std::optional<MeleeAttackResult> &
+    GetLastMeleeAttackResult() const;
+
 private:
     EntityManager entityManager;
 
     ObjectManager objectManager;
 
     ActionManager actionManager;
+
+    CombatService combatService;
 
     Map map;
 
@@ -111,6 +123,9 @@ private:
     ActionValidationResult ValidateRecipeAction(
         int entityID,
         RecipeType recipeType);
+    ActionValidationResult ValidateMeleeAttackAction(
+        int attackerEntityID,
+        int defenderEntityID);
     void CancelGatheringForToolChange(
         int entityID);
     bool CanUseStation(
@@ -128,4 +143,7 @@ private:
     std::map<int, int> pendingStationInteractions;
     std::map<int, StationType> openedStations;
     std::map<int, int> activeStations;
+
+    std::optional<MeleeAttackResult>
+        lastMeleeAttackResult;
 };

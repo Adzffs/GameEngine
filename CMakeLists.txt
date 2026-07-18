@@ -140,4 +140,15 @@ if(BUILD_TESTING)
         NAME CombatServiceTests
         COMMAND CombatServiceTests
     )
+
+    add_executable(MeleeCombatActionTests
+        tests/MeleeCombatActionTests.cpp
+    )
+
+    target_link_libraries(MeleeCombatActionTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME MeleeCombatActionTests
+        COMMAND MeleeCombatActionTests
+    )
 endif()
