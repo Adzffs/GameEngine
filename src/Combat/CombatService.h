@@ -2,10 +2,10 @@
 
 #include "MeleeAttackResolver.h"
 
+#include "Combatant.h"
 #include "../Core/RandomSource.h"
 #include "../Core/SeededRandom.h"
 #include "../Stats/CombatRatings.h"
-#include "../Stats/HealthPool.h"
 
 #include <memory>
 
@@ -19,7 +19,7 @@ public:
     MeleeAttackResult ResolveMeleeAttack(
         const CombatRatings &attacker,
         const CombatRatings &defender,
-        HealthPool &defenderHealth);
+        Combatant &defenderCombatant);
 
 private:
     MeleeAttackResolver meleeAttackResolver;

@@ -16,6 +16,20 @@
 #include "../Core/Random.h"
 #include "../Recipe/RecipeSystem.h"
 #include "../Recipe/RecipeDatabase.h"
+#include "../Combat/Combatant.h"
+
+namespace
+{
+    Combatant *TryGetCombatant(Entity *entity)
+    {
+        if (entity == nullptr)
+        {
+            return nullptr;
+        }
+
+        return dynamic_cast<Combatant *>(entity);
+    }
+}
 
 World::World(unsigned int combatSeed)
     : combatService(combatSeed),
@@ -98,6 +112,18 @@ int World::CreatePlayer()
 {
     return entityManager.CreatePlayer();
 }
+
+int World::CreateMonster(
+    int x,
+    int y,
+    const CombatRatings &ratings)
+{
+    return entityManager.CreateMonster(
+        x,
+        y,
+        ratings);
+}
+
 Entity *World::GetEntityByID(int id)
 {
     return entityManager.GetEntityByID(id);
@@ -422,11 +448,19 @@ Map &World::GetMap()
 }
 void World::QueueMovementRequest(const MovementRequest &request)
 {
+    CancelActionsForEntity(
+        request.GetEntityID(),
+        ActionCancelReason::PLAYER_MOVED);
+
     movementRequests.push(request);
 }
 void World::QueueMovementDestination(
     const MovementDestinationRequest &request)
 {
+    CancelActionsForEntity(
+        request.GetEntityID(),
+        ActionCancelReason::PLAYER_MOVED);
+
     movementDestinationRequests.push(request);
 }
 void World::ProcessMovementDestinationRequests()
@@ -920,12 +954,12 @@ ActionValidationResult World::ValidateMeleeAttackAction(
         entityManager.GetEntityByID(
             defenderEntityID);
 
-    Player *attacker =
-        dynamic_cast<Player *>(
+    Combatant *attacker =
+        TryGetCombatant(
             attackerEntity);
 
-    Player *defender =
-        dynamic_cast<Player *>(
+    Combatant *defender =
+        TryGetCombatant(
             defenderEntity);
 
     if (attacker == nullptr)
@@ -961,12 +995,12 @@ ActionValidationResult World::ValidateMeleeAttackAction(
     }
 
     int distanceX = std::abs(
-        attacker->GetPosition().GetX() -
-        defender->GetPosition().GetX());
+        attackerEntity->GetPosition().GetX() -
+        defenderEntity->GetPosition().GetX());
 
     int distanceY = std::abs(
-        attacker->GetPosition().GetY() -
-        defender->GetPosition().GetY());
+        attackerEntity->GetPosition().GetY() -
+        defenderEntity->GetPosition().GetY());
 
     bool isAdjacent =
         distanceX <= 1 &&
@@ -1131,15 +1165,21 @@ void World::ProcessCompletedActions(
                 continue;
             }
 
-            Player *attacker =
-                dynamic_cast<Player *>(
-                    entityManager.GetEntityByID(
-                        action.GetOwnerID()));
+            Entity *attackerEntity =
+                entityManager.GetEntityByID(
+                    action.GetOwnerID());
 
-            Player *defender =
-                dynamic_cast<Player *>(
-                    entityManager.GetEntityByID(
-                        action.GetTargetID()));
+            Entity *defenderEntity =
+                entityManager.GetEntityByID(
+                    action.GetTargetID());
+
+            Combatant *attacker =
+                TryGetCombatant(
+                    attackerEntity);
+
+            Combatant *defender =
+                TryGetCombatant(
+                    defenderEntity);
 
             if (attacker == nullptr ||
                 defender == nullptr)
@@ -1151,7 +1191,7 @@ void World::ProcessCompletedActions(
                 combatService.ResolveMeleeAttack(
                     attacker->GetCombatRatings(),
                     defender->GetCombatRatings(),
-                    defender->GetHealthPool());
+                    *defender);
 
             continue;
         }

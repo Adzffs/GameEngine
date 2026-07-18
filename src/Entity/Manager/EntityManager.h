@@ -5,6 +5,7 @@
 #include "../../Input/InputManager.h"
 #include "../../Player/Player.h"
 #include "../../NPC/NPC.h"
+#include "../../Stats/CombatRatings.h"
 class World;
 
 class EntityManager
@@ -15,6 +16,11 @@ public:
     int CreatePlayer();
 
     int CreateNPC(int x, int y);
+
+    int CreateMonster(
+        int x,
+        int y,
+        const CombatRatings &ratings);
 
     void Update(World &world);
 

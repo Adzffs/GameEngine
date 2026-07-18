@@ -12,6 +12,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/World/World.cpp
     src/World/Position.cpp
     src/Entity/Entity.cpp
+    src/Entity/Monster/Monster.cpp
     src/Entity/Manager/EntityManager.cpp
     src/Movement/Movement.cpp
     src/World/Map.cpp
@@ -150,5 +151,16 @@ if(BUILD_TESTING)
     add_test(
         NAME MeleeCombatActionTests
         COMMAND MeleeCombatActionTests
+    )
+
+    add_executable(CombatantMonsterTests
+        tests/CombatantMonsterTests.cpp
+    )
+
+    target_link_libraries(CombatantMonsterTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME CombatantMonsterTests
+        COMMAND CombatantMonsterTests
     )
 endif()

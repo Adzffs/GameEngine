@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Entity/Entity.h"
+#include "../Combat/Combatant.h"
 #include "../Combat/CombatFormulas.h"
 #include "../Inventory/Inventory.h"
 #include "../Skills/SkillSet.h"
@@ -11,7 +12,7 @@
 
 class World;
 
-class Player : public Entity
+class Player : public Entity, public Combatant
 {
 public:
     Player(int id);
@@ -31,18 +32,15 @@ public:
     int GetEquipmentBonus(StatType stat) const;
     int GetTotalStat(StatType stat) const;
 
-    int GetCurrentHealth() const;
-    int GetMaximumHealth() const;
-    bool IsAlive() const;
+    int GetCurrentHealth() const override;
+    int GetMaximumHealth() const override;
+    bool IsAlive() const override;
 
-    HealthPool &GetHealthPool();
-    const HealthPool &GetHealthPool() const;
-
-    int ApplyDamage(int amount);
+    int ApplyDamage(int amount) override;
     void Heal(int amount);
     void RestoreHealthToFull();
 
-    CombatRatings GetCombatRatings() const;
+    CombatRatings GetCombatRatings() const override;
     CombatFormulas::MeleeCombatProfile GetMeleeCombatProfile() const;
 
     // Call after changes that can affect derived stats such as maximum health.

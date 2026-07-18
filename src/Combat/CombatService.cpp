@@ -20,11 +20,11 @@ CombatService::CombatService(std::unique_ptr<RandomSource> randomSource)
 MeleeAttackResult CombatService::ResolveMeleeAttack(
     const CombatRatings &attacker,
     const CombatRatings &defender,
-    HealthPool &defenderHealth)
+    Combatant &defenderCombatant)
 {
     return meleeAttackResolver.Resolve(
         attacker,
         defender,
-        defenderHealth,
+        defenderCombatant,
         *randomSource);
 }

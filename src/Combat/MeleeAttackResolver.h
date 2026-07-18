@@ -2,16 +2,16 @@
 
 #include "MeleeAttackResult.h"
 
+#include "Combatant.h"
 #include "../Core/RandomSource.h"
 #include "../Stats/CombatRatings.h"
-#include "../Stats/HealthPool.h"
 
 class MeleeAttackResolver
 {
 public:
     MeleeAttackResult Resolve(
         const CombatRatings &attacker,
-        const CombatRatings &defender,
-        HealthPool &defenderHealth,
+        const CombatRatings &defenderRatings,
+        Combatant &defenderCombatant,
         RandomSource &randomSource) const;
 };

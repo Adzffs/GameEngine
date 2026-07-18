@@ -5,7 +5,7 @@
 MeleeAttackResult MeleeAttackResolver::Resolve(
     const CombatRatings &attacker,
     const CombatRatings &defender,
-    HealthPool &defenderHealth,
+    Combatant &defenderCombatant,
     RandomSource &randomSource) const
 {
     MeleeAttackResult result;
@@ -44,7 +44,7 @@ MeleeAttackResult MeleeAttackResolver::Resolve(
         rawDamageRoll,
         result.maximumHit);
 
-    result.actualDamageApplied = defenderHealth.ApplyDamage(
+    result.actualDamageApplied = defenderCombatant.ApplyDamage(
         result.rolledDamage);
 
     return result;

@@ -12,6 +12,7 @@
 #include "../Recipe/RecipeType.h"
 #include <map>
 #include "../Combat/CombatService.h"
+#include "../Stats/CombatRatings.h"
 #include <optional>
 
 class World
@@ -24,6 +25,10 @@ public:
     Map &GetMap();
 
     int CreatePlayer();
+    int CreateMonster(
+        int x,
+        int y,
+        const CombatRatings &ratings);
     Entity *GetEntityByID(int id);
     const std::vector<std::unique_ptr<Entity>> &
     GetEntities() const;
@@ -83,6 +88,8 @@ public:
         int defenderEntityID,
         int durationTicks);
 
+    // Temporary global seam used by tests and manual debugging.
+    // This is not intended as the long-term per-entity combat event model.
     const std::optional<MeleeAttackResult> &
     GetLastMeleeAttackResult() const;
 

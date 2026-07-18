@@ -13,6 +13,43 @@
 
 namespace
 {
+    class HealthPoolCombatant : public Combatant
+    {
+    public:
+        explicit HealthPoolCombatant(int maximumHealth)
+            : healthPool(maximumHealth)
+        {
+        }
+
+        CombatRatings GetCombatRatings() const override
+        {
+            return CombatRatings{};
+        }
+
+        int GetCurrentHealth() const override
+        {
+            return healthPool.GetCurrentHealth();
+        }
+
+        int GetMaximumHealth() const override
+        {
+            return healthPool.GetMaximumHealth();
+        }
+
+        bool IsAlive() const override
+        {
+            return healthPool.IsAlive();
+        }
+
+        int ApplyDamage(int amount) override
+        {
+            return healthPool.ApplyDamage(amount);
+        }
+
+    private:
+        HealthPool healthPool;
+    };
+
     class SequenceRandomSource : public RandomSource
     {
     public:
@@ -107,7 +144,7 @@ int main()
         CombatService service(101);
         CombatRatings attacker = MakeRatings(12, 20, 5, 100);
         CombatRatings defender = MakeRatings(8, 10, 7, 100);
-        HealthPool health(40);
+        HealthPoolCombatant health(40);
 
         MeleeAttackResult result = service.ResolveMeleeAttack(
             attacker,
@@ -128,7 +165,7 @@ int main()
 
         CombatRatings attacker = MakeRatings(10, 20, 5, 100);
         CombatRatings defender = MakeRatings(8, 10, 5, 100);
-        HealthPool health(20);
+        HealthPoolCombatant health(20);
 
         MeleeAttackResult result = service.ResolveMeleeAttack(
             attacker,
@@ -168,8 +205,8 @@ int main()
 
         for (int index = 0; index < 12; ++index)
         {
-            HealthPool firstHealth(80);
-            HealthPool secondHealth(80);
+            HealthPoolCombatant firstHealth(80);
+            HealthPoolCombatant secondHealth(80);
 
             MeleeAttackResult left = first.ResolveMeleeAttack(
                 attacker,
@@ -198,8 +235,8 @@ int main()
 
         for (int index = 0; index < 20; ++index)
         {
-            HealthPool firstHealth(80);
-            HealthPool secondHealth(80);
+            HealthPoolCombatant firstHealth(80);
+            HealthPoolCombatant secondHealth(80);
 
             MeleeAttackResult left = first.ResolveMeleeAttack(
                 attacker,
@@ -231,8 +268,8 @@ int main()
         CombatRatings attacker = MakeRatings(10, 30, 4, 100);
         CombatRatings defender = MakeRatings(8, 5, 6, 100);
 
-        HealthPool firstHealth(100);
-        HealthPool secondHealth(100);
+        HealthPoolCombatant firstHealth(100);
+        HealthPoolCombatant secondHealth(100);
 
         MeleeAttackResult first = service.ResolveMeleeAttack(
             attacker,
@@ -257,7 +294,7 @@ int main()
 
         CombatRatings attacker = MakeRatings(10, 20, 3, 100);
         CombatRatings defender = MakeRatings(8, 4, 10, 100);
-        HealthPool health(40);
+        HealthPoolCombatant health(40);
 
         MeleeAttackResult result = service.ResolveMeleeAttack(
             attacker,
@@ -282,7 +319,7 @@ int main()
 
         CombatRatings attacker = MakeRatings(12, 20, 5, 100);
         CombatRatings defender = MakeRatings(8, 7, 6, 100);
-        HealthPool health(20);
+        HealthPoolCombatant health(20);
 
         MeleeAttackResult result = service.ResolveMeleeAttack(
             attacker,
@@ -314,7 +351,7 @@ int main()
 
         CombatRatings attacker = MakeRatings(12, 20, 5, 100);
         CombatRatings defender = MakeRatings(8, 7, 6, 100);
-        HealthPool health(3);
+        HealthPoolCombatant health(3);
 
         MeleeAttackResult result = service.ResolveMeleeAttack(
             attacker,
@@ -335,7 +372,7 @@ int main()
 
         CombatRatings attacker = MakeRatings(12, 20, 5, 100);
         CombatRatings defender = MakeRatings(8, 7, 6, 100);
-        HealthPool health(1);
+        HealthPoolCombatant health(1);
         health.ApplyDamage(1);
 
         MeleeAttackResult result = service.ResolveMeleeAttack(
@@ -365,7 +402,7 @@ int main()
         CombatRatings attackerBefore = attacker;
         CombatRatings defenderBefore = defender;
 
-        HealthPool defenderHealth(20);
+        HealthPoolCombatant defenderHealth(20);
         int defenderHealthBefore = defenderHealth.GetCurrentHealth();
 
         MeleeAttackResult result = service.ResolveMeleeAttack(

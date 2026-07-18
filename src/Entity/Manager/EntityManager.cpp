@@ -2,6 +2,7 @@
 #include "../../Movement/Movement.h"
 #include "../../Movement/MovementRequest.h"
 #include "../../Player/Player.h"
+#include "../../Entity/Monster/Monster.h"
 #include "../../World/World.h"
 
 EntityManager::EntityManager()
@@ -33,6 +34,26 @@ int EntityManager::CreateNPC(int x, int y)
 
     return npcID;
 }
+
+int EntityManager::CreateMonster(
+    int x,
+    int y,
+    const CombatRatings &ratings)
+{
+    int monsterID = nextID;
+
+    entities.push_back(
+        std::make_unique<Monster>(
+            monsterID,
+            x,
+            y,
+            ratings));
+
+    nextID++;
+
+    return monsterID;
+}
+
 Entity *EntityManager::GetEntityByID(int id)
 {
     for (const auto &entity : entities)

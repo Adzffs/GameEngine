@@ -17,6 +17,43 @@
 
 namespace
 {
+    class HealthPoolCombatant : public Combatant
+    {
+    public:
+        explicit HealthPoolCombatant(int maximumHealth)
+            : healthPool(maximumHealth)
+        {
+        }
+
+        CombatRatings GetCombatRatings() const override
+        {
+            return CombatRatings{};
+        }
+
+        int GetCurrentHealth() const override
+        {
+            return healthPool.GetCurrentHealth();
+        }
+
+        int GetMaximumHealth() const override
+        {
+            return healthPool.GetMaximumHealth();
+        }
+
+        bool IsAlive() const override
+        {
+            return healthPool.IsAlive();
+        }
+
+        int ApplyDamage(int amount) override
+        {
+            return healthPool.ApplyDamage(amount);
+        }
+
+    private:
+        HealthPool healthPool;
+    };
+
     class SequenceRandomSource : public RandomSource
     {
     public:
@@ -169,7 +206,7 @@ int main()
         MeleeAttackResolver resolver;
         CombatRatings attacker = MakeRatings(10, 10, 5, 100);
         CombatRatings defender = MakeRatings(5, 5, 10, 100);
-        HealthPool defenderHealth(20);
+        HealthPoolCombatant defenderHealth(20);
         SequenceRandomSource sequence({3, 4, 7});
 
         MeleeAttackResult result = resolver.Resolve(
@@ -203,7 +240,7 @@ int main()
         MeleeAttackResolver resolver;
         CombatRatings attacker = MakeRatings(8, 10, 5, 100);
         CombatRatings defender = MakeRatings(5, 5, 8, 100);
-        HealthPool defenderHealth(20);
+        HealthPoolCombatant defenderHealth(20);
         SequenceRandomSource sequence({5, 5, 9});
 
         MeleeAttackResult result = resolver.Resolve(
@@ -225,7 +262,7 @@ int main()
         MeleeAttackResolver resolver;
         CombatRatings attacker = MakeRatings(12, 20, 5, 100);
         CombatRatings defender = MakeRatings(5, 5, 6, 100);
-        HealthPool defenderHealth(20);
+        HealthPoolCombatant defenderHealth(20);
         SequenceRandomSource sequence({6, 2, 2});
 
         MeleeAttackResult result = resolver.Resolve(
@@ -255,7 +292,7 @@ int main()
         MeleeAttackResolver resolver;
         CombatRatings attacker = MakeRatings(12, 20, 5, 100);
         CombatRatings defender = MakeRatings(5, 5, 6, 100);
-        HealthPool defenderHealth(20);
+        HealthPoolCombatant defenderHealth(20);
         SequenceRandomSource sequence({6, 1, 0});
 
         MeleeAttackResult result = resolver.Resolve(
@@ -282,7 +319,7 @@ int main()
         CombatRatings attacker = MakeRatings(12, 20, 5, 100);
         CombatRatings defender = MakeRatings(5, 5, 6, 100);
         int maximumHit = CombatFormulas::CalculateMaximumHit(attacker);
-        HealthPool defenderHealth(20);
+        HealthPoolCombatant defenderHealth(20);
         SequenceRandomSource sequence({6, 1, maximumHit});
 
         MeleeAttackResult result = resolver.Resolve(
@@ -304,7 +341,7 @@ int main()
         MeleeAttackResolver resolver;
         CombatRatings attacker = MakeRatings(12, 20, 5, 100);
         CombatRatings defender = MakeRatings(5, 5, 6, 100);
-        HealthPool defenderHealth(2);
+        HealthPoolCombatant defenderHealth(2);
         SequenceRandomSource sequence({6, 1, 5});
 
         MeleeAttackResult result = resolver.Resolve(
@@ -327,7 +364,7 @@ int main()
         MeleeAttackResolver resolver;
         CombatRatings attacker = MakeRatings(12, 20, 5, 100);
         CombatRatings defender = MakeRatings(5, 5, 6, 100);
-        HealthPool defenderHealth(1);
+        HealthPoolCombatant defenderHealth(1);
         defenderHealth.ApplyDamage(1);
 
         SequenceRandomSource sequence({6, 1, 3});
@@ -383,7 +420,7 @@ int main()
 
         CombatRatings attackerRatings = attacker.GetCombatRatings();
         CombatRatings defenderRatings = defender.GetCombatRatings();
-        HealthPool defenderHealth(defenderRatings.maximumHealth);
+        HealthPoolCombatant defenderHealth(defenderRatings.maximumHealth);
 
         SequenceRandomSource sequence({0, 0, 0});
 
@@ -425,7 +462,7 @@ int main()
 
         CombatRatings swordRatings = attacker.GetCombatRatings();
 
-        HealthPool beforeSwordHealth(defender.GetCombatRatings().maximumHealth);
+        HealthPoolCombatant beforeSwordHealth(defender.GetCombatRatings().maximumHealth);
         SequenceRandomSource beforeSequence({0, 0, 0});
         MeleeAttackResult beforeSwordResult = resolver.Resolve(
             beforeSwordRatings,
@@ -433,7 +470,7 @@ int main()
             beforeSwordHealth,
             beforeSequence);
 
-        HealthPool swordHealth(defender.GetCombatRatings().maximumHealth);
+        HealthPoolCombatant swordHealth(defender.GetCombatRatings().maximumHealth);
         SequenceRandomSource swordSequence({0, 0, 0});
         MeleeAttackResult swordResult = resolver.Resolve(
             swordRatings,
@@ -463,7 +500,7 @@ int main()
 
         CombatRatings defenderWithShield = defender.GetCombatRatings();
 
-        HealthPool baseHealth(defenderBeforeShield.maximumHealth);
+        HealthPoolCombatant baseHealth(defenderBeforeShield.maximumHealth);
         SequenceRandomSource baseSequence({0, 0, 0});
         MeleeAttackResult baseResult = resolver.Resolve(
             attacker.GetCombatRatings(),
@@ -471,7 +508,7 @@ int main()
             baseHealth,
             baseSequence);
 
-        HealthPool shieldHealth(defenderWithShield.maximumHealth);
+        HealthPoolCombatant shieldHealth(defenderWithShield.maximumHealth);
         SequenceRandomSource shieldSequence({0, 0, 0});
         MeleeAttackResult shieldResult = resolver.Resolve(
             attacker.GetCombatRatings(),
@@ -497,7 +534,7 @@ int main()
 
         CombatRatings afterAttackXp = attacker.GetCombatRatings();
 
-        HealthPool beforeHealth(defender.GetCombatRatings().maximumHealth);
+        HealthPoolCombatant beforeHealth(defender.GetCombatRatings().maximumHealth);
         SequenceRandomSource beforeSequence({0, 0, 0});
         MeleeAttackResult beforeResult = resolver.Resolve(
             beforeAttackXp,
@@ -505,7 +542,7 @@ int main()
             beforeHealth,
             beforeSequence);
 
-        HealthPool afterHealth(defender.GetCombatRatings().maximumHealth);
+        HealthPoolCombatant afterHealth(defender.GetCombatRatings().maximumHealth);
         SequenceRandomSource afterSequence({0, 0, 0});
         MeleeAttackResult afterResult = resolver.Resolve(
             afterAttackXp,
@@ -537,7 +574,7 @@ int main()
 
         CombatRatings afterDefenceXp = defender.GetCombatRatings();
 
-        HealthPool beforeHealth(afterDefenceXp.maximumHealth);
+        HealthPoolCombatant beforeHealth(afterDefenceXp.maximumHealth);
         SequenceRandomSource beforeSequence({0, 0, 0});
         MeleeAttackResult beforeResult = resolver.Resolve(
             attacker.GetCombatRatings(),
@@ -545,7 +582,7 @@ int main()
             beforeHealth,
             beforeSequence);
 
-        HealthPool afterHealth(afterDefenceXp.maximumHealth);
+        HealthPoolCombatant afterHealth(afterDefenceXp.maximumHealth);
         SequenceRandomSource afterSequence({0, 0, 0});
         MeleeAttackResult afterResult = resolver.Resolve(
             attacker.GetCombatRatings(),
