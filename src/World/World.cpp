@@ -151,10 +151,12 @@ void World::QueueStationInteraction(
 }
 
 void World::CancelActionsForEntity(
-    int entityID)
+    int entityID,
+    ActionCancelReason reason)
 {
     actionManager.CancelActionsForEntity(
-        entityID);
+        entityID,
+        reason);
 
     activeRecipeLoops.erase(
         entityID);

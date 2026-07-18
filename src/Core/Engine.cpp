@@ -2,6 +2,7 @@
 #include <chrono>
 #include <thread>
 #include "Core/Logger.h"
+#include "../Action/ActionCancelReason.h"
 #include "../Movement/MovementDestinationRequest.h"
 #include "../Player/Player.h"
 #include "../Skills/SkillType.h"
@@ -66,7 +67,9 @@ void Engine::Run()
                 clickedTileX,
                 clickedTileY))
         {
-            world.CancelActionsForEntity(playerID);
+            world.CancelActionsForEntity(
+                playerID,
+                ActionCancelReason::PLAYER_MOVED);
 
             world.CloseStationInteraction(
                 playerID);
@@ -109,7 +112,8 @@ void Engine::Run()
         if (graphics.ConsumeStationMenuClose())
         {
             world.CancelActionsForEntity(
-                playerID);
+                playerID,
+                ActionCancelReason::INTERFACE_CLOSED);
 
             world.CloseStationInteraction(
                 playerID);

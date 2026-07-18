@@ -46,7 +46,10 @@ public:
     void QueueStationInteraction(
         int entityID,
         int stationID);
-    void CancelActionsForEntity(int entityID);
+    void CancelActionsForEntity(
+        int entityID,
+        ActionCancelReason reason =
+            ActionCancelReason::NONE);
     void CloseStationInteraction(
         int entityID);
     void ClearPendingResourceInteraction(
