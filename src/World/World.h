@@ -54,6 +54,10 @@ public:
     void QueueStationInteraction(
         int entityID,
         int stationID);
+    bool QueueMeleeEngagementRequest(
+        int attackerEntityID,
+        int defenderEntityID,
+        int durationTicks);
     void CancelActionsForEntity(
         int entityID,
         ActionCancelReason reason =
@@ -93,6 +97,9 @@ public:
         int defenderEntityID,
         int durationTicks);
 
+    bool HasPendingMeleeEngagement(
+        int attackerEntityID) const;
+
     // Temporary global seam used by tests and manual debugging.
     // This is not intended as the long-term per-entity combat event model.
     const std::optional<MeleeAttackResult> &
@@ -126,6 +133,7 @@ private:
     void ProcessActiveMovementPaths();
     void ProcessResourceInteractions();
     void ProcessStationInteractions();
+    void ProcessPendingMeleeInteractions();
     void ProcessCompletedActions(
         const std::vector<Action> &completedActions);
     ActionValidationResult ValidateGatheringAction(
@@ -147,6 +155,11 @@ private:
         int defenderEntityID,
         int durationTicks,
         bool repeating);
+    std::optional<std::pair<int, int>> FindMeleeApproachTile(
+        int attackerX,
+        int attackerY,
+        int defenderX,
+        int defenderY);
     void CancelGatheringForToolChange(
         int entityID);
     bool CanUseStation(
@@ -162,6 +175,16 @@ private:
 
     std::map<int, int> pendingResourceInteractions;
     std::map<int, int> pendingStationInteractions;
+    struct PendingMeleeInteraction
+    {
+        int attackerEntityID;
+        int defenderEntityID;
+        int durationTicks;
+        std::optional<std::pair<int, int>> destination;
+    };
+
+    std::map<int, PendingMeleeInteraction>
+        pendingMeleeInteractions;
     std::map<int, StationType> openedStations;
     std::map<int, int> activeStations;
 

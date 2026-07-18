@@ -17,9 +17,21 @@
 #include "../Recipe/RecipeSystem.h"
 #include "../Recipe/RecipeDatabase.h"
 #include "../Combat/Combatant.h"
+#include <array>
+#include <utility>
 
 namespace
 {
+    constexpr std::array<std::pair<int, int>, 8>
+        MeleeAdjacentOffsets{{{0, -1},
+                              {1, 0},
+                              {0, 1},
+                              {-1, 0},
+                              {1, -1},
+                              {1, 1},
+                              {-1, 1},
+                              {-1, -1}}};
+
     Combatant *TryGetCombatant(Entity *entity)
     {
         if (entity == nullptr)
@@ -165,6 +177,8 @@ void World::QueueResourceInteraction(
     int entityID,
     int resourceID)
 {
+    pendingMeleeInteractions.erase(entityID);
+
     pendingResourceInteractions[entityID] =
         resourceID;
 }
@@ -173,8 +187,139 @@ void World::QueueStationInteraction(
     int entityID,
     int stationID)
 {
+    pendingMeleeInteractions.erase(entityID);
+
     pendingStationInteractions[entityID] =
         stationID;
+}
+
+bool World::QueueMeleeEngagementRequest(
+    int attackerEntityID,
+    int defenderEntityID,
+    int durationTicks)
+{
+    if (durationTicks < 1)
+    {
+        Logger::Game(
+            "Melee attack duration must be at least one tick");
+
+        return false;
+    }
+
+    if (attackerEntityID == defenderEntityID)
+    {
+        Logger::Game(
+            "You cannot target yourself");
+
+        return false;
+    }
+
+    Entity *attackerEntity =
+        entityManager.GetEntityByID(
+            attackerEntityID);
+
+    Player *attacker =
+        dynamic_cast<Player *>(attackerEntity);
+
+    if (attacker == nullptr)
+    {
+        Logger::Game(
+            "Player could not be found");
+
+        return false;
+    }
+
+    Entity *defenderEntity =
+        entityManager.GetEntityByID(
+            defenderEntityID);
+
+    Combatant *defender =
+        TryGetCombatant(defenderEntity);
+
+    if (defender == nullptr)
+    {
+        Logger::Game(
+            "The target cannot be engaged in combat");
+
+        return false;
+    }
+
+    if (!attacker->IsAlive())
+    {
+        Logger::Game(
+            "Attacker is not alive");
+
+        return false;
+    }
+
+    if (!defender->IsAlive())
+    {
+        Logger::Game(
+            "Defender is not alive");
+
+        return false;
+    }
+
+    int attackerX = attackerEntity->GetPosition().GetX();
+    int attackerY = attackerEntity->GetPosition().GetY();
+    int defenderX = defenderEntity->GetPosition().GetX();
+    int defenderY = defenderEntity->GetPosition().GetY();
+
+    std::optional<std::pair<int, int>> destination =
+        FindMeleeApproachTile(
+            attackerX,
+            attackerY,
+            defenderX,
+            defenderY);
+
+    bool isAdjacent =
+        std::abs(attackerX - defenderX) <= 1 &&
+        std::abs(attackerY - defenderY) <= 1;
+
+    if (!isAdjacent && !destination.has_value())
+    {
+        Logger::Game(
+            "No reachable adjacent tile exists");
+
+        return false;
+    }
+
+    CancelActionsForEntity(
+        attackerEntityID,
+        ActionCancelReason::NEW_ACTION_STARTED);
+
+    pendingResourceInteractions.erase(attackerEntityID);
+    pendingStationInteractions.erase(attackerEntityID);
+
+    pendingMeleeInteractions[attackerEntityID] =
+        PendingMeleeInteraction{
+            attackerEntityID,
+            defenderEntityID,
+            durationTicks,
+            destination};
+
+    activeMovementPaths.erase(attackerEntityID);
+
+    if (isAdjacent)
+    {
+        bool started = TryStartMeleeEngagement(
+            attackerEntityID,
+            defenderEntityID,
+            durationTicks);
+
+        pendingMeleeInteractions.erase(
+            attackerEntityID);
+
+        return started;
+    }
+
+    movementDestinationRequests.push(
+        MovementDestinationRequest(
+            attackerEntityID,
+            destination->first,
+            destination->second));
+
+    return true;
 }
 
 void World::CancelActionsForEntity(
@@ -216,6 +361,100 @@ void World::ClearPendingStationInteraction(
     int entityID)
 {
     pendingStationInteractions.erase(entityID);
+}
+
+bool World::HasPendingMeleeEngagement(
+    int entityID) const
+{
+    return pendingMeleeInteractions.find(entityID) !=
+           pendingMeleeInteractions.end();
+}
+
+void World::ProcessPendingMeleeInteractions()
+{
+    auto interactionIterator =
+        pendingMeleeInteractions.begin();
+
+    while (interactionIterator !=
+           pendingMeleeInteractions.end())
+    {
+        PendingMeleeInteraction request =
+            interactionIterator->second;
+
+        Entity *attackerEntity =
+            entityManager.GetEntityByID(
+                request.attackerEntityID);
+
+        Entity *defenderEntity =
+            entityManager.GetEntityByID(
+                request.defenderEntityID);
+
+        Player *attacker =
+            dynamic_cast<Player *>(attackerEntity);
+
+        Combatant *defender =
+            TryGetCombatant(defenderEntity);
+
+        if (attacker == nullptr ||
+            defender == nullptr ||
+            !attacker->IsAlive() ||
+            !defender->IsAlive())
+        {
+            interactionIterator =
+                pendingMeleeInteractions.erase(
+                    interactionIterator);
+            continue;
+        }
+
+        if (actionManager.HasActionForEntity(
+                request.attackerEntityID))
+        {
+            interactionIterator =
+                pendingMeleeInteractions.erase(
+                    interactionIterator);
+            continue;
+        }
+
+        int attackerX = attackerEntity->GetPosition().GetX();
+        int attackerY = attackerEntity->GetPosition().GetY();
+        int defenderX = defenderEntity->GetPosition().GetX();
+        int defenderY = defenderEntity->GetPosition().GetY();
+
+        bool isAdjacent =
+            std::abs(attackerX - defenderX) <= 1 &&
+            std::abs(attackerY - defenderY) <= 1;
+
+        if (isAdjacent)
+        {
+            bool started = TryStartMeleeEngagement(
+                request.attackerEntityID,
+                request.defenderEntityID,
+                request.durationTicks);
+
+            interactionIterator =
+                pendingMeleeInteractions.erase(
+                    interactionIterator);
+
+            if (!started)
+            {
+                continue;
+            }
+
+            continue;
+        }
+
+        if (activeMovementPaths.find(
+                request.attackerEntityID) !=
+            activeMovementPaths.end())
+        {
+            ++interactionIterator;
+            continue;
+        }
+
+        interactionIterator =
+            pendingMeleeInteractions.erase(
+                interactionIterator);
+    }
 }
 
 const Action *
@@ -452,6 +691,64 @@ bool World::TryStartMeleeAction(
     return true;
 }
 
+std::optional<std::pair<int, int>> World::FindMeleeApproachTile(
+    int attackerX,
+    int attackerY,
+    int defenderX,
+    int defenderY)
+{
+    for (const auto &offset : MeleeAdjacentOffsets)
+    {
+        int candidateX = defenderX + offset.first;
+        int candidateY = defenderY + offset.second;
+
+        if (candidateX == defenderX &&
+            candidateY == defenderY)
+        {
+            continue;
+        }
+
+        if (!map.IsValidPosition(candidateX, candidateY))
+        {
+            continue;
+        }
+
+        std::vector<PathStep> path = pathfinder.FindPath(
+            map,
+            attackerX,
+            attackerY,
+            candidateX,
+            candidateY);
+
+        if (path.empty())
+        {
+            if (attackerX == candidateX &&
+                attackerY == candidateY)
+            {
+                return std::pair<int, int>{
+                    candidateX,
+                    candidateY};
+            }
+
+            continue;
+        }
+
+        const PathStep &finalStep = path.back();
+
+        if (finalStep.x != candidateX ||
+            finalStep.y != candidateY)
+        {
+            continue;
+        }
+
+        return std::pair<int, int>{
+            candidateX,
+            candidateY};
+    }
+
+    return std::nullopt;
+}
+
 const std::optional<MeleeAttackResult> &
 World::GetLastMeleeAttackResult() const
 {
@@ -476,6 +773,7 @@ void World::Update()
 
     entityManager.Update(*this);
     ProcessMovementRequests();
+    ProcessPendingMeleeInteractions();
 }
 
 Map &World::GetMap()
@@ -488,6 +786,9 @@ void World::QueueMovementRequest(const MovementRequest &request)
         request.GetEntityID(),
         ActionCancelReason::PLAYER_MOVED);
 
+    pendingMeleeInteractions.erase(
+        request.GetEntityID());
+
     movementRequests.push(request);
 }
 void World::QueueMovementDestination(
@@ -496,6 +797,9 @@ void World::QueueMovementDestination(
     CancelActionsForEntity(
         request.GetEntityID(),
         ActionCancelReason::PLAYER_MOVED);
+
+    pendingMeleeInteractions.erase(
+        request.GetEntityID());
 
     movementDestinationRequests.push(request);
 }
