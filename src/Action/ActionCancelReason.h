@@ -1,0 +1,15 @@
+#pragma once
+
+enum class ActionCancelReason
+{
+    NONE,
+    PLAYER_MOVED,
+    NEW_ACTION_STARTED,
+    TARGET_MISSING,
+    TARGET_DEPLETED,
+    INVALID_TOOL,
+    REQUIREMENTS_FAILED,
+    INVENTORY_FULL,
+    OUT_OF_RANGE,
+    INTERFACE_CLOSED
+};

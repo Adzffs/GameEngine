@@ -4,6 +4,8 @@ void ActionManager::AddAction(
     const Action &action)
 {
     actions.push_back(action);
+
+    actions.back().Start(currentTick);
 }
 
 bool ActionManager::HasActionForEntity(
@@ -40,10 +42,12 @@ std::vector<Action> ActionManager::Update()
 {
     std::vector<Action> completedActions;
 
+    currentTick++;
+
     for (auto actionIterator = actions.begin();
          actionIterator != actions.end();)
     {
-        actionIterator->Update();
+        actionIterator->Update(currentTick);
 
         if (actionIterator->IsComplete())
         {
@@ -72,6 +76,9 @@ void ActionManager::CancelActionsForEntity(
         if (actionIterator->GetEntityID() ==
             entityID)
         {
+            actionIterator->Cancel(
+                ActionCancelReason::NONE);
+
             actionIterator =
                 actions.erase(actionIterator);
         }

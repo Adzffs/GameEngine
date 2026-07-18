@@ -5,29 +5,95 @@ Action::Action(
     std::string name,
     int duration,
     int entityID,
-    int targetID)
+    int targetID,
+    bool repeats)
     : type(type),
+      state(ActionState::PENDING),
+      cancelReason(ActionCancelReason::NONE),
       name(name),
-      duration(duration),
+      duration(duration < 0 ? 0 : duration),
       currentTick(0),
-      entityID(entityID),
-      targetID(targetID)
+      startTick(0),
+      completionTick(0),
+      ownerID(entityID),
+      targetID(targetID),
+      repeats(repeats)
 {
 }
 
-void Action::Update()
+void Action::Start(int serverTick)
 {
-    if (currentTick >= duration)
+    startTick = serverTick;
+    completionTick = startTick + duration;
+    currentTick = 0;
+
+    cancelReason = ActionCancelReason::NONE;
+
+    if (duration == 0)
+    {
+        state = ActionState::COMPLETED;
+        return;
+    }
+
+    state = ActionState::RUNNING;
+}
+
+void Action::Update(int serverTick)
+{
+    if (state != ActionState::RUNNING)
     {
         return;
     }
 
-    currentTick++;
+    if (serverTick < startTick)
+    {
+        currentTick = 0;
+        return;
+    }
+
+    currentTick = serverTick - startTick;
+
+    if (currentTick >= duration)
+    {
+        currentTick = duration;
+        state = ActionState::COMPLETED;
+    }
+}
+
+void Action::Restart(int serverTick)
+{
+    Start(serverTick);
+}
+
+void Action::Cancel(ActionCancelReason reason)
+{
+    if (state == ActionState::CANCELLED)
+    {
+        return;
+    }
+
+    state = ActionState::CANCELLED;
+    cancelReason = reason;
 }
 
 bool Action::IsComplete() const
 {
-    return currentTick >= duration;
+    return state == ActionState::COMPLETED;
+}
+
+bool Action::IsCancelled() const
+{
+    return state == ActionState::CANCELLED;
+}
+
+bool Action::IsRunning() const
+{
+    return state == ActionState::RUNNING;
+}
+
+bool Action::IsRepeating() const
+{
+    return repeats;
 }
 
 const std::string &Action::GetName() const
@@ -43,6 +109,16 @@ int Action::GetDuration() const
 int Action::GetCurrentTick() const
 {
     return currentTick;
+}
+
+int Action::GetStartTick() const
+{
+    return startTick;
+}
+
+int Action::GetCompletionTick() const
+{
+    return completionTick;
 }
 
 float Action::GetProgress() const
@@ -74,9 +150,24 @@ ActionType Action::GetType() const
     return type;
 }
 
+ActionState Action::GetState() const
+{
+    return state;
+}
+
+ActionCancelReason Action::GetCancelReason() const
+{
+    return cancelReason;
+}
+
+int Action::GetOwnerID() const
+{
+    return ownerID;
+}
+
 int Action::GetEntityID() const
 {
-    return entityID;
+    return ownerID;
 }
 
 int Action::GetTargetID() const

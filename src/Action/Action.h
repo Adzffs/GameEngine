@@ -3,6 +3,8 @@
 #include <string>
 
 #include "ActionType.h"
+#include "ActionState.h"
+#include "ActionCancelReason.h"
 
 class Action
 {
@@ -12,32 +14,57 @@ public:
         std::string name,
         int duration,
         int entityID,
-        int targetID);
+        int targetID,
+        bool repeats = false);
 
-    void Update();
+    void Start(int serverTick);
+    void Update(int serverTick);
+    void Restart(int serverTick);
+
+    void Cancel(ActionCancelReason reason);
 
     bool IsComplete() const;
+    bool IsCancelled() const;
+    bool IsRunning() const;
+    bool IsRepeating() const;
 
     const std::string &GetName() const;
 
     int GetDuration() const;
     int GetCurrentTick() const;
 
+    int GetStartTick() const;
+    int GetCompletionTick() const;
+
     float GetProgress() const;
 
     ActionType GetType() const;
+    ActionState GetState() const;
+    ActionCancelReason GetCancelReason() const;
 
+    int GetOwnerID() const;
+
+    // Temporary compatibility function.
+    // Existing World and ActionManager code still uses this name.
     int GetEntityID() const;
+
     int GetTargetID() const;
 
 private:
     ActionType type;
+    ActionState state;
+    ActionCancelReason cancelReason;
 
     std::string name;
 
     int duration;
     int currentTick;
 
-    int entityID;
+    int startTick;
+    int completionTick;
+
+    int ownerID;
     int targetID;
+
+    bool repeats;
 };

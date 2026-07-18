@@ -20,4 +20,6 @@ public:
 
 private:
     std::vector<Action> actions;
+
+    int currentTick = 0;
 };
