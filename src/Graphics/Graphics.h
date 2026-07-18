@@ -2,11 +2,13 @@
 
 #include <SDL3/SDL.h>
 #include <memory>
+#include <map>
 #include <optional>
 #include <vector>
 
 #include "../Action/Action.h"
 #include "../Entity/Entity.h"
+#include "../Combat/MeleeCombatFeedback.h"
 #include "../World/Object/Resource/ResourceNode.h"
 #include "../World/Object/Station/CraftingStation.h"
 #include "../World/Object/Station/StationType.h"
@@ -47,11 +49,36 @@ public:
     void DrawActionProgress(
         const Action *activeAction);
 
+    float CalculateHealthRatio(
+        int currentHealth,
+        int maximumHealth) const;
+
+    SDL_FRect GetMonsterHealthBarBackgroundRectangle(
+        const Monster &monster,
+        int cameraTileX = 0,
+        int cameraTileY = 0) const;
+
+    SDL_FRect GetMonsterHealthBarFillRectangle(
+        const Monster &monster,
+        int cameraTileX = 0,
+        int cameraTileY = 0) const;
+
+    SDL_FRect GetMonsterCorpseRectangle(
+        const Monster &monster,
+        int cameraTileX = 0,
+        int cameraTileY = 0) const;
+
+    SDL_FPoint GetMonsterCombatFeedbackPosition(
+        const Monster &monster,
+        int cameraTileX = 0,
+        int cameraTileY = 0) const;
+
     void Render(
         Map &map,
         const std::vector<std::unique_ptr<Entity>> &entities,
         const std::vector<ResourceNode> &resources,
         const std::vector<CraftingStation> &stations,
+        const std::map<int, MeleeCombatFeedback> &combatFeedbacks,
         int playerX,
         int playerY,
         const Inventory &inventory,
@@ -105,6 +132,11 @@ public:
         const std::vector<std::unique_ptr<Entity>> &entities);
     void DrawMonsters(
         const std::vector<std::unique_ptr<Entity>> &entities);
+    void DrawMonsterHealthBars(
+        const std::vector<std::unique_ptr<Entity>> &entities);
+    void DrawMonsterCombatFeedback(
+        const std::vector<std::unique_ptr<Entity>> &entities,
+        const std::map<int, MeleeCombatFeedback> &combatFeedbacks);
     void DrawResources(
         const std::vector<ResourceNode> &resources);
     void DrawStations(

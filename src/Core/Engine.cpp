@@ -132,6 +132,7 @@ void Engine::Run()
                 world.GetEntities(),
                 world.GetResources(),
                 world.GetStations(),
+                world.GetMeleeCombatFeedbacks(),
                 player->GetPosition().GetX(),
                 player->GetPosition().GetY(),
                 player->GetInventory(),

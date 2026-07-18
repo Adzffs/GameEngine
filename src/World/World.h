@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <queue>
 #include "../Movement/MovementRequest.h"
 #include "../Entity/Manager/EntityManager.h"
@@ -12,13 +13,17 @@
 #include "../Recipe/RecipeType.h"
 #include <map>
 #include "../Combat/CombatService.h"
+#include "../Combat/MeleeCombatFeedback.h"
 #include "../Stats/CombatRatings.h"
 #include <optional>
+
+class RandomSource;
 
 class World
 {
 public:
     explicit World(unsigned int combatSeed = 1337U);
+    explicit World(std::unique_ptr<RandomSource> combatRandomSource);
 
     void Update();
 
@@ -100,10 +105,15 @@ public:
     bool HasPendingMeleeEngagement(
         int attackerEntityID) const;
 
+    int GetCurrentTick() const;
+
     // Temporary global seam used by tests and manual debugging.
     // This is not intended as the long-term per-entity combat event model.
     const std::optional<MeleeAttackResult> &
     GetLastMeleeAttackResult() const;
+
+    const std::map<int, MeleeCombatFeedback> &
+    GetMeleeCombatFeedbacks() const;
 
 private:
     EntityManager entityManager;
@@ -190,4 +200,17 @@ private:
 
     std::optional<MeleeAttackResult>
         lastMeleeAttackResult;
+
+    int currentTick = 0;
+
+    std::map<int, MeleeCombatFeedback>
+        meleeCombatFeedbacks;
+
+    static constexpr int MeleeCombatFeedbackLifetimeTicks = 3;
+
+    void UpdateMeleeCombatFeedback();
+    void RecordMeleeCombatFeedback(
+        int attackerEntityID,
+        int defenderEntityID,
+        const MeleeAttackResult &result);
 };

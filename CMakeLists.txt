@@ -209,4 +209,16 @@ if(BUILD_TESTING)
         NAME CombatantMonsterTests
         COMMAND CombatantMonsterTests
     )
+
+    add_executable(CombatFeedbackTests
+        tests/CombatFeedbackTests.cpp
+        src/Graphics/Graphics.cpp
+    )
+
+    target_link_libraries(CombatFeedbackTests PRIVATE GameEngineCore SDL3::SDL3)
+
+    add_test(
+        NAME CombatFeedbackTests
+        COMMAND CombatFeedbackTests
+    )
 endif()

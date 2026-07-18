@@ -3,14 +3,32 @@
 #include "../World/Map.h"
 #include "../Player/Player.h"
 #include "../Entity/Monster/Monster.h"
+#include "../Combat/Combatant.h"
 #include "../World/Object/Resource/ResourceDatabase.h"
 #include "../World/Object/Resource/DepletedVisualType.h"
+#include "../Entity/EntityType.h"
 #include <string>
 #include <array>
 #include <algorithm>
+#include <map>
 
 namespace
 {
+    Entity *GetEntityByID(
+        const std::vector<std::unique_ptr<Entity>> &entities,
+        int entityID)
+    {
+        for (const auto &entity : entities)
+        {
+            if (entity->GetID() == entityID)
+            {
+                return entity.get();
+            }
+        }
+
+        return nullptr;
+    }
+
     SDL_FRect MakeEntityTileRectangle(
         int tileX,
         int tileY,
@@ -669,6 +687,91 @@ void Graphics::ProcessEvents(bool &running)
         }
     }
 }
+
+float Graphics::CalculateHealthRatio(
+    int currentHealth,
+    int maximumHealth) const
+{
+    if (maximumHealth <= 0)
+    {
+        return 0.0f;
+    }
+
+    float ratio = static_cast<float>(currentHealth) /
+                  static_cast<float>(maximumHealth);
+
+    return std::clamp(ratio, 0.0f, 1.0f);
+}
+
+SDL_FRect Graphics::GetMonsterHealthBarBackgroundRectangle(
+    const Monster &monster,
+    int cameraTileX,
+    int cameraTileY) const
+{
+    SDL_FRect monsterRectangle = GetMonsterScreenRectangle(
+        monster,
+        cameraTileX,
+        cameraTileY);
+
+    return SDL_FRect{
+        monsterRectangle.x,
+        monsterRectangle.y - 7.0f,
+        monsterRectangle.w,
+        4.0f};
+}
+
+SDL_FRect Graphics::GetMonsterHealthBarFillRectangle(
+    const Monster &monster,
+    int cameraTileX,
+    int cameraTileY) const
+{
+    const Combatant &combatant = monster;
+
+    SDL_FRect background = GetMonsterHealthBarBackgroundRectangle(
+        monster,
+        cameraTileX,
+        cameraTileY);
+
+    return SDL_FRect{
+        background.x,
+        background.y,
+        background.w * CalculateHealthRatio(
+                           combatant.GetCurrentHealth(),
+                           combatant.GetMaximumHealth()),
+        background.h};
+}
+
+SDL_FRect Graphics::GetMonsterCorpseRectangle(
+    const Monster &monster,
+    int cameraTileX,
+    int cameraTileY) const
+{
+    SDL_FRect monsterRectangle = GetMonsterScreenRectangle(
+        monster,
+        cameraTileX,
+        cameraTileY);
+
+    return SDL_FRect{
+        monsterRectangle.x + 2.0f,
+        monsterRectangle.y + monsterRectangle.h * 0.46f,
+        monsterRectangle.w - 4.0f,
+        monsterRectangle.h * 0.34f};
+}
+
+SDL_FPoint Graphics::GetMonsterCombatFeedbackPosition(
+    const Monster &monster,
+    int cameraTileX,
+    int cameraTileY) const
+{
+    SDL_FRect monsterRectangle = GetMonsterScreenRectangle(
+        monster,
+        cameraTileX,
+        cameraTileY);
+
+    return SDL_FPoint{
+        monsterRectangle.x + 4.0f,
+        monsterRectangle.y - 15.0f};
+}
 bool Graphics::ConsumeClickedTile(
     int &tileX,
     int &tileY)
@@ -945,35 +1048,179 @@ void Graphics::DrawMonsters(
         Monster *monster =
             dynamic_cast<Monster *>(entity.get());
 
+        if (monster == nullptr)
+        {
+            continue;
+        }
+
+        if (monster->IsAlive())
+        {
+            SDL_FRect monsterRectangle =
+                GetMonsterScreenRectangle(*monster);
+
+            SDL_SetRenderDrawColor(
+                renderer,
+                155,
+                50,
+                60,
+                255);
+
+            SDL_RenderFillRect(
+                renderer,
+                &monsterRectangle);
+
+            SDL_SetRenderDrawColor(
+                renderer,
+                220,
+                110,
+                120,
+                255);
+
+            SDL_RenderRect(
+                renderer,
+                &monsterRectangle);
+            continue;
+        }
+
+        SDL_FRect corpseRectangle =
+            GetMonsterCorpseRectangle(*monster);
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            55,
+            35,
+            35,
+            255);
+
+        SDL_RenderFillRect(
+            renderer,
+            &corpseRectangle);
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            25,
+            18,
+            18,
+            255);
+
+        SDL_RenderRect(
+            renderer,
+            &corpseRectangle);
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            25,
+            10,
+            10,
+            255);
+
+        SDL_RenderLine(
+            renderer,
+            corpseRectangle.x + 1.0f,
+            corpseRectangle.y + 1.0f,
+            corpseRectangle.x + corpseRectangle.w - 1.0f,
+            corpseRectangle.y + corpseRectangle.h - 1.0f);
+
+        SDL_RenderLine(
+            renderer,
+            corpseRectangle.x + corpseRectangle.w - 1.0f,
+            corpseRectangle.y + 1.0f,
+            corpseRectangle.x + 1.0f,
+            corpseRectangle.y + corpseRectangle.h - 1.0f);
+    }
+}
+
+void Graphics::DrawMonsterHealthBars(
+    const std::vector<std::unique_ptr<Entity>> &entities)
+{
+    for (const auto &entity : entities)
+    {
+        Monster *monster = dynamic_cast<Monster *>(entity.get());
+
         if (monster == nullptr || !monster->IsAlive())
         {
             continue;
         }
 
-        SDL_FRect monsterRectangle =
-            GetMonsterScreenRectangle(*monster);
+        SDL_FRect background =
+            GetMonsterHealthBarBackgroundRectangle(*monster);
+
+        SDL_FRect fill =
+            GetMonsterHealthBarFillRectangle(*monster);
 
         SDL_SetRenderDrawColor(
             renderer,
-            155,
-            50,
-            60,
+            55,
+            55,
+            55,
             255);
 
         SDL_RenderFillRect(
             renderer,
-            &monsterRectangle);
+            &background);
 
         SDL_SetRenderDrawColor(
             renderer,
-            220,
-            110,
-            120,
+            75,
+            185,
+            85,
+            255);
+
+        SDL_RenderFillRect(
+            renderer,
+            &fill);
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            20,
+            20,
+            20,
             255);
 
         SDL_RenderRect(
             renderer,
-            &monsterRectangle);
+            &background);
+    }
+}
+
+void Graphics::DrawMonsterCombatFeedback(
+    const std::vector<std::unique_ptr<Entity>> &entities,
+    const std::map<int, MeleeCombatFeedback> &combatFeedbacks)
+{
+    for (const auto &[defenderEntityID, feedback] : combatFeedbacks)
+    {
+        (void)defenderEntityID;
+
+        Entity *entity = GetEntityByID(
+            entities,
+            feedback.defenderEntityID);
+
+        Monster *monster = dynamic_cast<Monster *>(entity);
+
+        if (monster == nullptr)
+        {
+            continue;
+        }
+
+        SDL_FPoint textPosition = GetMonsterCombatFeedbackPosition(
+            *monster);
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            feedback.hit ? 255 : 230,
+            feedback.hit ? 220 : 230,
+            feedback.hit ? 70 : 230,
+            255);
+
+        std::string feedbackText = feedback.hit
+                                       ? std::to_string(feedback.actualDamageApplied)
+                                       : "MISS";
+
+        SDL_RenderDebugText(
+            renderer,
+            textPosition.x,
+            textPosition.y,
+            feedbackText.c_str());
     }
 }
 void Graphics::DrawStations(
@@ -2417,6 +2664,7 @@ void Graphics::Render(
     const std::vector<std::unique_ptr<Entity>> &entities,
     const std::vector<ResourceNode> &resources,
     const std::vector<CraftingStation> &stations,
+    const std::map<int, MeleeCombatFeedback> &combatFeedbacks,
     int playerX,
     int playerY,
     const Inventory &inventory,
@@ -2441,6 +2689,8 @@ void Graphics::Render(
     DrawMonsters(entities);
     DrawNPCs(entities);
     DrawPlayer(playerX, playerY);
+    DrawMonsterHealthBars(entities);
+    DrawMonsterCombatFeedback(entities, combatFeedbacks);
 
     DrawSidePanelTabs();
 

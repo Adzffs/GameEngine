@@ -14,9 +14,11 @@
 #include <string>
 #include "Object/Resource/ResourceDatabase.h"
 #include "../Core/Random.h"
+#include "../Core/SeededRandom.h"
 #include "../Recipe/RecipeSystem.h"
 #include "../Recipe/RecipeDatabase.h"
 #include "../Combat/Combatant.h"
+#include "../Combat/MeleeCombatFeedback.h"
 #include <array>
 #include <utility>
 
@@ -44,7 +46,12 @@ namespace
 }
 
 World::World(unsigned int combatSeed)
-    : combatService(combatSeed),
+    : World(std::make_unique<SeededRandom>(combatSeed))
+{
+}
+
+World::World(std::unique_ptr<RandomSource> combatRandomSource)
+    : combatService(std::move(combatRandomSource)),
       map(100, 100)
 {
     entityManager.CreateNPC(3, 3);
@@ -764,9 +771,61 @@ World::GetLastMeleeAttackResult() const
     return lastMeleeAttackResult;
 }
 
+const std::map<int, MeleeCombatFeedback> &
+World::GetMeleeCombatFeedbacks() const
+{
+    return meleeCombatFeedbacks;
+}
+
+int World::GetCurrentTick() const
+{
+    return currentTick;
+}
+
+void World::UpdateMeleeCombatFeedback()
+{
+    auto iterator = meleeCombatFeedbacks.begin();
+
+    while (iterator != meleeCombatFeedbacks.end())
+    {
+        if (iterator->second.remainingTicks <= 0)
+        {
+            iterator = meleeCombatFeedbacks.erase(iterator);
+            continue;
+        }
+
+        iterator->second.remainingTicks--;
+
+        if (iterator->second.remainingTicks <= 0)
+        {
+            iterator = meleeCombatFeedbacks.erase(iterator);
+            continue;
+        }
+
+        ++iterator;
+    }
+}
+
+void World::RecordMeleeCombatFeedback(
+    int attackerEntityID,
+    int defenderEntityID,
+    const MeleeAttackResult &result)
+{
+    meleeCombatFeedbacks[defenderEntityID] = MeleeCombatFeedback{
+        attackerEntityID,
+        defenderEntityID,
+        result.didHit,
+        result.actualDamageApplied,
+        MeleeCombatFeedbackLifetimeTicks};
+}
+
 void World::Update()
 {
     Logger::Debug("Updating World");
+
+    currentTick++;
+
+    UpdateMeleeCombatFeedback();
 
     ProcessMovementDestinationRequests();
     ProcessActiveMovementPaths();
@@ -1541,6 +1600,16 @@ void World::ProcessCompletedActions(
                     attacker->GetCombatRatings(),
                     defender->GetCombatRatings(),
                     *defender);
+
+            RecordMeleeCombatFeedback(
+                action.GetOwnerID(),
+                action.GetTargetID(),
+                *lastMeleeAttackResult);
+
+            if (!defender->IsAlive())
+            {
+                continue;
+            }
 
             if (!action.IsRepeating())
             {
