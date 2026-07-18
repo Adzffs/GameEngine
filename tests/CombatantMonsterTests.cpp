@@ -232,6 +232,50 @@ int main()
     {
         World world;
 
+        Monster *starterMonster = nullptr;
+
+        for (const auto &entity : world.GetEntities())
+        {
+            if (entity->GetType() == EntityType::MONSTER)
+            {
+                starterMonster = dynamic_cast<Monster *>(
+                    entity.get());
+                break;
+            }
+        }
+
+        test.Expect(
+            starterMonster != nullptr,
+            "World bootstrap creates a default development monster");
+
+        if (starterMonster != nullptr)
+        {
+            test.ExpectEqual(
+                starterMonster->GetPosition().GetX(),
+                6,
+                "Starter monster spawns on the configured X tile");
+            test.ExpectEqual(
+                starterMonster->GetPosition().GetY(),
+                1,
+                "Starter monster spawns on the configured Y tile");
+
+            CombatRatings expectedRatings{5, 4, 3, 30};
+
+            test.Expect(
+                AreEqual(
+                    starterMonster->GetCombatRatings(),
+                    expectedRatings),
+                "Starter monster uses the configured combat ratings");
+            test.ExpectEqual(
+                starterMonster->GetCurrentHealth(),
+                30,
+                "Starter monster begins at full health");
+            test.ExpectEqual(
+                starterMonster->GetMaximumHealth(),
+                30,
+                "Starter monster maximum health matches the configured rating");
+        }
+
         CombatRatings firstRatings{5, 6, 4, 12};
         CombatRatings secondRatings{7, 8, 3, 22};
 

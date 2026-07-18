@@ -49,6 +49,15 @@ World::World(unsigned int combatSeed)
 {
     entityManager.CreateNPC(3, 3);
 
+    CreateMonster(
+        6,
+        1,
+        CombatRatings{
+            5,
+            4,
+            3,
+            30});
+
     CreateResource(
         ResourceType::NORMAL_TREE,
         5,
