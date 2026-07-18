@@ -8,6 +8,7 @@
 #include "../Player/Player.h"
 #include "../Entity/Monster/Monster.h"
 #include "../Inventory/ItemType.h"
+#include "../Inventory/ItemAmount.h"
 #include "../Skills/SkillType.h"
 #include "../Equipment/EquipmentSlotType.h"
 #include "../Item/ItemDatabase.h"
@@ -18,9 +19,12 @@
 #include "../Core/SeededRandom.h"
 #include "../Recipe/RecipeSystem.h"
 #include "../Recipe/RecipeDatabase.h"
+#include "../Reward/RewardTableRegistry.h"
 #include "../Combat/Combatant.h"
 #include "../Combat/MeleeCombatFeedback.h"
 #include <array>
+#include <limits>
+#include <stdexcept>
 #include <utility>
 
 namespace
@@ -46,15 +50,37 @@ namespace
     }
 }
 
-World::World(unsigned int combatSeed)
-    : World(std::make_unique<SeededRandom>(combatSeed))
+World::World(
+    unsigned int combatSeed,
+    unsigned int rewardSeed)
+    : World(
+          std::make_unique<SeededRandom>(combatSeed),
+          std::make_unique<SeededRandom>(rewardSeed))
 {
 }
 
 World::World(std::unique_ptr<RandomSource> combatRandomSource)
+    : World(
+          std::move(combatRandomSource),
+          std::make_unique<SeededRandom>(7331U))
+{
+}
+
+World::World(
+    std::unique_ptr<RandomSource> combatRandomSource,
+    std::unique_ptr<RandomSource> rewardRandomSource)
     : combatService(std::move(combatRandomSource)),
+      rewardRandomSource(std::move(rewardRandomSource)),
       map(100, 100)
 {
+    if (this->rewardRandomSource == nullptr)
+    {
+        throw std::invalid_argument("World requires a non-null reward RandomSource");
+    }
+
+    rewardTableRoller = std::make_unique<RewardTableRoller>(
+        *this->rewardRandomSource);
+
     entityManager.CreateNPC(3, 3);
 
     CreateMonster(
@@ -64,7 +90,8 @@ World::World(std::unique_ptr<RandomSource> combatRandomSource)
             5,
             4,
             3,
-            30});
+            30},
+        RewardTableType::DEVELOPMENT_MONSTER);
 
     CreateResource(
         ResourceType::NORMAL_TREE,
@@ -145,12 +172,14 @@ int World::CreatePlayer()
 int World::CreateMonster(
     int x,
     int y,
-    const CombatRatings &ratings)
+    const CombatRatings &ratings,
+    RewardTableType rewardTableType)
 {
     return entityManager.CreateMonster(
         x,
         y,
-        ratings);
+        ratings,
+        rewardTableType);
 }
 
 Entity *World::GetEntityByID(int id)
@@ -928,6 +957,7 @@ void World::Update()
     entityManager.Update(*this);
     ProcessMovementRequests();
     ProcessPendingMeleeInteractions();
+    ProcessEntityDeathRewards();
 }
 
 Map &World::GetMap()
@@ -2566,5 +2596,152 @@ void World::ProcessDeadCombatantCleanup()
 
         HandleCombatantDeath(
             entity->GetID());
+    }
+}
+
+bool World::TryBuildLootReceiptMessage(
+    const std::vector<ItemReward> &rewards,
+    std::string &message)
+{
+    message.clear();
+
+    if (rewards.empty())
+    {
+        return true;
+    }
+
+    for (int index = 0; index < static_cast<int>(rewards.size()); ++index)
+    {
+        const ItemReward &reward = rewards[index];
+
+        const ItemDefinition &definition =
+            ItemDatabase::Get(reward.itemType);
+
+        if (definition.GetItemType() != reward.itemType)
+        {
+            message.clear();
+            return false;
+        }
+
+        if (!message.empty())
+        {
+            message += " and ";
+        }
+
+        message += std::to_string(reward.quantity) +
+                   " " +
+                   definition.GetName();
+    }
+
+    return true;
+}
+
+void World::ProcessEntityDeathRewards()
+{
+    for (const EntityDiedEvent &event : entityDiedEvents)
+    {
+        Entity *deadEntity =
+            entityManager.GetEntityByID(
+                event.deadEntityID);
+
+        Monster *monster =
+            dynamic_cast<Monster *>(deadEntity);
+
+        if (monster == nullptr)
+        {
+            continue;
+        }
+
+        RewardTableType rewardTableType =
+            monster->GetRewardTableType();
+
+        if (rewardTableType == RewardTableType::NONE)
+        {
+            continue;
+        }
+
+        Entity *killerEntity =
+            entityManager.GetEntityByID(
+                event.killerEntityID);
+
+        Player *killer =
+            dynamic_cast<Player *>(killerEntity);
+
+        if (killer == nullptr)
+        {
+            continue;
+        }
+
+        const RewardTable *rewardTable =
+            RewardTableRegistry::TryGetRewardTable(
+                rewardTableType);
+
+        if (rewardTable == nullptr ||
+            rewardTableRoller == nullptr)
+        {
+            continue;
+        }
+
+        std::vector<ItemReward> rolledRewards =
+            rewardTableRoller->Roll(
+                *rewardTable);
+
+        if (rolledRewards.empty())
+        {
+            Logger::Game(
+                "[LOOT] Player " +
+                std::to_string(killer->GetID()) +
+                " could not roll Monster " +
+                std::to_string(monster->GetID()) +
+                " rewards");
+            continue;
+        }
+
+        std::vector<ItemAmount> itemAmounts;
+        itemAmounts.reserve(rolledRewards.size());
+
+        for (const ItemReward &reward : rolledRewards)
+        {
+            itemAmounts.push_back(
+                ItemAmount{
+                    reward.itemType,
+                    reward.quantity});
+        }
+
+        bool granted =
+            killer->GetInventory()
+                .TryAddItemsAtomically(
+                    itemAmounts);
+
+        if (!granted)
+        {
+            Logger::Game(
+                "[LOOT] Player " +
+                std::to_string(killer->GetID()) +
+                " could not receive Monster " +
+                std::to_string(monster->GetID()) +
+                " rewards");
+            continue;
+        }
+
+        std::string rewardReceipt;
+
+        if (!TryBuildLootReceiptMessage(
+                rolledRewards,
+                rewardReceipt))
+        {
+            Logger::Game(
+                "[LOOT] Player " +
+                std::to_string(killer->GetID()) +
+                " received rewards from Monster " +
+                std::to_string(monster->GetID()));
+            continue;
+        }
+
+        Logger::Game(
+            "[LOOT] Player " +
+            std::to_string(killer->GetID()) +
+            " received " +
+            rewardReceipt);
     }
 }

@@ -1,8 +1,10 @@
 #pragma once
 
+#include "ItemAmount.h"
 #include "InventorySlot.h"
 
 #include <array>
+#include <vector>
 
 class Inventory
 {
@@ -31,6 +33,9 @@ public:
         InventorySlot,
         SlotCount> &
     GetSlots() const;
+
+    bool TryAddItemsAtomically(
+        const std::vector<ItemAmount> &items);
 
 private:
     std::array<

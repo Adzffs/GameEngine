@@ -5,6 +5,7 @@
 #include "../../Input/InputManager.h"
 #include "../../Player/Player.h"
 #include "../../NPC/NPC.h"
+#include "../../Reward/RewardTableType.h"
 #include "../../Stats/CombatRatings.h"
 class World;
 
@@ -20,7 +21,9 @@ public:
     int CreateMonster(
         int x,
         int y,
-        const CombatRatings &ratings);
+        const CombatRatings &ratings,
+        RewardTableType rewardTableType =
+            RewardTableType::NONE);
 
     void Update(World &world);
 

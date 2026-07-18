@@ -6,10 +6,12 @@ Monster::Monster(
     int id,
     int x,
     int y,
-    const CombatRatings &ratings)
+    const CombatRatings &ratings,
+    RewardTableType rewardTableType)
     : Entity(id, EntityType::MONSTER),
       combatRatings(ratings),
-      healthPool(ratings.maximumHealth)
+      healthPool(ratings.maximumHealth),
+      rewardTableType(rewardTableType)
 {
     // Keep ratings and health cap internally consistent when health is clamped.
     combatRatings.maximumHealth = healthPool.GetMaximumHealth();
@@ -50,4 +52,9 @@ int Monster::ApplyDamage(int amount)
 void Monster::RestoreHealthToFull()
 {
     healthPool.RestoreToFull();
+}
+
+RewardTableType Monster::GetRewardTableType() const
+{
+    return rewardTableType;
 }

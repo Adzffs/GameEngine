@@ -2,6 +2,8 @@
 
 #include "../Item/ItemDatabase.h"
 
+#include <limits>
+
 bool Inventory::AddItem(
     ItemType itemType,
     int amount)
@@ -208,4 +210,50 @@ const std::array<
 Inventory::GetSlots() const
 {
     return slots;
+}
+
+bool Inventory::TryAddItemsAtomically(
+    const std::vector<ItemAmount> &items)
+{
+    Inventory simulated = *this;
+
+    for (const ItemAmount &item : items)
+    {
+        if (item.itemType == ItemType::NONE ||
+            item.quantity <= 0)
+        {
+            return false;
+        }
+
+        const ItemDefinition &definition =
+            ItemDatabase::Get(item.itemType);
+
+        if (definition.GetItemType() != item.itemType)
+        {
+            return false;
+        }
+
+        if (definition.IsStackable())
+        {
+            int currentAmount =
+                simulated.GetItemAmount(
+                    item.itemType);
+
+            if (currentAmount >
+                std::numeric_limits<int>::max() - item.quantity)
+            {
+                return false;
+            }
+        }
+
+        if (!simulated.AddItem(
+                item.itemType,
+                item.quantity))
+        {
+            return false;
+        }
+    }
+
+    *this = simulated;
+    return true;
 }

@@ -2,6 +2,7 @@
 
 #include "../../Combat/Combatant.h"
 #include "../Entity.h"
+#include "../../Reward/RewardTableType.h"
 #include "../../Stats/HealthPool.h"
 
 class Monster : public Entity, public Combatant
@@ -11,7 +12,9 @@ public:
         int id,
         int x,
         int y,
-        const CombatRatings &ratings);
+        const CombatRatings &ratings,
+        RewardTableType rewardTableType =
+            RewardTableType::NONE);
 
     void Update(World &world) override;
 
@@ -24,7 +27,10 @@ public:
     int ApplyDamage(int amount) override;
     void RestoreHealthToFull();
 
+    RewardTableType GetRewardTableType() const;
+
 private:
     CombatRatings combatRatings;
     HealthPool healthPool;
+    RewardTableType rewardTableType;
 };

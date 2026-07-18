@@ -38,7 +38,8 @@ int EntityManager::CreateNPC(int x, int y)
 int EntityManager::CreateMonster(
     int x,
     int y,
-    const CombatRatings &ratings)
+    const CombatRatings &ratings,
+    RewardTableType rewardTableType)
 {
     int monsterID = nextID;
 
@@ -47,7 +48,8 @@ int EntityManager::CreateMonster(
             monsterID,
             x,
             y,
-            ratings));
+            ratings,
+            rewardTableType));
 
     nextID++;
 

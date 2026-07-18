@@ -47,6 +47,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/Reward/RewardTable.cpp
     src/Reward/RewardTableRoller.cpp
     src/Reward/DevelopmentRewardTables.cpp
+    src/Reward/RewardTableRegistry.cpp
 )
 
 add_library(GameEngineCore
@@ -257,5 +258,27 @@ if(BUILD_TESTING)
     add_test(
         NAME RewardTableTests
         COMMAND RewardTableTests
+    )
+
+    add_executable(InventoryTransactionTests
+        tests/InventoryTransactionTests.cpp
+    )
+
+    target_link_libraries(InventoryTransactionTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME InventoryTransactionTests
+        COMMAND InventoryTransactionTests
+    )
+
+    add_executable(MonsterLootIntegrationTests
+        tests/MonsterLootIntegrationTests.cpp
+    )
+
+    target_link_libraries(MonsterLootIntegrationTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME MonsterLootIntegrationTests
+        COMMAND MonsterLootIntegrationTests
     )
 endif()

@@ -15,9 +15,13 @@
 #include <map>
 #include "../Combat/CombatService.h"
 #include "../Combat/MeleeCombatFeedback.h"
+#include "../Reward/ItemReward.h"
+#include "../Reward/RewardTableRoller.h"
+#include "../Reward/RewardTableType.h"
 #include "../Stats/CombatRatings.h"
 #include <optional>
 #include <set>
+#include <string>
 #include <vector>
 
 class RandomSource;
@@ -25,8 +29,13 @@ class RandomSource;
 class World
 {
 public:
-    explicit World(unsigned int combatSeed = 1337U);
+    explicit World(
+        unsigned int combatSeed = 1337U,
+        unsigned int rewardSeed = 7331U);
     explicit World(std::unique_ptr<RandomSource> combatRandomSource);
+    World(
+        std::unique_ptr<RandomSource> combatRandomSource,
+        std::unique_ptr<RandomSource> rewardRandomSource);
 
     void Update();
 
@@ -36,7 +45,9 @@ public:
     int CreateMonster(
         int x,
         int y,
-        const CombatRatings &ratings);
+        const CombatRatings &ratings,
+        RewardTableType rewardTableType =
+            RewardTableType::NONE);
     Entity *GetEntityByID(int id);
     const std::vector<std::unique_ptr<Entity>> &
     GetEntities() const;
@@ -129,6 +140,12 @@ private:
     ActionManager actionManager;
 
     CombatService combatService;
+
+    std::unique_ptr<RandomSource>
+        rewardRandomSource;
+
+    std::unique_ptr<RewardTableRoller>
+        rewardTableRoller;
 
     Map map;
 
@@ -247,6 +264,11 @@ private:
         int killerEntityID);
 
     void ProcessDeadCombatantCleanup();
+    void ProcessEntityDeathRewards();
+
+    static bool TryBuildLootReceiptMessage(
+        const std::vector<ItemReward> &rewards,
+        std::string &message);
 
     std::set<int> processedDeathEntityIDs;
     std::vector<EntityDiedEvent> entityDiedEvents;
