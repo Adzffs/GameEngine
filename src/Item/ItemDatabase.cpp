@@ -76,7 +76,7 @@ const ItemDefinition &ItemDatabase::Get(
     static const ItemDefinition coal{
         ItemType::COAL,
         "Coal",
-        true,
+        false,
         EquipmentSlotType::NONE,
         ToolType::NONE,
         SkillType::NONE,
@@ -86,7 +86,7 @@ const ItemDefinition &ItemDatabase::Get(
     static const ItemDefinition bronzeBar{
         ItemType::BRONZE_BAR,
         "Bronze bar",
-        true,
+        false,
         EquipmentSlotType::NONE,
         ToolType::NONE,
         SkillType::NONE,
@@ -96,7 +96,7 @@ const ItemDefinition &ItemDatabase::Get(
     static const ItemDefinition ironBar{
         ItemType::IRON_BAR,
         "Iron bar",
-        true,
+        false,
         EquipmentSlotType::NONE,
         ToolType::NONE,
         SkillType::NONE,
@@ -106,7 +106,7 @@ const ItemDefinition &ItemDatabase::Get(
     static const ItemDefinition steelBar{
         ItemType::STEEL_BAR,
         "Steel bar",
-        true,
+        false,
         EquipmentSlotType::NONE,
         ToolType::NONE,
         SkillType::NONE,

@@ -4,6 +4,7 @@
 #include "../src/Inventory/InventorySlot.h"
 #include "../src/Inventory/ItemAmount.h"
 #include "../src/Inventory/ItemType.h"
+#include "../src/Item/ItemDatabase.h"
 
 #include <climits>
 #include <vector>
@@ -62,6 +63,33 @@ int main()
     TestContext test;
 
     {
+        test.Expect(
+            !ItemDatabase::Get(ItemType::COAL).IsStackable(),
+            "Coal is non-stackable");
+        test.Expect(
+            !ItemDatabase::Get(ItemType::COPPER_ORE).IsStackable(),
+            "Copper ore is non-stackable");
+        test.Expect(
+            !ItemDatabase::Get(ItemType::TIN_ORE).IsStackable(),
+            "Tin ore is non-stackable");
+        test.Expect(
+            !ItemDatabase::Get(ItemType::IRON_ORE).IsStackable(),
+            "Iron ore is non-stackable");
+        test.Expect(
+            !ItemDatabase::Get(ItemType::BRONZE_BAR).IsStackable(),
+            "Bronze bar is non-stackable");
+        test.Expect(
+            !ItemDatabase::Get(ItemType::IRON_BAR).IsStackable(),
+            "Iron bar is non-stackable");
+        test.Expect(
+            !ItemDatabase::Get(ItemType::STEEL_BAR).IsStackable(),
+            "Steel bar is non-stackable");
+        test.Expect(
+            ItemDatabase::Get(ItemType::COINS).IsStackable(),
+            "Coins remain stackable");
+    }
+
+    {
         Inventory inventory;
         Inventory before = inventory;
 
@@ -78,10 +106,10 @@ int main()
 
         test.Expect(
             inventory.TryAddItemsAtomically(
-                {{ItemType::COAL, 5}}),
+                {{ItemType::COINS, 5}}),
             "One stackable reward succeeds");
         test.ExpectEqual(
-            inventory.GetItemAmount(ItemType::COAL),
+            inventory.GetItemAmount(ItemType::COINS),
             5,
             "Stackable quantity is applied");
     }
@@ -104,12 +132,54 @@ int main()
 
         test.Expect(
             inventory.TryAddItemsAtomically(
-                {{ItemType::COAL, 3},
+                {{ItemType::COAL, 2}}),
+            "Non-stackable material quantity succeeds");
+
+        int firstCoalSlot =
+            FindFirstSlot(
+                inventory,
+                ItemType::COAL);
+
+        test.Expect(
+            firstCoalSlot >= 0,
+            "First coal slot exists");
+
+        const auto &slots = inventory.GetSlots();
+
+        bool foundSecondCoal = false;
+
+        for (int index = 0; index < Inventory::SlotCount; ++index)
+        {
+            if (index == firstCoalSlot)
+            {
+                continue;
+            }
+
+            if (!slots[index].IsEmpty() &&
+                slots[index].GetItemType() == ItemType::COAL &&
+                slots[index].GetAmount() == 1)
+            {
+                foundSecondCoal = true;
+                break;
+            }
+        }
+
+        test.Expect(
+            foundSecondCoal,
+            "Adding quantity 2 of a non-stackable material uses two slots");
+    }
+
+    {
+        Inventory inventory;
+
+        test.Expect(
+            inventory.TryAddItemsAtomically(
+                {{ItemType::COINS, 3},
                  {ItemType::LOG, 2},
                  {ItemType::TIN_ORE, 1}}),
             "Multiple different rewards succeed");
         test.ExpectEqual(
-            inventory.GetItemAmount(ItemType::COAL),
+            inventory.GetItemAmount(ItemType::COINS),
             3,
             "Stackable in mixed transaction is added");
         test.ExpectEqual(
@@ -166,14 +236,14 @@ int main()
 
     {
         Inventory inventory;
-        inventory.AddItem(ItemType::COAL, 7);
+        inventory.AddItem(ItemType::COINS, 7);
 
         test.Expect(
             inventory.TryAddItemsAtomically(
-                {{ItemType::COAL, 5}}),
+                {{ItemType::COINS, 5}}),
             "Existing stack accepts additional stackable quantity");
         test.ExpectEqual(
-            inventory.GetItemAmount(ItemType::COAL),
+            inventory.GetItemAmount(ItemType::COINS),
             12,
             "Existing stack receives the full added quantity");
     }
@@ -197,7 +267,7 @@ int main()
 
         test.Expect(
             !inventory.TryAddItemsAtomically(
-                {{ItemType::COAL, 0}}),
+                {{ItemType::COINS, 0}}),
             "Zero quantity causes complete failure");
         test.Expect(
             SameSlots(inventory, before),
@@ -210,7 +280,7 @@ int main()
 
         test.Expect(
             !inventory.TryAddItemsAtomically(
-                {{ItemType::COAL, -3}}),
+                {{ItemType::COINS, -3}}),
             "Negative quantity causes complete failure");
         test.Expect(
             SameSlots(inventory, before),
@@ -224,7 +294,7 @@ int main()
 
         test.Expect(
             !inventory.TryAddItemsAtomically(
-                {{ItemType::COAL, 1}}),
+                {{ItemType::COINS, 1}}),
             "Insufficient capacity causes complete failure");
         test.Expect(
             SameSlots(inventory, before),
@@ -233,12 +303,12 @@ int main()
 
     {
         Inventory inventory;
-        inventory.AddItem(ItemType::COAL, INT_MAX);
+        inventory.AddItem(ItemType::COINS, INT_MAX);
         Inventory before = inventory;
 
         test.Expect(
             !inventory.TryAddItemsAtomically(
-                {{ItemType::COAL, 1}}),
+                {{ItemType::COINS, 1}}),
             "Quantity overflow fails");
         test.Expect(
             SameSlots(inventory, before),
@@ -250,13 +320,13 @@ int main()
 
         test.Expect(
             inventory.TryAddItemsAtomically(
-                {{ItemType::COAL, 1},
+                {{ItemType::COINS, 1},
                  {ItemType::COPPER_ORE, 1}}),
             "Valid transaction commits all items");
         test.ExpectEqual(
-            inventory.GetItemAmount(ItemType::COAL),
+            inventory.GetItemAmount(ItemType::COINS),
             1,
-            "Valid transaction adds coal exactly once");
+            "Valid transaction adds coins exactly once");
         test.ExpectEqual(
             inventory.GetItemAmount(ItemType::COPPER_ORE),
             1,
