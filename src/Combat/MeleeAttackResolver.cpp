@@ -2,10 +2,9 @@
 
 #include "CombatFormulas.h"
 
-MeleeAttackResult MeleeAttackResolver::Resolve(
+MeleeAttackResult MeleeAttackResolver::Evaluate(
     const CombatRatings &attacker,
     const CombatRatings &defender,
-    Combatant &defenderCombatant,
     RandomSource &randomSource) const
 {
     MeleeAttackResult result;
@@ -44,8 +43,13 @@ MeleeAttackResult MeleeAttackResolver::Resolve(
         rawDamageRoll,
         result.maximumHit);
 
-    result.actualDamageApplied = defenderCombatant.ApplyDamage(
-        result.rolledDamage);
-
     return result;
+}
+
+int MeleeAttackResolver::ApplyRolledDamage(
+    int rolledDamage,
+    Combatant &defenderCombatant) const
+{
+    return defenderCombatant.ApplyDamage(
+        rolledDamage);
 }

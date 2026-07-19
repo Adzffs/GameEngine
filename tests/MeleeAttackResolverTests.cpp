@@ -209,10 +209,9 @@ int main()
         HealthPoolCombatant defenderHealth(20);
         SequenceRandomSource sequence({3, 4, 7});
 
-        MeleeAttackResult result = resolver.Resolve(
+        MeleeAttackResult result = resolver.Evaluate(
             attacker,
             defender,
-            defenderHealth,
             sequence);
 
         test.Expect(
@@ -240,13 +239,11 @@ int main()
         MeleeAttackResolver resolver;
         CombatRatings attacker = MakeRatings(8, 10, 5, 100);
         CombatRatings defender = MakeRatings(5, 5, 8, 100);
-        HealthPoolCombatant defenderHealth(20);
         SequenceRandomSource sequence({5, 5, 9});
 
-        MeleeAttackResult result = resolver.Resolve(
+        MeleeAttackResult result = resolver.Evaluate(
             attacker,
             defender,
-            defenderHealth,
             sequence);
 
         test.Expect(
@@ -265,11 +262,15 @@ int main()
         HealthPoolCombatant defenderHealth(20);
         SequenceRandomSource sequence({6, 2, 2});
 
-        MeleeAttackResult result = resolver.Resolve(
+        MeleeAttackResult result = resolver.Evaluate(
             attacker,
             defender,
-            defenderHealth,
             sequence);
+
+        result.actualDamageApplied =
+            resolver.ApplyRolledDamage(
+                result.rolledDamage,
+                defenderHealth);
 
         test.Expect(
             result.didHit,
@@ -295,11 +296,15 @@ int main()
         HealthPoolCombatant defenderHealth(20);
         SequenceRandomSource sequence({6, 1, 0});
 
-        MeleeAttackResult result = resolver.Resolve(
+        MeleeAttackResult result = resolver.Evaluate(
             attacker,
             defender,
-            defenderHealth,
             sequence);
+
+        result.actualDamageApplied =
+            resolver.ApplyRolledDamage(
+                result.rolledDamage,
+                defenderHealth);
 
         test.Expect(
             result.didHit,
@@ -322,10 +327,9 @@ int main()
         HealthPoolCombatant defenderHealth(20);
         SequenceRandomSource sequence({6, 1, maximumHit});
 
-        MeleeAttackResult result = resolver.Resolve(
+        MeleeAttackResult result = resolver.Evaluate(
             attacker,
             defender,
-            defenderHealth,
             sequence);
 
         test.ExpectEqual(
@@ -344,11 +348,15 @@ int main()
         HealthPoolCombatant defenderHealth(2);
         SequenceRandomSource sequence({6, 1, 5});
 
-        MeleeAttackResult result = resolver.Resolve(
+        MeleeAttackResult result = resolver.Evaluate(
             attacker,
             defender,
-            defenderHealth,
             sequence);
+
+        result.actualDamageApplied =
+            resolver.ApplyRolledDamage(
+                result.rolledDamage,
+                defenderHealth);
 
         test.ExpectEqual(
             result.actualDamageApplied,
@@ -369,11 +377,15 @@ int main()
 
         SequenceRandomSource sequence({6, 1, 3});
 
-        MeleeAttackResult result = resolver.Resolve(
+        MeleeAttackResult result = resolver.Evaluate(
             attacker,
             defender,
-            defenderHealth,
             sequence);
+
+        result.actualDamageApplied =
+            resolver.ApplyRolledDamage(
+                result.rolledDamage,
+                defenderHealth);
 
         test.Expect(
             result.didHit,
@@ -420,14 +432,12 @@ int main()
 
         CombatRatings attackerRatings = attacker.GetCombatRatings();
         CombatRatings defenderRatings = defender.GetCombatRatings();
-        HealthPoolCombatant defenderHealth(defenderRatings.maximumHealth);
 
         SequenceRandomSource sequence({0, 0, 0});
 
-        MeleeAttackResult baseline = resolver.Resolve(
+        MeleeAttackResult baseline = resolver.Evaluate(
             attackerRatings,
             defenderRatings,
-            defenderHealth,
             sequence);
 
         test.ExpectEqual(
@@ -462,20 +472,16 @@ int main()
 
         CombatRatings swordRatings = attacker.GetCombatRatings();
 
-        HealthPoolCombatant beforeSwordHealth(defender.GetCombatRatings().maximumHealth);
         SequenceRandomSource beforeSequence({0, 0, 0});
-        MeleeAttackResult beforeSwordResult = resolver.Resolve(
+        MeleeAttackResult beforeSwordResult = resolver.Evaluate(
             beforeSwordRatings,
             defender.GetCombatRatings(),
-            beforeSwordHealth,
             beforeSequence);
 
-        HealthPoolCombatant swordHealth(defender.GetCombatRatings().maximumHealth);
         SequenceRandomSource swordSequence({0, 0, 0});
-        MeleeAttackResult swordResult = resolver.Resolve(
+        MeleeAttackResult swordResult = resolver.Evaluate(
             swordRatings,
             defender.GetCombatRatings(),
-            swordHealth,
             swordSequence);
 
         test.Expect(
@@ -500,20 +506,16 @@ int main()
 
         CombatRatings defenderWithShield = defender.GetCombatRatings();
 
-        HealthPoolCombatant baseHealth(defenderBeforeShield.maximumHealth);
         SequenceRandomSource baseSequence({0, 0, 0});
-        MeleeAttackResult baseResult = resolver.Resolve(
+        MeleeAttackResult baseResult = resolver.Evaluate(
             attacker.GetCombatRatings(),
             defenderBeforeShield,
-            baseHealth,
             baseSequence);
 
-        HealthPoolCombatant shieldHealth(defenderWithShield.maximumHealth);
         SequenceRandomSource shieldSequence({0, 0, 0});
-        MeleeAttackResult shieldResult = resolver.Resolve(
+        MeleeAttackResult shieldResult = resolver.Evaluate(
             attacker.GetCombatRatings(),
             defenderWithShield,
-            shieldHealth,
             shieldSequence);
 
         test.Expect(
@@ -534,20 +536,16 @@ int main()
 
         CombatRatings afterAttackXp = attacker.GetCombatRatings();
 
-        HealthPoolCombatant beforeHealth(defender.GetCombatRatings().maximumHealth);
         SequenceRandomSource beforeSequence({0, 0, 0});
-        MeleeAttackResult beforeResult = resolver.Resolve(
+        MeleeAttackResult beforeResult = resolver.Evaluate(
             beforeAttackXp,
             defender.GetCombatRatings(),
-            beforeHealth,
             beforeSequence);
 
-        HealthPoolCombatant afterHealth(defender.GetCombatRatings().maximumHealth);
         SequenceRandomSource afterSequence({0, 0, 0});
-        MeleeAttackResult afterResult = resolver.Resolve(
+        MeleeAttackResult afterResult = resolver.Evaluate(
             afterAttackXp,
             defender.GetCombatRatings(),
-            afterHealth,
             afterSequence);
 
         test.Expect(
@@ -574,20 +572,16 @@ int main()
 
         CombatRatings afterDefenceXp = defender.GetCombatRatings();
 
-        HealthPoolCombatant beforeHealth(afterDefenceXp.maximumHealth);
         SequenceRandomSource beforeSequence({0, 0, 0});
-        MeleeAttackResult beforeResult = resolver.Resolve(
+        MeleeAttackResult beforeResult = resolver.Evaluate(
             attacker.GetCombatRatings(),
             beforeDefenceXp,
-            beforeHealth,
             beforeSequence);
 
-        HealthPoolCombatant afterHealth(afterDefenceXp.maximumHealth);
         SequenceRandomSource afterSequence({0, 0, 0});
-        MeleeAttackResult afterResult = resolver.Resolve(
+        MeleeAttackResult afterResult = resolver.Evaluate(
             attacker.GetCombatRatings(),
             afterDefenceXp,
-            afterHealth,
             afterSequence);
 
         test.Expect(

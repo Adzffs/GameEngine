@@ -9,9 +9,12 @@
 class MeleeAttackResolver
 {
 public:
-    MeleeAttackResult Resolve(
+    MeleeAttackResult Evaluate(
         const CombatRatings &attacker,
         const CombatRatings &defenderRatings,
-        Combatant &defenderCombatant,
         RandomSource &randomSource) const;
+
+    int ApplyRolledDamage(
+        int rolledDamage,
+        Combatant &defenderCombatant) const;
 };

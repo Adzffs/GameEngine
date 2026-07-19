@@ -2,7 +2,9 @@
 
 #include "../src/Action/ActionCancelReason.h"
 #include "../src/Action/ActionType.h"
+#include "../src/Core/RandomSource.h"
 #include "../src/Equipment/EquipmentSlotType.h"
+#include "../src/Entity/Monster/Monster.h"
 #include "../src/Inventory/ItemType.h"
 #include "../src/Player/Player.h"
 #include "../src/Recipe/RecipeDatabase.h"
@@ -10,8 +12,40 @@
 #include "../src/Stats/CombatRatings.h"
 #include "../src/World/World.h"
 
+#include <memory>
+#include <utility>
+#include <vector>
+
 namespace
 {
+    class SequenceRandomSource : public RandomSource
+    {
+    public:
+        explicit SequenceRandomSource(std::vector<int> values)
+            : values(std::move(values))
+        {
+        }
+
+        int NextIntInclusive(
+            int minimum,
+            int maximum) override
+        {
+            (void)minimum;
+            (void)maximum;
+
+            if (nextIndex >= static_cast<int>(values.size()))
+            {
+                return 0;
+            }
+
+            return values[nextIndex++];
+        }
+
+    private:
+        std::vector<int> values;
+        int nextIndex = 0;
+    };
+
     Player *GetPlayer(
         World &world,
         int playerID)
@@ -405,6 +439,40 @@ int main()
     }
 
     {
+        World world(1111U);
+        int attackerID = world.CreatePlayer();
+        int defenderID = world.CreatePlayer();
+
+        Player *attacker = GetPlayer(world, attackerID);
+        Player *defender = GetPlayer(world, defenderID);
+
+        attacker->GetPosition().SetPosition(10, 10);
+        defender->GetPosition().SetPosition(11, 10);
+
+        int defenderHealthBefore =
+            defender->GetCurrentHealth();
+
+        test.Expect(
+            world.TryStartMeleeAttack(
+                attackerID,
+                defenderID,
+                2),
+            "Melee action starts for attacker out-of-range revalidation");
+
+        attacker->GetPosition().SetPosition(50, 50);
+
+        AdvanceWorldTicks(world, 2);
+
+        test.Expect(
+            !world.GetLastMeleeAttackResult().has_value(),
+            "Attacker moving out of range before completion prevents resolution");
+        test.ExpectEqual(
+            defender->GetCurrentHealth(),
+            defenderHealthBefore,
+            "Attacker out-of-range revalidation prevents damage");
+    }
+
+    {
         World world(112U);
         int attackerID = world.CreatePlayer();
         int defenderID = world.CreatePlayer();
@@ -510,6 +578,125 @@ int main()
             defender->GetCurrentHealth(),
             defenderHealthBefore,
             "Dead attacker cannot apply damage on completion");
+    }
+
+    {
+        World world(std::make_unique<SequenceRandomSource>(
+            std::vector<int>{999, 0, 999}));
+
+        int attackerID = world.CreatePlayer();
+        int defenderID = world.CreatePlayer();
+
+        Player *attacker = GetPlayer(world, attackerID);
+        Player *defender = GetPlayer(world, defenderID);
+
+        attacker->GetPosition().SetPosition(10, 10);
+        defender->GetPosition().SetPosition(11, 10);
+
+        const int defenderHealthBefore =
+            defender->GetCurrentHealth();
+
+        test.Expect(
+            world.TryStartMeleeAttack(
+                attackerID,
+                defenderID,
+                1),
+            "Melee action starts for maximum-damage completion validation");
+
+        world.Update();
+
+        test.Expect(
+            world.GetLastMeleeAttackResult().has_value(),
+            "Maximum-damage test resolves a melee completion");
+
+        if (world.GetLastMeleeAttackResult().has_value())
+        {
+            const MeleeAttackResult &result =
+                world.GetLastMeleeAttackResult().value();
+
+            test.Expect(
+                result.didHit,
+                "Maximum-damage test resolves a hit");
+            test.ExpectEqual(
+                result.rolledDamage,
+                result.maximumHit,
+                "Maximum-damage completion preserves rolled maximum hit");
+            test.ExpectEqual(
+                defenderHealthBefore - defender->GetCurrentHealth(),
+                result.actualDamageApplied,
+                "Maximum-damage completion applies expected health delta");
+        }
+    }
+
+    {
+        World world(std::make_unique<SequenceRandomSource>(
+            std::vector<int>{999, 0, 999}));
+
+        int attackerID = world.CreateMonster(
+            10,
+            10,
+            CombatRatings{40, 80, 10, 100});
+
+        int defenderID = world.CreateMonster(
+            11,
+            10,
+            CombatRatings{5, 5, 5, 40});
+
+        Monster *attacker =
+            dynamic_cast<Monster *>(
+                world.GetEntityByID(attackerID));
+
+        Monster *defender =
+            dynamic_cast<Monster *>(
+                world.GetEntityByID(defenderID));
+
+        test.Expect(
+            attacker != nullptr && defender != nullptr,
+            "Overkill test creates monster combatants");
+
+        if (attacker != nullptr &&
+            defender != nullptr)
+        {
+            defender->ApplyDamage(
+                defender->GetCurrentHealth() - 1);
+
+            const int defenderHealthBeforeAttack =
+                defender->GetCurrentHealth();
+
+            test.Expect(
+                world.TryStartMeleeAttack(
+                    attackerID,
+                    defenderID,
+                    1),
+                "Melee action starts for overkill completion validation");
+
+            world.Update();
+
+            test.Expect(
+                world.GetLastMeleeAttackResult().has_value(),
+                "Overkill test resolves a melee completion");
+
+            if (world.GetLastMeleeAttackResult().has_value())
+            {
+                const MeleeAttackResult &result =
+                    world.GetLastMeleeAttackResult().value();
+
+                test.Expect(
+                    result.didHit,
+                    "Overkill test resolves a hit");
+                test.Expect(
+                    result.rolledDamage > result.actualDamageApplied,
+                    "Overkill preserves larger rolled damage than applied damage");
+                test.ExpectEqual(
+                    result.actualDamageApplied,
+                    1,
+                    "Overkill clamps applied damage to remaining health");
+                test.ExpectEqual(
+                    defenderHealthBeforeAttack - defender->GetCurrentHealth(),
+                    result.actualDamageApplied,
+                    "Overkill removes all remaining defender health exactly once");
+            }
+        }
     }
 
     {

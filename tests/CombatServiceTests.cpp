@@ -1,5 +1,6 @@
 #include "TestSupport.h"
 
+#include "../src/Action/Action.h"
 #include "../src/Combat/CombatFormulas.h"
 #include "../src/Combat/CombatService.h"
 #include "../src/Core/RandomSource.h"
@@ -134,6 +135,25 @@ namespace
                left.rolledDamage == right.rolledDamage &&
                left.actualDamageApplied == right.actualDamageApplied;
     }
+
+    MeleeAttackResult EvaluateAndApply(
+        CombatService &service,
+        const CombatRatings &attacker,
+        const CombatRatings &defender,
+        Combatant &defenderCombatant)
+    {
+        MeleeAttackResult result =
+            service.EvaluateMeleeAttack(
+                attacker,
+                defender);
+
+        result.actualDamageApplied =
+            service.ApplyMeleeDamage(
+                result.rolledDamage,
+                defenderCombatant);
+
+        return result;
+    }
 }
 
 int main()
@@ -146,7 +166,8 @@ int main()
         CombatRatings defender = MakeRatings(8, 10, 7, 100);
         HealthPoolCombatant health(40);
 
-        MeleeAttackResult result = service.ResolveMeleeAttack(
+        MeleeAttackResult result = EvaluateAndApply(
+            service,
             attacker,
             defender,
             health);
@@ -167,7 +188,8 @@ int main()
         CombatRatings defender = MakeRatings(8, 10, 5, 100);
         HealthPoolCombatant health(20);
 
-        MeleeAttackResult result = service.ResolveMeleeAttack(
+        MeleeAttackResult result = EvaluateAndApply(
+            service,
             attacker,
             defender,
             health);
@@ -208,12 +230,14 @@ int main()
             HealthPoolCombatant firstHealth(80);
             HealthPoolCombatant secondHealth(80);
 
-            MeleeAttackResult left = first.ResolveMeleeAttack(
+            MeleeAttackResult left = EvaluateAndApply(
+                first,
                 attacker,
                 defender,
                 firstHealth);
 
-            MeleeAttackResult right = second.ResolveMeleeAttack(
+            MeleeAttackResult right = EvaluateAndApply(
+                second,
                 attacker,
                 defender,
                 secondHealth);
@@ -238,12 +262,14 @@ int main()
             HealthPoolCombatant firstHealth(80);
             HealthPoolCombatant secondHealth(80);
 
-            MeleeAttackResult left = first.ResolveMeleeAttack(
+            MeleeAttackResult left = EvaluateAndApply(
+                first,
                 attacker,
                 defender,
                 firstHealth);
 
-            MeleeAttackResult right = second.ResolveMeleeAttack(
+            MeleeAttackResult right = EvaluateAndApply(
+                second,
                 attacker,
                 defender,
                 secondHealth);
@@ -271,11 +297,13 @@ int main()
         HealthPoolCombatant firstHealth(100);
         HealthPoolCombatant secondHealth(100);
 
-        MeleeAttackResult first = service.ResolveMeleeAttack(
+        MeleeAttackResult first = EvaluateAndApply(
+            service,
             attacker,
             defender,
             firstHealth);
-        MeleeAttackResult second = service.ResolveMeleeAttack(
+        MeleeAttackResult second = EvaluateAndApply(
+            service,
             attacker,
             defender,
             secondHealth);
@@ -296,7 +324,8 @@ int main()
         CombatRatings defender = MakeRatings(8, 4, 10, 100);
         HealthPoolCombatant health(40);
 
-        MeleeAttackResult result = service.ResolveMeleeAttack(
+        MeleeAttackResult result = EvaluateAndApply(
+            service,
             attacker,
             defender,
             health);
@@ -321,7 +350,8 @@ int main()
         CombatRatings defender = MakeRatings(8, 7, 6, 100);
         HealthPoolCombatant health(20);
 
-        MeleeAttackResult result = service.ResolveMeleeAttack(
+        MeleeAttackResult result = EvaluateAndApply(
+            service,
             attacker,
             defender,
             health);
@@ -353,7 +383,8 @@ int main()
         CombatRatings defender = MakeRatings(8, 7, 6, 100);
         HealthPoolCombatant health(3);
 
-        MeleeAttackResult result = service.ResolveMeleeAttack(
+        MeleeAttackResult result = EvaluateAndApply(
+            service,
             attacker,
             defender,
             health);
@@ -375,7 +406,8 @@ int main()
         HealthPoolCombatant health(1);
         health.ApplyDamage(1);
 
-        MeleeAttackResult result = service.ResolveMeleeAttack(
+        MeleeAttackResult result = EvaluateAndApply(
+            service,
             attacker,
             defender,
             health);
@@ -405,7 +437,8 @@ int main()
         HealthPoolCombatant defenderHealth(20);
         int defenderHealthBefore = defenderHealth.GetCurrentHealth();
 
-        MeleeAttackResult result = service.ResolveMeleeAttack(
+        MeleeAttackResult result = EvaluateAndApply(
+            service,
             attacker,
             defender,
             defenderHealth);
@@ -432,6 +465,451 @@ int main()
             result.maximumHit,
             CombatFormulas::CalculateMaximumHit(attacker),
             "Result exposes maximum hit from formulas");
+    }
+
+    {
+        auto sequence = std::make_unique<SequenceRandomSource>(
+            std::vector<int>{6, 1, 0});
+        SequenceRandomSource *sequencePtr = sequence.get();
+
+        CombatService service(std::move(sequence));
+        CombatRatings attacker = MakeRatings(12, 20, 5, 100);
+        CombatRatings defender = MakeRatings(8, 7, 6, 100);
+
+        MeleeAttackResult result =
+            service.EvaluateMeleeAttack(
+                attacker,
+                defender);
+
+        test.Expect(
+            result.didHit,
+            "Zero-damage hit still resolves as a hit");
+        test.ExpectEqual(
+            result.rolledDamage,
+            0,
+            "Zero-damage hit preserves rolled damage");
+        test.ExpectEqual(
+            sequencePtr->GetCallCount(),
+            3,
+            "Zero-damage hit consumes exactly three random values");
+    }
+
+    {
+        auto sequence = std::make_unique<SequenceRandomSource>(
+            std::vector<int>{9, 1, 1});
+        SequenceRandomSource *sequencePtr = sequence.get();
+
+        CombatService service(std::move(sequence));
+
+        Action action(
+            ActionType::RECIPE,
+            "Recipe",
+            1,
+            100,
+            200,
+            false);
+
+        bool validatorCalled = false;
+        bool providerCalled = false;
+
+        MeleeCompletionOutcome outcome =
+            service.EvaluateCompletedMeleeAction(
+                action,
+                [&](int, int)
+                {
+                    validatorCalled = true;
+                    return ActionValidationResult{
+                        true,
+                        ActionCancelReason::NONE,
+                        ""};
+                },
+                [&](int, int)
+                    -> std::optional<MeleeCombatRatingsSnapshot>
+                {
+                    providerCalled = true;
+                    return std::nullopt;
+                });
+
+        test.ExpectEqual(
+            static_cast<int>(outcome.type),
+            static_cast<int>(MeleeCompletionOutcomeType::IGNORE),
+            "Non-melee completed actions return IGNORE");
+        test.Expect(
+            !validatorCalled && !providerCalled,
+            "IGNORE outcome does not invoke completion validation or ratings lookup");
+        test.ExpectEqual(
+            sequencePtr->GetCallCount(),
+            0,
+            "IGNORE outcome consumes zero combat RNG calls");
+    }
+
+    {
+        auto sequence = std::make_unique<SequenceRandomSource>(
+            std::vector<int>{9, 1, 1});
+        SequenceRandomSource *sequencePtr = sequence.get();
+
+        CombatService service(std::move(sequence));
+
+        Action action(
+            ActionType::MELEE_ATTACK,
+            "Melee attack",
+            1,
+            401,
+            402,
+            false);
+
+        MeleeCompletionOutcome outcome =
+            service.EvaluateCompletedMeleeAction(
+                action,
+                [](int, int)
+                {
+                    return ActionValidationResult{
+                        true,
+                        ActionCancelReason::NONE,
+                        ""};
+                },
+                [](int, int)
+                    -> std::optional<MeleeCombatRatingsSnapshot>
+                {
+                    return std::nullopt;
+                });
+
+        test.ExpectEqual(
+            static_cast<int>(outcome.type),
+            static_cast<int>(MeleeCompletionOutcomeType::CLEAR_STALE),
+            "Missing completion participants return CLEAR_STALE");
+        test.ExpectEqual(
+            sequencePtr->GetCallCount(),
+            0,
+            "CLEAR_STALE completion consumes zero combat RNG calls");
+    }
+
+    {
+        auto sequence = std::make_unique<SequenceRandomSource>(
+            std::vector<int>{9, 1, 1});
+        SequenceRandomSource *sequencePtr = sequence.get();
+
+        CombatService service(std::move(sequence));
+
+        Action action(
+            ActionType::MELEE_ATTACK,
+            "Melee attack",
+            1,
+            411,
+            412,
+            false);
+
+        MeleeCompletionOutcome outcome =
+            service.EvaluateCompletedMeleeAction(
+                action,
+                [](int, int)
+                {
+                    return ActionValidationResult{
+                        true,
+                        ActionCancelReason::NONE,
+                        ""};
+                },
+                [](int attackerEntityID, int)
+                    -> std::optional<MeleeCombatRatingsSnapshot>
+                {
+                    if (attackerEntityID == 411)
+                    {
+                        return std::nullopt;
+                    }
+
+                    return MeleeCombatRatingsSnapshot{
+                        MakeRatings(10, 10, 10, 100),
+                        MakeRatings(10, 10, 10, 100)};
+                });
+
+        test.ExpectEqual(
+            static_cast<int>(outcome.type),
+            static_cast<int>(MeleeCompletionOutcomeType::CLEAR_STALE),
+            "Missing attacker completion returns CLEAR_STALE");
+        test.ExpectEqual(
+            sequencePtr->GetCallCount(),
+            0,
+            "Missing attacker completion consumes zero combat RNG calls");
+    }
+
+    {
+        auto sequence = std::make_unique<SequenceRandomSource>(
+            std::vector<int>{9, 1, 1});
+        SequenceRandomSource *sequencePtr = sequence.get();
+
+        CombatService service(std::move(sequence));
+
+        Action action(
+            ActionType::MELEE_ATTACK,
+            "Melee attack",
+            1,
+            421,
+            422,
+            false);
+
+        MeleeCompletionOutcome outcome =
+            service.EvaluateCompletedMeleeAction(
+                action,
+                [](int, int)
+                {
+                    return ActionValidationResult{
+                        true,
+                        ActionCancelReason::NONE,
+                        ""};
+                },
+                [](int, int defenderEntityID)
+                    -> std::optional<MeleeCombatRatingsSnapshot>
+                {
+                    if (defenderEntityID == 422)
+                    {
+                        return std::nullopt;
+                    }
+
+                    return MeleeCombatRatingsSnapshot{
+                        MakeRatings(10, 10, 10, 100),
+                        MakeRatings(10, 10, 10, 100)};
+                });
+
+        test.ExpectEqual(
+            static_cast<int>(outcome.type),
+            static_cast<int>(MeleeCompletionOutcomeType::CLEAR_STALE),
+            "Missing target completion returns CLEAR_STALE");
+        test.ExpectEqual(
+            sequencePtr->GetCallCount(),
+            0,
+            "Missing target completion consumes zero combat RNG calls");
+    }
+
+    {
+        auto sequence = std::make_unique<SequenceRandomSource>(
+            std::vector<int>{9, 1, 1});
+        SequenceRandomSource *sequencePtr = sequence.get();
+
+        CombatService service(std::move(sequence));
+
+        Action action(
+            ActionType::MELEE_ATTACK,
+            "Melee attack",
+            1,
+            501,
+            502,
+            false);
+
+        bool providerCalled = false;
+
+        MeleeCompletionOutcome outcome =
+            service.EvaluateCompletedMeleeAction(
+                action,
+                [](int, int)
+                {
+                    return ActionValidationResult{
+                        false,
+                        ActionCancelReason::ENTITY_DIED,
+                        "Attacker is not alive"};
+                },
+                [&](int, int)
+                    -> std::optional<MeleeCombatRatingsSnapshot>
+                {
+                    providerCalled = true;
+                    return std::nullopt;
+                });
+
+        test.ExpectEqual(
+            static_cast<int>(outcome.type),
+            static_cast<int>(MeleeCompletionOutcomeType::CANCEL),
+            "Dead attacker completion returns CANCEL");
+        test.ExpectEqual(
+            static_cast<int>(outcome.cancelReason),
+            static_cast<int>(ActionCancelReason::ENTITY_DIED),
+            "Dead attacker completion preserves cancellation reason");
+        test.Expect(
+            !providerCalled,
+            "CANCEL completion skips stale ratings lookup");
+        test.ExpectEqual(
+            sequencePtr->GetCallCount(),
+            0,
+            "Dead attacker completion consumes zero combat RNG calls");
+    }
+
+    {
+        auto sequence = std::make_unique<SequenceRandomSource>(
+            std::vector<int>{9, 1, 1});
+        SequenceRandomSource *sequencePtr = sequence.get();
+
+        CombatService service(std::move(sequence));
+
+        Action action(
+            ActionType::MELEE_ATTACK,
+            "Melee attack",
+            1,
+            601,
+            602,
+            false);
+
+        MeleeCompletionOutcome outcome =
+            service.EvaluateCompletedMeleeAction(
+                action,
+                [](int, int)
+                {
+                    return ActionValidationResult{
+                        false,
+                        ActionCancelReason::ENTITY_DIED,
+                        "Defender is not alive"};
+                },
+                [](int, int)
+                    -> std::optional<MeleeCombatRatingsSnapshot>
+                {
+                    return std::nullopt;
+                });
+
+        test.ExpectEqual(
+            static_cast<int>(outcome.type),
+            static_cast<int>(MeleeCompletionOutcomeType::CANCEL),
+            "Dead target completion returns CANCEL");
+        test.ExpectEqual(
+            sequencePtr->GetCallCount(),
+            0,
+            "Dead target completion consumes zero combat RNG calls");
+    }
+
+    {
+        auto sequence = std::make_unique<SequenceRandomSource>(
+            std::vector<int>{9, 1, 1});
+        SequenceRandomSource *sequencePtr = sequence.get();
+
+        CombatService service(std::move(sequence));
+
+        Action action(
+            ActionType::MELEE_ATTACK,
+            "Melee attack",
+            1,
+            701,
+            702,
+            false);
+
+        MeleeCompletionOutcome outcome =
+            service.EvaluateCompletedMeleeAction(
+                action,
+                [](int, int)
+                {
+                    return ActionValidationResult{
+                        false,
+                        ActionCancelReason::OUT_OF_RANGE,
+                        "You are too far away from the defender"};
+                },
+                [](int, int)
+                    -> std::optional<MeleeCombatRatingsSnapshot>
+                {
+                    return std::nullopt;
+                });
+
+        test.ExpectEqual(
+            static_cast<int>(outcome.type),
+            static_cast<int>(MeleeCompletionOutcomeType::CANCEL),
+            "Out-of-range completion returns CANCEL");
+        test.ExpectEqual(
+            sequencePtr->GetCallCount(),
+            0,
+            "Out-of-range completion consumes zero combat RNG calls");
+    }
+
+    {
+        auto sequence = std::make_unique<SequenceRandomSource>(
+            std::vector<int>{9, 1, 1});
+        SequenceRandomSource *sequencePtr = sequence.get();
+
+        CombatService service(std::move(sequence));
+
+        Action action(
+            ActionType::MELEE_ATTACK,
+            "Melee attack",
+            1,
+            711,
+            712,
+            false);
+
+        MeleeCompletionOutcome outcome =
+            service.EvaluateCompletedMeleeAction(
+                action,
+                [](int, int)
+                {
+                    return ActionValidationResult{
+                        false,
+                        ActionCancelReason::OUT_OF_RANGE,
+                        "The target moved out of range"};
+                },
+                [](int, int)
+                    -> std::optional<MeleeCombatRatingsSnapshot>
+                {
+                    return std::nullopt;
+                });
+
+        test.ExpectEqual(
+            static_cast<int>(outcome.type),
+            static_cast<int>(MeleeCompletionOutcomeType::CANCEL),
+            "Out-of-range target completion returns CANCEL");
+        test.ExpectEqual(
+            sequencePtr->GetCallCount(),
+            0,
+            "Out-of-range target completion consumes zero combat RNG calls");
+    }
+
+    {
+        auto sequence = std::make_unique<SequenceRandomSource>(
+            std::vector<int>{6, 1, 2});
+
+        CombatService service(std::move(sequence));
+
+        Action action(
+            ActionType::MELEE_ATTACK,
+            "Melee attack",
+            1,
+            801,
+            802,
+            false);
+
+        HealthPoolCombatant defenderHealth(20);
+        const int healthBefore =
+            defenderHealth.GetCurrentHealth();
+
+        MeleeCompletionOutcome outcome =
+            service.EvaluateCompletedMeleeAction(
+                action,
+                [](int, int)
+                {
+                    return ActionValidationResult{
+                        true,
+                        ActionCancelReason::NONE,
+                        ""};
+                },
+                [&](int, int)
+                    -> std::optional<MeleeCombatRatingsSnapshot>
+                {
+                    return MeleeCombatRatingsSnapshot{
+                        MakeRatings(12, 20, 5, 100),
+                        MakeRatings(8, 7, 6, 100)};
+                });
+
+        test.ExpectEqual(
+            static_cast<int>(outcome.type),
+            static_cast<int>(MeleeCompletionOutcomeType::RESOLVE),
+            "Valid completion returns RESOLVE");
+        test.ExpectEqual(
+            outcome.attackerEntityID,
+            801,
+            "RESOLVE completion preserves attacker ID value data");
+        test.ExpectEqual(
+            outcome.defenderEntityID,
+            802,
+            "RESOLVE completion preserves defender ID value data");
+        test.ExpectEqual(
+            outcome.ratingsSnapshot.has_value(),
+            true,
+            "RESOLVE completion carries value-only ratings snapshot");
+        test.ExpectEqual(
+            defenderHealth.GetCurrentHealth(),
+            healthBefore,
+            "Completion evaluation does not alter defender health");
     }
 
     return test.Finish();

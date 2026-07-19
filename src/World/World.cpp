@@ -2091,40 +2091,82 @@ void World::ProcessCompletedActions(
         if (action.GetType() ==
             ActionType::MELEE_ATTACK)
         {
-            ActionValidationResult validation =
-                ValidateMeleeAttackAction(
-                    action.GetOwnerID(),
-                    action.GetTargetID());
+            MeleeCompletionOutcome meleeOutcome =
+                combatService.EvaluateCompletedMeleeAction(
+                    action,
+                    [this](
+                        int attackerEntityID,
+                        int defenderEntityID)
+                    {
+                        return ValidateMeleeAttackAction(
+                            attackerEntityID,
+                            defenderEntityID);
+                    },
+                    [this](
+                        int attackerEntityID,
+                        int defenderEntityID)
+                        -> std::optional<MeleeCombatRatingsSnapshot>
+                    {
+                        Entity *attackerEntity =
+                            entityManager.GetEntityByID(
+                                attackerEntityID);
 
-            if (!validation.valid)
+                        Entity *defenderEntity =
+                            entityManager.GetEntityByID(
+                                defenderEntityID);
+
+                        Combatant *attacker =
+                            TryGetCombatant(
+                                attackerEntity);
+
+                        Combatant *defender =
+                            TryGetCombatant(
+                                defenderEntity);
+
+                        if (attacker == nullptr ||
+                            defender == nullptr)
+                        {
+                            return std::nullopt;
+                        }
+
+                        return MeleeCombatRatingsSnapshot{
+                            attacker->GetCombatRatings(),
+                            defender->GetCombatRatings()};
+                    });
+
+            if (meleeOutcome.type ==
+                MeleeCompletionOutcomeType::IGNORE)
             {
-                if (!validation.message.empty())
+                continue;
+            }
+
+            if (meleeOutcome.type ==
+                MeleeCompletionOutcomeType::CLEAR_STALE)
+            {
+                continue;
+            }
+
+            if (meleeOutcome.type ==
+                MeleeCompletionOutcomeType::CANCEL)
+            {
+                if (!meleeOutcome.message.empty())
                 {
                     Logger::Game(
-                        validation.message);
+                        meleeOutcome.message);
                 }
 
                 continue;
             }
 
-            Entity *attackerEntity =
-                entityManager.GetEntityByID(
-                    action.GetOwnerID());
-
             Entity *defenderEntity =
                 entityManager.GetEntityByID(
-                    action.GetTargetID());
-
-            Combatant *attacker =
-                TryGetCombatant(
-                    attackerEntity);
+                    meleeOutcome.defenderEntityID);
 
             Combatant *defender =
                 TryGetCombatant(
                     defenderEntity);
 
-            if (attacker == nullptr ||
-                defender == nullptr)
+            if (defender == nullptr)
             {
                 continue;
             }
@@ -2134,11 +2176,23 @@ void World::ProcessCompletedActions(
             const bool defenderWasAliveBeforeAttack =
                 defender->IsAlive();
 
-            lastMeleeAttackResult =
-                combatService.ResolveMeleeAttack(
-                    attacker->GetCombatRatings(),
-                    defender->GetCombatRatings(),
+            if (!meleeOutcome.ratingsSnapshot.has_value())
+            {
+                continue;
+            }
+
+            MeleeAttackResult resolvedAttack =
+                combatService.EvaluateMeleeAttack(
+                    meleeOutcome.ratingsSnapshot->attackerRatings,
+                    meleeOutcome.ratingsSnapshot->defenderRatings);
+
+            resolvedAttack.actualDamageApplied =
+                combatService.ApplyMeleeDamage(
+                    resolvedAttack.rolledDamage,
                     *defender);
+
+            lastMeleeAttackResult =
+                resolvedAttack;
 
             RecordMeleeCombatFeedback(
                 action.GetOwnerID(),
@@ -2159,7 +2213,7 @@ void World::ProcessCompletedActions(
                 }
 
                 HandleCombatantDeath(
-                    action.GetTargetID(),
+                    meleeOutcome.defenderEntityID,
                     killerEntityID);
 
                 continue;
