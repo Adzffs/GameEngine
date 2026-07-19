@@ -14,6 +14,7 @@
 #include "../NPC/NpcDefinition.h"
 #include "../NPC/NpcSpawnDefinition.h"
 #include "../Dialogue/DialogueDefinition.h"
+#include "../Shop/ShopDefinition.h"
 
 class ContentValidator
 {
@@ -51,6 +52,11 @@ public:
 
     static ContentValidationReport ValidateNpcDefinitions(
         const std::vector<NpcDefinition> &definitions);
+
+    static ContentValidationReport ValidateShopDefinition(
+        ShopId registryShopId, const ShopDefinition &definition);
+    static ContentValidationReport ValidateShopDefinitions(
+        const std::vector<ShopDefinition> &definitions);
 
     static ContentValidationReport ValidateDialogueDefinition(
         const DialogueDefinition &definition);
@@ -119,6 +125,9 @@ private:
 
     static void AppendNpcDefinitionValidation(
         const NpcDefinition &definition,
+        ContentValidationReport &report);
+    static void AppendShopDefinitionValidation(
+        ShopId registryShopId, const ShopDefinition &definition,
         ContentValidationReport &report);
 
     static void AppendDialogueDefinitionValidation(

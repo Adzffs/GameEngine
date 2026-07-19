@@ -9,6 +9,8 @@
 #include "../Interaction/InteractionIntent.h"
 #include "../Dialogue/DialogueSessionId.h"
 #include "../Dialogue/DialogueChoiceId.h"
+#include "../Inventory/ItemType.h"
+#include "../Shop/ShopSessionId.h"
 
 struct MoveCommand
 {
@@ -79,6 +81,28 @@ struct DialogueChooseCommand
     DialogueChoiceId choiceId;
 };
 
+struct ShopBuyCommand
+{
+    int actorEntityID;
+    ShopSessionId shopSessionId;
+    ItemType itemType;
+    int quantity;
+};
+
+struct ShopSellCommand
+{
+    int actorEntityID;
+    ShopSessionId shopSessionId;
+    ItemType itemType;
+    int quantity;
+};
+
+struct ShopCloseCommand
+{
+    int actorEntityID;
+    ShopSessionId shopSessionId;
+};
+
 using ServerCommandData = std::variant<
     MoveCommand,
     AttackCommand,
@@ -90,7 +114,10 @@ using ServerCommandData = std::variant<
     NpcInteractionCommand,
     DialogueContinueCommand,
     DialogueChooseCommand,
-    DialogueCloseCommand>;
+    DialogueCloseCommand,
+    ShopBuyCommand,
+    ShopSellCommand,
+    ShopCloseCommand>;
 
 struct ServerCommand
 {

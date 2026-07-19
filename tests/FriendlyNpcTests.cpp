@@ -16,8 +16,11 @@ int main()
     {
         test.Expect(guide->kind == NpcKind::FRIENDLY, "Guide is friendly");
         test.Expect(!guide->combat.has_value(), "Guide has no combat profile");
-        test.ExpectEqual(guide->interactions.size(), std::size_t{1}, "Guide exposes one interaction");
-        test.Expect(guide->interactions[0] == NpcInteractionType::TALK, "Guide exposes TALK");
+        test.ExpectEqual(guide->interactions.size(), std::size_t{2}, "Guide exposes two interactions");
+        test.Expect(guide->interactions[0] == NpcInteractionType::TALK, "Guide exposes TALK first");
+        test.Expect(guide->interactions[1] == NpcInteractionType::TRADE, "Guide exposes TRADE second");
+        test.Expect(guide->shopId == ShopId::DEVELOPMENT_GUIDE_SUPPLIES,
+                    "Guide references development supplies");
         test.Expect(guide->dialogueId == DialogueId::DEVELOPMENT_GUIDE_INTRO,
                     "Guide references the authored dialogue");
 

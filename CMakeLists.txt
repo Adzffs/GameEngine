@@ -28,6 +28,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(GAMEENGINE_CORE_SOURCES
     src/Dialogue/DialogueDefinitionDatabase.cpp
     src/Dialogue/DialogueSystem.cpp
+    src/Shop/ShopDefinitionDatabase.cpp
+    src/Shop/ShopSystem.cpp
     src/AI/MonsterAISystem.cpp
     src/Command/ServerCommandQueue.cpp
     src/Scheduling/TickScheduler.cpp
@@ -192,6 +194,9 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(DialogueDefinitionTests tests/DialogueDefinitionTests.cpp)
     add_gameengine_headless_test(DialogueSystemTests tests/DialogueSystemTests.cpp)
     add_gameengine_headless_test(DialogueChoiceTests tests/DialogueChoiceTests.cpp)
+    add_gameengine_headless_test(ShopDefinitionTests tests/ShopDefinitionTests.cpp)
+    add_gameengine_headless_test(ShopSystemTests tests/ShopSystemTests.cpp)
+    add_gameengine_headless_test(ShopInteractionTests tests/ShopInteractionTests.cpp)
 
     if(GAMEENGINE_BUILD_GRAPHICS_TESTS)
         add_gameengine_graphics_test(MonsterGraphicsTests tests/MonsterGraphicsTests.cpp)

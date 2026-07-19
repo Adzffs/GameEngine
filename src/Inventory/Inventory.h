@@ -41,6 +41,12 @@ public:
     bool TryAddItemsAtomically(
         const std::vector<ItemAmount> &items);
 
+    // Items are value types today; there is no durability or unique-instance
+    // metadata, so type-and-quantity transactions are authoritative.
+    bool TryApplyTransactionAtomically(
+        const std::vector<ItemAmount> &removals,
+        const std::vector<ItemAmount> &additions);
+
 private:
     std::array<
         InventorySlot,

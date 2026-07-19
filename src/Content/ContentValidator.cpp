@@ -11,6 +11,7 @@
 #include "../NPC/NpcDefinitionDatabase.h"
 #include "../NPC/NpcSpawnDatabase.h"
 #include "../Dialogue/DialogueDefinitionDatabase.h"
+#include "../Shop/ShopDefinitionDatabase.h"
 #include "../Skills/SkillType.h"
 #include "../Stats/StatType.h"
 #include "../World/Map.h"
@@ -231,6 +232,20 @@ ContentValidationReport ContentValidator::ValidateAll()
     ValidateAllResources(report);
     ValidateAllRecipes(report);
     ValidateAllRewardTables(report);
+    std::set<ShopId> registeredShopIds;
+    for (ShopId shopId : ShopDefinitionDatabase::GetAllShopIds())
+    {
+        if (!registeredShopIds.insert(shopId).second)
+        {
+            report.AddError("ShopDefinition", "duplicate", "registered shop ID must be unique");
+            continue;
+        }
+        const ShopDefinition *shop = ShopDefinitionDatabase::TryGet(shopId);
+        if (shop == nullptr)
+            report.AddError("ShopDefinition", "missing", "registered shop must resolve");
+        else
+            AppendShopDefinitionValidation(shopId, *shop, report);
+    }
     std::set<DialogueId> registeredDialogueIds;
     for (DialogueId dialogueId : DialogueDefinitionDatabase::GetAllDialogueIds())
     {
@@ -445,6 +460,29 @@ ContentValidationReport ContentValidator::ValidateNpcDefinition(
 {
     ContentValidationReport report;
     AppendNpcDefinitionValidation(definition, report);
+    return report;
+}
+
+ContentValidationReport ContentValidator::ValidateShopDefinition(
+    ShopId registryShopId, const ShopDefinition &definition)
+{
+    ContentValidationReport report;
+    AppendShopDefinitionValidation(registryShopId, definition, report);
+    return report;
+}
+
+ContentValidationReport ContentValidator::ValidateShopDefinitions(
+    const std::vector<ShopDefinition> &definitions)
+{
+    ContentValidationReport report;
+    std::set<ShopId> ids;
+    for (const ShopDefinition &definition : definitions)
+    {
+        if (!ids.insert(definition.id).second)
+            report.AddError("ShopDefinition", std::to_string(static_cast<int>(definition.id)),
+                            "shop ID must be unique");
+        AppendShopDefinitionValidation(definition.id, definition, report);
+    }
     return report;
 }
 
@@ -1504,6 +1542,8 @@ void ContentValidator::AppendNpcDefinitionValidation(
         report.AddError("NpcDefinition", contentID, "monster definition must contain combat data");
     if (definition.kind == NpcKind::MONSTER && !definition.interactions.empty())
         report.AddError("NpcDefinition", contentID, "monster advertises an unsupported NPC interaction");
+    if (definition.kind == NpcKind::MONSTER && definition.shopId != ShopId::NONE)
+        report.AddError("NpcDefinition", contentID, "monster must not reference a shop");
     std::set<NpcInteractionType> interactions;
     for (NpcInteractionType interaction : definition.interactions)
     {
@@ -1514,10 +1554,17 @@ void ContentValidator::AppendNpcDefinitionValidation(
         if (interaction == NpcInteractionType::TALK &&
             DialogueDefinitionDatabase::TryGet(definition.dialogueId) == nullptr)
             report.AddError("NpcDefinition", contentID, "TALK requires a valid dialogue");
+        if (interaction == NpcInteractionType::TRADE &&
+            ShopDefinitionDatabase::TryGet(definition.shopId) == nullptr)
+            report.AddError("NpcDefinition", contentID, "TRADE requires a valid shop");
     }
     if (definition.dialogueId != DialogueId::NONE &&
         std::find(definition.interactions.begin(), definition.interactions.end(), NpcInteractionType::TALK) == definition.interactions.end())
         report.AddError("NpcDefinition", contentID, "dialogue reference requires a TALK interaction");
+    const bool hasTrade = std::find(definition.interactions.begin(),
+        definition.interactions.end(), NpcInteractionType::TRADE) != definition.interactions.end();
+    if (definition.shopId != ShopId::NONE && !hasTrade)
+        report.AddError("NpcDefinition", contentID, "shop reference requires a TRADE interaction");
     if (!definition.combat.has_value()) return;
     const NpcCombatDefinition &combat = *definition.combat;
     if (combat.ratings.attackAccuracy < 0 ||
@@ -1540,6 +1587,46 @@ void ContentValidator::AppendNpcDefinitionValidation(
             report.AddError("NpcDefinition", contentID, "aggression leash radius must be positive");
         if (aggression.leashRadius < aggression.detectionRadius)
             report.AddError("NpcDefinition", contentID, "aggression leash radius must be at least detection radius");
+    }
+}
+
+void ContentValidator::AppendShopDefinitionValidation(
+    ShopId registryShopId, const ShopDefinition &definition,
+    ContentValidationReport &report)
+{
+    const std::string contentID = std::to_string(static_cast<int>(definition.id));
+    if (registryShopId == ShopId::NONE || definition.id == ShopId::NONE ||
+        registryShopId != definition.id || ShopDefinitionDatabase::TryGet(registryShopId) == nullptr)
+        report.AddError("ShopDefinition", contentID, "shop ID must be known, matching and non-NONE");
+    if (definition.name.empty())
+        report.AddError("ShopDefinition", contentID, "name must not be empty");
+    const ItemDefinition &currency = ItemDatabase::Get(definition.currencyItemType);
+    if (definition.currencyItemType == ItemType::NONE ||
+        currency.GetItemType() != definition.currencyItemType)
+        report.AddError("ShopDefinition", contentID, "currency item must resolve");
+    else if (!currency.IsStackable())
+        report.AddError("ShopDefinition", contentID, "currency item must be stackable");
+    if (definition.entries.empty())
+        report.AddError("ShopDefinition", contentID, "shop must contain an entry");
+    std::set<ItemType> itemTypes;
+    for (const ShopEntryDefinition &entry : definition.entries)
+    {
+        const ItemDefinition &item = ItemDatabase::Get(entry.itemType);
+        if (entry.itemType == ItemType::NONE || item.GetItemType() != entry.itemType)
+            report.AddError("ShopDefinition", contentID, "entry item must resolve");
+        if (entry.itemType == definition.currencyItemType)
+            report.AddError("ShopDefinition", contentID, "currency cannot be listed as stock");
+        if (!itemTypes.insert(entry.itemType).second)
+            report.AddError("ShopDefinition", contentID, "entry items must be unique");
+        if (!entry.buyPrice.has_value() && !entry.sellPrice.has_value())
+            report.AddError("ShopDefinition", contentID, "entry must support BUY or SELL");
+        if (entry.buyPrice.has_value() && *entry.buyPrice <= 0)
+            report.AddError("ShopDefinition", contentID, "buy price must be positive");
+        if (entry.sellPrice.has_value() && *entry.sellPrice <= 0)
+            report.AddError("ShopDefinition", contentID, "sell price must be positive");
+        if (entry.buyPrice.has_value() && entry.sellPrice.has_value() &&
+            *entry.sellPrice > *entry.buyPrice)
+            report.AddError("ShopDefinition", contentID, "sell price must not exceed buy price");
     }
 }
 

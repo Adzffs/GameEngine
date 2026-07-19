@@ -41,6 +41,9 @@
 #include "../Gathering/GatheringSystem.h"
 #include "../Recipe/RecipeActionSystem.h"
 #include "../Dialogue/DialogueSystem.h"
+#include "../Shop/ShopOpenedEvent.h"
+#include "../Shop/ShopSystem.h"
+#include "../Shop/ShopTransactionEvent.h"
 
 class RandomSource;
 class Monster;
@@ -211,6 +214,9 @@ public:
     const NpcSpawnManager &GetNpcSpawnManager() const;
     const std::vector<NpcTalkEvent> &GetNpcTalkEvents() const;
     const ActiveDialogueSession *GetActiveDialogueSession(int actorEntityID) const;
+    const ActiveShopSession *GetActiveShopSession(int actorEntityID) const;
+    const std::vector<ShopOpenedEvent> &GetShopOpenedEvents() const;
+    const std::vector<ShopTransactionEvent> &GetShopTransactionEvents() const;
 
 private:
     friend struct WorldTestAccess;
@@ -242,6 +248,7 @@ private:
 
     InteractionSystem interactionSystem;
     DialogueSystem dialogueSystem;
+    ShopSystem shopSystem;
 
     GatheringSystem gatheringSystem;
 
@@ -263,6 +270,11 @@ private:
     void ProcessInteractionSystem();
     bool PublishDialogueNode(const ActiveDialogueSession &session,
                              const DialogueNodeDefinition &node);
+    bool TryOpenShop(const InteractionIntent &intent);
+    bool TryProcessShopTransaction(int actorEntityID, ShopSessionId sessionId,
+        ItemType itemType, int quantity, ShopTransactionType transactionType);
+    const ActiveShopSession *ValidateActiveShopSession(
+        int actorEntityID, ShopSessionId sessionId, bool closeLifecycleFailure);
     void ProcessMeleeEngagementSystem();
     void ProcessCompletedActions(
         const std::vector<Action> &completedActions);
@@ -349,6 +361,10 @@ private:
 
     std::vector<NpcTalkEvent> pendingNpcTalkEvents;
     std::vector<NpcTalkEvent> publishedNpcTalkEvents;
+    std::vector<ShopOpenedEvent> pendingShopOpenedEvents;
+    std::vector<ShopOpenedEvent> publishedShopOpenedEvents;
+    std::vector<ShopTransactionEvent> pendingShopTransactionEvents;
+    std::vector<ShopTransactionEvent> publishedShopTransactionEvents;
 
     int currentTick = 0;
 

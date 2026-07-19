@@ -601,5 +601,61 @@ int main()
             "Invalid selected slot failure leaves complete inventory unchanged");
     }
 
+    {
+        Inventory inventory;
+        inventory.AddItem(ItemType::COINS, 5);
+        test.Expect(inventory.TryApplyTransactionAtomically(
+            {{ItemType::COINS, 2}, {ItemType::COINS, 3}},
+            {{ItemType::LOG, 1}}),
+            "Duplicate removals apply deterministically");
+        test.ExpectEqual(inventory.GetItemAmount(ItemType::COINS), 0,
+                         "Duplicate removals remove the exact aggregate");
+        test.ExpectEqual(inventory.GetItemAmount(ItemType::LOG), 1,
+                         "Addition commits with duplicate removals");
+    }
+
+    {
+        Inventory inventory;
+        inventory.AddItem(ItemType::COINS, 5);
+        const Inventory before = inventory;
+        test.Expect(!inventory.TryApplyTransactionAtomically(
+            {{ItemType::COINS, 3}, {ItemType::COINS, 3}},
+            {{ItemType::LOG, 1}}),
+            "Aggregate insufficient duplicate removal rejects");
+        test.Expect(SameSlots(inventory, before),
+                    "Failed duplicate removal is fully atomic");
+    }
+
+    {
+        Inventory inventory;
+        inventory.AddItem(ItemType::COINS, 2);
+        test.Expect(inventory.TryApplyTransactionAtomically(
+            {{ItemType::COINS, 2}}, {{ItemType::COINS, 3}}),
+            "Same item may be removed then re-added");
+        test.ExpectEqual(inventory.GetItemAmount(ItemType::COINS), 3,
+                         "Removal-before-addition result is exact");
+    }
+
+    {
+        Inventory inventory;
+        inventory.AddItem(ItemType::COINS, 1);
+        inventory.AddItem(ItemType::LOG, Inventory::SlotCount - 1);
+        test.Expect(inventory.TryApplyTransactionAtomically(
+            {{ItemType::COINS, 1}}, {{ItemType::BRONZE_AXE, 1}}),
+            "Removing final coin stack frees purchase slot");
+        test.ExpectEqual(inventory.GetItemAmount(ItemType::BRONZE_AXE), 1,
+                         "Freed slot receives purchased item");
+    }
+
+    {
+        Inventory inventory;
+        inventory.AddItem(ItemType::LOG, Inventory::SlotCount);
+        test.Expect(inventory.TryApplyTransactionAtomically(
+            {{ItemType::LOG, 1}}, {{ItemType::COINS, 1}}),
+            "Selling an item frees a coin slot");
+        test.ExpectEqual(inventory.GetItemAmount(ItemType::COINS), 1,
+                         "Freed sale slot receives coins");
+    }
+
     return test.Finish();
 }

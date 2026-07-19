@@ -281,3 +281,31 @@ bool Inventory::TryAddItemsAtomically(
     *this = simulated;
     return true;
 }
+
+bool Inventory::TryApplyTransactionAtomically(
+    const std::vector<ItemAmount> &removals,
+    const std::vector<ItemAmount> &additions)
+{
+    Inventory simulated = *this;
+    for (const ItemAmount &item : removals)
+    {
+        if (item.itemType == ItemType::NONE || item.quantity <= 0 ||
+            ItemDatabase::Get(item.itemType).GetItemType() != item.itemType ||
+            !simulated.RemoveItem(item.itemType, item.quantity))
+            return false;
+    }
+    for (const ItemAmount &item : additions)
+    {
+        if (item.itemType == ItemType::NONE || item.quantity <= 0 ||
+            ItemDatabase::Get(item.itemType).GetItemType() != item.itemType)
+            return false;
+        if (ItemDatabase::Get(item.itemType).IsStackable() &&
+            simulated.GetItemAmount(item.itemType) >
+                std::numeric_limits<int>::max() - item.quantity)
+            return false;
+        if (!simulated.AddItem(item.itemType, item.quantity))
+            return false;
+    }
+    *this = simulated;
+    return true;
+}

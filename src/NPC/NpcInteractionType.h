@@ -2,10 +2,11 @@
 
 enum class NpcInteractionType
 {
-    TALK
+    TALK,
+    TRADE
 };
 
 constexpr bool IsValidNpcInteractionType(NpcInteractionType type)
 {
-    return type == NpcInteractionType::TALK;
+    return type == NpcInteractionType::TALK || type == NpcInteractionType::TRADE;
 }

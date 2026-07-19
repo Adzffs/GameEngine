@@ -24,6 +24,7 @@
 #include "../NPC/NpcSpawnDefinition.h"
 #include "../NPC/NpcSpawnDatabase.h"
 #include "../Dialogue/DialogueDefinitionDatabase.h"
+#include "../Shop/ShopDefinitionDatabase.h"
 #include "../Reward/RewardTableRegistry.h"
 #include "../Core/SeededRandom.h"
 #include "../Recipe/RecipeSystem.h"
@@ -397,6 +398,7 @@ void World::QueueResourceInteraction(
 {
     meleeEngagementSystem.ClearEngagement(entityID);
     dialogueSystem.CancelActor(entityID);
+    shopSystem.CancelActor(entityID);
     interactionSystem.RequestInteraction(
         entityID,
         resourceID,
@@ -411,6 +413,7 @@ void World::QueueStationInteraction(
 {
     meleeEngagementSystem.ClearEngagement(entityID);
     dialogueSystem.CancelActor(entityID);
+    shopSystem.CancelActor(entityID);
     interactionSystem.RequestInteraction(
         entityID,
         stationID,
@@ -526,6 +529,7 @@ bool World::QueueMeleeEngagementRequest(
     }
 
     dialogueSystem.CancelActor(attackerEntityID);
+    shopSystem.CancelActor(attackerEntityID);
 
     movementSystem.CancelMovement(attackerEntityID);
 
@@ -1230,6 +1234,8 @@ void World::Update()
     entityDiedEvents.clear();
     publishedActionLifecycleEvents.clear();
     publishedNpcTalkEvents.clear();
+    publishedShopOpenedEvents.clear();
+    publishedShopTransactionEvents.clear();
     respawnedMonsterEntityIDsThisTick.clear();
 
     publishedCommandProcessingResults.clear();
@@ -1266,6 +1272,10 @@ void World::Update()
         std::move(pendingCommandProcessingResults);
     publishedNpcTalkEvents = std::move(pendingNpcTalkEvents);
     pendingNpcTalkEvents.clear();
+    publishedShopOpenedEvents = std::move(pendingShopOpenedEvents);
+    pendingShopOpenedEvents.clear();
+    publishedShopTransactionEvents = std::move(pendingShopTransactionEvents);
+    pendingShopTransactionEvents.clear();
 }
 
 const std::vector<NpcTalkEvent> &World::GetNpcTalkEvents() const
@@ -1276,6 +1286,21 @@ const std::vector<NpcTalkEvent> &World::GetNpcTalkEvents() const
 const ActiveDialogueSession *World::GetActiveDialogueSession(int actorEntityID) const
 {
     return dialogueSystem.GetSession(actorEntityID);
+}
+
+const ActiveShopSession *World::GetActiveShopSession(int actorEntityID) const
+{
+    return shopSystem.GetSession(actorEntityID);
+}
+
+const std::vector<ShopOpenedEvent> &World::GetShopOpenedEvents() const
+{
+    return publishedShopOpenedEvents;
+}
+
+const std::vector<ShopTransactionEvent> &World::GetShopTransactionEvents() const
+{
+    return publishedShopTransactionEvents;
 }
 
 std::uint64_t World::EnqueueCommand(
@@ -1546,6 +1571,7 @@ void World::ProcessQueuedCommands()
                             }
                         }
                         dialogueSystem.CancelActor(data.actorEntityID);
+                        shopSystem.CancelActor(data.actorEntityID);
                         CloseStationInteraction(data.actorEntityID);
                         CancelActionsForEntity(data.actorEntityID, ActionCancelReason::PLAYER_MOVED);
                         if (std::abs(actorPosition.GetX() - targetPosition.GetX()) <= 1 &&
@@ -1678,6 +1704,29 @@ void World::ProcessQueuedCommands()
                 {
                     if (actor->IsAlive() && dialogueSystem.Close(
                             data.actorEntityID, data.sessionId))
+                        resultCode = CommandResultCode::ACCEPTED;
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, ShopBuyCommand>)
+                {
+                    if (TryProcessShopTransaction(data.actorEntityID,
+                            data.shopSessionId, data.itemType, data.quantity,
+                            ShopTransactionType::BUY))
+                        resultCode = CommandResultCode::ACCEPTED;
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, ShopSellCommand>)
+                {
+                    if (TryProcessShopTransaction(data.actorEntityID,
+                            data.shopSessionId, data.itemType, data.quantity,
+                            ShopTransactionType::SELL))
+                        resultCode = CommandResultCode::ACCEPTED;
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, ShopCloseCommand>)
+                {
+                    if (actor->IsAlive() && shopSystem.Close(
+                            data.actorEntityID, data.shopSessionId))
                         resultCode = CommandResultCode::ACCEPTED;
                 }
                 else if constexpr (
@@ -1923,6 +1972,7 @@ void World::QueueMovementRequest(const MovementRequest &request)
         request.GetEntityID());
     interactionSystem.ClearInteraction(request.GetEntityID());
     dialogueSystem.CancelActor(request.GetEntityID());
+    shopSystem.CancelActor(request.GetEntityID());
 
     movementRequests.push(request);
 }
@@ -1949,6 +1999,7 @@ void World::QueueMovementDestination(
     meleeEngagementSystem.ClearEngagement(
         request.GetEntityID());
     dialogueSystem.CancelActor(request.GetEntityID());
+    shopSystem.CancelActor(request.GetEntityID());
 
     movementSystem.QueueDestination(
         request.GetEntityID(),
@@ -2021,6 +2072,11 @@ void World::ProcessInteractionSystem()
         if (intent.targetType == InteractionTargetType::NPC)
         {
             movementSystem.CancelMovement(intent.actorEntityID);
+            if (intent.npcInteractionType == NpcInteractionType::TRADE)
+            {
+                TryOpenShop(intent);
+                continue;
+            }
             NPC *npc = dynamic_cast<NPC *>(entityManager.GetEntityByID(intent.targetObjectID));
             const NpcDefinition *definition = npc == nullptr ? nullptr : NpcDefinitionDatabase::TryGet(npc->GetNpcType());
             Player *actor = dynamic_cast<Player *>(entityManager.GetEntityByID(intent.actorEntityID));
@@ -2035,6 +2091,7 @@ void World::ProcessInteractionSystem()
                           NpcInteractionType::TALK) != definition->interactions.end() &&
                 dialogue != nullptr && startNode != nullptr)
             {
+                shopSystem.CancelActor(intent.actorEntityID);
                 dialogueSystem.CancelActor(intent.actorEntityID);
                 const DialogueSessionId sessionId = dialogueSystem.Start(
                     intent.actorEntityID, npc->GetID(), npc->GetNpcType(),
@@ -2097,6 +2154,128 @@ void World::ProcessInteractionSystem()
                 true));
         }
     }
+}
+
+bool World::TryOpenShop(const InteractionIntent &intent)
+{
+    Player *actor = dynamic_cast<Player *>(
+        entityManager.GetEntityByID(intent.actorEntityID));
+    NPC *npc = dynamic_cast<NPC *>(
+        entityManager.GetEntityByID(intent.targetObjectID));
+    const NpcDefinition *npcDefinition = npc == nullptr ? nullptr :
+        NpcDefinitionDatabase::TryGet(npc->GetNpcType());
+    const ShopDefinition *shop = npcDefinition == nullptr ? nullptr :
+        ShopDefinitionDatabase::TryGet(npcDefinition->shopId);
+    const bool adjacent = actor != nullptr && npc != nullptr &&
+        std::abs(actor->GetPosition().GetX() - npc->GetPosition().GetX()) <= 1 &&
+        std::abs(actor->GetPosition().GetY() - npc->GetPosition().GetY()) <= 1;
+    if (actor == nullptr || !actor->IsAlive() || npc == nullptr ||
+        npcDefinition == nullptr || npcDefinition->kind != NpcKind::FRIENDLY ||
+        intent.npcInteractionType != NpcInteractionType::TRADE ||
+        std::find(npcDefinition->interactions.begin(), npcDefinition->interactions.end(),
+                  NpcInteractionType::TRADE) == npcDefinition->interactions.end() ||
+        npcDefinition->shopId == ShopId::NONE || shop == nullptr || !adjacent)
+        return false;
+
+    ShopOpenedEvent event{intent.actorEntityID, npc->GetID(), npc->GetNpcType(),
+        InvalidShopSessionId, shop->id, shop->name, shop->currencyItemType, {}};
+    event.entries.reserve(shop->entries.size());
+    for (const ShopEntryDefinition &entry : shop->entries)
+        event.entries.push_back({entry.itemType, entry.buyPrice, entry.sellPrice});
+
+    // Reserve before replacing interface state so event-buffer allocation
+    // failure cannot leave an invisible newly opened session.
+    if (pendingShopOpenedEvents.size() == pendingShopOpenedEvents.max_size())
+        return false;
+    pendingShopOpenedEvents.reserve(pendingShopOpenedEvents.size() + 1);
+
+    shopSystem.CancelActor(intent.actorEntityID);
+    dialogueSystem.CancelActor(intent.actorEntityID);
+    CloseStationInteraction(intent.actorEntityID);
+    const ShopSessionId sessionId = shopSystem.Start(intent.actorEntityID,
+        npc->GetID(), npc->GetNpcType(), shop->id, currentTick);
+    if (sessionId == InvalidShopSessionId)
+        return false;
+    event.sessionId = sessionId;
+    pendingShopOpenedEvents.push_back(std::move(event));
+    return true;
+}
+
+const ActiveShopSession *World::ValidateActiveShopSession(
+    int actorEntityID, ShopSessionId sessionId, bool closeLifecycleFailure)
+{
+    if (sessionId == InvalidShopSessionId)
+        return nullptr;
+    const ActiveShopSession *session = shopSystem.GetSession(actorEntityID);
+    if (session == nullptr || session->sessionId != sessionId)
+        return nullptr;
+    Player *actor = dynamic_cast<Player *>(entityManager.GetEntityByID(actorEntityID));
+    NPC *npc = dynamic_cast<NPC *>(entityManager.GetEntityByID(session->npcEntityID));
+    const NpcDefinition *definition = npc == nullptr ? nullptr :
+        NpcDefinitionDatabase::TryGet(npc->GetNpcType());
+    const bool adjacent = actor != nullptr && npc != nullptr &&
+        std::abs(actor->GetPosition().GetX() - npc->GetPosition().GetX()) <= 1 &&
+        std::abs(actor->GetPosition().GetY() - npc->GetPosition().GetY()) <= 1;
+    const bool valid = actor != nullptr && actor->IsAlive() && npc != nullptr &&
+        npc->GetID() == session->npcEntityID && npc->GetNpcType() == session->npcType &&
+        definition != nullptr && definition->kind == NpcKind::FRIENDLY &&
+        std::find(definition->interactions.begin(), definition->interactions.end(),
+                  NpcInteractionType::TRADE) != definition->interactions.end() &&
+        definition->shopId == session->shopId &&
+        ShopDefinitionDatabase::TryGet(session->shopId) != nullptr && adjacent;
+    if (!valid)
+    {
+        if (closeLifecycleFailure)
+            shopSystem.CancelActor(actorEntityID);
+        return nullptr;
+    }
+    return session;
+}
+
+bool World::TryProcessShopTransaction(int actorEntityID, ShopSessionId sessionId,
+    ItemType itemType, int quantity, ShopTransactionType transactionType)
+{
+    const ActiveShopSession *active = ValidateActiveShopSession(
+        actorEntityID, sessionId, true);
+    if (active == nullptr || quantity <= 0 || itemType == ItemType::NONE)
+        return false;
+    const ActiveShopSession session = *active;
+    const ShopDefinition *shop = ShopDefinitionDatabase::TryGet(session.shopId);
+    const ShopEntryDefinition *entry =
+        ShopDefinitionDatabase::TryGetEntry(session.shopId, itemType);
+    if (shop == nullptr || entry == nullptr || itemType == shop->currencyItemType)
+        return false;
+    const std::optional<int> price = transactionType == ShopTransactionType::BUY
+        ? entry->buyPrice : entry->sellPrice;
+    if (!price.has_value() || *price <= 0)
+        return false;
+    const std::int64_t wideTotal = static_cast<std::int64_t>(*price) * quantity;
+    if (wideTotal <= 0 || wideTotal > std::numeric_limits<int>::max())
+        return false;
+    const int totalPrice = static_cast<int>(wideTotal);
+    Player *actor = dynamic_cast<Player *>(entityManager.GetEntityByID(actorEntityID));
+    if (actor == nullptr)
+        return false;
+    const std::vector<ItemAmount> removals = transactionType == ShopTransactionType::BUY
+        ? std::vector<ItemAmount>{{shop->currencyItemType, totalPrice}}
+        : std::vector<ItemAmount>{{itemType, quantity}};
+    const std::vector<ItemAmount> additions = transactionType == ShopTransactionType::BUY
+        ? std::vector<ItemAmount>{{itemType, quantity}}
+        : std::vector<ItemAmount>{{shop->currencyItemType, totalPrice}};
+    ShopTransactionEvent event{actorEntityID, session.npcEntityID,
+        session.sessionId, session.shopId, transactionType, itemType, quantity,
+        shop->currencyItemType, *price, totalPrice};
+    // Reserve before inventory commit. ShopTransactionEvent is value-only and
+    // nothrow-movable, so insertion cannot allocate after the mutation.
+    if (pendingShopTransactionEvents.size() ==
+        pendingShopTransactionEvents.max_size())
+        return false;
+    pendingShopTransactionEvents.reserve(
+        pendingShopTransactionEvents.size() + 1);
+    if (!actor->GetInventory().TryApplyTransactionAtomically(removals, additions))
+        return false;
+    pendingShopTransactionEvents.push_back(std::move(event));
+    return true;
 }
 
 bool World::PublishDialogueNode(const ActiveDialogueSession &session,
@@ -3640,6 +3819,7 @@ void World::HandleCombatantDeath(
     int killerEntityID)
 {
     dialogueSystem.CancelActor(deadEntityID);
+    shopSystem.CancelActor(deadEntityID);
     Entity *entity =
         entityManager.GetEntityByID(
             deadEntityID);
@@ -4100,6 +4280,8 @@ bool World::RemoveEntity(int entityID)
     interactionSystem.ClearInteractionsTargeting(entityID);
     dialogueSystem.CancelActor(entityID);
     dialogueSystem.CancelTarget(entityID);
+    shopSystem.CancelActor(entityID);
+    shopSystem.CancelTarget(entityID);
 
     auto association = monsterRespawnEventIDs.find(entityID);
     if (association != monsterRespawnEventIDs.end())
