@@ -277,44 +277,26 @@ void World::QueueResourceInteraction(
     int entityID,
     int resourceID)
 {
-    Entity *entity =
-        entityManager.GetEntityByID(entityID);
-
-    Player *player =
-        dynamic_cast<Player *>(entity);
-
-    if (player != nullptr &&
-        !player->IsAlive())
-    {
-        return;
-    }
-
     meleeEngagementSystem.ClearEngagement(entityID);
-
-    pendingResourceInteractions[entityID] =
-        resourceID;
+    interactionSystem.RequestInteraction(
+        entityID,
+        resourceID,
+        InteractionTargetType::RESOURCE,
+        entityManager,
+        objectManager);
 }
 
 void World::QueueStationInteraction(
     int entityID,
     int stationID)
 {
-    Entity *entity =
-        entityManager.GetEntityByID(entityID);
-
-    Player *player =
-        dynamic_cast<Player *>(entity);
-
-    if (player != nullptr &&
-        !player->IsAlive())
-    {
-        return;
-    }
-
     meleeEngagementSystem.ClearEngagement(entityID);
-
-    pendingStationInteractions[entityID] =
-        stationID;
+    interactionSystem.RequestInteraction(
+        entityID,
+        stationID,
+        InteractionTargetType::STATION,
+        entityManager,
+        objectManager);
 }
 
 bool World::QueueMeleeEngagementRequest(
@@ -412,8 +394,7 @@ bool World::QueueMeleeEngagementRequest(
         attackerEntityID,
         ActionCancelReason::NEW_ACTION_STARTED);
 
-    pendingResourceInteractions.erase(attackerEntityID);
-    pendingStationInteractions.erase(attackerEntityID);
+    interactionSystem.ClearInteraction(attackerEntityID);
 
     if (!meleeEngagementSystem.RequestEngagement(
             attackerEntityID,
@@ -480,20 +461,34 @@ void World::CancelGatheringForToolChange(
             ActionCancelReason::INVALID_TOOL);
     }
 
-    pendingResourceInteractions.erase(
-        entityID);
+    const auto interaction = interactionSystem.GetInteraction(entityID);
+    if (interaction.has_value() && interaction->targetType ==
+                                       InteractionTargetType::RESOURCE)
+    {
+        interactionSystem.ClearInteraction(entityID);
+    }
 }
 
 void World::ClearPendingResourceInteraction(
     int entityID)
 {
-    pendingResourceInteractions.erase(entityID);
+    const auto interaction = interactionSystem.GetInteraction(entityID);
+    if (interaction.has_value() && interaction->targetType ==
+                                       InteractionTargetType::RESOURCE)
+    {
+        interactionSystem.ClearInteraction(entityID);
+    }
 }
 
 void World::ClearPendingStationInteraction(
     int entityID)
 {
-    pendingStationInteractions.erase(entityID);
+    const auto interaction = interactionSystem.GetInteraction(entityID);
+    if (interaction.has_value() && interaction->targetType ==
+                                       InteractionTargetType::STATION)
+    {
+        interactionSystem.ClearInteraction(entityID);
+    }
 }
 
 bool World::HasPendingMeleeEngagement(
@@ -656,8 +651,7 @@ bool World::CanUseStation(
 void World::CloseStationInteraction(
     int entityID)
 {
-    pendingStationInteractions.erase(
-        entityID);
+    ClearPendingStationInteraction(entityID);
 
     openedStations.erase(entityID);
 
@@ -1046,8 +1040,7 @@ void World::Update()
     ProcessDeadCombatantCleanup();
 
     ProcessMovementSystem();
-    ProcessResourceInteractions();
-    ProcessStationInteractions();
+    ProcessInteractionSystem();
 
     objectManager.Update();
 
@@ -1556,57 +1549,75 @@ void World::ProcessMovementSystem()
     // and melee phases below authoritatively observe the updated positions.
     (void)outcomes;
 }
-void World::ProcessStationInteractions()
+void World::ProcessInteractionSystem()
 {
-    auto interactionIterator =
-        pendingStationInteractions.begin();
-
-    while (interactionIterator !=
-           pendingStationInteractions.end())
+    std::unordered_set<int> actorsWithActiveMovement;
+    for (const auto &entity : entityManager.GetEntities())
     {
-        int entityID = interactionIterator->first;
-        int stationID = interactionIterator->second;
-
-        Entity *entity =
-            entityManager.GetEntityByID(entityID);
-
-        CraftingStation *station =
-            objectManager.GetStationByID(stationID);
-
-        if (entity == nullptr || station == nullptr)
+        if (movementSystem.HasMovement(entity->GetID()))
         {
-            interactionIterator =
-                pendingStationInteractions.erase(
-                    interactionIterator);
+            actorsWithActiveMovement.insert(entity->GetID());
+        }
+    }
+
+    const auto intents = interactionSystem.Evaluate(
+        entityManager, objectManager, actorsWithActiveMovement);
+    for (const InteractionIntent &intent : intents)
+    {
+        if (intent.type == InteractionIntentType::CLEAR_INTERACTION)
+        {
             continue;
         }
 
-        int distanceX = std::abs(
-            entity->GetPosition().GetX() -
-            station->GetX());
-
-        int distanceY = std::abs(
-            entity->GetPosition().GetY() -
-            station->GetY());
-
-        bool isAdjacent =
-            distanceX <= 1 && distanceY <= 1;
-
-        if (!isAdjacent)
+        if (intent.targetType == InteractionTargetType::STATION)
         {
-            ++interactionIterator;
+            CraftingStation *station =
+                objectManager.GetStationByID(intent.targetObjectID);
+            if (station != nullptr)
+            {
+                activeStations[intent.actorEntityID] = intent.targetObjectID;
+                openedStations[intent.actorEntityID] =
+                    station->GetStationType();
+            }
             continue;
         }
 
-        activeStations[entityID] =
-            stationID;
+        ResourceNode *resource =
+            objectManager.GetResourceByID(intent.targetObjectID);
+        if (resource == nullptr || !resource->IsActive())
+        {
+            continue;
+        }
 
-        openedStations[entityID] =
-            station->GetStationType();
+        ActionValidationResult validation = ValidateGatheringAction(
+            intent.actorEntityID, intent.targetObjectID, false);
+        if (!validation.valid)
+        {
+            if (!validation.message.empty())
+            {
+                Logger::Game(validation.message);
+            }
+            CancelActionsForEntity(intent.actorEntityID, validation.reason);
+            continue;
+        }
 
-        interactionIterator =
-            pendingStationInteractions.erase(
-                interactionIterator);
+        Player *player = dynamic_cast<Player *>(
+            entityManager.GetEntityByID(intent.actorEntityID));
+        const ResourceDefinition &resourceDefinition =
+            ResourceDatabase::Get(resource->GetResourceType());
+        const ItemDefinition &weaponDefinition = ItemDatabase::Get(
+            player->GetEquipment().GetEquippedItem(
+                EquipmentSlotType::WEAPON));
+        if (!actionManager.HasActionForEntity(intent.actorEntityID))
+        {
+            StartAction(Action(
+                ActionType::GATHERING,
+                "Gathering " + resourceDefinition.GetName(),
+                weaponDefinition.GetActionDurationTicks(),
+                intent.actorEntityID,
+                intent.targetObjectID,
+                true));
+        }
     }
 }
 
@@ -1953,127 +1964,6 @@ ActionValidationResult World::ValidateMeleeAttackAction(
         ""};
 }
 
-void World::ProcessResourceInteractions()
-{
-    auto interactionIterator =
-        pendingResourceInteractions.begin();
-
-    while (interactionIterator !=
-           pendingResourceInteractions.end())
-    {
-        int entityID =
-            interactionIterator->first;
-
-        int resourceID =
-            interactionIterator->second;
-
-        Entity *entity =
-            entityManager.GetEntityByID(
-                entityID);
-
-        ResourceNode *resource =
-            objectManager.GetResourceByID(
-                resourceID);
-
-        if (entity == nullptr ||
-            resource == nullptr)
-        {
-            interactionIterator =
-                pendingResourceInteractions.erase(
-                    interactionIterator);
-
-            continue;
-        }
-
-        if (!resource->IsActive())
-        {
-            interactionIterator =
-                pendingResourceInteractions.erase(
-                    interactionIterator);
-
-            continue;
-        }
-
-        int distanceX =
-            std::abs(
-                entity->GetPosition().GetX() -
-                resource->GetX());
-
-        int distanceY =
-            std::abs(
-                entity->GetPosition().GetY() -
-                resource->GetY());
-
-        bool isAdjacent =
-            distanceX <= 1 &&
-            distanceY <= 1;
-
-        if (!isAdjacent)
-        {
-            ++interactionIterator;
-            continue;
-        }
-
-        ActionValidationResult validation =
-            ValidateGatheringAction(
-                entityID,
-                resourceID,
-                false);
-
-        if (!validation.valid)
-        {
-            if (!validation.message.empty())
-            {
-                Logger::Game(validation.message);
-            }
-
-            CancelActionsForEntity(
-                entityID,
-                validation.reason);
-
-            interactionIterator =
-                pendingResourceInteractions.erase(
-                    interactionIterator);
-
-            continue;
-        }
-
-        Player *player =
-            dynamic_cast<Player *>(entity);
-
-        const ResourceDefinition &resourceDefinition =
-            ResourceDatabase::Get(
-                resource->GetResourceType());
-
-        ItemType equippedWeapon =
-            player->GetEquipment()
-                .GetEquippedItem(
-                    EquipmentSlotType::WEAPON);
-
-        const ItemDefinition &weaponDefinition =
-            ItemDatabase::Get(
-                equippedWeapon);
-
-        if (!actionManager.HasActionForEntity(
-                entityID))
-        {
-            StartAction(
-                Action(
-                    ActionType::GATHERING,
-                    "Gathering " +
-                        resourceDefinition.GetName(),
-                    weaponDefinition
-                        .GetActionDurationTicks(),
-                    entityID,
-                    resourceID,
-                    true));
-        }
-
-        interactionIterator =
-            pendingResourceInteractions.erase(
-                interactionIterator);
-    }
-}
 void World::ProcessCompletedActions(
     const std::vector<Action> &completedActions)
 {
@@ -2303,8 +2193,7 @@ void World::ProcessCompletedActions(
                 Logger::Game(validation.message);
             }
 
-            pendingResourceInteractions.erase(
-                action.GetOwnerID());
+            ClearPendingResourceInteraction(action.GetOwnerID());
 
             CancelActionsForEntity(
                 action.GetOwnerID(),
@@ -2362,8 +2251,7 @@ void World::ProcessCompletedActions(
                 Logger::Game(
                     "Player inventory is full");
 
-                pendingResourceInteractions.erase(
-                    action.GetOwnerID());
+                ClearPendingResourceInteraction(action.GetOwnerID());
 
                 continue;
             }
@@ -2433,8 +2321,7 @@ void World::ProcessCompletedActions(
         // Only stop after a successful gather depleted the resource.
         if (!resource->IsActive())
         {
-            pendingResourceInteractions.erase(
-                action.GetOwnerID());
+            ClearPendingResourceInteraction(action.GetOwnerID());
 
             Logger::Game(
                 resourceDefinition.GetName() +
@@ -3171,11 +3058,7 @@ void World::HandleCombatantDeath(
         return;
     }
 
-    pendingResourceInteractions.erase(
-        deadEntityID);
-
-    pendingStationInteractions.erase(
-        deadEntityID);
+    interactionSystem.ClearInteraction(deadEntityID);
 
     openedStations.erase(
         deadEntityID);
@@ -3569,6 +3452,7 @@ bool World::RemoveEntity(int entityID)
 {
     ClearPendingMovementForEntity(entityID);
     ClearPendingMeleeInteractionsInvolvingEntity(entityID);
+    interactionSystem.ClearInteraction(entityID);
 
     auto association = monsterRespawnEventIDs.find(entityID);
     if (association != monsterRespawnEventIDs.end())
@@ -3611,11 +3495,7 @@ void World::ExecuteMonsterRespawn(
     ClearCombatFeedbackInvolvingEntity(
         monsterEntityID);
 
-    pendingResourceInteractions.erase(
-        monsterEntityID);
-
-    pendingStationInteractions.erase(
-        monsterEntityID);
+    interactionSystem.ClearInteraction(monsterEntityID);
 
     openedStations.erase(
         monsterEntityID);

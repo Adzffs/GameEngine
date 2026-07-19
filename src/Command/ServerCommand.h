@@ -6,6 +6,7 @@
 #include "../Equipment/EquipmentSlotType.h"
 #include "../Recipe/RecipeType.h"
 #include "../World/Position.h"
+#include "../Interaction/InteractionIntent.h"
 
 struct MoveCommand
 {
@@ -35,12 +36,6 @@ struct StartRecipeCommand
 {
     int actorEntityID;
     RecipeType recipeType;
-};
-
-enum class InteractionTargetType
-{
-    RESOURCE,
-    STATION
 };
 
 struct InteractCommand

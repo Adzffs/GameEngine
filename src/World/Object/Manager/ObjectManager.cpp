@@ -52,6 +52,18 @@ ResourceNode *ObjectManager::GetResourceByID(int id)
     return nullptr;
 }
 
+const ResourceNode *ObjectManager::GetResourceByID(int id) const
+{
+    for (const ResourceNode &resource : resources)
+    {
+        if (resource.GetID() == id)
+        {
+            return &resource;
+        }
+    }
+    return nullptr;
+}
+
 void ObjectManager::CreateStation(
     StationType stationType,
     int x,
@@ -83,6 +95,18 @@ ObjectManager::GetStationByID(int id)
         }
     }
 
+    return nullptr;
+}
+
+const CraftingStation *ObjectManager::GetStationByID(int id) const
+{
+    for (const CraftingStation &station : stations)
+    {
+        if (station.GetID() == id)
+        {
+            return &station;
+        }
+    }
     return nullptr;
 }
 

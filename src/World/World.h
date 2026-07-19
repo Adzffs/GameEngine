@@ -34,6 +34,7 @@
 #include "../Command/ServerCommandQueue.h"
 #include "../Scheduling/TickScheduler.h"
 #include "../AI/MonsterAIIntent.h"
+#include "../Interaction/InteractionSystem.h"
 
 class RandomSource;
 class Monster;
@@ -212,6 +213,8 @@ private:
 
     MeleeEngagementSystem meleeEngagementSystem;
 
+    InteractionSystem interactionSystem;
+
     void CreateResource(
         ResourceType resourceType,
         int x,
@@ -225,8 +228,7 @@ private:
     void ProcessMovementRequests();
     void ProcessQueuedCommands();
     void ProcessMovementSystem();
-    void ProcessResourceInteractions();
-    void ProcessStationInteractions();
+    void ProcessInteractionSystem();
     void ProcessMeleeEngagementSystem();
     void ProcessCompletedActions(
         const std::vector<Action> &completedActions);
@@ -278,8 +280,6 @@ private:
         StationType requiredStationType);
     std::queue<MovementRequest> movementRequests;
 
-    std::map<int, int> pendingResourceInteractions;
-    std::map<int, int> pendingStationInteractions;
     std::map<int, StationType> openedStations;
     std::map<int, int> activeStations;
 

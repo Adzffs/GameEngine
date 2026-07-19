@@ -19,6 +19,7 @@ public:
     const std::vector<ResourceNode> &GetResources() const;
     ResourceNode *GetResourceAt(int x, int y);
     ResourceNode *GetResourceByID(int id);
+    const ResourceNode *GetResourceByID(int id) const;
 
     void CreateStation(
         StationType stationType,
@@ -29,6 +30,7 @@ public:
     GetStations() const;
 
     CraftingStation *GetStationByID(int id);
+    const CraftingStation *GetStationByID(int id) const;
 
     CraftingStation *GetStationAt(
         int x,
