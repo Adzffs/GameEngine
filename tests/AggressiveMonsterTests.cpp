@@ -3,6 +3,7 @@
 #include "../src/Action/Action.h"
 #include "../src/Action/ActionType.h"
 #include "../src/Content/ContentValidator.h"
+#include "../src/Core/RandomSource.h"
 #include "../src/Entity/EntityType.h"
 #include "../src/Entity/Monster/Monster.h"
 #include "../src/Inventory/ItemType.h"
@@ -16,10 +17,48 @@
 
 #include <algorithm>
 #include <optional>
+#include <stdexcept>
+#include <utility>
 #include <vector>
 
 namespace
 {
+    class SequenceRandomSource : public RandomSource
+    {
+    public:
+        explicit SequenceRandomSource(std::vector<int> values)
+            : values(std::move(values))
+        {
+        }
+
+        int NextIntInclusive(int minimum, int maximum) override
+        {
+            if (nextIndex >= values.size())
+            {
+                throw std::runtime_error(
+                    "SequenceRandomSource exhausted");
+            }
+
+            int value = values[nextIndex++];
+            if (value < minimum || value > maximum)
+            {
+                throw std::runtime_error(
+                    "SequenceRandomSource value outside requested range");
+            }
+
+            return value;
+        }
+
+        std::size_t GetCallCount() const
+        {
+            return nextIndex;
+        }
+
+    private:
+        std::vector<int> values;
+        std::size_t nextIndex = 0;
+    };
+
     Player *GetPlayer(
         World &world,
         int entityID)
@@ -510,7 +549,18 @@ int main()
     }
 
     {
-        World world;
+        auto combatRandomSource =
+            std::make_unique<SequenceRandomSource>(
+                std::vector<int>{8, 0, 1});
+        SequenceRandomSource *combatRandom =
+            combatRandomSource.get();
+
+        World world(
+            std::move(combatRandomSource),
+            std::make_unique<SequenceRandomSource>(
+                std::vector<int>{}),
+            std::make_unique<SequenceRandomSource>(
+                std::vector<int>{}));
 
         int playerID = world.CreatePlayer();
         int aggressiveMonsterID = world.CreateMonster(
@@ -534,6 +584,9 @@ int main()
             world.GetActionForEntity(aggressiveMonsterID) != nullptr,
             "Aggressive monster starts engagement in range");
 
+        const Action *startedAction =
+            world.GetActionForEntity(aggressiveMonsterID);
+
         test.ExpectEqual(
             player->GetCurrentHealth(),
             healthBefore,
@@ -549,11 +602,27 @@ int main()
             targetBefore,
             "Aggressive retaliation path does not create duplicate target ownership");
 
-        AdvanceTicks(world, 20);
-
         test.Expect(
-            player->GetCurrentHealth() < healthBefore,
-            "Existing melee action resolver eventually applies damage to the player");
+            world.GetActionForEntity(aggressiveMonsterID) == startedAction,
+            "Aggression update does not replace the existing melee action");
+
+        AdvanceTicks(world, 3);
+
+        test.ExpectEqual(
+            player->GetCurrentHealth(),
+            healthBefore,
+            "Timed melee action applies no damage before completion");
+
+        world.Update();
+
+        test.ExpectEqual(
+            player->GetCurrentHealth(),
+            healthBefore - 1,
+            "Existing melee action resolver applies deterministic positive damage on completion");
+        test.ExpectEqual(
+            combatRandom->GetCallCount(),
+            static_cast<std::size_t>(3),
+            "Completed melee attack consumes accuracy, defence and damage rolls exactly once");
     }
 
     {
