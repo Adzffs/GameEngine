@@ -6,6 +6,7 @@
 #include "MonsterRespawnDefinition.h"
 #include "../../Reward/RewardTableType.h"
 #include "../../Stats/HealthPool.h"
+#include "../../NPC/NpcType.h"
 #include <optional>
 
 class Monster : public Entity, public Combatant
@@ -21,7 +22,9 @@ public:
         std::optional<MonsterAggressionDefinition> aggressionDefinition =
             std::nullopt,
         std::optional<MonsterRespawnDefinition> respawnDefinition =
-            std::nullopt);
+            std::nullopt,
+        NpcType npcType = NpcType::NONE,
+        int attackDurationTicks = 5);
 
     void Update(World &world) override;
 
@@ -47,6 +50,8 @@ public:
 
     int GetOriginalSpawnX() const;
     int GetOriginalSpawnY() const;
+    NpcType GetNpcType() const;
+    int GetAttackDurationTicks() const;
 
 private:
     CombatRatings combatRatings;
@@ -58,4 +63,6 @@ private:
         InvalidAggressionTargetEntityID;
     const int originalSpawnX;
     const int originalSpawnY;
+    const NpcType npcType;
+    const int attackDurationTicks;
 };

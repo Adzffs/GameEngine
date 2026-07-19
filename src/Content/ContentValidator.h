@@ -11,6 +11,8 @@
 #include "../Requirement/Requirement.h"
 #include "../World/Development/DevelopmentWorldContent.h"
 #include "../World/Object/Resource/ResourceDefinition.h"
+#include "../NPC/NpcDefinition.h"
+#include "../NPC/NpcSpawnDefinition.h"
 
 class ContentValidator
 {
@@ -43,11 +45,22 @@ public:
         RewardTableType rewardTableType,
         const RewardTable *rewardTable);
 
-    static ContentValidationReport ValidateMonsterSpawnDefinition(
-        const DevelopmentMonsterSpawnDefinition &definition,
+    static ContentValidationReport ValidateNpcDefinition(
+        const NpcDefinition &definition);
+
+    static ContentValidationReport ValidateNpcDefinitions(
+        const std::vector<NpcDefinition> &definitions);
+
+    static ContentValidationReport ValidateNpcSpawnDefinition(
+        const NpcSpawnDefinition &definition,
         int mapWidth,
         int mapHeight,
         bool spawnTileBlockedByObject = false);
+
+    static ContentValidationReport ValidateNpcSpawnDefinitions(
+        const std::vector<NpcSpawnDefinition> &definitions,
+        int mapWidth,
+        int mapHeight);
 
     static ContentValidationReport ValidateResourceRequirementConsistency(
         const std::string &contentID,
@@ -98,8 +111,12 @@ private:
         const RewardTable &rewardTable,
         ContentValidationReport &report);
 
-    static void AppendMonsterSpawnValidation(
-        const DevelopmentMonsterSpawnDefinition &definition,
+    static void AppendNpcDefinitionValidation(
+        const NpcDefinition &definition,
+        ContentValidationReport &report);
+
+    static void AppendNpcSpawnValidation(
+        const NpcSpawnDefinition &definition,
         int mapWidth,
         int mapHeight,
         bool spawnTileBlockedByObject,

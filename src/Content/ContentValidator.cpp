@@ -7,6 +7,8 @@
 #include "../Recipe/RecipeIngredient.h"
 #include "../Requirement/RequirementEvaluator.h"
 #include "../Reward/RewardTableRegistry.h"
+#include "../NPC/NpcDefinitionDatabase.h"
+#include "../NPC/NpcSpawnDatabase.h"
 #include "../Skills/SkillType.h"
 #include "../Stats/StatType.h"
 #include "../World/Map.h"
@@ -17,10 +19,11 @@
 #include <limits>
 #include <set>
 #include <string>
+#include <tuple>
 
 namespace
 {
-    using Position = std::pair<int, int>;
+    using GridPosition = std::pair<int, int>;
 
     bool IsKnownSkillType(SkillType skillType)
     {
@@ -420,20 +423,86 @@ ContentValidationReport ContentValidator::ValidateRewardTableRegistration(
         *rewardTable);
 }
 
-ContentValidationReport ContentValidator::ValidateMonsterSpawnDefinition(
-    const DevelopmentMonsterSpawnDefinition &definition,
+ContentValidationReport ContentValidator::ValidateNpcDefinition(
+    const NpcDefinition &definition)
+{
+    ContentValidationReport report;
+    AppendNpcDefinitionValidation(definition, report);
+    return report;
+}
+
+ContentValidationReport ContentValidator::ValidateNpcDefinitions(
+    const std::vector<NpcDefinition> &definitions)
+{
+    ContentValidationReport report;
+    std::set<NpcType> types;
+
+    for (const NpcDefinition &definition : definitions)
+    {
+        if (!types.insert(definition.type).second)
+        {
+            report.AddError(
+                "NpcDefinition",
+                std::to_string(static_cast<int>(definition.type)),
+                "definition ID must be unique");
+        }
+        AppendNpcDefinitionValidation(definition, report);
+    }
+
+    return report;
+}
+
+ContentValidationReport ContentValidator::ValidateNpcSpawnDefinition(
+    const NpcSpawnDefinition &definition,
     int mapWidth,
     int mapHeight,
     bool spawnTileBlockedByObject)
 {
     ContentValidationReport report;
 
-    AppendMonsterSpawnValidation(
+    AppendNpcSpawnValidation(
         definition,
         mapWidth,
         mapHeight,
         spawnTileBlockedByObject,
         report);
+
+    return report;
+}
+
+ContentValidationReport ContentValidator::ValidateNpcSpawnDefinitions(
+    const std::vector<NpcSpawnDefinition> &definitions,
+    int mapWidth,
+    int mapHeight)
+{
+    ContentValidationReport report;
+    std::set<std::tuple<NpcType, int, int, int, bool>> records;
+
+    for (const NpcSpawnDefinition &definition : definitions)
+    {
+        AppendNpcSpawnValidation(
+            definition,
+            mapWidth,
+            mapHeight,
+            false,
+            report);
+
+        const auto record = std::make_tuple(
+            definition.npcType,
+            definition.spawnPosition.GetX(),
+            definition.spawnPosition.GetY(),
+            definition.wanderRadius,
+            definition.respawns);
+        if (!records.insert(record).second)
+        {
+            report.AddError(
+                "StarterMonsterSpawn",
+                PositionToString(
+                    definition.spawnPosition.GetX(),
+                    definition.spawnPosition.GetY()),
+                "duplicate monster spawn definition");
+        }
+    }
 
     return report;
 }
@@ -666,7 +735,7 @@ void ContentValidator::ValidateStarterWorldContent(
         DevelopmentWorldContent::MapWidth,
         DevelopmentWorldContent::MapHeight);
 
-    std::set<Position> blockedObjectPositions;
+    std::set<GridPosition> blockedObjectPositions;
 
     for (const DevelopmentResourcePlacementDefinition &resourcePlacement :
          DevelopmentWorldContent::GetStarterResourcePlacements())
@@ -699,7 +768,7 @@ void ContentValidator::ValidateStarterWorldContent(
         }
 
         if (!blockedObjectPositions.insert(
-                                       Position{
+                                       GridPosition{
                                            resourcePlacement.x,
                                            resourcePlacement.y})
                  .second)
@@ -739,7 +808,7 @@ void ContentValidator::ValidateStarterWorldContent(
         }
 
         if (!blockedObjectPositions.insert(
-                                       Position{
+                                       GridPosition{
                                            stationPlacement.x,
                                            stationPlacement.y})
                  .second)
@@ -751,7 +820,7 @@ void ContentValidator::ValidateStarterWorldContent(
         }
     }
 
-    std::set<Position> occupiedEntitySpawnPositions;
+    std::set<GridPosition> occupiedEntitySpawnPositions;
 
     for (const DevelopmentNpcSpawnDefinition &npcSpawn :
          DevelopmentWorldContent::GetStarterNPCSpawns())
@@ -773,7 +842,7 @@ void ContentValidator::ValidateStarterWorldContent(
         }
 
         if (blockedObjectPositions.find(
-                Position{
+                GridPosition{
                     npcSpawn.spawnX,
                     npcSpawn.spawnY}) !=
             blockedObjectPositions.end())
@@ -785,7 +854,7 @@ void ContentValidator::ValidateStarterWorldContent(
         }
 
         if (!occupiedEntitySpawnPositions.insert(
-                                             Position{
+                                             GridPosition{
                                                  npcSpawn.spawnX,
                                                  npcSpawn.spawnY})
                  .second)
@@ -797,18 +866,37 @@ void ContentValidator::ValidateStarterWorldContent(
         }
     }
 
-    for (const DevelopmentMonsterSpawnDefinition &monsterSpawn :
-         DevelopmentWorldContent::GetStarterMonsterSpawns())
+    std::set<NpcType> registeredNpcTypes;
+    for (NpcType npcType : NpcDefinitionDatabase::GetAllNpcTypes())
     {
-        const Position spawnPosition{
-            monsterSpawn.spawnX,
-            monsterSpawn.spawnY};
+        if (!registeredNpcTypes.insert(npcType).second)
+        {
+            report.AddError("NpcDefinition", "duplicate", "definition ID must be unique");
+            continue;
+        }
+
+        const NpcDefinition *definition = NpcDefinitionDatabase::TryGet(npcType);
+        if (definition == nullptr)
+        {
+            report.AddError("NpcDefinition", "missing", "registered definition must resolve");
+            continue;
+        }
+        AppendNpcDefinitionValidation(*definition, report);
+    }
+
+    std::set<std::pair<int, int>> monsterSpawnPositions;
+    for (const NpcSpawnDefinition &monsterSpawn :
+         NpcSpawnDatabase::GetStarterMonsterSpawns())
+    {
+        const GridPosition spawnPosition{
+            monsterSpawn.spawnPosition.GetX(),
+            monsterSpawn.spawnPosition.GetY()};
 
         const bool blockedByObject =
             blockedObjectPositions.find(spawnPosition) !=
             blockedObjectPositions.end();
 
-        AppendMonsterSpawnValidation(
+        AppendNpcSpawnValidation(
             monsterSpawn,
             DevelopmentWorldContent::MapWidth,
             DevelopmentWorldContent::MapHeight,
@@ -821,9 +909,17 @@ void ContentValidator::ValidateStarterWorldContent(
             report.AddError(
                 "StarterMonsterSpawn",
                 PositionToString(
-                    monsterSpawn.spawnX,
-                    monsterSpawn.spawnY),
+                    monsterSpawn.spawnPosition.GetX(),
+                    monsterSpawn.spawnPosition.GetY()),
                 "multiple starter entities cannot share one spawn tile");
+        }
+
+        const std::pair<int, int> spawnKey{
+            monsterSpawn.spawnPosition.GetX(),
+            monsterSpawn.spawnPosition.GetY()};
+        if (!monsterSpawnPositions.insert(spawnKey).second)
+        {
+            report.AddError("StarterMonsterSpawn", PositionToString(spawnKey.first, spawnKey.second), "duplicate monster spawn definition");
         }
     }
 }
@@ -1372,8 +1468,42 @@ void ContentValidator::AppendRewardTableValidation(
     }
 }
 
-void ContentValidator::AppendMonsterSpawnValidation(
-    const DevelopmentMonsterSpawnDefinition &definition,
+void ContentValidator::AppendNpcDefinitionValidation(
+    const NpcDefinition &definition,
+    ContentValidationReport &report)
+{
+    const std::string contentID = std::to_string(static_cast<int>(definition.type));
+    if (definition.type == NpcType::NONE ||
+        NpcDefinitionDatabase::TryGet(definition.type) == nullptr)
+        report.AddError("NpcDefinition", contentID, "definition ID must be real content");
+    if (definition.name.empty())
+        report.AddError("NpcDefinition", contentID, "name must not be empty");
+    if (definition.combatRatings.attackAccuracy < 0 ||
+        definition.combatRatings.meleeStrength < 0 ||
+        definition.combatRatings.defence < 0)
+        report.AddError("NpcDefinition", contentID, "combat ratings must not be negative");
+    if (definition.combatRatings.maximumHealth <= 0)
+        report.AddError("NpcDefinition", contentID, "maximum health must be positive");
+    if (definition.attackDurationTicks <= 0)
+        report.AddError("NpcDefinition", contentID, "attack duration must be positive");
+    if (definition.respawnDelayTicks < 0)
+        report.AddError("NpcDefinition", contentID, "respawn delay must not be negative");
+    if (RewardTableRegistry::TryGetRewardTable(definition.rewardTableType) == nullptr)
+        report.AddError("NpcDefinition", contentID, "reward-table reference is invalid");
+    if (definition.aggressionDefinition.has_value())
+    {
+        const MonsterAggressionDefinition &aggression = definition.aggressionDefinition.value();
+        if (aggression.detectionRadius <= 0)
+            report.AddError("NpcDefinition", contentID, "aggression detection radius must be positive");
+        if (aggression.leashRadius <= 0)
+            report.AddError("NpcDefinition", contentID, "aggression leash radius must be positive");
+        if (aggression.leashRadius < aggression.detectionRadius)
+            report.AddError("NpcDefinition", contentID, "aggression leash radius must be at least detection radius");
+    }
+}
+
+void ContentValidator::AppendNpcSpawnValidation(
+    const NpcSpawnDefinition &definition,
     int mapWidth,
     int mapHeight,
     bool spawnTileBlockedByObject,
@@ -1381,8 +1511,8 @@ void ContentValidator::AppendMonsterSpawnValidation(
 {
     const std::string contentID =
         PositionToString(
-            definition.spawnX,
-            definition.spawnY);
+            definition.spawnPosition.GetX(),
+            definition.spawnPosition.GetY());
 
     if (mapWidth <= 0 ||
         mapHeight <= 0)
@@ -1397,8 +1527,8 @@ void ContentValidator::AppendMonsterSpawnValidation(
     Map map(mapWidth, mapHeight);
 
     if (!map.IsValidPosition(
-            definition.spawnX,
-            definition.spawnY))
+            definition.spawnPosition.GetX(),
+            definition.spawnPosition.GetY()))
     {
         report.AddError(
             "StarterMonsterSpawn",
@@ -1414,71 +1544,25 @@ void ContentValidator::AppendMonsterSpawnValidation(
             "monster spawn cannot overlap blocked starter object placement");
     }
 
-    if (definition.ratings.attackAccuracy < 0 ||
-        definition.ratings.meleeStrength < 0 ||
-        definition.ratings.defence < 0)
+    const NpcDefinition *npcDefinition =
+        NpcDefinitionDatabase::TryGet(definition.npcType);
+    if (npcDefinition == nullptr)
     {
         report.AddError(
             "StarterMonsterSpawn",
             contentID,
-            "combat ratings must not be negative");
+            "NPC definition reference is invalid");
     }
-
-    if (definition.ratings.maximumHealth <= 0)
+    if (definition.wanderRadius < 0)
+    {
+        report.AddError("StarterMonsterSpawn", contentID, "wander radius must not be negative");
+    }
+    if (definition.respawns && npcDefinition != nullptr &&
+        npcDefinition->respawnDelayTicks <= 0)
     {
         report.AddError(
             "StarterMonsterSpawn",
             contentID,
-            "maximum health must be positive");
-    }
-
-    if (definition.rewardTableType == RewardTableType::NONE ||
-        RewardTableRegistry::TryGetRewardTable(
-            definition.rewardTableType) == nullptr)
-    {
-        report.AddError(
-            "StarterMonsterSpawn",
-            contentID,
-            "reward-table reference is invalid");
-    }
-
-    if (definition.aggressionDefinition.has_value())
-    {
-        const MonsterAggressionDefinition &aggression =
-            definition.aggressionDefinition.value();
-
-        if (aggression.detectionRadius <= 0)
-        {
-            report.AddError(
-                "StarterMonsterSpawn",
-                contentID,
-                "aggression detection radius must be positive");
-        }
-
-        if (aggression.leashRadius <= 0)
-        {
-            report.AddError(
-                "StarterMonsterSpawn",
-                contentID,
-                "aggression leash radius must be positive");
-        }
-
-        if (aggression.leashRadius <
-            aggression.detectionRadius)
-        {
-            report.AddError(
-                "StarterMonsterSpawn",
-                contentID,
-                "aggression leash radius must be at least detection radius");
-        }
-    }
-
-    if (definition.respawnDefinition.has_value() &&
-        definition.respawnDefinition->delayTicks <= 0)
-    {
-        report.AddError(
-            "StarterMonsterSpawn",
-            contentID,
-            "respawn delay must be positive when respawn is enabled");
+            "referenced definition must have a positive respawn delay when respawn is enabled");
     }
 }

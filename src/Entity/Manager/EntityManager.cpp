@@ -47,7 +47,9 @@ int EntityManager::CreateMonster(
     const CombatRatings &ratings,
     RewardTableType rewardTableType,
     std::optional<MonsterRespawnDefinition> respawnDefinition,
-    std::optional<MonsterAggressionDefinition> aggressionDefinition)
+    std::optional<MonsterAggressionDefinition> aggressionDefinition,
+    NpcType npcType,
+    int attackDurationTicks)
 {
     int monsterID = nextID;
 
@@ -59,7 +61,9 @@ int EntityManager::CreateMonster(
             ratings,
             rewardTableType,
             aggressionDefinition,
-            respawnDefinition)) == nullptr)
+            respawnDefinition,
+            npcType,
+            attackDurationTicks)) == nullptr)
     {
         return 0;
     }

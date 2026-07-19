@@ -9,6 +9,7 @@
 #include "../../Entity/Monster/MonsterRespawnDefinition.h"
 #include "../../Reward/RewardTableType.h"
 #include "../../Stats/CombatRatings.h"
+#include "../../NPC/NpcType.h"
 #include <optional>
 class World;
 struct EntityManagerTestAccess;
@@ -31,7 +32,9 @@ public:
         std::optional<MonsterRespawnDefinition> respawnDefinition =
             std::nullopt,
         std::optional<MonsterAggressionDefinition> aggressionDefinition =
-            std::nullopt);
+            std::nullopt,
+        NpcType npcType = NpcType::NONE,
+        int attackDurationTicks = 5);
 
     void Update(World &world);
 

@@ -19,6 +19,11 @@
 #include <string>
 #include "Object/Resource/ResourceDatabase.h"
 #include "Development/DevelopmentWorldContent.h"
+#include "../NPC/NpcDefinition.h"
+#include "../NPC/NpcDefinitionDatabase.h"
+#include "../NPC/NpcSpawnDefinition.h"
+#include "../NPC/NpcSpawnDatabase.h"
+#include "../Reward/RewardTableRegistry.h"
 #include "../Core/SeededRandom.h"
 #include "../Recipe/RecipeSystem.h"
 #include "../Recipe/RecipeDatabase.h"
@@ -153,16 +158,10 @@ World::World(
             definition.spawnY);
     }
 
-    for (const DevelopmentMonsterSpawnDefinition &definition :
-         DevelopmentWorldContent::GetStarterMonsterSpawns())
+    for (const NpcSpawnDefinition &spawn :
+         NpcSpawnDatabase::GetStarterMonsterSpawns())
     {
-        CreateMonster(
-            definition.spawnX,
-            definition.spawnY,
-            definition.ratings,
-            definition.rewardTableType,
-            definition.respawnDefinition,
-            definition.aggressionDefinition);
+        CreateMonster(spawn.npcType, spawn);
     }
 
     for (const DevelopmentResourcePlacementDefinition &definition :
@@ -234,6 +233,58 @@ int World::CreateMonster(
         rewardTableType,
         respawnDefinition,
         aggressionDefinition);
+}
+
+int World::CreateMonster(
+    NpcType npcType,
+    const NpcSpawnDefinition &spawn)
+{
+    const NpcDefinition *definition =
+        NpcDefinitionDatabase::TryGet(npcType);
+    if (definition == nullptr ||
+        npcType != spawn.npcType ||
+        definition->name.empty() ||
+        definition->combatRatings.attackAccuracy < 0 ||
+        definition->combatRatings.meleeStrength < 0 ||
+        definition->combatRatings.defence < 0 ||
+        definition->combatRatings.maximumHealth <= 0 ||
+        definition->attackDurationTicks <= 0 ||
+        definition->respawnDelayTicks < 0 ||
+        RewardTableRegistry::TryGetRewardTable(
+            definition->rewardTableType) == nullptr ||
+        !map.IsValidPosition(
+            spawn.spawnPosition.GetX(),
+            spawn.spawnPosition.GetY()) ||
+        spawn.wanderRadius < 0 ||
+        (spawn.respawns && definition->respawnDelayTicks <= 0))
+    {
+        return 0;
+    }
+
+    if (definition->aggressionDefinition.has_value())
+    {
+        const MonsterAggressionDefinition &aggression =
+            definition->aggressionDefinition.value();
+        if (aggression.detectionRadius <= 0 ||
+            aggression.leashRadius < aggression.detectionRadius)
+        {
+            return 0;
+        }
+    }
+
+    return entityManager.CreateMonster(
+        spawn.spawnPosition.GetX(),
+        spawn.spawnPosition.GetY(),
+        definition->combatRatings,
+        definition->rewardTableType,
+        spawn.respawns
+            ? std::optional<MonsterRespawnDefinition>{
+                  MonsterRespawnDefinition{
+                      definition->respawnDelayTicks}}
+            : std::nullopt,
+        definition->aggressionDefinition,
+        definition->type,
+        definition->attackDurationTicks);
 }
 
 Entity *World::GetEntityByID(int id)
@@ -1491,7 +1542,7 @@ void World::ExecuteMonsterAIIntent(
             TryStartMeleeEngagement(
                 intent.monsterEntityID,
                 intent.targetEntityID,
-                DefaultMonsterAttackDurationTicks);
+                monster->GetAttackDurationTicks());
         }
         return;
     }
@@ -3078,7 +3129,7 @@ void World::TryStartMonsterRetaliation(
     TryStartMeleeEngagement(
         monsterEntityID,
         playerEntityID,
-        DefaultMonsterAttackDurationTicks);
+        monster->GetAttackDurationTicks());
 }
 
 void World::CancelMeleeActionsTargetingEntity(

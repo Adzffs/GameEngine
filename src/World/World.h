@@ -40,6 +40,8 @@
 
 class RandomSource;
 class Monster;
+struct NpcSpawnDefinition;
+enum class NpcType;
 struct WorldTestAccess;
 
 class World
@@ -70,6 +72,8 @@ public:
     Map &GetMap();
 
     int CreatePlayer();
+    // Lower-level compatibility seam used by focused tests and ad-hoc
+    // runtime fixtures. Built-in content must use the NpcType overload.
     int CreateMonster(
         int x,
         int y,
@@ -80,6 +84,9 @@ public:
             std::nullopt,
         std::optional<MonsterAggressionDefinition> aggressionDefinition =
             std::nullopt);
+    int CreateMonster(
+        NpcType npcType,
+        const NpcSpawnDefinition &spawn);
     Entity *GetEntityByID(int id);
     const std::vector<std::unique_ptr<Entity>> &
     GetEntities() const;
@@ -337,8 +344,6 @@ private:
         int attackerEntityID,
         int defenderEntityID,
         const MeleeAttackResult &result);
-
-    static constexpr int DefaultMonsterAttackDurationTicks = 5;
 
     void TryStartMonsterRetaliation(
         int monsterEntityID,

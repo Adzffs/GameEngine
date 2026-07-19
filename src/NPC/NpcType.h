@@ -1,0 +1,8 @@
+#pragma once
+
+enum class NpcType
+{
+    NONE,
+    PASSIVE_DEVELOPMENT_MONSTER,
+    AGGRESSIVE_DEVELOPMENT_MONSTER
+};

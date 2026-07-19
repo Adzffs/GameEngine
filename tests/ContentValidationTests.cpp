@@ -14,6 +14,8 @@
 #include "../src/Reward/WeightedRewardEntry.h"
 #include "../src/World/Development/DevelopmentWorldContent.h"
 #include "../src/World/Object/Resource/ResourceDatabase.h"
+#include "../src/NPC/NpcDefinitionDatabase.h"
+#include "../src/NPC/NpcSpawnDatabase.h"
 
 static_assert(
     std::is_same_v<
@@ -981,21 +983,21 @@ int main()
     }
 
     {
-        const std::vector<DevelopmentMonsterSpawnDefinition> &starterSpawns =
-            DevelopmentWorldContent::GetStarterMonsterSpawns();
+        const std::vector<NpcSpawnDefinition> &starterSpawns =
+            NpcSpawnDatabase::GetStarterMonsterSpawns();
 
         test.Expect(
             starterSpawns.size() >= 2,
             "Starter content includes both passive and aggressive monster definitions");
 
-        const DevelopmentMonsterSpawnDefinition &validSpawn =
+        const NpcSpawnDefinition &validSpawn =
             starterSpawns.front();
 
-        const DevelopmentMonsterSpawnDefinition &aggressiveSpawn =
+        const NpcSpawnDefinition &aggressiveSpawn =
             starterSpawns.at(1);
 
         test.Expect(
-            ContentValidator::ValidateMonsterSpawnDefinition(
+            ContentValidator::ValidateNpcSpawnDefinition(
                 validSpawn,
                 DevelopmentWorldContent::MapWidth,
                 DevelopmentWorldContent::MapHeight,
@@ -1004,15 +1006,15 @@ int main()
             "Valid development monster spawn definition succeeds");
 
         test.Expect(
-            !validSpawn.aggressionDefinition.has_value(),
+            !NpcDefinitionDatabase::TryGet(validSpawn.npcType)->aggressionDefinition.has_value(),
             "Passive starter monster has no aggression definition");
 
         test.Expect(
-            aggressiveSpawn.aggressionDefinition.has_value(),
+            NpcDefinitionDatabase::TryGet(aggressiveSpawn.npcType)->aggressionDefinition.has_value(),
             "Aggressive starter monster has aggression definition");
 
         test.Expect(
-            ContentValidator::ValidateMonsterSpawnDefinition(
+            ContentValidator::ValidateNpcSpawnDefinition(
                 aggressiveSpawn,
                 DevelopmentWorldContent::MapWidth,
                 DevelopmentWorldContent::MapHeight,
@@ -1020,12 +1022,12 @@ int main()
                 .IsValid(),
             "Aggressive starter monster spawn definition succeeds");
 
-        DevelopmentMonsterSpawnDefinition outOfBounds =
+        NpcSpawnDefinition outOfBounds =
             validSpawn;
-        outOfBounds.spawnX = -1;
+        outOfBounds.spawnPosition.SetPosition(-1, 1);
 
         test.Expect(
-            !ContentValidator::ValidateMonsterSpawnDefinition(
+            !ContentValidator::ValidateNpcSpawnDefinition(
                  outOfBounds,
                  DevelopmentWorldContent::MapWidth,
                  DevelopmentWorldContent::MapHeight,
@@ -1033,13 +1035,12 @@ int main()
                  .IsValid(),
             "Out-of-bounds monster spawn is rejected");
 
-        DevelopmentMonsterSpawnDefinition blockedTileSpawn =
+        NpcSpawnDefinition blockedTileSpawn =
             validSpawn;
-        blockedTileSpawn.spawnX = 10;
-        blockedTileSpawn.spawnY = 10;
+        blockedTileSpawn.spawnPosition.SetPosition(10, 10);
 
         test.Expect(
-            !ContentValidator::ValidateMonsterSpawnDefinition(
+            !ContentValidator::ValidateNpcSpawnDefinition(
                  blockedTileSpawn,
                  DevelopmentWorldContent::MapWidth,
                  DevelopmentWorldContent::MapHeight,
@@ -1047,108 +1048,79 @@ int main()
                  .IsValid(),
             "Blocked-tile monster spawn is rejected");
 
-        DevelopmentMonsterSpawnDefinition invalidHealth =
-            validSpawn;
-        invalidHealth.ratings.maximumHealth = 0;
+        NpcDefinition invalidHealth =
+            *NpcDefinitionDatabase::TryGet(validSpawn.npcType);
+        invalidHealth.combatRatings.maximumHealth = 0;
 
         test.Expect(
-            !ContentValidator::ValidateMonsterSpawnDefinition(
-                 invalidHealth,
-                 DevelopmentWorldContent::MapWidth,
-                 DevelopmentWorldContent::MapHeight,
-                 false)
+            !ContentValidator::ValidateNpcDefinition(invalidHealth)
                  .IsValid(),
             "Non-positive monster maximum health is rejected");
 
-        DevelopmentMonsterSpawnDefinition invalidRewardTable =
-            validSpawn;
+        NpcDefinition invalidRewardTable =
+            *NpcDefinitionDatabase::TryGet(validSpawn.npcType);
         invalidRewardTable.rewardTableType =
             RewardTableType::NONE;
 
         test.Expect(
-            !ContentValidator::ValidateMonsterSpawnDefinition(
-                 invalidRewardTable,
-                 DevelopmentWorldContent::MapWidth,
-                 DevelopmentWorldContent::MapHeight,
-                 false)
+            !ContentValidator::ValidateNpcDefinition(invalidRewardTable)
                  .IsValid(),
             "Invalid monster reward-table reference is rejected");
 
-        DevelopmentMonsterSpawnDefinition invalidRespawn =
-            validSpawn;
-        invalidRespawn.respawnDefinition =
-            MonsterRespawnDefinition{0};
+        NpcDefinition invalidRespawn =
+            *NpcDefinitionDatabase::TryGet(validSpawn.npcType);
+        invalidRespawn.respawnDelayTicks = -1;
 
         test.Expect(
-            !ContentValidator::ValidateMonsterSpawnDefinition(
-                 invalidRespawn,
-                 DevelopmentWorldContent::MapWidth,
-                 DevelopmentWorldContent::MapHeight,
-                 false)
+            !ContentValidator::ValidateNpcDefinition(invalidRespawn)
                  .IsValid(),
             "Invalid monster respawn delay is rejected");
 
-        DevelopmentMonsterSpawnDefinition zeroDetectionAggression =
-            aggressiveSpawn;
+        NpcDefinition zeroDetectionAggression =
+            *NpcDefinitionDatabase::TryGet(aggressiveSpawn.npcType);
         zeroDetectionAggression.aggressionDefinition =
             MonsterAggressionDefinition{0, 8};
 
         test.Expect(
-            !ContentValidator::ValidateMonsterSpawnDefinition(
-                 zeroDetectionAggression,
-                 DevelopmentWorldContent::MapWidth,
-                 DevelopmentWorldContent::MapHeight,
-                 false)
+            !ContentValidator::ValidateNpcDefinition(zeroDetectionAggression)
                  .IsValid(),
             "Aggression definition with zero detection radius is rejected");
 
-        DevelopmentMonsterSpawnDefinition negativeDetectionAggression =
-            aggressiveSpawn;
+        NpcDefinition negativeDetectionAggression =
+            *NpcDefinitionDatabase::TryGet(aggressiveSpawn.npcType);
         negativeDetectionAggression.aggressionDefinition =
             MonsterAggressionDefinition{-1, 8};
 
         test.Expect(
-            !ContentValidator::ValidateMonsterSpawnDefinition(
-                 negativeDetectionAggression,
-                 DevelopmentWorldContent::MapWidth,
-                 DevelopmentWorldContent::MapHeight,
-                 false)
+            !ContentValidator::ValidateNpcDefinition(negativeDetectionAggression)
                  .IsValid(),
             "Aggression definition with negative detection radius is rejected");
 
-        DevelopmentMonsterSpawnDefinition zeroLeashAggression =
-            aggressiveSpawn;
+        NpcDefinition zeroLeashAggression =
+            *NpcDefinitionDatabase::TryGet(aggressiveSpawn.npcType);
         zeroLeashAggression.aggressionDefinition =
             MonsterAggressionDefinition{5, 0};
 
         test.Expect(
-            !ContentValidator::ValidateMonsterSpawnDefinition(
-                 zeroLeashAggression,
-                 DevelopmentWorldContent::MapWidth,
-                 DevelopmentWorldContent::MapHeight,
-                 false)
+            !ContentValidator::ValidateNpcDefinition(zeroLeashAggression)
                  .IsValid(),
             "Aggression definition with zero leash radius is rejected");
 
-        DevelopmentMonsterSpawnDefinition shortLeashAggression =
-            aggressiveSpawn;
+        NpcDefinition shortLeashAggression =
+            *NpcDefinitionDatabase::TryGet(aggressiveSpawn.npcType);
         shortLeashAggression.aggressionDefinition =
             MonsterAggressionDefinition{5, 4};
 
         test.Expect(
-            !ContentValidator::ValidateMonsterSpawnDefinition(
-                 shortLeashAggression,
-                 DevelopmentWorldContent::MapWidth,
-                 DevelopmentWorldContent::MapHeight,
-                 false)
+            !ContentValidator::ValidateNpcDefinition(shortLeashAggression)
                  .IsValid(),
             "Aggression definition with leash smaller than detection is rejected");
 
-        DevelopmentMonsterSpawnDefinition overlappingAggressiveSpawn =
+        NpcSpawnDefinition overlappingAggressiveSpawn =
             aggressiveSpawn;
 
         test.Expect(
-            !ContentValidator::ValidateMonsterSpawnDefinition(
+            !ContentValidator::ValidateNpcSpawnDefinition(
                  overlappingAggressiveSpawn,
                  DevelopmentWorldContent::MapWidth,
                  DevelopmentWorldContent::MapHeight,

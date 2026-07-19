@@ -11,6 +11,8 @@
 #include "../src/Skills/SkillType.h"
 #include "../src/Stats/CombatRatings.h"
 #include "../src/World/Development/DevelopmentWorldContent.h"
+#include "../src/NPC/NpcDefinitionDatabase.h"
+#include "../src/NPC/NpcSpawnDatabase.h"
 #include "../src/World/Distance.h"
 #include "../src/World/Event/ActionCancelledEvent.h"
 #include "../src/World/World.h"
@@ -192,8 +194,8 @@ int main()
     TestContext test;
 
     {
-        const std::vector<DevelopmentMonsterSpawnDefinition> &starterSpawns =
-            DevelopmentWorldContent::GetStarterMonsterSpawns();
+        const std::vector<NpcSpawnDefinition> &starterSpawns =
+            NpcSpawnDatabase::GetStarterMonsterSpawns();
 
         test.ExpectEqual(
             static_cast<int>(starterSpawns.size()),
@@ -201,21 +203,24 @@ int main()
             "Starter content defines exactly one passive and one aggressive monster");
 
         test.Expect(
-            !starterSpawns[0].aggressionDefinition.has_value(),
+            !NpcDefinitionDatabase::TryGet(starterSpawns[0].npcType)->aggressionDefinition.has_value(),
             "Starter passive monster keeps no aggression definition");
 
         test.Expect(
-            starterSpawns[1].aggressionDefinition.has_value(),
+            NpcDefinitionDatabase::TryGet(starterSpawns[1].npcType)->aggressionDefinition.has_value(),
             "Starter aggressive monster has aggression definition");
 
-        if (starterSpawns[1].aggressionDefinition.has_value())
+        const NpcDefinition *aggressiveDefinition =
+            NpcDefinitionDatabase::TryGet(starterSpawns[1].npcType);
+        if (aggressiveDefinition != nullptr &&
+            aggressiveDefinition->aggressionDefinition.has_value())
         {
             test.ExpectEqual(
-                starterSpawns[1].aggressionDefinition->detectionRadius,
+                aggressiveDefinition->aggressionDefinition->detectionRadius,
                 5,
                 "Starter aggressive monster uses configured detection radius");
             test.ExpectEqual(
-                starterSpawns[1].aggressionDefinition->leashRadius,
+                aggressiveDefinition->aggressionDefinition->leashRadius,
                 8,
                 "Starter aggressive monster uses configured leash radius");
         }
