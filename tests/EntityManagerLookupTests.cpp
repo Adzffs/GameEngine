@@ -10,6 +10,18 @@
 
 struct EntityManagerTestAccess
 {
+    static int GetNextEntityIDCandidate(const EntityManager &manager)
+    {
+        return manager.GetNextEntityIDCandidate();
+    }
+
+    static int RegisterPreparedPlayer(
+        EntityManager &manager,
+        std::unique_ptr<Player> player)
+    {
+        return manager.RegisterPreparedPlayer(std::move(player));
+    }
+
     static Entity *RegisterEntity(
         EntityManager &manager,
         std::unique_ptr<Entity> entity)
@@ -31,6 +43,44 @@ struct EntityManagerTestAccess
 
 namespace
 {
+    void TestPreparedPlayerRegistration(TestContext &test)
+    {
+        EntityManager manager;
+        test.ExpectEqual(EntityManagerTestAccess::GetNextEntityIDCandidate(manager), 1,
+                         "Candidate ID is current next ID");
+        test.ExpectEqual(EntityManagerTestAccess::GetNextEntityIDCandidate(manager), 1,
+                         "Repeated candidate lookup does not reserve an ID");
+        test.ExpectEqual(EntityManagerTestAccess::RegisterPreparedPlayer(manager, nullptr),
+                         0, "Prepared registration rejects null");
+        test.ExpectEqual(EntityManagerTestAccess::RegisterPreparedPlayer(
+                             manager, std::make_unique<Player>(0)),
+                         0, "Prepared registration rejects nonpositive ID");
+        test.ExpectEqual(EntityManagerTestAccess::RegisterPreparedPlayer(
+                             manager, std::make_unique<Player>(-1)),
+                         0, "Prepared registration rejects negative ID");
+        test.ExpectEqual(EntityManagerTestAccess::RegisterPreparedPlayer(
+                             manager, std::make_unique<Player>(2)),
+                         0, "Prepared registration rejects unexpected ID");
+        test.Expect(manager.GetEntities().empty(),
+                    "Rejected prepared Player leaves entity order unchanged");
+        test.ExpectEqual(EntityManagerTestAccess::GetNextEntityIDCandidate(manager), 1,
+                         "Rejected prepared Player does not consume ID");
+        test.ExpectEqual(EntityManagerTestAccess::RegisterPreparedPlayer(
+                             manager, std::make_unique<Player>(1)),
+                         1, "Prepared registration accepts current candidate");
+        test.ExpectEqual(EntityManagerTestAccess::GetNextEntityIDCandidate(manager), 2,
+                         "Successful prepared registration advances once");
+        test.ExpectEqual(EntityManagerTestAccess::RegisterPreparedPlayer(
+                             manager, std::make_unique<Player>(1)),
+                         0, "Prepared registration rejects past duplicate ID");
+        test.ExpectEqual(EntityManagerTestAccess::RegisterPreparedPlayer(
+                             manager, std::make_unique<Player>(3)),
+                         0, "Prepared registration rejects future ID after insertion");
+        test.Expect(manager.GetEntities().size() == 1 &&
+                        manager.GetEntities().front()->GetID() == 1,
+                    "Prepared rejections preserve successful entity order");
+    }
+
     void TestLookupBasics(TestContext &test)
     {
         EntityManager manager;
@@ -177,6 +227,8 @@ namespace
 int main()
 {
     TestContext test;
+
+    TestPreparedPlayerRegistration(test);
     TestLookupBasics(test);
     TestDeterministicIterationAndPointerStability(test);
     TestRegistrationIntegrity(test);

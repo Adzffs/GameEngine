@@ -42,6 +42,8 @@
 #include <algorithm>
 #include <random>
 #include <type_traits>
+#include "../Persistence/PlayerSaveFileStore.h"
+#include "../Persistence/PlayerSaveState.h"
 
 namespace
 {
@@ -218,6 +220,206 @@ void World::CreateStation(
 int World::CreatePlayer()
 {
     return entityManager.CreatePlayer();
+}
+
+WorldPlayerLoadResult World::LoadOrCreatePlayerFromFile(
+    const std::filesystem::path &savePath)
+{
+    WorldPlayerLoadResult result;
+    PlayerSaveFileLoadResult fileResult = PlayerSaveFileStore::Load(savePath);
+    const PlayerSaveFileLoadStatus fileStatus = fileResult.GetStatus();
+    const std::optional<PlayerSaveData> saveData = fileResult.GetSaveData();
+
+    if (fileStatus == PlayerSaveFileLoadStatus::FAILURE)
+    {
+        result.SetFileLoadResult(std::move(fileResult));
+        result.AddIssue(WorldPlayerPersistenceIssueSeverity::ERROR,
+                        WorldPlayerPersistenceIssueCode::FILE_LOAD_FAILED, 0,
+                        "Player save file could not be loaded");
+        return result;
+    }
+
+    std::unique_ptr<Player> player;
+    int candidateID = 0;
+
+    if (fileStatus == PlayerSaveFileLoadStatus::NOT_FOUND)
+    {
+        result.SetFileLoadResult(std::move(fileResult));
+        if (!map.IsValidPosition(DevelopmentWorldContent::PlayerSpawnX,
+                                 DevelopmentWorldContent::PlayerSpawnY))
+        {
+            result.AddIssue(WorldPlayerPersistenceIssueSeverity::ERROR,
+                            WorldPlayerPersistenceIssueCode::DEVELOPMENT_SPAWN_INVALID,
+                            candidateID, "Development Player spawn is invalid");
+            return result;
+        }
+        candidateID = entityManager.GetNextEntityIDCandidate();
+        player = std::make_unique<Player>(
+            candidateID, PlayerInitializationMode::DEVELOPMENT_DEFAULTS);
+        player->GetPosition().SetPosition(DevelopmentWorldContent::PlayerSpawnX,
+                                          DevelopmentWorldContent::PlayerSpawnY);
+    }
+    else
+    {
+        if (!saveData.has_value())
+        {
+            result.SetFileLoadResult(std::move(fileResult));
+            result.AddIssue(WorldPlayerPersistenceIssueSeverity::ERROR,
+                            WorldPlayerPersistenceIssueCode::PLAYER_RECONSTRUCTION_FAILED,
+                            candidateID, "Loaded save did not contain Player data");
+            return result;
+        }
+        return TryRegisterLoadedPlayer(
+            std::move(fileResult), *saveData, &PlayerSaveState::TryCreatePlayer);
+    }
+
+    const int finalX = player->GetPosition().GetX();
+    const int finalY = player->GetPosition().GetY();
+    if (!map.IsValidPosition(finalX, finalY))
+    {
+        result.AddIssue(WorldPlayerPersistenceIssueSeverity::ERROR,
+                        WorldPlayerPersistenceIssueCode::DEVELOPMENT_SPAWN_INVALID,
+                        candidateID, "Final Player position is invalid");
+        return result;
+    }
+
+    const int registeredID = entityManager.RegisterPreparedPlayer(std::move(player));
+    if (registeredID == 0)
+    {
+        result.AddIssue(WorldPlayerPersistenceIssueSeverity::ERROR,
+                        WorldPlayerPersistenceIssueCode::ENTITY_REGISTRATION_FAILED,
+                        candidateID, "Prepared Player registration failed");
+        return result;
+    }
+
+    result.SetPlayerEntityID(registeredID);
+    result.SetStatus(fileStatus == PlayerSaveFileLoadStatus::NOT_FOUND
+                         ? WorldPlayerLoadStatus::CREATED_NEW
+                         : WorldPlayerLoadStatus::LOADED_EXISTING);
+    return result;
+}
+
+WorldPlayerLoadResult World::TryRegisterLoadedPlayer(
+    PlayerSaveFileLoadResult fileLoadResult,
+    const PlayerSaveData &saveData,
+    PlayerReconstructionFunction reconstructPlayer)
+{
+    WorldPlayerLoadResult result;
+    result.SetFileLoadResult(std::move(fileLoadResult));
+    const int candidateID = entityManager.GetNextEntityIDCandidate();
+    PlayerSaveValidationReport validationReport;
+    std::unique_ptr<Player> player = reconstructPlayer == nullptr
+        ? nullptr
+        : reconstructPlayer(candidateID, saveData, validationReport);
+    result.SetReconstructionValidationReport(validationReport);
+    if (player == nullptr)
+    {
+        result.AddIssue(WorldPlayerPersistenceIssueSeverity::ERROR,
+                        WorldPlayerPersistenceIssueCode::PLAYER_RECONSTRUCTION_FAILED,
+                        candidateID, "Player reconstruction failed");
+        return result;
+    }
+
+    const int savedX = player->GetPosition().GetX();
+    const int savedY = player->GetPosition().GetY();
+    if (!map.IsValidPosition(savedX, savedY))
+    {
+        if (!map.IsValidPosition(DevelopmentWorldContent::PlayerSpawnX,
+                                 DevelopmentWorldContent::PlayerSpawnY))
+        {
+            result.AddIssue(WorldPlayerPersistenceIssueSeverity::ERROR,
+                            WorldPlayerPersistenceIssueCode::DEVELOPMENT_SPAWN_INVALID,
+                            candidateID, "Development Player spawn is invalid");
+            return result;
+        }
+
+        const bool outOfBounds = !map.IsInBounds(savedX, savedY);
+        result.AddIssue(WorldPlayerPersistenceIssueSeverity::WARNING,
+                        outOfBounds
+                            ? WorldPlayerPersistenceIssueCode::SAVED_POSITION_OUT_OF_BOUNDS
+                            : WorldPlayerPersistenceIssueCode::SAVED_POSITION_BLOCKED,
+                        candidateID,
+                        outOfBounds ? "Saved position is out of bounds; development spawn used"
+                                    : "Saved position is blocked; development spawn used");
+        result.SetUsedSpawnFallback();
+        player->GetPosition().SetPosition(DevelopmentWorldContent::PlayerSpawnX,
+                                          DevelopmentWorldContent::PlayerSpawnY);
+    }
+
+    const int finalX = player->GetPosition().GetX();
+    const int finalY = player->GetPosition().GetY();
+    if (!map.IsValidPosition(finalX, finalY))
+    {
+        result.AddIssue(WorldPlayerPersistenceIssueSeverity::ERROR,
+                        WorldPlayerPersistenceIssueCode::DEVELOPMENT_SPAWN_INVALID,
+                        candidateID, "Final Player position is invalid");
+        return result;
+    }
+
+    const int registeredID = entityManager.RegisterPreparedPlayer(std::move(player));
+    if (registeredID == 0)
+    {
+        result.AddIssue(WorldPlayerPersistenceIssueSeverity::ERROR,
+                        WorldPlayerPersistenceIssueCode::ENTITY_REGISTRATION_FAILED,
+                        candidateID, "Prepared Player registration failed");
+        return result;
+    }
+
+    result.SetPlayerEntityID(registeredID);
+    result.SetStatus(WorldPlayerLoadStatus::LOADED_EXISTING);
+    return result;
+}
+
+WorldPlayerSaveResult World::SavePlayerToFile(
+    int playerEntityID,
+    const std::filesystem::path &savePath) const
+{
+    WorldPlayerSaveResult result;
+    if (playerEntityID <= 0)
+    {
+        result.AddIssue(WorldPlayerPersistenceIssueSeverity::ERROR,
+                        WorldPlayerPersistenceIssueCode::INVALID_RUNTIME_ENTITY_ID,
+                        playerEntityID, "Runtime entity ID must be positive");
+        return result;
+    }
+
+    const Entity *entity = entityManager.GetEntityByID(playerEntityID);
+    if (entity == nullptr)
+    {
+        result.AddIssue(WorldPlayerPersistenceIssueSeverity::ERROR,
+                        WorldPlayerPersistenceIssueCode::ENTITY_NOT_FOUND,
+                        playerEntityID, "Entity was not found");
+        return result;
+    }
+    const Player *player = dynamic_cast<const Player *>(entity);
+    if (player == nullptr)
+    {
+        result.AddIssue(WorldPlayerPersistenceIssueSeverity::ERROR,
+                        WorldPlayerPersistenceIssueCode::ENTITY_NOT_PLAYER,
+                        playerEntityID, "Entity is not a Player");
+        return result;
+    }
+    if (!player->IsAlive())
+    {
+        result.AddIssue(WorldPlayerPersistenceIssueSeverity::ERROR,
+                        WorldPlayerPersistenceIssueCode::PLAYER_NOT_ALIVE,
+                        playerEntityID, "Dead Players cannot be saved");
+        return result;
+    }
+
+    PlayerSaveFileSaveResult fileResult =
+        PlayerSaveFileStore::Save(savePath, PlayerSaveState::Capture(*player));
+    const bool saved = fileResult.IsSuccess();
+    result.SetFileSaveResult(std::move(fileResult));
+    if (!saved)
+    {
+        result.AddIssue(WorldPlayerPersistenceIssueSeverity::ERROR,
+                        WorldPlayerPersistenceIssueCode::FILE_SAVE_FAILED,
+                        playerEntityID, "Player save file could not be committed");
+        return result;
+    }
+    result.SetPlayerEntityID(playerEntityID);
+    return result;
 }
 
 int World::CreateMonster(

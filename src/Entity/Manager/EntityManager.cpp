@@ -11,16 +11,30 @@ EntityManager::EntityManager()
 }
 int EntityManager::CreatePlayer()
 {
-    int playerID = nextID;
+    int playerID = GetNextEntityIDCandidate();
+    return RegisterPreparedPlayer(std::make_unique<Player>(playerID));
+}
 
-    if (RegisterEntity(
-            std::make_unique<Player>(playerID)) == nullptr)
+int EntityManager::GetNextEntityIDCandidate() const
+{
+    return nextID;
+}
+
+int EntityManager::RegisterPreparedPlayer(std::unique_ptr<Player> player)
+{
+    if (player == nullptr || player->GetID() <= 0 || player->GetID() != nextID ||
+        entityLookup.find(player->GetID()) != entityLookup.end())
     {
         return 0;
     }
 
-    nextID++;
+    const int playerID = player->GetID();
+    if (RegisterEntity(std::move(player)) == nullptr)
+    {
+        return 0;
+    }
 
+    ++nextID;
     return playerID;
 }
 int EntityManager::CreateNPC(int x, int y, NpcType npcType, NpcSpawnId spawnId)

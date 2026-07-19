@@ -49,6 +49,8 @@ public:
     const std::vector<std::unique_ptr<Entity>> &GetEntities() const;
 
 private:
+    int GetNextEntityIDCandidate() const;
+    int RegisterPreparedPlayer(std::unique_ptr<Player> player);
     Entity *RegisterEntity(std::unique_ptr<Entity> entity);
     bool RemoveEntity(int id);
     bool RollbackLastCreatedEntity(int id);

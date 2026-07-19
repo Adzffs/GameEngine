@@ -23,6 +23,8 @@ namespace DevelopmentWorldContent
 {
     constexpr int MapWidth = 100;
     constexpr int MapHeight = 100;
+    inline constexpr int PlayerSpawnX = 0;
+    inline constexpr int PlayerSpawnY = 0;
 
     const std::vector<DevelopmentResourcePlacementDefinition> &
     GetStarterResourcePlacements();

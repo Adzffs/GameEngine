@@ -44,6 +44,8 @@
 #include "../Shop/ShopOpenedEvent.h"
 #include "../Shop/ShopSystem.h"
 #include "../Shop/ShopTransactionEvent.h"
+#include "../Persistence/WorldPlayerPersistenceResult.h"
+#include <filesystem>
 
 class RandomSource;
 class Monster;
@@ -80,6 +82,11 @@ public:
     Map &GetMap();
 
     int CreatePlayer();
+    WorldPlayerLoadResult LoadOrCreatePlayerFromFile(
+        const std::filesystem::path &savePath);
+    WorldPlayerSaveResult SavePlayerToFile(
+        int playerEntityID,
+        const std::filesystem::path &savePath) const;
     // Lower-level compatibility seam used by focused tests and ad-hoc
     // runtime fixtures. Built-in content must use the NpcType overload.
     int CreateMonster(
@@ -220,6 +227,16 @@ public:
 
 private:
     friend struct WorldTestAccess;
+
+    using PlayerReconstructionFunction = std::unique_ptr<Player> (*)(
+        int,
+        const PlayerSaveData &,
+        PlayerSaveValidationReport &);
+
+    WorldPlayerLoadResult TryRegisterLoadedPlayer(
+        PlayerSaveFileLoadResult fileLoadResult,
+        const PlayerSaveData &saveData,
+        PlayerReconstructionFunction reconstructPlayer);
 
     EntityManager entityManager;
 
