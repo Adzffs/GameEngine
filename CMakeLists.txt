@@ -26,6 +26,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(GAMEENGINE_CORE_SOURCES
+    src/AI/MonsterAISystem.cpp
     src/Command/ServerCommandQueue.cpp
     src/Scheduling/TickScheduler.cpp
     src/Stats/StatBlock.cpp
@@ -160,6 +161,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(StatusEffectTests tests/StatusEffectTests.cpp)
     add_gameengine_headless_test(FoodHealingTests tests/FoodHealingTests.cpp)
     add_gameengine_headless_test(AggressiveMonsterTests tests/AggressiveMonsterTests.cpp)
+    add_gameengine_headless_test(MonsterAISystemTests tests/MonsterAISystemTests.cpp)
     add_gameengine_headless_test(WorldTickAuthorityTests tests/WorldTickAuthorityTests.cpp)
     add_gameengine_headless_test(ClockPacingTests tests/ClockPacingTests.cpp)
     add_gameengine_headless_test(GatheringRandomTests tests/GatheringRandomTests.cpp)

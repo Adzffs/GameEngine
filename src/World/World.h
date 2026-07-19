@@ -32,6 +32,7 @@
 #include "../Command/CommandProcessingResult.h"
 #include "../Command/ServerCommandQueue.h"
 #include "../Scheduling/TickScheduler.h"
+#include "../AI/MonsterAIIntent.h"
 
 class RandomSource;
 class Monster;
@@ -225,6 +226,8 @@ private:
     void ProcessCompletedActions(
         const std::vector<Action> &completedActions);
     void ProcessAggressiveMonsters();
+    void ExecuteMonsterAIIntent(
+        const MonsterAIIntent &intent);
     void PublishActionLifecycleEvents();
     void RecordActionStartedEvent(
         const ActionStartedSnapshot &snapshot);
@@ -258,12 +261,6 @@ private:
     bool IsValidMonsterAggressionTarget(
         const Monster &monster,
         int targetEntityID);
-    bool IsMonsterOutsideLeash(
-        const Monster &monster,
-        const MonsterAggressionDefinition &aggressionDefinition);
-    int SelectMonsterAggressionTargetEntityID(
-        const Monster &monster,
-        const MonsterAggressionDefinition &aggressionDefinition);
     std::optional<std::pair<int, int>> FindMeleeApproachTile(
         int attackerX,
         int attackerY,

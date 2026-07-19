@@ -1,4 +1,5 @@
 #include "World.h"
+#include "../AI/MonsterAISystem.h"
 #include <iostream>
 #include "Distance.h"
 #include "Object/Resource/ResourceNode.h"
@@ -1341,383 +1342,143 @@ Map &World::GetMap()
     return map;
 }
 
-bool World::IsMonsterOutsideLeash(
-    const Monster &monster,
-    const MonsterAggressionDefinition &aggressionDefinition)
-{
-    const int distanceFromSpawn =
-        Distance::Calculate(
-            monster.GetPosition().GetX(),
-            monster.GetPosition().GetY(),
-            monster.GetOriginalSpawnX(),
-            monster.GetOriginalSpawnY());
-
-    return distanceFromSpawn >
-           aggressionDefinition.leashRadius;
-}
-
 bool World::IsValidMonsterAggressionTarget(
     const Monster &monster,
     int targetEntityID)
 {
-    if (!monster.HasAggressionDefinition() ||
-        targetEntityID == Monster::InvalidAggressionTargetEntityID)
-    {
-        return false;
-    }
-
-    Entity *targetEntity =
-        entityManager.GetEntityByID(
-            targetEntityID);
-
-    Player *targetPlayer =
-        dynamic_cast<Player *>(targetEntity);
-
-    if (targetPlayer == nullptr ||
-        !targetPlayer->IsAlive())
-    {
-        return false;
-    }
-
-    std::optional<MonsterAggressionDefinition> aggressionDefinition =
-        monster.GetAggressionDefinition();
-
-    if (!aggressionDefinition.has_value())
-    {
-        return false;
-    }
-
-    if (IsMonsterOutsideLeash(
-            monster,
-            aggressionDefinition.value()))
-    {
-        return false;
-    }
-
-    const int targetDistanceFromSpawn =
-        Distance::Calculate(
-            targetPlayer->GetPosition().GetX(),
-            targetPlayer->GetPosition().GetY(),
-            monster.GetOriginalSpawnX(),
-            monster.GetOriginalSpawnY());
-
-    return targetDistanceFromSpawn <=
-           aggressionDefinition->leashRadius;
-}
-
-int World::SelectMonsterAggressionTargetEntityID(
-    const Monster &monster,
-    const MonsterAggressionDefinition &aggressionDefinition)
-{
-    struct CandidateTarget
-    {
-        int entityID;
-        int distance;
-    };
-
-    std::optional<CandidateTarget> selectedTarget;
-
-    for (const std::unique_ptr<Entity> &entity :
-         entityManager.GetEntities())
-    {
-        Player *player =
-            dynamic_cast<Player *>(entity.get());
-
-        if (player == nullptr ||
-            !player->IsAlive())
-        {
-            continue;
-        }
-
-        const int distanceToMonster =
-            Distance::Calculate(
-                monster.GetPosition().GetX(),
-                monster.GetPosition().GetY(),
-                player->GetPosition().GetX(),
-                player->GetPosition().GetY());
-
-        if (distanceToMonster >
-            aggressionDefinition.detectionRadius)
-        {
-            continue;
-        }
-
-        const int distanceFromSpawn =
-            Distance::Calculate(
-                monster.GetOriginalSpawnX(),
-                monster.GetOriginalSpawnY(),
-                player->GetPosition().GetX(),
-                player->GetPosition().GetY());
-
-        if (distanceFromSpawn >
-            aggressionDefinition.leashRadius)
-        {
-            continue;
-        }
-
-        const CandidateTarget candidate{
-            player->GetID(),
-            distanceToMonster};
-
-        if (!selectedTarget.has_value() ||
-            candidate.distance < selectedTarget->distance ||
-            (candidate.distance == selectedTarget->distance &&
-             candidate.entityID < selectedTarget->entityID))
-        {
-            selectedTarget = candidate;
-        }
-    }
-
-    if (!selectedTarget.has_value())
-    {
-        return Monster::InvalidAggressionTargetEntityID;
-    }
-
-    return selectedTarget->entityID;
+    return MonsterAISystem().IsValidTarget(
+        monster,
+        entityManager,
+        targetEntityID);
 }
 
 void World::ProcessAggressiveMonsters()
 {
+    const MonsterAISystem monsterAISystem;
+
     for (const std::unique_ptr<Entity> &entity :
          entityManager.GetEntities())
     {
         Monster *monster =
             dynamic_cast<Monster *>(entity.get());
 
-        if (monster == nullptr ||
-            !monster->IsAlive() ||
-            !monster->HasAggressionDefinition())
+        if (monster == nullptr)
         {
             continue;
         }
 
-        if (HasScheduledMonsterRespawn(monster->GetID()))
+        const bool respawnSuppressed =
+            HasScheduledMonsterRespawn(monster->GetID()) ||
+            respawnedMonsterEntityIDsThisTick.contains(monster->GetID());
+
+        ExecuteMonsterAIIntent(
+            monsterAISystem.Evaluate(
+                *monster,
+                entityManager,
+                respawnSuppressed));
+    }
+}
+
+void World::ExecuteMonsterAIIntent(
+    const MonsterAIIntent &intent)
+{
+    Monster *monster = dynamic_cast<Monster *>(
+        entityManager.GetEntityByID(intent.monsterEntityID));
+    if (monster == nullptr)
+    {
+        return;
+    }
+
+    switch (intent.type)
+    {
+    case MonsterAIIntentType::NONE:
+        return;
+    case MonsterAIIntentType::CLEAR_TARGET:
+        monster->ClearAggressionTargetEntityID();
+        CancelActionsForEntity(
+            intent.monsterEntityID,
+            intent.clearReason == MonsterAIClearReason::LEASH_VIOLATED
+                ? ActionCancelReason::OUT_OF_RANGE
+                : ActionCancelReason::TARGET_MISSING);
+        pendingMeleeInteractions.erase(intent.monsterEntityID);
+        ClearPendingMovementForEntity(intent.monsterEntityID);
+        return;
+    case MonsterAIIntentType::ATTACK_TARGET:
+    {
+        const int previousTargetID =
+            monster->GetAggressionTargetEntityID();
+        if (previousTargetID != Monster::InvalidAggressionTargetEntityID &&
+            previousTargetID != intent.targetEntityID)
         {
-            continue;
-        }
-
-        if (respawnedMonsterEntityIDsThisTick.find(
-                monster->GetID()) !=
-            respawnedMonsterEntityIDsThisTick.end())
-        {
-            continue;
-        }
-
-        const std::optional<MonsterAggressionDefinition>
-            aggressionDefinition =
-                monster->GetAggressionDefinition();
-
-        if (!aggressionDefinition.has_value() ||
-            aggressionDefinition->detectionRadius <= 0 ||
-            aggressionDefinition->leashRadius <
-                aggressionDefinition->detectionRadius)
-        {
-            continue;
-        }
-
-        const int monsterEntityID = monster->GetID();
-        bool acquiredTargetThisTick = false;
-
-        const auto clearAggressionState =
-            [&](ActionCancelReason reason)
-        {
-            monster->ClearAggressionTargetEntityID();
-
             CancelActionsForEntity(
-                monsterEntityID,
-                reason);
-
-            pendingMeleeInteractions.erase(
-                monsterEntityID);
-
-            ClearPendingMovementForEntity(
-                monsterEntityID);
-        };
-
-        if (IsMonsterOutsideLeash(
-                *monster,
-                aggressionDefinition.value()))
-        {
-            if (monster->GetAggressionTargetEntityID() !=
-                    Monster::InvalidAggressionTargetEntityID ||
-                actionManager.HasActionForEntity(
-                    monsterEntityID) ||
-                HasPendingMeleeEngagement(
-                    monsterEntityID))
-            {
-                clearAggressionState(
-                    ActionCancelReason::OUT_OF_RANGE);
-            }
-        }
-
-        const int currentTargetEntityID =
-            monster->GetAggressionTargetEntityID();
-
-        if (currentTargetEntityID !=
-                Monster::InvalidAggressionTargetEntityID &&
-            !IsValidMonsterAggressionTarget(
-                *monster,
-                currentTargetEntityID))
-        {
-            clearAggressionState(
+                intent.monsterEntityID,
                 ActionCancelReason::TARGET_MISSING);
+            pendingMeleeInteractions.erase(intent.monsterEntityID);
         }
-
-        if (monster->GetAggressionTargetEntityID() ==
-            Monster::InvalidAggressionTargetEntityID)
+        monster->SetAggressionTargetEntityID(intent.targetEntityID);
+        ClearPendingMovementForEntity(intent.monsterEntityID);
+        if (!actionManager.HasActionForEntity(intent.monsterEntityID) &&
+            !HasPendingMeleeEngagement(intent.monsterEntityID))
         {
-            const int selectedTargetID =
-                SelectMonsterAggressionTargetEntityID(
-                    *monster,
-                    aggressionDefinition.value());
-
-            if (selectedTargetID !=
-                Monster::InvalidAggressionTargetEntityID)
-            {
-                monster->SetAggressionTargetEntityID(
-                    selectedTargetID);
-
-                acquiredTargetThisTick = true;
-            }
-        }
-
-        const int targetEntityID =
-            monster->GetAggressionTargetEntityID();
-
-        if (targetEntityID ==
-            Monster::InvalidAggressionTargetEntityID)
-        {
-            if (actionManager.HasActionForEntity(
-                    monsterEntityID) ||
-                HasPendingMeleeEngagement(
-                    monsterEntityID) ||
-                activeMovementPaths.find(
-                    monsterEntityID) !=
-                    activeMovementPaths.end())
-            {
-                continue;
-            }
-
-            if (monster->GetPosition().GetX() ==
-                    monster->GetOriginalSpawnX() &&
-                monster->GetPosition().GetY() ==
-                    monster->GetOriginalSpawnY())
-            {
-                continue;
-            }
-
-            QueueMovementDestination(
-                MovementDestinationRequest(
-                    monsterEntityID,
-                    monster->GetOriginalSpawnX(),
-                    monster->GetOriginalSpawnY()));
-
-            continue;
-        }
-
-        Entity *targetEntity =
-            entityManager.GetEntityByID(targetEntityID);
-
-        Player *targetPlayer =
-            dynamic_cast<Player *>(targetEntity);
-
-        if (targetPlayer == nullptr)
-        {
-            clearAggressionState(
-                ActionCancelReason::TARGET_MISSING);
-            continue;
-        }
-
-        const int distanceX =
-            std::abs(
-                monster->GetPosition().GetX() -
-                targetPlayer->GetPosition().GetX());
-
-        const int distanceY =
-            std::abs(
-                monster->GetPosition().GetY() -
-                targetPlayer->GetPosition().GetY());
-
-        const bool isAdjacent =
-            distanceX <= 1 &&
-            distanceY <= 1;
-
-        if (isAdjacent)
-        {
-            ClearPendingMovementForEntity(
-                monsterEntityID);
-
-            if (actionManager.HasActionForEntity(
-                    monsterEntityID) ||
-                HasPendingMeleeEngagement(
-                    monsterEntityID))
-            {
-                continue;
-            }
-
             TryStartMeleeEngagement(
-                monsterEntityID,
-                targetEntityID,
+                intent.monsterEntityID,
+                intent.targetEntityID,
                 DefaultMonsterAttackDurationTicks);
-
-            continue;
         }
-
-        bool hasAction =
-            actionManager.HasActionForEntity(
-                monsterEntityID);
-
-        bool hasPendingMelee =
-            HasPendingMeleeEngagement(
-                monsterEntityID);
-
-        auto activePathIterator =
-            activeMovementPaths.find(
-                monsterEntityID);
-
-        if (hasAction ||
-            hasPendingMelee ||
-            activePathIterator !=
-                activeMovementPaths.end())
+        return;
+    }
+    case MonsterAIIntentType::CHASE_TARGET:
+    {
+        const int previousTargetID =
+            monster->GetAggressionTargetEntityID();
+        const bool acquiredTarget = previousTargetID != intent.targetEntityID;
+        if (previousTargetID != Monster::InvalidAggressionTargetEntityID &&
+            acquiredTarget)
         {
-            if (acquiredTargetThisTick &&
-                activePathIterator !=
-                    activeMovementPaths.end())
-            {
-                ClearPendingMovementForEntity(
-                    monsterEntityID);
-
-                activePathIterator =
-                    activeMovementPaths.find(
-                        monsterEntityID);
-            }
-
-            if (hasAction ||
-                hasPendingMelee ||
-                activePathIterator !=
-                    activeMovementPaths.end())
-            {
-                continue;
-            }
+            CancelActionsForEntity(
+                intent.monsterEntityID,
+                ActionCancelReason::TARGET_MISSING);
+            pendingMeleeInteractions.erase(intent.monsterEntityID);
+        }
+        monster->SetAggressionTargetEntityID(intent.targetEntityID);
+        if (acquiredTarget)
+        {
+            ClearPendingMovementForEntity(intent.monsterEntityID);
         }
 
-        std::optional<std::pair<int, int>> destination =
+        if (actionManager.HasActionForEntity(intent.monsterEntityID) ||
+            HasPendingMeleeEngagement(intent.monsterEntityID) ||
+            activeMovementPaths.contains(intent.monsterEntityID))
+        {
+            return;
+        }
+
+        const std::optional<std::pair<int, int>> destination =
             FindMeleeApproachTile(
                 monster->GetPosition().GetX(),
                 monster->GetPosition().GetY(),
-                targetPlayer->GetPosition().GetX(),
-                targetPlayer->GetPosition().GetY());
-
-        if (!destination.has_value())
+                intent.destination.GetX(),
+                intent.destination.GetY());
+        if (destination.has_value())
         {
-            continue;
-        }
-
-        QueueMovementDestination(
-            MovementDestinationRequest(
-                monsterEntityID,
+            QueueMovementDestination(MovementDestinationRequest(
+                intent.monsterEntityID,
                 destination->first,
                 destination->second));
+        }
+        return;
+    }
+    case MonsterAIIntentType::RETURN_HOME:
+        if (!actionManager.HasActionForEntity(intent.monsterEntityID) &&
+            !HasPendingMeleeEngagement(intent.monsterEntityID) &&
+            !activeMovementPaths.contains(intent.monsterEntityID))
+        {
+            QueueMovementDestination(MovementDestinationRequest(
+                intent.monsterEntityID,
+                intent.destination.GetX(),
+                intent.destination.GetY()));
+        }
+        return;
     }
 }
 
