@@ -230,10 +230,14 @@ int main()
                 0);
 
         test.Expect(
-            manager.Apply(buff),
+            manager.Apply(
+                buff,
+                10),
             "Valid buff applies successfully");
         test.Expect(
-            manager.Apply(debuff),
+            manager.Apply(
+                debuff,
+                10),
             "Valid debuff applies successfully");
         test.Expect(
             manager.HasEffect(
@@ -256,7 +260,8 @@ int main()
                     1,
                     0,
                     0,
-                    0)),
+                    0),
+                10),
             "NONE type definitions are rejected");
         test.Expect(
             !manager.Apply(
@@ -266,7 +271,8 @@ int main()
                     1,
                     0,
                     0,
-                    0)),
+                    0),
+                10),
             "Unknown enum-cast types are rejected");
         test.Expect(
             !manager.Apply(
@@ -276,7 +282,8 @@ int main()
                     1,
                     0,
                     0,
-                    0)),
+                    0),
+                10),
             "Zero duration definitions are rejected");
         test.Expect(
             !manager.Apply(
@@ -286,7 +293,8 @@ int main()
                     1,
                     0,
                     0,
-                    0)),
+                    0),
+                10),
             "Negative duration definitions are rejected");
         test.Expect(
             !manager.Apply(
@@ -296,7 +304,8 @@ int main()
                     0,
                     0,
                     0,
-                    0)),
+                    0),
+                10),
             "All-zero modifiers are rejected");
     }
 
@@ -311,7 +320,8 @@ int main()
                     4,
                     0,
                     0,
-                    0)),
+                    0),
+                10),
             "First effect applies");
         test.Expect(
             manager.Apply(
@@ -321,7 +331,8 @@ int main()
                     0,
                     0,
                     0,
-                    10)),
+                    10),
+                10),
             "Different type applies");
 
         test.ExpectEqual(
@@ -354,7 +365,8 @@ int main()
                     2,
                     0,
                     0,
-                    0)),
+                    0),
+                10),
             "Initial same-type effect applies");
         test.Expect(
             manager.Apply(
@@ -364,7 +376,8 @@ int main()
                     0,
                     0,
                     0,
-                    5)),
+                    5),
+                10),
             "Second type establishes deterministic ordering");
         test.Expect(
             manager.Apply(
@@ -374,7 +387,8 @@ int main()
                     9,
                     0,
                     0,
-                    0)),
+                    0),
+                10),
             "Reapplying same type succeeds by replacing existing entry");
 
         test.ExpectEqual(
@@ -423,7 +437,8 @@ int main()
                 1,
                 0,
                 0,
-                0));
+                0),
+            10);
 
         test.Expect(
             manager.Remove(
@@ -458,7 +473,8 @@ int main()
                 1,
                 0,
                 0,
-                0));
+                0),
+            10);
         manager.Apply(
             MakeEffect(
                 StatusEffectType::MAX_HEALTH_BOOST,
@@ -466,10 +482,11 @@ int main()
                 0,
                 0,
                 0,
-                5));
+                5),
+            10);
 
         test.Expect(
-            !manager.Tick(),
+            !manager.Tick(11),
             "Tick reports no expiry when all remaining durations stay above zero");
 
         const ActiveStatusEffect *combatBoost =
@@ -489,7 +506,7 @@ int main()
             "Tick decrements independent effects exactly once");
 
         test.Expect(
-            manager.Tick(),
+            manager.Tick(12),
             "Tick reports expiry when duration reaches zero");
 
         test.Expect(
@@ -509,7 +526,8 @@ int main()
                 -2,
                 0,
                 0,
-                0));
+                0),
+            12);
 
         manager.Apply(
             MakeEffect(
@@ -518,10 +536,11 @@ int main()
                 0,
                 0,
                 0,
-                2));
+                2),
+            12);
 
         test.Expect(
-            manager.Tick(),
+            manager.Tick(13),
             "Expiry pass is deterministic when multiple effects end together");
         test.Expect(
             !manager.HasEffect(
@@ -541,7 +560,8 @@ int main()
                 std::numeric_limits<int>::max(),
                 std::numeric_limits<int>::max(),
                 0,
-                0));
+                0),
+            10);
 
         manager.Apply(
             MakeEffect(
@@ -550,7 +570,8 @@ int main()
                 1,
                 1,
                 0,
-                0));
+                0),
+            10);
 
         StatusEffectModifiers combined =
             manager.GetCombinedModifiers();
@@ -578,6 +599,237 @@ int main()
         test.Expect(
             IsValidStatusEffectDefinition(multiStat),
             "Validation allows mixed positive and negative modifiers across multiple stats");
+    }
+
+    {
+        StatusEffectManager manager;
+
+        test.Expect(
+            manager.Apply(
+                MakeEffect(
+                    StatusEffectType::COMBAT_BOOST,
+                    3,
+                    5,
+                    0,
+                    0,
+                    0),
+                10),
+            "Effect applies with authoritative tick context");
+
+        const ActiveStatusEffect *appliedAt10 =
+            manager.FindEffect(
+                StatusEffectType::COMBAT_BOOST);
+
+        test.Expect(
+            appliedAt10 != nullptr &&
+                appliedAt10->remainingTicks == 3,
+            "Applying during simulated current tick receives full duration");
+
+        test.Expect(
+            !manager.Tick(10),
+            "Effect applied at tick 10 does not decrement when Tick(10) runs");
+
+        const ActiveStatusEffect *afterSameTick =
+            manager.FindEffect(
+                StatusEffectType::COMBAT_BOOST);
+
+        test.Expect(
+            afterSameTick != nullptr &&
+                afterSameTick->remainingTicks == 3,
+            "End of same tick preserves full remaining duration");
+
+        test.Expect(
+            !manager.Tick(11),
+            "Tick(11) decrements once without immediate expiry");
+
+        const ActiveStatusEffect *afterTick11 =
+            manager.FindEffect(
+                StatusEffectType::COMBAT_BOOST);
+
+        test.Expect(
+            afterTick11 != nullptr &&
+                afterTick11->remainingTicks == 2,
+            "Effect decrements once on the next authoritative tick");
+    }
+
+    {
+        StatusEffectManager manager;
+
+        test.Expect(
+            manager.Apply(
+                MakeEffect(
+                    StatusEffectType::COMBAT_BOOST,
+                    1,
+                    1,
+                    0,
+                    0,
+                    0),
+                10),
+            "Duration-one effect applies at tick 10");
+
+        test.Expect(
+            !manager.Tick(10),
+            "Duration-one effect survives Tick(10) without decrement");
+        test.Expect(
+            manager.HasEffect(
+                StatusEffectType::COMBAT_BOOST),
+            "Duration-one effect remains active during its application tick");
+
+        test.Expect(
+            manager.Tick(11),
+            "Duration-one effect expires when first eligible decrement occurs");
+        test.Expect(
+            !manager.HasEffect(
+                StatusEffectType::COMBAT_BOOST),
+            "Duration-one effect is removed after Tick(11)");
+    }
+
+    {
+        StatusEffectManager manager;
+
+        test.Expect(
+            manager.Apply(
+                MakeEffect(
+                    StatusEffectType::COMBAT_BOOST,
+                    2,
+                    2,
+                    0,
+                    0,
+                    0),
+                10),
+            "Initial effect applies for same-tick reapply behavior");
+
+        test.Expect(
+            !manager.Tick(11),
+            "Tick(11) decrements duration-two setup effect without expiring it");
+
+        test.Expect(
+            manager.Apply(
+                MakeEffect(
+                    StatusEffectType::COMBAT_BOOST,
+                    3,
+                    7,
+                    0,
+                    0,
+                    0),
+                12),
+            "Reapply on later tick restores full duration");
+
+        test.Expect(
+            manager.Apply(
+                MakeEffect(
+                    StatusEffectType::COMBAT_BOOST,
+                    4,
+                    9,
+                    0,
+                    0,
+                    0),
+                12),
+            "Same-tick reapplication succeeds");
+
+        const ActiveStatusEffect *sameTickReapplied =
+            manager.FindEffect(
+                StatusEffectType::COMBAT_BOOST);
+
+        test.Expect(
+            sameTickReapplied != nullptr &&
+                sameTickReapplied->remainingTicks == 4,
+            "Same-tick reapplication resets full duration");
+
+        test.Expect(
+            !manager.Tick(12),
+            "Same-tick reapplication prevents immediate decrement");
+
+        const ActiveStatusEffect *afterSameTickReapplyTick =
+            manager.FindEffect(
+                StatusEffectType::COMBAT_BOOST);
+
+        test.Expect(
+            afterSameTickReapplyTick != nullptr &&
+                afterSameTickReapplyTick->remainingTicks == 4,
+            "Reapplied effect keeps full duration through the reapply tick");
+
+        test.Expect(
+            !manager.Tick(13),
+            "Later tick decrements reapplied effect normally");
+
+        const ActiveStatusEffect *afterLaterTick =
+            manager.FindEffect(
+                StatusEffectType::COMBAT_BOOST);
+
+        test.Expect(
+            afterLaterTick != nullptr &&
+                afterLaterTick->remainingTicks == 3,
+            "Later-tick decrement occurs once after reapplication");
+    }
+
+    {
+        StatusEffectManager manager;
+
+        test.Expect(
+            manager.Apply(
+                MakeEffect(
+                    StatusEffectType::COMBAT_BOOST,
+                    3,
+                    2,
+                    0,
+                    0,
+                    0),
+                10),
+            "First effect applies at tick 10");
+
+        test.Expect(
+            !manager.Tick(11),
+            "First effect decrements during tick 11 setup without expiring");
+
+        test.Expect(
+            manager.Apply(
+                MakeEffect(
+                    StatusEffectType::MAX_HEALTH_BOOST,
+                    3,
+                    0,
+                    0,
+                    0,
+                    5),
+                11),
+            "Second effect applies at tick 11");
+
+        const ActiveStatusEffect *first =
+            manager.FindEffect(
+                StatusEffectType::COMBAT_BOOST);
+        const ActiveStatusEffect *second =
+            manager.FindEffect(
+                StatusEffectType::MAX_HEALTH_BOOST);
+
+        test.Expect(
+            first != nullptr &&
+                second != nullptr &&
+                first->remainingTicks == 2 &&
+                second->remainingTicks == 3,
+            "Different effects retain independent application ticks and durations");
+    }
+
+    {
+        StatusEffectManager manager;
+
+        test.Expect(
+            !manager.Apply(
+                MakeEffect(
+                    StatusEffectType::COMBAT_BOOST,
+                    3,
+                    1,
+                    0,
+                    0,
+                    0),
+                -1),
+            "Negative apply ticks are rejected safely");
+        test.Expect(
+            manager.GetActiveEffects().empty(),
+            "Rejected negative apply tick does not mutate state");
+
+        test.Expect(
+            !manager.Tick(-1),
+            "Negative tick values are rejected safely");
     }
 
     {

@@ -9,7 +9,8 @@ class StatusEffectManager
 {
 public:
     bool Apply(
-        const StatusEffectDefinition &definition);
+        const StatusEffectDefinition &definition,
+        int currentTick);
 
     bool Remove(
         StatusEffectType type);
@@ -20,7 +21,8 @@ public:
     const ActiveStatusEffect *FindEffect(
         StatusEffectType type) const;
 
-    bool Tick();
+    bool Tick(
+        int currentTick);
 
     StatusEffectModifiers
     GetCombinedModifiers() const;

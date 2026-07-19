@@ -2385,7 +2385,8 @@ bool World::TryApplyStatusEffect(
     }
 
     if (!player->GetStatusEffectManager().Apply(
-            definition))
+            definition,
+            currentTick))
     {
         return false;
     }
@@ -2925,7 +2926,8 @@ void World::TickPlayerStatusEffects()
         }
 
         bool expiredEffects =
-            player->GetStatusEffectManager().Tick();
+            player->GetStatusEffectManager().Tick(
+                currentTick);
 
         if (!expiredEffects)
         {

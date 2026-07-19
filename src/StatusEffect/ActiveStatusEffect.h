@@ -10,5 +10,7 @@ struct ActiveStatusEffect
 
     int remainingTicks = 0;
 
+    int lastAppliedTick = 0;
+
     StatusEffectModifiers modifiers;
 };

@@ -37,10 +37,16 @@ namespace
 }
 
 bool StatusEffectManager::Apply(
-    const StatusEffectDefinition &definition)
+    const StatusEffectDefinition &definition,
+    int currentTick)
 {
     if (!IsValidStatusEffectDefinition(
             definition))
+    {
+        return false;
+    }
+
+    if (currentTick < 0)
     {
         return false;
     }
@@ -57,6 +63,9 @@ bool StatusEffectManager::Apply(
         activeEffect.remainingTicks =
             definition.durationTicks;
 
+        activeEffect.lastAppliedTick =
+            currentTick;
+
         activeEffect.modifiers =
             definition.modifiers;
 
@@ -67,6 +76,7 @@ bool StatusEffectManager::Apply(
         ActiveStatusEffect{
             definition.type,
             definition.durationTicks,
+            currentTick,
             definition.modifiers});
 
     return true;
@@ -120,12 +130,19 @@ const ActiveStatusEffect *StatusEffectManager::FindEffect(
     return nullptr;
 }
 
-bool StatusEffectManager::Tick()
+bool StatusEffectManager::Tick(
+    int currentTick)
 {
+    if (currentTick < 0)
+    {
+        return false;
+    }
+
     for (ActiveStatusEffect &activeEffect :
          activeEffects)
     {
-        if (activeEffect.remainingTicks > 0)
+        if (activeEffect.remainingTicks > 0 &&
+            activeEffect.lastAppliedTick < currentTick)
         {
             activeEffect.remainingTicks--;
         }
