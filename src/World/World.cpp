@@ -2083,6 +2083,59 @@ ActionValidationResult World::ValidateMeleeAttackAction(
         ""};
 }
 
+MeleeCompletionContext World::BuildMeleeCompletionContext(
+    int attackerEntityID,
+    int defenderEntityID) const
+{
+    MeleeCompletionContext context;
+    context.attackerEntityID = attackerEntityID;
+    context.defenderEntityID = defenderEntityID;
+
+    const Entity *attackerEntity =
+        entityManager.GetEntityByID(attackerEntityID);
+    if (attackerEntity == nullptr)
+    {
+        context.status =
+            MeleeCompletionContextStatus::MISSING_ATTACKER;
+        return context;
+    }
+
+    const Entity *defenderEntity =
+        entityManager.GetEntityByID(defenderEntityID);
+    if (defenderEntity == nullptr)
+    {
+        context.status =
+            MeleeCompletionContextStatus::MISSING_DEFENDER;
+        return context;
+    }
+
+    const Combatant *attacker =
+        dynamic_cast<const Combatant *>(attackerEntity);
+    if (attacker == nullptr)
+    {
+        context.status =
+            MeleeCompletionContextStatus::INVALID_ATTACKER;
+        return context;
+    }
+
+    const Combatant *defender =
+        dynamic_cast<const Combatant *>(defenderEntity);
+    if (defender == nullptr)
+    {
+        context.status =
+            MeleeCompletionContextStatus::INVALID_DEFENDER;
+        return context;
+    }
+
+    context.status =
+        MeleeCompletionContextStatus::VALID;
+    context.attackerRatings =
+        attacker->GetCombatRatings();
+    context.defenderRatings =
+        defender->GetCombatRatings();
+    return context;
+}
+
 void World::ProcessCompletedActions(
     const std::vector<Action> &completedActions)
 {
@@ -2091,48 +2144,24 @@ void World::ProcessCompletedActions(
         if (action.GetType() ==
             ActionType::MELEE_ATTACK)
         {
+            const ActionValidationResult validation =
+                ValidateMeleeAttackAction(
+                    action.GetOwnerID(),
+                    action.GetTargetID());
+
+            MeleeCompletionContext context;
+            if (validation.valid)
+            {
+                context = BuildMeleeCompletionContext(
+                    action.GetOwnerID(),
+                    action.GetTargetID());
+            }
+
             MeleeCompletionOutcome meleeOutcome =
                 combatService.EvaluateCompletedMeleeAction(
                     action,
-                    [this](
-                        int attackerEntityID,
-                        int defenderEntityID)
-                    {
-                        return ValidateMeleeAttackAction(
-                            attackerEntityID,
-                            defenderEntityID);
-                    },
-                    [this](
-                        int attackerEntityID,
-                        int defenderEntityID)
-                        -> std::optional<MeleeCombatRatingsSnapshot>
-                    {
-                        Entity *attackerEntity =
-                            entityManager.GetEntityByID(
-                                attackerEntityID);
-
-                        Entity *defenderEntity =
-                            entityManager.GetEntityByID(
-                                defenderEntityID);
-
-                        Combatant *attacker =
-                            TryGetCombatant(
-                                attackerEntity);
-
-                        Combatant *defender =
-                            TryGetCombatant(
-                                defenderEntity);
-
-                        if (attacker == nullptr ||
-                            defender == nullptr)
-                        {
-                            return std::nullopt;
-                        }
-
-                        return MeleeCombatRatingsSnapshot{
-                            attacker->GetCombatRatings(),
-                            defender->GetCombatRatings()};
-                    });
+                    validation,
+                    context);
 
             if (meleeOutcome.type ==
                 MeleeCompletionOutcomeType::IGNORE)
@@ -2176,15 +2205,10 @@ void World::ProcessCompletedActions(
             const bool defenderWasAliveBeforeAttack =
                 defender->IsAlive();
 
-            if (!meleeOutcome.ratingsSnapshot.has_value())
-            {
-                continue;
-            }
-
             MeleeAttackResult resolvedAttack =
                 combatService.EvaluateMeleeAttack(
-                    meleeOutcome.ratingsSnapshot->attackerRatings,
-                    meleeOutcome.ratingsSnapshot->defenderRatings);
+                    meleeOutcome.attackerRatings,
+                    meleeOutcome.defenderRatings);
 
             resolvedAttack.actualDamageApplied =
                 combatService.ApplyMeleeDamage(

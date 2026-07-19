@@ -21,8 +21,8 @@ CombatService::CombatService(std::unique_ptr<RandomSource> randomSource)
 
 MeleeCompletionOutcome CombatService::EvaluateCompletedMeleeAction(
     const Action &action,
-    const MeleeCompletionValidator &completionValidator,
-    const MeleeCombatRatingsProvider &ratingsProvider)
+    const ActionValidationResult &validation,
+    const MeleeCompletionContext &context) const
 {
     MeleeCompletionOutcome outcome;
     outcome.attackerEntityID =
@@ -38,11 +38,6 @@ MeleeCompletionOutcome CombatService::EvaluateCompletedMeleeAction(
         return outcome;
     }
 
-    ActionValidationResult validation =
-        completionValidator(
-            action.GetOwnerID(),
-            action.GetTargetID());
-
     if (!validation.valid)
     {
         outcome.type =
@@ -54,22 +49,25 @@ MeleeCompletionOutcome CombatService::EvaluateCompletedMeleeAction(
         return outcome;
     }
 
-    std::optional<MeleeCombatRatingsSnapshot> ratingsSnapshot =
-        ratingsProvider(
-            action.GetOwnerID(),
-            action.GetTargetID());
-
-    if (!ratingsSnapshot.has_value())
+    if (context.status !=
+        MeleeCompletionContextStatus::VALID)
     {
         outcome.type =
             MeleeCompletionOutcomeType::CLEAR_STALE;
+        outcome.staleReason = context.status;
         return outcome;
     }
 
     outcome.type =
         MeleeCompletionOutcomeType::RESOLVE;
-    outcome.ratingsSnapshot =
-        ratingsSnapshot;
+    outcome.attackerEntityID =
+        context.attackerEntityID;
+    outcome.defenderEntityID =
+        context.defenderEntityID;
+    outcome.attackerRatings =
+        context.attackerRatings;
+    outcome.defenderRatings =
+        context.defenderRatings;
 
     return outcome;
 }

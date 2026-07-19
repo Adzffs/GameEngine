@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MeleeCompletionOutcome.h"
+#include "MeleeCompletionContext.h"
 #include "MeleeAttackResolver.h"
 
 #include "../Action/Action.h"
@@ -10,9 +11,7 @@
 #include "../Core/SeededRandom.h"
 #include "../Stats/CombatRatings.h"
 
-#include <functional>
 #include <memory>
-#include <optional>
 
 class CombatService
 {
@@ -21,20 +20,10 @@ public:
 
     explicit CombatService(std::unique_ptr<RandomSource> randomSource);
 
-    using MeleeCompletionValidator =
-        std::function<ActionValidationResult(
-            int attackerEntityID,
-            int defenderEntityID)>;
-
-    using MeleeCombatRatingsProvider =
-        std::function<std::optional<MeleeCombatRatingsSnapshot>(
-            int attackerEntityID,
-            int defenderEntityID)>;
-
     MeleeCompletionOutcome EvaluateCompletedMeleeAction(
         const Action &action,
-        const MeleeCompletionValidator &completionValidator,
-        const MeleeCombatRatingsProvider &ratingsProvider);
+        const ActionValidationResult &validation,
+        const MeleeCompletionContext &context) const;
 
     MeleeAttackResult EvaluateMeleeAttack(
         const CombatRatings &attacker,

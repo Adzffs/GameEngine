@@ -245,6 +245,9 @@ private:
     void ProcessMeleeEngagementSystem();
     void ProcessCompletedActions(
         const std::vector<Action> &completedActions);
+    MeleeCompletionContext BuildMeleeCompletionContext(
+        int attackerEntityID,
+        int defenderEntityID) const;
     void ProcessAggressiveMonsters();
     void ExecuteMonsterAIIntent(
         const MonsterAIIntent &intent);

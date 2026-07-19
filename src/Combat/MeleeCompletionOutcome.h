@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../Action/ActionCancelReason.h"
+#include "MeleeCompletionContext.h"
 #include "../Stats/CombatRatings.h"
 
-#include <optional>
 #include <string>
 
 enum class MeleeCompletionOutcomeType
@@ -12,12 +12,6 @@ enum class MeleeCompletionOutcomeType
     CLEAR_STALE,
     CANCEL,
     RESOLVE
-};
-
-struct MeleeCombatRatingsSnapshot
-{
-    CombatRatings attackerRatings;
-    CombatRatings defenderRatings;
 };
 
 struct MeleeCompletionOutcome
@@ -31,8 +25,11 @@ struct MeleeCompletionOutcome
     ActionCancelReason cancelReason =
         ActionCancelReason::NONE;
 
+    MeleeCompletionContextStatus staleReason =
+        MeleeCompletionContextStatus::VALID;
+
     std::string message;
 
-    std::optional<MeleeCombatRatingsSnapshot>
-        ratingsSnapshot;
+    CombatRatings attackerRatings;
+    CombatRatings defenderRatings;
 };
