@@ -1,7 +1,26 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(GameEngine)
-find_package(SDL3 REQUIRED CONFIG)
+
+option(
+    GAMEENGINE_BUILD_CLIENT
+    "Build the SDL client executable"
+    ON
+)
+
+set(GAMEENGINE_DEFAULT_BUILD_GRAPHICS_TESTS ${GAMEENGINE_BUILD_CLIENT})
+option(
+    GAMEENGINE_BUILD_GRAPHICS_TESTS
+    "Build tests that require SDL graphics/input"
+    ${GAMEENGINE_DEFAULT_BUILD_GRAPHICS_TESTS}
+)
+
+if(
+    GAMEENGINE_BUILD_CLIENT
+    OR GAMEENGINE_BUILD_GRAPHICS_TESTS
+)
+    find_package(SDL3 REQUIRED CONFIG)
+endif()
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -63,317 +82,86 @@ add_library(GameEngineCore
 
 target_include_directories(GameEngineCore PUBLIC src)
 
-add_executable(GameEngine
-    src/main.cpp
-    src/Core/Engine.cpp
-    src/Time/Clock.cpp
-    src/Input/InputManager.cpp
-    src/Graphics/Graphics.cpp
-)
+if(GAMEENGINE_BUILD_CLIENT)
+    add_executable(GameEngine
+        src/main.cpp
+        src/Core/Engine.cpp
+        src/Time/Clock.cpp
+        src/Input/InputManager.cpp
+        src/Graphics/Graphics.cpp
+    )
 
-target_link_libraries(GameEngine PRIVATE GameEngineCore SDL3::SDL3)
+    target_link_libraries(GameEngine PRIVATE GameEngineCore SDL3::SDL3)
+endif()
 
 include(CTest)
 
+function(add_gameengine_headless_test target source)
+    add_executable(${target}
+        ${source}
+    )
+
+    target_link_libraries(${target} PRIVATE GameEngineCore)
+
+    add_test(
+        NAME ${target}
+        COMMAND ${target}
+    )
+
+    set_tests_properties(
+        ${target}
+        PROPERTIES LABELS "headless"
+    )
+endfunction()
+
+function(add_gameengine_graphics_test target source)
+    add_executable(${target}
+        ${source}
+        src/Graphics/Graphics.cpp
+    )
+
+    target_link_libraries(${target} PRIVATE GameEngineCore SDL3::SDL3)
+
+    add_test(
+        NAME ${target}
+        COMMAND ${target}
+    )
+
+    set_tests_properties(
+        ${target}
+        PROPERTIES LABELS "graphics"
+    )
+endfunction()
+
 if(BUILD_TESTING)
-    add_executable(ActionFrameworkTests
-        tests/ActionFrameworkTests.cpp
-    )
-
-    target_link_libraries(ActionFrameworkTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME ActionFrameworkTests
-        COMMAND ActionFrameworkTests
-    )
-
-    add_executable(GameplayActionIntegrationTests
-        tests/GameplayActionIntegrationTests.cpp
-    )
-
-    target_link_libraries(GameplayActionIntegrationTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME GameplayActionIntegrationTests
-        COMMAND GameplayActionIntegrationTests
-    )
-
-    add_executable(EquipmentStatsTests
-        tests/EquipmentStatsTests.cpp
-    )
-
-    target_link_libraries(EquipmentStatsTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME EquipmentStatsTests
-        COMMAND EquipmentStatsTests
-    )
-
-    add_executable(PlayerHealthTests
-        tests/PlayerHealthTests.cpp
-    )
-
-    target_link_libraries(PlayerHealthTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME PlayerHealthTests
-        COMMAND PlayerHealthTests
-    )
-
-    add_executable(CombatFormulaTests
-        tests/CombatFormulaTests.cpp
-    )
-
-    target_link_libraries(CombatFormulaTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME CombatFormulaTests
-        COMMAND CombatFormulaTests
-    )
-
-    add_executable(MeleeAttackResolverTests
-        tests/MeleeAttackResolverTests.cpp
-    )
-
-    target_link_libraries(MeleeAttackResolverTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME MeleeAttackResolverTests
-        COMMAND MeleeAttackResolverTests
-    )
-
-    add_executable(CombatServiceTests
-        tests/CombatServiceTests.cpp
-    )
-
-    target_link_libraries(CombatServiceTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME CombatServiceTests
-        COMMAND CombatServiceTests
-    )
-
-    add_executable(MeleeCombatActionTests
-        tests/MeleeCombatActionTests.cpp
-    )
-
-    target_link_libraries(MeleeCombatActionTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME MeleeCombatActionTests
-        COMMAND MeleeCombatActionTests
-    )
-
-    add_executable(MonsterGraphicsTests
-        tests/MonsterGraphicsTests.cpp
-        src/Graphics/Graphics.cpp
-    )
-
-    target_link_libraries(MonsterGraphicsTests PRIVATE GameEngineCore SDL3::SDL3)
-
-    add_test(
-        NAME MonsterGraphicsTests
-        COMMAND MonsterGraphicsTests
-    )
-
-    add_executable(MeleeClickIntegrationTests
-        tests/MeleeClickIntegrationTests.cpp
-        src/Graphics/Graphics.cpp
-    )
-
-    target_link_libraries(MeleeClickIntegrationTests PRIVATE GameEngineCore SDL3::SDL3)
-
-    add_test(
-        NAME MeleeClickIntegrationTests
-        COMMAND MeleeClickIntegrationTests
-    )
-
-    add_executable(PendingMeleeInteractionTests
-        tests/PendingMeleeInteractionTests.cpp
-    )
-
-    target_link_libraries(PendingMeleeInteractionTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME PendingMeleeInteractionTests
-        COMMAND PendingMeleeInteractionTests
-    )
-
-    add_executable(MeleeEngagementTests
-        tests/MeleeEngagementTests.cpp
-    )
-
-    target_link_libraries(MeleeEngagementTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME MeleeEngagementTests
-        COMMAND MeleeEngagementTests
-    )
-
-    add_executable(CombatantMonsterTests
-        tests/CombatantMonsterTests.cpp
-    )
-
-    target_link_libraries(CombatantMonsterTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME CombatantMonsterTests
-        COMMAND CombatantMonsterTests
-    )
-
-    add_executable(CombatFeedbackTests
-        tests/CombatFeedbackTests.cpp
-        src/Graphics/Graphics.cpp
-    )
-
-    target_link_libraries(CombatFeedbackTests PRIVATE GameEngineCore SDL3::SDL3)
-
-    add_test(
-        NAME CombatFeedbackTests
-        COMMAND CombatFeedbackTests
-    )
-
-    add_executable(MonsterRetaliationTests
-        tests/MonsterRetaliationTests.cpp
-        src/Graphics/Graphics.cpp
-    )
-
-    target_link_libraries(MonsterRetaliationTests PRIVATE GameEngineCore SDL3::SDL3)
-
-    add_test(
-        NAME MonsterRetaliationTests
-        COMMAND MonsterRetaliationTests
-    )
-
-    add_executable(EntityDeathEventTests
-        tests/EntityDeathEventTests.cpp
-    )
-
-    target_link_libraries(EntityDeathEventTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME EntityDeathEventTests
-        COMMAND EntityDeathEventTests
-    )
-
-    add_executable(RewardTableTests
-        tests/RewardTableTests.cpp
-    )
-
-    target_link_libraries(RewardTableTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME RewardTableTests
-        COMMAND RewardTableTests
-    )
-
-    add_executable(InventoryTransactionTests
-        tests/InventoryTransactionTests.cpp
-    )
-
-    target_link_libraries(InventoryTransactionTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME InventoryTransactionTests
-        COMMAND InventoryTransactionTests
-    )
-
-    add_executable(MonsterLootIntegrationTests
-        tests/MonsterLootIntegrationTests.cpp
-    )
-
-    target_link_libraries(MonsterLootIntegrationTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME MonsterLootIntegrationTests
-        COMMAND MonsterLootIntegrationTests
-    )
-
-    add_executable(MonsterRespawnTests
-        tests/MonsterRespawnTests.cpp
-    )
-
-    target_link_libraries(MonsterRespawnTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME MonsterRespawnTests
-        COMMAND MonsterRespawnTests
-    )
-
-    add_executable(EquipmentUnequipTests
-        tests/EquipmentUnequipTests.cpp
-    )
-
-    target_link_libraries(EquipmentUnequipTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME EquipmentUnequipTests
-        COMMAND EquipmentUnequipTests
-    )
-
-    add_executable(RequirementSystemTests
-        tests/RequirementSystemTests.cpp
-    )
-
-    target_link_libraries(RequirementSystemTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME RequirementSystemTests
-        COMMAND RequirementSystemTests
-    )
-
-    add_executable(ActionLifecycleEventTests
-        tests/ActionLifecycleEventTests.cpp
-    )
-
-    target_link_libraries(ActionLifecycleEventTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME ActionLifecycleEventTests
-        COMMAND ActionLifecycleEventTests
-    )
-
-    add_executable(ContentValidationTests
-        tests/ContentValidationTests.cpp
-    )
-
-    target_link_libraries(ContentValidationTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME ContentValidationTests
-        COMMAND ContentValidationTests
-    )
-
-    add_executable(StatusEffectTests
-        tests/StatusEffectTests.cpp
-    )
-
-    target_link_libraries(StatusEffectTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME StatusEffectTests
-        COMMAND StatusEffectTests
-    )
-
-    add_executable(FoodHealingTests
-        tests/FoodHealingTests.cpp
-    )
-
-    target_link_libraries(FoodHealingTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME FoodHealingTests
-        COMMAND FoodHealingTests
-    )
-
-    add_executable(AggressiveMonsterTests
-        tests/AggressiveMonsterTests.cpp
-    )
-
-    target_link_libraries(AggressiveMonsterTests PRIVATE GameEngineCore)
-
-    add_test(
-        NAME AggressiveMonsterTests
-        COMMAND AggressiveMonsterTests
-    )
+    add_gameengine_headless_test(ActionFrameworkTests tests/ActionFrameworkTests.cpp)
+    add_gameengine_headless_test(GameplayActionIntegrationTests tests/GameplayActionIntegrationTests.cpp)
+    add_gameengine_headless_test(EquipmentStatsTests tests/EquipmentStatsTests.cpp)
+    add_gameengine_headless_test(PlayerHealthTests tests/PlayerHealthTests.cpp)
+    add_gameengine_headless_test(CombatFormulaTests tests/CombatFormulaTests.cpp)
+    add_gameengine_headless_test(MeleeAttackResolverTests tests/MeleeAttackResolverTests.cpp)
+    add_gameengine_headless_test(CombatServiceTests tests/CombatServiceTests.cpp)
+    add_gameengine_headless_test(MeleeCombatActionTests tests/MeleeCombatActionTests.cpp)
+    add_gameengine_headless_test(PendingMeleeInteractionTests tests/PendingMeleeInteractionTests.cpp)
+    add_gameengine_headless_test(MeleeEngagementTests tests/MeleeEngagementTests.cpp)
+    add_gameengine_headless_test(CombatantMonsterTests tests/CombatantMonsterTests.cpp)
+    add_gameengine_headless_test(EntityDeathEventTests tests/EntityDeathEventTests.cpp)
+    add_gameengine_headless_test(RewardTableTests tests/RewardTableTests.cpp)
+    add_gameengine_headless_test(InventoryTransactionTests tests/InventoryTransactionTests.cpp)
+    add_gameengine_headless_test(MonsterLootIntegrationTests tests/MonsterLootIntegrationTests.cpp)
+    add_gameengine_headless_test(MonsterRespawnTests tests/MonsterRespawnTests.cpp)
+    add_gameengine_headless_test(EquipmentUnequipTests tests/EquipmentUnequipTests.cpp)
+    add_gameengine_headless_test(RequirementSystemTests tests/RequirementSystemTests.cpp)
+    add_gameengine_headless_test(ActionLifecycleEventTests tests/ActionLifecycleEventTests.cpp)
+    add_gameengine_headless_test(ContentValidationTests tests/ContentValidationTests.cpp)
+    add_gameengine_headless_test(StatusEffectTests tests/StatusEffectTests.cpp)
+    add_gameengine_headless_test(FoodHealingTests tests/FoodHealingTests.cpp)
+    add_gameengine_headless_test(AggressiveMonsterTests tests/AggressiveMonsterTests.cpp)
+
+    if(GAMEENGINE_BUILD_GRAPHICS_TESTS)
+        add_gameengine_graphics_test(MonsterGraphicsTests tests/MonsterGraphicsTests.cpp)
+        add_gameengine_graphics_test(MeleeClickIntegrationTests tests/MeleeClickIntegrationTests.cpp)
+        add_gameengine_graphics_test(CombatFeedbackTests tests/CombatFeedbackTests.cpp)
+        add_gameengine_graphics_test(MonsterRetaliationTests tests/MonsterRetaliationTests.cpp)
+    endif()
 endif()

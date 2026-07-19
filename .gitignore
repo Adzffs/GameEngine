@@ -1,5 +1,7 @@
 # Build files
 build/
+build_client/
+build_headless/
 
 # Compiled files
 *.exe
