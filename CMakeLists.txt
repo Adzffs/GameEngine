@@ -61,6 +61,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/Combat/CombatFormulas.cpp
     src/Combat/MeleeAttackResolver.cpp
     src/Combat/CombatService.cpp
+    src/Combat/MeleeEngagementSystem.cpp
     src/Time/Clock.cpp
     src/Core/SeededRandom.cpp
     src/Time/TickPerformance.cpp
@@ -149,6 +150,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(MeleeCombatActionTests tests/MeleeCombatActionTests.cpp)
     add_gameengine_headless_test(PendingMeleeInteractionTests tests/PendingMeleeInteractionTests.cpp)
     add_gameengine_headless_test(MeleeEngagementTests tests/MeleeEngagementTests.cpp)
+    add_gameengine_headless_test(MeleeEngagementSystemTests tests/MeleeEngagementSystemTests.cpp)
     add_gameengine_headless_test(CombatantMonsterTests tests/CombatantMonsterTests.cpp)
     add_gameengine_headless_test(EntityDeathEventTests tests/EntityDeathEventTests.cpp)
     add_gameengine_headless_test(RewardTableTests tests/RewardTableTests.cpp)

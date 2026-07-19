@@ -289,7 +289,7 @@ void World::QueueResourceInteraction(
         return;
     }
 
-    pendingMeleeInteractions.erase(entityID);
+    meleeEngagementSystem.ClearEngagement(entityID);
 
     pendingResourceInteractions[entityID] =
         resourceID;
@@ -311,7 +311,7 @@ void World::QueueStationInteraction(
         return;
     }
 
-    pendingMeleeInteractions.erase(entityID);
+    meleeEngagementSystem.ClearEngagement(entityID);
 
     pendingStationInteractions[entityID] =
         stationID;
@@ -415,12 +415,14 @@ bool World::QueueMeleeEngagementRequest(
     pendingResourceInteractions.erase(attackerEntityID);
     pendingStationInteractions.erase(attackerEntityID);
 
-    pendingMeleeInteractions[attackerEntityID] =
-        PendingMeleeInteraction{
+    if (!meleeEngagementSystem.RequestEngagement(
             attackerEntityID,
             defenderEntityID,
             durationTicks,
-            destination};
+            entityManager))
+    {
+        return false;
+    }
 
     movementSystem.CancelMovement(attackerEntityID);
 
@@ -431,7 +433,7 @@ bool World::QueueMeleeEngagementRequest(
             defenderEntityID,
             durationTicks);
 
-        pendingMeleeInteractions.erase(
+        meleeEngagementSystem.ClearEngagement(
             attackerEntityID);
 
         return started;
@@ -497,93 +499,72 @@ void World::ClearPendingStationInteraction(
 bool World::HasPendingMeleeEngagement(
     int entityID) const
 {
-    return pendingMeleeInteractions.find(entityID) !=
-           pendingMeleeInteractions.end();
+    return meleeEngagementSystem.HasEngagement(entityID);
 }
 
-void World::ProcessPendingMeleeInteractions()
+void World::ProcessMeleeEngagementSystem()
 {
-    auto interactionIterator =
-        pendingMeleeInteractions.begin();
+    const std::vector<MeleeEngagementIntent> intents =
+        meleeEngagementSystem.Evaluate(entityManager);
 
-    while (interactionIterator !=
-           pendingMeleeInteractions.end())
+    for (const MeleeEngagementIntent &intent : intents)
     {
-        PendingMeleeInteraction request =
-            interactionIterator->second;
-
-        Entity *attackerEntity =
-            entityManager.GetEntityByID(
-                request.attackerEntityID);
-
-        Entity *defenderEntity =
-            entityManager.GetEntityByID(
-                request.defenderEntityID);
-
-        Player *attacker =
-            dynamic_cast<Player *>(attackerEntity);
-
-        Combatant *defender =
-            TryGetCombatant(defenderEntity);
-
-        if (attacker == nullptr ||
-            defender == nullptr ||
-            !attacker->IsAlive() ||
-            !defender->IsAlive())
+        if (intent.type ==
+            MeleeEngagementIntentType::CLEAR_ENGAGEMENT)
         {
-            interactionIterator =
-                pendingMeleeInteractions.erase(
-                    interactionIterator);
             continue;
         }
 
-        if (actionManager.HasActionForEntity(
-                request.attackerEntityID))
+        if (actionManager.HasActionForEntity(intent.attackerEntityID))
         {
-            interactionIterator =
-                pendingMeleeInteractions.erase(
-                    interactionIterator);
+            meleeEngagementSystem.ClearEngagement(
+                intent.attackerEntityID);
             continue;
         }
 
-        int attackerX = attackerEntity->GetPosition().GetX();
-        int attackerY = attackerEntity->GetPosition().GetY();
-        int defenderX = defenderEntity->GetPosition().GetX();
-        int defenderY = defenderEntity->GetPosition().GetY();
-
-        bool isAdjacent =
-            std::abs(attackerX - defenderX) <= 1 &&
-            std::abs(attackerY - defenderY) <= 1;
-
-        if (isAdjacent)
+        if (intent.type == MeleeEngagementIntentType::ATTACK_TARGET)
         {
-            bool started = TryStartMeleeEngagement(
-                request.attackerEntityID,
-                request.defenderEntityID,
-                request.durationTicks);
-
-            interactionIterator =
-                pendingMeleeInteractions.erase(
-                    interactionIterator);
-
-            if (!started)
-            {
-                continue;
-            }
-
+            const bool started = TryStartMeleeEngagement(
+                intent.attackerEntityID,
+                intent.targetEntityID,
+                intent.durationTicks);
+            meleeEngagementSystem.ClearEngagement(
+                intent.attackerEntityID);
+            (void)started;
             continue;
         }
 
-        if (movementSystem.HasMovement(
-                request.attackerEntityID))
+        if (movementSystem.HasMovement(intent.attackerEntityID))
         {
-            ++interactionIterator;
             continue;
         }
 
-        interactionIterator =
-            pendingMeleeInteractions.erase(
-                interactionIterator);
+        Entity *attackerEntity = entityManager.GetEntityByID(
+            intent.attackerEntityID);
+        Entity *targetEntity = entityManager.GetEntityByID(
+            intent.targetEntityID);
+        if (attackerEntity == nullptr || targetEntity == nullptr)
+        {
+            meleeEngagementSystem.ClearEngagement(intent.attackerEntityID);
+            continue;
+        }
+
+        const std::optional<std::pair<int, int>> destination =
+            FindMeleeApproachTile(
+                attackerEntity->GetPosition().GetX(),
+                attackerEntity->GetPosition().GetY(),
+                targetEntity->GetPosition().GetX(),
+                targetEntity->GetPosition().GetY());
+
+        if (!destination.has_value() ||
+            !movementSystem.QueueDestination(
+                intent.attackerEntityID,
+                Position(destination->first, destination->second),
+                entityManager,
+                map))
+        {
+            meleeEngagementSystem.ClearEngagement(intent.attackerEntityID);
+        }
     }
 }
 
@@ -773,6 +754,15 @@ bool World::TryStartMeleeEngagement(
     int defenderEntityID,
     int durationTicks)
 {
+    if (!meleeEngagementSystem.RequestEngagement(
+            attackerEntityID,
+            defenderEntityID,
+            durationTicks,
+            entityManager))
+    {
+        return false;
+    }
+
     bool started = TryStartMeleeAction(
         attackerEntityID,
         defenderEntityID,
@@ -781,8 +771,11 @@ bool World::TryStartMeleeEngagement(
 
     if (!started)
     {
+        meleeEngagementSystem.ClearEngagement(attackerEntityID);
         return false;
     }
+
+    meleeEngagementSystem.ClearEngagement(attackerEntityID);
 
     Entity *attackerEntity =
         entityManager.GetEntityByID(
@@ -1066,7 +1059,7 @@ void World::Update()
     entityManager.Update(*this);
     ProcessMovementRequests();
     ProcessAggressiveMonsters();
-    ProcessPendingMeleeInteractions();
+    ProcessMeleeEngagementSystem();
     ProcessEntityDeathRewards();
     ScheduleMonsterRespawnsFromDeathEvents();
     PublishActionLifecycleEvents();
@@ -1401,7 +1394,7 @@ void World::ExecuteMonsterAIIntent(
             intent.clearReason == MonsterAIClearReason::LEASH_VIOLATED
                 ? ActionCancelReason::OUT_OF_RANGE
                 : ActionCancelReason::TARGET_MISSING);
-        pendingMeleeInteractions.erase(intent.monsterEntityID);
+        meleeEngagementSystem.ClearEngagement(intent.monsterEntityID);
         ClearPendingMovementForEntity(intent.monsterEntityID);
         return;
     case MonsterAIIntentType::ATTACK_TARGET:
@@ -1414,7 +1407,7 @@ void World::ExecuteMonsterAIIntent(
             CancelActionsForEntity(
                 intent.monsterEntityID,
                 ActionCancelReason::TARGET_MISSING);
-            pendingMeleeInteractions.erase(intent.monsterEntityID);
+            meleeEngagementSystem.ClearEngagement(intent.monsterEntityID);
         }
         monster->SetAggressionTargetEntityID(intent.targetEntityID);
         ClearPendingMovementForEntity(intent.monsterEntityID);
@@ -1439,7 +1432,7 @@ void World::ExecuteMonsterAIIntent(
             CancelActionsForEntity(
                 intent.monsterEntityID,
                 ActionCancelReason::TARGET_MISSING);
-            pendingMeleeInteractions.erase(intent.monsterEntityID);
+            meleeEngagementSystem.ClearEngagement(intent.monsterEntityID);
         }
         monster->SetAggressionTargetEntityID(intent.targetEntityID);
         if (acquiredTarget)
@@ -1502,7 +1495,7 @@ void World::QueueMovementRequest(const MovementRequest &request)
         request.GetEntityID(),
         ActionCancelReason::PLAYER_MOVED);
 
-    pendingMeleeInteractions.erase(
+    meleeEngagementSystem.ClearEngagement(
         request.GetEntityID());
 
     movementRequests.push(request);
@@ -1527,7 +1520,7 @@ void World::QueueMovementDestination(
         request.GetEntityID(),
         ActionCancelReason::PLAYER_MOVED);
 
-    pendingMeleeInteractions.erase(
+    meleeEngagementSystem.ClearEngagement(
         request.GetEntityID());
 
     movementSystem.QueueDestination(
@@ -3094,21 +3087,7 @@ void World::RestartAction(
 void World::ClearPendingMeleeInteractionsInvolvingEntity(
     int entityID)
 {
-    auto iterator =
-        pendingMeleeInteractions.begin();
-
-    while (iterator != pendingMeleeInteractions.end())
-    {
-        if (iterator->second.attackerEntityID == entityID ||
-            iterator->second.defenderEntityID == entityID)
-        {
-            iterator = pendingMeleeInteractions.erase(
-                iterator);
-            continue;
-        }
-
-        ++iterator;
-    }
+    meleeEngagementSystem.ClearEngagementsInvolving(entityID);
 }
 
 void World::ClearPendingMovementForEntity(
@@ -3589,6 +3568,7 @@ bool World::ScheduleMonsterRespawn(
 bool World::RemoveEntity(int entityID)
 {
     ClearPendingMovementForEntity(entityID);
+    ClearPendingMeleeInteractionsInvolvingEntity(entityID);
 
     auto association = monsterRespawnEventIDs.find(entityID);
     if (association != monsterRespawnEventIDs.end())

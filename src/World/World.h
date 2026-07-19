@@ -17,6 +17,7 @@
 #include <map>
 #include "../Combat/CombatService.h"
 #include "../Combat/MeleeCombatFeedback.h"
+#include "../Combat/MeleeEngagementSystem.h"
 #include "../Reward/ItemReward.h"
 #include "../Reward/RewardTableRoller.h"
 #include "../Reward/RewardTableType.h"
@@ -209,6 +210,8 @@ private:
 
     MovementSystem movementSystem;
 
+    MeleeEngagementSystem meleeEngagementSystem;
+
     void CreateResource(
         ResourceType resourceType,
         int x,
@@ -224,7 +227,7 @@ private:
     void ProcessMovementSystem();
     void ProcessResourceInteractions();
     void ProcessStationInteractions();
-    void ProcessPendingMeleeInteractions();
+    void ProcessMeleeEngagementSystem();
     void ProcessCompletedActions(
         const std::vector<Action> &completedActions);
     void ProcessAggressiveMonsters();
@@ -277,16 +280,6 @@ private:
 
     std::map<int, int> pendingResourceInteractions;
     std::map<int, int> pendingStationInteractions;
-    struct PendingMeleeInteraction
-    {
-        int attackerEntityID;
-        int defenderEntityID;
-        int durationTicks;
-        std::optional<std::pair<int, int>> destination;
-    };
-
-    std::map<int, PendingMeleeInteraction>
-        pendingMeleeInteractions;
     std::map<int, StationType> openedStations;
     std::map<int, int> activeStations;
 
