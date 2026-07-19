@@ -15,6 +15,7 @@ ItemDatabase::GetAllItemTypes()
         ItemType::IRON_BAR,
         ItemType::STEEL_BAR,
         ItemType::COINS,
+        ItemType::COOKED_MEAT,
         ItemType::BRONZE_AXE,
         ItemType::IRON_AXE,
         ItemType::STEEL_AXE,
@@ -150,6 +151,18 @@ const ItemDefinition &ItemDatabase::Get(
         SkillType::NONE,
         0,
         0};
+
+    static const ItemDefinition cookedMeat{
+        ItemType::COOKED_MEAT,
+        "Cooked meat",
+        false,
+        EquipmentSlotType::NONE,
+        ToolType::NONE,
+        SkillType::NONE,
+        0,
+        0,
+        StatBlock(),
+        FoodDefinition{5}};
 
     static const ItemDefinition bronzeAxe{
         ItemType::BRONZE_AXE,
@@ -308,6 +321,9 @@ const ItemDefinition &ItemDatabase::Get(
 
     case ItemType::COINS:
         return coins;
+
+    case ItemType::COOKED_MEAT:
+        return cookedMeat;
 
     case ItemType::BRONZE_AXE:
         return bronzeAxe;

@@ -18,6 +18,7 @@ enum class ItemType
     STEEL_BAR,
 
     COINS,
+    COOKED_MEAT,
 
     BRONZE_AXE,
     IRON_AXE,

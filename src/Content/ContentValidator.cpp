@@ -109,6 +109,8 @@ namespace
             return "STEEL_BAR";
         case ItemType::COINS:
             return "COINS";
+        case ItemType::COOKED_MEAT:
+            return "COOKED_MEAT";
         case ItemType::BRONZE_AXE:
             return "BRONZE_AXE";
         case ItemType::IRON_AXE:
@@ -964,6 +966,70 @@ void ContentValidator::AppendItemValidation(
                 contentID,
                 "equipment stat bonuses must not be negative");
             break;
+        }
+    }
+
+    if (definition.IsFood())
+    {
+        const FoodDefinition *foodDefinition =
+            definition.GetFoodDefinition();
+
+        if (foodDefinition == nullptr)
+        {
+            report.AddError(
+                "Item",
+                contentID,
+                "food items must have a valid food definition");
+        }
+        else if (foodDefinition->healAmount <= 0)
+        {
+            report.AddError(
+                "Item",
+                contentID,
+                "food healing amount must be positive");
+        }
+
+        if (definition.IsEquippable())
+        {
+            report.AddError(
+                "Item",
+                contentID,
+                "food items must not be equippable");
+        }
+
+        if (definition.GetEquipmentSlot() !=
+            EquipmentSlotType::NONE)
+        {
+            report.AddError(
+                "Item",
+                contentID,
+                "food items must use EquipmentSlotType::NONE");
+        }
+
+        if (definition.GetToolType() !=
+            ToolType::NONE)
+        {
+            report.AddError(
+                "Item",
+                contentID,
+                "food items must not be gathering tools");
+        }
+
+        for (int rawStatType = 0;
+             rawStatType < static_cast<int>(StatType::COUNT);
+             ++rawStatType)
+        {
+            StatType statType =
+                static_cast<StatType>(rawStatType);
+
+            if (bonuses.Get(statType) != 0)
+            {
+                report.AddError(
+                    "Item",
+                    contentID,
+                    "food items must not have equipment stat bonuses");
+                break;
+            }
         }
     }
 

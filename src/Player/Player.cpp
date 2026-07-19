@@ -217,9 +217,51 @@ int Player::ApplyDamage(int amount)
     return healthPool.ApplyDamage(amount);
 }
 
+bool Player::TryHeal(int amount)
+{
+    if (amount <= 0)
+    {
+        return false;
+    }
+
+    if (!IsAlive())
+    {
+        return false;
+    }
+
+    const int currentHealth =
+        healthPool.GetCurrentHealth();
+
+    const int maximumHealth =
+        healthPool.GetMaximumHealth();
+
+    if (currentHealth >= maximumHealth)
+    {
+        return false;
+    }
+
+    int missingHealth =
+        maximumHealth - currentHealth;
+
+    int appliedHealing = amount;
+
+    if (appliedHealing > missingHealth)
+    {
+        appliedHealing = missingHealth;
+    }
+
+    if (appliedHealing <= 0)
+    {
+        return false;
+    }
+
+    healthPool.Heal(appliedHealing);
+    return true;
+}
+
 void Player::Heal(int amount)
 {
-    healthPool.Heal(amount);
+    TryHeal(amount);
 }
 
 void Player::RestoreHealthToFull()

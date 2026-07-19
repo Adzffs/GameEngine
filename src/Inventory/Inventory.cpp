@@ -181,6 +181,30 @@ bool Inventory::RemoveItem(
     return false;
 }
 
+bool Inventory::RemoveItemFromSlot(
+    int slotIndex,
+    int amount)
+{
+    if (slotIndex < 0 ||
+        slotIndex >= SlotCount ||
+        amount <= 0)
+    {
+        return false;
+    }
+
+    InventorySlot &slot =
+        slots[slotIndex];
+
+    if (slot.IsEmpty() ||
+        slot.GetAmount() < amount)
+    {
+        return false;
+    }
+
+    slot.RemoveAmount(amount);
+    return true;
+}
+
 int Inventory::GetItemAmount(
     ItemType itemType) const
 {

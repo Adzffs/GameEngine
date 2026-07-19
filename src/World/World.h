@@ -108,6 +108,10 @@ public:
         int entityID,
         int slotIndex);
 
+    bool TryConsumeFood(
+        int playerEntityID,
+        int inventorySlotIndex);
+
     bool TryUnequipItem(
         int entityID,
         EquipmentSlotType equipmentSlot);

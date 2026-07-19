@@ -11,7 +11,8 @@ ItemDefinition::ItemDefinition(
     SkillType requiredSkill,
     int requiredSkillLevel,
     int actionDurationTicks,
-    StatBlock equipmentStatBonuses)
+    StatBlock equipmentStatBonuses,
+    std::optional<FoodDefinition> foodDefinition)
     : itemType(itemType),
       name(std::move(name)),
       stackable(stackable),
@@ -20,7 +21,8 @@ ItemDefinition::ItemDefinition(
       requiredSkill(requiredSkill),
       requiredSkillLevel(requiredSkillLevel),
       actionDurationTicks(actionDurationTicks),
-      equipmentStatBonuses(equipmentStatBonuses)
+      equipmentStatBonuses(equipmentStatBonuses),
+      foodDefinition(foodDefinition)
 {
     if (requiredSkill != SkillType::NONE ||
         requiredSkillLevel != 0)
@@ -83,6 +85,22 @@ int ItemDefinition::GetRequiredSkillLevel() const
 int ItemDefinition::GetActionDurationTicks() const
 {
     return actionDurationTicks;
+}
+
+bool ItemDefinition::IsFood() const
+{
+    return foodDefinition.has_value();
+}
+
+const FoodDefinition *
+ItemDefinition::GetFoodDefinition() const
+{
+    if (!foodDefinition.has_value())
+    {
+        return nullptr;
+    }
+
+    return &foodDefinition.value();
 }
 
 const std::vector<RequirementSystem::Requirement> &

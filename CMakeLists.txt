@@ -354,4 +354,15 @@ if(BUILD_TESTING)
         NAME StatusEffectTests
         COMMAND StatusEffectTests
     )
+
+    add_executable(FoodHealingTests
+        tests/FoodHealingTests.cpp
+    )
+
+    target_link_libraries(FoodHealingTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME FoodHealingTests
+        COMMAND FoodHealingTests
+    )
 endif()

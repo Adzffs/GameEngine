@@ -23,6 +23,10 @@ public:
         ItemType itemType,
         int amount);
 
+    bool RemoveItemFromSlot(
+        int slotIndex,
+        int amount);
+
     int GetItemAmount(
         ItemType itemType) const;
 

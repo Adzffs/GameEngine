@@ -6,9 +6,11 @@
 #include "../Stats/StatBlock.h"
 #include "../Requirement/Requirement.h"
 #include "ToolType.h"
+#include "FoodDefinition.h"
 
 #include <vector>
 #include <string>
+#include <optional>
 
 class ItemDefinition
 {
@@ -22,7 +24,8 @@ public:
         SkillType requiredSkill,
         int requiredSkillLevel,
         int actionDurationTicks,
-        StatBlock equipmentStatBonuses = StatBlock());
+        StatBlock equipmentStatBonuses = StatBlock(),
+        std::optional<FoodDefinition> foodDefinition = std::nullopt);
 
     ItemType GetItemType() const;
     const std::string &GetName() const;
@@ -38,6 +41,11 @@ public:
     int GetRequiredSkillLevel() const;
 
     int GetActionDurationTicks() const;
+
+    bool IsFood() const;
+
+    const FoodDefinition *
+    GetFoodDefinition() const;
 
     const std::vector<RequirementSystem::Requirement> &
     GetRequirements() const;
@@ -60,4 +68,6 @@ private:
     std::vector<RequirementSystem::Requirement> requirements;
 
     StatBlock equipmentStatBonuses;
+
+    std::optional<FoodDefinition> foodDefinition;
 };

@@ -41,6 +41,7 @@ public:
     bool IsAlive() const override;
 
     int ApplyDamage(int amount) override;
+    bool TryHeal(int amount);
     void Heal(int amount);
     void RestoreHealthToFull();
 

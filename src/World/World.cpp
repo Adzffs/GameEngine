@@ -2108,6 +2108,100 @@ void World::ProcessMovementRequests()
             request.GetY());
     }
 }
+
+bool World::TryConsumeFood(
+    int playerEntityID,
+    int inventorySlotIndex)
+{
+    Entity *entity =
+        entityManager.GetEntityByID(
+            playerEntityID);
+
+    if (entity == nullptr)
+    {
+        return false;
+    }
+
+    Player *player =
+        dynamic_cast<Player *>(entity);
+
+    if (player == nullptr)
+    {
+        return false;
+    }
+
+    if (!player->IsAlive())
+    {
+        return false;
+    }
+
+    if (inventorySlotIndex < 0 ||
+        inventorySlotIndex >= Inventory::SlotCount)
+    {
+        return false;
+    }
+
+    Inventory &inventory =
+        player->GetInventory();
+
+    const InventorySlot &slot =
+        inventory.GetSlots()[inventorySlotIndex];
+
+    if (slot.IsEmpty())
+    {
+        return false;
+    }
+
+    const ItemType itemType =
+        slot.GetItemType();
+
+    const ItemDefinition &itemDefinition =
+        ItemDatabase::Get(itemType);
+
+    if (itemDefinition.GetItemType() != itemType)
+    {
+        return false;
+    }
+
+    const FoodDefinition *foodDefinition =
+        itemDefinition.GetFoodDefinition();
+
+    if (foodDefinition == nullptr)
+    {
+        return false;
+    }
+
+    const int healAmount =
+        foodDefinition->healAmount;
+
+    if (healAmount <= 0)
+    {
+        return false;
+    }
+
+    if (player->GetCurrentHealth() >=
+        player->GetMaximumHealth())
+    {
+        return false;
+    }
+
+    Inventory simulatedInventory =
+        inventory;
+
+    if (!simulatedInventory.RemoveItemFromSlot(
+            inventorySlotIndex,
+            1))
+    {
+        return false;
+    }
+
+    player->GetInventory() =
+        simulatedInventory;
+
+    return player->TryHeal(
+        healAmount);
+}
+
 bool World::TryEquipInventoryItem(
     int entityID,
     int slotIndex)

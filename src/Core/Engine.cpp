@@ -96,9 +96,14 @@ void Engine::Run()
         if (graphics.ConsumeInventorySlotClick(
                 clickedInventorySlot))
         {
-            world.TryEquipInventoryItem(
-                playerID,
-                clickedInventorySlot);
+            if (!world.TryConsumeFood(
+                    playerID,
+                    clickedInventorySlot))
+            {
+                world.TryEquipInventoryItem(
+                    playerID,
+                    clickedInventorySlot);
+            }
         }
 
         if (graphics.ConsumeWeaponSlotClick())

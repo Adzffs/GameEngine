@@ -198,6 +198,11 @@ public:
         float x,
         float y,
         float size);
+    void DrawFoodIcon(
+        ItemType itemType,
+        float x,
+        float y,
+        float size);
     SDL_Window *window;
     SDL_Renderer *renderer;
 

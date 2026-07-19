@@ -2539,6 +2539,53 @@ void Graphics::DrawOreIcon(
         &oreDeposit);
 }
 
+void Graphics::DrawFoodIcon(
+    ItemType itemType,
+    float x,
+    float y,
+    float size)
+{
+    if (itemType !=
+        ItemType::COOKED_MEAT)
+    {
+        return;
+    }
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        145,
+        70,
+        45,
+        255);
+
+    SDL_FRect meatRectangle{
+        x + size * 0.20f,
+        y + size * 0.30f,
+        size * 0.60f,
+        size * 0.38f};
+
+    SDL_RenderFillRect(
+        renderer,
+        &meatRectangle);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        205,
+        125,
+        90,
+        255);
+
+    SDL_FRect highlightRectangle{
+        x + size * 0.26f,
+        y + size * 0.36f,
+        size * 0.32f,
+        size * 0.12f};
+
+    SDL_RenderFillRect(
+        renderer,
+        &highlightRectangle);
+}
+
 void Graphics::DrawInventory(
     const Inventory &inventory)
 {
@@ -2703,6 +2750,12 @@ void Graphics::DrawInventory(
             slotSize);
 
         DrawBarIcon(
+            slot.GetItemType(),
+            slotX,
+            slotY,
+            slotSize);
+
+        DrawFoodIcon(
             slot.GetItemType(),
             slotX,
             slotY,

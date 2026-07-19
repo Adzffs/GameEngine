@@ -333,5 +333,273 @@ int main()
             "Valid transaction adds ore exactly once");
     }
 
+    {
+        Inventory inventory;
+        inventory.AddItem(ItemType::COINS, 5);
+
+        int coinSlot =
+            FindFirstSlot(
+                inventory,
+                ItemType::COINS);
+
+        test.Expect(
+            coinSlot >= 0,
+            "Stack slot exists for slot-removal failure tests");
+
+        Inventory before = inventory;
+
+        test.Expect(
+            !inventory.RemoveItemFromSlot(
+                -1,
+                1),
+            "Negative slot index fails");
+        test.Expect(
+            SameSlots(inventory, before),
+            "Negative slot index leaves inventory unchanged");
+
+        test.Expect(
+            !inventory.RemoveItemFromSlot(
+                Inventory::SlotCount,
+                1),
+            "Slot index equal to SlotCount fails");
+        test.Expect(
+            SameSlots(inventory, before),
+            "SlotCount index failure leaves inventory unchanged");
+
+        test.Expect(
+            !inventory.RemoveItemFromSlot(
+                Inventory::SlotCount + 1,
+                1),
+            "Slot index greater than SlotCount fails");
+        test.Expect(
+            SameSlots(inventory, before),
+            "Out-of-range slot index leaves inventory unchanged");
+
+        test.Expect(
+            !inventory.RemoveItemFromSlot(
+                coinSlot,
+                0),
+            "Quantity zero fails");
+        test.Expect(
+            SameSlots(inventory, before),
+            "Zero quantity failure leaves inventory unchanged");
+
+        test.Expect(
+            !inventory.RemoveItemFromSlot(
+                coinSlot,
+                -3),
+            "Negative quantity fails");
+        test.Expect(
+            SameSlots(inventory, before),
+            "Negative quantity failure leaves inventory unchanged");
+
+        test.Expect(
+            !inventory.RemoveItemFromSlot(
+                coinSlot,
+                6),
+            "Quantity greater than slot amount fails");
+        test.Expect(
+            SameSlots(inventory, before),
+            "Excess quantity failure leaves inventory unchanged");
+
+        int emptySlot = -1;
+
+        const auto &slots =
+            inventory.GetSlots();
+
+        for (int index = 0; index < Inventory::SlotCount; ++index)
+        {
+            if (slots[index].IsEmpty())
+            {
+                emptySlot = index;
+                break;
+            }
+        }
+
+        test.Expect(
+            emptySlot >= 0,
+            "Empty slot exists for removal failure test");
+        test.Expect(
+            !inventory.RemoveItemFromSlot(
+                emptySlot,
+                1),
+            "Empty slot removal fails");
+        test.Expect(
+            SameSlots(inventory, before),
+            "Empty slot failure leaves inventory unchanged");
+    }
+
+    {
+        Inventory inventory;
+
+        test.Expect(
+            inventory.AddItem(
+                ItemType::COAL,
+                2),
+            "Two non-stackable items are added for slot-specific removal tests");
+
+        int firstCoalSlot = -1;
+        int secondCoalSlot = -1;
+
+        const auto &beforeSlots =
+            inventory.GetSlots();
+
+        for (int index = 0; index < Inventory::SlotCount; ++index)
+        {
+            if (beforeSlots[index].IsEmpty() ||
+                beforeSlots[index].GetItemType() != ItemType::COAL)
+            {
+                continue;
+            }
+
+            if (firstCoalSlot < 0)
+            {
+                firstCoalSlot = index;
+            }
+            else
+            {
+                secondCoalSlot = index;
+                break;
+            }
+        }
+
+        test.Expect(
+            firstCoalSlot >= 0 && secondCoalSlot >= 0,
+            "Duplicate non-stackable items occupy two distinct slots");
+
+        Inventory before = inventory;
+
+        test.Expect(
+            inventory.RemoveItemFromSlot(
+                firstCoalSlot,
+                1),
+            "Removing one non-stackable item succeeds");
+
+        const auto &afterSlots =
+            inventory.GetSlots();
+
+        test.Expect(
+            afterSlots[firstCoalSlot].IsEmpty(),
+            "Removing one from a non-stackable slot empties that exact slot");
+        test.Expect(
+            !afterSlots[secondCoalSlot].IsEmpty() &&
+                afterSlots[secondCoalSlot].GetItemType() == ItemType::COAL &&
+                afterSlots[secondCoalSlot].GetAmount() == 1,
+            "Removing one duplicate non-stackable item leaves the other slot unchanged");
+
+        test.ExpectEqual(
+            inventory.GetItemAmount(ItemType::COAL),
+            before.GetItemAmount(ItemType::COAL) - 1,
+            "Exactly one duplicate non-stackable item is removed");
+    }
+
+    {
+        Inventory inventory;
+
+        test.Expect(
+            inventory.AddItem(
+                ItemType::COINS,
+                10),
+            "Stackable item is added for selected-slot stack-removal tests");
+
+        int coinSlot =
+            FindFirstSlot(
+                inventory,
+                ItemType::COINS);
+
+        test.Expect(
+            coinSlot >= 0,
+            "Coin stack slot exists");
+
+        test.Expect(
+            inventory.RemoveItemFromSlot(
+                coinSlot,
+                3),
+            "Removing part of a stack succeeds");
+
+        const auto &afterPartialRemoval =
+            inventory.GetSlots();
+
+        test.Expect(
+            !afterPartialRemoval[coinSlot].IsEmpty() &&
+                afterPartialRemoval[coinSlot].GetItemType() == ItemType::COINS,
+            "Partial stack removal keeps selected slot occupied by same item type");
+        test.ExpectEqual(
+            afterPartialRemoval[coinSlot].GetAmount(),
+            7,
+            "Partial stack removal decreases only selected slot amount");
+
+        test.Expect(
+            inventory.RemoveItemFromSlot(
+                coinSlot,
+                7),
+            "Removing the rest of the stack succeeds");
+
+        const auto &afterFullRemoval =
+            inventory.GetSlots();
+
+        test.Expect(
+            afterFullRemoval[coinSlot].IsEmpty(),
+            "Removing entire stack empties selected slot");
+    }
+
+    {
+        Inventory inventory;
+        inventory.AddItem(ItemType::COAL, 1);
+        inventory.AddItem(ItemType::COINS, 4);
+
+        int coalSlot =
+            FindFirstSlot(
+                inventory,
+                ItemType::COAL);
+        int coinSlot =
+            FindFirstSlot(
+                inventory,
+                ItemType::COINS);
+
+        test.Expect(
+            coalSlot >= 0 && coinSlot >= 0,
+            "Slots exist for fallback-removal guard test");
+
+        Inventory before = inventory;
+
+        test.Expect(
+            inventory.RemoveItemFromSlot(
+                coalSlot,
+                1),
+            "Removing selected non-stackable slot succeeds");
+
+        test.Expect(
+            !inventory.RemoveItemFromSlot(
+                coalSlot,
+                1),
+            "Second removal from now-empty selected slot fails");
+
+        const auto &after =
+            inventory.GetSlots();
+
+        test.Expect(
+            !after[coinSlot].IsEmpty() &&
+                after[coinSlot].GetItemType() == ItemType::COINS &&
+                after[coinSlot].GetAmount() == 4,
+            "Failed removal from empty selected slot does not remove item from another slot");
+
+        test.ExpectEqual(
+            inventory.GetItemAmount(ItemType::COINS),
+            before.GetItemAmount(ItemType::COINS),
+            "No item-type fallback removes another matching or non-matching item");
+
+        Inventory afterEmptyFail = inventory;
+
+        test.Expect(
+            !inventory.RemoveItemFromSlot(
+                Inventory::SlotCount,
+                1),
+            "Invalid selected slot does not trigger fallback removal");
+        test.Expect(
+            SameSlots(inventory, afterEmptyFail),
+            "Invalid selected slot failure leaves complete inventory unchanged");
+    }
+
     return test.Finish();
 }

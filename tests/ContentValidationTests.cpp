@@ -138,7 +138,7 @@ int main()
 
         test.ExpectEqual(
             static_cast<int>(itemTypes.size()),
-            20,
+            21,
             "Every registered item type is enumerated");
         test.ExpectEqual(
             static_cast<int>(resourceTypes.size()),
@@ -167,6 +167,47 @@ int main()
         test.Expect(
             itemIDsMatch,
             "Enumerated item definitions match their IDs");
+
+        bool hasCookedMeat = false;
+
+        for (ItemType itemType : itemTypes)
+        {
+            if (itemType == ItemType::COOKED_MEAT)
+            {
+                hasCookedMeat = true;
+                break;
+            }
+        }
+
+        test.Expect(
+            hasCookedMeat,
+            "Cooked meat is included in deterministic item enumeration");
+
+        const ItemDefinition &cookedMeat =
+            ItemDatabase::Get(
+                ItemType::COOKED_MEAT);
+
+        test.ExpectEqual(
+            cookedMeat.GetName(),
+            std::string("Cooked meat"),
+            "Cooked meat has a non-empty registered name");
+        test.Expect(
+            cookedMeat.IsFood(),
+            "Cooked meat has a food definition");
+        test.Expect(
+            cookedMeat.GetFoodDefinition() != nullptr,
+            "Cooked meat food definition is readable");
+        test.ExpectEqual(
+            cookedMeat.GetFoodDefinition()->healAmount,
+            5,
+            "Cooked meat heal amount is 5");
+        test.Expect(
+            !cookedMeat.IsEquippable(),
+            "Cooked meat is non-equippable");
+        test.ExpectEqual(
+            static_cast<int>(cookedMeat.GetToolType()),
+            static_cast<int>(ToolType::NONE),
+            "Cooked meat is not a tool");
     }
 
     {
@@ -352,6 +393,106 @@ int main()
                  malformedRequirement)
                  .IsValid(),
             "Malformed item requirement is rejected");
+
+        ItemDefinition zeroFoodHealing(
+            ItemType::COOKED_MEAT,
+            "Zero food",
+            false,
+            EquipmentSlotType::NONE,
+            ToolType::NONE,
+            SkillType::NONE,
+            0,
+            0,
+            StatBlock(),
+            FoodDefinition{0});
+
+        test.Expect(
+            !ContentValidator::ValidateItemDefinition(
+                 ItemType::COOKED_MEAT,
+                 zeroFoodHealing)
+                 .IsValid(),
+            "Food with zero healing is rejected");
+
+        ItemDefinition negativeFoodHealing(
+            ItemType::COOKED_MEAT,
+            "Negative food",
+            false,
+            EquipmentSlotType::NONE,
+            ToolType::NONE,
+            SkillType::NONE,
+            0,
+            0,
+            StatBlock(),
+            FoodDefinition{-5});
+
+        test.Expect(
+            !ContentValidator::ValidateItemDefinition(
+                 ItemType::COOKED_MEAT,
+                 negativeFoodHealing)
+                 .IsValid(),
+            "Food with negative healing is rejected");
+
+        ItemDefinition foodWithEquipmentSlot(
+            ItemType::COOKED_MEAT,
+            "Food with slot",
+            false,
+            EquipmentSlotType::WEAPON,
+            ToolType::NONE,
+            SkillType::NONE,
+            0,
+            0,
+            StatBlock(),
+            FoodDefinition{5});
+
+        test.Expect(
+            !ContentValidator::ValidateItemDefinition(
+                 ItemType::COOKED_MEAT,
+                 foodWithEquipmentSlot)
+                 .IsValid(),
+            "Food with an equipment slot is rejected");
+
+        ItemDefinition foodAsTool(
+            ItemType::COOKED_MEAT,
+            "Food tool",
+            false,
+            EquipmentSlotType::NONE,
+            ToolType::AXE,
+            SkillType::WOODCUTTING,
+            1,
+            5,
+            StatBlock(),
+            FoodDefinition{5});
+
+        test.Expect(
+            !ContentValidator::ValidateItemDefinition(
+                 ItemType::COOKED_MEAT,
+                 foodAsTool)
+                 .IsValid(),
+            "Food configured as a tool is rejected");
+
+        StatBlock foodBonuses;
+        foodBonuses.Set(
+            StatType::MAX_HEALTH,
+            1);
+
+        ItemDefinition foodWithBonuses(
+            ItemType::COOKED_MEAT,
+            "Food bonus",
+            false,
+            EquipmentSlotType::NONE,
+            ToolType::NONE,
+            SkillType::NONE,
+            0,
+            0,
+            foodBonuses,
+            FoodDefinition{5});
+
+        test.Expect(
+            !ContentValidator::ValidateItemDefinition(
+                 ItemType::COOKED_MEAT,
+                 foodWithBonuses)
+                 .IsValid(),
+            "Food with equipment bonuses is rejected");
     }
 
     {
