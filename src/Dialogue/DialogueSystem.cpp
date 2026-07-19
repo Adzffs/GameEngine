@@ -1,4 +1,5 @@
 #include "DialogueSystem.h"
+#include "DialogueDefinitionDatabase.h"
 
 DialogueSessionId DialogueSystem::Start(
     int actorEntityID, int npcEntityID, NpcType npcType, DialogueId dialogueId,
@@ -28,6 +29,35 @@ bool DialogueSystem::Advance(int actorEntityID, DialogueSessionId sessionId,
     found->second.currentNodeId = nextNodeId;
     found->second.lastAdvancedTick = currentTick;
     return true;
+}
+
+bool DialogueSystem::CommitContinuation(
+    int actorEntityID, DialogueSessionId sessionId,
+    DialogueNodeId nextNodeId, int currentTick)
+{
+    const ActiveDialogueSession *session = GetSession(actorEntityID);
+    const DialogueNodeDefinition *node = session == nullptr ? nullptr :
+        DialogueDefinitionDatabase::TryGetNode(
+            session->dialogueId, session->currentNodeId);
+    if (session == nullptr || session->sessionId != sessionId || node == nullptr ||
+        node->kind != DialogueNodeKind::CONTINUE ||
+        node->nextNodeId != nextNodeId)
+        return false;
+    return Advance(actorEntityID, sessionId, nextNodeId, currentTick);
+}
+
+bool DialogueSystem::CommitChoice(
+    int actorEntityID, DialogueSessionId sessionId, DialogueChoiceId choiceId,
+    DialogueNodeId destinationNodeId, int currentTick)
+{
+    const ActiveDialogueSession *session = GetSession(actorEntityID);
+    const DialogueChoiceDefinition *choice = session == nullptr ? nullptr :
+        DialogueDefinitionDatabase::TryGetChoice(
+            session->dialogueId, session->currentNodeId, choiceId);
+    if (session == nullptr || session->sessionId != sessionId || choice == nullptr ||
+        choice->destinationNodeId != destinationNodeId)
+        return false;
+    return Advance(actorEntityID, sessionId, destinationNodeId, currentTick);
 }
 
 bool DialogueSystem::Close(int actorEntityID, DialogueSessionId sessionId)

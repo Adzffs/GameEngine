@@ -21,9 +21,16 @@ int main()
             dialogue->id, DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME);
         const auto *explanation = DialogueDefinitionDatabase::TryGetNode(
             dialogue->id, DialogueNodeId::DEVELOPMENT_GUIDE_EXPLANATION);
+        const auto *prompt = DialogueDefinitionDatabase::TryGetNode(
+            dialogue->id, DialogueNodeId::DEVELOPMENT_GUIDE_TOPIC_PROMPT);
+        const auto *gathering = DialogueDefinitionDatabase::TryGetNode(
+            dialogue->id, DialogueNodeId::DEVELOPMENT_GUIDE_GATHERING_RESPONSE);
+        const auto *combat = DialogueDefinitionDatabase::TryGetNode(
+            dialogue->id, DialogueNodeId::DEVELOPMENT_GUIDE_COMBAT_RESPONSE);
         const auto *future = DialogueDefinitionDatabase::TryGetNode(
             dialogue->id, DialogueNodeId::DEVELOPMENT_GUIDE_FUTURE);
-        test.Expect(welcome != nullptr && explanation != nullptr && future != nullptr,
+        test.Expect(welcome != nullptr && explanation != nullptr && prompt != nullptr &&
+                        gathering != nullptr && combat != nullptr && future != nullptr,
                     "All stable nodes resolve");
         test.Expect(welcome->text == "Welcome to the development world.",
                     "Welcome text is exact");
@@ -35,8 +42,16 @@ int main()
             "Terminal text is exact");
         test.Expect(welcome->nextNodeId == DialogueNodeId::DEVELOPMENT_GUIDE_EXPLANATION,
                     "Welcome points to explanation");
-        test.Expect(explanation->nextNodeId == DialogueNodeId::DEVELOPMENT_GUIDE_FUTURE,
-                    "Explanation points to future");
+        test.Expect(explanation->nextNodeId == DialogueNodeId::DEVELOPMENT_GUIDE_TOPIC_PROMPT,
+                    "Explanation points to topic prompt");
+        test.Expect(prompt->kind == DialogueNodeKind::CHOICE && prompt->choices.size() == 2,
+                    "Topic prompt has two authored choices");
+        test.Expect(prompt->choices[0].id == DialogueChoiceId::DEVELOPMENT_GUIDE_GATHERING &&
+                        prompt->choices[1].id == DialogueChoiceId::DEVELOPMENT_GUIDE_COMBAT,
+                    "Choice order is deterministic");
+        test.Expect(gathering->nextNodeId == DialogueNodeId::DEVELOPMENT_GUIDE_FUTURE &&
+                        combat->nextNodeId == DialogueNodeId::DEVELOPMENT_GUIDE_FUTURE,
+                    "Both branches reconverge at future");
         test.Expect(!future->nextNodeId.has_value(), "Future node is terminal");
         test.Expect(ContentValidator::ValidateDialogueDefinition(*dialogue).IsValid(),
                     "Built-in dialogue validates");
@@ -58,7 +73,7 @@ int main()
         test.Expect(!ContentValidator::ValidateDialogueDefinition(emptyText).IsValid(),
                     "Empty node text is rejected");
         DialogueDefinition cycle = *dialogue;
-        cycle.nodes[2].nextNodeId = DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME;
+        cycle.nodes[3].nextNodeId = DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME;
         test.Expect(!ContentValidator::ValidateDialogueDefinition(cycle).IsValid(),
                     "Cycle is rejected");
         DialogueDefinition unreachable = *dialogue;
@@ -66,7 +81,8 @@ int main()
         test.Expect(!ContentValidator::ValidateDialogueDefinition(unreachable).IsValid(),
                     "Unreachable node is rejected");
         DialogueDefinition noTerminal = *dialogue;
-        noTerminal.nodes[2].nextNodeId = DialogueNodeId::DEVELOPMENT_GUIDE_EXPLANATION;
+        noTerminal.nodes.back().kind = DialogueNodeKind::CONTINUE;
+        noTerminal.nodes.back().nextNodeId = DialogueNodeId::DEVELOPMENT_GUIDE_EXPLANATION;
         test.Expect(!ContentValidator::ValidateDialogueDefinition(noTerminal).IsValid(),
                     "Graph without terminal is rejected");
         test.Expect(!ContentValidator::ValidateDialogueDefinitions({*dialogue, *dialogue}).IsValid(),

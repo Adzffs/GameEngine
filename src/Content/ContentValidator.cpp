@@ -482,11 +482,18 @@ ContentValidationReport ContentValidator::ValidateDialogueDefinitions(
 {
     ContentValidationReport report;
     std::set<DialogueId> ids;
+    std::set<DialogueChoiceId> choiceIds;
     for (const DialogueDefinition &definition : definitions)
     {
         if (!ids.insert(definition.id).second)
             report.AddError("DialogueDefinition", "duplicate", "dialogue ID must be unique");
         AppendDialogueDefinitionValidation(definition, report);
+        for (const DialogueNodeDefinition &node : definition.nodes)
+            for (const DialogueChoiceDefinition &choice : node.choices)
+                if (IsValidDialogueChoiceId(choice.id) &&
+                    !choiceIds.insert(choice.id).second)
+                    report.AddError("DialogueDefinition", "duplicate",
+                                    "choice IDs must be globally unique across dialogues");
     }
     return report;
 }
@@ -1547,6 +1554,7 @@ void ContentValidator::AppendDialogueDefinitionValidation(
         report.AddError("DialogueDefinition", contentID, "start node ID must be known and non-NONE");
 
     std::map<DialogueNodeId, const DialogueNodeDefinition *> nodes;
+    std::set<DialogueChoiceId> globalChoiceIds;
     for (const DialogueNodeDefinition &node : definition.nodes)
     {
         if (!IsValidDialogueNodeId(node.id))
@@ -1555,36 +1563,86 @@ void ContentValidator::AppendDialogueDefinitionValidation(
             report.AddError("DialogueDefinition", contentID, "node IDs must be unique");
         if (node.text.empty())
             report.AddError("DialogueDefinition", contentID, "node text must not be empty");
+        if (!IsValidDialogueNodeKind(node.kind))
+            report.AddError("DialogueDefinition", contentID, "node kind must be known");
         if (node.nextNodeId.has_value() && !IsValidDialogueNodeId(*node.nextNodeId))
             report.AddError("DialogueDefinition", contentID, "next node ID must be known");
+        if (node.kind == DialogueNodeKind::CONTINUE && !node.nextNodeId.has_value())
+            report.AddError("DialogueDefinition", contentID, "continue node must have one successor");
+        if (node.kind == DialogueNodeKind::CONTINUE && !node.choices.empty())
+            report.AddError("DialogueDefinition", contentID, "continue node must have no choices");
+        if (node.kind == DialogueNodeKind::CHOICE && node.nextNodeId.has_value())
+            report.AddError("DialogueDefinition", contentID, "choice node must have no automatic successor");
+        if (node.kind == DialogueNodeKind::CHOICE && node.choices.size() < 2)
+            report.AddError("DialogueDefinition", contentID, "choice node must have at least two choices");
+        if (node.kind == DialogueNodeKind::TERMINAL && node.nextNodeId.has_value())
+            report.AddError("DialogueDefinition", contentID, "terminal node must have no successor");
+        if (node.kind == DialogueNodeKind::TERMINAL && !node.choices.empty())
+            report.AddError("DialogueDefinition", contentID, "terminal node must have no choices");
+
+        std::set<DialogueChoiceId> nodeChoiceIds;
+        for (const DialogueChoiceDefinition &choice : node.choices)
+        {
+            if (!IsValidDialogueChoiceId(choice.id))
+                report.AddError("DialogueDefinition", contentID, "choice ID must be known and non-NONE");
+            if (!nodeChoiceIds.insert(choice.id).second)
+                report.AddError("DialogueDefinition", contentID, "choice IDs must be unique within a node");
+            if (!globalChoiceIds.insert(choice.id).second)
+                report.AddError("DialogueDefinition", contentID, "choice IDs must be globally unique");
+            if (choice.text.empty())
+                report.AddError("DialogueDefinition", contentID, "choice text must not be empty");
+            if (!IsValidDialogueNodeId(choice.destinationNodeId))
+                report.AddError("DialogueDefinition", contentID, "choice destination must be known");
+        }
     }
     if (!nodes.contains(definition.startNodeId))
         report.AddError("DialogueDefinition", contentID, "start node must resolve");
     for (const DialogueNodeDefinition &node : definition.nodes)
+    {
         if (node.nextNodeId.has_value() && !nodes.contains(*node.nextNodeId))
             report.AddError("DialogueDefinition", contentID, "next node reference must resolve");
-
-    std::set<DialogueNodeId> visited;
-    DialogueNodeId current = definition.startNodeId;
-    bool reachedTerminal = false;
-    while (nodes.contains(current))
-    {
-        if (!visited.insert(current).second)
-        {
-            report.AddError("DialogueDefinition", contentID, "dialogue graph must not contain a cycle");
-            break;
-        }
-        const DialogueNodeDefinition &node = *nodes.at(current);
-        if (!node.nextNodeId.has_value())
-        {
-            reachedTerminal = true;
-            break;
-        }
-        current = *node.nextNodeId;
+        for (const DialogueChoiceDefinition &choice : node.choices)
+            if (!nodes.contains(choice.destinationNodeId))
+                report.AddError("DialogueDefinition", contentID, "choice destination must resolve");
     }
-    if (!reachedTerminal)
-        report.AddError("DialogueDefinition", contentID, "dialogue graph must reach a terminal node");
-    if (visited.size() != nodes.size())
+
+    std::map<DialogueNodeId, bool> terminalReachability;
+    std::set<DialogueNodeId> visiting;
+    bool hasCycle = false;
+    bool missingTerminalPath = false;
+    const auto visit = [&](const auto &self, DialogueNodeId id) -> bool {
+        if (!nodes.contains(id))
+            return false;
+        if (visiting.contains(id))
+        {
+            hasCycle = true;
+            return false;
+        }
+        if (terminalReachability.contains(id))
+            return terminalReachability.at(id);
+        visiting.insert(id);
+        const DialogueNodeDefinition &node = *nodes.at(id);
+        bool reachesTerminal = node.kind == DialogueNodeKind::TERMINAL;
+        if (node.kind == DialogueNodeKind::CONTINUE && node.nextNodeId.has_value())
+            reachesTerminal = self(self, *node.nextNodeId);
+        else if (node.kind == DialogueNodeKind::CHOICE)
+        {
+            reachesTerminal = !node.choices.empty();
+            for (const DialogueChoiceDefinition &choice : node.choices)
+                reachesTerminal = self(self, choice.destinationNodeId) && reachesTerminal;
+        }
+        visiting.erase(id);
+        terminalReachability.emplace(id, reachesTerminal);
+        if (!reachesTerminal)
+            missingTerminalPath = true;
+        return reachesTerminal;
+    };
+    visit(visit, definition.startNodeId);
+    if (hasCycle)
+        report.AddError("DialogueDefinition", contentID, "dialogue graph must not contain a cycle");
+    if (missingTerminalPath)
+        report.AddError("DialogueDefinition", contentID, "every branch must reach a terminal node");
+    if (terminalReachability.size() != nodes.size())
         report.AddError("DialogueDefinition", contentID, "every node must be reachable from the start");
 }
 

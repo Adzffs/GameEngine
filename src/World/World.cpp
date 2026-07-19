@@ -1583,11 +1583,12 @@ void World::ProcessQueuedCommands()
                                       npcDefinition->interactions.end(),
                                       NpcInteractionType::TALK) == npcDefinition->interactions.end() ||
                             npcDefinition->dialogueId != session.dialogueId || dialogue == nullptr ||
-                            currentNode == nullptr || !currentNode->nextNodeId.has_value() || !adjacent)
+                            currentNode == nullptr || !IsValidDialogueNodeKind(currentNode->kind) || !adjacent)
                         {
                             dialogueSystem.CancelActor(data.actorEntityID);
                         }
-                        else
+                        else if (currentNode->kind == DialogueNodeKind::CONTINUE &&
+                                 currentNode->nextNodeId.has_value())
                         {
                             const DialogueNodeDefinition *nextNode =
                                 DialogueDefinitionDatabase::TryGetNode(
@@ -1600,10 +1601,71 @@ void World::ProcessQueuedCommands()
                                 advanced.currentNodeId = nextNode->id;
                                 advanced.lastAdvancedTick = currentTick + 1;
                                 if (PublishDialogueNode(advanced, *nextNode) &&
-                                    dialogueSystem.Advance(data.actorEntityID, data.sessionId,
-                                                           nextNode->id, currentTick + 1))
+                                    dialogueSystem.CommitContinuation(
+                                        data.actorEntityID, data.sessionId,
+                                        nextNode->id, currentTick + 1))
                                 {
-                                    if (!nextNode->nextNodeId.has_value())
+                                    if (nextNode->kind == DialogueNodeKind::TERMINAL)
+                                        dialogueSystem.Close(data.actorEntityID, data.sessionId);
+                                    resultCode = CommandResultCode::ACCEPTED;
+                                }
+                            }
+                        }
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, DialogueChooseCommand>)
+                {
+                    const ActiveDialogueSession *active =
+                        dialogueSystem.GetSession(data.actorEntityID);
+                    if (!actor->IsAlive())
+                    {
+                        dialogueSystem.CancelActor(data.actorEntityID);
+                    }
+                    else if (active != nullptr && data.sessionId != InvalidDialogueSessionId &&
+                             active->sessionId == data.sessionId)
+                    {
+                        const ActiveDialogueSession session = *active;
+                        NPC *npc = dynamic_cast<NPC *>(entityManager.GetEntityByID(session.npcEntityID));
+                        const NpcDefinition *npcDefinition = npc == nullptr ? nullptr :
+                            NpcDefinitionDatabase::TryGet(npc->GetNpcType());
+                        const DialogueDefinition *dialogue =
+                            DialogueDefinitionDatabase::TryGet(session.dialogueId);
+                        const DialogueNodeDefinition *currentNode =
+                            DialogueDefinitionDatabase::TryGetNode(session.dialogueId, session.currentNodeId);
+                        const bool adjacent = npc != nullptr &&
+                            std::abs(actor->GetPosition().GetX() - npc->GetPosition().GetX()) <= 1 &&
+                            std::abs(actor->GetPosition().GetY() - npc->GetPosition().GetY()) <= 1;
+                        if (npc == nullptr || npc->GetNpcType() != session.npcType ||
+                            npcDefinition == nullptr || npcDefinition->kind != NpcKind::FRIENDLY ||
+                            std::find(npcDefinition->interactions.begin(),
+                                      npcDefinition->interactions.end(),
+                                      NpcInteractionType::TALK) == npcDefinition->interactions.end() ||
+                            npcDefinition->dialogueId != session.dialogueId || dialogue == nullptr ||
+                            currentNode == nullptr || !IsValidDialogueNodeKind(currentNode->kind) || !adjacent)
+                        {
+                            dialogueSystem.CancelActor(data.actorEntityID);
+                        }
+                        else if (currentNode->kind == DialogueNodeKind::CHOICE &&
+                                 session.lastAdvancedTick != currentTick + 1)
+                        {
+                            const DialogueChoiceDefinition *choice =
+                                DialogueDefinitionDatabase::TryGetChoice(
+                                    session.dialogueId, session.currentNodeId, data.choiceId);
+                            const DialogueNodeDefinition *destination = choice == nullptr ? nullptr :
+                                DialogueDefinitionDatabase::TryGetNode(
+                                    session.dialogueId, choice->destinationNodeId);
+                            if (choice != nullptr && destination != nullptr)
+                            {
+                                ActiveDialogueSession advanced = session;
+                                advanced.currentNodeId = destination->id;
+                                advanced.lastAdvancedTick = currentTick + 1;
+                                if (PublishDialogueNode(advanced, *destination) &&
+                                    dialogueSystem.CommitChoice(
+                                        data.actorEntityID, data.sessionId, data.choiceId,
+                                        destination->id, currentTick + 1))
+                                {
+                                    if (destination->kind == DialogueNodeKind::TERMINAL)
                                         dialogueSystem.Close(data.actorEntityID, data.sessionId);
                                     resultCode = CommandResultCode::ACCEPTED;
                                 }
@@ -1985,7 +2047,7 @@ void World::ProcessInteractionSystem()
                     {
                         if (!PublishDialogueNode(*session, *startNode))
                             dialogueSystem.Close(intent.actorEntityID, sessionId);
-                        else if (!startNode->nextNodeId.has_value())
+                        else if (startNode->kind == DialogueNodeKind::TERMINAL)
                             dialogueSystem.Close(intent.actorEntityID, sessionId);
                     }
                     catch (...)
@@ -2040,11 +2102,23 @@ void World::ProcessInteractionSystem()
 bool World::PublishDialogueNode(const ActiveDialogueSession &session,
                                 const DialogueNodeDefinition &node)
 {
-    if (node.text.empty())
+    if (node.text.empty() || !IsValidDialogueNodeKind(node.kind))
         return false;
+    std::vector<DialogueEventChoice> eventChoices;
+    if (node.kind == DialogueNodeKind::CHOICE)
+    {
+        eventChoices.reserve(node.choices.size());
+        for (const DialogueChoiceDefinition &choice : node.choices)
+        {
+            if (!IsValidDialogueChoiceId(choice.id) || choice.text.empty())
+                return false;
+            eventChoices.push_back({choice.id, choice.text});
+        }
+    }
     pendingNpcTalkEvents.push_back({session.actorEntityID, session.npcEntityID,
         session.npcType, session.sessionId, session.dialogueId, node.id,
-        node.text, !node.nextNodeId.has_value()});
+        node.text, node.kind, node.kind == DialogueNodeKind::TERMINAL,
+        std::move(eventChoices)});
     return true;
 }
 

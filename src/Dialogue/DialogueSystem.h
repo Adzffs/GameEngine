@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DialogueId.h"
+#include "DialogueChoiceId.h"
 #include "DialogueNodeId.h"
 #include "DialogueSessionId.h"
 #include "../NPC/NpcType.h"
@@ -28,6 +29,11 @@ public:
                             int currentTick);
     bool Advance(int actorEntityID, DialogueSessionId sessionId,
                  DialogueNodeId nextNodeId, int currentTick);
+    bool CommitContinuation(int actorEntityID, DialogueSessionId sessionId,
+                            DialogueNodeId nextNodeId, int currentTick);
+    bool CommitChoice(int actorEntityID, DialogueSessionId sessionId,
+                      DialogueChoiceId choiceId, DialogueNodeId destinationNodeId,
+                      int currentTick);
     bool Close(int actorEntityID, DialogueSessionId sessionId);
     bool CancelActor(int actorEntityID);
     std::size_t CancelTarget(int npcEntityID);

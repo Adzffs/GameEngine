@@ -191,6 +191,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(NpcInteractionTests tests/NpcInteractionTests.cpp)
     add_gameengine_headless_test(DialogueDefinitionTests tests/DialogueDefinitionTests.cpp)
     add_gameengine_headless_test(DialogueSystemTests tests/DialogueSystemTests.cpp)
+    add_gameengine_headless_test(DialogueChoiceTests tests/DialogueChoiceTests.cpp)
 
     if(GAMEENGINE_BUILD_GRAPHICS_TESTS)
         add_gameengine_graphics_test(MonsterGraphicsTests tests/MonsterGraphicsTests.cpp)

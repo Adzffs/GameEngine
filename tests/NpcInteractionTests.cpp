@@ -18,6 +18,7 @@ static_assert(!std::is_pointer_v<decltype(PendingInteraction::actorEntityID)>);
 static_assert(!std::is_pointer_v<decltype(PendingInteraction::targetObjectID)>);
 static_assert(!std::is_pointer_v<decltype(NpcTalkEvent::text)>);
 static_assert(std::is_same_v<decltype(DialogueContinueCommand::sessionId), DialogueSessionId>);
+static_assert(std::is_same_v<decltype(DialogueChooseCommand::choiceId), DialogueChoiceId>);
 static_assert(std::is_same_v<decltype(DialogueCloseCommand::sessionId), DialogueSessionId>);
 
 struct WorldTestAccess
@@ -114,17 +115,33 @@ int main()
     nearby.Update();
     test.ExpectEqual(nearby.GetCurrentTick(), 3, "Second CONTINUE processes on tick three");
     test.Expect(nearby.GetNpcTalkEvents()[0].nodeId ==
-                    DialogueNodeId::DEVELOPMENT_GUIDE_FUTURE,
-                "Tick three publishes terminal node");
+                    DialogueNodeId::DEVELOPMENT_GUIDE_TOPIC_PROMPT,
+                "Tick three publishes topic prompt");
     test.Expect(nearby.GetNpcTalkEvents()[0].text ==
-                    "More adventures will be added as the world grows.",
-                "Terminal text is authoritative");
-    test.Expect(nearby.GetNpcTalkEvents()[0].isTerminal, "Third node is terminal");
-    test.Expect(nearby.GetActiveDialogueSession(nearbyPlayer->GetID()) == nullptr,
-                "Terminal publication closes session");
+                    "What would you like to hear about?",
+                "Prompt text is authoritative");
+    test.Expect(!nearby.GetNpcTalkEvents()[0].isTerminal &&
+                    nearby.GetNpcTalkEvents()[0].choices.size() == 2,
+                "Prompt exposes two choices");
+    nearby.EnqueueCommand(DialogueChooseCommand{nearbyPlayer->GetID(), nearbySessionId,
+        DialogueChoiceId::DEVELOPMENT_GUIDE_GATHERING});
+    nearby.Update();
+    test.Expect(nearby.GetNpcTalkEvents()[0].nodeId ==
+                    DialogueNodeId::DEVELOPMENT_GUIDE_GATHERING_RESPONSE,
+                "Tick four publishes selected response");
     nearby.EnqueueCommand(DialogueContinueCommand{nearbyPlayer->GetID(), nearbySessionId});
     nearby.Update();
-    test.Expect(nearby.GetNpcTalkEvents().empty(), "Stale tick-four CONTINUE publishes nothing");
+    test.Expect(nearby.GetNpcTalkEvents()[0].nodeId == DialogueNodeId::DEVELOPMENT_GUIDE_FUTURE &&
+                    nearby.GetNpcTalkEvents()[0].isTerminal,
+                "Tick five publishes terminal and closes session");
+    test.Expect(nearby.GetActiveDialogueSession(nearbyPlayer->GetID()) == nullptr,
+                "Terminal publication closes session");
+    nearby.EnqueueCommand(DialogueChooseCommand{nearbyPlayer->GetID(), nearbySessionId,
+        DialogueChoiceId::DEVELOPMENT_GUIDE_GATHERING});
+    nearby.EnqueueCommand(DialogueContinueCommand{nearbyPlayer->GetID(), nearbySessionId});
+    nearby.Update();
+    test.ExpectEqual(nearby.GetCurrentTick(), 6, "Adjacent stale commands process on tick six");
+    test.Expect(nearby.GetNpcTalkEvents().empty(), "Adjacent stale commands publish nothing");
 
     World distant;
     Player *distantPlayer = CreatePlayerAt(distant, 0, 0);
@@ -162,11 +179,26 @@ int main()
                 "Distant tick six is node two");
     distant.EnqueueCommand(DialogueContinueCommand{distantPlayer->GetID(), distantSessionId});
     distant.Update();
-    test.ExpectEqual(distant.GetCurrentTick(), 7, "Distant terminal publishes on tick seven");
-    test.Expect(distant.GetNpcTalkEvents()[0].nodeId == DialogueNodeId::DEVELOPMENT_GUIDE_FUTURE,
-                "Distant tick seven is terminal node");
-    test.Expect(distant.GetActiveDialogueSession(distantPlayer->GetID()) == nullptr,
-                "Distant session closes on tick seven");
+    test.ExpectEqual(distant.GetCurrentTick(), 7, "Distant prompt publishes on tick seven");
+    test.Expect(distant.GetNpcTalkEvents()[0].nodeId ==
+                    DialogueNodeId::DEVELOPMENT_GUIDE_TOPIC_PROMPT,
+                "Distant tick seven is choice node");
+    distant.EnqueueCommand(DialogueChooseCommand{distantPlayer->GetID(), distantSessionId,
+        DialogueChoiceId::DEVELOPMENT_GUIDE_COMBAT});
+    distant.Update();
+    test.Expect(distant.GetNpcTalkEvents()[0].nodeId ==
+                    DialogueNodeId::DEVELOPMENT_GUIDE_COMBAT_RESPONSE,
+                "Distant tick eight is combat response");
+    distant.EnqueueCommand(DialogueContinueCommand{distantPlayer->GetID(), distantSessionId});
+    distant.Update();
+    test.Expect(distant.GetNpcTalkEvents()[0].nodeId == DialogueNodeId::DEVELOPMENT_GUIDE_FUTURE &&
+                    distant.GetActiveDialogueSession(distantPlayer->GetID()) == nullptr,
+                "Distant tick nine publishes terminal and closes");
+    distant.EnqueueCommand(DialogueChooseCommand{distantPlayer->GetID(), distantSessionId,
+        DialogueChoiceId::DEVELOPMENT_GUIDE_COMBAT});
+    distant.Update();
+    test.ExpectEqual(distant.GetCurrentTick(), 10, "Distant stale command processes on tick ten");
+    test.Expect(distant.GetNpcTalkEvents().empty(), "Distant stale choice publishes nothing");
 
     World duplicateContinue;
     Player *duplicatePlayer = CreatePlayerAt(duplicateContinue, 2, 3);
@@ -495,6 +527,12 @@ int main()
     combatIsolation.EnqueueCommand(DialogueContinueCommand{combatPlayer->GetID(), combatSession});
     combatIsolation.Update();
     test.ExpectEqual(combatCounter->calls, 0, "CONTINUE consumes zero combat RNG");
+    combatIsolation.EnqueueCommand(DialogueContinueCommand{combatPlayer->GetID(), combatSession});
+    combatIsolation.Update();
+    combatIsolation.EnqueueCommand(DialogueChooseCommand{combatPlayer->GetID(), combatSession,
+        DialogueChoiceId::DEVELOPMENT_GUIDE_GATHERING});
+    combatIsolation.Update();
+    test.ExpectEqual(combatCounter->calls, 0, "CHOOSE consumes zero combat RNG");
     combatIsolation.EnqueueCommand(DialogueCloseCommand{combatPlayer->GetID(), combatSession});
     combatIsolation.Update();
     test.ExpectEqual(combatCounter->calls, 0, "CLOSE consumes zero combat RNG");

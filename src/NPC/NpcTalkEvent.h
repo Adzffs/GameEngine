@@ -2,9 +2,12 @@
 
 #include "NpcType.h"
 #include "../Dialogue/DialogueId.h"
+#include "../Dialogue/DialogueEventChoice.h"
 #include "../Dialogue/DialogueNodeId.h"
+#include "../Dialogue/DialogueNodeKind.h"
 #include "../Dialogue/DialogueSessionId.h"
 #include <string>
+#include <vector>
 
 struct NpcTalkEvent
 {
@@ -15,5 +18,7 @@ struct NpcTalkEvent
     DialogueId dialogueId;
     DialogueNodeId nodeId;
     std::string text;
+    DialogueNodeKind nodeKind;
     bool isTerminal;
+    std::vector<DialogueEventChoice> choices;
 };
