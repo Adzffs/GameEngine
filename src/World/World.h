@@ -27,6 +27,8 @@
 #include "../StatusEffect/StatusEffectType.h"
 #include "../Entity/Monster/MonsterRespawnDefinition.h"
 #include "../NPC/NpcSpawnManager.h"
+#include "../NPC/NpcInteractionType.h"
+#include "../NPC/NpcTalkEvent.h"
 #include <optional>
 #include <set>
 #include <string>
@@ -88,6 +90,7 @@ public:
     int CreateMonster(
         NpcType npcType,
         const NpcSpawnDefinition &spawn);
+    int CreateNpc(NpcType npcType, const NpcSpawnDefinition &spawn);
     Entity *GetEntityByID(int id);
     const std::vector<std::unique_ptr<Entity>> &
     GetEntities() const;
@@ -204,6 +207,7 @@ public:
     std::optional<int> GetScheduledMonsterRespawnTick(
         int monsterEntityID) const;
     const NpcSpawnManager &GetNpcSpawnManager() const;
+    const std::vector<NpcTalkEvent> &GetNpcTalkEvents() const;
 
 private:
     friend struct WorldTestAccess;
@@ -336,6 +340,9 @@ private:
 
     std::vector<CommandProcessingResult>
         publishedCommandProcessingResults;
+
+    std::vector<NpcTalkEvent> pendingNpcTalkEvents;
+    std::vector<NpcTalkEvent> publishedNpcTalkEvents;
 
     int currentTick = 0;
 

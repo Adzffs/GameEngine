@@ -1,4 +1,5 @@
 #include "ContentValidator.h"
+#include <algorithm>
 
 #include "../Equipment/EquipmentSlotType.h"
 #include "../Item/ItemDatabase.h"
@@ -830,50 +831,6 @@ void ContentValidator::ValidateStarterWorldContent(
 
     std::set<GridPosition> occupiedEntitySpawnPositions;
 
-    for (const DevelopmentNpcSpawnDefinition &npcSpawn :
-         DevelopmentWorldContent::GetStarterNPCSpawns())
-    {
-        const std::string contentID =
-            PositionToString(
-                npcSpawn.spawnX,
-                npcSpawn.spawnY);
-
-        if (!map.IsValidPosition(
-                npcSpawn.spawnX,
-                npcSpawn.spawnY))
-        {
-            report.AddError(
-                "StarterNPCSpawn",
-                contentID,
-                "NPC spawn must be on a valid walkable tile");
-            continue;
-        }
-
-        if (blockedObjectPositions.find(
-                GridPosition{
-                    npcSpawn.spawnX,
-                    npcSpawn.spawnY}) !=
-            blockedObjectPositions.end())
-        {
-            report.AddError(
-                "StarterNPCSpawn",
-                contentID,
-                "NPC spawn cannot overlap blocked starter object placement");
-        }
-
-        if (!occupiedEntitySpawnPositions.insert(
-                                             GridPosition{
-                                                 npcSpawn.spawnX,
-                                                 npcSpawn.spawnY})
-                 .second)
-        {
-            report.AddError(
-                "StarterNPCSpawn",
-                contentID,
-                "multiple starter entities cannot share one spawn tile");
-        }
-    }
-
     std::set<NpcType> registeredNpcTypes;
     for (NpcType npcType : NpcDefinitionDatabase::GetAllNpcTypes())
     {
@@ -894,8 +851,7 @@ void ContentValidator::ValidateStarterWorldContent(
 
     std::set<std::pair<int, int>> monsterSpawnPositions;
     std::set<NpcSpawnId> registeredNpcSpawnIds;
-    for (const NpcSpawnDefinition &monsterSpawn :
-         NpcSpawnDatabase::GetStarterMonsterSpawns())
+    for (const NpcSpawnDefinition &monsterSpawn : NpcSpawnDatabase::GetStarterSpawns())
     {
         const GridPosition spawnPosition{
             monsterSpawn.spawnPosition.GetX(),
@@ -1495,21 +1451,44 @@ void ContentValidator::AppendNpcDefinitionValidation(
         report.AddError("NpcDefinition", contentID, "definition ID must be real content");
     if (definition.name.empty())
         report.AddError("NpcDefinition", contentID, "name must not be empty");
-    if (definition.combatRatings.attackAccuracy < 0 ||
-        definition.combatRatings.meleeStrength < 0 ||
-        definition.combatRatings.defence < 0)
-        report.AddError("NpcDefinition", contentID, "combat ratings must not be negative");
-    if (definition.combatRatings.maximumHealth <= 0)
-        report.AddError("NpcDefinition", contentID, "maximum health must be positive");
-    if (definition.attackDurationTicks <= 0)
-        report.AddError("NpcDefinition", contentID, "attack duration must be positive");
-    if (definition.respawnDelayTicks < 0)
-        report.AddError("NpcDefinition", contentID, "respawn delay must not be negative");
-    if (RewardTableRegistry::TryGetRewardTable(definition.rewardTableType) == nullptr)
-        report.AddError("NpcDefinition", contentID, "reward-table reference is invalid");
-    if (definition.aggressionDefinition.has_value())
+    if (definition.kind != NpcKind::FRIENDLY && definition.kind != NpcKind::MONSTER)
+        report.AddError("NpcDefinition", contentID, "NPC kind is unknown");
+    if (definition.kind == NpcKind::FRIENDLY && definition.combat.has_value())
+        report.AddError("NpcDefinition", contentID, "friendly definition must not contain combat data");
+    if (definition.kind == NpcKind::MONSTER && !definition.combat.has_value())
+        report.AddError("NpcDefinition", contentID, "monster definition must contain combat data");
+    if (definition.kind == NpcKind::MONSTER && !definition.interactions.empty())
+        report.AddError("NpcDefinition", contentID, "monster advertises an unsupported NPC interaction");
+    std::set<NpcInteractionType> interactions;
+    for (NpcInteractionType interaction : definition.interactions)
     {
-        const MonsterAggressionDefinition &aggression = definition.aggressionDefinition.value();
+        if (!IsValidNpcInteractionType(interaction))
+            report.AddError("NpcDefinition", contentID, "interaction option is unknown");
+        if (!interactions.insert(interaction).second)
+            report.AddError("NpcDefinition", contentID, "interaction options must be unique");
+        if (interaction == NpcInteractionType::TALK &&
+            (!definition.talkText.has_value() || definition.talkText->empty()))
+            report.AddError("NpcDefinition", contentID, "TALK requires server-owned content");
+    }
+    if (definition.talkText.has_value() &&
+        std::find(definition.interactions.begin(), definition.interactions.end(), NpcInteractionType::TALK) == definition.interactions.end())
+        report.AddError("NpcDefinition", contentID, "talk content requires a TALK interaction");
+    if (!definition.combat.has_value()) return;
+    const NpcCombatDefinition &combat = *definition.combat;
+    if (combat.ratings.attackAccuracy < 0 ||
+        combat.ratings.meleeStrength < 0 || combat.ratings.defence < 0)
+        report.AddError("NpcDefinition", contentID, "combat ratings must not be negative");
+    if (combat.ratings.maximumHealth <= 0)
+        report.AddError("NpcDefinition", contentID, "maximum health must be positive");
+    if (combat.attackDurationTicks <= 0)
+        report.AddError("NpcDefinition", contentID, "attack duration must be positive");
+    if (combat.respawnDelayTicks < 0)
+        report.AddError("NpcDefinition", contentID, "respawn delay must not be negative");
+    if (RewardTableRegistry::TryGetRewardTable(combat.rewardTableType) == nullptr)
+        report.AddError("NpcDefinition", contentID, "reward-table reference is invalid");
+    if (combat.aggression.has_value())
+    {
+        const MonsterAggressionDefinition &aggression = combat.aggression.value();
         if (aggression.detectionRadius <= 0)
             report.AddError("NpcDefinition", contentID, "aggression detection radius must be positive");
         if (aggression.leashRadius <= 0)
@@ -1566,6 +1545,8 @@ void ContentValidator::AppendNpcSpawnValidation(
 
     const NpcDefinition *npcDefinition =
         NpcDefinitionDatabase::TryGet(definition.npcType);
+    const NpcSpawnDefinition *authoredSpawn =
+        NpcSpawnDatabase::TryGet(definition.spawnId);
     if (npcDefinition == nullptr)
     {
         report.AddError(
@@ -1573,6 +1554,8 @@ void ContentValidator::AppendNpcSpawnValidation(
             contentID,
             "NPC definition reference is invalid");
     }
+    if (authoredSpawn != nullptr && authoredSpawn->npcType != definition.npcType)
+        report.AddError("StarterMonsterSpawn", contentID, "spawn ID and NPC type must match authored content");
     if (definition.wanderRadius < 0)
     {
         report.AddError("StarterMonsterSpawn", contentID, "wander radius must not be negative");
@@ -1584,7 +1567,7 @@ void ContentValidator::AppendNpcSpawnValidation(
     if (definition.maximumActiveCount <= 0)
         report.AddError("StarterMonsterSpawn", contentID, "maximum active count must be positive");
     if (definition.respawns && npcDefinition != nullptr &&
-        npcDefinition->respawnDelayTicks <= 0)
+        (!npcDefinition->combat.has_value() || npcDefinition->combat->respawnDelayTicks <= 0))
     {
         report.AddError(
             "StarterMonsterSpawn",

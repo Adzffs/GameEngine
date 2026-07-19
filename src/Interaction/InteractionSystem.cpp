@@ -2,6 +2,8 @@
 
 #include "../Entity/Manager/EntityManager.h"
 #include "../Player/Player.h"
+#include "../NPC/NPC.h"
+#include "../NPC/NpcDefinitionDatabase.h"
 #include "../World/Object/Manager/ObjectManager.h"
 
 #include <algorithm>
@@ -14,9 +16,16 @@ namespace
         InteractionTargetType targetType,
         const ObjectManager &objects)
     {
-        return targetType == InteractionTargetType::RESOURCE
-                   ? objects.GetResourceByID(targetObjectID) != nullptr
-                   : objects.GetStationByID(targetObjectID) != nullptr;
+        switch (targetType)
+        {
+        case InteractionTargetType::RESOURCE:
+            return objects.GetResourceByID(targetObjectID) != nullptr;
+        case InteractionTargetType::STATION:
+            return objects.GetStationByID(targetObjectID) != nullptr;
+        case InteractionTargetType::NPC:
+            return false;
+        }
+        return false;
     }
 
     bool OppositeTargetExists(
@@ -24,9 +33,16 @@ namespace
         InteractionTargetType targetType,
         const ObjectManager &objects)
     {
-        return targetType == InteractionTargetType::RESOURCE
-                   ? objects.GetStationByID(targetObjectID) != nullptr
-                   : objects.GetResourceByID(targetObjectID) != nullptr;
+        switch (targetType)
+        {
+        case InteractionTargetType::RESOURCE:
+            return objects.GetStationByID(targetObjectID) != nullptr;
+        case InteractionTargetType::STATION:
+            return objects.GetResourceByID(targetObjectID) != nullptr;
+        case InteractionTargetType::NPC:
+            return false;
+        }
+        return false;
     }
 }
 
@@ -48,6 +64,26 @@ bool InteractionSystem::RequestInteraction(
     pendingInteractionsByActorID.insert_or_assign(
         actorEntityID,
         PendingInteraction{actorEntityID, targetObjectID, targetType});
+    return true;
+}
+
+bool InteractionSystem::RequestNpcInteraction(
+    int actorEntityID, int targetNpcEntityID, NpcInteractionType interactionType,
+    const EntityManager &entityManager)
+{
+    const Player *player = dynamic_cast<const Player *>(entityManager.GetEntityByID(actorEntityID));
+    const NPC *npc = dynamic_cast<const NPC *>(entityManager.GetEntityByID(targetNpcEntityID));
+    const NpcDefinition *definition = npc == nullptr ? nullptr :
+        NpcDefinitionDatabase::TryGet(npc->GetNpcType());
+    if (player == nullptr || !player->IsAlive() || npc == nullptr ||
+        definition == nullptr || definition->kind != NpcKind::FRIENDLY ||
+        !IsValidNpcInteractionType(interactionType) ||
+        std::find(definition->interactions.begin(), definition->interactions.end(), interactionType) == definition->interactions.end() ||
+        (interactionType == NpcInteractionType::TALK &&
+         (!definition->talkText.has_value() || definition->talkText->empty())))
+        return false;
+    pendingInteractionsByActorID.insert_or_assign(actorEntityID,
+        PendingInteraction{actorEntityID, targetNpcEntityID, InteractionTargetType::NPC, interactionType});
     return true;
 }
 
@@ -121,6 +157,19 @@ std::vector<InteractionIntent> InteractionSystem::Evaluate(
         {
             reason = InteractionClearReason::ACTOR_DEAD;
         }
+        else if (pending.targetType == InteractionTargetType::NPC)
+        {
+            const NPC *npc = dynamic_cast<const NPC *>(entityManager.GetEntityByID(pending.targetObjectID));
+            const NpcDefinition *definition = npc == nullptr ? nullptr : NpcDefinitionDatabase::TryGet(npc->GetNpcType());
+            if (npc == nullptr || definition == nullptr ||
+                definition->kind != NpcKind::FRIENDLY)
+                reason = InteractionClearReason::INVALID_TARGET;
+            else if (std::find(definition->interactions.begin(), definition->interactions.end(), pending.npcInteractionType) == definition->interactions.end())
+                reason = InteractionClearReason::UNSUPPORTED_INTERACTION;
+            else if (pending.npcInteractionType == NpcInteractionType::TALK &&
+                     (!definition->talkText.has_value() || definition->talkText->empty()))
+                reason = InteractionClearReason::UNSUPPORTED_INTERACTION;
+        }
         else if (!TargetMatches(
                      pending.targetObjectID, pending.targetType, objectManager))
         {
@@ -141,7 +190,13 @@ std::vector<InteractionIntent> InteractionSystem::Evaluate(
 
         int targetX = 0;
         int targetY = 0;
-        if (pending.targetType == InteractionTargetType::RESOURCE)
+        if (pending.targetType == InteractionTargetType::NPC)
+        {
+            const NPC *npc = dynamic_cast<const NPC *>(entityManager.GetEntityByID(pending.targetObjectID));
+            targetX = npc->GetPosition().GetX();
+            targetY = npc->GetPosition().GetY();
+        }
+        else if (pending.targetType == InteractionTargetType::RESOURCE)
         {
             const auto *resource =
                 objectManager.GetResourceByID(pending.targetObjectID);
@@ -163,7 +218,7 @@ std::vector<InteractionIntent> InteractionSystem::Evaluate(
         {
             intents.push_back({actorID, pending.targetObjectID,
                                pending.targetType, InteractionIntentType::READY,
-                               InteractionClearReason::NONE});
+                               InteractionClearReason::NONE, pending.npcInteractionType});
             pendingInteractionsByActorID.erase(iterator);
         }
         else if (!actorsWithActiveMovement.contains(actorID))

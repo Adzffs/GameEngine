@@ -150,19 +150,13 @@ World::World(
     rewardTableRoller = std::make_unique<RewardTableRoller>(
         *this->rewardRandomSource);
 
-    for (const NpcSpawnDefinition &spawn :
-         NpcSpawnDatabase::GetStarterMonsterSpawns())
+    for (const NpcSpawnDefinition &spawn : NpcSpawnDatabase::GetStarterSpawns())
     {
         npcSpawnManager.AddSpawn(spawn);
     }
 
-    for (const DevelopmentNpcSpawnDefinition &definition :
-         DevelopmentWorldContent::GetStarterNPCSpawns())
-    {
-        entityManager.CreateNPC(
-            definition.spawnX,
-            definition.spawnY);
-    }
+    CreateNpc(NpcType::DEVELOPMENT_GUIDE,
+              *NpcSpawnDatabase::TryGet(NpcSpawnId::DEVELOPMENT_GUIDE_SPAWN));
 
     for (const NpcSpawnDefinition &spawn :
          NpcSpawnDatabase::GetStarterMonsterSpawns())
@@ -261,15 +255,16 @@ int World::CreateMonster(
         authoredSpawn->wanderIntervalTicks != spawn.wanderIntervalTicks ||
         authoredSpawn->maximumActiveCount != spawn.maximumActiveCount ||
         authoredSpawn->respawns != spawn.respawns ||
+        definition->kind != NpcKind::MONSTER || !definition->combat.has_value() ||
         definition->name.empty() ||
-        definition->combatRatings.attackAccuracy < 0 ||
-        definition->combatRatings.meleeStrength < 0 ||
-        definition->combatRatings.defence < 0 ||
-        definition->combatRatings.maximumHealth <= 0 ||
-        definition->attackDurationTicks <= 0 ||
-        definition->respawnDelayTicks < 0 ||
+        definition->combat->ratings.attackAccuracy < 0 ||
+        definition->combat->ratings.meleeStrength < 0 ||
+        definition->combat->ratings.defence < 0 ||
+        definition->combat->ratings.maximumHealth <= 0 ||
+        definition->combat->attackDurationTicks <= 0 ||
+        definition->combat->respawnDelayTicks < 0 ||
         RewardTableRegistry::TryGetRewardTable(
-            definition->rewardTableType) == nullptr ||
+            definition->combat->rewardTableType) == nullptr ||
         !map.IsValidPosition(
             spawn.spawnPosition.GetX(),
             spawn.spawnPosition.GetY()) ||
@@ -277,15 +272,15 @@ int World::CreateMonster(
         (spawn.wanderRadius > 0 && spawn.wanderIntervalTicks <= 0) ||
         (spawn.wanderRadius == 0 && spawn.wanderIntervalTicks != 0) ||
         spawn.maximumActiveCount <= 0 ||
-        (spawn.respawns && definition->respawnDelayTicks <= 0))
+        (spawn.respawns && definition->combat->respawnDelayTicks <= 0))
     {
         return 0;
     }
 
-    if (definition->aggressionDefinition.has_value())
+    if (definition->combat->aggression.has_value())
     {
         const MonsterAggressionDefinition &aggression =
-            definition->aggressionDefinition.value();
+            definition->combat->aggression.value();
         if (aggression.detectionRadius <= 0 ||
             aggression.leashRadius < aggression.detectionRadius)
         {
@@ -296,16 +291,16 @@ int World::CreateMonster(
     const int monsterId = entityManager.CreateMonster(
         spawn.spawnPosition.GetX(),
         spawn.spawnPosition.GetY(),
-        definition->combatRatings,
-        definition->rewardTableType,
+        definition->combat->ratings,
+        definition->combat->rewardTableType,
         spawn.respawns
             ? std::optional<MonsterRespawnDefinition>{
                   MonsterRespawnDefinition{
-                      definition->respawnDelayTicks}}
+                      definition->combat->respawnDelayTicks}}
             : std::nullopt,
-        definition->aggressionDefinition,
+        definition->combat->aggression,
         definition->type,
-        definition->attackDurationTicks,
+        definition->combat->attackDurationTicks,
         spawn.spawnId,
         spawn.wanderRadius,
         spawn.wanderIntervalTicks);
@@ -328,6 +323,34 @@ int World::CreateMonster(
         return 0;
     }
     return monsterId;
+}
+
+int World::CreateNpc(NpcType npcType, const NpcSpawnDefinition &spawn)
+{
+    const NpcDefinition *definition = NpcDefinitionDatabase::TryGet(npcType);
+    const NpcSpawnDefinition *authored = NpcSpawnDatabase::TryGet(spawn.spawnId);
+    if (definition == nullptr || authored == nullptr || definition->kind != NpcKind::FRIENDLY ||
+        definition->combat.has_value() || npcType != spawn.npcType ||
+        authored->npcType != npcType || authored->spawnId != spawn.spawnId ||
+        authored->spawnPosition.GetX() != spawn.spawnPosition.GetX() ||
+        authored->spawnPosition.GetY() != spawn.spawnPosition.GetY() ||
+        authored->wanderRadius != spawn.wanderRadius ||
+        authored->wanderIntervalTicks != spawn.wanderIntervalTicks ||
+        authored->maximumActiveCount != spawn.maximumActiveCount ||
+        authored->respawns != spawn.respawns || spawn.respawns ||
+        !npcSpawnManager.HasCapacity(spawn.spawnId) ||
+        !map.IsValidPosition(spawn.spawnPosition.GetX(), spawn.spawnPosition.GetY()))
+        return 0;
+
+    const int id = entityManager.CreateNPC(spawn.spawnPosition.GetX(),
+        spawn.spawnPosition.GetY(), npcType, spawn.spawnId);
+    if (id == 0) return 0;
+    if (!npcSpawnManager.RegisterEntity(spawn.spawnId, id, currentTick))
+    {
+        entityManager.RollbackLastCreatedEntity(id);
+        return 0;
+    }
+    return id;
 }
 
 Entity *World::GetEntityByID(int id)
@@ -1201,6 +1224,7 @@ void World::Update()
 
     entityDiedEvents.clear();
     publishedActionLifecycleEvents.clear();
+    publishedNpcTalkEvents.clear();
     respawnedMonsterEntityIDsThisTick.clear();
 
     publishedCommandProcessingResults.clear();
@@ -1235,6 +1259,13 @@ void World::Update()
 
     publishedCommandProcessingResults =
         std::move(pendingCommandProcessingResults);
+    publishedNpcTalkEvents = std::move(pendingNpcTalkEvents);
+    pendingNpcTalkEvents.clear();
+}
+
+const std::vector<NpcTalkEvent> &World::GetNpcTalkEvents() const
+{
+    return publishedNpcTalkEvents;
 }
 
 std::uint64_t World::EnqueueCommand(
@@ -1309,6 +1340,7 @@ void World::ProcessQueuedCommands()
                             data.actorEntityID);
                         ClearPendingResourceInteraction(
                             data.actorEntityID);
+                        interactionSystem.ClearInteraction(data.actorEntityID);
                         QueueMovementDestination(
                             MovementDestinationRequest(
                                 data.actorEntityID,
@@ -1474,6 +1506,37 @@ void World::ProcessQueuedCommands()
 
                         resultCode =
                             CommandResultCode::ACCEPTED;
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, NpcInteractionCommand>)
+                {
+                    NPC *npc = dynamic_cast<NPC *>(entityManager.GetEntityByID(data.targetNpcEntityID));
+                    if (npc == nullptr || !IsValidNpcInteractionType(data.interactionType))
+                        resultCode = CommandResultCode::INVALID_COMMAND_DATA;
+                    else if (actor->IsAlive() && interactionSystem.RequestNpcInteraction(
+                                 data.actorEntityID, data.targetNpcEntityID,
+                                 data.interactionType, entityManager))
+                    {
+                        CloseStationInteraction(data.actorEntityID);
+                        CancelActionsForEntity(data.actorEntityID, ActionCancelReason::PLAYER_MOVED);
+                        movementSystem.CancelMovement(data.actorEntityID);
+                        const Position &actorPosition = actor->GetPosition();
+                        const Position &targetPosition = npc->GetPosition();
+                        if (std::abs(actorPosition.GetX() - targetPosition.GetX()) > 1 ||
+                            std::abs(actorPosition.GetY() - targetPosition.GetY()) > 1)
+                        {
+                            auto approach = FindMeleeApproachTile(actorPosition.GetX(), actorPosition.GetY(),
+                                targetPosition.GetX(), targetPosition.GetY());
+                            if (!approach.has_value() || !movementSystem.QueueDestination(data.actorEntityID,
+                                    Position{approach->first, approach->second}, entityManager, map))
+                            {
+                                interactionSystem.ClearInteraction(data.actorEntityID);
+                                resultCode = CommandResultCode::GAMEPLAY_REJECTED;
+                                return;
+                            }
+                        }
+                        resultCode = CommandResultCode::ACCEPTED;
                     }
                 }
                 else if constexpr (
@@ -1717,6 +1780,7 @@ void World::QueueMovementRequest(const MovementRequest &request)
 
     meleeEngagementSystem.ClearEngagement(
         request.GetEntityID());
+    interactionSystem.ClearInteraction(request.GetEntityID());
 
     movementRequests.push(request);
 }
@@ -1793,6 +1857,8 @@ void World::ProcessInteractionSystem()
     {
         if (intent.type == InteractionIntentType::CLEAR_INTERACTION)
         {
+            if (intent.targetType == InteractionTargetType::NPC)
+                movementSystem.CancelMovement(intent.actorEntityID);
             continue;
         }
 
@@ -1806,6 +1872,17 @@ void World::ProcessInteractionSystem()
                 openedStations[intent.actorEntityID] =
                     station->GetStationType();
             }
+            continue;
+        }
+
+        if (intent.targetType == InteractionTargetType::NPC)
+        {
+            movementSystem.CancelMovement(intent.actorEntityID);
+            NPC *npc = dynamic_cast<NPC *>(entityManager.GetEntityByID(intent.targetObjectID));
+            const NpcDefinition *definition = npc == nullptr ? nullptr : NpcDefinitionDatabase::TryGet(npc->GetNpcType());
+            if (npc != nullptr && definition != nullptr && definition->kind == NpcKind::FRIENDLY &&
+                intent.npcInteractionType == NpcInteractionType::TALK && definition->talkText.has_value())
+                pendingNpcTalkEvents.push_back({intent.actorEntityID, npc->GetID(), npc->GetNpcType(), *definition->talkText});
             continue;
         }
 
@@ -3812,9 +3889,17 @@ bool World::ScheduleMonsterRespawn(
 
 bool World::RemoveEntity(int entityID)
 {
+    for (const auto &entity : entityManager.GetEntities())
+    {
+        const auto pending = interactionSystem.GetInteraction(entity->GetID());
+        if (pending.has_value() && pending->targetType == InteractionTargetType::NPC &&
+            pending->targetObjectID == entityID)
+            movementSystem.CancelMovement(entity->GetID());
+    }
     ClearPendingMovementForEntity(entityID);
     ClearPendingMeleeInteractionsInvolvingEntity(entityID);
     interactionSystem.ClearInteraction(entityID);
+    interactionSystem.ClearInteractionsTargeting(entityID);
 
     auto association = monsterRespawnEventIDs.find(entityID);
     if (association != monsterRespawnEventIDs.end())

@@ -1006,11 +1006,11 @@ int main()
             "Valid development monster spawn definition succeeds");
 
         test.Expect(
-            !NpcDefinitionDatabase::TryGet(validSpawn.npcType)->aggressionDefinition.has_value(),
+            !NpcDefinitionDatabase::TryGet(validSpawn.npcType)->combat->aggression.has_value(),
             "Passive starter monster has no aggression definition");
 
         test.Expect(
-            NpcDefinitionDatabase::TryGet(aggressiveSpawn.npcType)->aggressionDefinition.has_value(),
+            NpcDefinitionDatabase::TryGet(aggressiveSpawn.npcType)->combat->aggression.has_value(),
             "Aggressive starter monster has aggression definition");
 
         test.Expect(
@@ -1050,7 +1050,7 @@ int main()
 
         NpcDefinition invalidHealth =
             *NpcDefinitionDatabase::TryGet(validSpawn.npcType);
-        invalidHealth.combatRatings.maximumHealth = 0;
+        invalidHealth.combat->ratings.maximumHealth = 0;
 
         test.Expect(
             !ContentValidator::ValidateNpcDefinition(invalidHealth)
@@ -1059,7 +1059,7 @@ int main()
 
         NpcDefinition invalidRewardTable =
             *NpcDefinitionDatabase::TryGet(validSpawn.npcType);
-        invalidRewardTable.rewardTableType =
+        invalidRewardTable.combat->rewardTableType =
             RewardTableType::NONE;
 
         test.Expect(
@@ -1069,7 +1069,7 @@ int main()
 
         NpcDefinition invalidRespawn =
             *NpcDefinitionDatabase::TryGet(validSpawn.npcType);
-        invalidRespawn.respawnDelayTicks = -1;
+        invalidRespawn.combat->respawnDelayTicks = -1;
 
         test.Expect(
             !ContentValidator::ValidateNpcDefinition(invalidRespawn)
@@ -1078,7 +1078,7 @@ int main()
 
         NpcDefinition zeroDetectionAggression =
             *NpcDefinitionDatabase::TryGet(aggressiveSpawn.npcType);
-        zeroDetectionAggression.aggressionDefinition =
+        zeroDetectionAggression.combat->aggression =
             MonsterAggressionDefinition{0, 8};
 
         test.Expect(
@@ -1088,7 +1088,7 @@ int main()
 
         NpcDefinition negativeDetectionAggression =
             *NpcDefinitionDatabase::TryGet(aggressiveSpawn.npcType);
-        negativeDetectionAggression.aggressionDefinition =
+        negativeDetectionAggression.combat->aggression =
             MonsterAggressionDefinition{-1, 8};
 
         test.Expect(
@@ -1098,7 +1098,7 @@ int main()
 
         NpcDefinition zeroLeashAggression =
             *NpcDefinitionDatabase::TryGet(aggressiveSpawn.npcType);
-        zeroLeashAggression.aggressionDefinition =
+        zeroLeashAggression.combat->aggression =
             MonsterAggressionDefinition{5, 0};
 
         test.Expect(
@@ -1108,7 +1108,7 @@ int main()
 
         NpcDefinition shortLeashAggression =
             *NpcDefinitionDatabase::TryGet(aggressiveSpawn.npcType);
-        shortLeashAggression.aggressionDefinition =
+        shortLeashAggression.combat->aggression =
             MonsterAggressionDefinition{5, 4};
 
         test.Expect(

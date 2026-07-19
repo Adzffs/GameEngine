@@ -51,6 +51,13 @@ struct CloseStationCommand
     int actorEntityID;
 };
 
+struct NpcInteractionCommand
+{
+    int actorEntityID;
+    int targetNpcEntityID;
+    NpcInteractionType interactionType;
+};
+
 using ServerCommandData = std::variant<
     MoveCommand,
     AttackCommand,
@@ -58,7 +65,8 @@ using ServerCommandData = std::variant<
     UnequipItemCommand,
     StartRecipeCommand,
     InteractCommand,
-    CloseStationCommand>;
+    CloseStationCommand,
+    NpcInteractionCommand>;
 
 struct ServerCommand
 {

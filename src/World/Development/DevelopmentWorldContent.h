@@ -5,12 +5,6 @@
 
 #include <vector>
 
-struct DevelopmentNpcSpawnDefinition
-{
-    int spawnX;
-    int spawnY;
-};
-
 struct DevelopmentResourcePlacementDefinition
 {
     ResourceType resourceType;
@@ -29,9 +23,6 @@ namespace DevelopmentWorldContent
 {
     constexpr int MapWidth = 100;
     constexpr int MapHeight = 100;
-
-    const std::vector<DevelopmentNpcSpawnDefinition> &
-    GetStarterNPCSpawns();
 
     const std::vector<DevelopmentResourcePlacementDefinition> &
     GetStarterResourcePlacements();

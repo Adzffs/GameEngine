@@ -23,13 +23,12 @@ int EntityManager::CreatePlayer()
 
     return playerID;
 }
-int EntityManager::CreateNPC(int x, int y)
+int EntityManager::CreateNPC(int x, int y, NpcType npcType, NpcSpawnId spawnId)
 {
     int npcID = nextID;
 
     std::unique_ptr<NPC> npc =
-        std::make_unique<NPC>(npcID);
-    npc->GetPosition().SetPosition(x, y);
+        std::make_unique<NPC>(npcID, x, y, npcType, spawnId);
 
     if (RegisterEntity(std::move(npc)) == nullptr)
     {

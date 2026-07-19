@@ -1,9 +1,11 @@
 #pragma once
+#include "../NPC/NpcInteractionType.h"
 
 enum class InteractionTargetType
 {
     RESOURCE,
-    STATION
+    STATION,
+    NPC
 };
 
 enum class InteractionIntentType
@@ -20,7 +22,8 @@ enum class InteractionClearReason
     INVALID_TARGET,
     TARGET_TYPE_MISMATCH,
     APPROACH_FAILED,
-    CANCELLED
+    CANCELLED,
+    UNSUPPORTED_INTERACTION
 };
 
 struct InteractionIntent
@@ -30,4 +33,5 @@ struct InteractionIntent
     InteractionTargetType targetType;
     InteractionIntentType type;
     InteractionClearReason clearReason;
+    NpcInteractionType npcInteractionType = NpcInteractionType::TALK;
 };

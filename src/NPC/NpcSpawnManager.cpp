@@ -64,16 +64,17 @@ bool NpcSpawnManager::RegisterEntity(NpcSpawnId spawnId, int entityId, int curre
             return false;
         }
 
-        const auto [state, stateInserted] = wanderStates.emplace(
-            entityId,
-            WanderRuntime{
-                NextTick(currentTick, spawn->second.wanderIntervalTicks), 0});
-        (void)state;
-        if (!stateInserted)
+        if (spawn->second.wanderIntervalTicks > 0)
         {
-            entitySpawns.erase(entityId);
-            spawn->second.entityIds.erase(entityId);
-            return false;
+            const auto [state, stateInserted] = wanderStates.emplace(
+                entityId, WanderRuntime{NextTick(currentTick, spawn->second.wanderIntervalTicks), 0});
+            (void)state;
+            if (!stateInserted)
+            {
+                entitySpawns.erase(entityId);
+                spawn->second.entityIds.erase(entityId);
+                return false;
+            }
         }
     }
     catch (...)

@@ -22,7 +22,8 @@ public:
 
     int CreatePlayer();
 
-    int CreateNPC(int x, int y);
+    int CreateNPC(int x, int y, NpcType npcType = NpcType::NONE,
+                  NpcSpawnId spawnId = NpcSpawnId::NONE);
 
     int CreateMonster(
         int x,

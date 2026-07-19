@@ -203,24 +203,24 @@ int main()
             "Starter content defines exactly one passive and one aggressive monster");
 
         test.Expect(
-            !NpcDefinitionDatabase::TryGet(starterSpawns[0].npcType)->aggressionDefinition.has_value(),
+            !NpcDefinitionDatabase::TryGet(starterSpawns[0].npcType)->combat->aggression.has_value(),
             "Starter passive monster keeps no aggression definition");
 
         test.Expect(
-            NpcDefinitionDatabase::TryGet(starterSpawns[1].npcType)->aggressionDefinition.has_value(),
+            NpcDefinitionDatabase::TryGet(starterSpawns[1].npcType)->combat->aggression.has_value(),
             "Starter aggressive monster has aggression definition");
 
         const NpcDefinition *aggressiveDefinition =
             NpcDefinitionDatabase::TryGet(starterSpawns[1].npcType);
         if (aggressiveDefinition != nullptr &&
-            aggressiveDefinition->aggressionDefinition.has_value())
+            aggressiveDefinition->combat->aggression.has_value())
         {
             test.ExpectEqual(
-                aggressiveDefinition->aggressionDefinition->detectionRadius,
+                aggressiveDefinition->combat->aggression->detectionRadius,
                 5,
                 "Starter aggressive monster uses configured detection radius");
             test.ExpectEqual(
-                aggressiveDefinition->aggressionDefinition->leashRadius,
+                aggressiveDefinition->combat->aggression->leashRadius,
                 8,
                 "Starter aggressive monster uses configured leash radius");
         }

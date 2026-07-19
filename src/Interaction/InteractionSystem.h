@@ -1,6 +1,7 @@
 #pragma once
 
 #include "InteractionIntent.h"
+#include "../NPC/NpcInteractionType.h"
 
 #include <cstddef>
 #include <optional>
@@ -16,6 +17,7 @@ struct PendingInteraction
     int actorEntityID;
     int targetObjectID;
     InteractionTargetType targetType;
+    NpcInteractionType npcInteractionType = NpcInteractionType::TALK;
 
     bool operator==(const PendingInteraction &) const = default;
 };
@@ -29,6 +31,8 @@ public:
         InteractionTargetType targetType,
         const EntityManager &entityManager,
         const ObjectManager &objectManager);
+    bool RequestNpcInteraction(int actorEntityID, int targetNpcEntityID,
+        NpcInteractionType interactionType, const EntityManager &entityManager);
 
     bool ClearInteraction(int actorEntityID);
     std::size_t ClearInteractionsTargeting(int targetObjectID);

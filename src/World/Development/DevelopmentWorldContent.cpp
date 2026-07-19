@@ -2,15 +2,6 @@
 
 namespace DevelopmentWorldContent
 {
-    const std::vector<DevelopmentNpcSpawnDefinition> &
-    GetStarterNPCSpawns()
-    {
-        static const std::vector<DevelopmentNpcSpawnDefinition> definitions{
-            {3, 3}};
-
-        return definitions;
-    }
-
     const std::vector<DevelopmentResourcePlacementDefinition> &
     GetStarterResourcePlacements()
     {

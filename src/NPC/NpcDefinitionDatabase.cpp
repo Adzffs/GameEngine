@@ -2,23 +2,30 @@
 
 namespace
 {
+    const NpcDefinition DevelopmentGuide{
+        NpcType::DEVELOPMENT_GUIDE,
+        "Development guide",
+        NpcKind::FRIENDLY,
+        std::nullopt,
+        {NpcInteractionType::TALK},
+        "Welcome to the development world."};
+
     const NpcDefinition PassiveDevelopmentMonster{
         NpcType::PASSIVE_DEVELOPMENT_MONSTER,
         "Passive development monster",
-        CombatRatings{5, 4, 3, 30},
-        std::nullopt,
-        5,
-        8,
-        RewardTableType::DEVELOPMENT_MONSTER};
+        NpcKind::MONSTER,
+        NpcCombatDefinition{CombatRatings{5, 4, 3, 30}, 5,
+            RewardTableType::DEVELOPMENT_MONSTER, std::nullopt, 8},
+        {}, std::nullopt};
 
     const NpcDefinition AggressiveDevelopmentMonster{
         NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER,
         "Aggressive development monster",
-        CombatRatings{5, 4, 3, 30},
-        MonsterAggressionDefinition{5, 8},
-        5,
-        8,
-        RewardTableType::DEVELOPMENT_MONSTER};
+        NpcKind::MONSTER,
+        NpcCombatDefinition{CombatRatings{5, 4, 3, 30}, 5,
+            RewardTableType::DEVELOPMENT_MONSTER,
+            MonsterAggressionDefinition{5, 8}, 8},
+        {}, std::nullopt};
 }
 
 namespace NpcDefinitionDatabase
@@ -26,6 +33,7 @@ namespace NpcDefinitionDatabase
     const std::vector<NpcType> &GetAllNpcTypes()
     {
         static const std::vector<NpcType> types{
+            NpcType::DEVELOPMENT_GUIDE,
             NpcType::PASSIVE_DEVELOPMENT_MONSTER,
             NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER};
         return types;
@@ -35,6 +43,8 @@ namespace NpcDefinitionDatabase
     {
         switch (type)
         {
+        case NpcType::DEVELOPMENT_GUIDE:
+            return &DevelopmentGuide;
         case NpcType::PASSIVE_DEVELOPMENT_MONSTER:
             return &PassiveDevelopmentMonster;
         case NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER:

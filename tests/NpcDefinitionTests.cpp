@@ -54,44 +54,45 @@ int main()
     {
         for (const NpcDefinition *definition : {passive, aggressive})
         {
-            test.ExpectEqual(definition->combatRatings.attackAccuracy, 5, "Attack accuracy is preserved");
-            test.ExpectEqual(definition->combatRatings.meleeStrength, 4, "Melee strength is preserved");
-            test.ExpectEqual(definition->combatRatings.defence, 3, "Defence is preserved");
-            test.ExpectEqual(definition->combatRatings.maximumHealth, 30, "Maximum health is preserved");
-            test.ExpectEqual(definition->attackDurationTicks, 5, "Attack duration is preserved");
-            test.ExpectEqual(definition->respawnDelayTicks, 8, "Respawn delay is preserved");
+            test.Expect(definition->combat.has_value(), "Monster has combat data");
+            test.ExpectEqual(definition->combat->ratings.attackAccuracy, 5, "Attack accuracy is preserved");
+            test.ExpectEqual(definition->combat->ratings.meleeStrength, 4, "Melee strength is preserved");
+            test.ExpectEqual(definition->combat->ratings.defence, 3, "Defence is preserved");
+            test.ExpectEqual(definition->combat->ratings.maximumHealth, 30, "Maximum health is preserved");
+            test.ExpectEqual(definition->combat->attackDurationTicks, 5, "Attack duration is preserved");
+            test.ExpectEqual(definition->combat->respawnDelayTicks, 8, "Respawn delay is preserved");
             test.ExpectEqual(
-                static_cast<int>(definition->rewardTableType),
+                static_cast<int>(definition->combat->rewardTableType),
                 static_cast<int>(RewardTableType::DEVELOPMENT_MONSTER),
                 "Reward-table identity is preserved");
         }
-        test.Expect(!passive->aggressionDefinition.has_value(), "Passive definition is non-aggressive");
-        test.Expect(aggressive->aggressionDefinition.has_value(), "Aggressive definition is aggressive");
-        test.ExpectEqual(aggressive->aggressionDefinition->detectionRadius, 5, "Detection radius is preserved");
-        test.ExpectEqual(aggressive->aggressionDefinition->leashRadius, 8, "Leash radius is preserved");
+        test.Expect(!passive->combat->aggression.has_value(), "Passive definition is non-aggressive");
+        test.Expect(aggressive->combat->aggression.has_value(), "Aggressive definition is aggressive");
+        test.ExpectEqual(aggressive->combat->aggression->detectionRadius, 5, "Detection radius is preserved");
+        test.ExpectEqual(aggressive->combat->aggression->leashRadius, 8, "Leash radius is preserved");
 
         NpcDefinition emptyName = *passive;
         emptyName.name.clear();
         test.Expect(!ContentValidator::ValidateNpcDefinition(emptyName).IsValid(), "Empty NPC name is rejected");
 
         NpcDefinition invalidDuration = *passive;
-        invalidDuration.attackDurationTicks = 0;
+        invalidDuration.combat->attackDurationTicks = 0;
         test.Expect(!ContentValidator::ValidateNpcDefinition(invalidDuration).IsValid(), "Non-positive attack duration is rejected");
 
         NpcDefinition negativeRatings = *passive;
-        negativeRatings.combatRatings.attackAccuracy = -1;
+        negativeRatings.combat->ratings.attackAccuracy = -1;
         test.Expect(!ContentValidator::ValidateNpcDefinition(negativeRatings).IsValid(), "Negative combat ratings are rejected");
 
         NpcDefinition invalidReward = *passive;
-        invalidReward.rewardTableType = RewardTableType::NONE;
+        invalidReward.combat->rewardTableType = RewardTableType::NONE;
         test.Expect(!ContentValidator::ValidateNpcDefinition(invalidReward).IsValid(), "Invalid reward-table reference is rejected");
 
         NpcDefinition invalidHealth = *passive;
-        invalidHealth.combatRatings.maximumHealth = 0;
+        invalidHealth.combat->ratings.maximumHealth = 0;
         test.Expect(!ContentValidator::ValidateNpcDefinition(invalidHealth).IsValid(), "Non-positive health is rejected");
 
         NpcDefinition invalidRespawnDelay = *passive;
-        invalidRespawnDelay.respawnDelayTicks = -1;
+        invalidRespawnDelay.combat->respawnDelayTicks = -1;
         test.Expect(!ContentValidator::ValidateNpcDefinition(invalidRespawnDelay).IsValid(), "Negative respawn delay is rejected");
 
         NpcDefinition unknownDefinition = *passive;
@@ -131,8 +132,8 @@ int main()
             std::vector<NpcSpawnDefinition>{spawns[0], secondPassive},
             DevelopmentWorldContent::MapWidth,
             DevelopmentWorldContent::MapHeight)
-            .IsValid(),
-        "Separate spawns may share one NPC definition ID");
+            .IsValid() == false,
+        "Spawn identity cannot be paired with a different NPC type");
     NpcSpawnDefinition duplicateId = spawns[0];
     duplicateId.spawnPosition.SetPosition(8, 1);
     test.Expect(!ContentValidator::ValidateNpcSpawnDefinitions(
