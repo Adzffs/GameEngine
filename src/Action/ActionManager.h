@@ -31,8 +31,12 @@ struct ActionStartTransition
 class ActionManager
 {
 public:
-    ActionStartTransition StartAction(const Action &action);
-    ActionStartTransition RestartAction(const Action &action);
+    ActionStartTransition StartAction(
+        const Action &action,
+        int currentWorldTick);
+    ActionStartTransition RestartAction(
+        const Action &action,
+        int currentWorldTick);
 
     bool HasActionForEntity(int entityID) const;
 
@@ -49,10 +53,9 @@ public:
         ActionCancelReason reason =
             ActionCancelReason::ENTITY_DIED);
 
-    std::vector<Action> Update();
+    std::vector<Action> Update(
+        int currentWorldTick);
 
 private:
     std::vector<Action> actions;
-
-    int currentTick = 0;
 };

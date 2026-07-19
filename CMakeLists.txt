@@ -157,6 +157,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(StatusEffectTests tests/StatusEffectTests.cpp)
     add_gameengine_headless_test(FoodHealingTests tests/FoodHealingTests.cpp)
     add_gameengine_headless_test(AggressiveMonsterTests tests/AggressiveMonsterTests.cpp)
+    add_gameengine_headless_test(WorldTickAuthorityTests tests/WorldTickAuthorityTests.cpp)
 
     if(GAMEENGINE_BUILD_GRAPHICS_TESTS)
         add_gameengine_graphics_test(MonsterGraphicsTests tests/MonsterGraphicsTests.cpp)

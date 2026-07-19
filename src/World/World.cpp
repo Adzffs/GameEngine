@@ -1013,7 +1013,7 @@ void World::Update()
     objectManager.Update();
 
     std::vector<Action> completedActions =
-        actionManager.Update();
+        actionManager.Update(currentTick);
 
     ProcessCompletedActions(completedActions);
 
@@ -3053,7 +3053,9 @@ void World::StartAction(
     const Action &action)
 {
     ActionStartTransition transition =
-        actionManager.StartAction(action);
+        actionManager.StartAction(
+            action,
+            currentTick);
 
     if (transition.cancelledAction.has_value())
     {
@@ -3072,7 +3074,9 @@ void World::RestartAction(
     const Action &action)
 {
     ActionStartTransition transition =
-        actionManager.RestartAction(action);
+        actionManager.RestartAction(
+            action,
+            currentTick);
 
     if (transition.cancelledAction.has_value())
     {

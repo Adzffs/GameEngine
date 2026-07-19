@@ -199,6 +199,5 @@ void Engine::Run()
 
 void Engine::Update()
 {
-    tick++;
     world.Update();
 }

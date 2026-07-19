@@ -17,9 +17,9 @@ public:
         int targetID,
         bool repeats = false);
 
-    void Start(int serverTick);
-    void Update(int serverTick);
-    void Restart(int serverTick);
+    void Start(int currentWorldTick);
+    void Update(int currentWorldTick);
+    void Restart(int currentWorldTick);
 
     void Cancel(ActionCancelReason reason);
 

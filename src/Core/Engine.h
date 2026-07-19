@@ -19,7 +19,6 @@ private:
     InputManager inputManager;
     Graphics graphics;
 
-    int tick = 0;
     int playerID = -1;
 
     void Update();

@@ -21,9 +21,9 @@ Action::Action(
 {
 }
 
-void Action::Start(int serverTick)
+void Action::Start(int currentWorldTick)
 {
-    startTick = serverTick;
+    startTick = currentWorldTick;
     completionTick = startTick + duration;
     currentTick = 0;
 
@@ -38,20 +38,20 @@ void Action::Start(int serverTick)
     state = ActionState::RUNNING;
 }
 
-void Action::Update(int serverTick)
+void Action::Update(int currentWorldTick)
 {
     if (state != ActionState::RUNNING)
     {
         return;
     }
 
-    if (serverTick < startTick)
+    if (currentWorldTick < startTick)
     {
         currentTick = 0;
         return;
     }
 
-    currentTick = serverTick - startTick;
+    currentTick = currentWorldTick - startTick;
 
     if (currentTick >= duration)
     {
@@ -60,9 +60,9 @@ void Action::Update(int serverTick)
     }
 }
 
-void Action::Restart(int serverTick)
+void Action::Restart(int currentWorldTick)
 {
-    Start(serverTick);
+    Start(currentWorldTick);
 }
 
 void Action::Cancel(ActionCancelReason reason)

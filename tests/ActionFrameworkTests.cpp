@@ -7,12 +7,15 @@ namespace
 {
     void AdvanceTicks(
         ActionManager &actionManager,
+        int &currentWorldTick,
         int ticks,
         std::vector<Action> &completedActions)
     {
         for (int index = 0; index < ticks; ++index)
         {
-            completedActions = actionManager.Update();
+            currentWorldTick++;
+            completedActions = actionManager.Update(
+                currentWorldTick);
         }
     }
 }
@@ -157,6 +160,7 @@ int main()
 
     {
         ActionManager actionManager;
+        int currentWorldTick = 0;
 
         actionManager.StartAction(
             Action(
@@ -165,7 +169,8 @@ int main()
                 6,
                 1,
                 100,
-                false));
+                false),
+            currentWorldTick);
 
         const Action *firstActiveAction =
             actionManager.GetActionForEntity(1);
@@ -189,7 +194,8 @@ int main()
                 4,
                 1,
                 200,
-                false));
+                false),
+            currentWorldTick);
 
         const Action *replacementAction =
             actionManager.GetActionForEntity(1);
@@ -205,6 +211,7 @@ int main()
         std::vector<Action> completedActions;
         AdvanceTicks(
             actionManager,
+            currentWorldTick,
             4,
             completedActions);
 
@@ -223,6 +230,7 @@ int main()
 
     {
         ActionManager actionManager;
+        int currentWorldTick = 0;
         std::vector<Action> completedActions;
 
         actionManager.StartAction(
@@ -232,10 +240,12 @@ int main()
                 3,
                 2,
                 300,
-                false));
+                false),
+            currentWorldTick);
 
         AdvanceTicks(
             actionManager,
+            currentWorldTick,
             2,
             completedActions);
 
@@ -245,6 +255,7 @@ int main()
 
         AdvanceTicks(
             actionManager,
+            currentWorldTick,
             1,
             completedActions);
 
@@ -260,6 +271,7 @@ int main()
 
     {
         ActionManager actionManager;
+        int currentWorldTick = 0;
         std::vector<Action> completedActions;
 
         actionManager.RestartAction(
@@ -269,7 +281,8 @@ int main()
                 3,
                 3,
                 301,
-                true));
+                true),
+            currentWorldTick);
 
         test.Expect(
             actionManager.GetActionForEntity(3) == nullptr,
@@ -285,7 +298,9 @@ int main()
         cancelledRepeating.Start(0);
         cancelledRepeating.Cancel(ActionCancelReason::PLAYER_MOVED);
 
-        actionManager.RestartAction(cancelledRepeating);
+        actionManager.RestartAction(
+            cancelledRepeating,
+            currentWorldTick);
 
         test.Expect(
             actionManager.GetActionForEntity(3) == nullptr,
@@ -298,15 +313,18 @@ int main()
                 2,
                 4,
                 400,
-                false));
+                false),
+            currentWorldTick);
 
         AdvanceTicks(
             actionManager,
+            currentWorldTick,
             2,
             completedActions);
 
         actionManager.RestartAction(
-            completedActions.front());
+            completedActions.front(),
+            currentWorldTick);
 
         test.Expect(
             actionManager.GetActionForEntity(4) == nullptr,
@@ -319,15 +337,18 @@ int main()
                 2,
                 5,
                 500,
-                true));
+                true),
+            currentWorldTick);
 
         AdvanceTicks(
             actionManager,
+            currentWorldTick,
             2,
             completedActions);
 
         actionManager.RestartAction(
-            completedActions.front());
+            completedActions.front(),
+            currentWorldTick);
 
         const Action *restartedAction =
             actionManager.GetActionForEntity(5);

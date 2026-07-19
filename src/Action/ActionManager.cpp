@@ -26,7 +26,8 @@ namespace
 }
 
 ActionStartTransition ActionManager::StartAction(
-    const Action &action)
+    const Action &action,
+    int currentWorldTick)
 {
     ActionStartTransition transition;
 
@@ -35,7 +36,7 @@ ActionStartTransition ActionManager::StartAction(
         ActionCancelReason::NEW_ACTION_STARTED);
 
     actions.push_back(action);
-    actions.back().Start(currentTick);
+    actions.back().Start(currentWorldTick);
 
     if (actions.back().IsRunning())
     {
@@ -47,7 +48,8 @@ ActionStartTransition ActionManager::StartAction(
 }
 
 ActionStartTransition ActionManager::RestartAction(
-    const Action &action)
+    const Action &action,
+    int currentWorldTick)
 {
     ActionStartTransition transition;
 
@@ -62,7 +64,7 @@ ActionStartTransition ActionManager::RestartAction(
         ActionCancelReason::NEW_ACTION_STARTED);
 
     Action restartedAction = action;
-    restartedAction.Restart(currentTick);
+    restartedAction.Restart(currentWorldTick);
 
     actions.push_back(restartedAction);
 
@@ -103,16 +105,15 @@ const Action *ActionManager::GetActionForEntity(
     return nullptr;
 }
 
-std::vector<Action> ActionManager::Update()
+std::vector<Action> ActionManager::Update(
+    int currentWorldTick)
 {
     std::vector<Action> completedActions;
-
-    currentTick++;
 
     for (auto actionIterator = actions.begin();
          actionIterator != actions.end();)
     {
-        actionIterator->Update(currentTick);
+        actionIterator->Update(currentWorldTick);
 
         if (actionIterator->IsComplete())
         {
