@@ -58,6 +58,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/Persistence/PlayerSaveState.cpp
     src/Persistence/PersistenceTokenCodec.cpp
     src/Persistence/PlayerSaveTextCodec.cpp
+    src/Persistence/PlayerSaveFileStore.cpp
     src/NPC/NPC.cpp
     src/NPC/NpcDefinitionDatabase.cpp
     src/NPC/NpcSpawnDatabase.cpp
@@ -172,6 +173,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(InventoryTransactionTests tests/InventoryTransactionTests.cpp)
     add_gameengine_headless_test(PlayerSaveStateTests tests/PlayerSaveStateTests.cpp)
     add_gameengine_headless_test(PlayerSaveTextCodecTests tests/PlayerSaveTextCodecTests.cpp)
+    add_gameengine_headless_test(PlayerSaveFileStoreTests tests/PlayerSaveFileStoreTests.cpp)
     add_gameengine_headless_test(MonsterLootIntegrationTests tests/MonsterLootIntegrationTests.cpp)
     add_gameengine_headless_test(MonsterRespawnTests tests/MonsterRespawnTests.cpp)
     add_gameengine_headless_test(EquipmentUnequipTests tests/EquipmentUnequipTests.cpp)
