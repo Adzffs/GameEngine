@@ -49,7 +49,10 @@ int EntityManager::CreateMonster(
     std::optional<MonsterRespawnDefinition> respawnDefinition,
     std::optional<MonsterAggressionDefinition> aggressionDefinition,
     NpcType npcType,
-    int attackDurationTicks)
+    int attackDurationTicks,
+    NpcSpawnId npcSpawnId,
+    int wanderRadius,
+    int wanderIntervalTicks)
 {
     int monsterID = nextID;
 
@@ -63,7 +66,10 @@ int EntityManager::CreateMonster(
             aggressionDefinition,
             respawnDefinition,
             npcType,
-            attackDurationTicks)) == nullptr)
+            attackDurationTicks,
+            npcSpawnId,
+            wanderRadius,
+            wanderIntervalTicks)) == nullptr)
     {
         return 0;
     }
@@ -162,6 +168,23 @@ bool EntityManager::RemoveEntity(int id)
 
     entityLookup.erase(lookupIterator);
     entities.erase(entityIterator);
+    return true;
+}
+
+bool EntityManager::RollbackLastCreatedEntity(int id)
+{
+    if (id <= 0 || nextID != id + 1 || entities.empty() ||
+        entities.back()->GetID() != id)
+    {
+        return false;
+    }
+
+    if (!RemoveEntity(id))
+    {
+        return false;
+    }
+
+    nextID = id;
     return true;
 }
 const std::vector<std::unique_ptr<Entity>> &

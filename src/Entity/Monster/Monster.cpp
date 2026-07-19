@@ -11,7 +11,10 @@ Monster::Monster(
     std::optional<MonsterAggressionDefinition> aggressionDefinition,
     std::optional<MonsterRespawnDefinition> respawnDefinition,
     NpcType npcType,
-    int attackDurationTicks)
+    int attackDurationTicks,
+    NpcSpawnId npcSpawnId,
+    int wanderRadius,
+    int wanderIntervalTicks)
     : Entity(id, EntityType::MONSTER),
       combatRatings(ratings),
       healthPool(ratings.maximumHealth),
@@ -21,7 +24,10 @@ Monster::Monster(
       originalSpawnX(x),
       originalSpawnY(y),
       npcType(npcType),
-      attackDurationTicks(attackDurationTicks)
+      attackDurationTicks(attackDurationTicks),
+      npcSpawnId(npcSpawnId),
+      wanderRadius(wanderRadius),
+      wanderIntervalTicks(wanderIntervalTicks)
 {
     // Keep ratings and health cap internally consistent when health is clamped.
     combatRatings.maximumHealth = healthPool.GetMaximumHealth();
@@ -127,4 +133,19 @@ NpcType Monster::GetNpcType() const
 int Monster::GetAttackDurationTicks() const
 {
     return attackDurationTicks;
+}
+
+NpcSpawnId Monster::GetNpcSpawnId() const
+{
+    return npcSpawnId;
+}
+
+int Monster::GetWanderRadius() const
+{
+    return wanderRadius;
+}
+
+int Monster::GetWanderIntervalTicks() const
+{
+    return wanderIntervalTicks;
 }

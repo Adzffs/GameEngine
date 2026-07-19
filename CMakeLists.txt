@@ -53,6 +53,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/NPC/NPC.cpp
     src/NPC/NpcDefinitionDatabase.cpp
     src/NPC/NpcSpawnDatabase.cpp
+    src/NPC/NpcSpawnManager.cpp
     src/Inventory/Inventory.cpp
     src/Inventory/InventorySlot.cpp
     src/Skills/Skill.cpp
@@ -182,6 +183,8 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(ServerCommandQueueTests tests/ServerCommandQueueTests.cpp)
     add_gameengine_headless_test(TickSchedulerTests tests/TickSchedulerTests.cpp)
     add_gameengine_headless_test(NpcDefinitionTests tests/NpcDefinitionTests.cpp)
+    add_gameengine_headless_test(NpcSpawnManagerTests tests/NpcSpawnManagerTests.cpp)
+    add_gameengine_headless_test(MonsterWanderingTests tests/MonsterWanderingTests.cpp)
 
     if(GAMEENGINE_BUILD_GRAPHICS_TESTS)
         add_gameengine_graphics_test(MonsterGraphicsTests tests/MonsterGraphicsTests.cpp)

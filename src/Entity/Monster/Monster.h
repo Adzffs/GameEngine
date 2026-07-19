@@ -7,6 +7,7 @@
 #include "../../Reward/RewardTableType.h"
 #include "../../Stats/HealthPool.h"
 #include "../../NPC/NpcType.h"
+#include "../../NPC/NpcSpawnId.h"
 #include <optional>
 
 class Monster : public Entity, public Combatant
@@ -24,7 +25,10 @@ public:
         std::optional<MonsterRespawnDefinition> respawnDefinition =
             std::nullopt,
         NpcType npcType = NpcType::NONE,
-        int attackDurationTicks = 5);
+        int attackDurationTicks = 5,
+        NpcSpawnId npcSpawnId = NpcSpawnId::NONE,
+        int wanderRadius = 0,
+        int wanderIntervalTicks = 0);
 
     void Update(World &world) override;
 
@@ -52,6 +56,9 @@ public:
     int GetOriginalSpawnY() const;
     NpcType GetNpcType() const;
     int GetAttackDurationTicks() const;
+    NpcSpawnId GetNpcSpawnId() const;
+    int GetWanderRadius() const;
+    int GetWanderIntervalTicks() const;
 
 private:
     CombatRatings combatRatings;
@@ -65,4 +72,7 @@ private:
     const int originalSpawnY;
     const NpcType npcType;
     const int attackDurationTicks;
+    const NpcSpawnId npcSpawnId;
+    const int wanderRadius;
+    const int wanderIntervalTicks;
 };

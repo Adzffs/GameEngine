@@ -476,7 +476,8 @@ ContentValidationReport ContentValidator::ValidateNpcSpawnDefinitions(
     int mapHeight)
 {
     ContentValidationReport report;
-    std::set<std::tuple<NpcType, int, int, int, bool>> records;
+    std::set<NpcSpawnId> spawnIds;
+    std::set<std::tuple<NpcSpawnId, NpcType, int, int, int, int, int, bool>> records;
 
     for (const NpcSpawnDefinition &definition : definitions)
     {
@@ -487,11 +488,18 @@ ContentValidationReport ContentValidator::ValidateNpcSpawnDefinitions(
             false,
             report);
 
+        if (!spawnIds.insert(definition.spawnId).second)
+            report.AddError("StarterMonsterSpawn", std::to_string(static_cast<int>(definition.spawnId)),
+                            "spawn ID must be unique");
+
         const auto record = std::make_tuple(
+            definition.spawnId,
             definition.npcType,
             definition.spawnPosition.GetX(),
             definition.spawnPosition.GetY(),
             definition.wanderRadius,
+            definition.wanderIntervalTicks,
+            definition.maximumActiveCount,
             definition.respawns);
         if (!records.insert(record).second)
         {
@@ -885,6 +893,7 @@ void ContentValidator::ValidateStarterWorldContent(
     }
 
     std::set<std::pair<int, int>> monsterSpawnPositions;
+    std::set<NpcSpawnId> registeredNpcSpawnIds;
     for (const NpcSpawnDefinition &monsterSpawn :
          NpcSpawnDatabase::GetStarterMonsterSpawns())
     {
@@ -902,6 +911,14 @@ void ContentValidator::ValidateStarterWorldContent(
             DevelopmentWorldContent::MapHeight,
             blockedByObject,
             report);
+
+        if (!registeredNpcSpawnIds.insert(monsterSpawn.spawnId).second)
+        {
+            report.AddError(
+                "StarterMonsterSpawn",
+                std::to_string(static_cast<int>(monsterSpawn.spawnId)),
+                "spawn ID must be unique");
+        }
 
         if (!occupiedEntitySpawnPositions.insert(spawnPosition)
                  .second)
@@ -1514,6 +1531,9 @@ void ContentValidator::AppendNpcSpawnValidation(
             definition.spawnPosition.GetX(),
             definition.spawnPosition.GetY());
 
+    if (!IsValidNpcSpawnId(definition.spawnId))
+        report.AddError("StarterMonsterSpawn", contentID, "spawn ID must be real content");
+
     if (mapWidth <= 0 ||
         mapHeight <= 0)
     {
@@ -1557,6 +1577,12 @@ void ContentValidator::AppendNpcSpawnValidation(
     {
         report.AddError("StarterMonsterSpawn", contentID, "wander radius must not be negative");
     }
+    if (definition.wanderRadius > 0 && definition.wanderIntervalTicks <= 0)
+        report.AddError("StarterMonsterSpawn", contentID, "wander interval must be positive when wandering is enabled");
+    if (definition.wanderRadius == 0 && definition.wanderIntervalTicks != 0)
+        report.AddError("StarterMonsterSpawn", contentID, "disabled wandering must use a zero interval");
+    if (definition.maximumActiveCount <= 0)
+        report.AddError("StarterMonsterSpawn", contentID, "maximum active count must be positive");
     if (definition.respawns && npcDefinition != nullptr &&
         npcDefinition->respawnDelayTicks <= 0)
     {

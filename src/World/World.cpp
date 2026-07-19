@@ -150,6 +150,12 @@ World::World(
     rewardTableRoller = std::make_unique<RewardTableRoller>(
         *this->rewardRandomSource);
 
+    for (const NpcSpawnDefinition &spawn :
+         NpcSpawnDatabase::GetStarterMonsterSpawns())
+    {
+        npcSpawnManager.AddSpawn(spawn);
+    }
+
     for (const DevelopmentNpcSpawnDefinition &definition :
          DevelopmentWorldContent::GetStarterNPCSpawns())
     {
@@ -239,10 +245,22 @@ int World::CreateMonster(
     NpcType npcType,
     const NpcSpawnDefinition &spawn)
 {
+    const NpcSpawnDefinition *authoredSpawn =
+        NpcSpawnDatabase::TryGet(spawn.spawnId);
     const NpcDefinition *definition =
         NpcDefinitionDatabase::TryGet(npcType);
-    if (definition == nullptr ||
+    if (definition == nullptr || authoredSpawn == nullptr ||
+        spawn.spawnId == NpcSpawnId::NONE ||
+        !npcSpawnManager.HasSpawn(spawn.spawnId) ||
+        !npcSpawnManager.HasCapacity(spawn.spawnId) ||
         npcType != spawn.npcType ||
+        authoredSpawn->npcType != spawn.npcType ||
+        authoredSpawn->spawnPosition.GetX() != spawn.spawnPosition.GetX() ||
+        authoredSpawn->spawnPosition.GetY() != spawn.spawnPosition.GetY() ||
+        authoredSpawn->wanderRadius != spawn.wanderRadius ||
+        authoredSpawn->wanderIntervalTicks != spawn.wanderIntervalTicks ||
+        authoredSpawn->maximumActiveCount != spawn.maximumActiveCount ||
+        authoredSpawn->respawns != spawn.respawns ||
         definition->name.empty() ||
         definition->combatRatings.attackAccuracy < 0 ||
         definition->combatRatings.meleeStrength < 0 ||
@@ -256,6 +274,9 @@ int World::CreateMonster(
             spawn.spawnPosition.GetX(),
             spawn.spawnPosition.GetY()) ||
         spawn.wanderRadius < 0 ||
+        (spawn.wanderRadius > 0 && spawn.wanderIntervalTicks <= 0) ||
+        (spawn.wanderRadius == 0 && spawn.wanderIntervalTicks != 0) ||
+        spawn.maximumActiveCount <= 0 ||
         (spawn.respawns && definition->respawnDelayTicks <= 0))
     {
         return 0;
@@ -272,7 +293,7 @@ int World::CreateMonster(
         }
     }
 
-    return entityManager.CreateMonster(
+    const int monsterId = entityManager.CreateMonster(
         spawn.spawnPosition.GetX(),
         spawn.spawnPosition.GetY(),
         definition->combatRatings,
@@ -284,7 +305,29 @@ int World::CreateMonster(
             : std::nullopt,
         definition->aggressionDefinition,
         definition->type,
-        definition->attackDurationTicks);
+        definition->attackDurationTicks,
+        spawn.spawnId,
+        spawn.wanderRadius,
+        spawn.wanderIntervalTicks);
+    if (monsterId == 0)
+        return 0;
+    bool registered = false;
+    try
+    {
+        registered = npcSpawnManager.RegisterEntity(
+            spawn.spawnId, monsterId, currentTick);
+    }
+    catch (...)
+    {
+        entityManager.RollbackLastCreatedEntity(monsterId);
+        throw;
+    }
+    if (!registered)
+    {
+        entityManager.RollbackLastCreatedEntity(monsterId);
+        return 0;
+    }
+    return monsterId;
 }
 
 Entity *World::GetEntityByID(int id)
@@ -1490,11 +1533,52 @@ void World::ProcessAggressiveMonsters()
             HasScheduledMonsterRespawn(monster->GetID()) ||
             respawnedMonsterEntityIDsThisTick.contains(monster->GetID());
 
-        ExecuteMonsterAIIntent(
-            monsterAISystem.Evaluate(
-                *monster,
-                entityManager,
-                respawnSuppressed));
+        const MonsterAIIntent combatIntent = monsterAISystem.Evaluate(
+            *monster, entityManager, respawnSuppressed);
+        ExecuteMonsterAIIntent(combatIntent);
+        if (combatIntent.type == MonsterAIIntentType::NONE)
+            TryProcessIdleWander(*monster);
+    }
+}
+
+void World::TryProcessIdleWander(Monster &monster)
+{
+    if (!monster.IsAlive() || monster.GetWanderRadius() <= 0 ||
+        monster.GetAggressionTargetEntityID() != Monster::InvalidAggressionTargetEntityID ||
+        actionManager.HasActionForEntity(monster.GetID()) ||
+        HasPendingMeleeEngagement(monster.GetID()) ||
+        movementSystem.HasMovement(monster.GetID()) ||
+        HasScheduledMonsterRespawn(monster.GetID()) ||
+        respawnedMonsterEntityIDsThisTick.contains(monster.GetID()) ||
+        Distance::Calculate(monster.GetPosition().GetX(), monster.GetPosition().GetY(),
+                            monster.GetOriginalSpawnX(), monster.GetOriginalSpawnY()) >
+            monster.GetWanderRadius())
+        return;
+
+    const std::optional<int> start =
+        npcSpawnManager.BeginWanderAttempt(monster.GetID(), currentTick);
+    if (!start.has_value())
+        return;
+
+    static constexpr int DirectionCount = 4;
+    static constexpr int ChangeX[DirectionCount] = {1, 0, -1, 0};
+    static constexpr int ChangeY[DirectionCount] = {0, 1, 0, -1};
+    for (int offset = 0; offset < DirectionCount; ++offset)
+    {
+        const int candidate = (start.value() + offset) % DirectionCount;
+        const Position destination(
+            monster.GetPosition().GetX() + ChangeX[candidate],
+            monster.GetPosition().GetY() + ChangeY[candidate]);
+        if (!map.IsValidPosition(destination.GetX(), destination.GetY()) ||
+            Distance::Calculate(destination.GetX(), destination.GetY(),
+                                monster.GetOriginalSpawnX(), monster.GetOriginalSpawnY()) >
+                monster.GetWanderRadius())
+            continue;
+
+        ExecuteMonsterAIIntent(MonsterAIIntent{
+            MonsterAIIntentType::WANDER, monster.GetID(),
+            Monster::InvalidAggressionTargetEntityID, destination});
+        return;
     }
 }
 
@@ -1596,6 +1680,17 @@ void World::ExecuteMonsterAIIntent(
                 intent.monsterEntityID,
                 intent.destination.GetX(),
                 intent.destination.GetY()));
+        }
+        return;
+    case MonsterAIIntentType::WANDER:
+        if (monster->IsAlive() && monster->GetWanderRadius() > 0 &&
+            monster->GetAggressionTargetEntityID() == Monster::InvalidAggressionTargetEntityID &&
+            !actionManager.HasActionForEntity(intent.monsterEntityID) &&
+            !HasPendingMeleeEngagement(intent.monsterEntityID) &&
+            !movementSystem.HasMovement(intent.monsterEntityID))
+        {
+            movementSystem.QueueDestination(
+                intent.monsterEntityID, intent.destination, entityManager, map);
         }
         return;
     }
@@ -3085,6 +3180,8 @@ void World::TryStartMonsterRetaliation(
         return;
     }
 
+    ClearPendingMovementForEntity(monsterEntityID);
+
     if (monster->HasAggressionDefinition())
     {
         const int currentTargetID =
@@ -3727,7 +3824,10 @@ bool World::RemoveEntity(int entityID)
     }
     processedDeathEntityIDs.erase(entityID);
     respawnedMonsterEntityIDsThisTick.erase(entityID);
-    return entityManager.RemoveEntity(entityID);
+    const bool removed = entityManager.RemoveEntity(entityID);
+    if (removed)
+        npcSpawnManager.UnregisterEntity(entityID);
+    return removed;
 }
 
 void World::ExecuteMonsterRespawn(
@@ -3771,6 +3871,8 @@ void World::ExecuteMonsterRespawn(
     processedDeathEntityIDs.erase(
         monsterEntityID);
 
+    npcSpawnManager.ResetWanderState(monsterEntityID, currentTick);
+
     respawnedMonsterEntityIDsThisTick.insert(
         monsterEntityID);
 
@@ -3782,6 +3884,11 @@ void World::ExecuteMonsterRespawn(
         ", " +
         std::to_string(monster.GetOriginalSpawnY()) +
         ")");
+}
+
+const NpcSpawnManager &World::GetNpcSpawnManager() const
+{
+    return npcSpawnManager;
 }
 
 void World::ClearCombatFeedbackInvolvingEntity(

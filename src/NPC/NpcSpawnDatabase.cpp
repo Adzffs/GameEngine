@@ -5,8 +5,20 @@ namespace NpcSpawnDatabase
     const std::vector<NpcSpawnDefinition> &GetStarterMonsterSpawns()
     {
         static const std::vector<NpcSpawnDefinition> spawns{
-            {NpcType::PASSIVE_DEVELOPMENT_MONSTER, Position{6, 1}, 0, true},
-            {NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER, Position{18, 2}, 0, true}};
+            {NpcSpawnId::PASSIVE_DEVELOPMENT_SPAWN, NpcType::PASSIVE_DEVELOPMENT_MONSTER,
+             Position{6, 1}, 2, 5, 1, true},
+            {NpcSpawnId::AGGRESSIVE_DEVELOPMENT_SPAWN, NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER,
+             Position{18, 2}, 0, 0, 1, true}};
         return spawns;
+    }
+
+    const NpcSpawnDefinition *TryGet(NpcSpawnId spawnId)
+    {
+        for (const NpcSpawnDefinition &spawn : GetStarterMonsterSpawns())
+        {
+            if (spawn.spawnId == spawnId)
+                return &spawn;
+        }
+        return nullptr;
     }
 }

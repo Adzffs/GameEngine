@@ -26,6 +26,7 @@
 #include "../StatusEffect/StatusEffectDefinition.h"
 #include "../StatusEffect/StatusEffectType.h"
 #include "../Entity/Monster/MonsterRespawnDefinition.h"
+#include "../NPC/NpcSpawnManager.h"
 #include <optional>
 #include <set>
 #include <string>
@@ -202,11 +203,14 @@ public:
         int monsterEntityID) const;
     std::optional<int> GetScheduledMonsterRespawnTick(
         int monsterEntityID) const;
+    const NpcSpawnManager &GetNpcSpawnManager() const;
 
 private:
     friend struct WorldTestAccess;
 
     EntityManager entityManager;
+
+    NpcSpawnManager npcSpawnManager;
 
     ObjectManager objectManager;
 
@@ -256,6 +260,7 @@ private:
         int attackerEntityID,
         int defenderEntityID) const;
     void ProcessAggressiveMonsters();
+    void TryProcessIdleWander(Monster &monster);
     void ExecuteMonsterAIIntent(
         const MonsterAIIntent &intent);
     void PublishActionLifecycleEvents();

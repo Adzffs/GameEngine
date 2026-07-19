@@ -10,6 +10,7 @@
 #include "../../Reward/RewardTableType.h"
 #include "../../Stats/CombatRatings.h"
 #include "../../NPC/NpcType.h"
+#include "../../NPC/NpcSpawnId.h"
 #include <optional>
 class World;
 struct EntityManagerTestAccess;
@@ -34,7 +35,10 @@ public:
         std::optional<MonsterAggressionDefinition> aggressionDefinition =
             std::nullopt,
         NpcType npcType = NpcType::NONE,
-        int attackDurationTicks = 5);
+        int attackDurationTicks = 5,
+        NpcSpawnId npcSpawnId = NpcSpawnId::NONE,
+        int wanderRadius = 0,
+        int wanderIntervalTicks = 0);
 
     void Update(World &world);
 
@@ -46,6 +50,7 @@ public:
 private:
     Entity *RegisterEntity(std::unique_ptr<Entity> entity);
     bool RemoveEntity(int id);
+    bool RollbackLastCreatedEntity(int id);
 
     // Vector order is authoritative for deterministic iteration. Moving a
     // unique_ptr during vector growth does not move its heap-allocated Entity.

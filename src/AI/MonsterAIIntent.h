@@ -8,7 +8,8 @@ enum class MonsterAIIntentType
     CLEAR_TARGET,
     CHASE_TARGET,
     ATTACK_TARGET,
-    RETURN_HOME
+    RETURN_HOME,
+    WANDER
 };
 
 enum class MonsterAIClearReason

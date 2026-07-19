@@ -111,9 +111,20 @@ int main()
     test.ExpectEqual(spawns[0].spawnPosition.GetY(), 1, "Passive spawn Y is preserved");
     test.ExpectEqual(spawns[1].spawnPosition.GetX(), 18, "Aggressive spawn X is preserved");
     test.ExpectEqual(spawns[1].spawnPosition.GetY(), 2, "Aggressive spawn Y is preserved");
+    test.Expect(spawns[0].spawnId == NpcSpawnId::PASSIVE_DEVELOPMENT_SPAWN,
+                "Passive spawn has its stable authored ID");
+    test.Expect(spawns[1].spawnId == NpcSpawnId::AGGRESSIVE_DEVELOPMENT_SPAWN,
+                "Aggressive spawn has its stable authored ID");
+    test.Expect(NpcSpawnDatabase::TryGet(NpcSpawnId::NONE) == nullptr,
+                "Unknown spawn ID fails safely");
+    test.ExpectEqual(spawns[0].wanderRadius, 2, "Passive wander radius is authored");
+    test.ExpectEqual(spawns[0].wanderIntervalTicks, 5, "Passive wander interval is authored");
+    test.ExpectEqual(spawns[0].maximumActiveCount, 1, "Passive capacity is authored");
+    test.ExpectEqual(spawns[1].wanderRadius, 0, "Aggressive wandering remains disabled");
     test.Expect(spawns[0].respawns && spawns[1].respawns, "Starter respawn flags are preserved");
 
     NpcSpawnDefinition secondPassive = spawns[0];
+    secondPassive.spawnId = NpcSpawnId::AGGRESSIVE_DEVELOPMENT_SPAWN;
     secondPassive.spawnPosition.SetPosition(7, 1);
     test.Expect(
         ContentValidator::ValidateNpcSpawnDefinitions(
@@ -122,6 +133,13 @@ int main()
             DevelopmentWorldContent::MapHeight)
             .IsValid(),
         "Separate spawns may share one NPC definition ID");
+    NpcSpawnDefinition duplicateId = spawns[0];
+    duplicateId.spawnPosition.SetPosition(8, 1);
+    test.Expect(!ContentValidator::ValidateNpcSpawnDefinitions(
+                     std::vector<NpcSpawnDefinition>{spawns[0], duplicateId},
+                     DevelopmentWorldContent::MapWidth,
+                     DevelopmentWorldContent::MapHeight).IsValid(),
+                "Different records cannot reuse one stable spawn ID");
     test.Expect(
         !ContentValidator::ValidateNpcSpawnDefinitions(
              std::vector<NpcSpawnDefinition>{spawns[0], spawns[0]},
@@ -139,6 +157,41 @@ int main()
              DevelopmentWorldContent::MapHeight)
              .IsValid(),
         "Negative wander radius is rejected");
+
+    NpcSpawnDefinition invalidSpawnId = spawns[0];
+    invalidSpawnId.spawnId = NpcSpawnId::NONE;
+    test.Expect(!ContentValidator::ValidateNpcSpawnDefinition(
+                    invalidSpawnId, DevelopmentWorldContent::MapWidth,
+                    DevelopmentWorldContent::MapHeight).IsValid(),
+                "NONE spawn ID is rejected");
+
+    NpcSpawnDefinition unknownStableSpawnId = spawns[0];
+    unknownStableSpawnId.spawnId = static_cast<NpcSpawnId>(999);
+    test.Expect(!ContentValidator::ValidateNpcSpawnDefinition(
+                    unknownStableSpawnId, DevelopmentWorldContent::MapWidth,
+                    DevelopmentWorldContent::MapHeight).IsValid(),
+                "Unknown spawn ID is rejected by content validation");
+
+    NpcSpawnDefinition invalidInterval = spawns[0];
+    invalidInterval.wanderIntervalTicks = 0;
+    test.Expect(!ContentValidator::ValidateNpcSpawnDefinition(
+                    invalidInterval, DevelopmentWorldContent::MapWidth,
+                    DevelopmentWorldContent::MapHeight).IsValid(),
+                "Enabled wandering requires a positive interval");
+
+    NpcSpawnDefinition invalidCapacity = spawns[0];
+    invalidCapacity.maximumActiveCount = 0;
+    test.Expect(!ContentValidator::ValidateNpcSpawnDefinition(
+                    invalidCapacity, DevelopmentWorldContent::MapWidth,
+                    DevelopmentWorldContent::MapHeight).IsValid(),
+                "Spawn capacity must be positive");
+
+    NpcSpawnDefinition invalidDisabledInterval = spawns[1];
+    invalidDisabledInterval.wanderIntervalTicks = 5;
+    test.Expect(!ContentValidator::ValidateNpcSpawnDefinition(
+                    invalidDisabledInterval, DevelopmentWorldContent::MapWidth,
+                    DevelopmentWorldContent::MapHeight).IsValid(),
+                "Disabled wandering requires exactly zero interval");
 
     NpcSpawnDefinition unknownSpawn = spawns[0];
     unknownSpawn.npcType = static_cast<NpcType>(999);
@@ -175,6 +228,12 @@ int main()
         world.CreateMonster(unknownSpawn.npcType, unknownSpawn),
         0,
         "Unknown requested NPC type fails safely");
+    NpcSpawnDefinition unknownSpawnId = spawns[0];
+    unknownSpawnId.spawnId = static_cast<NpcSpawnId>(999);
+    test.ExpectEqual(
+        world.CreateMonster(unknownSpawnId.npcType, unknownSpawnId),
+        0,
+        "Unknown authored spawn ID creates no entity");
     test.ExpectEqual(
         world.CreateMonster(
             NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER,
@@ -204,9 +263,32 @@ int main()
         "Invalid position does not consume the next entity ID");
 
     test.ExpectEqual(
-        world.CreateMonster(secondPassive.npcType, secondPassive),
+        world.CreateMonster(spawns[0].npcType, spawns[0]),
+        0,
+        "Authored spawn capacity prevents a duplicate runtime monster");
+    test.ExpectEqual(
+        world.CreatePlayer(),
         6,
-        "A second valid spawn may use the same NPC definition");
+        "Capacity failure does not consume the next entity ID");
+
+    World primitiveWorld;
+    const int primitiveId = primitiveWorld.CreateMonster(
+        2, 2, CombatRatings{1, 1, 1, 10});
+    Monster *primitiveMonster = dynamic_cast<Monster *>(
+        primitiveWorld.GetEntityByID(primitiveId));
+    test.Expect(primitiveMonster != nullptr, "Primitive monster fixture creation remains available");
+    if (primitiveMonster != nullptr)
+    {
+        test.Expect(primitiveMonster->GetNpcSpawnId() == NpcSpawnId::NONE,
+                    "Primitive monster has no authored spawn ID");
+        test.ExpectEqual(primitiveMonster->GetWanderRadius(), 0,
+                         "Primitive monster receives no wandering configuration");
+    }
+    test.Expect(!primitiveWorld.GetNpcSpawnManager().GetSpawnId(primitiveId).has_value(),
+                "Primitive monster receives no spawn-manager membership");
+    test.ExpectEqual(primitiveWorld.GetNpcSpawnManager().GetActiveCount(
+                         NpcSpawnId::PASSIVE_DEVELOPMENT_SPAWN), 1,
+                     "Primitive monster consumes no authored spawn capacity");
 
     return test.Finish();
 }
