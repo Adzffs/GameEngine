@@ -10,6 +10,7 @@
 #include "../Reward/RewardTableRegistry.h"
 #include "../NPC/NpcDefinitionDatabase.h"
 #include "../NPC/NpcSpawnDatabase.h"
+#include "../Dialogue/DialogueDefinitionDatabase.h"
 #include "../Skills/SkillType.h"
 #include "../Stats/StatType.h"
 #include "../World/Map.h"
@@ -18,6 +19,7 @@
 #include "../World/Object/Station/StationType.h"
 
 #include <limits>
+#include <map>
 #include <set>
 #include <string>
 #include <tuple>
@@ -229,6 +231,20 @@ ContentValidationReport ContentValidator::ValidateAll()
     ValidateAllResources(report);
     ValidateAllRecipes(report);
     ValidateAllRewardTables(report);
+    std::set<DialogueId> registeredDialogueIds;
+    for (DialogueId dialogueId : DialogueDefinitionDatabase::GetAllDialogueIds())
+    {
+        if (!registeredDialogueIds.insert(dialogueId).second)
+        {
+            report.AddError("DialogueDefinition", "duplicate", "registered dialogue ID must be unique");
+            continue;
+        }
+        const DialogueDefinition *dialogue = DialogueDefinitionDatabase::TryGet(dialogueId);
+        if (dialogue == nullptr)
+            report.AddError("DialogueDefinition", "missing", "registered dialogue must resolve");
+        else
+            AppendDialogueDefinitionValidation(*dialogue, report);
+    }
     ValidateStarterWorldContent(report);
 
     return report;
@@ -450,6 +466,28 @@ ContentValidationReport ContentValidator::ValidateNpcDefinitions(
         AppendNpcDefinitionValidation(definition, report);
     }
 
+    return report;
+}
+
+ContentValidationReport ContentValidator::ValidateDialogueDefinition(
+    const DialogueDefinition &definition)
+{
+    ContentValidationReport report;
+    AppendDialogueDefinitionValidation(definition, report);
+    return report;
+}
+
+ContentValidationReport ContentValidator::ValidateDialogueDefinitions(
+    const std::vector<DialogueDefinition> &definitions)
+{
+    ContentValidationReport report;
+    std::set<DialogueId> ids;
+    for (const DialogueDefinition &definition : definitions)
+    {
+        if (!ids.insert(definition.id).second)
+            report.AddError("DialogueDefinition", "duplicate", "dialogue ID must be unique");
+        AppendDialogueDefinitionValidation(definition, report);
+    }
     return report;
 }
 
@@ -1467,12 +1505,12 @@ void ContentValidator::AppendNpcDefinitionValidation(
         if (!interactions.insert(interaction).second)
             report.AddError("NpcDefinition", contentID, "interaction options must be unique");
         if (interaction == NpcInteractionType::TALK &&
-            (!definition.talkText.has_value() || definition.talkText->empty()))
-            report.AddError("NpcDefinition", contentID, "TALK requires server-owned content");
+            DialogueDefinitionDatabase::TryGet(definition.dialogueId) == nullptr)
+            report.AddError("NpcDefinition", contentID, "TALK requires a valid dialogue");
     }
-    if (definition.talkText.has_value() &&
+    if (definition.dialogueId != DialogueId::NONE &&
         std::find(definition.interactions.begin(), definition.interactions.end(), NpcInteractionType::TALK) == definition.interactions.end())
-        report.AddError("NpcDefinition", contentID, "talk content requires a TALK interaction");
+        report.AddError("NpcDefinition", contentID, "dialogue reference requires a TALK interaction");
     if (!definition.combat.has_value()) return;
     const NpcCombatDefinition &combat = *definition.combat;
     if (combat.ratings.attackAccuracy < 0 ||
@@ -1496,6 +1534,58 @@ void ContentValidator::AppendNpcDefinitionValidation(
         if (aggression.leashRadius < aggression.detectionRadius)
             report.AddError("NpcDefinition", contentID, "aggression leash radius must be at least detection radius");
     }
+}
+
+void ContentValidator::AppendDialogueDefinitionValidation(
+    const DialogueDefinition &definition,
+    ContentValidationReport &report)
+{
+    const std::string contentID = std::to_string(static_cast<int>(definition.id));
+    if (!IsValidDialogueId(definition.id))
+        report.AddError("DialogueDefinition", contentID, "dialogue ID must be known and non-NONE");
+    if (!IsValidDialogueNodeId(definition.startNodeId))
+        report.AddError("DialogueDefinition", contentID, "start node ID must be known and non-NONE");
+
+    std::map<DialogueNodeId, const DialogueNodeDefinition *> nodes;
+    for (const DialogueNodeDefinition &node : definition.nodes)
+    {
+        if (!IsValidDialogueNodeId(node.id))
+            report.AddError("DialogueDefinition", contentID, "node ID must be known and non-NONE");
+        if (!nodes.emplace(node.id, &node).second)
+            report.AddError("DialogueDefinition", contentID, "node IDs must be unique");
+        if (node.text.empty())
+            report.AddError("DialogueDefinition", contentID, "node text must not be empty");
+        if (node.nextNodeId.has_value() && !IsValidDialogueNodeId(*node.nextNodeId))
+            report.AddError("DialogueDefinition", contentID, "next node ID must be known");
+    }
+    if (!nodes.contains(definition.startNodeId))
+        report.AddError("DialogueDefinition", contentID, "start node must resolve");
+    for (const DialogueNodeDefinition &node : definition.nodes)
+        if (node.nextNodeId.has_value() && !nodes.contains(*node.nextNodeId))
+            report.AddError("DialogueDefinition", contentID, "next node reference must resolve");
+
+    std::set<DialogueNodeId> visited;
+    DialogueNodeId current = definition.startNodeId;
+    bool reachedTerminal = false;
+    while (nodes.contains(current))
+    {
+        if (!visited.insert(current).second)
+        {
+            report.AddError("DialogueDefinition", contentID, "dialogue graph must not contain a cycle");
+            break;
+        }
+        const DialogueNodeDefinition &node = *nodes.at(current);
+        if (!node.nextNodeId.has_value())
+        {
+            reachedTerminal = true;
+            break;
+        }
+        current = *node.nextNodeId;
+    }
+    if (!reachedTerminal)
+        report.AddError("DialogueDefinition", contentID, "dialogue graph must reach a terminal node");
+    if (visited.size() != nodes.size())
+        report.AddError("DialogueDefinition", contentID, "every node must be reachable from the start");
 }
 
 void ContentValidator::AppendNpcSpawnValidation(

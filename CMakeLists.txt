@@ -26,6 +26,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(GAMEENGINE_CORE_SOURCES
+    src/Dialogue/DialogueDefinitionDatabase.cpp
+    src/Dialogue/DialogueSystem.cpp
     src/AI/MonsterAISystem.cpp
     src/Command/ServerCommandQueue.cpp
     src/Scheduling/TickScheduler.cpp
@@ -187,6 +189,8 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(MonsterWanderingTests tests/MonsterWanderingTests.cpp)
     add_gameengine_headless_test(FriendlyNpcTests tests/FriendlyNpcTests.cpp)
     add_gameengine_headless_test(NpcInteractionTests tests/NpcInteractionTests.cpp)
+    add_gameengine_headless_test(DialogueDefinitionTests tests/DialogueDefinitionTests.cpp)
+    add_gameengine_headless_test(DialogueSystemTests tests/DialogueSystemTests.cpp)
 
     if(GAMEENGINE_BUILD_GRAPHICS_TESTS)
         add_gameengine_graphics_test(MonsterGraphicsTests tests/MonsterGraphicsTests.cpp)

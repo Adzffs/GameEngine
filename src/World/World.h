@@ -40,10 +40,12 @@
 #include "../Interaction/InteractionSystem.h"
 #include "../Gathering/GatheringSystem.h"
 #include "../Recipe/RecipeActionSystem.h"
+#include "../Dialogue/DialogueSystem.h"
 
 class RandomSource;
 class Monster;
 struct NpcSpawnDefinition;
+struct DialogueNodeDefinition;
 enum class NpcType;
 struct WorldTestAccess;
 
@@ -208,6 +210,7 @@ public:
         int monsterEntityID) const;
     const NpcSpawnManager &GetNpcSpawnManager() const;
     const std::vector<NpcTalkEvent> &GetNpcTalkEvents() const;
+    const ActiveDialogueSession *GetActiveDialogueSession(int actorEntityID) const;
 
 private:
     friend struct WorldTestAccess;
@@ -238,6 +241,7 @@ private:
     MeleeEngagementSystem meleeEngagementSystem;
 
     InteractionSystem interactionSystem;
+    DialogueSystem dialogueSystem;
 
     GatheringSystem gatheringSystem;
 
@@ -257,6 +261,8 @@ private:
     void ProcessQueuedCommands();
     void ProcessMovementSystem();
     void ProcessInteractionSystem();
+    bool PublishDialogueNode(const ActiveDialogueSession &session,
+                             const DialogueNodeDefinition &node);
     void ProcessMeleeEngagementSystem();
     void ProcessCompletedActions(
         const std::vector<Action> &completedActions);

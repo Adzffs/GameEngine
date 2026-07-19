@@ -60,7 +60,7 @@ namespace ContentStartupValidation
         }
 
         Logger::Info(
-            "[CONTENT] Validated items, resources, recipes, rewards and starter spawns");
+            "[CONTENT] Validated items, resources, recipes, rewards, dialogues and starter spawns");
 
         return true;
     }

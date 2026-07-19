@@ -18,7 +18,8 @@ int main()
         test.Expect(!guide->combat.has_value(), "Guide has no combat profile");
         test.ExpectEqual(guide->interactions.size(), std::size_t{1}, "Guide exposes one interaction");
         test.Expect(guide->interactions[0] == NpcInteractionType::TALK, "Guide exposes TALK");
-        test.Expect(guide->talkText.has_value() && !guide->talkText->empty(), "Guide owns talk content");
+        test.Expect(guide->dialogueId == DialogueId::DEVELOPMENT_GUIDE_INTRO,
+                    "Guide references the authored dialogue");
 
         NpcDefinition invalidFriendly = *guide;
         invalidFriendly.combat = NpcCombatDefinition{CombatRatings{1,1,1,1}, 1,
@@ -33,10 +34,10 @@ int main()
         duplicateTalk.interactions.push_back(NpcInteractionType::TALK);
         test.Expect(!ContentValidator::ValidateNpcDefinition(duplicateTalk).IsValid(),
                     "Duplicate interactions are rejected");
-        NpcDefinition missingTalk = *guide;
-        missingTalk.talkText = std::string{};
-        test.Expect(!ContentValidator::ValidateNpcDefinition(missingTalk).IsValid(),
-                    "Empty TALK content is rejected");
+        NpcDefinition missingDialogue = *guide;
+        missingDialogue.dialogueId = DialogueId::NONE;
+        test.Expect(!ContentValidator::ValidateNpcDefinition(missingDialogue).IsValid(),
+                    "TALK without a dialogue is rejected");
     }
 
     const auto &spawns = NpcSpawnDatabase::GetStarterSpawns();
@@ -85,7 +86,7 @@ int main()
         monsterWithoutCombat.type = NpcType::PASSIVE_DEVELOPMENT_MONSTER;
         monsterWithoutCombat.kind = NpcKind::MONSTER;
         monsterWithoutCombat.interactions.clear();
-        monsterWithoutCombat.talkText.reset();
+        monsterWithoutCombat.dialogueId = DialogueId::NONE;
         test.Expect(!ContentValidator::ValidateNpcDefinition(monsterWithoutCombat).IsValid(),
                     "Monster without combat data is rejected");
     }

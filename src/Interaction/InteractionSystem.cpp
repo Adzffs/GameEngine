@@ -4,6 +4,7 @@
 #include "../Player/Player.h"
 #include "../NPC/NPC.h"
 #include "../NPC/NpcDefinitionDatabase.h"
+#include "../Dialogue/DialogueDefinitionDatabase.h"
 #include "../World/Object/Manager/ObjectManager.h"
 
 #include <algorithm>
@@ -80,7 +81,7 @@ bool InteractionSystem::RequestNpcInteraction(
         !IsValidNpcInteractionType(interactionType) ||
         std::find(definition->interactions.begin(), definition->interactions.end(), interactionType) == definition->interactions.end() ||
         (interactionType == NpcInteractionType::TALK &&
-         (!definition->talkText.has_value() || definition->talkText->empty())))
+         DialogueDefinitionDatabase::TryGet(definition->dialogueId) == nullptr))
         return false;
     pendingInteractionsByActorID.insert_or_assign(actorEntityID,
         PendingInteraction{actorEntityID, targetNpcEntityID, InteractionTargetType::NPC, interactionType});
@@ -167,7 +168,7 @@ std::vector<InteractionIntent> InteractionSystem::Evaluate(
             else if (std::find(definition->interactions.begin(), definition->interactions.end(), pending.npcInteractionType) == definition->interactions.end())
                 reason = InteractionClearReason::UNSUPPORTED_INTERACTION;
             else if (pending.npcInteractionType == NpcInteractionType::TALK &&
-                     (!definition->talkText.has_value() || definition->talkText->empty()))
+                     DialogueDefinitionDatabase::TryGet(definition->dialogueId) == nullptr)
                 reason = InteractionClearReason::UNSUPPORTED_INTERACTION;
         }
         else if (!TargetMatches(

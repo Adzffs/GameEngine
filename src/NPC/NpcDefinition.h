@@ -3,6 +3,7 @@
 #include "NpcType.h"
 #include "NpcKind.h"
 #include "NpcInteractionType.h"
+#include "../Dialogue/DialogueId.h"
 #include "../Entity/Monster/MonsterAggressionDefinition.h"
 #include "../Reward/RewardTableType.h"
 #include "../Stats/CombatRatings.h"
@@ -27,5 +28,5 @@ struct NpcDefinition
     NpcKind kind = NpcKind::FRIENDLY;
     std::optional<NpcCombatDefinition> combat;
     std::vector<NpcInteractionType> interactions;
-    std::optional<std::string> talkText;
+    DialogueId dialogueId = DialogueId::NONE;
 };

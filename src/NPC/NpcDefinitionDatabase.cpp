@@ -8,7 +8,7 @@ namespace
         NpcKind::FRIENDLY,
         std::nullopt,
         {NpcInteractionType::TALK},
-        "Welcome to the development world."};
+        DialogueId::DEVELOPMENT_GUIDE_INTRO};
 
     const NpcDefinition PassiveDevelopmentMonster{
         NpcType::PASSIVE_DEVELOPMENT_MONSTER,
@@ -16,7 +16,7 @@ namespace
         NpcKind::MONSTER,
         NpcCombatDefinition{CombatRatings{5, 4, 3, 30}, 5,
             RewardTableType::DEVELOPMENT_MONSTER, std::nullopt, 8},
-        {}, std::nullopt};
+        {}, DialogueId::NONE};
 
     const NpcDefinition AggressiveDevelopmentMonster{
         NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER,
@@ -25,7 +25,7 @@ namespace
         NpcCombatDefinition{CombatRatings{5, 4, 3, 30}, 5,
             RewardTableType::DEVELOPMENT_MONSTER,
             MonsterAggressionDefinition{5, 8}, 8},
-        {}, std::nullopt};
+        {}, DialogueId::NONE};
 }
 
 namespace NpcDefinitionDatabase

@@ -13,6 +13,7 @@
 #include "../World/Object/Resource/ResourceDefinition.h"
 #include "../NPC/NpcDefinition.h"
 #include "../NPC/NpcSpawnDefinition.h"
+#include "../Dialogue/DialogueDefinition.h"
 
 class ContentValidator
 {
@@ -50,6 +51,11 @@ public:
 
     static ContentValidationReport ValidateNpcDefinitions(
         const std::vector<NpcDefinition> &definitions);
+
+    static ContentValidationReport ValidateDialogueDefinition(
+        const DialogueDefinition &definition);
+    static ContentValidationReport ValidateDialogueDefinitions(
+        const std::vector<DialogueDefinition> &definitions);
 
     static ContentValidationReport ValidateNpcSpawnDefinition(
         const NpcSpawnDefinition &definition,
@@ -113,6 +119,10 @@ private:
 
     static void AppendNpcDefinitionValidation(
         const NpcDefinition &definition,
+        ContentValidationReport &report);
+
+    static void AppendDialogueDefinitionValidation(
+        const DialogueDefinition &definition,
         ContentValidationReport &report);
 
     static void AppendNpcSpawnValidation(

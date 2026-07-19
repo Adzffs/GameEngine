@@ -23,6 +23,7 @@
 #include "../NPC/NpcDefinitionDatabase.h"
 #include "../NPC/NpcSpawnDefinition.h"
 #include "../NPC/NpcSpawnDatabase.h"
+#include "../Dialogue/DialogueDefinitionDatabase.h"
 #include "../Reward/RewardTableRegistry.h"
 #include "../Core/SeededRandom.h"
 #include "../Recipe/RecipeSystem.h"
@@ -395,6 +396,7 @@ void World::QueueResourceInteraction(
     int resourceID)
 {
     meleeEngagementSystem.ClearEngagement(entityID);
+    dialogueSystem.CancelActor(entityID);
     interactionSystem.RequestInteraction(
         entityID,
         resourceID,
@@ -408,6 +410,7 @@ void World::QueueStationInteraction(
     int stationID)
 {
     meleeEngagementSystem.ClearEngagement(entityID);
+    dialogueSystem.CancelActor(entityID);
     interactionSystem.RequestInteraction(
         entityID,
         stationID,
@@ -521,6 +524,8 @@ bool World::QueueMeleeEngagementRequest(
     {
         return false;
     }
+
+    dialogueSystem.CancelActor(attackerEntityID);
 
     movementSystem.CancelMovement(attackerEntityID);
 
@@ -1268,6 +1273,11 @@ const std::vector<NpcTalkEvent> &World::GetNpcTalkEvents() const
     return publishedNpcTalkEvents;
 }
 
+const ActiveDialogueSession *World::GetActiveDialogueSession(int actorEntityID) const
+{
+    return dialogueSystem.GetSession(actorEntityID);
+}
+
 std::uint64_t World::EnqueueCommand(
     ServerCommandData command)
 {
@@ -1341,6 +1351,7 @@ void World::ProcessQueuedCommands()
                         ClearPendingResourceInteraction(
                             data.actorEntityID);
                         interactionSystem.ClearInteraction(data.actorEntityID);
+                        dialogueSystem.CancelActor(data.actorEntityID);
                         QueueMovementDestination(
                             MovementDestinationRequest(
                                 data.actorEntityID,
@@ -1477,6 +1488,7 @@ void World::ProcessQueuedCommands()
                              (resource == nullptr ||
                               resource->IsActive()))
                     {
+                        dialogueSystem.CancelActor(data.actorEntityID);
                         CancelActionsForEntity(
                             data.actorEntityID,
                             ActionCancelReason::PLAYER_MOVED);
@@ -1518,9 +1530,6 @@ void World::ProcessQueuedCommands()
                                  data.actorEntityID, data.targetNpcEntityID,
                                  data.interactionType, entityManager))
                     {
-                        CloseStationInteraction(data.actorEntityID);
-                        CancelActionsForEntity(data.actorEntityID, ActionCancelReason::PLAYER_MOVED);
-                        movementSystem.CancelMovement(data.actorEntityID);
                         const Position &actorPosition = actor->GetPosition();
                         const Position &targetPosition = npc->GetPosition();
                         if (std::abs(actorPosition.GetX() - targetPosition.GetX()) > 1 ||
@@ -1536,8 +1545,78 @@ void World::ProcessQueuedCommands()
                                 return;
                             }
                         }
+                        dialogueSystem.CancelActor(data.actorEntityID);
+                        CloseStationInteraction(data.actorEntityID);
+                        CancelActionsForEntity(data.actorEntityID, ActionCancelReason::PLAYER_MOVED);
+                        if (std::abs(actorPosition.GetX() - targetPosition.GetX()) <= 1 &&
+                            std::abs(actorPosition.GetY() - targetPosition.GetY()) <= 1)
+                            movementSystem.CancelMovement(data.actorEntityID);
                         resultCode = CommandResultCode::ACCEPTED;
                     }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, DialogueContinueCommand>)
+                {
+                    const ActiveDialogueSession *active =
+                        dialogueSystem.GetSession(data.actorEntityID);
+                    if (!actor->IsAlive())
+                    {
+                        dialogueSystem.CancelActor(data.actorEntityID);
+                    }
+                    else if (active != nullptr && data.sessionId != InvalidDialogueSessionId &&
+                             active->sessionId == data.sessionId)
+                    {
+                        const ActiveDialogueSession session = *active;
+                        NPC *npc = dynamic_cast<NPC *>(entityManager.GetEntityByID(session.npcEntityID));
+                        const NpcDefinition *npcDefinition = npc == nullptr ? nullptr :
+                            NpcDefinitionDatabase::TryGet(npc->GetNpcType());
+                        const DialogueDefinition *dialogue =
+                            DialogueDefinitionDatabase::TryGet(session.dialogueId);
+                        const DialogueNodeDefinition *currentNode =
+                            DialogueDefinitionDatabase::TryGetNode(session.dialogueId, session.currentNodeId);
+                        const bool adjacent = npc != nullptr &&
+                            std::abs(actor->GetPosition().GetX() - npc->GetPosition().GetX()) <= 1 &&
+                            std::abs(actor->GetPosition().GetY() - npc->GetPosition().GetY()) <= 1;
+                        if (npc == nullptr || npc->GetNpcType() != session.npcType ||
+                            npcDefinition == nullptr || npcDefinition->kind != NpcKind::FRIENDLY ||
+                            std::find(npcDefinition->interactions.begin(),
+                                      npcDefinition->interactions.end(),
+                                      NpcInteractionType::TALK) == npcDefinition->interactions.end() ||
+                            npcDefinition->dialogueId != session.dialogueId || dialogue == nullptr ||
+                            currentNode == nullptr || !currentNode->nextNodeId.has_value() || !adjacent)
+                        {
+                            dialogueSystem.CancelActor(data.actorEntityID);
+                        }
+                        else
+                        {
+                            const DialogueNodeDefinition *nextNode =
+                                DialogueDefinitionDatabase::TryGetNode(
+                                    session.dialogueId, *currentNode->nextNodeId);
+                            if (nextNode == nullptr)
+                                dialogueSystem.CancelActor(data.actorEntityID);
+                            else if (session.lastAdvancedTick != currentTick + 1)
+                            {
+                                ActiveDialogueSession advanced = session;
+                                advanced.currentNodeId = nextNode->id;
+                                advanced.lastAdvancedTick = currentTick + 1;
+                                if (PublishDialogueNode(advanced, *nextNode) &&
+                                    dialogueSystem.Advance(data.actorEntityID, data.sessionId,
+                                                           nextNode->id, currentTick + 1))
+                                {
+                                    if (!nextNode->nextNodeId.has_value())
+                                        dialogueSystem.Close(data.actorEntityID, data.sessionId);
+                                    resultCode = CommandResultCode::ACCEPTED;
+                                }
+                            }
+                        }
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, DialogueCloseCommand>)
+                {
+                    if (actor->IsAlive() && dialogueSystem.Close(
+                            data.actorEntityID, data.sessionId))
+                        resultCode = CommandResultCode::ACCEPTED;
                 }
                 else if constexpr (
                     std::is_same_v<CommandType,
@@ -1781,6 +1860,7 @@ void World::QueueMovementRequest(const MovementRequest &request)
     meleeEngagementSystem.ClearEngagement(
         request.GetEntityID());
     interactionSystem.ClearInteraction(request.GetEntityID());
+    dialogueSystem.CancelActor(request.GetEntityID());
 
     movementRequests.push(request);
 }
@@ -1806,6 +1886,7 @@ void World::QueueMovementDestination(
 
     meleeEngagementSystem.ClearEngagement(
         request.GetEntityID());
+    dialogueSystem.CancelActor(request.GetEntityID());
 
     movementSystem.QueueDestination(
         request.GetEntityID(),
@@ -1880,9 +1961,40 @@ void World::ProcessInteractionSystem()
             movementSystem.CancelMovement(intent.actorEntityID);
             NPC *npc = dynamic_cast<NPC *>(entityManager.GetEntityByID(intent.targetObjectID));
             const NpcDefinition *definition = npc == nullptr ? nullptr : NpcDefinitionDatabase::TryGet(npc->GetNpcType());
-            if (npc != nullptr && definition != nullptr && definition->kind == NpcKind::FRIENDLY &&
-                intent.npcInteractionType == NpcInteractionType::TALK && definition->talkText.has_value())
-                pendingNpcTalkEvents.push_back({intent.actorEntityID, npc->GetID(), npc->GetNpcType(), *definition->talkText});
+            Player *actor = dynamic_cast<Player *>(entityManager.GetEntityByID(intent.actorEntityID));
+            const DialogueDefinition *dialogue = definition == nullptr ? nullptr :
+                DialogueDefinitionDatabase::TryGet(definition->dialogueId);
+            const DialogueNodeDefinition *startNode = dialogue == nullptr ? nullptr :
+                DialogueDefinitionDatabase::TryGetNode(dialogue->id, dialogue->startNodeId);
+            if (actor != nullptr && actor->IsAlive() && npc != nullptr && definition != nullptr &&
+                definition->kind == NpcKind::FRIENDLY &&
+                intent.npcInteractionType == NpcInteractionType::TALK &&
+                std::find(definition->interactions.begin(), definition->interactions.end(),
+                          NpcInteractionType::TALK) != definition->interactions.end() &&
+                dialogue != nullptr && startNode != nullptr)
+            {
+                dialogueSystem.CancelActor(intent.actorEntityID);
+                const DialogueSessionId sessionId = dialogueSystem.Start(
+                    intent.actorEntityID, npc->GetID(), npc->GetNpcType(),
+                    dialogue->id, startNode->id, currentTick);
+                const ActiveDialogueSession *session =
+                    dialogueSystem.GetSession(intent.actorEntityID);
+                if (sessionId != InvalidDialogueSessionId && session != nullptr)
+                {
+                    try
+                    {
+                        if (!PublishDialogueNode(*session, *startNode))
+                            dialogueSystem.Close(intent.actorEntityID, sessionId);
+                        else if (!startNode->nextNodeId.has_value())
+                            dialogueSystem.Close(intent.actorEntityID, sessionId);
+                    }
+                    catch (...)
+                    {
+                        dialogueSystem.Close(intent.actorEntityID, sessionId);
+                        throw;
+                    }
+                }
+            }
             continue;
         }
 
@@ -1923,6 +2035,17 @@ void World::ProcessInteractionSystem()
                 true));
         }
     }
+}
+
+bool World::PublishDialogueNode(const ActiveDialogueSession &session,
+                                const DialogueNodeDefinition &node)
+{
+    if (node.text.empty())
+        return false;
+    pendingNpcTalkEvents.push_back({session.actorEntityID, session.npcEntityID,
+        session.npcType, session.sessionId, session.dialogueId, node.id,
+        node.text, !node.nextNodeId.has_value()});
+    return true;
 }
 
 ActionValidationResult World::ValidateGatheringAction(
@@ -3442,6 +3565,7 @@ void World::HandleCombatantDeath(
     int deadEntityID,
     int killerEntityID)
 {
+    dialogueSystem.CancelActor(deadEntityID);
     Entity *entity =
         entityManager.GetEntityByID(
             deadEntityID);
@@ -3900,6 +4024,8 @@ bool World::RemoveEntity(int entityID)
     ClearPendingMeleeInteractionsInvolvingEntity(entityID);
     interactionSystem.ClearInteraction(entityID);
     interactionSystem.ClearInteractionsTargeting(entityID);
+    dialogueSystem.CancelActor(entityID);
+    dialogueSystem.CancelTarget(entityID);
 
     auto association = monsterRespawnEventIDs.find(entityID);
     if (association != monsterRespawnEventIDs.end())

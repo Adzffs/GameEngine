@@ -7,6 +7,7 @@
 #include "../Recipe/RecipeType.h"
 #include "../World/Position.h"
 #include "../Interaction/InteractionIntent.h"
+#include "../Dialogue/DialogueSessionId.h"
 
 struct MoveCommand
 {
@@ -58,6 +59,18 @@ struct NpcInteractionCommand
     NpcInteractionType interactionType;
 };
 
+struct DialogueContinueCommand
+{
+    int actorEntityID;
+    DialogueSessionId sessionId;
+};
+
+struct DialogueCloseCommand
+{
+    int actorEntityID;
+    DialogueSessionId sessionId;
+};
+
 using ServerCommandData = std::variant<
     MoveCommand,
     AttackCommand,
@@ -66,7 +79,9 @@ using ServerCommandData = std::variant<
     StartRecipeCommand,
     InteractCommand,
     CloseStationCommand,
-    NpcInteractionCommand>;
+    NpcInteractionCommand,
+    DialogueContinueCommand,
+    DialogueCloseCommand>;
 
 struct ServerCommand
 {
