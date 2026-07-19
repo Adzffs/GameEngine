@@ -73,6 +73,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/World/Object/Resource/ResourceDatabase.cpp
     src/Recipe/RecipeDefinition.cpp
     src/Recipe/RecipeDatabase.cpp
+    src/Recipe/RecipeActionSystem.cpp
     src/Recipe/RecipeSystem.cpp
     src/Requirement/RequirementEvaluator.cpp
     src/Content/ContentValidationReport.cpp
@@ -172,6 +173,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(ClockPacingTests tests/ClockPacingTests.cpp)
     add_gameengine_headless_test(GatheringRandomTests tests/GatheringRandomTests.cpp)
     add_gameengine_headless_test(GatheringSystemTests tests/GatheringSystemTests.cpp)
+    add_gameengine_headless_test(RecipeActionSystemTests tests/RecipeActionSystemTests.cpp)
     add_gameengine_headless_test(MovementPathSafetyTests tests/MovementPathSafetyTests.cpp)
     add_gameengine_headless_test(MovementSystemTests tests/MovementSystemTests.cpp)
     add_gameengine_headless_test(EntityManagerLookupTests tests/EntityManagerLookupTests.cpp)

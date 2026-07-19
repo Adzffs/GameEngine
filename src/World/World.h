@@ -36,6 +36,7 @@
 #include "../AI/MonsterAIIntent.h"
 #include "../Interaction/InteractionSystem.h"
 #include "../Gathering/GatheringSystem.h"
+#include "../Recipe/RecipeActionSystem.h"
 
 class RandomSource;
 class Monster;
@@ -125,6 +126,13 @@ public:
     bool ConsumeOpenedStation(
         int entityID,
         StationType &stationType);
+
+    bool HasActiveStation(
+        int entityID) const;
+
+    bool IsStationUsableForRecipeValidation(
+        int entityID,
+        StationType requiredStationType) const;
 
     const Action *GetActionForEntity(
         int entityID) const;
@@ -218,6 +226,8 @@ private:
 
     GatheringSystem gatheringSystem;
 
+    RecipeActionSystem recipeActionSystem;
+
     void CreateResource(
         ResourceType resourceType,
         int x,
@@ -278,6 +288,15 @@ private:
         int defenderY);
     void CancelGatheringForToolChange(
         int entityID);
+    bool IsStationUsable(
+        int entityID,
+        StationType requiredStationType) const;
+    void CleanupInvalidActiveStationEntry(
+        int entityID,
+        StationType requiredStationType);
+    ActionValidationResult ValidateRecipeActionReadOnly(
+        int entityID,
+        RecipeType recipeType) const;
     bool CanUseStation(
         int entityID,
         StationType requiredStationType);

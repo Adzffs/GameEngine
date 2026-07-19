@@ -590,9 +590,24 @@ bool World::ConsumeOpenedStation(
     return true;
 }
 
-bool World::CanUseStation(
+bool World::HasActiveStation(
+    int entityID) const
+{
+    return activeStations.contains(entityID);
+}
+
+bool World::IsStationUsableForRecipeValidation(
     int entityID,
-    StationType requiredStationType)
+    StationType requiredStationType) const
+{
+    return IsStationUsable(
+        entityID,
+        requiredStationType);
+}
+
+bool World::IsStationUsable(
+    int entityID,
+    StationType requiredStationType) const
 {
     auto activeStationIterator =
         activeStations.find(entityID);
@@ -603,20 +618,17 @@ bool World::CanUseStation(
         return false;
     }
 
-    Entity *entity =
+    const Entity *entity =
         entityManager.GetEntityByID(
             entityID);
 
-    CraftingStation *station =
+    const CraftingStation *station =
         objectManager.GetStationByID(
             activeStationIterator->second);
 
     if (entity == nullptr ||
         station == nullptr)
     {
-        activeStations.erase(
-            activeStationIterator);
-
         return false;
     }
 
@@ -639,13 +651,82 @@ bool World::CanUseStation(
 
     if (!isAdjacent)
     {
-        activeStations.erase(
-            activeStationIterator);
-
         return false;
     }
 
     return true;
+}
+
+void World::CleanupInvalidActiveStationEntry(
+    int entityID,
+    StationType requiredStationType)
+{
+    auto activeStationIterator =
+        activeStations.find(entityID);
+
+    if (activeStationIterator ==
+        activeStations.end())
+    {
+        return;
+    }
+
+    Entity *entity =
+        entityManager.GetEntityByID(
+            entityID);
+
+    CraftingStation *station =
+        objectManager.GetStationByID(
+            activeStationIterator->second);
+
+    if (entity == nullptr ||
+        station == nullptr)
+    {
+        activeStations.erase(
+            activeStationIterator);
+        return;
+    }
+
+    if (station->GetStationType() !=
+        requiredStationType)
+    {
+        return;
+    }
+
+    int distanceX = std::abs(
+        entity->GetPosition().GetX() -
+        station->GetX());
+
+    int distanceY = std::abs(
+        entity->GetPosition().GetY() -
+        station->GetY());
+
+    bool isAdjacent =
+        distanceX <= 1 && distanceY <= 1;
+
+    if (!isAdjacent)
+    {
+        activeStations.erase(
+            activeStationIterator);
+    }
+}
+
+bool World::CanUseStation(
+    int entityID,
+    StationType requiredStationType)
+{
+    bool usable =
+        IsStationUsable(
+            entityID,
+            requiredStationType);
+
+    if (!usable)
+    {
+        CleanupInvalidActiveStationEntry(
+            entityID,
+            requiredStationType);
+    }
+
+    return usable;
 }
 
 void World::CloseStationInteraction(
@@ -1777,12 +1858,50 @@ ActionValidationResult World::ValidateRecipeAction(
     int entityID,
     RecipeType recipeType)
 {
-    Entity *entity =
+    ActionValidationResult validation =
+        ValidateRecipeActionReadOnly(
+            entityID,
+            recipeType);
+
+    if (!validation.valid &&
+        validation.reason ==
+            ActionCancelReason::OUT_OF_RANGE)
+    {
+        switch (recipeType)
+        {
+        case RecipeType::BRONZE_BAR:
+        case RecipeType::IRON_BAR:
+        case RecipeType::STEEL_BAR:
+        {
+            const RecipeDefinition &recipe =
+                RecipeDatabase::Get(
+                    recipeType);
+
+            CleanupInvalidActiveStationEntry(
+                entityID,
+                recipe.GetRequiredStationType());
+            break;
+        }
+
+        case RecipeType::NONE:
+        default:
+            break;
+        }
+    }
+
+    return validation;
+}
+
+ActionValidationResult World::ValidateRecipeActionReadOnly(
+    int entityID,
+    RecipeType recipeType) const
+{
+    const Entity *entity =
         entityManager.GetEntityByID(
             entityID);
 
-    Player *player =
-        dynamic_cast<Player *>(entity);
+    const Player *player =
+        dynamic_cast<const Player *>(entity);
 
     if (player == nullptr)
     {
@@ -1819,7 +1938,7 @@ ActionValidationResult World::ValidateRecipeAction(
         RecipeDatabase::Get(
             recipeType);
 
-    if (!CanUseStation(
+    if (!IsStationUsable(
             entityID,
             recipe.GetRequiredStationType()))
     {
@@ -2075,12 +2194,58 @@ void World::ProcessCompletedActions(
         if (action.GetType() ==
             ActionType::RECIPE)
         {
-            const int entityID =
-                action.GetOwnerID();
+            RecipeActionCompletionOutcome recipeOutcome =
+                recipeActionSystem.EvaluateCompletedAction(
+                    action,
+                    entityManager,
+                    [this](
+                        int actorEntityID,
+                        RecipeType recipeType)
+                    {
+                        return ValidateRecipeActionReadOnly(
+                            actorEntityID,
+                            recipeType);
+                    });
+
+            if (recipeOutcome.type ==
+                RecipeActionCompletionOutcomeType::IGNORE)
+            {
+                continue;
+            }
+
+            if (recipeOutcome.type ==
+                RecipeActionCompletionOutcomeType::CLEAR_STALE)
+            {
+                continue;
+            }
+
+            if (recipeOutcome.type ==
+                RecipeActionCompletionOutcomeType::CANCEL)
+            {
+                if (!recipeOutcome.message.empty())
+                {
+                    Logger::Game(
+                        recipeOutcome.message);
+                }
+
+                if (recipeOutcome.cancelReason ==
+                    ActionCancelReason::OUT_OF_RANGE)
+                {
+                    const RecipeDefinition &recipe =
+                        RecipeDatabase::Get(
+                            recipeOutcome.recipeType);
+
+                    CleanupInvalidActiveStationEntry(
+                        recipeOutcome.actorEntityID,
+                        recipe.GetRequiredStationType());
+                }
+
+                continue;
+            }
 
             Entity *entity =
                 entityManager.GetEntityByID(
-                    entityID);
+                    recipeOutcome.actorEntityID);
 
             Player *player =
                 dynamic_cast<Player *>(entity);
@@ -2090,34 +2255,10 @@ void World::ProcessCompletedActions(
                 continue;
             }
 
-            RecipeType recipeType =
-                static_cast<RecipeType>(
-                    action.GetTargetID());
-
-            ActionValidationResult validation =
-                ValidateRecipeAction(
-                    entityID,
-                    recipeType);
-
-            if (!validation.valid)
-            {
-                if (!validation.message.empty())
-                {
-                    Logger::Game(
-                        validation.message);
-                }
-
-                continue;
-            }
-
-            const RecipeDefinition &recipe =
-                RecipeDatabase::Get(
-                    recipeType);
-
             bool created =
                 RecipeSystem::TryCreateRecipe(
                     *player,
-                    recipeType);
+                    recipeOutcome.recipeType);
 
             if (!created)
             {
@@ -2131,12 +2272,12 @@ void World::ProcessCompletedActions(
 
             Logger::Game(
                 "Created: " +
-                recipe.GetName());
+                recipeOutcome.recipeName);
 
             ActionValidationResult repeatValidation =
                 ValidateRecipeAction(
-                    entityID,
-                    recipeType);
+                    recipeOutcome.actorEntityID,
+                    recipeOutcome.recipeType);
 
             if (!repeatValidation.valid)
             {
