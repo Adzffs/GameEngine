@@ -20,61 +20,85 @@
 #include <string>
 #include <variant>
 
+struct MovementSystemTestAccess
+{
+    static bool HasActiveMovementPath(
+        const MovementSystem &system,
+        int entityID)
+    {
+        return system.activeMovementPaths.contains(entityID);
+    }
+
+    static int GetRemainingStepCount(
+        const MovementSystem &system,
+        int entityID)
+    {
+        auto iterator = system.activeMovementPaths.find(entityID);
+        return iterator == system.activeMovementPaths.end()
+                   ? 0
+                   : static_cast<int>(iterator->second.remainingSteps.size());
+    }
+
+    static std::optional<Position> GetNextStep(
+        const MovementSystem &system,
+        int entityID)
+    {
+        auto iterator = system.activeMovementPaths.find(entityID);
+        if (iterator == system.activeMovementPaths.end() ||
+            iterator->second.remainingSteps.empty())
+        {
+            return std::nullopt;
+        }
+        return iterator->second.remainingSteps.front();
+    }
+
+    static std::optional<Position> GetDestination(
+        const MovementSystem &system,
+        int entityID)
+    {
+        auto iterator = system.activeMovementPaths.find(entityID);
+        return iterator == system.activeMovementPaths.end()
+                   ? std::nullopt
+                   : std::optional<Position>(iterator->second.requestedDestination);
+    }
+};
+
 struct WorldTestAccess
 {
     static bool HasActiveMovementPath(
         const World &world,
         int entityID)
     {
-        return world.activeMovementPaths.find(entityID) !=
-               world.activeMovementPaths.end();
+        return MovementSystemTestAccess::HasActiveMovementPath(
+            world.movementSystem,
+            entityID);
     }
 
     static int GetRemainingStepCount(
         const World &world,
         int entityID)
     {
-        auto iterator =
-            world.activeMovementPaths.find(entityID);
-
-        if (iterator == world.activeMovementPaths.end())
-        {
-            return 0;
-        }
-
-        return static_cast<int>(
-            iterator->second.remainingSteps.size());
+        return MovementSystemTestAccess::GetRemainingStepCount(
+            world.movementSystem,
+            entityID);
     }
 
-    static std::optional<PathStep> GetNextStep(
+    static std::optional<Position> GetNextStep(
         const World &world,
         int entityID)
     {
-        auto iterator =
-            world.activeMovementPaths.find(entityID);
-
-        if (iterator == world.activeMovementPaths.end() ||
-            iterator->second.remainingSteps.empty())
-        {
-            return std::nullopt;
-        }
-
-        return iterator->second.remainingSteps.front();
+        return MovementSystemTestAccess::GetNextStep(
+            world.movementSystem,
+            entityID);
     }
 
-    static std::optional<PathStep> GetDestination(
+    static std::optional<Position> GetDestination(
         const World &world,
         int entityID)
     {
-        auto iterator =
-            world.activeMovementPaths.find(entityID);
-
-        if (iterator == world.activeMovementPaths.end())
-        {
-            return std::nullopt;
-        }
-
-        return iterator->second.destination;
+        return MovementSystemTestAccess::GetDestination(
+            world.movementSystem,
+            entityID);
     }
 };
 
@@ -326,7 +350,7 @@ namespace
                 40));
         world.Update();
 
-        std::optional<PathStep> blockedStep =
+        std::optional<Position> blockedStep =
             WorldTestAccess::GetNextStep(
                 world,
                 playerID);
@@ -338,8 +362,8 @@ namespace
         if (blockedStep.has_value())
         {
             world.GetMap().SetTileType(
-                blockedStep->x,
-                blockedStep->y,
+                blockedStep->GetX(),
+                blockedStep->GetY(),
                 TileType::WALL);
         }
 
@@ -364,27 +388,27 @@ namespace
                 playerID),
             "A valid detour replaces the obstructed path");
 
-        std::optional<PathStep> destination =
+        std::optional<Position> destination =
             WorldTestAccess::GetDestination(
                 world,
                 playerID);
-        std::optional<PathStep> replacementStep =
+        std::optional<Position> replacementStep =
             WorldTestAccess::GetNextStep(
                 world,
                 playerID);
 
         test.Expect(
             destination.has_value() &&
-                destination->x == 35 &&
-                destination->y == 40,
+                destination->GetX() == 35 &&
+                destination->GetY() == 40,
             "Recalculation retains the original final destination");
         test.Expect(
             replacementStep.has_value() &&
                 ManhattanDistance(
                     positionBeforeFailureX,
                     positionBeforeFailureY,
-                    replacementStep->x,
-                    replacementStep->y) == 1,
+                    replacementStep->GetX(),
+                    replacementStep->GetY()) == 1,
             "The replacement path begins with an orthogonally adjacent step");
 
         world.Update();

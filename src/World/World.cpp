@@ -6,6 +6,7 @@
 #include "../Core/Logger.h"
 #include "../Action/Action.h"
 #include "../Movement/Movement.h"
+#include "../Pathfinding/Pathfinder.h"
 #include <cstdlib>
 #include "../Player/Player.h"
 #include "../Entity/Monster/Monster.h"
@@ -421,7 +422,7 @@ bool World::QueueMeleeEngagementRequest(
             durationTicks,
             destination};
 
-    activeMovementPaths.erase(attackerEntityID);
+    movementSystem.CancelMovement(attackerEntityID);
 
     if (isAdjacent)
     {
@@ -436,11 +437,11 @@ bool World::QueueMeleeEngagementRequest(
         return started;
     }
 
-    movementDestinationRequests.push(
-        MovementDestinationRequest(
-            attackerEntityID,
-            destination->first,
-            destination->second));
+    movementSystem.QueueDestination(
+        attackerEntityID,
+        Position(destination->first, destination->second),
+        entityManager,
+        map);
 
     return true;
 }
@@ -573,9 +574,8 @@ void World::ProcessPendingMeleeInteractions()
             continue;
         }
 
-        if (activeMovementPaths.find(
-                request.attackerEntityID) !=
-            activeMovementPaths.end())
+        if (movementSystem.HasMovement(
+                request.attackerEntityID))
         {
             ++interactionIterator;
             continue;
@@ -879,6 +879,8 @@ std::optional<std::pair<int, int>> World::FindMeleeApproachTile(
     int defenderX,
     int defenderY)
 {
+    Pathfinder pathfinder;
+
     for (const auto &offset : MeleeAdjacentOffsets)
     {
         int candidateX = defenderX + offset.first;
@@ -1050,8 +1052,7 @@ void World::Update()
     UpdateMeleeCombatFeedback();
     ProcessDeadCombatantCleanup();
 
-    ProcessMovementDestinationRequests();
-    ProcessActiveMovementPaths();
+    ProcessMovementSystem();
     ProcessResourceInteractions();
     ProcessStationInteractions();
 
@@ -1448,7 +1449,7 @@ void World::ExecuteMonsterAIIntent(
 
         if (actionManager.HasActionForEntity(intent.monsterEntityID) ||
             HasPendingMeleeEngagement(intent.monsterEntityID) ||
-            activeMovementPaths.contains(intent.monsterEntityID))
+            movementSystem.HasMovement(intent.monsterEntityID))
         {
             return;
         }
@@ -1471,7 +1472,7 @@ void World::ExecuteMonsterAIIntent(
     case MonsterAIIntentType::RETURN_HOME:
         if (!actionManager.HasActionForEntity(intent.monsterEntityID) &&
             !HasPendingMeleeEngagement(intent.monsterEntityID) &&
-            !activeMovementPaths.contains(intent.monsterEntityID))
+            !movementSystem.HasMovement(intent.monsterEntityID))
         {
             QueueMovementDestination(MovementDestinationRequest(
                 intent.monsterEntityID,
@@ -1529,182 +1530,38 @@ void World::QueueMovementDestination(
     pendingMeleeInteractions.erase(
         request.GetEntityID());
 
-    movementDestinationRequests.push(request);
+    movementSystem.QueueDestination(
+        request.GetEntityID(),
+        Position(
+            request.GetDestinationX(),
+            request.GetDestinationY()),
+        entityManager,
+        map);
 }
-void World::ProcessMovementDestinationRequests()
+
+bool World::ClearMovementPath(int entityID)
 {
-    while (!movementDestinationRequests.empty())
-    {
-        MovementDestinationRequest request =
-            movementDestinationRequests.front();
-
-        movementDestinationRequests.pop();
-
-        Entity *entity =
-            entityManager.GetEntityByID(
-                request.GetEntityID());
-
-        if (entity == nullptr)
-        {
-            continue;
-        }
-
-        int startX =
-            entity->GetPosition().GetX();
-
-        int startY =
-            entity->GetPosition().GetY();
-
-        std::vector<PathStep> path =
-            pathfinder.FindPath(
-                map,
-                startX,
-                startY,
-                request.GetDestinationX(),
-                request.GetDestinationY());
-
-        if (path.empty())
-        {
-            continue;
-        }
-        ActiveMovementPath activePath{
-            PathStep{
-                request.GetDestinationX(),
-                request.GetDestinationY()},
-            {}};
-
-        for (const PathStep &step : path)
-        {
-            activePath.remainingSteps.push(step);
-        }
-
-        activeMovementPaths.insert_or_assign(
-            request.GetEntityID(),
-            std::move(activePath));
-    }
+    return movementSystem.CancelMovement(entityID);
 }
-void World::ProcessActiveMovementPaths()
+
+bool World::HasActiveMovementPath(int entityID) const
 {
-    auto pathIterator =
-        activeMovementPaths.begin();
+    return movementSystem.HasMovement(entityID);
+}
 
-    while (pathIterator !=
-           activeMovementPaths.end())
-    {
-        int entityID = pathIterator->first;
+std::optional<Position> World::GetMovementDestination(int entityID) const
+{
+    return movementSystem.GetDestination(entityID);
+}
 
-        ActiveMovementPath &activePath =
-            pathIterator->second;
+void World::ProcessMovementSystem()
+{
+    const std::vector<MovementOutcome> outcomes =
+        movementSystem.Process(entityManager, map);
 
-        std::queue<PathStep> &path =
-            activePath.remainingSteps;
-
-        Entity *entity =
-            entityManager.GetEntityByID(entityID);
-
-        if (entity == nullptr || path.empty())
-        {
-            pathIterator =
-                activeMovementPaths.erase(
-                    pathIterator);
-
-            continue;
-        }
-
-        PathStep nextStep = path.front();
-
-        int changeX =
-            nextStep.x -
-            entity->GetPosition().GetX();
-
-        int changeY =
-            nextStep.y -
-            entity->GetPosition().GetY();
-
-        const bool moved = Movement::Move(
-            *entity,
-            map,
-            changeX,
-            changeY);
-
-        if (moved)
-        {
-            path.pop();
-
-            if (path.empty())
-            {
-                pathIterator =
-                    activeMovementPaths.erase(
-                        pathIterator);
-            }
-            else
-            {
-                ++pathIterator;
-            }
-
-            continue;
-        }
-
-        std::vector<PathStep> recalculatedPath =
-            pathfinder.FindPath(
-                map,
-                entity->GetPosition().GetX(),
-                entity->GetPosition().GetY(),
-                activePath.destination.x,
-                activePath.destination.y);
-
-        if (recalculatedPath.empty())
-        {
-            pathIterator =
-                activeMovementPaths.erase(
-                    pathIterator);
-
-            continue;
-        }
-
-        const PathStep &firstRecalculatedStep =
-            recalculatedPath.front();
-
-        const int recalculatedChangeX =
-            firstRecalculatedStep.x -
-            entity->GetPosition().GetX();
-
-        const int recalculatedChangeY =
-            firstRecalculatedStep.y -
-            entity->GetPosition().GetY();
-
-        const bool firstStepIsOrthogonal =
-            ((recalculatedChangeX == -1 ||
-              recalculatedChangeX == 1) &&
-             recalculatedChangeY == 0) ||
-            (recalculatedChangeX == 0 &&
-             (recalculatedChangeY == -1 ||
-              recalculatedChangeY == 1));
-
-        if (!firstStepIsOrthogonal ||
-            !map.IsValidPosition(
-                firstRecalculatedStep.x,
-                firstRecalculatedStep.y))
-        {
-            pathIterator =
-                activeMovementPaths.erase(
-                    pathIterator);
-
-            continue;
-        }
-
-        std::queue<PathStep> replacementSteps;
-
-        for (const PathStep &step : recalculatedPath)
-        {
-            replacementSteps.push(step);
-        }
-
-        activePath.remainingSteps =
-            std::move(replacementSteps);
-
-        ++pathIterator;
-    }
+    // Movement currently has no gameplay event of its own. Resource, station,
+    // and melee phases below authoritatively observe the updated positions.
+    (void)outcomes;
 }
 void World::ProcessStationInteractions()
 {
@@ -3273,26 +3130,7 @@ void World::ClearPendingMovementForEntity(
     movementRequests = std::move(
         remainingMovementRequests);
 
-    std::queue<MovementDestinationRequest>
-        remainingDestinationRequests;
-
-    while (!movementDestinationRequests.empty())
-    {
-        MovementDestinationRequest request =
-            movementDestinationRequests.front();
-        movementDestinationRequests.pop();
-
-        if (request.GetEntityID() != entityID)
-        {
-            remainingDestinationRequests.push(
-                request);
-        }
-    }
-
-    movementDestinationRequests = std::move(
-        remainingDestinationRequests);
-
-    activeMovementPaths.erase(entityID);
+    movementSystem.CancelMovement(entityID);
 }
 
 void World::HandleCombatantDeath(
@@ -3750,6 +3588,8 @@ bool World::ScheduleMonsterRespawn(
 
 bool World::RemoveEntity(int entityID)
 {
+    ClearPendingMovementForEntity(entityID);
+
     auto association = monsterRespawnEventIDs.find(entityID);
     if (association != monsterRespawnEventIDs.end())
     {

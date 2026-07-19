@@ -37,6 +37,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/Entity/Monster/Monster.cpp
     src/Entity/Manager/EntityManager.cpp
     src/Movement/Movement.cpp
+    src/Movement/MovementSystem.cpp
     src/World/Map.cpp
     src/World/Tile/Tile.cpp
     src/World/Object/WorldObject.cpp
@@ -166,6 +167,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(ClockPacingTests tests/ClockPacingTests.cpp)
     add_gameengine_headless_test(GatheringRandomTests tests/GatheringRandomTests.cpp)
     add_gameengine_headless_test(MovementPathSafetyTests tests/MovementPathSafetyTests.cpp)
+    add_gameengine_headless_test(MovementSystemTests tests/MovementSystemTests.cpp)
     add_gameengine_headless_test(EntityManagerLookupTests tests/EntityManagerLookupTests.cpp)
     add_gameengine_headless_test(ServerCommandQueueTests tests/ServerCommandQueueTests.cpp)
     add_gameengine_headless_test(TickSchedulerTests tests/TickSchedulerTests.cpp)

@@ -11,7 +11,7 @@
 #include "../Action/ActionCancelReason.h"
 #include "../Action/ActionValidationResult.h"
 #include "../Movement/MovementDestinationRequest.h"
-#include "../Pathfinding/Pathfinder.h"
+#include "../Movement/MovementSystem.h"
 #include "../Equipment/EquipmentSlotType.h"
 #include "../Recipe/RecipeType.h"
 #include <map>
@@ -95,6 +95,9 @@ public:
         const MovementRequest &request);
     void QueueMovementDestination(
         const MovementDestinationRequest &request);
+    bool ClearMovementPath(int entityID);
+    bool HasActiveMovementPath(int entityID) const;
+    std::optional<Position> GetMovementDestination(int entityID) const;
     void QueueResourceInteraction(
         int entityID,
         int resourceID);
@@ -204,7 +207,7 @@ private:
 
     Map map;
 
-    Pathfinder pathfinder;
+    MovementSystem movementSystem;
 
     void CreateResource(
         ResourceType resourceType,
@@ -218,8 +221,7 @@ private:
 
     void ProcessMovementRequests();
     void ProcessQueuedCommands();
-    void ProcessMovementDestinationRequests();
-    void ProcessActiveMovementPaths();
+    void ProcessMovementSystem();
     void ProcessResourceInteractions();
     void ProcessStationInteractions();
     void ProcessPendingMeleeInteractions();
@@ -272,18 +274,6 @@ private:
         int entityID,
         StationType requiredStationType);
     std::queue<MovementRequest> movementRequests;
-
-    std::queue<MovementDestinationRequest>
-        movementDestinationRequests;
-
-    struct ActiveMovementPath
-    {
-        PathStep destination;
-        std::queue<PathStep> remainingSteps;
-    };
-
-    std::map<int, ActiveMovementPath>
-        activeMovementPaths;
 
     std::map<int, int> pendingResourceInteractions;
     std::map<int, int> pendingStationInteractions;
