@@ -34,6 +34,11 @@ struct WorldTestAccess
             entityID,
             respawnTick);
     }
+
+    static bool RemoveEntity(World &world, int entityID)
+    {
+        return world.RemoveEntity(entityID);
+    }
 };
 
 namespace
@@ -629,6 +634,44 @@ int main()
                 monsterID,
                 std::numeric_limits<int>::max()),
             "Tick-overflow scheduling is rejected safely");
+    }
+
+    {
+        World world;
+
+        int monsterID = world.CreateMonster(
+            38,
+            38,
+            MakeRatings(1, 1, 1, 2),
+            RewardTableType::NONE,
+            MonsterRespawnDefinition{2});
+
+        Monster *monster = GetMonster(world, monsterID);
+        monster->ApplyDamage(monster->GetCurrentHealth());
+        world.Update();
+
+        test.Expect(
+            world.HasScheduledMonsterRespawn(monsterID),
+            "Removed monster setup has a pending respawn event");
+        test.Expect(
+            WorldTestAccess::RemoveEntity(world, monsterID),
+            "Physical monster removal succeeds through World cleanup hook");
+        test.Expect(
+            !world.HasScheduledMonsterRespawn(monsterID),
+            "Physical removal clears the monster event association");
+        test.ExpectEqual(
+            world.GetScheduledMonsterRespawnCount(),
+            0,
+            "Physical removal cancels the scheduler event");
+        test.Expect(
+            world.GetEntityByID(monsterID) == nullptr,
+            "Physically removed monster is absent from the entity index");
+
+        AdvanceTicks(world, 3);
+
+        test.Expect(
+            world.GetEntityByID(monsterID) == nullptr,
+            "Cancelled removed monster does not respawn");
     }
 
     return test.Finish();

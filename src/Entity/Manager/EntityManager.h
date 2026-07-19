@@ -53,4 +53,5 @@ private:
     int nextID = 1;
 
     friend struct EntityManagerTestAccess;
+    friend class World;
 };

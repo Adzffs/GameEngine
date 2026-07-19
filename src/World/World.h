@@ -31,6 +31,7 @@
 #include <vector>
 #include "../Command/CommandProcessingResult.h"
 #include "../Command/ServerCommandQueue.h"
+#include "../Scheduling/TickScheduler.h"
 
 class RandomSource;
 class Monster;
@@ -362,13 +363,17 @@ private:
     void ProcessEntityDeathRewards();
     void TickPlayerStatusEffects();
     void ScheduleMonsterRespawnsFromDeathEvents();
-    void ProcessDueMonsterRespawns();
+    void ProcessScheduledEvents();
+    void HandleScheduledEvent(
+        const MonsterRespawnScheduledEvent &event,
+        std::uint64_t eventID);
     bool TryCalculateRespawnTick(
         int delayTicks,
         int &respawnTick) const;
     bool ScheduleMonsterRespawn(
         int monsterEntityID,
         int respawnTick);
+    bool RemoveEntity(int entityID);
     void ExecuteMonsterRespawn(
         Monster &monster);
     void ClearCombatFeedbackInvolvingEntity(
@@ -380,10 +385,9 @@ private:
 
     std::set<int> processedDeathEntityIDs;
     std::vector<EntityDiedEvent> entityDiedEvents;
-    std::map<int, int>
-        scheduledMonsterRespawnTicksByEntityID;
-    std::map<int, std::set<int>>
-        scheduledMonsterRespawnEntityIDsByTick;
+    TickScheduler tickScheduler;
+    std::unordered_map<int, std::uint64_t>
+        monsterRespawnEventIDs;
 
     std::set<int>
         respawnedMonsterEntityIDsThisTick;

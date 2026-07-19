@@ -957,31 +957,35 @@ World::GetActionLifecycleEvents() const
 int World::GetScheduledMonsterRespawnCount() const
 {
     return static_cast<int>(
-        scheduledMonsterRespawnTicksByEntityID.size());
+        monsterRespawnEventIDs.size());
 }
 
 bool World::HasScheduledMonsterRespawn(
     int monsterEntityID) const
 {
-    return scheduledMonsterRespawnTicksByEntityID.find(
+    return monsterRespawnEventIDs.find(
                monsterEntityID) !=
-           scheduledMonsterRespawnTicksByEntityID.end();
+           monsterRespawnEventIDs.end();
 }
 
 std::optional<int> World::GetScheduledMonsterRespawnTick(
     int monsterEntityID) const
 {
     auto iterator =
-        scheduledMonsterRespawnTicksByEntityID.find(
+        monsterRespawnEventIDs.find(
             monsterEntityID);
 
     if (iterator ==
-        scheduledMonsterRespawnTicksByEntityID.end())
+        monsterRespawnEventIDs.end())
     {
         return std::nullopt;
     }
 
-    return iterator->second;
+    std::optional<ScheduledEvent> event =
+        tickScheduler.GetScheduledEvent(iterator->second);
+    return event.has_value()
+               ? std::optional<int>(event->dueTick)
+               : std::nullopt;
 }
 
 int World::GetCurrentTick() const
@@ -1040,7 +1044,7 @@ void World::Update()
 
     currentTick++;
 
-    ProcessDueMonsterRespawns();
+    ProcessScheduledEvents();
 
     UpdateMeleeCombatFeedback();
     ProcessDeadCombatantCleanup();
@@ -3883,65 +3887,57 @@ void World::ScheduleMonsterRespawnsFromDeathEvents()
     }
 }
 
-void World::ProcessDueMonsterRespawns()
+void World::ProcessScheduledEvents()
 {
-    while (!scheduledMonsterRespawnEntityIDsByTick.empty())
+    std::vector<ScheduledEvent> dueEvents =
+        tickScheduler.PopDueEvents(currentTick);
+
+    for (const ScheduledEvent &event : dueEvents)
     {
-        auto bucketIterator =
-            scheduledMonsterRespawnEntityIDsByTick.begin();
-
-        const int dueTick =
-            bucketIterator->first;
-
-        if (dueTick > currentTick)
-        {
-            break;
-        }
-
-        std::set<int> dueMonsterEntityIDs =
-            bucketIterator->second;
-
-        scheduledMonsterRespawnEntityIDsByTick.erase(
-            bucketIterator);
-
-        for (int monsterEntityID : dueMonsterEntityIDs)
-        {
-            auto scheduledIterator =
-                scheduledMonsterRespawnTicksByEntityID.find(
-                    monsterEntityID);
-
-            if (scheduledIterator ==
-                    scheduledMonsterRespawnTicksByEntityID.end() ||
-                scheduledIterator->second != dueTick)
+        std::visit(
+            [this, eventID = event.eventID](const auto &data)
             {
-                continue;
-            }
-
-            scheduledMonsterRespawnTicksByEntityID.erase(
-                scheduledIterator);
-
-            Entity *entity =
-                entityManager.GetEntityByID(
-                    monsterEntityID);
-
-            Monster *monster =
-                dynamic_cast<Monster *>(entity);
-
-            if (monster == nullptr)
-            {
-                continue;
-            }
-
-            if (monster->IsAlive())
-            {
-                processedDeathEntityIDs.erase(
-                    monsterEntityID);
-                continue;
-            }
-
-            ExecuteMonsterRespawn(*monster);
-        }
+                HandleScheduledEvent(data, eventID);
+            },
+            event.data);
     }
+}
+
+void World::HandleScheduledEvent(
+    const MonsterRespawnScheduledEvent &event,
+    std::uint64_t eventID)
+{
+    auto association = monsterRespawnEventIDs.find(
+        event.monsterEntityID);
+    if (association == monsterRespawnEventIDs.end() ||
+        association->second != eventID)
+    {
+        return;
+    }
+    monsterRespawnEventIDs.erase(association);
+
+    Entity *entity = entityManager.GetEntityByID(
+        event.monsterEntityID);
+    Monster *monster = dynamic_cast<Monster *>(entity);
+    if (monster == nullptr)
+    {
+        return;
+    }
+
+    std::optional<MonsterRespawnDefinition> definition =
+        monster->GetRespawnDefinition();
+    if (monster->IsAlive() ||
+        !definition.has_value() ||
+        definition->delayTicks <= 0)
+    {
+        if (monster->IsAlive())
+        {
+            processedDeathEntityIDs.erase(event.monsterEntityID);
+        }
+        return;
+    }
+
+    ExecuteMonsterRespawn(*monster);
 }
 
 bool World::TryCalculateRespawnTick(
@@ -3971,20 +3967,37 @@ bool World::ScheduleMonsterRespawn(
     int monsterEntityID,
     int respawnTick)
 {
-    if (scheduledMonsterRespawnTicksByEntityID.find(
+    if (monsterRespawnEventIDs.find(
             monsterEntityID) !=
-        scheduledMonsterRespawnTicksByEntityID.end())
+        monsterRespawnEventIDs.end())
     {
         return false;
     }
 
-    scheduledMonsterRespawnTicksByEntityID[monsterEntityID] =
-        respawnTick;
+    std::uint64_t eventID = tickScheduler.Schedule(
+        respawnTick,
+        monsterEntityID,
+        MonsterRespawnScheduledEvent{monsterEntityID});
+    if (eventID == 0)
+    {
+        return false;
+    }
 
-    scheduledMonsterRespawnEntityIDsByTick[respawnTick].insert(
-        monsterEntityID);
-
+    monsterRespawnEventIDs.emplace(monsterEntityID, eventID);
     return true;
+}
+
+bool World::RemoveEntity(int entityID)
+{
+    auto association = monsterRespawnEventIDs.find(entityID);
+    if (association != monsterRespawnEventIDs.end())
+    {
+        tickScheduler.Cancel(association->second);
+        monsterRespawnEventIDs.erase(association);
+    }
+    processedDeathEntityIDs.erase(entityID);
+    respawnedMonsterEntityIDsThisTick.erase(entityID);
+    return entityManager.RemoveEntity(entityID);
 }
 
 void World::ExecuteMonsterRespawn(

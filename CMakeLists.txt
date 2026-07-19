@@ -27,6 +27,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(GAMEENGINE_CORE_SOURCES
     src/Command/ServerCommandQueue.cpp
+    src/Scheduling/TickScheduler.cpp
     src/Stats/StatBlock.cpp
     src/Stats/HealthPool.cpp
     src/World/World.cpp
@@ -165,6 +166,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(MovementPathSafetyTests tests/MovementPathSafetyTests.cpp)
     add_gameengine_headless_test(EntityManagerLookupTests tests/EntityManagerLookupTests.cpp)
     add_gameengine_headless_test(ServerCommandQueueTests tests/ServerCommandQueueTests.cpp)
+    add_gameengine_headless_test(TickSchedulerTests tests/TickSchedulerTests.cpp)
 
     if(GAMEENGINE_BUILD_GRAPHICS_TESTS)
         add_gameengine_graphics_test(MonsterGraphicsTests tests/MonsterGraphicsTests.cpp)
