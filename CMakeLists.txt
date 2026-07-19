@@ -315,4 +315,15 @@ if(BUILD_TESTING)
         NAME RequirementSystemTests
         COMMAND RequirementSystemTests
     )
+
+    add_executable(ActionLifecycleEventTests
+        tests/ActionLifecycleEventTests.cpp
+    )
+
+    target_link_libraries(ActionLifecycleEventTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME ActionLifecycleEventTests
+        COMMAND ActionLifecycleEventTests
+    )
 endif()

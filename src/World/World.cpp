@@ -419,9 +419,16 @@ void World::CancelActionsForEntity(
     int entityID,
     ActionCancelReason reason)
 {
-    actionManager.CancelActionsForEntity(
-        entityID,
-        reason);
+    std::optional<CancelledActionSnapshot> cancelledAction =
+        actionManager.CancelActionsForEntity(
+            entityID,
+            reason);
+
+    if (cancelledAction.has_value())
+    {
+        RecordActionCancelledEvent(
+            cancelledAction.value());
+    }
 }
 
 void World::CancelGatheringForToolChange(
@@ -435,7 +442,7 @@ void World::CancelGatheringForToolChange(
         action->GetType() ==
             ActionType::GATHERING)
     {
-        actionManager.CancelActionsForEntity(
+        CancelActionsForEntity(
             entityID,
             ActionCancelReason::INVALID_TOOL);
     }
@@ -702,7 +709,7 @@ bool World::TryStartRecipeAction(
         RecipeDatabase::Get(
             recipeType);
 
-    actionManager.StartAction(
+    StartAction(
         Action(
             ActionType::RECIPE,
             recipe.GetName(),
@@ -824,7 +831,7 @@ bool World::TryStartMeleeAction(
 
     lastMeleeAttackResult.reset();
 
-    actionManager.StartAction(
+    StartAction(
         Action(
             ActionType::MELEE_ATTACK,
             "Melee attack",
@@ -912,6 +919,12 @@ World::GetEntityDiedEvents() const
     return entityDiedEvents;
 }
 
+const std::vector<ActionLifecycleEvent> &
+World::GetActionLifecycleEvents() const
+{
+    return publishedActionLifecycleEvents;
+}
+
 int World::GetScheduledMonsterRespawnCount() const
 {
     return static_cast<int>(
@@ -989,6 +1002,7 @@ void World::Update()
     Logger::Debug("Updating World");
 
     entityDiedEvents.clear();
+    publishedActionLifecycleEvents.clear();
 
     currentTick++;
 
@@ -1014,6 +1028,7 @@ void World::Update()
     ProcessPendingMeleeInteractions();
     ProcessEntityDeathRewards();
     ScheduleMonsterRespawnsFromDeathEvents();
+    PublishActionLifecycleEvents();
 }
 
 Map &World::GetMap()
@@ -1642,7 +1657,7 @@ void World::ProcessResourceInteractions()
                 Logger::Game(validation.message);
             }
 
-            actionManager.CancelActionsForEntity(
+            CancelActionsForEntity(
                 entityID,
                 validation.reason);
 
@@ -1672,7 +1687,7 @@ void World::ProcessResourceInteractions()
         if (!actionManager.HasActionForEntity(
                 entityID))
         {
-            actionManager.StartAction(
+            StartAction(
                 Action(
                     ActionType::GATHERING,
                     "Gathering " +
@@ -1735,6 +1750,8 @@ void World::ProcessCompletedActions(
                 continue;
             }
 
+            RecordActionCompletedEvent(action);
+
             const bool defenderWasAliveBeforeAttack =
                 defender->IsAlive();
 
@@ -1790,7 +1807,7 @@ void World::ProcessCompletedActions(
                 continue;
             }
 
-            actionManager.RestartAction(action);
+            RestartAction(action);
 
             continue;
         }
@@ -1850,6 +1867,8 @@ void World::ProcessCompletedActions(
                 continue;
             }
 
+            RecordActionCompletedEvent(action);
+
             Logger::Game(
                 "Created: " +
                 recipe.GetName());
@@ -1870,7 +1889,7 @@ void World::ProcessCompletedActions(
                 continue;
             }
 
-            actionManager.RestartAction(action);
+            RestartAction(action);
 
             continue;
         }
@@ -1917,7 +1936,7 @@ void World::ProcessCompletedActions(
             pendingResourceInteractions.erase(
                 action.GetOwnerID());
 
-            actionManager.CancelActionsForEntity(
+            CancelActionsForEntity(
                 action.GetOwnerID(),
                 validation.reason);
 
@@ -2039,6 +2058,8 @@ void World::ProcessCompletedActions(
                 " but receive nothing");
         }
 
+        RecordActionCompletedEvent(action);
+
         // Only stop after a successful gather depleted the resource.
         if (!resource->IsActive())
         {
@@ -2069,7 +2090,7 @@ void World::ProcessCompletedActions(
             continue;
         }
 
-        actionManager.RestartAction(action);
+        RestartAction(action);
     }
 }
 void World::ProcessMovementRequests()
@@ -2415,9 +2436,100 @@ void World::CancelMeleeActionsTargetingEntity(
     int targetEntityID,
     ActionCancelReason reason)
 {
-    actionManager.CancelMeleeActionsTargetingEntity(
-        targetEntityID,
-        reason);
+    std::vector<CancelledActionSnapshot> cancelledActions =
+        actionManager.CancelMeleeActionsTargetingEntity(
+            targetEntityID,
+            reason);
+
+    for (const CancelledActionSnapshot &cancelledAction :
+         cancelledActions)
+    {
+        RecordActionCancelledEvent(
+            cancelledAction);
+    }
+}
+
+void World::PublishActionLifecycleEvents()
+{
+    publishedActionLifecycleEvents =
+        std::move(pendingActionLifecycleEvents);
+    pendingActionLifecycleEvents.clear();
+}
+
+void World::RecordActionStartedEvent(
+    const ActionStartedSnapshot &snapshot)
+{
+    pendingActionLifecycleEvents.push_back(
+        ActionLifecycleEvent{
+            ActionStartedEvent{
+                snapshot.ownerEntityID,
+                snapshot.targetID,
+                snapshot.actionType,
+                snapshot.startTick,
+                snapshot.completionTick}});
+}
+
+void World::RecordActionCompletedEvent(
+    const Action &action)
+{
+    pendingActionLifecycleEvents.push_back(
+        ActionLifecycleEvent{
+            ActionCompletedEvent{
+                action.GetOwnerID(),
+                action.GetTargetID(),
+                action.GetType(),
+                action.GetCompletionTick()}});
+}
+
+void World::RecordActionCancelledEvent(
+    const CancelledActionSnapshot &snapshot)
+{
+    pendingActionLifecycleEvents.push_back(
+        ActionLifecycleEvent{
+            ActionCancelledEvent{
+                snapshot.ownerEntityID,
+                snapshot.targetID,
+                snapshot.actionType,
+                snapshot.reason,
+                currentTick}});
+}
+
+void World::StartAction(
+    const Action &action)
+{
+    ActionStartTransition transition =
+        actionManager.StartAction(action);
+
+    if (transition.cancelledAction.has_value())
+    {
+        RecordActionCancelledEvent(
+            transition.cancelledAction.value());
+    }
+
+    if (transition.startedAction.has_value())
+    {
+        RecordActionStartedEvent(
+            transition.startedAction.value());
+    }
+}
+
+void World::RestartAction(
+    const Action &action)
+{
+    ActionStartTransition transition =
+        actionManager.RestartAction(action);
+
+    if (transition.cancelledAction.has_value())
+    {
+        RecordActionCancelledEvent(
+            transition.cancelledAction.value());
+    }
+
+    if (transition.startedAction.has_value())
+    {
+        RecordActionStartedEvent(
+            transition.startedAction.value());
+    }
 }
 
 void World::ClearPendingMeleeInteractionsInvolvingEntity(

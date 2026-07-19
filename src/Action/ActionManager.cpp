@@ -1,26 +1,63 @@
 #include "ActionManager.h"
 
-void ActionManager::StartAction(
+namespace
+{
+    CancelledActionSnapshot BuildCancelledActionSnapshot(
+        const Action &action,
+        ActionCancelReason reason)
+    {
+        return CancelledActionSnapshot{
+            action.GetOwnerID(),
+            action.GetTargetID(),
+            action.GetType(),
+            reason};
+    }
+
+    ActionStartedSnapshot BuildStartedActionSnapshot(
+        const Action &action)
+    {
+        return ActionStartedSnapshot{
+            action.GetOwnerID(),
+            action.GetTargetID(),
+            action.GetType(),
+            action.GetStartTick(),
+            action.GetCompletionTick()};
+    }
+}
+
+ActionStartTransition ActionManager::StartAction(
     const Action &action)
 {
-    CancelActionsForEntity(
+    ActionStartTransition transition;
+
+    transition.cancelledAction = CancelActionsForEntity(
         action.GetOwnerID(),
         ActionCancelReason::NEW_ACTION_STARTED);
 
     actions.push_back(action);
     actions.back().Start(currentTick);
+
+    if (actions.back().IsRunning())
+    {
+        transition.startedAction =
+            BuildStartedActionSnapshot(actions.back());
+    }
+
+    return transition;
 }
 
-void ActionManager::RestartAction(
+ActionStartTransition ActionManager::RestartAction(
     const Action &action)
 {
+    ActionStartTransition transition;
+
     if (!action.IsRepeating() ||
         !action.IsComplete())
     {
-        return;
+        return transition;
     }
 
-    CancelActionsForEntity(
+    transition.cancelledAction = CancelActionsForEntity(
         action.GetOwnerID(),
         ActionCancelReason::NEW_ACTION_STARTED);
 
@@ -28,6 +65,14 @@ void ActionManager::RestartAction(
     restartedAction.Restart(currentTick);
 
     actions.push_back(restartedAction);
+
+    if (actions.back().IsRunning())
+    {
+        transition.startedAction =
+            BuildStartedActionSnapshot(actions.back());
+    }
+
+    return transition;
 }
 
 bool ActionManager::HasActionForEntity(
@@ -87,16 +132,23 @@ std::vector<Action> ActionManager::Update()
     return completedActions;
 }
 
-void ActionManager::CancelActionsForEntity(
+std::optional<CancelledActionSnapshot> ActionManager::CancelActionsForEntity(
     int entityID,
     ActionCancelReason reason)
 {
+    std::optional<CancelledActionSnapshot> cancelledAction;
+
     auto actionIterator = actions.begin();
 
     while (actionIterator != actions.end())
     {
         if (actionIterator->GetOwnerID() == entityID)
         {
+            cancelledAction =
+                BuildCancelledActionSnapshot(
+                    *actionIterator,
+                    reason);
+
             actionIterator->Cancel(reason);
             actionIterator = actions.erase(actionIterator);
         }
@@ -105,12 +157,17 @@ void ActionManager::CancelActionsForEntity(
             ++actionIterator;
         }
     }
+
+    return cancelledAction;
 }
 
-void ActionManager::CancelMeleeActionsTargetingEntity(
+std::vector<CancelledActionSnapshot>
+ActionManager::CancelMeleeActionsTargetingEntity(
     int targetEntityID,
     ActionCancelReason reason)
 {
+    std::vector<CancelledActionSnapshot> cancelledActions;
+
     auto actionIterator = actions.begin();
 
     while (actionIterator != actions.end())
@@ -118,6 +175,11 @@ void ActionManager::CancelMeleeActionsTargetingEntity(
         if (actionIterator->GetType() == ActionType::MELEE_ATTACK &&
             actionIterator->GetTargetID() == targetEntityID)
         {
+            cancelledActions.push_back(
+                BuildCancelledActionSnapshot(
+                    *actionIterator,
+                    reason));
+
             actionIterator->Cancel(reason);
             actionIterator = actions.erase(actionIterator);
         }
@@ -126,4 +188,6 @@ void ActionManager::CancelMeleeActionsTargetingEntity(
             ++actionIterator;
         }
     }
+
+    return cancelledActions;
 }

@@ -5,6 +5,7 @@
 #include "../Entity/Manager/EntityManager.h"
 #include "Map.h"
 #include "Object/Manager/ObjectManager.h"
+#include "Event/ActionLifecycleEvent.h"
 #include "Event/EntityDiedEvent.h"
 #include "../Action/ActionManager.h"
 #include "../Action/ActionCancelReason.h"
@@ -139,6 +140,9 @@ public:
     const std::vector<EntityDiedEvent> &
     GetEntityDiedEvents() const;
 
+    const std::vector<ActionLifecycleEvent> &
+    GetActionLifecycleEvents() const;
+
     int GetScheduledMonsterRespawnCount() const;
     bool HasScheduledMonsterRespawn(
         int monsterEntityID) const;
@@ -184,6 +188,17 @@ private:
     void ProcessPendingMeleeInteractions();
     void ProcessCompletedActions(
         const std::vector<Action> &completedActions);
+    void PublishActionLifecycleEvents();
+    void RecordActionStartedEvent(
+        const ActionStartedSnapshot &snapshot);
+    void RecordActionCompletedEvent(
+        const Action &action);
+    void RecordActionCancelledEvent(
+        const CancelledActionSnapshot &snapshot);
+    void StartAction(
+        const Action &action);
+    void RestartAction(
+        const Action &action);
     ActionValidationResult ValidateGatheringAction(
         int entityID,
         int resourceID,
@@ -238,6 +253,12 @@ private:
 
     std::optional<MeleeAttackResult>
         lastMeleeAttackResult;
+
+    std::vector<ActionLifecycleEvent>
+        pendingActionLifecycleEvents;
+
+    std::vector<ActionLifecycleEvent>
+        publishedActionLifecycleEvents;
 
     int currentTick = 0;
 
