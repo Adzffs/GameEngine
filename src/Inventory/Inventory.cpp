@@ -3,6 +3,7 @@
 #include "../Item/ItemDatabase.h"
 
 #include <limits>
+#include <algorithm>
 
 bool Inventory::AddItem(
     ItemType itemType,
@@ -234,6 +235,63 @@ const std::array<
 Inventory::GetSlots() const
 {
     return slots;
+}
+
+bool Inventory::TryReplaceSlotsAtomically(
+    const std::array<
+        InventorySlot,
+        SlotCount> &replacementSlots)
+{
+    std::vector<ItemType> stackableItems;
+
+    for (const InventorySlot &slot : replacementSlots)
+    {
+        ItemType itemType = slot.GetItemType();
+        int quantity = slot.GetAmount();
+
+        if (itemType == ItemType::NONE)
+        {
+            if (quantity != 0)
+            {
+                return false;
+            }
+            continue;
+        }
+
+        const std::vector<ItemType> &knownItems =
+            ItemDatabase::GetAllItemTypes();
+        if (std::find(
+                knownItems.begin(),
+                knownItems.end(),
+                itemType) == knownItems.end() ||
+            quantity <= 0)
+        {
+            return false;
+        }
+
+        const ItemDefinition &definition =
+            ItemDatabase::Get(itemType);
+        if (!definition.IsStackable())
+        {
+            if (quantity != 1)
+            {
+                return false;
+            }
+            continue;
+        }
+
+        if (std::find(
+                stackableItems.begin(),
+                stackableItems.end(),
+                itemType) != stackableItems.end())
+        {
+            return false;
+        }
+        stackableItems.push_back(itemType);
+    }
+
+    slots = replacementSlots;
+    return true;
 }
 
 bool Inventory::TryAddItemsAtomically(

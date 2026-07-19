@@ -38,6 +38,11 @@ public:
         SlotCount> &
     GetSlots() const;
 
+    bool TryReplaceSlotsAtomically(
+        const std::array<
+            InventorySlot,
+            SlotCount> &replacementSlots);
+
     bool TryAddItemsAtomically(
         const std::vector<ItemAmount> &items);
 

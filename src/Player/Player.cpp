@@ -49,39 +49,45 @@ namespace
     }
 }
 
-Player::Player(int id)
+Player::Player(
+    int id,
+    PlayerInitializationMode initializationMode)
     : Entity(id, EntityType::PLAYER),
       healthPool(1)
 {
-    inventory.AddItem(
-        ItemType::BRONZE_AXE,
-        1);
-
-    inventory.AddItem(
-        ItemType::BRONZE_PICKAXE,
-        1);
-
-    inventory.AddItem(
-        ItemType::IRON_PICKAXE,
-        1);
-
-    inventory.AddItem(
-        ItemType::STEEL_PICKAXE,
-        1);
-
-    if (DevelopmentConfig::ENABLE_TEST_PLAYER)
+    if (initializationMode ==
+        PlayerInitializationMode::DEVELOPMENT_DEFAULTS)
     {
-        skills.AddXP(
-            SkillType::WOODCUTTING,
-            DevelopmentConfig::TEST_WOODCUTTING_XP);
+        inventory.AddItem(
+            ItemType::BRONZE_AXE,
+            1);
 
-        skills.AddXP(
-            SkillType::MINING,
-            DevelopmentConfig::TEST_MINING_XP);
+        inventory.AddItem(
+            ItemType::BRONZE_PICKAXE,
+            1);
 
-        skills.AddXP(
-            SkillType::SMITHING,
-            DevelopmentConfig::TEST_SMITHING_XP);
+        inventory.AddItem(
+            ItemType::IRON_PICKAXE,
+            1);
+
+        inventory.AddItem(
+            ItemType::STEEL_PICKAXE,
+            1);
+
+        if (DevelopmentConfig::ENABLE_TEST_PLAYER)
+        {
+            skills.AddXP(
+                SkillType::WOODCUTTING,
+                DevelopmentConfig::TEST_WOODCUTTING_XP);
+
+            skills.AddXP(
+                SkillType::MINING,
+                DevelopmentConfig::TEST_MINING_XP);
+
+            skills.AddXP(
+                SkillType::SMITHING,
+                DevelopmentConfig::TEST_SMITHING_XP);
+        }
     }
 
     RefreshDerivedState();

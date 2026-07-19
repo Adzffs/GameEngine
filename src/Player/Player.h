@@ -10,13 +10,17 @@
 #include "../Stats/HealthPool.h"
 #include "../Stats/StatType.h"
 #include "../StatusEffect/StatusEffectManager.h"
+#include "PlayerInitializationMode.h"
 
 class World;
 
 class Player : public Entity, public Combatant
 {
 public:
-    Player(int id);
+    Player(
+        int id,
+        PlayerInitializationMode initializationMode =
+            PlayerInitializationMode::DEVELOPMENT_DEFAULTS);
 
     void Update(World &world) override;
 

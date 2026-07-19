@@ -54,6 +54,8 @@ set(GAMEENGINE_CORE_SOURCES
     src/Movement/MovementDestinationRequest.cpp
     src/Pathfinding/Pathfinder.cpp
     src/Player/Player.cpp
+    src/Persistence/PlayerSaveValidation.cpp
+    src/Persistence/PlayerSaveState.cpp
     src/NPC/NPC.cpp
     src/NPC/NpcDefinitionDatabase.cpp
     src/NPC/NpcSpawnDatabase.cpp
@@ -166,6 +168,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(EntityDeathEventTests tests/EntityDeathEventTests.cpp)
     add_gameengine_headless_test(RewardTableTests tests/RewardTableTests.cpp)
     add_gameengine_headless_test(InventoryTransactionTests tests/InventoryTransactionTests.cpp)
+    add_gameengine_headless_test(PlayerSaveStateTests tests/PlayerSaveStateTests.cpp)
     add_gameengine_headless_test(MonsterLootIntegrationTests tests/MonsterLootIntegrationTests.cpp)
     add_gameengine_headless_test(MonsterRespawnTests tests/MonsterRespawnTests.cpp)
     add_gameengine_headless_test(EquipmentUnequipTests tests/EquipmentUnequipTests.cpp)
