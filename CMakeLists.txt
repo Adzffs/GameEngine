@@ -33,6 +33,8 @@ set(GAMEENGINE_CORE_SOURCES
     src/Skills/Skill.cpp
     src/Skills/SkillSet.cpp
     src/Equipment/Equipment.cpp
+    src/StatusEffect/StatusEffectValidation.cpp
+    src/StatusEffect/StatusEffectManager.cpp
     src/Combat/CombatFormulas.cpp
     src/Combat/MeleeAttackResolver.cpp
     src/Combat/CombatService.cpp
@@ -340,5 +342,16 @@ if(BUILD_TESTING)
     add_test(
         NAME ContentValidationTests
         COMMAND ContentValidationTests
+    )
+
+    add_executable(StatusEffectTests
+        tests/StatusEffectTests.cpp
+    )
+
+    target_link_libraries(StatusEffectTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME StatusEffectTests
+        COMMAND StatusEffectTests
     )
 endif()

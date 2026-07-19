@@ -3,6 +3,51 @@
 #include "../Core/DevelopmentConfig.h"
 #include "../Skills/SkillType.h"
 #include <iostream>
+#include <limits>
+
+namespace
+{
+    int ClampToIntRange(long long value)
+    {
+        if (value > static_cast<long long>(
+                        std::numeric_limits<int>::max()))
+        {
+            return std::numeric_limits<int>::max();
+        }
+
+        if (value < static_cast<long long>(
+                        std::numeric_limits<int>::min()))
+        {
+            return std::numeric_limits<int>::min();
+        }
+
+        return static_cast<int>(value);
+    }
+
+    int GetStatusEffectModifierForStat(
+        const StatusEffectModifiers &modifiers,
+        StatType stat)
+    {
+        switch (stat)
+        {
+        case StatType::ATTACK_ACCURACY:
+            return modifiers.meleeAccuracy;
+
+        case StatType::MELEE_STRENGTH:
+            return modifiers.meleeStrength;
+
+        case StatType::DEFENCE:
+            return modifiers.meleeDefence;
+
+        case StatType::MAX_HEALTH:
+            return modifiers.maximumHealth;
+
+        case StatType::COUNT:
+        default:
+            return 0;
+        }
+    }
+}
 
 Player::Player(int id)
     : Entity(id, EntityType::PLAYER),
@@ -74,6 +119,16 @@ const Equipment &Player::GetEquipment() const
     return equipment;
 }
 
+StatusEffectManager &Player::GetStatusEffectManager()
+{
+    return statusEffectManager;
+}
+
+const StatusEffectManager &Player::GetStatusEffectManager() const
+{
+    return statusEffectManager;
+}
+
 int Player::GetBaseStat(StatType stat) const
 {
     switch (stat)
@@ -109,9 +164,29 @@ int Player::GetEquipmentBonus(StatType stat) const
 
 int Player::GetTotalStat(StatType stat) const
 {
+    StatusEffectModifiers statusModifiers =
+        statusEffectManager.GetCombinedModifiers();
+
+    long long combined =
+        static_cast<long long>(
+            GetBaseStat(stat)) +
+        static_cast<long long>(
+            GetEquipmentBonus(stat)) +
+        static_cast<long long>(
+            GetStatusEffectModifierForStat(
+                statusModifiers,
+                stat));
+
     int total =
-        GetBaseStat(stat) +
-        GetEquipmentBonus(stat);
+        ClampToIntRange(combined);
+
+    if ((stat == StatType::ATTACK_ACCURACY ||
+         stat == StatType::MELEE_STRENGTH ||
+         stat == StatType::DEFENCE) &&
+        total < 0)
+    {
+        return 0;
+    }
 
     if (stat == StatType::MAX_HEALTH &&
         total < 1)

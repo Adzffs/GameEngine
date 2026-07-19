@@ -24,6 +24,7 @@
 #include "../Combat/Combatant.h"
 #include "../Combat/MeleeCombatFeedback.h"
 #include "../Requirement/RequirementEvaluator.h"
+#include "../StatusEffect/StatusEffectValidation.h"
 #include <array>
 #include <limits>
 #include <stdexcept>
@@ -1016,6 +1017,7 @@ void World::Update()
     ProcessEntityDeathRewards();
     ScheduleMonsterRespawnsFromDeathEvents();
     PublishActionLifecycleEvents();
+    TickPlayerStatusEffects();
 }
 
 Map &World::GetMap()
@@ -2360,6 +2362,71 @@ bool World::TryUnequipItem(
     return true;
 }
 
+bool World::TryApplyStatusEffect(
+    int playerEntityID,
+    const StatusEffectDefinition &definition)
+{
+    Entity *entity =
+        entityManager.GetEntityByID(
+            playerEntityID);
+
+    Player *player =
+        dynamic_cast<Player *>(entity);
+
+    if (player == nullptr)
+    {
+        return false;
+    }
+
+    if (!IsValidStatusEffectDefinition(
+            definition))
+    {
+        return false;
+    }
+
+    if (!player->GetStatusEffectManager().Apply(
+            definition))
+    {
+        return false;
+    }
+
+    player->RefreshDerivedState();
+
+    return true;
+}
+
+bool World::TryRemoveStatusEffect(
+    int playerEntityID,
+    StatusEffectType type)
+{
+    Entity *entity =
+        entityManager.GetEntityByID(
+            playerEntityID);
+
+    Player *player =
+        dynamic_cast<Player *>(entity);
+
+    if (player == nullptr)
+    {
+        return false;
+    }
+
+    if (!IsKnownStatusEffectType(type))
+    {
+        return false;
+    }
+
+    if (!player->GetStatusEffectManager().Remove(
+            type))
+    {
+        return false;
+    }
+
+    player->RefreshDerivedState();
+
+    return true;
+}
+
 void World::TryStartMonsterRetaliation(
     int monsterEntityID,
     int playerEntityID)
@@ -2840,6 +2907,32 @@ void World::ProcessEntityDeathRewards()
             std::to_string(killer->GetID()) +
             " received " +
             rewardReceipt);
+    }
+}
+
+void World::TickPlayerStatusEffects()
+{
+    for (const std::unique_ptr<Entity> &entity :
+         entityManager.GetEntities())
+    {
+        Player *player =
+            dynamic_cast<Player *>(
+                entity.get());
+
+        if (player == nullptr)
+        {
+            continue;
+        }
+
+        bool expiredEffects =
+            player->GetStatusEffectManager().Tick();
+
+        if (!expiredEffects)
+        {
+            continue;
+        }
+
+        player->RefreshDerivedState();
     }
 }
 

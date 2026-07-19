@@ -21,6 +21,8 @@
 #include "../Reward/RewardTableRoller.h"
 #include "../Reward/RewardTableType.h"
 #include "../Stats/CombatRatings.h"
+#include "../StatusEffect/StatusEffectDefinition.h"
+#include "../StatusEffect/StatusEffectType.h"
 #include "../Entity/Monster/MonsterRespawnDefinition.h"
 #include <optional>
 #include <set>
@@ -123,6 +125,14 @@ public:
         int attackerEntityID,
         int defenderEntityID,
         int durationTicks);
+
+    bool TryApplyStatusEffect(
+        int playerEntityID,
+        const StatusEffectDefinition &definition);
+
+    bool TryRemoveStatusEffect(
+        int playerEntityID,
+        StatusEffectType type);
 
     bool HasPendingMeleeEngagement(
         int attackerEntityID) const;
@@ -301,6 +311,7 @@ private:
 
     void ProcessDeadCombatantCleanup();
     void ProcessEntityDeathRewards();
+    void TickPlayerStatusEffects();
     void ScheduleMonsterRespawnsFromDeathEvents();
     void ProcessDueMonsterRespawns();
     bool TryCalculateRespawnTick(

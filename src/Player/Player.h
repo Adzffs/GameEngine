@@ -9,6 +9,7 @@
 #include "../Stats/CombatRatings.h"
 #include "../Stats/HealthPool.h"
 #include "../Stats/StatType.h"
+#include "../StatusEffect/StatusEffectManager.h"
 
 class World;
 
@@ -27,6 +28,9 @@ public:
 
     Equipment &GetEquipment();
     const Equipment &GetEquipment() const;
+
+    StatusEffectManager &GetStatusEffectManager();
+    const StatusEffectManager &GetStatusEffectManager() const;
 
     int GetBaseStat(StatType stat) const;
     int GetEquipmentBonus(StatType stat) const;
@@ -52,6 +56,8 @@ private:
     SkillSet skills;
 
     Equipment equipment;
+
+    StatusEffectManager statusEffectManager;
 
     HealthPool healthPool;
 };
