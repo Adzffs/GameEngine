@@ -24,6 +24,19 @@ namespace DevelopmentWorldContent
                     3,
                     30},
                 RewardTableType::DEVELOPMENT_MONSTER,
+                std::nullopt,
+                MonsterRespawnDefinition{8},
+            },
+            {
+                18,
+                2,
+                CombatRatings{
+                    5,
+                    4,
+                    3,
+                    30},
+                RewardTableType::DEVELOPMENT_MONSTER,
+                MonsterAggressionDefinition{5, 8},
                 MonsterRespawnDefinition{8},
             }};
 

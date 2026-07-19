@@ -40,7 +40,8 @@ int EntityManager::CreateMonster(
     int y,
     const CombatRatings &ratings,
     RewardTableType rewardTableType,
-    std::optional<MonsterRespawnDefinition> respawnDefinition)
+    std::optional<MonsterRespawnDefinition> respawnDefinition,
+    std::optional<MonsterAggressionDefinition> aggressionDefinition)
 {
     int monsterID = nextID;
 
@@ -51,6 +52,7 @@ int EntityManager::CreateMonster(
             y,
             ratings,
             rewardTableType,
+            aggressionDefinition,
             respawnDefinition));
 
     nextID++;

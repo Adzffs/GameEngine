@@ -8,11 +8,13 @@ Monster::Monster(
     int y,
     const CombatRatings &ratings,
     RewardTableType rewardTableType,
+    std::optional<MonsterAggressionDefinition> aggressionDefinition,
     std::optional<MonsterRespawnDefinition> respawnDefinition)
     : Entity(id, EntityType::MONSTER),
       combatRatings(ratings),
       healthPool(ratings.maximumHealth),
       rewardTableType(rewardTableType),
+      aggressionDefinition(aggressionDefinition),
       respawnDefinition(respawnDefinition),
       originalSpawnX(x),
       originalSpawnY(y)
@@ -76,6 +78,31 @@ bool Monster::HasRespawnDefinition() const
 std::optional<MonsterRespawnDefinition> Monster::GetRespawnDefinition() const
 {
     return respawnDefinition;
+}
+
+bool Monster::HasAggressionDefinition() const
+{
+    return aggressionDefinition.has_value();
+}
+
+std::optional<MonsterAggressionDefinition> Monster::GetAggressionDefinition() const
+{
+    return aggressionDefinition;
+}
+
+int Monster::GetAggressionTargetEntityID() const
+{
+    return aggressionTargetEntityID;
+}
+
+void Monster::SetAggressionTargetEntityID(int targetEntityID)
+{
+    aggressionTargetEntityID = targetEntityID;
+}
+
+void Monster::ClearAggressionTargetEntityID()
+{
+    aggressionTargetEntityID = InvalidAggressionTargetEntityID;
 }
 
 int Monster::GetOriginalSpawnX() const

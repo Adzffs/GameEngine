@@ -1442,6 +1442,37 @@ void ContentValidator::AppendMonsterSpawnValidation(
             "reward-table reference is invalid");
     }
 
+    if (definition.aggressionDefinition.has_value())
+    {
+        const MonsterAggressionDefinition &aggression =
+            definition.aggressionDefinition.value();
+
+        if (aggression.detectionRadius <= 0)
+        {
+            report.AddError(
+                "StarterMonsterSpawn",
+                contentID,
+                "aggression detection radius must be positive");
+        }
+
+        if (aggression.leashRadius <= 0)
+        {
+            report.AddError(
+                "StarterMonsterSpawn",
+                contentID,
+                "aggression leash radius must be positive");
+        }
+
+        if (aggression.leashRadius <
+            aggression.detectionRadius)
+        {
+            report.AddError(
+                "StarterMonsterSpawn",
+                contentID,
+                "aggression leash radius must be at least detection radius");
+        }
+    }
+
     if (definition.respawnDefinition.has_value() &&
         definition.respawnDefinition->delayTicks <= 0)
     {

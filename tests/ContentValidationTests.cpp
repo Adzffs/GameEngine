@@ -981,8 +981,18 @@ int main()
     }
 
     {
+        const std::vector<DevelopmentMonsterSpawnDefinition> &starterSpawns =
+            DevelopmentWorldContent::GetStarterMonsterSpawns();
+
+        test.Expect(
+            starterSpawns.size() >= 2,
+            "Starter content includes both passive and aggressive monster definitions");
+
         const DevelopmentMonsterSpawnDefinition &validSpawn =
-            DevelopmentWorldContent::GetStarterMonsterSpawns().front();
+            starterSpawns.front();
+
+        const DevelopmentMonsterSpawnDefinition &aggressiveSpawn =
+            starterSpawns.at(1);
 
         test.Expect(
             ContentValidator::ValidateMonsterSpawnDefinition(
@@ -992,6 +1002,23 @@ int main()
                 false)
                 .IsValid(),
             "Valid development monster spawn definition succeeds");
+
+        test.Expect(
+            !validSpawn.aggressionDefinition.has_value(),
+            "Passive starter monster has no aggression definition");
+
+        test.Expect(
+            aggressiveSpawn.aggressionDefinition.has_value(),
+            "Aggressive starter monster has aggression definition");
+
+        test.Expect(
+            ContentValidator::ValidateMonsterSpawnDefinition(
+                aggressiveSpawn,
+                DevelopmentWorldContent::MapWidth,
+                DevelopmentWorldContent::MapHeight,
+                false)
+                .IsValid(),
+            "Aggressive starter monster spawn definition succeeds");
 
         DevelopmentMonsterSpawnDefinition outOfBounds =
             validSpawn;
@@ -1060,6 +1087,74 @@ int main()
                  false)
                  .IsValid(),
             "Invalid monster respawn delay is rejected");
+
+        DevelopmentMonsterSpawnDefinition zeroDetectionAggression =
+            aggressiveSpawn;
+        zeroDetectionAggression.aggressionDefinition =
+            MonsterAggressionDefinition{0, 8};
+
+        test.Expect(
+            !ContentValidator::ValidateMonsterSpawnDefinition(
+                 zeroDetectionAggression,
+                 DevelopmentWorldContent::MapWidth,
+                 DevelopmentWorldContent::MapHeight,
+                 false)
+                 .IsValid(),
+            "Aggression definition with zero detection radius is rejected");
+
+        DevelopmentMonsterSpawnDefinition negativeDetectionAggression =
+            aggressiveSpawn;
+        negativeDetectionAggression.aggressionDefinition =
+            MonsterAggressionDefinition{-1, 8};
+
+        test.Expect(
+            !ContentValidator::ValidateMonsterSpawnDefinition(
+                 negativeDetectionAggression,
+                 DevelopmentWorldContent::MapWidth,
+                 DevelopmentWorldContent::MapHeight,
+                 false)
+                 .IsValid(),
+            "Aggression definition with negative detection radius is rejected");
+
+        DevelopmentMonsterSpawnDefinition zeroLeashAggression =
+            aggressiveSpawn;
+        zeroLeashAggression.aggressionDefinition =
+            MonsterAggressionDefinition{5, 0};
+
+        test.Expect(
+            !ContentValidator::ValidateMonsterSpawnDefinition(
+                 zeroLeashAggression,
+                 DevelopmentWorldContent::MapWidth,
+                 DevelopmentWorldContent::MapHeight,
+                 false)
+                 .IsValid(),
+            "Aggression definition with zero leash radius is rejected");
+
+        DevelopmentMonsterSpawnDefinition shortLeashAggression =
+            aggressiveSpawn;
+        shortLeashAggression.aggressionDefinition =
+            MonsterAggressionDefinition{5, 4};
+
+        test.Expect(
+            !ContentValidator::ValidateMonsterSpawnDefinition(
+                 shortLeashAggression,
+                 DevelopmentWorldContent::MapWidth,
+                 DevelopmentWorldContent::MapHeight,
+                 false)
+                 .IsValid(),
+            "Aggression definition with leash smaller than detection is rejected");
+
+        DevelopmentMonsterSpawnDefinition overlappingAggressiveSpawn =
+            aggressiveSpawn;
+
+        test.Expect(
+            !ContentValidator::ValidateMonsterSpawnDefinition(
+                 overlappingAggressiveSpawn,
+                 DevelopmentWorldContent::MapWidth,
+                 DevelopmentWorldContent::MapHeight,
+                 true)
+                 .IsValid(),
+            "Aggressive monster spawn overlap with blocked starter object is rejected");
     }
 
     {

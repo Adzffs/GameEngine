@@ -365,4 +365,15 @@ if(BUILD_TESTING)
         NAME FoodHealingTests
         COMMAND FoodHealingTests
     )
+
+    add_executable(AggressiveMonsterTests
+        tests/AggressiveMonsterTests.cpp
+    )
+
+    target_link_libraries(AggressiveMonsterTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME AggressiveMonsterTests
+        COMMAND AggressiveMonsterTests
+    )
 endif()

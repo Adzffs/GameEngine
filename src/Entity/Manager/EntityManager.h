@@ -5,6 +5,7 @@
 #include "../../Input/InputManager.h"
 #include "../../Player/Player.h"
 #include "../../NPC/NPC.h"
+#include "../../Entity/Monster/MonsterAggressionDefinition.h"
 #include "../../Entity/Monster/MonsterRespawnDefinition.h"
 #include "../../Reward/RewardTableType.h"
 #include "../../Stats/CombatRatings.h"
@@ -27,6 +28,8 @@ public:
         RewardTableType rewardTableType =
             RewardTableType::NONE,
         std::optional<MonsterRespawnDefinition> respawnDefinition =
+            std::nullopt,
+        std::optional<MonsterAggressionDefinition> aggressionDefinition =
             std::nullopt);
 
     void Update(World &world);

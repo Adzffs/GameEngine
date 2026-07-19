@@ -21,6 +21,7 @@
 #include "../Reward/RewardTableRoller.h"
 #include "../Reward/RewardTableType.h"
 #include "../Stats/CombatRatings.h"
+#include "../Entity/Monster/MonsterAggressionDefinition.h"
 #include "../StatusEffect/StatusEffectDefinition.h"
 #include "../StatusEffect/StatusEffectType.h"
 #include "../Entity/Monster/MonsterRespawnDefinition.h"
@@ -56,6 +57,8 @@ public:
         RewardTableType rewardTableType =
             RewardTableType::NONE,
         std::optional<MonsterRespawnDefinition> respawnDefinition =
+            std::nullopt,
+        std::optional<MonsterAggressionDefinition> aggressionDefinition =
             std::nullopt);
     Entity *GetEntityByID(int id);
     const std::vector<std::unique_ptr<Entity>> &
@@ -202,6 +205,7 @@ private:
     void ProcessPendingMeleeInteractions();
     void ProcessCompletedActions(
         const std::vector<Action> &completedActions);
+    void ProcessAggressiveMonsters();
     void PublishActionLifecycleEvents();
     void RecordActionStartedEvent(
         const ActionStartedSnapshot &snapshot);
@@ -232,6 +236,15 @@ private:
         int defenderEntityID,
         int durationTicks,
         bool repeating);
+    bool IsValidMonsterAggressionTarget(
+        const Monster &monster,
+        int targetEntityID);
+    bool IsMonsterOutsideLeash(
+        const Monster &monster,
+        const MonsterAggressionDefinition &aggressionDefinition);
+    int SelectMonsterAggressionTargetEntityID(
+        const Monster &monster,
+        const MonsterAggressionDefinition &aggressionDefinition);
     std::optional<std::pair<int, int>> FindMeleeApproachTile(
         int attackerX,
         int attackerY,
@@ -339,4 +352,7 @@ private:
         scheduledMonsterRespawnTicksByEntityID;
     std::map<int, std::set<int>>
         scheduledMonsterRespawnEntityIDsByTick;
+
+    std::set<int>
+        respawnedMonsterEntityIDsThisTick;
 };

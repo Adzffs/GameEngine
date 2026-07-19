@@ -1,5 +1,6 @@
 #include "World.h"
 #include <iostream>
+#include "Distance.h"
 #include "Object/Resource/ResourceNode.h"
 #include "../Core/Logger.h"
 #include "../Action/Action.h"
@@ -30,6 +31,7 @@
 #include <stdexcept>
 #include <utility>
 #include <set>
+#include <algorithm>
 
 namespace
 {
@@ -121,7 +123,8 @@ World::World(
             definition.spawnY,
             definition.ratings,
             definition.rewardTableType,
-            definition.respawnDefinition);
+            definition.respawnDefinition,
+            definition.aggressionDefinition);
     }
 
     for (const DevelopmentResourcePlacementDefinition &definition :
@@ -183,14 +186,16 @@ int World::CreateMonster(
     int y,
     const CombatRatings &ratings,
     RewardTableType rewardTableType,
-    std::optional<MonsterRespawnDefinition> respawnDefinition)
+    std::optional<MonsterRespawnDefinition> respawnDefinition,
+    std::optional<MonsterAggressionDefinition> aggressionDefinition)
 {
     return entityManager.CreateMonster(
         x,
         y,
         ratings,
         rewardTableType,
-        respawnDefinition);
+        respawnDefinition,
+        aggressionDefinition);
 }
 
 Entity *World::GetEntityByID(int id)
@@ -991,6 +996,7 @@ void World::Update()
 
     entityDiedEvents.clear();
     publishedActionLifecycleEvents.clear();
+    respawnedMonsterEntityIDsThisTick.clear();
 
     currentTick++;
 
@@ -1013,6 +1019,7 @@ void World::Update()
 
     entityManager.Update(*this);
     ProcessMovementRequests();
+    ProcessAggressiveMonsters();
     ProcessPendingMeleeInteractions();
     ProcessEntityDeathRewards();
     ScheduleMonsterRespawnsFromDeathEvents();
@@ -1024,6 +1031,387 @@ Map &World::GetMap()
 {
     return map;
 }
+
+bool World::IsMonsterOutsideLeash(
+    const Monster &monster,
+    const MonsterAggressionDefinition &aggressionDefinition)
+{
+    const int distanceFromSpawn =
+        Distance::Calculate(
+            monster.GetPosition().GetX(),
+            monster.GetPosition().GetY(),
+            monster.GetOriginalSpawnX(),
+            monster.GetOriginalSpawnY());
+
+    return distanceFromSpawn >
+           aggressionDefinition.leashRadius;
+}
+
+bool World::IsValidMonsterAggressionTarget(
+    const Monster &monster,
+    int targetEntityID)
+{
+    if (!monster.HasAggressionDefinition() ||
+        targetEntityID == Monster::InvalidAggressionTargetEntityID)
+    {
+        return false;
+    }
+
+    Entity *targetEntity =
+        entityManager.GetEntityByID(
+            targetEntityID);
+
+    Player *targetPlayer =
+        dynamic_cast<Player *>(targetEntity);
+
+    if (targetPlayer == nullptr ||
+        !targetPlayer->IsAlive())
+    {
+        return false;
+    }
+
+    std::optional<MonsterAggressionDefinition> aggressionDefinition =
+        monster.GetAggressionDefinition();
+
+    if (!aggressionDefinition.has_value())
+    {
+        return false;
+    }
+
+    if (IsMonsterOutsideLeash(
+            monster,
+            aggressionDefinition.value()))
+    {
+        return false;
+    }
+
+    const int targetDistanceFromSpawn =
+        Distance::Calculate(
+            targetPlayer->GetPosition().GetX(),
+            targetPlayer->GetPosition().GetY(),
+            monster.GetOriginalSpawnX(),
+            monster.GetOriginalSpawnY());
+
+    return targetDistanceFromSpawn <=
+           aggressionDefinition->leashRadius;
+}
+
+int World::SelectMonsterAggressionTargetEntityID(
+    const Monster &monster,
+    const MonsterAggressionDefinition &aggressionDefinition)
+{
+    struct CandidateTarget
+    {
+        int entityID;
+        int distance;
+    };
+
+    std::optional<CandidateTarget> selectedTarget;
+
+    for (const std::unique_ptr<Entity> &entity :
+         entityManager.GetEntities())
+    {
+        Player *player =
+            dynamic_cast<Player *>(entity.get());
+
+        if (player == nullptr ||
+            !player->IsAlive())
+        {
+            continue;
+        }
+
+        const int distanceToMonster =
+            Distance::Calculate(
+                monster.GetPosition().GetX(),
+                monster.GetPosition().GetY(),
+                player->GetPosition().GetX(),
+                player->GetPosition().GetY());
+
+        if (distanceToMonster >
+            aggressionDefinition.detectionRadius)
+        {
+            continue;
+        }
+
+        const int distanceFromSpawn =
+            Distance::Calculate(
+                monster.GetOriginalSpawnX(),
+                monster.GetOriginalSpawnY(),
+                player->GetPosition().GetX(),
+                player->GetPosition().GetY());
+
+        if (distanceFromSpawn >
+            aggressionDefinition.leashRadius)
+        {
+            continue;
+        }
+
+        const CandidateTarget candidate{
+            player->GetID(),
+            distanceToMonster};
+
+        if (!selectedTarget.has_value() ||
+            candidate.distance < selectedTarget->distance ||
+            (candidate.distance == selectedTarget->distance &&
+             candidate.entityID < selectedTarget->entityID))
+        {
+            selectedTarget = candidate;
+        }
+    }
+
+    if (!selectedTarget.has_value())
+    {
+        return Monster::InvalidAggressionTargetEntityID;
+    }
+
+    return selectedTarget->entityID;
+}
+
+void World::ProcessAggressiveMonsters()
+{
+    for (const std::unique_ptr<Entity> &entity :
+         entityManager.GetEntities())
+    {
+        Monster *monster =
+            dynamic_cast<Monster *>(entity.get());
+
+        if (monster == nullptr ||
+            !monster->IsAlive() ||
+            !monster->HasAggressionDefinition())
+        {
+            continue;
+        }
+
+        if (HasScheduledMonsterRespawn(monster->GetID()))
+        {
+            continue;
+        }
+
+        if (respawnedMonsterEntityIDsThisTick.find(
+                monster->GetID()) !=
+            respawnedMonsterEntityIDsThisTick.end())
+        {
+            continue;
+        }
+
+        const std::optional<MonsterAggressionDefinition>
+            aggressionDefinition =
+                monster->GetAggressionDefinition();
+
+        if (!aggressionDefinition.has_value() ||
+            aggressionDefinition->detectionRadius <= 0 ||
+            aggressionDefinition->leashRadius <
+                aggressionDefinition->detectionRadius)
+        {
+            continue;
+        }
+
+        const int monsterEntityID = monster->GetID();
+        bool acquiredTargetThisTick = false;
+
+        const auto clearAggressionState =
+            [&](ActionCancelReason reason)
+        {
+            monster->ClearAggressionTargetEntityID();
+
+            CancelActionsForEntity(
+                monsterEntityID,
+                reason);
+
+            pendingMeleeInteractions.erase(
+                monsterEntityID);
+
+            ClearPendingMovementForEntity(
+                monsterEntityID);
+        };
+
+        if (IsMonsterOutsideLeash(
+                *monster,
+                aggressionDefinition.value()))
+        {
+            if (monster->GetAggressionTargetEntityID() !=
+                    Monster::InvalidAggressionTargetEntityID ||
+                actionManager.HasActionForEntity(
+                    monsterEntityID) ||
+                HasPendingMeleeEngagement(
+                    monsterEntityID))
+            {
+                clearAggressionState(
+                    ActionCancelReason::OUT_OF_RANGE);
+            }
+        }
+
+        const int currentTargetEntityID =
+            monster->GetAggressionTargetEntityID();
+
+        if (currentTargetEntityID !=
+                Monster::InvalidAggressionTargetEntityID &&
+            !IsValidMonsterAggressionTarget(
+                *monster,
+                currentTargetEntityID))
+        {
+            clearAggressionState(
+                ActionCancelReason::TARGET_MISSING);
+        }
+
+        if (monster->GetAggressionTargetEntityID() ==
+            Monster::InvalidAggressionTargetEntityID)
+        {
+            const int selectedTargetID =
+                SelectMonsterAggressionTargetEntityID(
+                    *monster,
+                    aggressionDefinition.value());
+
+            if (selectedTargetID !=
+                Monster::InvalidAggressionTargetEntityID)
+            {
+                monster->SetAggressionTargetEntityID(
+                    selectedTargetID);
+
+                acquiredTargetThisTick = true;
+            }
+        }
+
+        const int targetEntityID =
+            monster->GetAggressionTargetEntityID();
+
+        if (targetEntityID ==
+            Monster::InvalidAggressionTargetEntityID)
+        {
+            if (actionManager.HasActionForEntity(
+                    monsterEntityID) ||
+                HasPendingMeleeEngagement(
+                    monsterEntityID) ||
+                activeMovementPaths.find(
+                    monsterEntityID) !=
+                    activeMovementPaths.end())
+            {
+                continue;
+            }
+
+            if (monster->GetPosition().GetX() ==
+                    monster->GetOriginalSpawnX() &&
+                monster->GetPosition().GetY() ==
+                    monster->GetOriginalSpawnY())
+            {
+                continue;
+            }
+
+            QueueMovementDestination(
+                MovementDestinationRequest(
+                    monsterEntityID,
+                    monster->GetOriginalSpawnX(),
+                    monster->GetOriginalSpawnY()));
+
+            continue;
+        }
+
+        Entity *targetEntity =
+            entityManager.GetEntityByID(targetEntityID);
+
+        Player *targetPlayer =
+            dynamic_cast<Player *>(targetEntity);
+
+        if (targetPlayer == nullptr)
+        {
+            clearAggressionState(
+                ActionCancelReason::TARGET_MISSING);
+            continue;
+        }
+
+        const int distanceX =
+            std::abs(
+                monster->GetPosition().GetX() -
+                targetPlayer->GetPosition().GetX());
+
+        const int distanceY =
+            std::abs(
+                monster->GetPosition().GetY() -
+                targetPlayer->GetPosition().GetY());
+
+        const bool isAdjacent =
+            distanceX <= 1 &&
+            distanceY <= 1;
+
+        if (isAdjacent)
+        {
+            ClearPendingMovementForEntity(
+                monsterEntityID);
+
+            if (actionManager.HasActionForEntity(
+                    monsterEntityID) ||
+                HasPendingMeleeEngagement(
+                    monsterEntityID))
+            {
+                continue;
+            }
+
+            TryStartMeleeEngagement(
+                monsterEntityID,
+                targetEntityID,
+                DefaultMonsterAttackDurationTicks);
+
+            continue;
+        }
+
+        bool hasAction =
+            actionManager.HasActionForEntity(
+                monsterEntityID);
+
+        bool hasPendingMelee =
+            HasPendingMeleeEngagement(
+                monsterEntityID);
+
+        auto activePathIterator =
+            activeMovementPaths.find(
+                monsterEntityID);
+
+        if (hasAction ||
+            hasPendingMelee ||
+            activePathIterator !=
+                activeMovementPaths.end())
+        {
+            if (acquiredTargetThisTick &&
+                activePathIterator !=
+                    activeMovementPaths.end())
+            {
+                ClearPendingMovementForEntity(
+                    monsterEntityID);
+
+                activePathIterator =
+                    activeMovementPaths.find(
+                        monsterEntityID);
+            }
+
+            if (hasAction ||
+                hasPendingMelee ||
+                activePathIterator !=
+                    activeMovementPaths.end())
+            {
+                continue;
+            }
+        }
+
+        std::optional<std::pair<int, int>> destination =
+            FindMeleeApproachTile(
+                monster->GetPosition().GetX(),
+                monster->GetPosition().GetY(),
+                targetPlayer->GetPosition().GetX(),
+                targetPlayer->GetPosition().GetY());
+
+        if (!destination.has_value())
+        {
+            continue;
+        }
+
+        QueueMovementDestination(
+            MovementDestinationRequest(
+                monsterEntityID,
+                destination->first,
+                destination->second));
+    }
+}
+
 void World::QueueMovementRequest(const MovementRequest &request)
 {
     Entity *entity =
@@ -2552,6 +2940,24 @@ void World::TryStartMonsterRetaliation(
         return;
     }
 
+    if (monster->HasAggressionDefinition())
+    {
+        const int currentTargetID =
+            monster->GetAggressionTargetEntityID();
+
+        if (currentTargetID !=
+                Monster::InvalidAggressionTargetEntityID &&
+            IsValidMonsterAggressionTarget(
+                *monster,
+                currentTargetID))
+        {
+            return;
+        }
+
+        monster->SetAggressionTargetEntityID(
+            playerEntityID);
+    }
+
     int distanceX = std::abs(
         monster->GetPosition().GetX() -
         player->GetPosition().GetX());
@@ -2782,6 +3188,17 @@ void World::HandleCombatantDeath(
     ClearPendingMeleeInteractionsInvolvingEntity(
         deadEntityID);
 
+    Monster *monster =
+        dynamic_cast<Monster *>(entity);
+
+    if (monster != nullptr)
+    {
+        monster->ClearAggressionTargetEntityID();
+    }
+
+    ClearPendingMovementForEntity(
+        deadEntityID);
+
     Player *player =
         dynamic_cast<Player *>(entity);
 
@@ -2800,9 +3217,6 @@ void World::HandleCombatantDeath(
         deadEntityID);
 
     activeStations.erase(
-        deadEntityID);
-
-    ClearPendingMovementForEntity(
         deadEntityID);
 }
 
@@ -3198,6 +3612,7 @@ void World::ExecuteMonsterRespawn(
         monster.GetID();
 
     monster.RestoreHealthToFull();
+    monster.ClearAggressionTargetEntityID();
 
     monster.GetPosition().SetPosition(
         monster.GetOriginalSpawnX(),
@@ -3233,6 +3648,9 @@ void World::ExecuteMonsterRespawn(
         monsterEntityID);
 
     processedDeathEntityIDs.erase(
+        monsterEntityID);
+
+    respawnedMonsterEntityIDsThisTick.insert(
         monsterEntityID);
 
     Logger::Game(
