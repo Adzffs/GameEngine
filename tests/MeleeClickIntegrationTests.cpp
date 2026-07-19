@@ -76,8 +76,8 @@ int main()
             "Monster click should be handled by the routing helper");
 
         test.Expect(
-            world.HasPendingMeleeEngagement(playerID),
-            "Monster click queues a pending melee engagement");
+            !world.HasPendingMeleeEngagement(playerID),
+            "Monster click does not mutate combat before update");
         test.ExpectEqual(
             player->GetPosition().GetX(),
             startX,
@@ -89,6 +89,12 @@ int main()
         test.Expect(
             world.GetActionForEntity(playerID) == nullptr,
             "Monster click does not start a combat action immediately");
+
+        world.Update();
+
+        test.Expect(
+            world.HasPendingMeleeEngagement(playerID),
+            "Monster click queues a pending melee engagement on update");
 
         AdvanceWorldTicks(world, 6);
 
@@ -140,6 +146,8 @@ int main()
                 static_cast<int>(monsterRectangle.y + 1.0f)),
             "Second monster click should be handled");
 
+        world.Update();
+
         test.Expect(
             world.HasPendingMeleeEngagement(playerID),
             "First monster click creates a pending engagement");
@@ -165,6 +173,8 @@ int main()
                 static_cast<int>(secondRectangle.x + 1.0f),
                 static_cast<int>(secondRectangle.y + 1.0f)),
             "A different monster click should also be handled");
+
+        world.Update();
 
         test.Expect(
             world.HasPendingMeleeEngagement(playerID),
@@ -261,6 +271,12 @@ int main()
             "Station click takes priority over Monster selection");
 
         AdvanceWorldTicks(world, 1);
+
+        test.Expect(
+            world.GetCommandProcessingResults().size() == 1 &&
+                world.GetCommandProcessingResults()[0].resultCode ==
+                    CommandResultCode::ACCEPTED,
+            "Station click command is accepted at the update boundary");
 
         StationType openedStationType = StationType::NONE;
 

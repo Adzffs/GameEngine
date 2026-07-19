@@ -24,11 +24,14 @@ Tile &Map::GetTile(int x, int y)
 
 bool Map::IsValidPosition(int x, int y)
 {
-    if (x < 0 || y < 0)
-        return false;
-
-    if (x >= width || y >= height)
+    if (!IsInBounds(x, y))
         return false;
 
     return !GetTile(x, y).IsBlocked();
+}
+
+bool Map::IsInBounds(int x, int y) const
+{
+    return x >= 0 && y >= 0 &&
+           x < width && y < height;
 }

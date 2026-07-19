@@ -2,9 +2,8 @@
 #include <chrono>
 #include <thread>
 #include "Core/Logger.h"
-#include "../Action/ActionCancelReason.h"
+#include "../Command/ServerCommand.h"
 #include "../Equipment/EquipmentSlotType.h"
-#include "../Movement/MovementDestinationRequest.h"
 #include "../Inventory/ItemType.h"
 #include "../Player/Player.h"
 #include "../Skills/SkillType.h"
@@ -60,9 +59,10 @@ Engine::Engine()
 
         if (weaponSlotIndex >= 0)
         {
-            world.TryEquipInventoryItem(
-                playerID,
-                weaponSlotIndex);
+            world.EnqueueCommand(
+                UseInventoryItemCommand{
+                    playerID,
+                    weaponSlotIndex});
         }
     }
 }
@@ -86,9 +86,10 @@ void Engine::Run()
         if (graphics.ConsumeRecipeRequest(
                 requestedRecipe))
         {
-            world.TryStartRecipeAction(
-                playerID,
-                requestedRecipe);
+            world.EnqueueCommand(
+                StartRecipeCommand{
+                    playerID,
+                    requestedRecipe});
         }
 
         int clickedInventorySlot = -1;
@@ -96,21 +97,18 @@ void Engine::Run()
         if (graphics.ConsumeInventorySlotClick(
                 clickedInventorySlot))
         {
-            if (!world.TryConsumeFood(
+            world.EnqueueCommand(
+                UseInventoryItemCommand{
                     playerID,
-                    clickedInventorySlot))
-            {
-                world.TryEquipInventoryItem(
-                    playerID,
-                    clickedInventorySlot);
-            }
+                    clickedInventorySlot});
         }
 
         if (graphics.ConsumeWeaponSlotClick())
         {
-            world.TryUnequipItem(
-                playerID,
-                EquipmentSlotType::WEAPON);
+            world.EnqueueCommand(
+                UnequipItemCommand{
+                    playerID,
+                    EquipmentSlotType::WEAPON});
         }
 
         int clickedTileX;
@@ -136,12 +134,8 @@ void Engine::Run()
 
         if (graphics.ConsumeStationMenuClose())
         {
-            world.CancelActionsForEntity(
-                playerID,
-                ActionCancelReason::INTERFACE_CLOSED);
-
-            world.CloseStationInteraction(
-                playerID);
+            world.EnqueueCommand(
+                CloseStationCommand{playerID});
         }
 
         const Clock::TimePoint now =

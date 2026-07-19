@@ -32,6 +32,7 @@
 #include <set>
 #include <algorithm>
 #include <random>
+#include <type_traits>
 
 namespace
 {
@@ -1033,6 +1034,10 @@ void World::Update()
     publishedActionLifecycleEvents.clear();
     respawnedMonsterEntityIDsThisTick.clear();
 
+    publishedCommandProcessingResults.clear();
+    pendingCommandProcessingResults.clear();
+    ProcessQueuedCommands();
+
     currentTick++;
 
     ProcessDueMonsterRespawns();
@@ -1060,6 +1065,271 @@ void World::Update()
     ScheduleMonsterRespawnsFromDeathEvents();
     PublishActionLifecycleEvents();
     TickPlayerStatusEffects();
+
+    publishedCommandProcessingResults =
+        std::move(pendingCommandProcessingResults);
+}
+
+std::uint64_t World::EnqueueCommand(
+    ServerCommandData command)
+{
+    return serverCommandQueue.Enqueue(
+        std::move(command));
+}
+
+const std::vector<CommandProcessingResult> &
+World::GetCommandProcessingResults() const
+{
+    return publishedCommandProcessingResults;
+}
+
+void World::ProcessQueuedCommands()
+{
+    // Only the commands present at this boundary belong to this update.
+    // Any command enqueued by processing code waits for the next update.
+    const std::size_t batchCount =
+        serverCommandQueue.GetCount();
+
+    for (std::size_t index = 0;
+         index < batchCount;
+         ++index)
+    {
+        std::optional<ServerCommand> nextCommand =
+            serverCommandQueue.PopNext();
+
+        if (!nextCommand.has_value())
+        {
+            break;
+        }
+
+        const ServerCommand &command =
+            nextCommand.value();
+
+        std::visit(
+            [&](const auto &data)
+            {
+                using CommandType =
+                    std::decay_t<decltype(data)>;
+
+                CommandResultCode resultCode =
+                    CommandResultCode::GAMEPLAY_REJECTED;
+
+                Entity *actorEntity =
+                    entityManager.GetEntityByID(
+                        data.actorEntityID);
+
+                Player *actor =
+                    dynamic_cast<Player *>(actorEntity);
+
+                if (actor == nullptr)
+                {
+                    resultCode =
+                        CommandResultCode::INVALID_ACTOR;
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, MoveCommand>)
+                {
+                    if (!map.IsInBounds(
+                            data.destination.GetX(),
+                            data.destination.GetY()))
+                    {
+                        resultCode =
+                            CommandResultCode::INVALID_COMMAND_DATA;
+                    }
+                    else if (actor->IsAlive())
+                    {
+                        CloseStationInteraction(
+                            data.actorEntityID);
+                        ClearPendingResourceInteraction(
+                            data.actorEntityID);
+                        QueueMovementDestination(
+                            MovementDestinationRequest(
+                                data.actorEntityID,
+                                data.destination.GetX(),
+                                data.destination.GetY()));
+                        resultCode =
+                            CommandResultCode::ACCEPTED;
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, AttackCommand>)
+                {
+                    if (entityManager.GetEntityByID(
+                            data.targetEntityID) == nullptr)
+                    {
+                        resultCode =
+                            CommandResultCode::INVALID_COMMAND_DATA;
+                    }
+                    else if (QueueMeleeEngagementRequest(
+                                 data.actorEntityID,
+                                 data.targetEntityID,
+                                 4))
+                    {
+                        resultCode =
+                            CommandResultCode::ACCEPTED;
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType,
+                                   UseInventoryItemCommand>)
+                {
+                    if (data.inventorySlotIndex < 0 ||
+                        data.inventorySlotIndex >=
+                            Inventory::SlotCount)
+                    {
+                        resultCode =
+                            CommandResultCode::INVALID_COMMAND_DATA;
+                    }
+                    else if (TryConsumeFood(
+                                 data.actorEntityID,
+                                 data.inventorySlotIndex) ||
+                             TryEquipInventoryItem(
+                                 data.actorEntityID,
+                                 data.inventorySlotIndex))
+                    {
+                        resultCode =
+                            CommandResultCode::ACCEPTED;
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType,
+                                   UnequipItemCommand>)
+                {
+                    const int slotValue =
+                        static_cast<int>(data.equipmentSlot);
+
+                    if (slotValue < 0 ||
+                        slotValue >= static_cast<int>(
+                            EquipmentSlotType::COUNT))
+                    {
+                        resultCode =
+                            CommandResultCode::INVALID_COMMAND_DATA;
+                    }
+                    else if (TryUnequipItem(
+                                 data.actorEntityID,
+                                 data.equipmentSlot))
+                    {
+                        resultCode =
+                            CommandResultCode::ACCEPTED;
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType,
+                                   StartRecipeCommand>)
+                {
+                    const int recipeValue =
+                        static_cast<int>(data.recipeType);
+
+                    if (recipeValue <=
+                            static_cast<int>(RecipeType::NONE) ||
+                        recipeValue >
+                            static_cast<int>(RecipeType::STEEL_BAR))
+                    {
+                        resultCode =
+                            CommandResultCode::INVALID_COMMAND_DATA;
+                    }
+                    else if (TryStartRecipeAction(
+                                 data.actorEntityID,
+                                 data.recipeType))
+                    {
+                        resultCode =
+                            CommandResultCode::ACCEPTED;
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, InteractCommand>)
+                {
+                    const bool validDestination =
+                        map.IsInBounds(
+                            data.destination.GetX(),
+                            data.destination.GetY());
+
+                    ResourceNode *resource = nullptr;
+                    CraftingStation *station = nullptr;
+
+                    if (data.targetType ==
+                        InteractionTargetType::RESOURCE)
+                    {
+                        resource = objectManager.GetResourceByID(
+                            data.targetObjectID);
+                    }
+                    else if (data.targetType ==
+                             InteractionTargetType::STATION)
+                    {
+                        station = objectManager.GetStationByID(
+                            data.targetObjectID);
+                    }
+
+                    const bool targetMatchesDestination =
+                        (resource != nullptr &&
+                         resource->GetX() == data.destination.GetX() &&
+                         resource->GetY() == data.destination.GetY()) ||
+                        (station != nullptr &&
+                         station->GetX() == data.destination.GetX() &&
+                         station->GetY() == data.destination.GetY());
+
+                    if (!validDestination ||
+                        !targetMatchesDestination)
+                    {
+                        resultCode =
+                            CommandResultCode::INVALID_COMMAND_DATA;
+                    }
+                    else if (actor->IsAlive() &&
+                             (resource == nullptr ||
+                              resource->IsActive()))
+                    {
+                        CancelActionsForEntity(
+                            data.actorEntityID,
+                            ActionCancelReason::PLAYER_MOVED);
+                        CloseStationInteraction(
+                            data.actorEntityID);
+                        ClearPendingResourceInteraction(
+                            data.actorEntityID);
+
+                        if (resource != nullptr)
+                        {
+                            QueueResourceInteraction(
+                                data.actorEntityID,
+                                data.targetObjectID);
+                        }
+                        else
+                        {
+                            QueueStationInteraction(
+                                data.actorEntityID,
+                                data.targetObjectID);
+                        }
+
+                        QueueMovementDestination(
+                            MovementDestinationRequest(
+                                data.actorEntityID,
+                                data.destination.GetX(),
+                                data.destination.GetY()));
+
+                        resultCode =
+                            CommandResultCode::ACCEPTED;
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType,
+                                   CloseStationCommand>)
+                {
+                    CancelActionsForEntity(
+                        data.actorEntityID,
+                        ActionCancelReason::INTERFACE_CLOSED);
+                    CloseStationInteraction(
+                        data.actorEntityID);
+                    resultCode =
+                        CommandResultCode::ACCEPTED;
+                }
+
+                pendingCommandProcessingResults.push_back(
+                    CommandProcessingResult{
+                        command.commandID,
+                        data.actorEntityID,
+                        resultCode});
+            },
+            command.data);
+    }
 }
 
 Map &World::GetMap()

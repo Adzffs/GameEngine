@@ -2,16 +2,13 @@
 
 #include <optional>
 
-#include "../Action/ActionCancelReason.h"
+#include "../Command/ServerCommand.h"
 #include "../Graphics/Graphics.h"
-#include "../Movement/MovementDestinationRequest.h"
 #include "../Player/Player.h"
 #include "../World/World.h"
 
 namespace EngineClickRouting
 {
-    constexpr int DEFAULT_MELEE_ATTACK_DURATION_TICKS = 4;
-
     inline bool HandleWorldClick(
         Graphics &graphics,
         World &world,
@@ -46,51 +43,23 @@ namespace EngineClickRouting
         if (resource != nullptr &&
             resource->IsActive())
         {
-            world.CancelActionsForEntity(
-                playerID,
-                ActionCancelReason::PLAYER_MOVED);
-
-            world.CloseStationInteraction(
-                playerID);
-
-            world.ClearPendingResourceInteraction(
-                playerID);
-
-            world.QueueResourceInteraction(
-                playerID,
-                resource->GetID());
-
-            MovementDestinationRequest request(
-                playerID,
-                clickedTileX,
-                clickedTileY);
-
-            world.QueueMovementDestination(request);
+            world.EnqueueCommand(
+                InteractCommand{
+                    playerID,
+                    InteractionTargetType::RESOURCE,
+                    resource->GetID(),
+                    Position(clickedTileX, clickedTileY)});
 
             return true;
         }
         else if (station != nullptr)
         {
-            world.CancelActionsForEntity(
-                playerID,
-                ActionCancelReason::PLAYER_MOVED);
-
-            world.CloseStationInteraction(
-                playerID);
-
-            world.ClearPendingResourceInteraction(
-                playerID);
-
-            world.QueueStationInteraction(
-                playerID,
-                station->GetID());
-
-            MovementDestinationRequest request(
-                playerID,
-                clickedTileX,
-                clickedTileY);
-
-            world.QueueMovementDestination(request);
+            world.EnqueueCommand(
+                InteractCommand{
+                    playerID,
+                    InteractionTargetType::STATION,
+                    station->GetID(),
+                    Position(clickedTileX, clickedTileY)});
 
             return true;
         }
@@ -103,30 +72,18 @@ namespace EngineClickRouting
 
         if (monsterID.has_value())
         {
-            world.QueueMeleeEngagementRequest(
-                playerID,
-                monsterID.value(),
-                DEFAULT_MELEE_ATTACK_DURATION_TICKS);
+            world.EnqueueCommand(
+                AttackCommand{
+                    playerID,
+                    monsterID.value()});
 
             return true;
         }
 
-        world.CancelActionsForEntity(
-            playerID,
-            ActionCancelReason::PLAYER_MOVED);
-
-        world.CloseStationInteraction(
-            playerID);
-
-        world.ClearPendingResourceInteraction(
-            playerID);
-
-        MovementDestinationRequest request(
-            playerID,
-            clickedTileX,
-            clickedTileY);
-
-        world.QueueMovementDestination(request);
+        world.EnqueueCommand(
+            MoveCommand{
+                playerID,
+                Position(clickedTileX, clickedTileY)});
 
         return true;
     }

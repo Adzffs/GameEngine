@@ -29,6 +29,8 @@
 #include <set>
 #include <string>
 #include <vector>
+#include "../Command/CommandProcessingResult.h"
+#include "../Command/ServerCommandQueue.h"
 
 class RandomSource;
 class Monster;
@@ -52,6 +54,12 @@ public:
         std::unique_ptr<RandomSource> gatheringRandomSource);
 
     void Update();
+
+    std::uint64_t EnqueueCommand(
+        ServerCommandData command);
+
+    const std::vector<CommandProcessingResult> &
+    GetCommandProcessingResults() const;
 
     Map &GetMap();
 
@@ -207,6 +215,7 @@ private:
         int y);
 
     void ProcessMovementRequests();
+    void ProcessQueuedCommands();
     void ProcessMovementDestinationRequests();
     void ProcessActiveMovementPaths();
     void ProcessResourceInteractions();
@@ -301,6 +310,14 @@ private:
 
     std::vector<ActionLifecycleEvent>
         publishedActionLifecycleEvents;
+
+    ServerCommandQueue serverCommandQueue;
+
+    std::vector<CommandProcessingResult>
+        pendingCommandProcessingResults;
+
+    std::vector<CommandProcessingResult>
+        publishedCommandProcessingResults;
 
     int currentTick = 0;
 
