@@ -37,13 +37,19 @@ struct WorldTestAccess;
 class World
 {
 public:
+    World();
     explicit World(
-        unsigned int combatSeed = 1337U,
-        unsigned int rewardSeed = 7331U);
+        unsigned int combatSeed,
+        unsigned int rewardSeed = 7331U,
+        unsigned int gatheringSeed = 9001U);
     explicit World(std::unique_ptr<RandomSource> combatRandomSource);
     World(
         std::unique_ptr<RandomSource> combatRandomSource,
         std::unique_ptr<RandomSource> rewardRandomSource);
+    World(
+        std::unique_ptr<RandomSource> combatRandomSource,
+        std::unique_ptr<RandomSource> rewardRandomSource,
+        std::unique_ptr<RandomSource> gatheringRandomSource);
 
     void Update();
 
@@ -179,6 +185,9 @@ private:
 
     std::unique_ptr<RandomSource>
         rewardRandomSource;
+
+    std::unique_ptr<RandomSource>
+        gatheringRandomSource;
 
     std::unique_ptr<RewardTableRoller>
         rewardTableRoller;

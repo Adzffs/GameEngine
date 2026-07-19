@@ -17,7 +17,6 @@
 #include <string>
 #include "Object/Resource/ResourceDatabase.h"
 #include "Development/DevelopmentWorldContent.h"
-#include "../Core/Random.h"
 #include "../Core/SeededRandom.h"
 #include "../Recipe/RecipeSystem.h"
 #include "../Recipe/RecipeDatabase.h"
@@ -32,6 +31,7 @@
 #include <utility>
 #include <set>
 #include <algorithm>
+#include <random>
 
 namespace
 {
@@ -72,29 +72,59 @@ namespace
             return false;
         }
     }
+
+    std::unique_ptr<RandomSource>
+    CreateProductionRandomSource()
+    {
+        return std::make_unique<SeededRandom>(
+            std::random_device{}());
+    }
+}
+
+World::World()
+    : World(
+          CreateProductionRandomSource(),
+          CreateProductionRandomSource(),
+          CreateProductionRandomSource())
+{
 }
 
 World::World(
     unsigned int combatSeed,
-    unsigned int rewardSeed)
+    unsigned int rewardSeed,
+    unsigned int gatheringSeed)
     : World(
           std::make_unique<SeededRandom>(combatSeed),
-          std::make_unique<SeededRandom>(rewardSeed))
+          std::make_unique<SeededRandom>(rewardSeed),
+          std::make_unique<SeededRandom>(gatheringSeed))
 {
 }
 
 World::World(std::unique_ptr<RandomSource> combatRandomSource)
     : World(
           std::move(combatRandomSource),
-          std::make_unique<SeededRandom>(7331U))
+          CreateProductionRandomSource(),
+          CreateProductionRandomSource())
 {
 }
 
 World::World(
     std::unique_ptr<RandomSource> combatRandomSource,
     std::unique_ptr<RandomSource> rewardRandomSource)
+    : World(
+          std::move(combatRandomSource),
+          std::move(rewardRandomSource),
+          CreateProductionRandomSource())
+{
+}
+
+World::World(
+    std::unique_ptr<RandomSource> combatRandomSource,
+    std::unique_ptr<RandomSource> rewardRandomSource,
+    std::unique_ptr<RandomSource> gatheringRandomSource)
     : combatService(std::move(combatRandomSource)),
       rewardRandomSource(std::move(rewardRandomSource)),
+      gatheringRandomSource(std::move(gatheringRandomSource)),
       map(
           DevelopmentWorldContent::MapWidth,
           DevelopmentWorldContent::MapHeight)
@@ -102,6 +132,11 @@ World::World(
     if (this->rewardRandomSource == nullptr)
     {
         throw std::invalid_argument("World requires a non-null reward RandomSource");
+    }
+
+    if (this->gatheringRandomSource == nullptr)
+    {
+        throw std::invalid_argument("World requires a non-null gathering RandomSource");
     }
 
     rewardTableRoller = std::make_unique<RewardTableRoller>(
@@ -1652,6 +1687,14 @@ ActionValidationResult World::ValidateGatheringAction(
             "Only players can gather resources"};
     }
 
+    if (!player->IsAlive())
+    {
+        return {
+            false,
+            ActionCancelReason::ENTITY_DIED,
+            "Player is not alive"};
+    }
+
     ResourceNode *resource =
         objectManager.GetResourceByID(resourceID);
 
@@ -2348,7 +2391,7 @@ void World::ProcessCompletedActions(
         }
 
         bool successfulGather =
-            Random::RollPercentage(
+            gatheringRandomSource->RollPercentage(
                 successChance);
 
         if (successfulGather)
