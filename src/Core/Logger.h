@@ -33,6 +33,15 @@ public:
             << std::endl;
     }
 
+    static void Warn(
+        const std::string &message)
+    {
+        std::cout
+            << "[WARN] "
+            << message
+            << std::endl;
+    }
+
     static void Debug(
         const std::string &message)
     {

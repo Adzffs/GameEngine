@@ -57,7 +57,9 @@ set(GAMEENGINE_CORE_SOURCES
     src/Combat/CombatFormulas.cpp
     src/Combat/MeleeAttackResolver.cpp
     src/Combat/CombatService.cpp
+    src/Time/Clock.cpp
     src/Core/SeededRandom.cpp
+    src/Time/TickPerformance.cpp
     src/Item/ItemDefinition.cpp
     src/Item/ItemDatabase.cpp
     src/World/Object/Resource/ResourceDefinition.cpp
@@ -86,7 +88,6 @@ if(GAMEENGINE_BUILD_CLIENT)
     add_executable(GameEngine
         src/main.cpp
         src/Core/Engine.cpp
-        src/Time/Clock.cpp
         src/Input/InputManager.cpp
         src/Graphics/Graphics.cpp
     )
@@ -158,6 +159,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(FoodHealingTests tests/FoodHealingTests.cpp)
     add_gameengine_headless_test(AggressiveMonsterTests tests/AggressiveMonsterTests.cpp)
     add_gameengine_headless_test(WorldTickAuthorityTests tests/WorldTickAuthorityTests.cpp)
+    add_gameengine_headless_test(ClockPacingTests tests/ClockPacingTests.cpp)
 
     if(GAMEENGINE_BUILD_GRAPHICS_TESTS)
         add_gameengine_graphics_test(MonsterGraphicsTests tests/MonsterGraphicsTests.cpp)

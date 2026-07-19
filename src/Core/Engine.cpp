@@ -144,14 +144,75 @@ void Engine::Run()
                 playerID);
         }
 
-        if (clock.ShouldTick())
+        const Clock::TimePoint now =
+            Clock::ClockType::now();
+
+        const int dueTickCount =
+            clock.GetDueTickCount(
+                now,
+                MaxCatchUpTicks);
+
+        if (dueTickCount > 0)
         {
-            Update();
+            for (int index = 0;
+                 index < dueTickCount;
+                 ++index)
+            {
+                clock.AdvanceTickDeadline();
+                Update();
+            }
+
+            const Clock::TimePoint afterCatchUp =
+                Clock::ClockType::now();
+
+            if (clock.IsTickDue(afterCatchUp))
+            {
+                const long long backlogMs =
+                    std::chrono::duration_cast<std::chrono::milliseconds>(
+                        clock.GetBacklogDuration(afterCatchUp))
+                        .count();
+
+                Logger::Warn(
+                    "Tick backlog exceeded catch-up limit; "
+                    "clock resynchronised"
+                    " | tick=" +
+                    std::to_string(
+                        world.GetCurrentTick()) +
+                    " | processed=" +
+                    std::to_string(dueTickCount) +
+                    " | backlogMs=" +
+                    std::to_string(backlogMs));
+
+                clock.Resynchronise(afterCatchUp);
+            }
         }
         else
         {
-            std::this_thread::sleep_for(
-                std::chrono::milliseconds(1));
+            const Clock::TimePoint sleepDeadline =
+                clock.GetNextTickDeadline();
+
+            const Clock::TimePoint sleepStart =
+                Clock::ClockType::now();
+
+            if (sleepDeadline > sleepStart)
+            {
+                constexpr auto MaxIdleSleep =
+                    std::chrono::milliseconds(5);
+
+                const auto remaining =
+                    sleepDeadline - sleepStart;
+
+                if (remaining > MaxIdleSleep)
+                {
+                    std::this_thread::sleep_for(
+                        MaxIdleSleep);
+                }
+                else
+                {
+                    std::this_thread::sleep_until(
+                        sleepDeadline);
+                }
+            }
         }
 
         Player *player =
@@ -199,5 +260,45 @@ void Engine::Run()
 
 void Engine::Update()
 {
+    const Clock::TimePoint updateStart =
+        Clock::ClockType::now();
+
     world.Update();
+
+    const Clock::TimePoint updateEnd =
+        Clock::ClockType::now();
+
+    const auto updateDuration =
+        std::chrono::duration_cast<std::chrono::microseconds>(
+            updateEnd - updateStart);
+
+    const bool overrun =
+        RecordTickDuration(
+            tickPerformanceStats,
+            updateDuration,
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                clock.GetTickInterval()));
+
+    if (overrun)
+    {
+        const long long durationMs =
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                updateDuration)
+                .count();
+
+        const long long budgetMs =
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                clock.GetTickInterval())
+                .count();
+
+        Logger::Warn(
+            "Tick " +
+            std::to_string(
+                world.GetCurrentTick()) +
+            " exceeded budget: " +
+            std::to_string(durationMs) +
+            " ms / " +
+            std::to_string(budgetMs) +
+            " ms");
+    }
 }
