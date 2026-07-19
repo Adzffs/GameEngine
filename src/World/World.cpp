@@ -1532,22 +1532,20 @@ void World::ProcessMovementDestinationRequests()
         {
             continue;
         }
-        const PathStep &finalStep = path.back();
-
-        if (finalStep.x != request.GetDestinationX() ||
-            finalStep.y != request.GetDestinationY())
-        {
-        }
-
-        std::queue<PathStep> storedPath;
+        ActiveMovementPath activePath{
+            PathStep{
+                request.GetDestinationX(),
+                request.GetDestinationY()},
+            {}};
 
         for (const PathStep &step : path)
         {
-            storedPath.push(step);
+            activePath.remainingSteps.push(step);
         }
 
-        activeMovementPaths[request.GetEntityID()] =
-            storedPath;
+        activeMovementPaths.insert_or_assign(
+            request.GetEntityID(),
+            std::move(activePath));
     }
 }
 void World::ProcessActiveMovementPaths()
@@ -1560,8 +1558,11 @@ void World::ProcessActiveMovementPaths()
     {
         int entityID = pathIterator->first;
 
-        std::queue<PathStep> &path =
+        ActiveMovementPath &activePath =
             pathIterator->second;
+
+        std::queue<PathStep> &path =
+            activePath.remainingSteps;
 
         Entity *entity =
             entityManager.GetEntityByID(entityID);
@@ -1585,25 +1586,89 @@ void World::ProcessActiveMovementPaths()
             nextStep.y -
             entity->GetPosition().GetY();
 
-        Movement::Move(
+        const bool moved = Movement::Move(
             *entity,
             map,
             changeX,
             changeY);
 
-        path.pop();
-
-        if (path.empty())
+        if (moved)
         {
+            path.pop();
 
+            if (path.empty())
+            {
+                pathIterator =
+                    activeMovementPaths.erase(
+                        pathIterator);
+            }
+            else
+            {
+                ++pathIterator;
+            }
+
+            continue;
+        }
+
+        std::vector<PathStep> recalculatedPath =
+            pathfinder.FindPath(
+                map,
+                entity->GetPosition().GetX(),
+                entity->GetPosition().GetY(),
+                activePath.destination.x,
+                activePath.destination.y);
+
+        if (recalculatedPath.empty())
+        {
             pathIterator =
                 activeMovementPaths.erase(
                     pathIterator);
+
+            continue;
         }
-        else
+
+        const PathStep &firstRecalculatedStep =
+            recalculatedPath.front();
+
+        const int recalculatedChangeX =
+            firstRecalculatedStep.x -
+            entity->GetPosition().GetX();
+
+        const int recalculatedChangeY =
+            firstRecalculatedStep.y -
+            entity->GetPosition().GetY();
+
+        const bool firstStepIsOrthogonal =
+            ((recalculatedChangeX == -1 ||
+              recalculatedChangeX == 1) &&
+             recalculatedChangeY == 0) ||
+            (recalculatedChangeX == 0 &&
+             (recalculatedChangeY == -1 ||
+              recalculatedChangeY == 1));
+
+        if (!firstStepIsOrthogonal ||
+            !map.IsValidPosition(
+                firstRecalculatedStep.x,
+                firstRecalculatedStep.y))
         {
-            ++pathIterator;
+            pathIterator =
+                activeMovementPaths.erase(
+                    pathIterator);
+
+            continue;
         }
+
+        std::queue<PathStep> replacementSteps;
+
+        for (const PathStep &step : recalculatedPath)
+        {
+            replacementSteps.push(step);
+        }
+
+        activePath.remainingSteps =
+            std::move(replacementSteps);
+
+        ++pathIterator;
     }
 }
 void World::ProcessStationInteractions()

@@ -269,7 +269,13 @@ private:
     std::queue<MovementDestinationRequest>
         movementDestinationRequests;
 
-    std::map<int, std::queue<PathStep>>
+    struct ActiveMovementPath
+    {
+        PathStep destination;
+        std::queue<PathStep> remainingSteps;
+    };
+
+    std::map<int, ActiveMovementPath>
         activeMovementPaths;
 
     std::map<int, int> pendingResourceInteractions;

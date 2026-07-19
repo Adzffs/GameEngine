@@ -475,9 +475,6 @@ int main()
 
         world.Update();
 
-        const int xAfterReturnStep =
-            monster->GetPosition().GetX();
-
         player->GetPosition().SetPosition(82, 70);
 
         world.Update();
@@ -487,11 +484,28 @@ int main()
             playerID,
             "Aggressive monster can acquire while returning home");
 
+        const int xAfterAcquisition =
+            monster->GetPosition().GetX();
+
+        const int yAfterAcquisition =
+            monster->GetPosition().GetY();
+
         world.Update();
 
+        test.ExpectEqual(
+            Distance::Calculate(
+                xAfterAcquisition,
+                yAfterAcquisition,
+                monster->GetPosition().GetX(),
+                monster->GetPosition().GetY()),
+            1,
+            "Acquiring a player begins a legal one-tile chase step");
+
         test.Expect(
-            monster->GetPosition().GetX() >=
-                xAfterReturnStep,
+            monster->GetPosition().GetX() !=
+                    xAfterAcquisition - 1 ||
+                monster->GetPosition().GetY() !=
+                    yAfterAcquisition,
             "Acquiring a player interrupts return-home path instead of continuing old return direction");
     }
 

@@ -51,15 +51,11 @@ std::vector<PathStep> Pathfinder::FindPath(
     int bestPathLength =
         std::numeric_limits<int>::max();
 
-    const int directions[8][2]{
+    const int directions[4][2]{
         {0, -1},
-        {1, -1},
         {1, 0},
-        {1, 1},
         {0, 1},
-        {-1, 1},
-        {-1, 0},
-        {-1, -1}};
+        {-1, 0}};
 
     bool exactPathFound = false;
 
@@ -111,25 +107,6 @@ std::vector<PathStep> Pathfinder::FindPath(
             if (!map.IsValidPosition(nextX, nextY))
             {
                 continue;
-            }
-
-            if (changeX != 0 && changeY != 0)
-            {
-                bool horizontalTileIsValid =
-                    map.IsValidPosition(
-                        current.first + changeX,
-                        current.second);
-
-                bool verticalTileIsValid =
-                    map.IsValidPosition(
-                        current.first,
-                        current.second + changeY);
-
-                if (!horizontalTileIsValid ||
-                    !verticalTileIsValid)
-                {
-                    continue;
-                }
             }
 
             Coordinate next{
