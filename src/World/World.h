@@ -35,6 +35,7 @@
 #include "../Scheduling/TickScheduler.h"
 #include "../AI/MonsterAIIntent.h"
 #include "../Interaction/InteractionSystem.h"
+#include "../Gathering/GatheringSystem.h"
 
 class RandomSource;
 class Monster;
@@ -214,6 +215,8 @@ private:
     MeleeEngagementSystem meleeEngagementSystem;
 
     InteractionSystem interactionSystem;
+
+    GatheringSystem gatheringSystem;
 
     void CreateResource(
         ResourceType resourceType,

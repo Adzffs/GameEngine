@@ -1192,7 +1192,7 @@ void World::ProcessQueuedCommands()
 
                     if (slotValue < 0 ||
                         slotValue >= static_cast<int>(
-                            EquipmentSlotType::COUNT))
+                                         EquipmentSlotType::COUNT))
                     {
                         resultCode =
                             CommandResultCode::INVALID_COMMAND_DATA;
@@ -2154,6 +2154,54 @@ void World::ProcessCompletedActions(
             continue;
         }
 
+        GatheringCompletionOutcome gatheringOutcome =
+            gatheringSystem.EvaluateCompletedAction(
+                action,
+                entityManager,
+                objectManager,
+                [this](
+                    int actorEntityID,
+                    int resourceID,
+                    bool checkInventorySpace)
+                {
+                    return ValidateGatheringAction(
+                        actorEntityID,
+                        resourceID,
+                        checkInventorySpace);
+                },
+                *gatheringRandomSource);
+
+        if (gatheringOutcome.type ==
+            GatheringCompletionOutcomeType::IGNORE)
+        {
+            continue;
+        }
+
+        if (gatheringOutcome.type ==
+            GatheringCompletionOutcomeType::CLEAR_STALE)
+        {
+            continue;
+        }
+
+        if (gatheringOutcome.type ==
+            GatheringCompletionOutcomeType::CANCEL)
+        {
+            if (!gatheringOutcome.message.empty())
+            {
+                Logger::Game(
+                    gatheringOutcome.message);
+            }
+
+            ClearPendingResourceInteraction(
+                action.GetOwnerID());
+
+            CancelActionsForEntity(
+                action.GetOwnerID(),
+                gatheringOutcome.cancelReason);
+
+            continue;
+        }
+
         ResourceNode *resource =
             objectManager.GetResourceByID(
                 action.GetTargetID());
@@ -2180,71 +2228,17 @@ void World::ProcessCompletedActions(
             continue;
         }
 
-        ActionValidationResult validation =
-            ValidateGatheringAction(
-                action.GetOwnerID(),
-                action.GetTargetID(),
-                true);
-
-        if (!validation.valid)
-        {
-            if (!validation.message.empty())
-            {
-                Logger::Game(validation.message);
-            }
-
-            ClearPendingResourceInteraction(action.GetOwnerID());
-
-            CancelActionsForEntity(
-                action.GetOwnerID(),
-                validation.reason);
-
-            continue;
-        }
-
         const ResourceDefinition &resourceDefinition =
             ResourceDatabase::Get(
                 resource->GetResourceType());
 
-        SkillType requiredSkill =
-            resourceDefinition.GetRequiredSkill();
-
-        int playerSkillLevel =
-            player->GetSkills()
-                .GetSkill(requiredSkill)
-                .GetLevel();
-
-        int levelsAboveRequirement =
-            playerSkillLevel -
-            resourceDefinition
-                .GetRequiredSkillLevel();
-
-        int successChance =
-            resourceDefinition
-                .GetBaseSuccessChance() +
-            levelsAboveRequirement * 2;
-
-        if (successChance > 95)
+        if (gatheringOutcome.type ==
+            GatheringCompletionOutcomeType::SUCCESSFUL_ROLL)
         {
-            successChance = 95;
-        }
-
-        bool successfulGather =
-            gatheringRandomSource->RollPercentage(
-                successChance);
-
-        if (successfulGather)
-        {
-            ItemType rewardItem =
-                resourceDefinition.GetItemReward();
-
-            int rewardAmount =
-                resourceDefinition.GetItemAmount();
-
             bool itemAdded =
                 player->GetInventory().AddItem(
-                    rewardItem,
-                    rewardAmount);
+                    gatheringOutcome.rewardItem,
+                    gatheringOutcome.rewardAmount);
 
             if (!itemAdded)
             {
@@ -2258,20 +2252,20 @@ void World::ProcessCompletedActions(
 
             int previousLevel =
                 player->GetSkills()
-                    .GetSkill(requiredSkill)
+                    .GetSkill(gatheringOutcome.requiredSkill)
                     .GetLevel();
 
             player->GetSkills().AddXP(
-                requiredSkill,
-                resourceDefinition.GetXPReward());
+                gatheringOutcome.requiredSkill,
+                gatheringOutcome.xpReward);
 
             const Skill &gatheringSkill =
                 player->GetSkills()
-                    .GetSkill(requiredSkill);
+                    .GetSkill(gatheringOutcome.requiredSkill);
 
             const ItemDefinition &rewardDefinition =
                 ItemDatabase::Get(
-                    rewardItem);
+                    gatheringOutcome.rewardItem);
 
             Logger::Game(
                 "Player " +
@@ -2280,7 +2274,8 @@ void World::ProcessCompletedActions(
                 " gathered from " +
                 resourceDefinition.GetName() +
                 " | Received: " +
-                std::to_string(rewardAmount) +
+                std::to_string(
+                    gatheringOutcome.rewardAmount) +
                 " " +
                 rewardDefinition.GetName() +
                 " | XP: " +

@@ -62,6 +62,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/Combat/MeleeAttackResolver.cpp
     src/Combat/CombatService.cpp
     src/Combat/MeleeEngagementSystem.cpp
+    src/Gathering/GatheringSystem.cpp
     src/Interaction/InteractionSystem.cpp
     src/Time/Clock.cpp
     src/Core/SeededRandom.cpp
@@ -170,6 +171,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(WorldTickAuthorityTests tests/WorldTickAuthorityTests.cpp)
     add_gameengine_headless_test(ClockPacingTests tests/ClockPacingTests.cpp)
     add_gameengine_headless_test(GatheringRandomTests tests/GatheringRandomTests.cpp)
+    add_gameengine_headless_test(GatheringSystemTests tests/GatheringSystemTests.cpp)
     add_gameengine_headless_test(MovementPathSafetyTests tests/MovementPathSafetyTests.cpp)
     add_gameengine_headless_test(MovementSystemTests tests/MovementSystemTests.cpp)
     add_gameengine_headless_test(EntityManagerLookupTests tests/EntityManagerLookupTests.cpp)
