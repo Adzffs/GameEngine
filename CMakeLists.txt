@@ -162,6 +162,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(ClockPacingTests tests/ClockPacingTests.cpp)
     add_gameengine_headless_test(GatheringRandomTests tests/GatheringRandomTests.cpp)
     add_gameengine_headless_test(MovementPathSafetyTests tests/MovementPathSafetyTests.cpp)
+    add_gameengine_headless_test(EntityManagerLookupTests tests/EntityManagerLookupTests.cpp)
 
     if(GAMEENGINE_BUILD_GRAPHICS_TESTS)
         add_gameengine_graphics_test(MonsterGraphicsTests tests/MonsterGraphicsTests.cpp)

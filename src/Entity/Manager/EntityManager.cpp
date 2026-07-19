@@ -4,6 +4,7 @@
 #include "../../Player/Player.h"
 #include "../../Entity/Monster/Monster.h"
 #include "../../World/World.h"
+#include <algorithm>
 
 EntityManager::EntityManager()
 {
@@ -12,8 +13,11 @@ int EntityManager::CreatePlayer()
 {
     int playerID = nextID;
 
-    entities.push_back(
-        std::make_unique<Player>(playerID));
+    if (RegisterEntity(
+            std::make_unique<Player>(playerID)) == nullptr)
+    {
+        return 0;
+    }
 
     nextID++;
 
@@ -23,12 +27,14 @@ int EntityManager::CreateNPC(int x, int y)
 {
     int npcID = nextID;
 
-    entities.push_back(
-        std::make_unique<NPC>(npcID));
+    std::unique_ptr<NPC> npc =
+        std::make_unique<NPC>(npcID);
+    npc->GetPosition().SetPosition(x, y);
 
-    entities.back()
-        ->GetPosition()
-        .SetPosition(x, y);
+    if (RegisterEntity(std::move(npc)) == nullptr)
+    {
+        return 0;
+    }
 
     nextID++;
 
@@ -45,15 +51,18 @@ int EntityManager::CreateMonster(
 {
     int monsterID = nextID;
 
-    entities.push_back(
-        std::make_unique<Monster>(
+    if (RegisterEntity(
+            std::make_unique<Monster>(
             monsterID,
             x,
             y,
             ratings,
             rewardTableType,
             aggressionDefinition,
-            respawnDefinition));
+            respawnDefinition)) == nullptr)
+    {
+        return 0;
+    }
 
     nextID++;
 
@@ -62,15 +71,94 @@ int EntityManager::CreateMonster(
 
 Entity *EntityManager::GetEntityByID(int id)
 {
-    for (const auto &entity : entities)
+    if (id <= 0)
     {
-        if (entity->GetID() == id)
-        {
-            return entity.get();
-        }
+        return nullptr;
     }
 
-    return nullptr;
+    auto iterator = entityLookup.find(id);
+    return iterator == entityLookup.end()
+               ? nullptr
+               : iterator->second;
+}
+
+const Entity *EntityManager::GetEntityByID(int id) const
+{
+    if (id <= 0)
+    {
+        return nullptr;
+    }
+
+    auto iterator = entityLookup.find(id);
+    return iterator == entityLookup.end()
+               ? nullptr
+               : iterator->second;
+}
+
+Entity *EntityManager::RegisterEntity(
+    std::unique_ptr<Entity> entity)
+{
+    if (entity == nullptr)
+    {
+        return nullptr;
+    }
+
+    int id = entity->GetID();
+    if (id <= 0 || entityLookup.find(id) != entityLookup.end())
+    {
+        return nullptr;
+    }
+
+    Entity *entityPointer = entity.get();
+    entities.push_back(std::move(entity));
+
+    try
+    {
+        auto [iterator, inserted] =
+            entityLookup.emplace(id, entityPointer);
+        (void)iterator;
+
+        if (!inserted)
+        {
+            entities.pop_back();
+            return nullptr;
+        }
+    }
+    catch (...)
+    {
+        entities.pop_back();
+        throw;
+    }
+
+    return entityPointer;
+}
+
+bool EntityManager::RemoveEntity(int id)
+{
+    auto lookupIterator = entityLookup.find(id);
+    if (lookupIterator == entityLookup.end())
+    {
+        return false;
+    }
+
+    Entity *entityPointer = lookupIterator->second;
+    auto entityIterator = std::find_if(
+        entities.begin(),
+        entities.end(),
+        [entityPointer](const std::unique_ptr<Entity> &entity)
+        {
+            return entity.get() == entityPointer;
+        });
+
+    if (entityIterator == entities.end())
+    {
+        entityLookup.erase(lookupIterator);
+        return false;
+    }
+
+    entityLookup.erase(lookupIterator);
+    entities.erase(entityIterator);
+    return true;
 }
 const std::vector<std::unique_ptr<Entity>> &
 EntityManager::GetEntities() const
