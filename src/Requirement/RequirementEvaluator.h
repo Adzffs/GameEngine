@@ -19,7 +19,22 @@ namespace RequirementSystem
             const Player &player,
             const std::vector<Requirement> &requirements);
 
+        static RequirementResult ValidateDefinition(
+            const Requirement &requirement);
+
+        static RequirementResult ValidateDefinitionAll(
+            const std::vector<Requirement> &requirements);
+
     private:
+        static RequirementResult ValidateDefinition(
+            const SkillLevelRequirement &requirement);
+
+        static RequirementResult ValidateDefinition(
+            const HeldItemRequirement &requirement);
+
+        static RequirementResult ValidateDefinition(
+            const EquippedItemRequirement &requirement);
+
         static RequirementResult Evaluate(
             const Player &player,
             const SkillLevelRequirement &requirement);

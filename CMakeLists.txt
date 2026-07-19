@@ -45,10 +45,14 @@ set(GAMEENGINE_CORE_SOURCES
     src/Recipe/RecipeDatabase.cpp
     src/Recipe/RecipeSystem.cpp
     src/Requirement/RequirementEvaluator.cpp
+    src/Content/ContentValidationReport.cpp
+    src/Content/ContentValidator.cpp
+    src/Core/ContentStartupValidation.cpp
     src/Reward/RewardTable.cpp
     src/Reward/RewardTableRoller.cpp
     src/Reward/DevelopmentRewardTables.cpp
     src/Reward/RewardTableRegistry.cpp
+    src/World/Development/DevelopmentWorldContent.cpp
 )
 
 add_library(GameEngineCore
@@ -325,5 +329,16 @@ if(BUILD_TESTING)
     add_test(
         NAME ActionLifecycleEventTests
         COMMAND ActionLifecycleEventTests
+    )
+
+    add_executable(ContentValidationTests
+        tests/ContentValidationTests.cpp
+    )
+
+    target_link_libraries(ContentValidationTests PRIVATE GameEngineCore)
+
+    add_test(
+        NAME ContentValidationTests
+        COMMAND ContentValidationTests
     )
 endif()

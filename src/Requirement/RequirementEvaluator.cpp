@@ -84,14 +84,16 @@ namespace RequirementSystem
         const Player &player,
         const SkillLevelRequirement &requirement)
     {
+        RequirementResult definitionValidation =
+            ValidateDefinition(requirement);
+
+        if (!definitionValidation.satisfied)
+        {
+            return definitionValidation;
+        }
+
         std::optional<std::string_view> skillName =
             GetSkillName(requirement.skillType);
-
-        if (!skillName.has_value() ||
-            requirement.requiredLevel <= 0)
-        {
-            return InvalidRequirementResult();
-        }
 
         const Skill &skill =
             player.GetSkills().GetSkill(
@@ -115,10 +117,12 @@ namespace RequirementSystem
         const Player &player,
         const HeldItemRequirement &requirement)
     {
-        if (!IsValidItemType(requirement.itemType) ||
-            requirement.quantity <= 0)
+        RequirementResult definitionValidation =
+            ValidateDefinition(requirement);
+
+        if (!definitionValidation.satisfied)
         {
-            return InvalidRequirementResult();
+            return definitionValidation;
         }
 
         const Inventory &inventory =
@@ -146,9 +150,12 @@ namespace RequirementSystem
         const Player &player,
         const EquippedItemRequirement &requirement)
     {
-        if (!IsValidItemType(requirement.itemType))
+        RequirementResult definitionValidation =
+            ValidateDefinition(requirement);
+
+        if (!definitionValidation.satisfied)
         {
-            return InvalidRequirementResult();
+            return definitionValidation;
         }
 
         const Equipment &equipment =
@@ -164,6 +171,80 @@ namespace RequirementSystem
                 false,
                 "You need to equip " +
                     definition.GetName()};
+        }
+
+        return RequirementResult{};
+    }
+
+    RequirementResult RequirementEvaluator::ValidateDefinition(
+        const Requirement &requirement)
+    {
+        return std::visit(
+            [&](const auto &concreteRequirement)
+            {
+                return ValidateDefinition(concreteRequirement);
+            },
+            requirement.data);
+    }
+
+    RequirementResult RequirementEvaluator::ValidateDefinitionAll(
+        const std::vector<Requirement> &requirements)
+    {
+        for (const Requirement &requirement : requirements)
+        {
+            RequirementResult result =
+                ValidateDefinition(requirement);
+
+            if (!result.satisfied)
+            {
+                return result;
+            }
+        }
+
+        return RequirementResult{};
+    }
+
+    RequirementResult RequirementEvaluator::ValidateDefinition(
+        const SkillLevelRequirement &requirement)
+    {
+        std::optional<std::string_view> skillName =
+            GetSkillName(requirement.skillType);
+
+        if (!skillName.has_value() ||
+            requirement.requiredLevel <= 0)
+        {
+            return InvalidRequirementResult();
+        }
+
+        return RequirementResult{};
+    }
+
+    RequirementResult RequirementEvaluator::ValidateDefinition(
+        const HeldItemRequirement &requirement)
+    {
+        if (!IsValidItemType(requirement.itemType) ||
+            requirement.quantity <= 0)
+        {
+            return InvalidRequirementResult();
+        }
+
+        return RequirementResult{};
+    }
+
+    RequirementResult RequirementEvaluator::ValidateDefinition(
+        const EquippedItemRequirement &requirement)
+    {
+        if (!IsValidItemType(requirement.itemType))
+        {
+            return InvalidRequirementResult();
+        }
+
+        const ItemDefinition &definition =
+            ItemDatabase::Get(requirement.itemType);
+
+        if (!definition.IsEquippable())
+        {
+            return InvalidRequirementResult();
         }
 
         return RequirementResult{};

@@ -2,6 +2,17 @@
 
 #include <stdexcept>
 
+const std::vector<RecipeType> &
+RecipeDatabase::GetAllRecipeTypes()
+{
+    static const std::vector<RecipeType> recipeTypes{
+        RecipeType::BRONZE_BAR,
+        RecipeType::IRON_BAR,
+        RecipeType::STEEL_BAR};
+
+    return recipeTypes;
+}
+
 const RecipeDefinition &
 RecipeDatabase::Get(
     RecipeType recipeType)

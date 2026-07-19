@@ -1,5 +1,33 @@
 #include "ItemDatabase.h"
 
+const std::vector<ItemType> &
+ItemDatabase::GetAllItemTypes()
+{
+    static const std::vector<ItemType> itemTypes{
+        ItemType::LOG,
+        ItemType::OAK_LOG,
+        ItemType::WILLOW_LOG,
+        ItemType::COPPER_ORE,
+        ItemType::TIN_ORE,
+        ItemType::IRON_ORE,
+        ItemType::COAL,
+        ItemType::BRONZE_BAR,
+        ItemType::IRON_BAR,
+        ItemType::STEEL_BAR,
+        ItemType::COINS,
+        ItemType::BRONZE_AXE,
+        ItemType::IRON_AXE,
+        ItemType::STEEL_AXE,
+        ItemType::BRONZE_PICKAXE,
+        ItemType::IRON_PICKAXE,
+        ItemType::STEEL_PICKAXE,
+        ItemType::BRONZE_SWORD,
+        ItemType::DEVELOPER_GODSWORD,
+        ItemType::WOODEN_SHIELD};
+
+    return itemTypes;
+}
+
 const ItemDefinition &ItemDatabase::Get(
     ItemType itemType)
 {

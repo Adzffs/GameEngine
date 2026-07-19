@@ -15,6 +15,7 @@
 #include "../Item/ToolType.h"
 #include <string>
 #include "Object/Resource/ResourceDatabase.h"
+#include "Development/DevelopmentWorldContent.h"
 #include "../Core/Random.h"
 #include "../Core/SeededRandom.h"
 #include "../Recipe/RecipeSystem.h"
@@ -91,7 +92,9 @@ World::World(
     std::unique_ptr<RandomSource> rewardRandomSource)
     : combatService(std::move(combatRandomSource)),
       rewardRandomSource(std::move(rewardRandomSource)),
-      map(100, 100)
+      map(
+          DevelopmentWorldContent::MapWidth,
+          DevelopmentWorldContent::MapHeight)
 {
     if (this->rewardRandomSource == nullptr)
     {
@@ -101,58 +104,42 @@ World::World(
     rewardTableRoller = std::make_unique<RewardTableRoller>(
         *this->rewardRandomSource);
 
-    entityManager.CreateNPC(3, 3);
+    for (const DevelopmentNpcSpawnDefinition &definition :
+         DevelopmentWorldContent::GetStarterNPCSpawns())
+    {
+        entityManager.CreateNPC(
+            definition.spawnX,
+            definition.spawnY);
+    }
 
-    CreateMonster(
-        6,
-        1,
-        CombatRatings{
-            5,
-            4,
-            3,
-            30},
-        RewardTableType::DEVELOPMENT_MONSTER,
-        MonsterRespawnDefinition{8});
+    for (const DevelopmentMonsterSpawnDefinition &definition :
+         DevelopmentWorldContent::GetStarterMonsterSpawns())
+    {
+        CreateMonster(
+            definition.spawnX,
+            definition.spawnY,
+            definition.ratings,
+            definition.rewardTableType,
+            definition.respawnDefinition);
+    }
 
-    CreateResource(
-        ResourceType::NORMAL_TREE,
-        5,
-        5);
+    for (const DevelopmentResourcePlacementDefinition &definition :
+         DevelopmentWorldContent::GetStarterResourcePlacements())
+    {
+        CreateResource(
+            definition.resourceType,
+            definition.x,
+            definition.y);
+    }
 
-    CreateResource(
-        ResourceType::OAK_TREE,
-        8,
-        5);
-
-    CreateResource(
-        ResourceType::WILLOW_TREE,
-        11,
-        5);
-
-    CreateResource(
-        ResourceType::COPPER_ROCK,
-        5,
-        9);
-
-    CreateResource(
-        ResourceType::TIN_ROCK,
-        8,
-        9);
-
-    CreateResource(
-        ResourceType::IRON_ROCK,
-        11,
-        9);
-
-    CreateResource(
-        ResourceType::COAL_ROCK,
-        14,
-        12);
-
-    CreateStation(
-        StationType::FURNACE,
-        14,
-        9);
+    for (const DevelopmentStationPlacementDefinition &definition :
+         DevelopmentWorldContent::GetStarterStationPlacements())
+    {
+        CreateStation(
+            definition.stationType,
+            definition.x,
+            definition.y);
+    }
 }
 void World::CreateResource(
     ResourceType resourceType,

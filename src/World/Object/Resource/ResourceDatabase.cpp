@@ -1,5 +1,20 @@
 #include "ResourceDatabase.h"
 
+const std::vector<ResourceType> &
+ResourceDatabase::GetAllResourceTypes()
+{
+    static const std::vector<ResourceType> resourceTypes{
+        ResourceType::NORMAL_TREE,
+        ResourceType::OAK_TREE,
+        ResourceType::WILLOW_TREE,
+        ResourceType::COPPER_ROCK,
+        ResourceType::TIN_ROCK,
+        ResourceType::IRON_ROCK,
+        ResourceType::COAL_ROCK};
+
+    return resourceTypes;
+}
+
 const ResourceDefinition &ResourceDatabase::Get(
     ResourceType resourceType)
 {

@@ -4,6 +4,15 @@
 
 namespace RewardTableRegistry
 {
+    const std::vector<RewardTableType> &
+    GetAllRewardTableTypes()
+    {
+        static const std::vector<RewardTableType> rewardTableTypes{
+            RewardTableType::DEVELOPMENT_MONSTER};
+
+        return rewardTableTypes;
+    }
+
     const RewardTable *TryGetRewardTable(
         RewardTableType rewardTableType)
     {
