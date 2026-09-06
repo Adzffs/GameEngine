@@ -185,6 +185,8 @@ public:
     SDL_FRect GetDialogueChoiceButtonRectangle(std::size_t choiceIndex) const;
     SDL_FRect GetDialogueTradeButtonRectangle() const;
     SDL_FRect GetShopRowRectangle(std::size_t index) const;
+    SDL_FRect GetShopBuyButtonRectangle(std::size_t index) const;
+    SDL_FRect GetShopSellButtonRectangle(std::size_t index) const;
     SDL_FRect GetShopCloseButtonRectangle() const;
     void DrawShopPanel();
     void DrawDialoguePanel();
@@ -274,6 +276,7 @@ private:
     std::optional<ServerCommandData> pendingDialogueCommand;
     ShopPresentationState shopPresentationState;
     std::optional<ServerCommandData> pendingShopCommand;
+    int displayedCurrency = 0;
 
     bool HandleDialogueClick(float mouseX, float mouseY);
     bool HandleShopClick(float mouseX, float mouseY);

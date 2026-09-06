@@ -639,6 +639,12 @@ void Graphics::ProcessEvents(bool &running)
             if (event.key.scancode ==
                 SDL_SCANCODE_ESCAPE)
             {
+                if (shopPresentationState.IsOpen())
+                {
+                    if (!pendingShopCommand)
+                        pendingShopCommand = shopPresentationState.MakeClose();
+                    continue;
+                }
                 if (stationMenuOpen)
                 {
                     stationMenuOpen = false;
@@ -779,15 +785,17 @@ SDL_FRect Graphics::GetDialogueTradeButtonRectangle() const {
     const std::size_t index = event == nullptr ? 0 : event->choices.size();
     return GetDialogueChoiceButtonRectangle(index);
 }
-SDL_FRect Graphics::GetShopRowRectangle(std::size_t i) const { return SDL_FRect{240.0f,500.0f+static_cast<float>(i)*42.0f,800.0f,36.0f}; }
-SDL_FRect Graphics::GetShopCloseButtonRectangle() const { return SDL_FRect{960.0f,462.0f,80.0f,30.0f}; }
+SDL_FRect Graphics::GetShopRowRectangle(std::size_t i) const { return SDL_FRect{160.0f,150.0f+static_cast<float>(i)*48.0f,960.0f,42.0f}; }
+SDL_FRect Graphics::GetShopBuyButtonRectangle(std::size_t i) const { auto r=GetShopRowRectangle(i); return SDL_FRect{r.x+r.w-300.0f,r.y+4.0f,120.0f,r.h-8.0f}; }
+SDL_FRect Graphics::GetShopSellButtonRectangle(std::size_t i) const { auto r=GetShopRowRectangle(i); return SDL_FRect{r.x+r.w-160.0f,r.y+4.0f,120.0f,r.h-8.0f}; }
+SDL_FRect Graphics::GetShopCloseButtonRectangle() const { return SDL_FRect{1020.0f,100.0f,90.0f,32.0f}; }
 
 bool Graphics::HandleShopClick(float x,float y)
 {
     if(!shopPresentationState.IsOpen()||pendingShopCommand)return true;
     if(IsPointInsideRectangle(x,y,GetShopCloseButtonRectangle())) { pendingShopCommand=shopPresentationState.MakeClose(); return true; }
     const auto* e=shopPresentationState.GetEvent();
-    for(std::size_t i=0;i<e->entries.size();++i){ auto r=GetShopRowRectangle(i); if(!IsPointInsideRectangle(x,y,r))continue; if(x<r.x+r.w/2) pendingShopCommand=shopPresentationState.MakeBuy(i); else pendingShopCommand=shopPresentationState.MakeSell(i); return true; }
+    for(std::size_t i=0;i<e->entries.size();++i){ if(IsPointInsideRectangle(x,y,GetShopBuyButtonRectangle(i))) { pendingShopCommand=shopPresentationState.MakeBuy(i); return true; } if(IsPointInsideRectangle(x,y,GetShopSellButtonRectangle(i))) { pendingShopCommand=shopPresentationState.MakeSell(i); return true; } }
     return true;
 }
 
@@ -3256,10 +3264,10 @@ void Graphics::DrawDialoguePanel()
 void Graphics::DrawShopPanel()
 {
     const auto* e=shopPresentationState.GetEvent(); if(!e)return;
-    const SDL_FRect panel{180,420,920,290}; SDL_SetRenderDrawColor(renderer,24,22,20,248); SDL_RenderFillRect(renderer,&panel); SDL_SetRenderDrawColor(renderer,205,180,120,255); SDL_RenderRect(renderer,&panel);
-    SDL_SetRenderDrawColor(renderer,255,244,210,255); SDL_RenderDebugText(renderer,210,440,e->shopName.c_str()); SDL_RenderDebugText(renderer,210,460,"Quantity: 1 (server validated)");
-    if (shopPresentationState.HasRejection()) SDL_RenderDebugText(renderer,210,480,"Transaction rejected by server");
-    for(std::size_t i=0;i<e->entries.size();++i){ const auto&r=GetShopRowRectangle(i); SDL_SetRenderDrawColor(renderer,55,50,45,255); SDL_RenderFillRect(renderer,&r); SDL_SetRenderDrawColor(renderer,190,170,130,255); SDL_RenderRect(renderer,&r); const auto& row=e->entries[i]; std::string text=ItemDatabase::Get(row.itemType).GetName()+"  "; text += row.buyPrice ? ("BUY "+std::to_string(*row.buyPrice)) : "BUY -"; text += "   "; text += row.sellPrice ? ("SELL "+std::to_string(*row.sellPrice)) : "SELL -"; SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,r.x+12,r.y+11,text.c_str()); }
+    const SDL_FRect panel{120,70,1040,620}; SDL_SetRenderDrawColor(renderer,24,22,20,248); SDL_RenderFillRect(renderer,&panel); SDL_SetRenderDrawColor(renderer,205,180,120,255); SDL_RenderRect(renderer,&panel);
+    SDL_SetRenderDrawColor(renderer,255,244,210,255); SDL_RenderDebugText(renderer,160,95,e->shopName.c_str()); SDL_RenderDebugText(renderer,160,115,("Currency: "+std::to_string(displayedCurrency)+"    BUY (left)        SELL (right)     Quantity: 1").c_str());
+    if (shopPresentationState.HasRejection()) SDL_RenderDebugText(renderer,160,135,"Transaction rejected by server");
+    for(std::size_t i=0;i<e->entries.size();++i){ const auto&r=GetShopRowRectangle(i); const auto& row=e->entries[i]; SDL_SetRenderDrawColor(renderer,55,50,45,255); SDL_RenderFillRect(renderer,&r); SDL_SetRenderDrawColor(renderer,190,170,130,255); SDL_RenderRect(renderer,&r); SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,r.x+16,r.y+13,ItemDatabase::Get(row.itemType).GetName().c_str()); auto drawButton=[&](SDL_FRect b,const char* label){SDL_SetRenderDrawColor(renderer,70,90,65,255); SDL_RenderFillRect(renderer,&b); SDL_SetRenderDrawColor(renderer,220,200,160,255); SDL_RenderRect(renderer,&b); SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,b.x+35,b.y+11,label);}; drawButton(GetShopBuyButtonRectangle(i),"BUY"); drawButton(GetShopSellButtonRectangle(i),"SELL"); }
     const auto b=GetShopCloseButtonRectangle(); SDL_SetRenderDrawColor(renderer,70,55,45,255); SDL_RenderFillRect(renderer,&b); SDL_SetRenderDrawColor(renderer,220,200,160,255); SDL_RenderRect(renderer,&b); SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,b.x+20,b.y+9,"CLOSE");
 }
 
@@ -3276,6 +3284,7 @@ void Graphics::Render(
     const Player &player,
     const Action *activeAction)
 {
+    displayedCurrency = inventory.GetItemAmount(ItemType::COINS);
     SDL_SetRenderDrawColor(
         renderer,
         20,
