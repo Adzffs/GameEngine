@@ -1,0 +1,183 @@
+name: CI
+
+on:
+  push: {}
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux-headless:
+    name: Linux headless
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential cmake ninja-build
+
+      - name: Configure headless build
+        run: |
+          cmake -S . -B build-headless -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DBUILD_TESTING=ON \
+            -DGAMEENGINE_BUILD_CLIENT=OFF \
+            -DGAMEENGINE_BUILD_GRAPHICS_TESTS=OFF
+
+      - name: Build headless targets
+        run: cmake --build build-headless --parallel
+
+      - name: Run headless tests
+        run: |
+          ctest \
+            --test-dir build-headless \
+            --output-on-failure \
+            -L headless \
+            2>&1 | tee linux-headless-tests.log
+          exit "${PIPESTATUS[0]}"
+
+      - name: Upload failure log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-headless-test-log
+          path: |
+            linux-headless-tests.log
+            build-headless/Testing/Temporary/LastTest.log
+          if-no-files-found: ignore
+          retention-days: 7
+
+  windows-ucrt64:
+    name: Windows UCRT64 client
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up MSYS2 UCRT64
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-sdl3
+
+      - name: Report toolchain
+        run: |
+          g++ --version
+          cmake --version
+          ninja --version
+          pacman -Q mingw-w64-ucrt-x86_64-sdl3
+
+      - name: Configure client build
+        run: |
+          cmake -S . -B build-client -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DBUILD_TESTING=ON \
+            -DGAMEENGINE_BUILD_CLIENT=ON \
+            -DGAMEENGINE_BUILD_GRAPHICS_TESTS=ON
+
+      - name: Build client and tests
+        run: cmake --build build-client --parallel
+
+      - name: Run headless tests
+        id: headless
+        continue-on-error: true
+        env:
+          SDL_VIDEODRIVER: dummy
+        run: |
+          ctest \
+            --test-dir build-client \
+            --output-on-failure \
+            -L headless \
+            2>&1 | tee windows-headless-tests.log
+          exit "${PIPESTATUS[0]}"
+
+      - name: Run client tests
+        id: client
+        continue-on-error: true
+        env:
+          SDL_VIDEODRIVER: dummy
+        run: |
+          ctest \
+            --test-dir build-client \
+            --output-on-failure \
+            -L client \
+            2>&1 | tee windows-client-tests.log
+          exit "${PIPESTATUS[0]}"
+
+      - name: Run graphics tests
+        id: graphics
+        continue-on-error: true
+        env:
+          SDL_VIDEODRIVER: dummy
+        run: |
+          ctest \
+            --test-dir build-client \
+            --output-on-failure \
+            -L graphics \
+            2>&1 | tee windows-graphics-tests.log
+          exit "${PIPESTATUS[0]}"
+
+      - name: Upload failure logs
+        if: |
+          steps.headless.outcome == 'failure' ||
+          steps.client.outcome == 'failure' ||
+          steps.graphics.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-ucrt64-test-logs
+          path: |
+            windows-headless-tests.log
+            windows-client-tests.log
+            windows-graphics-tests.log
+            build-client/Testing/Temporary/LastTest.log
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Enforce test results
+        if: always()
+        run: |
+          failed=0
+
+          if [[ "${{ steps.headless.outcome }}" != "success" ]]; then
+            echo "::error title=Headless tests failed::Windows headless test group did not pass."
+            failed=1
+          fi
+
+          if [[ "${{ steps.client.outcome }}" != "success" ]]; then
+            echo "::error title=Client tests failed::Windows client test group did not pass."
+            failed=1
+          fi
+
+          if [[ "${{ steps.graphics.outcome }}" != "success" ]]; then
+            echo "::error title=Graphics tests failed::Windows graphics test group did not pass."
+            failed=1
+          fi
+
+          exit "$failed"
