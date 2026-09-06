@@ -145,10 +145,7 @@ jobs:
           exit "${PIPESTATUS[0]}"
 
       - name: Upload failure logs
-        if: |
-          steps.headless.outcome == 'failure' ||
-          steps.client.outcome == 'failure' ||
-          steps.graphics.outcome == 'failure'
+        if: ${{ steps.headless.outcome == 'failure' || steps.client.outcome == 'failure' || steps.graphics.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: windows-ucrt64-test-logs
