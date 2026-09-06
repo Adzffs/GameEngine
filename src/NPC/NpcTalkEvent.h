@@ -21,4 +21,5 @@ struct NpcTalkEvent
     DialogueNodeKind nodeKind;
     bool isTerminal;
     std::vector<DialogueEventChoice> choices;
+    bool offersTrade = false;
 };

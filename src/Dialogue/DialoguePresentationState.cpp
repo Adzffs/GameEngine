@@ -122,9 +122,7 @@ DialoguePresentationState::MakeCloseCommand() const
 bool DialoguePresentationState::CanTrade() const
 {
     if (!event || event->isTerminal || !activeAuthoritativeSession) return false;
-    // Trading is offered only on the Development Guide's authoritative
-    // opening/service node, not throughout the conversation.
-    if (event->nodeId != DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME) return false;
+    if (!event->offersTrade) return false;
     const NpcDefinition *definition = NpcDefinitionDatabase::TryGet(event->npcType);
     return definition != nullptr && std::find(definition->interactions.begin(), definition->interactions.end(), NpcInteractionType::TRADE) != definition->interactions.end();
 }

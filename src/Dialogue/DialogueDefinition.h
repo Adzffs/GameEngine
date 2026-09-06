@@ -23,6 +23,7 @@ struct DialogueNodeDefinition
     DialogueNodeKind kind = DialogueNodeKind::TERMINAL;
     std::optional<DialogueNodeId> nextNodeId;
     std::vector<DialogueChoiceDefinition> choices;
+    bool offersTrade = false;
 };
 
 struct DialogueDefinition

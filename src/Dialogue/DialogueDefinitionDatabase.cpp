@@ -10,7 +10,7 @@ namespace
              "Welcome to the development world.",
              DialogueNodeKind::CONTINUE,
              DialogueNodeId::DEVELOPMENT_GUIDE_EXPLANATION,
-             {}},
+             {}, true},
             {DialogueNodeId::DEVELOPMENT_GUIDE_EXPLANATION,
              "This area is used to test gathering, combat, and NPC systems.",
              DialogueNodeKind::CONTINUE,

@@ -2499,7 +2499,7 @@ bool World::PublishDialogueNode(const ActiveDialogueSession &session,
     pendingNpcTalkEvents.push_back({session.actorEntityID, session.npcEntityID,
         session.npcType, session.sessionId, session.dialogueId, node.id,
         node.text, node.kind, node.kind == DialogueNodeKind::TERMINAL,
-        std::move(eventChoices)});
+        std::move(eventChoices), node.offersTrade});
     return true;
 }
 

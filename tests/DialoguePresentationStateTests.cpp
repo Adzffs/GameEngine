@@ -12,7 +12,7 @@ namespace
         DialogueNodeKind kind,
         bool terminal = false)
     {
-        return NpcTalkEvent{
+        NpcTalkEvent event{
             actorID,
             1,
             NpcType::DEVELOPMENT_GUIDE,
@@ -27,6 +27,8 @@ namespace
                       {DialogueChoiceId::DEVELOPMENT_GUIDE_COMBAT,
                        "Combat"}}
                 : std::vector<DialogueEventChoice>{}};
+        event.offersTrade = (event.nodeId == DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME);
+        return event;
     }
 
     ActiveDialogueSession MakeSession(int actorID, DialogueSessionId sessionID)
@@ -62,6 +64,7 @@ int main()
 
     NpcTalkEvent ordinary = MakeEvent(4, 42, DialogueNodeKind::CONTINUE);
     ordinary.nodeId = DialogueNodeId::DEVELOPMENT_GUIDE_EXPLANATION;
+    ordinary.offersTrade = false;
     state.Synchronize(4, {ordinary}, &session);
     test.Expect(!state.CanTrade(), "Ordinary dialogue node hides Trade");
     NpcTalkEvent nonShop = ordinary;
