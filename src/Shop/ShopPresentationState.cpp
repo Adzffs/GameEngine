@@ -9,6 +9,7 @@ bool Matches(const ShopOpenedEvent& e, int actor, const ActiveShopSession& s) {
 }
 
 void ShopPresentationState::Synchronize(int actor,const std::vector<ShopOpenedEvent>& events,const ActiveShopSession* active){
+ rejectionVisible = false;
  const ShopOpenedEvent* latest=nullptr; for(const auto& e:events) if(e.actorEntityID==actor) latest=&e;
  if(latest){ if(latest->sessionId==dismissed) return; if(!active || !Matches(*latest,actor,*active)){ event.reset(); return; } event=*latest; return; }
  if(event && (!active || !Matches(*event,actor,*active))) event.reset();

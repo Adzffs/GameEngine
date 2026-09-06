@@ -12,7 +12,7 @@ public:
  std::optional<ServerCommandData> MakeBuy(std::size_t i,int quantity=1) const;
  std::optional<ServerCommandData> MakeSell(std::size_t i,int quantity=1) const;
  std::optional<ServerCommandData> MakeClose() const;
- void Dismiss(){if(event)dismissed=event->sessionId; event.reset();}
+ void Dismiss(){if(event)dismissed=event->sessionId; event.reset(); rejectionVisible=false;}
  void ReconcileRejectedCommand() { rejectionVisible = true; }
  bool HasRejection() const { return rejectionVisible; }
  void ClearRejection() { rejectionVisible = false; }
