@@ -42,4 +42,9 @@ private:
     void AddDevelopmentEquipment();
     void SynchronizeDialoguePresentation();
     bool EnqueuePendingDialogueCommand();
+    void SynchronizeShopPresentation();
+    bool EnqueuePendingShopCommand();
+    enum class PendingShopCommandType { NONE, BUY, SELL, CLOSE };
+    std::uint64_t pendingShopCommandID = 0;
+    PendingShopCommandType pendingShopCommandType = PendingShopCommandType::NONE;
 };

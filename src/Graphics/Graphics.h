@@ -17,7 +17,9 @@
 #include "../Equipment/Equipment.h"
 #include "../Recipe/RecipeType.h"
 #include "../Command/ServerCommand.h"
+#include "../Command/CommandProcessingResult.h"
 #include "../Dialogue/DialoguePresentationState.h"
+#include "../Shop/ShopPresentationState.h"
 
 class Map;
 class Player;
@@ -48,6 +50,8 @@ public:
         RecipeType &recipeType);
     bool ConsumeStationMenuClose();
     std::optional<ServerCommandData> ConsumeDialogueCommand();
+    std::optional<ServerCommandData> ConsumeShopCommand();
+    void ReconcileShopCommandResult(CommandResultCode result, bool closeCommand);
     void SynchronizeDialogue(
         int localActorEntityID,
         const std::vector<NpcTalkEvent> &publishedEvents,
@@ -56,6 +60,8 @@ public:
     {
         return dialoguePresentationState;
     }
+    void SynchronizeShop(int actor,const std::vector<ShopOpenedEvent>& events,const ActiveShopSession* active);
+    const ShopPresentationState &GetShopPresentationState() const { return shopPresentationState; }
 
     void OpenStationMenu(
         StationType stationType);
@@ -177,6 +183,10 @@ public:
     SDL_FRect GetDialogueCloseButtonRectangle() const;
     SDL_FRect GetDialogueContinueButtonRectangle() const;
     SDL_FRect GetDialogueChoiceButtonRectangle(std::size_t choiceIndex) const;
+    SDL_FRect GetDialogueTradeButtonRectangle() const;
+    SDL_FRect GetShopRowRectangle(std::size_t index) const;
+    SDL_FRect GetShopCloseButtonRectangle() const;
+    void DrawShopPanel();
     void DrawDialoguePanel();
     void DrawNPCs(
         const std::vector<std::unique_ptr<Entity>> &entities);
@@ -262,6 +272,9 @@ private:
     bool stationMenuClosePending;
     DialoguePresentationState dialoguePresentationState;
     std::optional<ServerCommandData> pendingDialogueCommand;
+    ShopPresentationState shopPresentationState;
+    std::optional<ServerCommandData> pendingShopCommand;
 
     bool HandleDialogueClick(float mouseX, float mouseY);
+    bool HandleShopClick(float mouseX, float mouseY);
 };

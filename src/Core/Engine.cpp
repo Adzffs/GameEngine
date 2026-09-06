@@ -126,6 +126,7 @@ bool Engine::Run()
     while (running)
     {
         SynchronizeDialoguePresentation();
+        SynchronizeShopPresentation();
         graphics.ProcessEvents(running);
 
         if (!running)
@@ -134,6 +135,7 @@ bool Engine::Run()
         }
 
         EnqueuePendingDialogueCommand();
+        EnqueuePendingShopCommand();
 
         RecipeType requestedRecipe =
             RecipeType::NONE;
@@ -265,6 +267,7 @@ bool Engine::Run()
         }
 
         SynchronizeDialoguePresentation();
+        SynchronizeShopPresentation();
 
         Player *player =
             dynamic_cast<Player *>(
@@ -325,6 +328,33 @@ bool Engine::EnqueuePendingDialogueCommand()
     std::optional<ServerCommandData> command = graphics.ConsumeDialogueCommand();
     if (!command.has_value()) return false;
     world.EnqueueCommand(std::move(*command));
+    return true;
+}
+
+void Engine::SynchronizeShopPresentation()
+{
+    for (const auto &result : world.GetCommandProcessingResults()) {
+        if (pendingShopCommandID == 0 || result.commandID != pendingShopCommandID || result.actorEntityID != playerID) continue;
+        const bool close = pendingShopCommandType == PendingShopCommandType::CLOSE;
+        graphics.ReconcileShopCommandResult(result.resultCode, close);
+        pendingShopCommandID = 0;
+        pendingShopCommandType = PendingShopCommandType::NONE;
+    }
+    graphics.SynchronizeShop(playerID, world.GetShopOpenedEvents(), world.GetActiveShopSession(playerID));
+}
+
+bool Engine::EnqueuePendingShopCommand()
+{
+    std::optional<ServerCommandData> command = graphics.ConsumeShopCommand();
+    if (!command) return false;
+    pendingShopCommandType = std::visit([](const auto &data) {
+        using T = std::decay_t<decltype(data)>;
+        if constexpr (std::is_same_v<T, ShopBuyCommand>) return PendingShopCommandType::BUY;
+        if constexpr (std::is_same_v<T, ShopSellCommand>) return PendingShopCommandType::SELL;
+        if constexpr (std::is_same_v<T, ShopCloseCommand>) return PendingShopCommandType::CLOSE;
+        return PendingShopCommandType::NONE;
+    }, *command);
+    pendingShopCommandID = world.EnqueueCommand(std::move(*command));
     return true;
 }
 

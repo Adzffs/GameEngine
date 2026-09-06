@@ -5,6 +5,7 @@
 #include "../Entity/Monster/Monster.h"
 #include "../NPC/NPC.h"
 #include "../NPC/NpcDefinitionDatabase.h"
+#include "../Item/ItemDatabase.h"
 #include "../Combat/Combatant.h"
 #include "../World/Object/Resource/ResourceDatabase.h"
 #include "../World/Object/Resource/DepletedVisualType.h"
@@ -68,7 +69,8 @@ Graphics::Graphics()
       stationMenuOpen(false),
       openStationType(StationType::NONE),
       stationMenuClosePending(false),
-      pendingDialogueCommand(std::nullopt)
+      pendingDialogueCommand(std::nullopt),
+      pendingShopCommand(std::nullopt)
 {
 }
 
@@ -657,6 +659,12 @@ void Graphics::ProcessEvents(bool &running)
             float mouseX = event.button.x;
             float mouseY = event.button.y;
 
+            if (shopPresentationState.IsOpen())
+            {
+                HandleShopClick(mouseX, mouseY);
+                continue;
+            }
+
             if (dialoguePresentationState.IsOpen())
             {
                 HandleDialogueClick(mouseX, mouseY);
@@ -726,6 +734,15 @@ void Graphics::SynchronizeDialogue(
     }
 }
 
+void Graphics::SynchronizeShop(int actor,const std::vector<ShopOpenedEvent>& events,const ActiveShopSession* active)
+{
+    const ShopSessionId old = shopPresentationState.GetEvent() ? shopPresentationState.GetEvent()->sessionId : InvalidShopSessionId;
+    shopPresentationState.Synchronize(actor, events, active);
+    if (shopPresentationState.IsOpen()) { dialoguePresentationState.Dismiss(); stationMenuOpen=false; openStationType=StationType::NONE; }
+    const auto* current=shopPresentationState.GetEvent();
+    if(pendingShopCommand && (!current || current->sessionId!=old)) pendingShopCommand.reset();
+}
+
 std::optional<ServerCommandData> Graphics::ConsumeDialogueCommand()
 {
     if (!pendingDialogueCommand.has_value()) return std::nullopt;
@@ -733,6 +750,9 @@ std::optional<ServerCommandData> Graphics::ConsumeDialogueCommand()
     pendingDialogueCommand.reset();
     return command;
 }
+
+std::optional<ServerCommandData> Graphics::ConsumeShopCommand(){ if(!pendingShopCommand)return std::nullopt; auto c=pendingShopCommand; pendingShopCommand.reset(); return c; }
+void Graphics::ReconcileShopCommandResult(CommandResultCode result, bool closeCommand){ if(result==CommandResultCode::ACCEPTED){shopPresentationState.ClearRejection();return;} shopPresentationState.ReconcileRejectedCommand(); if(closeCommand) shopPresentationState.Dismiss(); }
 
 SDL_FRect Graphics::GetDialogueCloseButtonRectangle() const
 {
@@ -754,6 +774,19 @@ SDL_FRect Graphics::GetDialogueChoiceButtonRectangle(
         38.0f};
 }
 
+SDL_FRect Graphics::GetDialogueTradeButtonRectangle() const { return SDL_FRect{640.0f,626.0f,190.0f,38.0f}; }
+SDL_FRect Graphics::GetShopRowRectangle(std::size_t i) const { return SDL_FRect{240.0f,500.0f+static_cast<float>(i)*42.0f,800.0f,36.0f}; }
+SDL_FRect Graphics::GetShopCloseButtonRectangle() const { return SDL_FRect{960.0f,462.0f,80.0f,30.0f}; }
+
+bool Graphics::HandleShopClick(float x,float y)
+{
+    if(!shopPresentationState.IsOpen()||pendingShopCommand)return true;
+    if(IsPointInsideRectangle(x,y,GetShopCloseButtonRectangle())) { pendingShopCommand=shopPresentationState.MakeClose(); return true; }
+    const auto* e=shopPresentationState.GetEvent();
+    for(std::size_t i=0;i<e->entries.size();++i){ auto r=GetShopRowRectangle(i); if(!IsPointInsideRectangle(x,y,r))continue; if(x<r.x+r.w/2) pendingShopCommand=shopPresentationState.MakeBuy(i); else pendingShopCommand=shopPresentationState.MakeSell(i); return true; }
+    return true;
+}
+
 bool Graphics::HandleDialogueClick(float mouseX, float mouseY)
 {
     if (!dialoguePresentationState.IsOpen()) return false;
@@ -770,6 +803,12 @@ bool Graphics::HandleDialogueClick(float mouseX, float mouseY)
         {
             pendingDialogueCommand = dialoguePresentationState.MakeCloseCommand();
         }
+        return true;
+    }
+
+    if (dialoguePresentationState.CanTrade() && IsPointInsideRectangle(mouseX, mouseY, GetDialogueTradeButtonRectangle()))
+    {
+        pendingDialogueCommand=dialoguePresentationState.MakeTradeCommand();
         return true;
     }
 
@@ -3205,6 +3244,18 @@ void Graphics::DrawDialoguePanel()
             renderer, button.x + 55.0f, button.y + 12.0f,
             event->isTerminal ? "CLOSE" : "CONTINUE");
     }
+    if (dialoguePresentationState.CanTrade()) {
+        const SDL_FRect b=GetDialogueTradeButtonRectangle(); SDL_SetRenderDrawColor(renderer,55,50,45,255); SDL_RenderFillRect(renderer,&b); SDL_SetRenderDrawColor(renderer,190,170,130,255); SDL_RenderRect(renderer,&b); SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,b.x+62,b.y+12,"TRADE");
+    }
+}
+
+void Graphics::DrawShopPanel()
+{
+    const auto* e=shopPresentationState.GetEvent(); if(!e)return;
+    const SDL_FRect panel{180,420,920,290}; SDL_SetRenderDrawColor(renderer,24,22,20,248); SDL_RenderFillRect(renderer,&panel); SDL_SetRenderDrawColor(renderer,205,180,120,255); SDL_RenderRect(renderer,&panel);
+    SDL_SetRenderDrawColor(renderer,255,244,210,255); SDL_RenderDebugText(renderer,210,440,e->shopName.c_str()); SDL_RenderDebugText(renderer,210,460,"Quantity: 1 (server validated)");
+    for(std::size_t i=0;i<e->entries.size();++i){ const auto&r=GetShopRowRectangle(i); SDL_SetRenderDrawColor(renderer,55,50,45,255); SDL_RenderFillRect(renderer,&r); SDL_SetRenderDrawColor(renderer,190,170,130,255); SDL_RenderRect(renderer,&r); const auto& row=e->entries[i]; std::string text=ItemDatabase::Get(row.itemType).GetName()+"  "; text += row.buyPrice ? ("BUY "+std::to_string(*row.buyPrice)) : "BUY -"; text += "   "; text += row.sellPrice ? ("SELL "+std::to_string(*row.sellPrice)) : "SELL -"; SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,r.x+12,r.y+11,text.c_str()); }
+    const auto b=GetShopCloseButtonRectangle(); SDL_SetRenderDrawColor(renderer,70,55,45,255); SDL_RenderFillRect(renderer,&b); SDL_SetRenderDrawColor(renderer,220,200,160,255); SDL_RenderRect(renderer,&b); SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,b.x+20,b.y+9,"CLOSE");
 }
 
 void Graphics::Render(
@@ -3278,7 +3329,7 @@ void Graphics::Render(
         activeAction);
 
     DrawStationMenu();
-    DrawDialoguePanel();
+    if (shopPresentationState.IsOpen()) DrawShopPanel(); else DrawDialoguePanel();
 
     SDL_RenderPresent(renderer);
 }

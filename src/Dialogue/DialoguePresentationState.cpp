@@ -1,12 +1,14 @@
 #include "DialoguePresentationState.h"
 
 #include "../NPC/NpcDefinitionDatabase.h"
+#include <algorithm>
 
 void DialoguePresentationState::Synchronize(
     int localActorEntityID,
     const std::vector<NpcTalkEvent> &publishedEvents,
     const ActiveDialogueSession *activeSession)
 {
+    activeAuthoritativeSession = false;
     const NpcTalkEvent *latest = nullptr;
     for (const NpcTalkEvent &publishedEvent : publishedEvents)
     {
@@ -40,6 +42,7 @@ void DialoguePresentationState::Synchronize(
             dismissedTerminalSessionId = InvalidDialogueSessionId;
         }
         event = *latest;
+        activeAuthoritativeSession = matchingSessionExists;
         const NpcDefinition *definition =
             NpcDefinitionDatabase::TryGet(latest->npcType);
         npcName = definition == nullptr ? "NPC" : definition->name;
@@ -105,6 +108,19 @@ DialoguePresentationState::MakeCloseCommand() const
     return DialogueCloseCommand{
         event->actorEntityID,
         event->sessionId};
+}
+
+bool DialoguePresentationState::CanTrade() const
+{
+    if (!event || event->isTerminal || !activeAuthoritativeSession) return false;
+    const NpcDefinition *definition = NpcDefinitionDatabase::TryGet(event->npcType);
+    return definition != nullptr && std::find(definition->interactions.begin(), definition->interactions.end(), NpcInteractionType::TRADE) != definition->interactions.end();
+}
+
+std::optional<ServerCommandData> DialoguePresentationState::MakeTradeCommand() const
+{
+    if (!CanTrade()) return std::nullopt;
+    return NpcInteractionCommand{event->actorEntityID, event->npcEntityID, NpcInteractionType::TRADE};
 }
 
 void DialoguePresentationState::DismissTerminal()

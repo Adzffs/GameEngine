@@ -27,10 +27,14 @@ public:
     std::optional<ServerCommandData> MakeChoiceCommand(
         std::size_t choiceIndex) const;
     std::optional<ServerCommandData> MakeCloseCommand() const;
+    std::optional<ServerCommandData> MakeTradeCommand() const;
+    bool CanTrade() const;
     void DismissTerminal();
+    void Dismiss() { event.reset(); npcName.clear(); }
 
 private:
     std::optional<NpcTalkEvent> event;
     std::string npcName;
     DialogueSessionId dismissedTerminalSessionId = InvalidDialogueSessionId;
+    bool activeAuthoritativeSession = false;
 };
