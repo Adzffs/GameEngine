@@ -40,4 +40,6 @@ private:
     bool InitializeWorldForRun();
     bool FinalizeWorldAfterRun();
     void AddDevelopmentEquipment();
+    void SynchronizeDialoguePresentation();
+    bool EnqueuePendingDialogueCommand();
 };

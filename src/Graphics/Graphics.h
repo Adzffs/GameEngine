@@ -16,10 +16,15 @@
 #include "../Inventory/Inventory.h"
 #include "../Equipment/Equipment.h"
 #include "../Recipe/RecipeType.h"
+#include "../Command/ServerCommand.h"
+#include "../Dialogue/DialoguePresentationState.h"
 
 class Map;
 class Player;
 class Monster;
+class NPC;
+struct ActiveDialogueSession;
+struct GraphicsTestAccess;
 
 class Graphics
 {
@@ -42,6 +47,15 @@ public:
     bool ConsumeRecipeRequest(
         RecipeType &recipeType);
     bool ConsumeStationMenuClose();
+    std::optional<ServerCommandData> ConsumeDialogueCommand();
+    void SynchronizeDialogue(
+        int localActorEntityID,
+        const std::vector<NpcTalkEvent> &publishedEvents,
+        const ActiveDialogueSession *activeSession);
+    const DialoguePresentationState &GetDialoguePresentationState() const
+    {
+        return dialoguePresentationState;
+    }
 
     void OpenStationMenu(
         StationType stationType);
@@ -150,6 +164,20 @@ public:
         const std::vector<std::unique_ptr<Entity>> &entities,
         int cameraTileX = 0,
         int cameraTileY = 0) const;
+    std::optional<int> GetFriendlyNpcAtScreenPosition(
+        int mouseX,
+        int mouseY,
+        const std::vector<std::unique_ptr<Entity>> &entities,
+        int cameraTileX = 0,
+        int cameraTileY = 0) const;
+    SDL_FRect GetFriendlyNpcScreenRectangle(
+        const NPC &npc,
+        int cameraTileX = 0,
+        int cameraTileY = 0) const;
+    SDL_FRect GetDialogueCloseButtonRectangle() const;
+    SDL_FRect GetDialogueContinueButtonRectangle() const;
+    SDL_FRect GetDialogueChoiceButtonRectangle(std::size_t choiceIndex) const;
+    void DrawDialoguePanel();
     void DrawNPCs(
         const std::vector<std::unique_ptr<Entity>> &entities);
     void DrawMonsters(
@@ -220,6 +248,8 @@ public:
     SidePanelTab selectedTab;
 
 private:
+    friend struct GraphicsTestAccess;
+
     bool inventorySlotClickPending;
     int clickedInventorySlotIndex;
 
@@ -230,4 +260,8 @@ private:
     bool stationMenuOpen;
     StationType openStationType;
     bool stationMenuClosePending;
+    DialoguePresentationState dialoguePresentationState;
+    std::optional<ServerCommandData> pendingDialogueCommand;
+
+    bool HandleDialogueClick(float mouseX, float mouseY);
 };

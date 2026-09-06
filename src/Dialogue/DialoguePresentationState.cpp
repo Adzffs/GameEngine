@@ -1,0 +1,118 @@
+#include "DialoguePresentationState.h"
+
+#include "../NPC/NpcDefinitionDatabase.h"
+
+void DialoguePresentationState::Synchronize(
+    int localActorEntityID,
+    const std::vector<NpcTalkEvent> &publishedEvents,
+    const ActiveDialogueSession *activeSession)
+{
+    const NpcTalkEvent *latest = nullptr;
+    for (const NpcTalkEvent &publishedEvent : publishedEvents)
+    {
+        if (publishedEvent.actorEntityID == localActorEntityID)
+        {
+            latest = &publishedEvent;
+        }
+    }
+
+    if (latest != nullptr)
+    {
+        if (latest->isTerminal &&
+            latest->sessionId == dismissedTerminalSessionId)
+        {
+            return;
+        }
+
+        const bool matchingSessionExists =
+            activeSession != nullptr &&
+            activeSession->actorEntityID == localActorEntityID &&
+            activeSession->sessionId == latest->sessionId;
+        if (!latest->isTerminal && !matchingSessionExists)
+        {
+            event.reset();
+            npcName.clear();
+            return;
+        }
+
+        if (latest->sessionId != dismissedTerminalSessionId)
+        {
+            dismissedTerminalSessionId = InvalidDialogueSessionId;
+        }
+        event = *latest;
+        const NpcDefinition *definition =
+            NpcDefinitionDatabase::TryGet(latest->npcType);
+        npcName = definition == nullptr ? "NPC" : definition->name;
+        return;
+    }
+
+    if (!event.has_value()) return;
+
+    const bool matchingSessionExists =
+        activeSession != nullptr &&
+        activeSession->actorEntityID == localActorEntityID &&
+        activeSession->sessionId == event->sessionId;
+
+    // World publishes the terminal node and closes its session in the same
+    // tick. Keep that final server-authored snapshot until the player dismisses
+    // it; every non-terminal view follows the authoritative session lifetime.
+    if (!matchingSessionExists && !event->isTerminal)
+    {
+        event.reset();
+        npcName.clear();
+    }
+}
+
+std::optional<ServerCommandData>
+DialoguePresentationState::MakeContinueCommand() const
+{
+    if (!event.has_value() ||
+        event->nodeKind != DialogueNodeKind::CONTINUE ||
+        event->sessionId == InvalidDialogueSessionId)
+    {
+        return std::nullopt;
+    }
+    return DialogueContinueCommand{
+        event->actorEntityID,
+        event->sessionId};
+}
+
+std::optional<ServerCommandData>
+DialoguePresentationState::MakeChoiceCommand(
+    std::size_t choiceIndex) const
+{
+    if (!event.has_value() ||
+        event->nodeKind != DialogueNodeKind::CHOICE ||
+        choiceIndex >= event->choices.size() ||
+        event->sessionId == InvalidDialogueSessionId)
+    {
+        return std::nullopt;
+    }
+    return DialogueChooseCommand{
+        event->actorEntityID,
+        event->sessionId,
+        event->choices[choiceIndex].id};
+}
+
+std::optional<ServerCommandData>
+DialoguePresentationState::MakeCloseCommand() const
+{
+    if (!event.has_value() ||
+        event->sessionId == InvalidDialogueSessionId)
+    {
+        return std::nullopt;
+    }
+    return DialogueCloseCommand{
+        event->actorEntityID,
+        event->sessionId};
+}
+
+void DialoguePresentationState::DismissTerminal()
+{
+    if (event.has_value() && event->isTerminal)
+    {
+        dismissedTerminalSessionId = event->sessionId;
+        event.reset();
+        npcName.clear();
+    }
+}

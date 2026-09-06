@@ -28,6 +28,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(GAMEENGINE_CORE_SOURCES
     src/Dialogue/DialogueDefinitionDatabase.cpp
     src/Dialogue/DialogueSystem.cpp
+    src/Dialogue/DialoguePresentationState.cpp
     src/Shop/ShopDefinitionDatabase.cpp
     src/Shop/ShopSystem.cpp
     src/AI/MonsterAISystem.cpp
@@ -217,6 +218,8 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(DialogueDefinitionTests tests/DialogueDefinitionTests.cpp)
     add_gameengine_headless_test(DialogueSystemTests tests/DialogueSystemTests.cpp)
     add_gameengine_headless_test(DialogueChoiceTests tests/DialogueChoiceTests.cpp)
+    add_gameengine_headless_test(DialoguePresentationStateTests tests/DialoguePresentationStateTests.cpp)
+    add_gameengine_headless_test(EngineWorldClickDecisionTests tests/EngineWorldClickDecisionTests.cpp)
     add_gameengine_headless_test(ShopDefinitionTests tests/ShopDefinitionTests.cpp)
     add_gameengine_headless_test(ShopSystemTests tests/ShopSystemTests.cpp)
     add_gameengine_headless_test(ShopInteractionTests tests/ShopInteractionTests.cpp)
@@ -226,5 +229,15 @@ if(BUILD_TESTING)
         add_gameengine_graphics_test(MeleeClickIntegrationTests tests/MeleeClickIntegrationTests.cpp)
         add_gameengine_graphics_test(CombatFeedbackTests tests/CombatFeedbackTests.cpp)
         add_gameengine_graphics_test(MonsterRetaliationTests tests/MonsterRetaliationTests.cpp)
+
+        add_executable(ClientDialogueIntegrationTests
+            tests/ClientDialogueIntegrationTests.cpp
+            src/Core/Engine.cpp
+            src/Input/InputManager.cpp
+            src/Graphics/Graphics.cpp
+        )
+        target_link_libraries(ClientDialogueIntegrationTests PRIVATE GameEngineCore SDL3::SDL3)
+        add_test(NAME ClientDialogueIntegrationTests COMMAND ClientDialogueIntegrationTests)
+        set_tests_properties(ClientDialogueIntegrationTests PROPERTIES LABELS "client")
     endif()
 endif()

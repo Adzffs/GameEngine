@@ -3,6 +3,8 @@
 #include "../World/Map.h"
 #include "../Player/Player.h"
 #include "../Entity/Monster/Monster.h"
+#include "../NPC/NPC.h"
+#include "../NPC/NpcDefinitionDatabase.h"
 #include "../Combat/Combatant.h"
 #include "../World/Object/Resource/ResourceDatabase.h"
 #include "../World/Object/Resource/DepletedVisualType.h"
@@ -65,7 +67,8 @@ Graphics::Graphics()
       requestedRecipeType(RecipeType::NONE),
       stationMenuOpen(false),
       openStationType(StationType::NONE),
-      stationMenuClosePending(false)
+      stationMenuClosePending(false),
+      pendingDialogueCommand(std::nullopt)
 {
 }
 
@@ -654,6 +657,12 @@ void Graphics::ProcessEvents(bool &running)
             float mouseX = event.button.x;
             float mouseY = event.button.y;
 
+            if (dialoguePresentationState.IsOpen())
+            {
+                HandleDialogueClick(mouseX, mouseY);
+                continue;
+            }
+
             if (HandleSidePanelClick(
                     mouseX,
                     mouseY))
@@ -686,6 +695,118 @@ void Graphics::ProcessEvents(bool &running)
             clickPending = true;
         }
     }
+}
+
+void Graphics::SynchronizeDialogue(
+    int localActorEntityID,
+    const std::vector<NpcTalkEvent> &publishedEvents,
+    const ActiveDialogueSession *activeSession)
+{
+    const DialogueSessionId previousSession =
+        dialoguePresentationState.GetEvent() == nullptr
+            ? InvalidDialogueSessionId
+            : dialoguePresentationState.GetEvent()->sessionId;
+
+    dialoguePresentationState.Synchronize(
+        localActorEntityID,
+        publishedEvents,
+        activeSession);
+
+    const NpcTalkEvent *current = dialoguePresentationState.GetEvent();
+    if (current != nullptr)
+    {
+        stationMenuOpen = false;
+        openStationType = StationType::NONE;
+    }
+
+    if (pendingDialogueCommand.has_value() &&
+        (current == nullptr || current->sessionId != previousSession))
+    {
+        pendingDialogueCommand.reset();
+    }
+}
+
+std::optional<ServerCommandData> Graphics::ConsumeDialogueCommand()
+{
+    if (!pendingDialogueCommand.has_value()) return std::nullopt;
+    std::optional<ServerCommandData> command = pendingDialogueCommand;
+    pendingDialogueCommand.reset();
+    return command;
+}
+
+SDL_FRect Graphics::GetDialogueCloseButtonRectangle() const
+{
+    return SDL_FRect{960.0f, 462.0f, 80.0f, 30.0f};
+}
+
+SDL_FRect Graphics::GetDialogueContinueButtonRectangle() const
+{
+    return SDL_FRect{850.0f, 626.0f, 190.0f, 38.0f};
+}
+
+SDL_FRect Graphics::GetDialogueChoiceButtonRectangle(
+    std::size_t choiceIndex) const
+{
+    return SDL_FRect{
+        240.0f,
+        558.0f + static_cast<float>(choiceIndex) * 44.0f,
+        800.0f,
+        38.0f};
+}
+
+bool Graphics::HandleDialogueClick(float mouseX, float mouseY)
+{
+    if (!dialoguePresentationState.IsOpen()) return false;
+    if (pendingDialogueCommand.has_value()) return true;
+
+    if (IsPointInsideRectangle(
+            mouseX, mouseY, GetDialogueCloseButtonRectangle()))
+    {
+        if (dialoguePresentationState.GetEvent()->isTerminal)
+        {
+            dialoguePresentationState.DismissTerminal();
+        }
+        else
+        {
+            pendingDialogueCommand = dialoguePresentationState.MakeCloseCommand();
+        }
+        return true;
+    }
+
+    const NpcTalkEvent *event = dialoguePresentationState.GetEvent();
+    if (event->nodeKind == DialogueNodeKind::CONTINUE &&
+        IsPointInsideRectangle(
+            mouseX, mouseY, GetDialogueContinueButtonRectangle()))
+    {
+        pendingDialogueCommand =
+            dialoguePresentationState.MakeContinueCommand();
+        return true;
+    }
+
+    if (event->isTerminal &&
+        IsPointInsideRectangle(
+            mouseX, mouseY, GetDialogueContinueButtonRectangle()))
+    {
+        dialoguePresentationState.DismissTerminal();
+        return true;
+    }
+
+    if (event->nodeKind == DialogueNodeKind::CHOICE)
+    {
+        for (std::size_t index = 0; index < event->choices.size(); ++index)
+        {
+            if (IsPointInsideRectangle(
+                    mouseX, mouseY,
+                    GetDialogueChoiceButtonRectangle(index)))
+            {
+                pendingDialogueCommand =
+                    dialoguePresentationState.MakeChoiceCommand(index);
+                return true;
+            }
+        }
+    }
+
+    return true;
 }
 
 float Graphics::CalculateHealthRatio(
@@ -1136,6 +1257,52 @@ std::optional<int> Graphics::GetMonsterAtScreenPosition(
 
     return std::nullopt;
 }
+
+SDL_FRect Graphics::GetFriendlyNpcScreenRectangle(
+    const NPC &npc,
+    int cameraTileX,
+    int cameraTileY) const
+{
+    return MakeEntityTileRectangle(
+        npc.GetPosition().GetX(),
+        npc.GetPosition().GetY(),
+        5.0f,
+        cameraTileX,
+        cameraTileY);
+}
+
+std::optional<int> Graphics::GetFriendlyNpcAtScreenPosition(
+    int mouseX,
+    int mouseY,
+    const std::vector<std::unique_ptr<Entity>> &entities,
+    int cameraTileX,
+    int cameraTileY) const
+{
+    for (const auto &entity : entities)
+    {
+        NPC *npc = dynamic_cast<NPC *>(entity.get());
+        const NpcDefinition *definition = npc == nullptr
+            ? nullptr
+            : NpcDefinitionDatabase::TryGet(npc->GetNpcType());
+        if (npc == nullptr || definition == nullptr ||
+            definition->kind != NpcKind::FRIENDLY)
+        {
+            continue;
+        }
+
+        const SDL_FRect rectangle = GetFriendlyNpcScreenRectangle(
+            *npc, cameraTileX, cameraTileY);
+        if (IsPointInsideRectangle(
+                static_cast<float>(mouseX),
+                static_cast<float>(mouseY),
+                rectangle))
+        {
+            return npc->GetID();
+        }
+    }
+    return std::nullopt;
+}
+
 void Graphics::DrawNPCs(
     const std::vector<std::unique_ptr<Entity>> &entities)
 {
@@ -2979,6 +3146,67 @@ bool Graphics::ConsumeWeaponSlotClick()
     return true;
 }
 
+void Graphics::DrawDialoguePanel()
+{
+    const NpcTalkEvent *event = dialoguePresentationState.GetEvent();
+    if (event == nullptr) return;
+
+    const SDL_FRect panel{220.0f, 450.0f, 840.0f, 230.0f};
+    SDL_SetRenderDrawColor(renderer, 24, 22, 20, 248);
+    SDL_RenderFillRect(renderer, &panel);
+    SDL_SetRenderDrawColor(renderer, 205, 180, 120, 255);
+    SDL_RenderRect(renderer, &panel);
+
+    const SDL_FRect closeButton = GetDialogueCloseButtonRectangle();
+    SDL_SetRenderDrawColor(renderer, 70, 55, 45, 255);
+    SDL_RenderFillRect(renderer, &closeButton);
+    SDL_SetRenderDrawColor(renderer, 220, 200, 160, 255);
+    SDL_RenderRect(renderer, &closeButton);
+
+    SDL_SetRenderDrawColor(renderer, 255, 244, 210, 255);
+    SDL_RenderDebugText(renderer, 240.0f, 468.0f,
+                        dialoguePresentationState.GetNpcName().c_str());
+    SDL_RenderDebugText(renderer, closeButton.x + 20.0f,
+                        closeButton.y + 9.0f, "CLOSE");
+
+    std::string firstLine = event->text.substr(0, 92);
+    SDL_RenderDebugText(renderer, 240.0f, 510.0f, firstLine.c_str());
+    if (event->text.size() > firstLine.size())
+    {
+        std::string secondLine = event->text.substr(firstLine.size(), 92);
+        SDL_RenderDebugText(renderer, 240.0f, 528.0f, secondLine.c_str());
+    }
+
+    if (event->nodeKind == DialogueNodeKind::CHOICE)
+    {
+        for (std::size_t index = 0; index < event->choices.size(); ++index)
+        {
+            const SDL_FRect button = GetDialogueChoiceButtonRectangle(index);
+            SDL_SetRenderDrawColor(renderer, 55, 50, 45, 255);
+            SDL_RenderFillRect(renderer, &button);
+            SDL_SetRenderDrawColor(renderer, 190, 170, 130, 255);
+            SDL_RenderRect(renderer, &button);
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            const std::string label = std::to_string(index + 1) + ". " +
+                                      event->choices[index].text;
+            SDL_RenderDebugText(renderer, button.x + 12.0f,
+                                button.y + 12.0f, label.c_str());
+        }
+    }
+    else
+    {
+        const SDL_FRect button = GetDialogueContinueButtonRectangle();
+        SDL_SetRenderDrawColor(renderer, 55, 50, 45, 255);
+        SDL_RenderFillRect(renderer, &button);
+        SDL_SetRenderDrawColor(renderer, 190, 170, 130, 255);
+        SDL_RenderRect(renderer, &button);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderDebugText(
+            renderer, button.x + 55.0f, button.y + 12.0f,
+            event->isTerminal ? "CLOSE" : "CONTINUE");
+    }
+}
+
 void Graphics::Render(
     Map &map,
     const std::vector<std::unique_ptr<Entity>> &entities,
@@ -3050,6 +3278,7 @@ void Graphics::Render(
         activeAction);
 
     DrawStationMenu();
+    DrawDialoguePanel();
 
     SDL_RenderPresent(renderer);
 }

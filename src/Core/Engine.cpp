@@ -125,12 +125,15 @@ bool Engine::Run()
 
     while (running)
     {
+        SynchronizeDialoguePresentation();
         graphics.ProcessEvents(running);
 
         if (!running)
         {
             break;
         }
+
+        EnqueuePendingDialogueCommand();
 
         RecipeType requestedRecipe =
             RecipeType::NONE;
@@ -261,6 +264,8 @@ bool Engine::Run()
             }
         }
 
+        SynchronizeDialoguePresentation();
+
         Player *player =
             dynamic_cast<Player *>(
                 world.GetEntityByID(playerID));
@@ -305,6 +310,22 @@ bool Engine::Run()
     const bool finalized = FinalizeWorldAfterRun();
     Logger::Info("Server stopped");
     return finalized;
+}
+
+void Engine::SynchronizeDialoguePresentation()
+{
+    graphics.SynchronizeDialogue(
+        playerID,
+        world.GetNpcTalkEvents(),
+        world.GetActiveDialogueSession(playerID));
+}
+
+bool Engine::EnqueuePendingDialogueCommand()
+{
+    std::optional<ServerCommandData> command = graphics.ConsumeDialogueCommand();
+    if (!command.has_value()) return false;
+    world.EnqueueCommand(std::move(*command));
+    return true;
 }
 
 bool Engine::FinalizeWorldAfterRun()
