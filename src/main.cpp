@@ -1,4 +1,5 @@
-#include <iostream>
+#include <cstdlib>
+#include <filesystem>
 #include "Core/Engine.h"
 #include "Core/ContentStartupValidation.h"
 
@@ -6,12 +7,15 @@ int main()
 {
     if (!ContentStartupValidation::ValidateAndLog())
     {
-        return 1;
+        return EXIT_FAILURE;
     }
 
-    Engine engine;
+    // Development application policy. World remains unaware of this path.
+    // Command-line and production path configuration are future work.
+    EngineConfiguration configuration;
+    configuration.developmentPlayerSavePath =
+        std::filesystem::path{"saves"} / "development-player.save";
+    Engine engine(configuration);
 
-    engine.Run();
-
-    return 0;
+    return engine.Run() ? EXIT_SUCCESS : EXIT_FAILURE;
 }

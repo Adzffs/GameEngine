@@ -1,5 +1,7 @@
 #include "Engine.h"
 #include <chrono>
+#include <memory>
+#include <string>
 #include <thread>
 #include "Core/Logger.h"
 #include "../Command/ServerCommand.h"
@@ -34,15 +36,62 @@ namespace
 }
 
 Engine::Engine()
+    : Engine(EngineConfiguration{})
+{
+}
+
+Engine::Engine(EngineConfiguration configuration)
     : playerID(-1)
 {
-    if (!graphics.Initialize())
+    if (configuration.developmentPlayerSavePath.has_value())
     {
-        running = false;
-        return;
+        playerPersistenceLifecycle =
+            std::make_unique<WorldPlayerPersistenceLifecycle>(
+                *configuration.developmentPlayerSavePath);
     }
 
-    playerID = world.CreatePlayer();
+}
+
+bool Engine::InitializeWorldForRun()
+{
+    if (initializationSucceeded) return true;
+
+    bool createdNew = true;
+    if (playerPersistenceLifecycle != nullptr)
+    {
+        WorldPlayerPersistenceStartupResult result =
+            playerPersistenceLifecycle->Start(world);
+        if (!result.IsSuccess())
+        {
+            Logger::Error(
+                "Development Player persistence startup failed"
+                " | path=" + playerPersistenceLifecycle->GetSavePath().string() +
+                " | lifecycleIssues=" + std::to_string(result.GetIssues().size()) +
+                " | worldIssues=" +
+                std::to_string(result.GetWorldLoadResult().GetIssues().size()));
+            return false;
+        }
+        playerID = result.GetPlayerEntityID();
+        createdNew = result.WasCreatedNew();
+        Logger::Info(
+            std::string("Development Player persistence startup ") +
+            (result.WasLoadedFromFile() ? "loaded existing Player" : "created new Player") +
+            " | runtimePlayerID=" + std::to_string(playerID) +
+            " | path=" + playerPersistenceLifecycle->GetSavePath().string());
+    }
+    else
+    {
+        playerID = world.CreatePlayer();
+    }
+
+    if (playerID <= 0) return false;
+    if (createdNew) AddDevelopmentEquipment();
+    initializationSucceeded = true;
+    return true;
+}
+
+void Engine::AddDevelopmentEquipment()
+{
 
     Player *player =
         dynamic_cast<Player *>(
@@ -67,8 +116,11 @@ Engine::Engine()
     }
 }
 
-void Engine::Run()
+bool Engine::Run()
 {
+    if (!graphics.Initialize()) return false;
+    if (!InitializeWorldForRun()) return false;
+
     Logger::Info("Server Started");
 
     while (running)
@@ -249,7 +301,39 @@ void Engine::Run()
                     playerID));
         }
     }
+
+    const bool finalized = FinalizeWorldAfterRun();
     Logger::Info("Server stopped");
+    return finalized;
+}
+
+bool Engine::FinalizeWorldAfterRun()
+{
+    if (!initializationSucceeded) return true;
+    if (playerPersistenceLifecycle != nullptr)
+    {
+        WorldPlayerPersistenceOperationResult result =
+            playerPersistenceLifecycle->Shutdown(world);
+        if (!result.IsSuccess())
+        {
+            Logger::Error(
+                "Development Player persistence shutdown failed"
+                " | runtimePlayerID=" + std::to_string(result.GetPlayerEntityID()) +
+                " | path=" + playerPersistenceLifecycle->GetSavePath().string() +
+                " | lifecycleIssues=" + std::to_string(result.GetIssues().size()) +
+                " | worldIssues=" +
+                std::to_string(result.GetWorldSaveResult().GetIssues().size()));
+            return false;
+        }
+        if (result.DidSave())
+        {
+            Logger::Info(
+                "Development Player persistence shutdown saved Player"
+                " | runtimePlayerID=" + std::to_string(result.GetPlayerEntityID()) +
+                " | path=" + playerPersistenceLifecycle->GetSavePath().string());
+        }
+    }
+    return true;
 }
 
 void Engine::Update()

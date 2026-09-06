@@ -5,14 +5,23 @@
 #include "../World/World.h"
 #include "../Input/InputManager.h"
 #include "../Graphics/Graphics.h"
+#include "EngineConfiguration.h"
+#include "../Persistence/WorldPlayerPersistenceLifecycle.h"
+
+#include <memory>
+
+struct EngineTestAccess;
 
 class Engine
 {
 public:
     Engine();
-    void Run();
+    explicit Engine(EngineConfiguration configuration);
+    bool Run();
 
 private:
+    friend struct EngineTestAccess;
+
     bool running = true;
 
     Clock clock;
@@ -22,8 +31,13 @@ private:
     TickPerformanceStats tickPerformanceStats;
 
     int playerID = -1;
+    bool initializationSucceeded = false;
+    std::unique_ptr<WorldPlayerPersistenceLifecycle> playerPersistenceLifecycle;
 
     static constexpr int MaxCatchUpTicks = 3;
 
     void Update();
+    bool InitializeWorldForRun();
+    bool FinalizeWorldAfterRun();
+    void AddDevelopmentEquipment();
 };
