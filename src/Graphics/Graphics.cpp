@@ -3258,6 +3258,7 @@ void Graphics::DrawShopPanel()
     const auto* e=shopPresentationState.GetEvent(); if(!e)return;
     const SDL_FRect panel{180,420,920,290}; SDL_SetRenderDrawColor(renderer,24,22,20,248); SDL_RenderFillRect(renderer,&panel); SDL_SetRenderDrawColor(renderer,205,180,120,255); SDL_RenderRect(renderer,&panel);
     SDL_SetRenderDrawColor(renderer,255,244,210,255); SDL_RenderDebugText(renderer,210,440,e->shopName.c_str()); SDL_RenderDebugText(renderer,210,460,"Quantity: 1 (server validated)");
+    if (shopPresentationState.HasRejection()) SDL_RenderDebugText(renderer,210,480,"Transaction rejected by server");
     for(std::size_t i=0;i<e->entries.size();++i){ const auto&r=GetShopRowRectangle(i); SDL_SetRenderDrawColor(renderer,55,50,45,255); SDL_RenderFillRect(renderer,&r); SDL_SetRenderDrawColor(renderer,190,170,130,255); SDL_RenderRect(renderer,&r); const auto& row=e->entries[i]; std::string text=ItemDatabase::Get(row.itemType).GetName()+"  "; text += row.buyPrice ? ("BUY "+std::to_string(*row.buyPrice)) : "BUY -"; text += "   "; text += row.sellPrice ? ("SELL "+std::to_string(*row.sellPrice)) : "SELL -"; SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,r.x+12,r.y+11,text.c_str()); }
     const auto b=GetShopCloseButtonRectangle(); SDL_SetRenderDrawColor(renderer,70,55,45,255); SDL_RenderFillRect(renderer,&b); SDL_SetRenderDrawColor(renderer,220,200,160,255); SDL_RenderRect(renderer,&b); SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,b.x+20,b.y+9,"CLOSE");
 }
