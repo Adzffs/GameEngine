@@ -774,7 +774,11 @@ SDL_FRect Graphics::GetDialogueChoiceButtonRectangle(
         38.0f};
 }
 
-SDL_FRect Graphics::GetDialogueTradeButtonRectangle() const { return SDL_FRect{640.0f,626.0f,190.0f,38.0f}; }
+SDL_FRect Graphics::GetDialogueTradeButtonRectangle() const {
+    const auto *event = dialoguePresentationState.GetEvent();
+    const std::size_t index = event == nullptr ? 0 : event->choices.size();
+    return GetDialogueChoiceButtonRectangle(index);
+}
 SDL_FRect Graphics::GetShopRowRectangle(std::size_t i) const { return SDL_FRect{240.0f,500.0f+static_cast<float>(i)*42.0f,800.0f,36.0f}; }
 SDL_FRect Graphics::GetShopCloseButtonRectangle() const { return SDL_FRect{960.0f,462.0f,80.0f,30.0f}; }
 
@@ -806,13 +810,13 @@ bool Graphics::HandleDialogueClick(float mouseX, float mouseY)
         return true;
     }
 
+    const NpcTalkEvent *event = dialoguePresentationState.GetEvent();
     if (dialoguePresentationState.CanTrade() && IsPointInsideRectangle(mouseX, mouseY, GetDialogueTradeButtonRectangle()))
     {
         pendingDialogueCommand=dialoguePresentationState.MakeTradeCommand();
         return true;
     }
 
-    const NpcTalkEvent *event = dialoguePresentationState.GetEvent();
     if (event->nodeKind == DialogueNodeKind::CONTINUE &&
         IsPointInsideRectangle(
             mouseX, mouseY, GetDialogueContinueButtonRectangle()))
@@ -3245,7 +3249,7 @@ void Graphics::DrawDialoguePanel()
             event->isTerminal ? "CLOSE" : "CONTINUE");
     }
     if (dialoguePresentationState.CanTrade()) {
-        const SDL_FRect b=GetDialogueTradeButtonRectangle(); SDL_SetRenderDrawColor(renderer,55,50,45,255); SDL_RenderFillRect(renderer,&b); SDL_SetRenderDrawColor(renderer,190,170,130,255); SDL_RenderRect(renderer,&b); SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,b.x+62,b.y+12,"TRADE");
+        const SDL_FRect b=GetDialogueTradeButtonRectangle(); SDL_SetRenderDrawColor(renderer,55,50,45,255); SDL_RenderFillRect(renderer,&b); SDL_SetRenderDrawColor(renderer,190,170,130,255); SDL_RenderRect(renderer,&b); SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,b.x+12,b.y+12,"Trade");
     }
 }
 
