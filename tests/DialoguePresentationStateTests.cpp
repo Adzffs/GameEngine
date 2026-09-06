@@ -56,6 +56,9 @@ int main()
                     state.GetNpcName() == "Development guide",
                 "Local event opens the presentation with NPC identity");
     test.Expect(state.CanTrade(), "Opening service node exposes Trade");
+    state.Synchronize(4, {}, &session);
+    test.Expect(state.IsOpen() && state.GetEvent()->text == "Published node" && state.CanTrade(),
+                "One-tick event buffer does not expire the dialogue presentation");
 
     NpcTalkEvent ordinary = MakeEvent(4, 42, DialogueNodeKind::CONTINUE);
     ordinary.nodeId = DialogueNodeId::DEVELOPMENT_GUIDE_EXPLANATION;

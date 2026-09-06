@@ -58,7 +58,12 @@ void DialoguePresentationState::Synchronize(
     const bool matchingSessionExists =
         activeSession != nullptr &&
         activeSession->actorEntityID == localActorEntityID &&
-        activeSession->sessionId == event->sessionId;
+        activeSession->sessionId == event->sessionId &&
+        activeSession->npcEntityID == event->npcEntityID &&
+        activeSession->npcType == event->npcType &&
+        activeSession->dialogueId == event->dialogueId &&
+        activeSession->currentNodeId == event->nodeId;
+    activeAuthoritativeSession = matchingSessionExists;
 
     // World publishes the terminal node and closes its session in the same
     // tick. Keep that final server-authored snapshot until the player dismisses
