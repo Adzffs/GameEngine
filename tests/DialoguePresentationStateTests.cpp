@@ -55,6 +55,20 @@ int main()
     test.Expect(state.IsOpen() && state.GetEvent()->sessionId == 42 &&
                     state.GetNpcName() == "Development guide",
                 "Local event opens the presentation with NPC identity");
+    test.Expect(state.CanTrade(), "Opening service node exposes Trade");
+
+    NpcTalkEvent ordinary = MakeEvent(4, 42, DialogueNodeKind::CONTINUE);
+    ordinary.nodeId = DialogueNodeId::DEVELOPMENT_GUIDE_EXPLANATION;
+    state.Synchronize(4, {ordinary}, &session);
+    test.Expect(!state.CanTrade(), "Ordinary dialogue node hides Trade");
+    NpcTalkEvent nonShop = ordinary;
+    nonShop.nodeId = DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME;
+    nonShop.npcType = NpcType::PASSIVE_DEVELOPMENT_MONSTER;
+    state.Synchronize(4, {nonShop}, &session);
+    test.Expect(!state.CanTrade(), "Non-shop NPC hides Trade");
+    NpcTalkEvent stale = MakeEvent(4, 99, DialogueNodeKind::CONTINUE);
+    state.Synchronize(4, {stale}, &session);
+    test.Expect(!state.CanTrade(), "Stale event cannot expose Trade");
 
     auto continued = state.MakeContinueCommand();
     const auto *continueCommand = continued.has_value()
