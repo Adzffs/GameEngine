@@ -29,7 +29,11 @@ void DialoguePresentationState::Synchronize(
         const bool matchingSessionExists =
             activeSession != nullptr &&
             activeSession->actorEntityID == localActorEntityID &&
-            activeSession->sessionId == latest->sessionId;
+            activeSession->sessionId == latest->sessionId &&
+            activeSession->npcEntityID == latest->npcEntityID &&
+            activeSession->npcType == latest->npcType &&
+            activeSession->dialogueId == latest->dialogueId &&
+            activeSession->currentNodeId == latest->nodeId;
         if (!latest->isTerminal && !matchingSessionExists)
         {
             event.reset();
