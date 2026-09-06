@@ -9,7 +9,7 @@ namespace
         "Development supplies",
         ItemType::COINS,
         {
-            {ItemType::LOG, std::nullopt, 1},
+            {ItemType::LOG, 1, 1},
             {ItemType::COPPER_ORE, std::nullopt, 2},
             {ItemType::TIN_ORE, std::nullopt, 2},
             {ItemType::COAL, std::nullopt, 4},
