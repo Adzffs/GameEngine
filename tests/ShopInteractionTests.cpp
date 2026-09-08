@@ -64,8 +64,10 @@ int main()
         ItemType::LOG, 1});
     world.Update();
     test.ExpectEqual(player->GetInventory().GetItemAmount(ItemType::COINS),
-                     before.GetItemAmount(ItemType::COINS),
-                     "Unsupported buy changes nothing");
+                     before.GetItemAmount(ItemType::COINS) - 1,
+                     "Authored one-Coin Log buy removes exact currency");
+    test.ExpectEqual(player->GetInventory().GetItemAmount(ItemType::LOG), 1,
+                     "Authored Log buy grants one Log");
     test.Expect(world.GetActiveShopSession(player->GetID()) != nullptr,
                 "Malformed transaction preserves valid session");
     world.EnqueueCommand(ShopCloseCommand{player->GetID(), opened.sessionId});

@@ -257,7 +257,8 @@ int main()
     }
 
     PlayerSaveData valid = MakeValidEmptySave();
-    test.ExpectEqual(valid.version, 1, "Capture writes exact version one");
+    test.ExpectEqual(valid.version, CURRENT_PLAYER_SAVE_VERSION,
+                     "Capture writes canonical current version two");
     test.ExpectEqual(static_cast<int>(valid.inventorySlots.size()), 28,
                      "Capture stores all 28 inventory slots");
     test.ExpectEqual(static_cast<int>(valid.skills.size()), 5,
@@ -358,7 +359,7 @@ int main()
         }
     }
 
-    for (int version : {0, -1, 2})
+    for (int version : {0, -1, 3})
     {
         PlayerSaveData malformed = valid;
         malformed.version = version;
@@ -380,7 +381,7 @@ int main()
         test.ExpectEqual(deadSave.currentHealth, 0,
                          "Capture mechanically records dead Player health zero");
         ExpectRejected(test, deadSave, PlayerSaveValidationCode::INVALID_CURRENT_HEALTH,
-                       "Captured dead Player cannot be restored in version 1");
+                       "Captured dead Player cannot be restored");
     }
 
     for (int health : {1, 100, 101, INT_MAX})

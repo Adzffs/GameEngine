@@ -11,6 +11,7 @@
 #include "../Stats/StatType.h"
 #include "../StatusEffect/StatusEffectManager.h"
 #include "PlayerInitializationMode.h"
+#include "../Quest/QuestJournal.h"
 
 class World;
 
@@ -32,6 +33,8 @@ public:
 
     Equipment &GetEquipment();
     const Equipment &GetEquipment() const;
+    QuestJournal &GetQuestJournal(){return questJournal;}
+    const QuestJournal &GetQuestJournal() const{return questJournal;}
 
     StatusEffectManager &GetStatusEffectManager();
     const StatusEffectManager &GetStatusEffectManager() const;
@@ -65,4 +68,5 @@ private:
     StatusEffectManager statusEffectManager;
 
     HealthPool healthPool;
+    QuestJournal questJournal;
 };

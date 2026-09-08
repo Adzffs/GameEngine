@@ -6,6 +6,7 @@
 #include "../Dialogue/DialogueNodeId.h"
 #include "../Dialogue/DialogueNodeKind.h"
 #include "../Dialogue/DialogueSessionId.h"
+#include "../Quest/QuestDialogueAction.h"
 #include <string>
 #include <vector>
 
@@ -22,4 +23,5 @@ struct NpcTalkEvent
     bool isTerminal;
     std::vector<DialogueEventChoice> choices;
     bool offersTrade = false;
+    QuestDialogueAction questAction = QuestDialogueAction::NONE;
 };

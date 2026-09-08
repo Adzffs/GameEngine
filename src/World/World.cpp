@@ -21,6 +21,7 @@
 #include "Development/DevelopmentWorldContent.h"
 #include "../NPC/NpcDefinition.h"
 #include "../NPC/NpcDefinitionDatabase.h"
+#include "../NPC/NPC.h"
 #include "../NPC/NpcSpawnDefinition.h"
 #include "../NPC/NpcSpawnDatabase.h"
 #include "../Dialogue/DialogueDefinitionDatabase.h"
@@ -44,6 +45,7 @@
 #include <type_traits>
 #include "../Persistence/PlayerSaveFileStore.h"
 #include "../Persistence/PlayerSaveState.h"
+#include "../Quest/QuestSystem.h"
 
 namespace
 {
@@ -1931,6 +1933,16 @@ void World::ProcessQueuedCommands()
                             data.actorEntityID, data.shopSessionId))
                         resultCode = CommandResultCode::ACCEPTED;
                 }
+                else if constexpr (std::is_same_v<CommandType,QuestAcceptCommand> || std::is_same_v<CommandType,QuestCompleteCommand>)
+                {
+                    Player* player=dynamic_cast<Player*>(actor);
+                    const ActiveDialogueSession* session=dialogueSystem.GetSession(data.actorEntityID);
+                    NPC* npc=dynamic_cast<NPC*>(entityManager.GetEntityByID(data.npcEntityID));
+                    const NpcDefinition* npcDefinition=npc==nullptr?nullptr:NpcDefinitionDatabase::TryGet(npc->GetNpcType());
+                    const bool validGuide=npc!=nullptr&&npc->GetNpcType()==NpcType::DEVELOPMENT_GUIDE&&npcDefinition!=nullptr&&npcDefinition->kind==NpcKind::FRIENDLY;
+                    const bool adjacent=validGuide&&std::abs(actor->GetPosition().GetX()-npc->GetPosition().GetX())<=1&&std::abs(actor->GetPosition().GetY()-npc->GetPosition().GetY())<=1;
+                    if(player&&player->IsAlive()&&session&&validGuide&&session->sessionId==data.dialogueSessionId&&session->npcEntityID==data.npcEntityID&&session->npcType==npc->GetNpcType()&&session->dialogueId==DialogueId::DEVELOPMENT_GUIDE_INTRO&&session->currentNodeId==DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME&&data.questId==QuestId::GATHERING_BASICS&&adjacent){bool ok=false;if constexpr(std::is_same_v<CommandType,QuestAcceptCommand>)ok=QuestSystem::Accept(player->GetQuestJournal());else ok=QuestSystem::Complete(player->GetQuestJournal(),player->GetInventory());if(ok)resultCode=CommandResultCode::ACCEPTED;}
+                }
                 else if constexpr (
                     std::is_same_v<CommandType,
                                    CloseStationCommand>)
@@ -2496,10 +2508,11 @@ bool World::PublishDialogueNode(const ActiveDialogueSession &session,
             eventChoices.push_back({choice.id, choice.text});
         }
     }
+    QuestDialogueAction questAction=QuestDialogueAction::NONE; Player* questPlayer=dynamic_cast<Player*>(entityManager.GetEntityByID(session.actorEntityID)); if(node.id==DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME&&questPlayer){const auto state=questPlayer->GetQuestJournal().Get().state;if(state==QuestState::AVAILABLE)questAction=QuestDialogueAction::ACCEPT_GATHERING_BASICS;else if(state==QuestState::READY_TO_COMPLETE)questAction=QuestDialogueAction::COMPLETE_GATHERING_BASICS;}
     pendingNpcTalkEvents.push_back({session.actorEntityID, session.npcEntityID,
         session.npcType, session.sessionId, session.dialogueId, node.id,
         node.text, node.kind, node.kind == DialogueNodeKind::TERMINAL,
-        std::move(eventChoices), node.offersTrade});
+        std::move(eventChoices), node.offersTrade,questAction});
     return true;
 }
 
@@ -3269,6 +3282,7 @@ void World::ProcessCompletedActions(
 
                 continue;
             }
+            for(int questUnit=0;questUnit<gatheringOutcome.rewardAmount;++questUnit) QuestSystem::RecordGathered(player->GetQuestJournal(),gatheringOutcome.rewardItem);
 
             int previousLevel =
                 player->GetSkills()

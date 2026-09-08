@@ -4,6 +4,7 @@
 #include "../Item/ItemDatabase.h"
 #include "../Player/Player.h"
 #include "../Player/PlayerInitializationMode.h"
+#include "../Quest/QuestDefinitionDatabase.h"
 #include "../Skills/Skill.h"
 
 #include <algorithm>
@@ -73,6 +74,8 @@ PlayerSaveData PlayerSaveState::Capture(const Player &player)
     saveData.positionX = player.GetPosition().GetX();
     saveData.positionY = player.GetPosition().GetY();
     saveData.currentHealth = player.GetCurrentHealth();
+    saveData.gatheringBasicsState=player.GetQuestJournal().Get().state;
+    saveData.gatheringBasicsProgress=player.GetQuestJournal().Get().progress;
 
     const auto &inventorySlots = player.GetInventory().GetSlots();
     for (int index = 0; index < Inventory::SlotCount; ++index)
@@ -105,12 +108,12 @@ PlayerSaveValidationReport PlayerSaveState::ValidateInternal(
 {
     PlayerSaveValidationReport report;
 
-    if (saveData.version != CURRENT_PLAYER_SAVE_VERSION)
+    if (saveData.version != 1 && saveData.version != CURRENT_PLAYER_SAVE_VERSION)
     {
         report.AddIssue(
             PlayerSaveValidationCode::UNSUPPORTED_VERSION,
             -1,
-            "Only player save version 1 is supported");
+            "Only player save versions 1 and 2 are supported");
     }
     if (saveData.currentHealth <= 0)
     {
@@ -119,6 +122,13 @@ PlayerSaveValidationReport PlayerSaveState::ValidateInternal(
             -1,
             "Current health must be positive");
     }
+    const int questState=static_cast<int>(saveData.gatheringBasicsState);
+    const QuestDefinition* questDefinition =
+        QuestDefinitionDatabase::TryGet(QuestId::GATHERING_BASICS);
+    const int requiredProgress =
+        questDefinition == nullptr ? -1 : questDefinition->requiredAmount;
+    const bool questValid=questState>=static_cast<int>(QuestState::AVAILABLE)&&questState<=static_cast<int>(QuestState::COMPLETED)&&saveData.gatheringBasicsProgress>=0&&saveData.gatheringBasicsProgress<=requiredProgress&&((saveData.gatheringBasicsState==QuestState::AVAILABLE&&saveData.gatheringBasicsProgress==0)||(saveData.gatheringBasicsState==QuestState::ACTIVE&&saveData.gatheringBasicsProgress<requiredProgress)||(saveData.gatheringBasicsState==QuestState::READY_TO_COMPLETE&&saveData.gatheringBasicsProgress==requiredProgress)||(saveData.gatheringBasicsState==QuestState::COMPLETED&&saveData.gatheringBasicsProgress==requiredProgress));
+    if(!questValid) report.AddIssue(PlayerSaveValidationCode::INTERNAL_RESTORE_FAILURE,-1,"Invalid Gathering Basics state/progress");
 
     std::vector<ItemType> stackableItems;
     for (int index = 0; index < Inventory::SlotCount; ++index)
@@ -337,6 +347,8 @@ std::unique_ptr<Player> PlayerSaveState::TryCreatePlayer(
     std::unique_ptr<Player> player = std::make_unique<Player>(
         runtimeEntityID,
         PlayerInitializationMode::EMPTY);
+    player->GetQuestJournal().Get().state=saveData.gatheringBasicsState;
+    player->GetQuestJournal().Get().progress=saveData.gatheringBasicsProgress;
 
     for (const SavedSkillXP &savedSkill : saveData.skills)
     {

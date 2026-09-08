@@ -11,6 +11,7 @@
 #include "../Dialogue/DialogueChoiceId.h"
 #include "../Inventory/ItemType.h"
 #include "../Shop/ShopSessionId.h"
+#include "../Quest/QuestId.h"
 
 struct MoveCommand
 {
@@ -102,6 +103,8 @@ struct ShopCloseCommand
     int actorEntityID;
     ShopSessionId shopSessionId;
 };
+struct QuestAcceptCommand{int actorEntityID; int npcEntityID; DialogueSessionId dialogueSessionId; QuestId questId;};
+struct QuestCompleteCommand{int actorEntityID; int npcEntityID; DialogueSessionId dialogueSessionId; QuestId questId;};
 
 using ServerCommandData = std::variant<
     MoveCommand,
@@ -117,7 +120,9 @@ using ServerCommandData = std::variant<
     DialogueCloseCommand,
     ShopBuyCommand,
     ShopSellCommand,
-    ShopCloseCommand>;
+    ShopCloseCommand,
+    QuestAcceptCommand,
+    QuestCompleteCommand>;
 
 struct ServerCommand
 {

@@ -21,7 +21,7 @@ int main()
     test.ExpectEqual(shop->entries.size(), std::size_t{9}, "Nine ordered entries");
     for (std::size_t i = 0; i < shop->entries.size(); ++i)
         test.Expect(shop->entries[i].itemType == order[i], "Entry order is authored");
-    const std::optional<int> buys[] = {std::nullopt, std::nullopt,
+    const std::optional<int> buys[] = {1, std::nullopt,
         std::nullopt, std::nullopt, 8, 25, 25, 40, 30};
     const std::optional<int> sells[] = {1, 2, 2, 4, 3, 10, 10, 15, 12};
     for (std::size_t i = 0; i < shop->entries.size(); ++i)

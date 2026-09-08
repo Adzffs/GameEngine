@@ -6,6 +6,7 @@
 #include "../NPC/NPC.h"
 #include "../NPC/NpcDefinitionDatabase.h"
 #include "../Item/ItemDatabase.h"
+#include "../Quest/QuestDefinitionDatabase.h"
 #include "../Combat/Combatant.h"
 #include "../World/Object/Resource/ResourceDatabase.h"
 #include "../World/Object/Resource/DepletedVisualType.h"
@@ -114,6 +115,17 @@ bool Graphics::Initialize()
             << SDL_GetError()
             << std::endl;
 
+        return false;
+    }
+
+    if (!SDL_SetRenderLogicalPresentation(
+            renderer,
+            WindowWidth,
+            WindowHeight,
+            SDL_LOGICAL_PRESENTATION_LETTERBOX))
+    {
+        std::cerr << "Logical presentation setup failed: "
+                  << SDL_GetError() << std::endl;
         return false;
     }
 
@@ -467,27 +479,9 @@ bool Graphics::HandleSidePanelClick(
     float mouseX,
     float mouseY)
 {
-    constexpr float panelWidth = 192.0f;
-    constexpr float panelHeight = 348.0f;
-
-    constexpr float tabWidth = 25.0f;
-    constexpr float tabHeight = 30.0f;
-    constexpr float tabGap = 2.0f;
-
-    const float panelX =
-        static_cast<float>(WindowWidth) -
-        panelWidth -
-        20.0f;
-
-    const float panelY =
-        static_cast<float>(WindowHeight) -
-        panelHeight -
-        20.0f;
-
-    const float tabY =
-        panelY -
-        tabHeight -
-        4.0f;
+    const SidePanelLayout layout = GetSidePanelLayout();
+    const float panelX = layout.panelBounds.x;
+    const float panelY = layout.panelBounds.y;
 
     const std::array<SidePanelTab, 7> tabs{
         SidePanelTab::SKILLS,
@@ -503,16 +497,10 @@ bool Graphics::HandleSidePanelClick(
          tabIndex < tabs.size();
          tabIndex++)
     {
-        const float tabX =
-            panelX +
-            static_cast<float>(tabIndex) *
-                (tabWidth + tabGap);
-
+        const SDL_FRect &tab = layout.tabBounds[tabIndex];
         const bool insideTab =
-            mouseX >= tabX &&
-            mouseX < tabX + tabWidth &&
-            mouseY >= tabY &&
-            mouseY < tabY + tabHeight;
+            mouseX >= tab.x && mouseX < tab.x + tab.w &&
+            mouseY >= tab.y && mouseY < tab.y + tab.h;
 
         if (insideTab)
         {
@@ -522,10 +510,10 @@ bool Graphics::HandleSidePanelClick(
     }
 
     const bool insidePanel =
-        mouseX >= panelX &&
-        mouseX < panelX + panelWidth &&
-        mouseY >= panelY &&
-        mouseY < panelY + panelHeight;
+        mouseX >= layout.panelBounds.x &&
+        mouseX < layout.panelBounds.x + layout.panelBounds.w &&
+        mouseY >= layout.panelBounds.y &&
+        mouseY < layout.panelBounds.y + layout.panelBounds.h;
 
     if (!insidePanel)
     {
@@ -662,6 +650,11 @@ void Graphics::ProcessEvents(bool &running)
         if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
             event.button.button == SDL_BUTTON_LEFT)
         {
+            if (renderer != nullptr &&
+                !SDL_ConvertEventToRenderCoordinates(renderer, &event))
+            {
+                continue;
+            }
             float mouseX = event.button.x;
             float mouseY = event.button.y;
 
@@ -785,6 +778,7 @@ SDL_FRect Graphics::GetDialogueTradeButtonRectangle() const {
     const std::size_t index = event == nullptr ? 0 : event->choices.size();
     return GetDialogueChoiceButtonRectangle(index);
 }
+SDL_FRect Graphics::GetDialogueQuestButtonRectangle() const {auto b=GetDialogueTradeButtonRectangle();b.y+=44.0f;return b;}
 SDL_FRect Graphics::GetShopRowRectangle(std::size_t i) const { return SDL_FRect{160.0f,150.0f+static_cast<float>(i)*48.0f,960.0f,42.0f}; }
 SDL_FRect Graphics::GetShopBuyButtonRectangle(std::size_t i) const { auto r=GetShopRowRectangle(i); return SDL_FRect{r.x+r.w-300.0f,r.y+4.0f,120.0f,r.h-8.0f}; }
 SDL_FRect Graphics::GetShopSellButtonRectangle(std::size_t i) const { auto r=GetShopRowRectangle(i); return SDL_FRect{r.x+r.w-160.0f,r.y+4.0f,120.0f,r.h-8.0f}; }
@@ -819,6 +813,7 @@ bool Graphics::HandleDialogueClick(float mouseX, float mouseY)
     }
 
     const NpcTalkEvent *event = dialoguePresentationState.GetEvent();
+    if(event->questAction!=QuestDialogueAction::NONE&&IsPointInsideRectangle(mouseX,mouseY,GetDialogueQuestButtonRectangle())){pendingDialogueCommand=dialoguePresentationState.MakeQuestCommand();return true;}
     if (dialoguePresentationState.CanTrade() && IsPointInsideRectangle(mouseX, mouseY, GetDialogueTradeButtonRectangle()))
     {
         pendingDialogueCommand=dialoguePresentationState.MakeTradeCommand();
@@ -1996,6 +1991,59 @@ void Graphics::DrawResources(
             &leavesRectangle);
     }
 }
+Graphics::SidePanelLayout Graphics::GetSidePanelLayout() const
+{
+    constexpr float panelWidth = 192.0f;
+    constexpr float panelHeight = 348.0f;
+    constexpr float panelMargin = 20.0f;
+    constexpr float contentInset = 10.0f;
+    constexpr float tabWidth = 25.0f;
+    constexpr float tabHeight = 30.0f;
+    constexpr float tabGap = 2.0f;
+    constexpr float tabOffset = 4.0f;
+
+    SidePanelLayout layout;
+    layout.panelBounds = SDL_FRect{
+        static_cast<float>(WindowWidth) - panelWidth - panelMargin,
+        static_cast<float>(WindowHeight) - panelHeight - panelMargin,
+        panelWidth,
+        panelHeight};
+    layout.contentBounds = SDL_FRect{
+        layout.panelBounds.x + contentInset,
+        layout.panelBounds.y + contentInset,
+        layout.panelBounds.w - contentInset * 2.0f,
+        layout.panelBounds.h - contentInset * 2.0f};
+    for (std::size_t index = 0; index < layout.tabBounds.size(); ++index)
+    {
+        layout.tabBounds[index] = SDL_FRect{
+            layout.panelBounds.x + static_cast<float>(index) * (tabWidth + tabGap),
+            layout.panelBounds.y - tabHeight - tabOffset,
+            tabWidth,
+            tabHeight};
+    }
+    return layout;
+}
+
+SDL_FRect Graphics::GetSidePanelRectangle() const
+{
+    return GetSidePanelLayout().panelBounds;
+}
+
+void Graphics::DrawSidePanelFrame(const char *title, float headingYOffset)
+{
+    const SidePanelLayout layout = GetSidePanelLayout();
+    SDL_SetRenderDrawColor(renderer, 30, 30, 30, 240);
+    SDL_RenderFillRect(renderer, &layout.panelBounds);
+    SDL_SetRenderDrawColor(renderer, 180, 180, 180, 255);
+    SDL_RenderRect(renderer, &layout.panelBounds);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderDebugText(
+        renderer,
+        layout.contentBounds.x,
+        layout.panelBounds.y + headingYOffset,
+        title);
+}
+
 void Graphics::DrawSkills(const Player &player)
 {
     struct SkillDisplayEntry
@@ -2013,59 +2061,10 @@ void Graphics::DrawSkills(const Player &player)
             {SkillType::SMITHING, "SMITHING"},
         }};
 
-    constexpr float panelWidth = 192.0f;
-    constexpr float panelHeight = 348.0f;
-
-    const float panelX =
-        static_cast<float>(WindowWidth) -
-        panelWidth -
-        20.0f;
-
-    const float panelY =
-        static_cast<float>(WindowHeight) -
-        panelHeight -
-        20.0f;
-
-    SDL_FRect panelRectangle{
-        panelX,
-        panelY,
-        panelWidth,
-        panelHeight};
-
-    SDL_SetRenderDrawColor(
-        renderer,
-        30,
-        30,
-        30,
-        240);
-
-    SDL_RenderFillRect(
-        renderer,
-        &panelRectangle);
-
-    SDL_SetRenderDrawColor(
-        renderer,
-        180,
-        180,
-        180,
-        255);
-
-    SDL_RenderRect(
-        renderer,
-        &panelRectangle);
-
-    SDL_SetRenderDrawColor(
-        renderer,
-        255,
-        255,
-        255,
-        255);
-
-    SDL_RenderDebugText(
-        renderer,
-        panelX + 10.0f,
-        panelY + 10.0f,
-        "SKILLS");
+    const SidePanelLayout layout = GetSidePanelLayout();
+    const float panelX = layout.panelBounds.x;
+    const float panelY = layout.panelBounds.y;
+    DrawSidePanelFrame("SKILLS");
 
     std::string healthText =
         "HEALTH " +
@@ -2124,59 +2123,10 @@ void Graphics::DrawSkills(const Player &player)
 void Graphics::DrawPlaceholderPanel(
     const char *title)
 {
-    constexpr float panelWidth = 192.0f;
-    constexpr float panelHeight = 348.0f;
-
-    const float panelX =
-        static_cast<float>(WindowWidth) -
-        panelWidth -
-        20.0f;
-
-    const float panelY =
-        static_cast<float>(WindowHeight) -
-        panelHeight -
-        20.0f;
-
-    SDL_FRect panelRectangle{
-        panelX,
-        panelY,
-        panelWidth,
-        panelHeight};
-
-    SDL_SetRenderDrawColor(
-        renderer,
-        30,
-        30,
-        30,
-        240);
-
-    SDL_RenderFillRect(
-        renderer,
-        &panelRectangle);
-
-    SDL_SetRenderDrawColor(
-        renderer,
-        180,
-        180,
-        180,
-        255);
-
-    SDL_RenderRect(
-        renderer,
-        &panelRectangle);
-
-    SDL_SetRenderDrawColor(
-        renderer,
-        255,
-        255,
-        255,
-        255);
-
-    SDL_RenderDebugText(
-        renderer,
-        panelX + 10.0f,
-        panelY + 10.0f,
-        title);
+    const SidePanelLayout layout = GetSidePanelLayout();
+    const float panelX = layout.panelBounds.x;
+    const float panelY = layout.panelBounds.y;
+    DrawSidePanelFrame(title);
 
     SDL_RenderDebugText(
         renderer,
@@ -2186,27 +2136,7 @@ void Graphics::DrawPlaceholderPanel(
 }
 void Graphics::DrawSidePanelTabs()
 {
-    constexpr float panelWidth = 192.0f;
-    constexpr float panelHeight = 348.0f;
-
-    constexpr float tabWidth = 25.0f;
-    constexpr float tabHeight = 30.0f;
-    constexpr float tabGap = 2.0f;
-
-    const float panelX =
-        static_cast<float>(WindowWidth) -
-        panelWidth -
-        20.0f;
-
-    const float panelY =
-        static_cast<float>(WindowHeight) -
-        panelHeight -
-        20.0f;
-
-    const float tabY =
-        panelY -
-        tabHeight -
-        4.0f;
+    const SidePanelLayout layout = GetSidePanelLayout();
 
     const std::array<SidePanelTab, 7> tabs{
         SidePanelTab::SKILLS,
@@ -2230,16 +2160,7 @@ void Graphics::DrawSidePanelTabs()
          tabIndex < tabs.size();
          tabIndex++)
     {
-        const float tabX =
-            panelX +
-            static_cast<float>(tabIndex) *
-                (tabWidth + tabGap);
-
-        SDL_FRect tabRectangle{
-            tabX,
-            tabY,
-            tabWidth,
-            tabHeight};
+        const SDL_FRect &tabRectangle = layout.tabBounds[tabIndex];
 
         if (selectedTab == tabs[tabIndex])
         {
@@ -2284,8 +2205,8 @@ void Graphics::DrawSidePanelTabs()
 
         SDL_RenderDebugText(
             renderer,
-            tabX + 4.0f,
-            tabY + 11.0f,
+            tabRectangle.x + 4.0f,
+            tabRectangle.y + 11.0f,
             labels[tabIndex]);
     }
 }
@@ -2815,67 +2736,13 @@ void Graphics::DrawInventory(
     constexpr float padding = 10.0f;
     constexpr float headerHeight = 24.0f;
 
-    constexpr float panelWidth =
-        padding * 2.0f +
-        columns * slotSize +
-        (columns - 1) * slotGap;
-
-    constexpr float panelHeight =
-        padding * 2.0f +
-        headerHeight +
-        rows * slotSize +
-        (rows - 1) * slotGap;
-
-    const float panelX =
-        static_cast<float>(WindowWidth) -
-        panelWidth -
-        20.0f;
-
-    const float panelY =
-        static_cast<float>(WindowHeight) -
-        panelHeight -
-        20.0f;
-
-    SDL_FRect panelRectangle{
-        panelX,
-        panelY,
-        panelWidth,
-        panelHeight};
-
-    SDL_SetRenderDrawColor(
-        renderer,
-        30,
-        30,
-        30,
-        240);
-
-    SDL_RenderFillRect(
-        renderer,
-        &panelRectangle);
-
-    SDL_SetRenderDrawColor(
-        renderer,
-        180,
-        180,
-        180,
-        255);
-
-    SDL_RenderRect(
-        renderer,
-        &panelRectangle);
-
-    SDL_SetRenderDrawColor(
-        renderer,
-        255,
-        255,
-        255,
-        255);
-
-    SDL_RenderDebugText(
-        renderer,
-        panelX + padding,
-        panelY + 8.0f,
-        "INVENTORY");
+    static_assert(
+        padding * 2.0f + columns * slotSize + (columns - 1) * slotGap == 192.0f &&
+        padding * 2.0f + headerHeight + rows * slotSize + (rows - 1) * slotGap == 348.0f);
+    const SidePanelLayout layout = GetSidePanelLayout();
+    const float panelX = layout.panelBounds.x;
+    const float panelY = layout.panelBounds.y;
+    DrawSidePanelFrame("INVENTORY", 8.0f);
 
     const auto &slots =
         inventory.GetSlots();
@@ -3004,59 +2871,10 @@ void Graphics::DrawInventory(
 void Graphics::DrawEquipment(
     const Equipment &equipment)
 {
-    constexpr float panelWidth = 192.0f;
-    constexpr float panelHeight = 348.0f;
-
-    const float panelX =
-        static_cast<float>(WindowWidth) -
-        panelWidth -
-        20.0f;
-
-    const float panelY =
-        static_cast<float>(WindowHeight) -
-        panelHeight -
-        20.0f;
-
-    SDL_FRect panelRectangle{
-        panelX,
-        panelY,
-        panelWidth,
-        panelHeight};
-
-    SDL_SetRenderDrawColor(
-        renderer,
-        30,
-        30,
-        30,
-        240);
-
-    SDL_RenderFillRect(
-        renderer,
-        &panelRectangle);
-
-    SDL_SetRenderDrawColor(
-        renderer,
-        180,
-        180,
-        180,
-        255);
-
-    SDL_RenderRect(
-        renderer,
-        &panelRectangle);
-
-    SDL_SetRenderDrawColor(
-        renderer,
-        255,
-        255,
-        255,
-        255);
-
-    SDL_RenderDebugText(
-        renderer,
-        panelX + 10.0f,
-        panelY + 10.0f,
-        "EQUIPMENT");
+    const SidePanelLayout layout = GetSidePanelLayout();
+    const float panelX = layout.panelBounds.x;
+    const float panelY = layout.panelBounds.y;
+    DrawSidePanelFrame("EQUIPMENT");
 
     struct EquipmentSlotDisplay
     {
@@ -3259,6 +3077,7 @@ void Graphics::DrawDialoguePanel()
     if (dialoguePresentationState.CanTrade()) {
         const SDL_FRect b=GetDialogueTradeButtonRectangle(); SDL_SetRenderDrawColor(renderer,55,50,45,255); SDL_RenderFillRect(renderer,&b); SDL_SetRenderDrawColor(renderer,190,170,130,255); SDL_RenderRect(renderer,&b); SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,b.x+12,b.y+12,"Trade");
     }
+    if(event->questAction!=QuestDialogueAction::NONE){const auto b=GetDialogueQuestButtonRectangle();SDL_SetRenderDrawColor(renderer,55,50,45,255);SDL_RenderFillRect(renderer,&b);SDL_SetRenderDrawColor(renderer,190,170,130,255);SDL_RenderRect(renderer,&b);SDL_SetRenderDrawColor(renderer,255,255,255,255);SDL_RenderDebugText(renderer,b.x+12,b.y+12,event->questAction==QuestDialogueAction::ACCEPT_GATHERING_BASICS?"Accept Gathering Basics":"Complete Gathering Basics");}
 }
 
 void Graphics::DrawShopPanel()
@@ -3269,6 +3088,73 @@ void Graphics::DrawShopPanel()
     if (shopPresentationState.HasRejection()) SDL_RenderDebugText(renderer,160,135,"Transaction rejected by server");
     for(std::size_t i=0;i<e->entries.size();++i){ const auto&r=GetShopRowRectangle(i); const auto& row=e->entries[i]; SDL_SetRenderDrawColor(renderer,55,50,45,255); SDL_RenderFillRect(renderer,&r); SDL_SetRenderDrawColor(renderer,190,170,130,255); SDL_RenderRect(renderer,&r); SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,r.x+16,r.y+13,ItemDatabase::Get(row.itemType).GetName().c_str()); auto drawButton=[&](SDL_FRect b,const char* label,int price){SDL_SetRenderDrawColor(renderer,70,90,65,255); SDL_RenderFillRect(renderer,&b); SDL_SetRenderDrawColor(renderer,220,200,160,255); SDL_RenderRect(renderer,&b); SDL_SetRenderDrawColor(renderer,255,255,255,255); std::string caption=std::string(label)+" "+std::to_string(price); SDL_RenderDebugText(renderer,b.x+18,b.y+11,caption.c_str());}; if(row.buyPrice) drawButton(GetShopBuyButtonRectangle(i),"BUY",*row.buyPrice); if(row.sellPrice) drawButton(GetShopSellButtonRectangle(i),"SELL",*row.sellPrice); }
     const auto b=GetShopCloseButtonRectangle(); SDL_SetRenderDrawColor(renderer,70,55,45,255); SDL_RenderFillRect(renderer,&b); SDL_SetRenderDrawColor(renderer,220,200,160,255); SDL_RenderRect(renderer,&b); SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,b.x+20,b.y+9,"CLOSE");
+}
+Graphics::QuestPanelView Graphics::BuildQuestPanelView(const Player &player) const
+{
+    const SidePanelLayout layout = GetSidePanelLayout();
+    const SDL_FRect bounds = layout.panelBounds;
+    const SDL_FRect content = layout.contentBounds;
+    const auto &record = player.GetQuestJournal().Get();
+    const QuestDefinition *definition = QuestDefinitionDatabase::TryGet(record.id);
+
+    QuestPanelView view{
+        bounds,
+        content,
+        {content.x, content.y},
+        {content.x, content.y + 32.0f},
+        {content.x, content.y + 60.0f},
+        {content.x, content.y + 84.0f},
+        "QUESTS",
+        definition == nullptr ? "Unknown quest" : definition->name,
+        "UNAVAILABLE",
+        "",
+        selectedTab == SidePanelTab::QUESTS};
+
+    switch (record.state)
+    {
+    case QuestState::AVAILABLE:
+        view.state = "AVAILABLE";
+        view.progress = "Logs: 0 / " +
+            std::to_string(definition == nullptr ? 0 : definition->requiredAmount);
+        break;
+    case QuestState::ACTIVE:
+        view.state = "ACTIVE";
+        view.progress = "Logs: " + std::to_string(record.progress) + " / " +
+            std::to_string(definition == nullptr ? 0 : definition->requiredAmount);
+        break;
+    case QuestState::READY_TO_COMPLETE:
+        view.state = "READY TO COMPLETE";
+        view.progress = "Logs: " + std::to_string(record.progress) + " / " +
+            std::to_string(definition == nullptr ? 0 : definition->requiredAmount);
+        break;
+    case QuestState::COMPLETED:
+        view.state = "COMPLETED";
+        view.progress = "Logs: " + std::to_string(record.progress) + " / " +
+            std::to_string(definition == nullptr ? 0 : definition->requiredAmount);
+        break;
+    default:
+        break;
+    }
+    return view;
+}
+
+void Graphics::DrawQuestPanel(const Player &player)
+{
+    const QuestPanelView view = BuildQuestPanelView(player);
+    DrawSidePanelFrame(view.heading.c_str());
+
+    const SDL_Rect clipRectangle{
+        static_cast<int>(view.contentBounds.x),
+        static_cast<int>(view.contentBounds.y),
+        static_cast<int>(view.contentBounds.w),
+        static_cast<int>(view.contentBounds.h)};
+    SDL_SetRenderClipRect(renderer, &clipRectangle);
+    SDL_SetRenderDrawColor(renderer, 255, 215, 100, 255);
+    SDL_RenderDebugText(renderer, view.titlePosition.x, view.titlePosition.y, view.title.c_str());
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderDebugText(renderer, view.statePosition.x, view.statePosition.y, view.state.c_str());
+    SDL_RenderDebugText(renderer, view.progressPosition.x, view.progressPosition.y, view.progress.c_str());
+    SDL_SetRenderClipRect(renderer, nullptr);
 }
 
 void Graphics::Render(
@@ -3306,6 +3192,9 @@ void Graphics::Render(
     DrawMonsterHealthBars(entities);
     DrawMonsterCombatFeedback(entities, combatFeedbacks);
 
+    SDL_SetRenderViewport(renderer, nullptr);
+    SDL_SetRenderScale(renderer, 1.0f, 1.0f);
+    SDL_SetRenderClipRect(renderer, nullptr);
     DrawSidePanelTabs();
 
     switch (selectedTab)
@@ -3323,7 +3212,7 @@ void Graphics::Render(
         break;
 
     case SidePanelTab::QUESTS:
-        DrawPlaceholderPanel("QUESTS");
+        DrawQuestPanel(player);
         break;
 
     case SidePanelTab::PRAYER:

@@ -4,11 +4,12 @@
 #include "../Inventory/Inventory.h"
 #include "../Inventory/ItemType.h"
 #include "../Skills/SkillType.h"
+#include "../Quest/QuestState.h"
 
 #include <array>
 #include <vector>
 
-inline constexpr int CURRENT_PLAYER_SAVE_VERSION = 1;
+inline constexpr int CURRENT_PLAYER_SAVE_VERSION = 2;
 
 struct SavedInventorySlot
 {
@@ -37,4 +38,6 @@ struct PlayerSaveData
     std::array<SavedInventorySlot, Inventory::SlotCount> inventorySlots{};
     std::vector<SavedSkillXP> skills;
     std::vector<SavedEquipmentSlot> equipment;
+    QuestState gatheringBasicsState = QuestState::AVAILABLE;
+    int gatheringBasicsProgress = 0;
 };

@@ -12,21 +12,20 @@ namespace
         DialogueNodeKind kind,
         bool terminal = false)
     {
-        NpcTalkEvent event{
-            actorID,
-            1,
-            NpcType::DEVELOPMENT_GUIDE,
-            sessionID,
-            DialogueId::DEVELOPMENT_GUIDE_INTRO,
-            DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME,
-            "Published node",
-            kind,
-            terminal,
-            kind == DialogueNodeKind::CHOICE
-                ? std::vector<DialogueEventChoice>{
-                      {DialogueChoiceId::DEVELOPMENT_GUIDE_COMBAT,
-                       "Combat"}}
-                : std::vector<DialogueEventChoice>{}};
+        NpcTalkEvent event{};
+        event.actorEntityID = actorID;
+        event.npcEntityID = 1;
+        event.npcType = NpcType::DEVELOPMENT_GUIDE;
+        event.sessionId = sessionID;
+        event.dialogueId = DialogueId::DEVELOPMENT_GUIDE_INTRO;
+        event.nodeId = DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME;
+        event.text = "Published node";
+        event.nodeKind = kind;
+        event.isTerminal = terminal;
+        event.choices = kind == DialogueNodeKind::CHOICE
+            ? std::vector<DialogueEventChoice>{
+                  {DialogueChoiceId::DEVELOPMENT_GUIDE_COMBAT, "Combat"}}
+            : std::vector<DialogueEventChoice>{};
         event.offersTrade = (event.nodeId == DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME);
         return event;
     }
@@ -74,8 +73,11 @@ int main()
     test.Expect(!state.CanTrade(), "Non-shop NPC hides Trade");
     NpcTalkEvent stale = MakeEvent(4, 99, DialogueNodeKind::CONTINUE);
     state.Synchronize(4, {stale}, &session);
-    test.Expect(!state.CanTrade(), "Stale event cannot expose Trade");
+    test.Expect(!state.IsOpen() && !state.CanTrade() &&
+                    !state.MakeContinueCommand().has_value(),
+                "Stale event clears presentation and cannot create controls");
 
+    state.Synchronize(4, {MakeEvent(4, 42, DialogueNodeKind::CONTINUE)}, &session);
     auto continued = state.MakeContinueCommand();
     const auto *continueCommand = continued.has_value()
         ? std::get_if<DialogueContinueCommand>(&*continued)

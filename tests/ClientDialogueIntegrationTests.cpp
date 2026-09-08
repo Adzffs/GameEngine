@@ -8,6 +8,22 @@
 
 struct GraphicsTestAccess
 {
+    static bool PushLeftClick(Graphics &graphics, float x, float y)
+    {
+        if ((SDL_WasInit(SDL_INIT_EVENTS) & SDL_INIT_EVENTS) == 0 &&
+            !SDL_InitSubSystem(SDL_INIT_EVENTS))
+            return false;
+        SDL_Event event{};
+        event.type = SDL_EVENT_MOUSE_BUTTON_DOWN;
+        event.button.button = SDL_BUTTON_LEFT;
+        event.button.x = x;
+        event.button.y = y;
+        if (!SDL_PushEvent(&event))
+            return false;
+        bool running = true;
+        graphics.ProcessEvents(running);
+        return running;
+    }
     static bool Click(Graphics &graphics, float x, float y)
     {
         return graphics.HandleDialogueClick(x, y);
@@ -69,6 +85,57 @@ namespace
 int main()
 {
     TestContext test;
+
+    {
+        Graphics graphics;
+        NpcTalkEvent event{
+            44, 17, NpcType::DEVELOPMENT_GUIDE, 901,
+            DialogueId::DEVELOPMENT_GUIDE_INTRO,
+            DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME,
+            "Let me show you the gathering basics.",
+            DialogueNodeKind::CONTINUE, false, {}, false,
+            QuestDialogueAction::ACCEPT_GATHERING_BASICS};
+        ActiveDialogueSession session{
+            901, 44, 17, NpcType::DEVELOPMENT_GUIDE,
+            DialogueId::DEVELOPMENT_GUIDE_INTRO,
+            DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME, 1};
+        graphics.SynchronizeDialogue(44, {event}, &session);
+        const SDL_FRect acceptRectangle =
+            graphics.GetDialogueQuestButtonRectangle();
+        ClickCenter(graphics, acceptRectangle);
+        auto accept = graphics.ConsumeDialogueCommand();
+        const auto* acceptCommand = accept
+            ? std::get_if<QuestAcceptCommand>(&*accept) : nullptr;
+        test.Expect(acceptCommand != nullptr &&
+                        acceptCommand->actorEntityID == 44 &&
+                        acceptCommand->npcEntityID == 17 &&
+                        acceptCommand->dialogueSessionId == 901 &&
+                        acceptCommand->questId == QuestId::GATHERING_BASICS,
+                    "Rendered Accept hitbox forwards exact authoritative IDs");
+        test.Expect(!GraphicsTestAccess::HasWorldClick(graphics) &&
+                        !graphics.ConsumeDialogueCommand().has_value(),
+                    "Accept click is modal and queues exactly one command");
+
+        event.questAction = QuestDialogueAction::COMPLETE_GATHERING_BASICS;
+        graphics.SynchronizeDialogue(44, {event}, &session);
+        const SDL_FRect completeRectangle =
+            graphics.GetDialogueQuestButtonRectangle();
+        test.Expect(acceptRectangle.x == completeRectangle.x &&
+                        acceptRectangle.y == completeRectangle.y &&
+                        acceptRectangle.w == completeRectangle.w &&
+                        acceptRectangle.h == completeRectangle.h,
+                    "Accept and Complete rendering share their hit-test rectangle");
+        ClickCenter(graphics, completeRectangle);
+        auto complete = graphics.ConsumeDialogueCommand();
+        const auto* completeCommand = complete
+            ? std::get_if<QuestCompleteCommand>(&*complete) : nullptr;
+        test.Expect(completeCommand != nullptr &&
+                        completeCommand->actorEntityID == 44 &&
+                        completeCommand->npcEntityID == 17 &&
+                        completeCommand->dialogueSessionId == 901 &&
+                        completeCommand->questId == QuestId::GATHERING_BASICS,
+                    "Rendered Complete hitbox forwards exact authoritative IDs");
+    }
 
     {
         Graphics graphics;
@@ -142,6 +209,33 @@ int main()
                         graphics.GetDialoguePresentationState().GetEvent()->nodeId ==
                             DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME,
                     "Engine presents the authoritative welcome event after approach");
+
+        const int beforeX = world.GetEntityByID(playerID)->GetPosition().GetX();
+        const int beforeY = world.GetEntityByID(playerID)->GetPosition().GetY();
+        test.Expect(GraphicsTestAccess::PushLeftClick(
+                        graphics, guideRectangle.x + 1.0f,
+                        guideRectangle.y + 1.0f),
+                    "SDL world-target click is submitted through ProcessEvents");
+        int blockedTileX = 0;
+        int blockedTileY = 0;
+        test.Expect(!graphics.ConsumeClickedTile(blockedTileX, blockedTileY) &&
+                        !graphics.ConsumeDialogueCommand().has_value() &&
+                        !graphics.ConsumeShopCommand().has_value(),
+                    "Dialogue modal SDL routing emits no world or unrelated command");
+        world.Update();
+        EngineTestAccess::Synchronize(engine);
+        const Entity* unchangedPlayer = world.GetEntityByID(playerID);
+        test.Expect(unchangedPlayer->GetPosition().GetX() == beforeX &&
+                        unchangedPlayer->GetPosition().GetY() == beforeY &&
+                        !world.HasActiveMovementPath(playerID) &&
+                        world.GetActionForEntity(playerID) == nullptr &&
+                        !world.HasPendingMeleeEngagement(playerID) &&
+                        !world.HasActiveStation(playerID) &&
+                        world.GetActiveShopSession(playerID) == nullptr,
+                    "Blocked SDL click creates no movement, combat, gathering, station or shop interaction");
+        test.Expect(world.GetActiveDialogueSession(playerID) != nullptr &&
+                        graphics.GetDialoguePresentationState().IsOpen(),
+                    "Dialogue remains authoritative and visible after blocked SDL click");
 
         ClickCenter(graphics, graphics.GetDialogueContinueButtonRectangle());
         test.Expect(EngineTestAccess::EnqueueDialogue(engine),

@@ -1,9 +1,11 @@
 #pragma once
 
 #include <SDL3/SDL.h>
+#include <array>
 #include <memory>
 #include <map>
 #include <optional>
+#include <string>
 #include <vector>
 
 #include "../Action/Action.h"
@@ -136,11 +138,35 @@ public:
         MAGIC,
         SETTINGS
     };
+    struct QuestPanelView
+    {
+        SDL_FRect bounds;
+        SDL_FRect contentBounds;
+        SDL_FPoint headingPosition;
+        SDL_FPoint titlePosition;
+        SDL_FPoint statePosition;
+        SDL_FPoint progressPosition;
+        std::string heading;
+        std::string title;
+        std::string state;
+        std::string progress;
+        bool visible;
+    };
+    struct SidePanelLayout
+    {
+        SDL_FRect panelBounds;
+        SDL_FRect contentBounds;
+        std::array<SDL_FRect, 7> tabBounds;
+    };
+    SidePanelLayout GetSidePanelLayout() const;
+    SDL_FRect GetSidePanelRectangle() const;
+    QuestPanelView BuildQuestPanelView(const Player &player) const;
     bool HandleSidePanelClick(
         float mouseX,
         float mouseY);
 
     void DrawSidePanelTabs();
+    void DrawSidePanelFrame(const char *title, float headingYOffset = 10.0f);
 
     void HandleStationMenuClick(
         float mouseX,
@@ -184,11 +210,13 @@ public:
     SDL_FRect GetDialogueContinueButtonRectangle() const;
     SDL_FRect GetDialogueChoiceButtonRectangle(std::size_t choiceIndex) const;
     SDL_FRect GetDialogueTradeButtonRectangle() const;
+    SDL_FRect GetDialogueQuestButtonRectangle() const;
     SDL_FRect GetShopRowRectangle(std::size_t index) const;
     SDL_FRect GetShopBuyButtonRectangle(std::size_t index) const;
     SDL_FRect GetShopSellButtonRectangle(std::size_t index) const;
     SDL_FRect GetShopCloseButtonRectangle() const;
     void DrawShopPanel();
+    void DrawQuestPanel(const Player &player);
     void DrawDialoguePanel();
     void DrawNPCs(
         const std::vector<std::unique_ptr<Entity>> &entities);

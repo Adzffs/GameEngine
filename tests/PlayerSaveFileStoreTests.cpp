@@ -149,7 +149,7 @@ int main()
     test.Expect(PlayerSaveFileStore::Save(target, replacement).IsSuccess() && ReadBytes(target) == replacementText,
                 "identical repeated save remains byte-identical");
 
-    PlayerSaveData invalid = original; invalid.version = 2;
+    PlayerSaveData invalid = original; invalid.version = 1;
     ExpectEncodeFailurePreserves(test, target, invalid, "unsupported version");
     invalid = original; invalid.currentHealth = 0;
     ExpectEncodeFailurePreserves(test, target, invalid, "invalid health");
@@ -277,7 +277,13 @@ int main()
     test.Expect(PlayerSaveFileStore::Load(corrupt).IsSuccess(), "CRLF valid file loads");
     WriteBytes(corrupt, canonical.substr(0, canonical.size() - 1));
     test.Expect(PlayerSaveFileStore::Load(corrupt).IsSuccess(), "valid file without final newline loads");
-    WriteBytes(corrupt, std::string(canonical).replace(canonical.find("version=1"), 9, "version=2"));
+    std::string unsupportedVersion = canonical;
+    const std::size_t versionPosition = unsupportedVersion.find("version=2");
+    test.Expect(versionPosition != std::string::npos,
+                "unsupported-version fixture finds canonical version record");
+    if (versionPosition != std::string::npos)
+        unsupportedVersion.replace(versionPosition, 9, "version=3");
+    WriteBytes(corrupt, unsupportedVersion);
     test.Expect(PlayerSaveFileStore::Load(corrupt).Contains(PlayerSaveFileIssueCode::DECODE_FAILED), "unsupported file version fails through codec");
 
     // Existing target is authoritative over both transaction artifacts.

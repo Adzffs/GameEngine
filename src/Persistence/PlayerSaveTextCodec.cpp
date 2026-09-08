@@ -105,6 +105,8 @@ namespace
             if (PERSISTED_EQUIPMENT_SLOT_TYPES[i] == type) return static_cast<int>(i);
         return -1;
     }
+    std::string_view QuestStateToken(QuestState s){switch(s){case QuestState::AVAILABLE:return "AVAILABLE";case QuestState::ACTIVE:return "ACTIVE";case QuestState::READY_TO_COMPLETE:return "READY_TO_COMPLETE";case QuestState::COMPLETED:return "COMPLETED";default:return "UNAVAILABLE";}}
+    std::optional<QuestState> ParseQuestState(std::string_view s){if(s=="AVAILABLE")return QuestState::AVAILABLE;if(s=="ACTIVE")return QuestState::ACTIVE;if(s=="READY_TO_COMPLETE")return QuestState::READY_TO_COMPLETE;if(s=="COMPLETED")return QuestState::COMPLETED;return std::nullopt;}
 }
 
 bool PlayerSaveTextDecodeResult::IsSuccess() const { return issues.empty() && saveData.has_value(); }
@@ -121,6 +123,14 @@ void PlayerSaveTextDecodeResult::AddIssue(PlayerSaveTextIssueCode code, int line
 bool PlayerSaveTextCodec::TryEncode(const PlayerSaveData &saveData, std::string &output,
                                     PlayerSaveValidationReport &validationReport)
 {
+    if (saveData.version != CURRENT_PLAYER_SAVE_VERSION)
+    {
+        validationReport = PlayerSaveValidationReport{};
+        validationReport.AddIssue(PlayerSaveValidationCode::UNSUPPORTED_VERSION,
+                                  -1,
+                                  "Only current-version player saves may be encoded");
+        return false;
+    }
     validationReport = PlayerSaveState::Validate(saveData);
     if (!validationReport.IsValid()) return false;
 
@@ -171,6 +181,7 @@ bool PlayerSaveTextCodec::TryEncode(const PlayerSaveData &saveData, std::string 
         encoded.append("equipment.").append(*slotToken).push_back('=');
         encoded.append(*itemToken).push_back('\n');
     }
+    encoded.append("quest.GATHERING_BASICS=").append(QuestStateToken(saveData.gatheringBasicsState)).push_back(','); AppendInteger(encoded,saveData.gatheringBasicsProgress); encoded.push_back('\n');
     encoded.append(END_MARKER).push_back('\n');
     output = std::move(encoded);
     return true;
@@ -224,7 +235,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
     }
     if (versionLine == -1)
     { result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD, -1, "Missing version"); return result; }
-    if (version != CURRENT_PLAYER_SAVE_VERSION)
+    if (version != 1 && version != CURRENT_PLAYER_SAVE_VERSION)
     { result.AddIssue(PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, versionLine, "Unsupported player save version"); return result; }
 
     PlayerSaveData save;
@@ -234,6 +245,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
     std::array<bool, 5> equipmentSeen{};
     std::array<int, 5> skillXP{};
     std::array<ItemType, 5> equipmentItems{};
+    bool questSeen=false;
     auto addInteger = [&](std::string_view value, int line, int &target)
     {
         const auto parsed = ParseInteger(value, target);
@@ -309,6 +321,10 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
             if (!item) { result.AddIssue(PlayerSaveTextIssueCode::UNKNOWN_ITEM_TOKEN, lineNumber, "Unknown item token"); continue; }
             equipmentItems[static_cast<std::size_t>(index)] = *item; continue;
         }
+        if(key=="quest.GATHERING_BASICS")
+        {
+            if(version==1||questSeen){result.AddIssue(PlayerSaveTextIssueCode::DUPLICATE_FIELD,lineNumber,"Unexpected or duplicate quest record");continue;} questSeen=true; const auto comma=value.find(','); if(comma==std::string_view::npos){result.AddIssue(PlayerSaveTextIssueCode::MALFORMED_RECORD,lineNumber,"Malformed quest record");continue;} const auto state=ParseQuestState(value.substr(0,comma)); if(!state){result.AddIssue(PlayerSaveTextIssueCode::UNKNOWN_FIELD,lineNumber,"Unknown quest state");continue;} save.gatheringBasicsState=*state; addInteger(value.substr(comma+1),lineNumber,save.gatheringBasicsProgress); continue;
+        }
         result.AddIssue(PlayerSaveTextIssueCode::UNKNOWN_FIELD, lineNumber, "Unknown field");
     }
 
@@ -320,6 +336,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         if (!skillsSeen[i]) result.AddIssue(PlayerSaveTextIssueCode::MISSING_SKILL_RECORD, -1, "Missing skill record");
     for (std::size_t i = 0; i < equipmentSeen.size(); ++i)
         if (!equipmentSeen[i]) result.AddIssue(PlayerSaveTextIssueCode::MISSING_EQUIPMENT_SLOT_RECORD, -1, "Missing equipment record");
+    if(version==2&&!questSeen) result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD,-1,"Missing Gathering Basics quest record");
     if (!result.GetIssues().empty()) return result;
 
     save.skills.reserve(5); save.equipment.reserve(5);
@@ -327,6 +344,14 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
     {
         save.skills.push_back({PERSISTED_SKILL_TYPES[i], skillXP[i]});
         save.equipment.push_back({PERSISTED_EQUIPMENT_SLOT_TYPES[i], equipmentItems[i]});
+    }
+    // Version 1 had no quest section. Successful legacy decoding migrates the
+    // in-memory representation to the current schema without inferring progress.
+    if (save.version == 1)
+    {
+        save.version = CURRENT_PLAYER_SAVE_VERSION;
+        save.gatheringBasicsState = QuestState::AVAILABLE;
+        save.gatheringBasicsProgress = 0;
     }
     result.validationReport = PlayerSaveState::Validate(save);
     if (!result.validationReport.IsValid())

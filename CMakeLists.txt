@@ -78,6 +78,8 @@ set(GAMEENGINE_CORE_SOURCES
     src/Combat/CombatService.cpp
     src/Combat/MeleeEngagementSystem.cpp
     src/Gathering/GatheringSystem.cpp
+    src/Quest/QuestDefinitionDatabase.cpp
+    src/Quest/QuestSystem.cpp
     src/Interaction/InteractionSystem.cpp
     src/Time/Clock.cpp
     src/Core/SeededRandom.cpp
@@ -189,7 +191,7 @@ if(BUILD_TESTING)
         )
         target_link_libraries(EnginePlayerPersistenceLifecycleTests PRIVATE GameEngineCore SDL3::SDL3)
         add_test(NAME EnginePlayerPersistenceLifecycleTests COMMAND EnginePlayerPersistenceLifecycleTests)
-        set_tests_properties(EnginePlayerPersistenceLifecycleTests PROPERTIES LABELS "headless")
+        set_tests_properties(EnginePlayerPersistenceLifecycleTests PROPERTIES LABELS "client")
     endif()
     add_gameengine_headless_test(MonsterLootIntegrationTests tests/MonsterLootIntegrationTests.cpp)
     add_gameengine_headless_test(MonsterRespawnTests tests/MonsterRespawnTests.cpp)
@@ -205,6 +207,12 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(ClockPacingTests tests/ClockPacingTests.cpp)
     add_gameengine_headless_test(GatheringRandomTests tests/GatheringRandomTests.cpp)
     add_gameengine_headless_test(GatheringSystemTests tests/GatheringSystemTests.cpp)
+    add_gameengine_headless_test(QuestSystemTests tests/QuestSystemTests.cpp)
+    add_gameengine_headless_test(QuestDefinitionTests tests/QuestDefinitionTests.cpp)
+    add_gameengine_headless_test(QuestWorldIntegrationTests tests/QuestWorldIntegrationTests.cpp)
+    add_gameengine_headless_test(QuestDialogueIntegrationTests tests/QuestDialogueIntegrationTests.cpp)
+    add_gameengine_headless_test(QuestPersistenceTests tests/QuestPersistenceTests.cpp)
+    add_gameengine_headless_test(QuestPresentationStateTests tests/QuestPresentationStateTests.cpp)
     add_gameengine_headless_test(RecipeActionSystemTests tests/RecipeActionSystemTests.cpp)
     add_gameengine_headless_test(MovementPathSafetyTests tests/MovementPathSafetyTests.cpp)
     add_gameengine_headless_test(MovementSystemTests tests/MovementSystemTests.cpp)
@@ -231,6 +239,7 @@ if(BUILD_TESTING)
         add_gameengine_graphics_test(MeleeClickIntegrationTests tests/MeleeClickIntegrationTests.cpp)
         add_gameengine_graphics_test(CombatFeedbackTests tests/CombatFeedbackTests.cpp)
         add_gameengine_graphics_test(MonsterRetaliationTests tests/MonsterRetaliationTests.cpp)
+        add_gameengine_graphics_test(QuestGraphicsTests tests/QuestGraphicsTests.cpp)
 
         add_executable(ClientDialogueIntegrationTests
             tests/ClientDialogueIntegrationTests.cpp
