@@ -334,28 +334,74 @@ bool Engine::EnqueuePendingDialogueCommand()
 void Engine::SynchronizeShopPresentation()
 {
     for (const auto &result : world.GetCommandProcessingResults()) {
-        if (pendingShopCommandID == 0 || result.commandID != pendingShopCommandID || result.actorEntityID != playerID) continue;
-        const bool close = pendingShopCommandType == PendingShopCommandType::CLOSE;
+        if (!pendingShopCommand.has_value() ||
+            result.commandID != pendingShopCommand->commandID ||
+            result.actorEntityID != pendingShopCommand->actorEntityID) continue;
+        const bool close = pendingShopCommand->type == PendingShopCommandType::CLOSE;
         graphics.ReconcileShopCommandResult(result.resultCode, close);
-        pendingShopCommandID = 0;
-        pendingShopCommandType = PendingShopCommandType::NONE;
+        ClearPendingShopCommand();
+        break;
     }
     graphics.SynchronizeShop(playerID, world.GetShopOpenedEvents(), world.GetActiveShopSession(playerID));
+
+    if (pendingShopCommand.has_value())
+    {
+        const ActiveShopSession *active =
+            world.GetActiveShopSession(pendingShopCommand->actorEntityID);
+        const ShopOpenedEvent *displayed =
+            graphics.GetShopPresentationState().GetEvent();
+        const bool originatingSessionStillActive =
+            active != nullptr && displayed != nullptr &&
+            active->actorEntityID == pendingShopCommand->actorEntityID &&
+            active->sessionId == pendingShopCommand->sessionID &&
+            displayed->actorEntityID == pendingShopCommand->actorEntityID &&
+            displayed->sessionId == pendingShopCommand->sessionID;
+        if (!originatingSessionStillActive)
+        {
+            ClearPendingShopCommand();
+        }
+    }
 }
 
 bool Engine::EnqueuePendingShopCommand()
 {
+    if (pendingShopCommand.has_value()) return false;
     std::optional<ServerCommandData> command = graphics.ConsumeShopCommand();
     if (!command) return false;
-    pendingShopCommandType = std::visit([](const auto &data) {
+    const PendingShopCommandType commandType = std::visit([](const auto &data) {
         using T = std::decay_t<decltype(data)>;
         if constexpr (std::is_same_v<T, ShopBuyCommand>) return PendingShopCommandType::BUY;
         if constexpr (std::is_same_v<T, ShopSellCommand>) return PendingShopCommandType::SELL;
         if constexpr (std::is_same_v<T, ShopCloseCommand>) return PendingShopCommandType::CLOSE;
         return PendingShopCommandType::NONE;
     }, *command);
-    pendingShopCommandID = world.EnqueueCommand(std::move(*command));
+    const auto [actorEntityID, sessionID] = std::visit([](const auto &data) {
+        using T = std::decay_t<decltype(data)>;
+        if constexpr (std::is_same_v<T, ShopBuyCommand> ||
+                      std::is_same_v<T, ShopSellCommand>)
+            return std::pair{data.actorEntityID, data.shopSessionId};
+        if constexpr (std::is_same_v<T, ShopCloseCommand>)
+            return std::pair{data.actorEntityID, data.shopSessionId};
+        return std::pair{0, InvalidShopSessionId};
+    }, *command);
+    if (commandType == PendingShopCommandType::NONE ||
+        actorEntityID <= 0 || sessionID == InvalidShopSessionId)
+    {
+        return false;
+    }
+    pendingShopCommand = PendingShopCommand{
+        world.EnqueueCommand(std::move(*command)),
+        actorEntityID,
+        sessionID,
+        commandType};
+    graphics.SetShopCommandInFlight(true);
     return true;
+}
+
+void Engine::ClearPendingShopCommand()
+{
+    pendingShopCommand.reset();
+    graphics.SetShopCommandInFlight(false);
 }
 
 bool Engine::FinalizeWorldAfterRun()

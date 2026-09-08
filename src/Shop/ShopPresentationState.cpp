@@ -18,6 +18,6 @@ void ShopPresentationState::Synchronize(int actor,const std::vector<ShopOpenedEv
  }
  if(event && (!active || !Matches(*event,actor,*active))){event.reset();rejectionVisible=false;}
 }
-std::optional<ServerCommandData> ShopPresentationState::MakeBuy(std::size_t i,int q) const{ if(!event||i>=event->entries.size()||q<=0)return std::nullopt; return ShopBuyCommand{event->actorEntityID,event->sessionId,event->entries[i].itemType,q}; }
-std::optional<ServerCommandData> ShopPresentationState::MakeSell(std::size_t i,int q) const{ if(!event||i>=event->entries.size()||q<=0)return std::nullopt; return ShopSellCommand{event->actorEntityID,event->sessionId,event->entries[i].itemType,q}; }
+std::optional<ServerCommandData> ShopPresentationState::MakeBuy(std::size_t i,int q) const{ if(!event||i>=event->entries.size()||q<=0||!event->entries[i].buyPrice.has_value())return std::nullopt; return ShopBuyCommand{event->actorEntityID,event->sessionId,event->entries[i].itemType,q}; }
+std::optional<ServerCommandData> ShopPresentationState::MakeSell(std::size_t i,int q) const{ if(!event||i>=event->entries.size()||q<=0||!event->entries[i].sellPrice.has_value())return std::nullopt; return ShopSellCommand{event->actorEntityID,event->sessionId,event->entries[i].itemType,q}; }
 std::optional<ServerCommandData> ShopPresentationState::MakeClose() const{ if(!event)return std::nullopt; return ShopCloseCommand{event->actorEntityID,event->sessionId}; }

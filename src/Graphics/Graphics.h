@@ -53,6 +53,8 @@ public:
     bool ConsumeStationMenuClose();
     std::optional<ServerCommandData> ConsumeDialogueCommand();
     std::optional<ServerCommandData> ConsumeShopCommand();
+    void SetShopCommandInFlight(bool inFlight);
+    bool IsShopCommandInFlight() const;
     void ReconcileShopCommandResult(CommandResultCode result, bool closeCommand);
     void SynchronizeDialogue(
         int localActorEntityID,
@@ -304,6 +306,7 @@ private:
     std::optional<ServerCommandData> pendingDialogueCommand;
     ShopPresentationState shopPresentationState;
     std::optional<ServerCommandData> pendingShopCommand;
+    bool shopCommandInFlight = false;
     int displayedCurrency = 0;
 
     bool HandleDialogueClick(float mouseX, float mouseY);

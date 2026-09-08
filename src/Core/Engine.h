@@ -45,6 +45,13 @@ private:
     void SynchronizeShopPresentation();
     bool EnqueuePendingShopCommand();
     enum class PendingShopCommandType { NONE, BUY, SELL, CLOSE };
-    std::uint64_t pendingShopCommandID = 0;
-    PendingShopCommandType pendingShopCommandType = PendingShopCommandType::NONE;
+    struct PendingShopCommand
+    {
+        std::uint64_t commandID = 0;
+        int actorEntityID = 0;
+        ShopSessionId sessionID = InvalidShopSessionId;
+        PendingShopCommandType type = PendingShopCommandType::NONE;
+    };
+    std::optional<PendingShopCommand> pendingShopCommand;
+    void ClearPendingShopCommand();
 };

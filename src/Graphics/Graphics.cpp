@@ -751,6 +751,20 @@ std::optional<ServerCommandData> Graphics::ConsumeDialogueCommand()
 }
 
 std::optional<ServerCommandData> Graphics::ConsumeShopCommand(){ if(!pendingShopCommand)return std::nullopt; auto c=pendingShopCommand; pendingShopCommand.reset(); return c; }
+void Graphics::SetShopCommandInFlight(bool inFlight)
+{
+    shopCommandInFlight = inFlight;
+    if (inFlight)
+    {
+        pendingShopCommand.reset();
+    }
+}
+
+bool Graphics::IsShopCommandInFlight() const
+{
+    return shopCommandInFlight;
+}
+
 void Graphics::ReconcileShopCommandResult(CommandResultCode result, bool closeCommand){ if(result==CommandResultCode::ACCEPTED){shopPresentationState.ClearRejection();return;} shopPresentationState.ReconcileRejectedCommand(); if(closeCommand) shopPresentationState.Dismiss(); }
 
 SDL_FRect Graphics::GetDialogueCloseButtonRectangle() const
@@ -786,7 +800,8 @@ SDL_FRect Graphics::GetShopCloseButtonRectangle() const { return SDL_FRect{1020.
 
 bool Graphics::HandleShopClick(float x,float y)
 {
-    if(!shopPresentationState.IsOpen()||pendingShopCommand)return true;
+    if(!shopPresentationState.IsOpen() || pendingShopCommand ||
+       shopCommandInFlight) return true;
     if(IsPointInsideRectangle(x,y,GetShopCloseButtonRectangle())) { pendingShopCommand=shopPresentationState.MakeClose(); return true; }
     const auto* e=shopPresentationState.GetEvent();
     for(std::size_t i=0;i<e->entries.size();++i){ const auto& row=e->entries[i]; if(row.buyPrice && IsPointInsideRectangle(x,y,GetShopBuyButtonRectangle(i))) { pendingShopCommand=shopPresentationState.MakeBuy(i); return true; } if(row.sellPrice && IsPointInsideRectangle(x,y,GetShopSellButtonRectangle(i))) { pendingShopCommand=shopPresentationState.MakeSell(i); return true; } }
