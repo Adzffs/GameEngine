@@ -78,6 +78,26 @@ bool HasYellowText(SDL_Surface* surface, const SDL_FPoint& origin)
     return false;
 }
 
+int CountPixelsDifferentFrom(
+    SDL_Surface* surface,
+    const SDL_FRect& region,
+    const Pixel& background)
+{
+    int changed = 0;
+    for (int y = static_cast<int>(region.y);
+         y < static_cast<int>(region.y + region.h); ++y)
+        for (int x = static_cast<int>(region.x);
+             x < static_cast<int>(region.x + region.w); ++x)
+        {
+            const Pixel pixel = ReadPixel(surface, x, y);
+            if (pixel.red != background.red ||
+                pixel.green != background.green ||
+                pixel.blue != background.blue)
+                ++changed;
+        }
+    return changed;
+}
+
 void SelectTab(Graphics &graphics, std::size_t index)
 {
     const SDL_FRect panel = graphics.GetSidePanelRectangle();
@@ -228,14 +248,40 @@ int main()
         SDL_RenderClear(renderer);
         GraphicsTestAccess::DrawQuestRows(nativeGraphics, syntheticQuests);
         SDL_Surface* syntheticPixels = SDL_RenderReadPixels(renderer, nullptr);
+        const Pixel background{5, 7, 9, 255};
+        const SDL_FRect insideGlyphRegion{
+            syntheticRows[3].titlePosition.x,
+            syntheticRows[3].titlePosition.y,
+            145.0f,
+            9.0f};
+        const SDL_FRect belowContentGlyphRegion{
+            syntheticRows[3].progressPosition.x,
+            syntheticRows[3].progressPosition.y,
+            145.0f,
+            9.0f};
         test.Expect(syntheticPixels != nullptr &&
-                        ReadPixel(syntheticPixels,
-                            static_cast<int>(layout.contentBounds.x) - 2,
-                            static_cast<int>(layout.contentBounds.y) + 40).red == 5 &&
-                        HasYellowText(syntheticPixels,
-                            syntheticRows.front().titlePosition),
-                    "Native multi-row drawing is clipped to shared Quest content bounds");
+                        CountPixelsDifferentFrom(syntheticPixels,
+                            insideGlyphRegion, background) > 0,
+                    "Overflow fixture row visibly renders its in-bounds title");
+        test.Expect(syntheticPixels != nullptr &&
+                        belowContentGlyphRegion.y >=
+                            layout.contentBounds.y + layout.contentBounds.h &&
+                        CountPixelsDifferentFrom(syntheticPixels,
+                            belowContentGlyphRegion, background) == 0,
+                    "Quest row clipping suppresses glyphs below the content boundary");
         if (syntheticPixels != nullptr) SDL_DestroySurface(syntheticPixels);
+
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderDebugText(renderer,
+            belowContentGlyphRegion.x,
+            belowContentGlyphRegion.y,
+            "Logs: 10 / 10");
+        SDL_Surface* postClipPixels = SDL_RenderReadPixels(renderer, nullptr);
+        test.Expect(postClipPixels != nullptr &&
+                        CountPixelsDifferentFrom(postClipPixels,
+                            belowContentGlyphRegion, background) > 0,
+                    "Quest drawing clears its clip before later UI rendering");
+        if (postClipPixels != nullptr) SDL_DestroySurface(postClipPixels);
 
         Player nativePlayer(101, PlayerInitializationMode::EMPTY);
         SelectTab(nativeGraphics, 1);
