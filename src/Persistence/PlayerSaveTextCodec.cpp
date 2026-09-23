@@ -415,7 +415,9 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         if (!skillsSeen[i]) result.AddIssue(PlayerSaveTextIssueCode::MISSING_SKILL_RECORD, -1, "Missing skill record");
     for (std::size_t i = 0; i < equipmentSeen.size(); ++i)
         if (!equipmentSeen[i]) result.AddIssue(PlayerSaveTextIssueCode::MISSING_EQUIPMENT_SLOT_RECORD, -1, "Missing equipment record");
-    if (version == 2 && parsedQuests.size() != 1)
+    if (version == 2 &&
+        (parsedQuests.size() != 1 ||
+         parsedQuests.front().id != QuestId::GATHERING_BASICS))
         result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD, -1,
             "Version 2 requires Gathering Basics exactly once");
     if (version == 2 && parsedQuests.size() == 1 &&
