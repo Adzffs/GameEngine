@@ -2,6 +2,7 @@
 
 #include "../src/Graphics/Graphics.h"
 #include "../src/Player/Player.h"
+#include "../src/Quest/QuestSystem.h"
 
 #include <iostream>
 
@@ -101,25 +102,23 @@ int main()
     test.Expect(view.state == "AVAILABLE" && view.progress == "Logs: 0 / 10",
                 "Available quest has a clear label");
 
-    player.GetQuestJournal().Get().state = QuestState::ACTIVE;
-    player.GetQuestJournal().Get().progress = 0;
+    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 0}});
     view = graphics.BuildQuestPanelView(player);
     test.Expect(view.state == "ACTIVE" && view.progress == "Logs: 0 / 10",
                 "Active quest displays authoritative zero progress");
-    player.GetQuestJournal().Get().progress = 6;
+    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 6}});
     view = graphics.BuildQuestPanelView(player);
     test.Expect(view.progress == "Logs: 6 / 10",
                 "Active quest displays authoritative updated progress");
 
-    player.GetQuestJournal().Get().state = QuestState::READY_TO_COMPLETE;
-    player.GetQuestJournal().Get().progress = 10;
+    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::READY_TO_COMPLETE, 10}});
     view = graphics.BuildQuestPanelView(player);
     test.Expect(view.state == "READY TO COMPLETE" &&
                     view.progress == "Logs: 10 / 10" &&
-                    player.GetQuestJournal().Get().progress == 10,
+                    player.GetQuestJournal().TryGet(QuestId::GATHERING_BASICS)->progress == 10,
                 "Ready quest has a clear completion label");
 
-    player.GetQuestJournal().Get().state = QuestState::COMPLETED;
+    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::COMPLETED, 10}});
     view = graphics.BuildQuestPanelView(player);
     test.Expect(view.state == "COMPLETED" && view.progress == "Logs: 10 / 10",
                 "Completed quest has a clear label");
@@ -170,8 +169,7 @@ int main()
             {QuestState::COMPLETED, 10}}};
         for (const auto& [state, progress] : states)
         {
-            nativePlayer.GetQuestJournal().Get().state = state;
-            nativePlayer.GetQuestJournal().Get().progress = progress;
+            QuestSystem::TryRestore(nativePlayer.GetQuestJournal(), {{QuestId::GATHERING_BASICS, state, progress}});
             const auto nativeView = nativeGraphics.BuildQuestPanelView(nativePlayer);
             SDL_SetRenderDrawColor(renderer, 5, 7, 9, 255);
             SDL_RenderClear(renderer);

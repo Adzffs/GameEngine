@@ -23,5 +23,5 @@ struct NpcTalkEvent
     bool isTerminal;
     std::vector<DialogueEventChoice> choices;
     bool offersTrade = false;
-    QuestDialogueAction questAction = QuestDialogueAction::NONE;
+    std::vector<QuestDialogueAction> questActions;
 };

@@ -12,6 +12,7 @@
 #include "../NPC/NpcSpawnDatabase.h"
 #include "../Dialogue/DialogueDefinitionDatabase.h"
 #include "../Shop/ShopDefinitionDatabase.h"
+#include "../Quest/QuestDefinitionDatabase.h"
 #include "../Skills/SkillType.h"
 #include "../Stats/StatType.h"
 #include "../World/Map.h"
@@ -260,9 +261,56 @@ ContentValidationReport ContentValidator::ValidateAll()
         else
             AppendDialogueDefinitionValidation(*dialogue, report);
     }
+    ContentValidationReport questReport =
+        ValidateQuestDefinitions(QuestDefinitionDatabase::GetAll());
+    for (const ContentValidationIssue &issue : questReport.GetIssues())
+        report.AddError(issue.category, issue.contentID, issue.message);
     ValidateStarterWorldContent(report);
 
     return report;
+}
+
+ContentValidationReport ContentValidator::ValidateQuestDefinition(
+    const QuestDefinition &definition)
+{
+    ContentValidationReport report;
+    AppendQuestDefinitionValidation(definition, report);
+    return report;
+}
+
+ContentValidationReport ContentValidator::ValidateQuestDefinitions(
+    const std::vector<QuestDefinition> &definitions)
+{
+    ContentValidationReport report;
+    if (!QuestDefinitionDatabase::IsValidCatalogue(definitions))
+        report.AddError("QuestDefinition", "catalogue",
+            "quest catalogue must be non-empty, unique, valid and ordered");
+    for (const QuestDefinition &definition : definitions)
+        AppendQuestDefinitionValidation(definition, report);
+    return report;
+}
+
+void ContentValidator::AppendQuestDefinitionValidation(
+    const QuestDefinition &definition,
+    ContentValidationReport &report)
+{
+    const std::string contentID = std::to_string(static_cast<int>(definition.id));
+    if (!QuestDefinitionDatabase::IsValidDefinition(definition))
+        report.AddError("QuestDefinition", contentID,
+            "quest definition fields are invalid");
+    const NpcDefinition *giver =
+        NpcDefinitionDatabase::TryGet(definition.giver.npcType);
+    const DialogueDefinition *dialogue =
+        DialogueDefinitionDatabase::TryGet(definition.giver.dialogueId);
+    if (giver == nullptr || giver->kind != NpcKind::FRIENDLY)
+        report.AddError("QuestDefinition", contentID,
+            "quest giver must be a known friendly NPC");
+    if (dialogue == nullptr ||
+        DialogueDefinitionDatabase::TryGetNode(
+            definition.giver.dialogueId,
+            definition.giver.interactionNodeId) == nullptr)
+        report.AddError("QuestDefinition", contentID,
+            "quest giver dialogue node must resolve");
 }
 
 ContentValidationReport ContentValidator::ValidateItemDefinition(

@@ -2,6 +2,7 @@
 
 #include "PersistenceTokenCodec.h"
 #include "PlayerSaveState.h"
+#include "../Quest/QuestDefinitionDatabase.h"
 
 #include <algorithm>
 #include <array>
@@ -106,7 +107,9 @@ namespace
         return -1;
     }
     std::string_view QuestStateToken(QuestState s){switch(s){case QuestState::AVAILABLE:return "AVAILABLE";case QuestState::ACTIVE:return "ACTIVE";case QuestState::READY_TO_COMPLETE:return "READY_TO_COMPLETE";case QuestState::COMPLETED:return "COMPLETED";default:return "UNAVAILABLE";}}
-    std::optional<QuestState> ParseQuestState(std::string_view s){if(s=="AVAILABLE")return QuestState::AVAILABLE;if(s=="ACTIVE")return QuestState::ACTIVE;if(s=="READY_TO_COMPLETE")return QuestState::READY_TO_COMPLETE;if(s=="COMPLETED")return QuestState::COMPLETED;return std::nullopt;}
+    std::optional<QuestState> ParseQuestState(std::string_view s){if(s=="UNAVAILABLE")return QuestState::UNAVAILABLE;if(s=="AVAILABLE")return QuestState::AVAILABLE;if(s=="ACTIVE")return QuestState::ACTIVE;if(s=="READY_TO_COMPLETE")return QuestState::READY_TO_COMPLETE;if(s=="COMPLETED")return QuestState::COMPLETED;return std::nullopt;}
+    std::string_view QuestIdToken(QuestId id){return id==QuestId::GATHERING_BASICS?"GATHERING_BASICS":"NONE";}
+    std::optional<QuestId> ParseQuestId(std::string_view token){if(token=="GATHERING_BASICS")return QuestId::GATHERING_BASICS;return std::nullopt;}
 }
 
 bool PlayerSaveTextDecodeResult::IsSuccess() const { return issues.empty() && saveData.has_value(); }
@@ -181,7 +184,16 @@ bool PlayerSaveTextCodec::TryEncode(const PlayerSaveData &saveData, std::string 
         encoded.append("equipment.").append(*slotToken).push_back('=');
         encoded.append(*itemToken).push_back('\n');
     }
-    encoded.append("quest.GATHERING_BASICS=").append(QuestStateToken(saveData.gatheringBasicsState)).push_back(','); AppendInteger(encoded,saveData.gatheringBasicsProgress); encoded.push_back('\n');
+    AppendScalar(encoded, "quest_count", static_cast<int>(saveData.quests.size()));
+    for (const QuestDefinition &definition : QuestDefinitionDatabase::GetAll())
+    {
+        const auto found = std::find_if(saveData.quests.begin(), saveData.quests.end(),
+            [&](const SavedQuestRecord &record){return record.id == definition.id;});
+        if (found == saveData.quests.end()) return false;
+        encoded.append("quest.").append(QuestIdToken(found->id)).push_back('=');
+        encoded.append(QuestStateToken(found->state)).push_back(',');
+        AppendInteger(encoded, found->progress); encoded.push_back('\n');
+    }
     encoded.append(END_MARKER).push_back('\n');
     output = std::move(encoded);
     return true;
@@ -235,7 +247,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
     }
     if (versionLine == -1)
     { result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD, -1, "Missing version"); return result; }
-    if (version != 1 && version != CURRENT_PLAYER_SAVE_VERSION)
+    if (version != 1 && version != 2 && version != CURRENT_PLAYER_SAVE_VERSION)
     { result.AddIssue(PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, versionLine, "Unsupported player save version"); return result; }
 
     PlayerSaveData save;
@@ -245,7 +257,9 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
     std::array<bool, 5> equipmentSeen{};
     std::array<int, 5> skillXP{};
     std::array<ItemType, 5> equipmentItems{};
-    bool questSeen=false;
+    bool questCountSeen = false;
+    int declaredQuestCount = -1;
+    std::vector<SavedQuestRecord> parsedQuests;
     auto addInteger = [&](std::string_view value, int line, int &target)
     {
         const auto parsed = ParseInteger(value, target);
@@ -282,6 +296,21 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
             scalars[index] = true;
             if (addInteger(value, lineNumber, count) && count != (index == 4 ? 28 : 5))
                 result.AddIssue(PlayerSaveTextIssueCode::INVALID_COUNT, lineNumber, "Incorrect record count");
+            continue;
+        }
+        if (key == "quest_count")
+        {
+            if (version != 3 || questCountSeen)
+            {
+                result.AddIssue(PlayerSaveTextIssueCode::DUPLICATE_FIELD,
+                    lineNumber, "Unexpected or duplicate quest_count");
+                continue;
+            }
+            questCountSeen = true;
+            if (addInteger(value, lineNumber, declaredQuestCount) &&
+                declaredQuestCount < 0)
+                result.AddIssue(PlayerSaveTextIssueCode::INVALID_COUNT,
+                    lineNumber, "Quest count cannot be negative");
             continue;
         }
         if (key.starts_with("inventory."))
@@ -321,9 +350,48 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
             if (!item) { result.AddIssue(PlayerSaveTextIssueCode::UNKNOWN_ITEM_TOKEN, lineNumber, "Unknown item token"); continue; }
             equipmentItems[static_cast<std::size_t>(index)] = *item; continue;
         }
-        if(key=="quest.GATHERING_BASICS")
+        if (key.starts_with("quest."))
         {
-            if(version==1||questSeen){result.AddIssue(PlayerSaveTextIssueCode::DUPLICATE_FIELD,lineNumber,"Unexpected or duplicate quest record");continue;} questSeen=true; const auto comma=value.find(','); if(comma==std::string_view::npos){result.AddIssue(PlayerSaveTextIssueCode::MALFORMED_RECORD,lineNumber,"Malformed quest record");continue;} const auto state=ParseQuestState(value.substr(0,comma)); if(!state){result.AddIssue(PlayerSaveTextIssueCode::UNKNOWN_FIELD,lineNumber,"Unknown quest state");continue;} save.gatheringBasicsState=*state; addInteger(value.substr(comma+1),lineNumber,save.gatheringBasicsProgress); continue;
+            if (version == 1)
+            {
+                result.AddIssue(PlayerSaveTextIssueCode::UNKNOWN_FIELD,
+                    lineNumber, "Version 1 cannot contain quest records");
+                continue;
+            }
+            const auto questId = ParseQuestId(key.substr(6));
+            if (!questId)
+            {
+                result.AddIssue(PlayerSaveTextIssueCode::UNKNOWN_FIELD,
+                    lineNumber, "Unknown quest ID");
+                continue;
+            }
+            if (std::any_of(parsedQuests.begin(), parsedQuests.end(),
+                    [&](const SavedQuestRecord &record){return record.id == *questId;}))
+            {
+                result.AddIssue(PlayerSaveTextIssueCode::DUPLICATE_FIELD,
+                    lineNumber, "Duplicate quest record");
+                continue;
+            }
+            const auto comma = value.find(',');
+            if (comma == std::string_view::npos || comma == 0 ||
+                comma + 1 == value.size() ||
+                value.find(',', comma + 1) != std::string_view::npos)
+            {
+                result.AddIssue(PlayerSaveTextIssueCode::MALFORMED_RECORD,
+                    lineNumber, "Malformed quest record");
+                continue;
+            }
+            const auto state = ParseQuestState(value.substr(0, comma));
+            if (!state)
+            {
+                result.AddIssue(PlayerSaveTextIssueCode::UNKNOWN_FIELD,
+                    lineNumber, "Unknown quest state");
+                continue;
+            }
+            int progress = 0;
+            if (addInteger(value.substr(comma + 1), lineNumber, progress))
+                parsedQuests.push_back({*questId, *state, progress});
+            continue;
         }
         result.AddIssue(PlayerSaveTextIssueCode::UNKNOWN_FIELD, lineNumber, "Unknown field");
     }
@@ -336,7 +404,32 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         if (!skillsSeen[i]) result.AddIssue(PlayerSaveTextIssueCode::MISSING_SKILL_RECORD, -1, "Missing skill record");
     for (std::size_t i = 0; i < equipmentSeen.size(); ++i)
         if (!equipmentSeen[i]) result.AddIssue(PlayerSaveTextIssueCode::MISSING_EQUIPMENT_SLOT_RECORD, -1, "Missing equipment record");
-    if(version==2&&!questSeen) result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD,-1,"Missing Gathering Basics quest record");
+    if (version == 2 && parsedQuests.size() != 1)
+        result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD, -1,
+            "Version 2 requires Gathering Basics exactly once");
+    if (version == 2 && parsedQuests.size() == 1 &&
+        parsedQuests.front().state == QuestState::UNAVAILABLE)
+        result.AddIssue(PlayerSaveTextIssueCode::SAVE_DATA_VALIDATION_FAILED,
+            -1, "Version 2 did not encode UNAVAILABLE quest state");
+    if (version == 3)
+    {
+        if (!questCountSeen)
+            result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD, -1,
+                "Missing quest_count");
+        else if (declaredQuestCount != static_cast<int>(parsedQuests.size()))
+            result.AddIssue(PlayerSaveTextIssueCode::INVALID_COUNT, -1,
+                "quest_count does not match parsed records");
+        // Version 3 is a historical wire contract: it contains exactly the
+        // catalogue shipped with this version, irrespective of future quests.
+        // Adding quest two requires version 4. A future v3-to-v4 migration
+        // must preserve this record and initialize new records from each
+        // version-4 definition's initialState; it must not reinterpret v3
+        // against the future live catalogue.
+        if (parsedQuests.size() != 1 ||
+            parsedQuests.front().id != QuestId::GATHERING_BASICS)
+            result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD, -1,
+                "Version 3 requires its historical one-quest catalogue");
+    }
     if (!result.GetIssues().empty()) return result;
 
     save.skills.reserve(5); save.equipment.reserve(5);
@@ -347,12 +440,30 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
     }
     // Version 1 had no quest section. Successful legacy decoding migrates the
     // in-memory representation to the current schema without inferring progress.
+    save.quests.clear();
     if (save.version == 1)
     {
-        save.version = CURRENT_PLAYER_SAVE_VERSION;
-        save.gatheringBasicsState = QuestState::AVAILABLE;
-        save.gatheringBasicsProgress = 0;
+        for (const QuestDefinition &definition : QuestDefinitionDatabase::GetAll())
+            save.quests.push_back({definition.id, definition.initialState, 0});
     }
+    else if (save.version == 2)
+    {
+        for (const QuestDefinition &definition : QuestDefinitionDatabase::GetAll())
+            save.quests.push_back({definition.id, definition.initialState, 0});
+        const SavedQuestRecord legacy = parsedQuests.front();
+        auto destination = std::find_if(save.quests.begin(), save.quests.end(),
+            [&](const SavedQuestRecord &record){return record.id == legacy.id;});
+        if (destination == save.quests.end())
+        {
+            result.AddIssue(PlayerSaveTextIssueCode::SAVE_DATA_VALIDATION_FAILED,
+                -1, "Version 2 quest could not be overlaid onto current defaults");
+            return result;
+        }
+        *destination = legacy;
+    }
+    else
+        save.quests = std::move(parsedQuests);
+    save.version = CURRENT_PLAYER_SAVE_VERSION;
     result.validationReport = PlayerSaveState::Validate(save);
     if (!result.validationReport.IsValid())
     { result.AddIssue(PlayerSaveTextIssueCode::SAVE_DATA_VALIDATION_FAILED, -1, "Decoded save data failed semantic validation"); return result; }

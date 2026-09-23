@@ -106,11 +106,19 @@ DialoguePresentationState::MakeChoiceCommand(
         event->choices[choiceIndex].id};
 }
 
-std::optional<ServerCommandData> DialoguePresentationState::MakeQuestCommand() const
+std::optional<ServerCommandData> DialoguePresentationState::MakeQuestCommand(
+    std::size_t actionIndex) const
 {
-    if(!event||!activeAuthoritativeSession)return std::nullopt;
-    if(event->questAction==QuestDialogueAction::ACCEPT_GATHERING_BASICS)return QuestAcceptCommand{event->actorEntityID,event->npcEntityID,event->sessionId,QuestId::GATHERING_BASICS};
-    if(event->questAction==QuestDialogueAction::COMPLETE_GATHERING_BASICS)return QuestCompleteCommand{event->actorEntityID,event->npcEntityID,event->sessionId,QuestId::GATHERING_BASICS};
+    if (!event || !activeAuthoritativeSession ||
+        actionIndex >= event->questActions.size()) return std::nullopt;
+    const QuestDialogueAction &action = event->questActions[actionIndex];
+    if (action.questId == QuestId::NONE) return std::nullopt;
+    if (action.kind == QuestDialogueActionKind::ACCEPT)
+        return QuestAcceptCommand{event->actorEntityID, event->npcEntityID,
+            event->sessionId, action.questId};
+    if (action.kind == QuestDialogueActionKind::COMPLETE)
+        return QuestCompleteCommand{event->actorEntityID, event->npcEntityID,
+            event->sessionId, action.questId};
     return std::nullopt;
 }
 

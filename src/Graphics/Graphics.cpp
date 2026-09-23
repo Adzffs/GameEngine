@@ -792,7 +792,16 @@ SDL_FRect Graphics::GetDialogueTradeButtonRectangle() const {
     const std::size_t index = event == nullptr ? 0 : event->choices.size();
     return GetDialogueChoiceButtonRectangle(index);
 }
-SDL_FRect Graphics::GetDialogueQuestButtonRectangle() const {auto b=GetDialogueTradeButtonRectangle();b.y+=44.0f;return b;}
+SDL_FRect Graphics::GetDialogueQuestButtonRectangle(
+    std::size_t actionIndex) const
+{
+    const NpcTalkEvent *event = dialoguePresentationState.GetEvent();
+    const std::size_t authoredChoices = event == nullptr ? 0 : event->choices.size();
+    const std::size_t tradeOffset =
+        dialoguePresentationState.CanTrade() ? 1 : 0;
+    return GetDialogueChoiceButtonRectangle(
+        authoredChoices + tradeOffset + actionIndex);
+}
 SDL_FRect Graphics::GetShopRowRectangle(std::size_t i) const { return SDL_FRect{160.0f,150.0f+static_cast<float>(i)*48.0f,960.0f,42.0f}; }
 SDL_FRect Graphics::GetShopBuyButtonRectangle(std::size_t i) const { auto r=GetShopRowRectangle(i); return SDL_FRect{r.x+r.w-300.0f,r.y+4.0f,120.0f,r.h-8.0f}; }
 SDL_FRect Graphics::GetShopSellButtonRectangle(std::size_t i) const { auto r=GetShopRowRectangle(i); return SDL_FRect{r.x+r.w-160.0f,r.y+4.0f,120.0f,r.h-8.0f}; }
@@ -828,7 +837,18 @@ bool Graphics::HandleDialogueClick(float mouseX, float mouseY)
     }
 
     const NpcTalkEvent *event = dialoguePresentationState.GetEvent();
-    if(event->questAction!=QuestDialogueAction::NONE&&IsPointInsideRectangle(mouseX,mouseY,GetDialogueQuestButtonRectangle())){pendingDialogueCommand=dialoguePresentationState.MakeQuestCommand();return true;}
+    for (std::size_t actionIndex = 0;
+         actionIndex < event->questActions.size(); ++actionIndex)
+    {
+        if (IsPointInsideRectangle(
+                mouseX, mouseY,
+                GetDialogueQuestButtonRectangle(actionIndex)))
+        {
+            pendingDialogueCommand =
+                dialoguePresentationState.MakeQuestCommand(actionIndex);
+            return true;
+        }
+    }
     if (dialoguePresentationState.CanTrade() && IsPointInsideRectangle(mouseX, mouseY, GetDialogueTradeButtonRectangle()))
     {
         pendingDialogueCommand=dialoguePresentationState.MakeTradeCommand();
@@ -3092,7 +3112,24 @@ void Graphics::DrawDialoguePanel()
     if (dialoguePresentationState.CanTrade()) {
         const SDL_FRect b=GetDialogueTradeButtonRectangle(); SDL_SetRenderDrawColor(renderer,55,50,45,255); SDL_RenderFillRect(renderer,&b); SDL_SetRenderDrawColor(renderer,190,170,130,255); SDL_RenderRect(renderer,&b); SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,b.x+12,b.y+12,"Trade");
     }
-    if(event->questAction!=QuestDialogueAction::NONE){const auto b=GetDialogueQuestButtonRectangle();SDL_SetRenderDrawColor(renderer,55,50,45,255);SDL_RenderFillRect(renderer,&b);SDL_SetRenderDrawColor(renderer,190,170,130,255);SDL_RenderRect(renderer,&b);SDL_SetRenderDrawColor(renderer,255,255,255,255);SDL_RenderDebugText(renderer,b.x+12,b.y+12,event->questAction==QuestDialogueAction::ACCEPT_GATHERING_BASICS?"Accept Gathering Basics":"Complete Gathering Basics");}
+    for (std::size_t actionIndex = 0;
+         actionIndex < event->questActions.size(); ++actionIndex)
+    {
+        const QuestDialogueAction &action = event->questActions[actionIndex];
+        const QuestDefinition *definition =
+            QuestDefinitionDatabase::TryGet(action.questId);
+        if (definition == nullptr) continue;
+        const SDL_FRect button = GetDialogueQuestButtonRectangle(actionIndex);
+        SDL_SetRenderDrawColor(renderer,55,50,45,255);
+        SDL_RenderFillRect(renderer,&button);
+        SDL_SetRenderDrawColor(renderer,190,170,130,255);
+        SDL_RenderRect(renderer,&button);
+        SDL_SetRenderDrawColor(renderer,255,255,255,255);
+        const std::string label =
+            std::string(action.kind == QuestDialogueActionKind::ACCEPT
+                ? "Accept " : "Complete ") + definition->name;
+        SDL_RenderDebugText(renderer,button.x+12,button.y+12,label.c_str());
+    }
 }
 
 void Graphics::DrawShopPanel()
@@ -3109,8 +3146,11 @@ Graphics::QuestPanelView Graphics::BuildQuestPanelView(const Player &player) con
     const SidePanelLayout layout = GetSidePanelLayout();
     const SDL_FRect bounds = layout.panelBounds;
     const SDL_FRect content = layout.contentBounds;
-    const auto &record = player.GetQuestJournal().Get();
-    const QuestDefinition *definition = QuestDefinitionDatabase::TryGet(record.id);
+    QuestPresentationState presentationState;
+    presentationState.Synchronize(player.GetQuestJournal());
+    const auto &quests = presentationState.GetQuests();
+    const QuestPresentation empty{};
+    const QuestPresentation &record = quests.empty() ? empty : quests.front();
 
     QuestPanelView view{
         bounds,
@@ -3120,34 +3160,37 @@ Graphics::QuestPanelView Graphics::BuildQuestPanelView(const Player &player) con
         {content.x, content.y + 60.0f},
         {content.x, content.y + 84.0f},
         "QUESTS",
-        definition == nullptr ? "Unknown quest" : definition->name,
+        record.title.empty() ? "Unknown quest" : record.title,
         "UNAVAILABLE",
         "",
         selectedTab == SidePanelTab::QUESTS};
 
     switch (record.state)
     {
+    case QuestState::UNAVAILABLE:
+        view.state = "UNAVAILABLE";
+        view.progress = record.objective + ": 0 / " +
+            std::to_string(record.required);
+        break;
     case QuestState::AVAILABLE:
         view.state = "AVAILABLE";
-        view.progress = "Logs: 0 / " +
-            std::to_string(definition == nullptr ? 0 : definition->requiredAmount);
+        view.progress = record.objective + ": 0 / " +
+            std::to_string(record.required);
         break;
     case QuestState::ACTIVE:
         view.state = "ACTIVE";
-        view.progress = "Logs: " + std::to_string(record.progress) + " / " +
-            std::to_string(definition == nullptr ? 0 : definition->requiredAmount);
+        view.progress = record.objective + ": " + std::to_string(record.progress) + " / " +
+            std::to_string(record.required);
         break;
     case QuestState::READY_TO_COMPLETE:
         view.state = "READY TO COMPLETE";
-        view.progress = "Logs: " + std::to_string(record.progress) + " / " +
-            std::to_string(definition == nullptr ? 0 : definition->requiredAmount);
+        view.progress = record.objective + ": " + std::to_string(record.progress) + " / " +
+            std::to_string(record.required);
         break;
     case QuestState::COMPLETED:
         view.state = "COMPLETED";
-        view.progress = "Logs: " + std::to_string(record.progress) + " / " +
-            std::to_string(definition == nullptr ? 0 : definition->requiredAmount);
-        break;
-    default:
+        view.progress = record.objective + ": " + std::to_string(record.progress) + " / " +
+            std::to_string(record.required);
         break;
     }
     return view;
@@ -3155,6 +3198,7 @@ Graphics::QuestPanelView Graphics::BuildQuestPanelView(const Player &player) con
 
 void Graphics::DrawQuestPanel(const Player &player)
 {
+    questPresentationState.Synchronize(player.GetQuestJournal());
     const QuestPanelView view = BuildQuestPanelView(player);
     DrawSidePanelFrame(view.heading.c_str());
 
@@ -3164,11 +3208,30 @@ void Graphics::DrawQuestPanel(const Player &player)
         static_cast<int>(view.contentBounds.w),
         static_cast<int>(view.contentBounds.h)};
     SDL_SetRenderClipRect(renderer, &clipRectangle);
-    SDL_SetRenderDrawColor(renderer, 255, 215, 100, 255);
-    SDL_RenderDebugText(renderer, view.titlePosition.x, view.titlePosition.y, view.title.c_str());
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderDebugText(renderer, view.statePosition.x, view.statePosition.y, view.state.c_str());
-    SDL_RenderDebugText(renderer, view.progressPosition.x, view.progressPosition.y, view.progress.c_str());
+    float rowY = view.titlePosition.y;
+    for (const QuestPresentation &quest : questPresentationState.GetQuests())
+    {
+        SDL_SetRenderDrawColor(renderer, 255, 215, 100, 255);
+        SDL_RenderDebugText(renderer, view.titlePosition.x, rowY,
+            quest.title.c_str());
+        std::string state;
+        switch (quest.state)
+        {
+        case QuestState::UNAVAILABLE: state = "UNAVAILABLE"; break;
+        case QuestState::AVAILABLE: state = "AVAILABLE"; break;
+        case QuestState::ACTIVE: state = "ACTIVE"; break;
+        case QuestState::READY_TO_COMPLETE: state = "READY TO COMPLETE"; break;
+        case QuestState::COMPLETED: state = "COMPLETED"; break;
+        }
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderDebugText(renderer, view.statePosition.x, rowY + 28.0f,
+            state.c_str());
+        const std::string progress = quest.objective + ": " + std::to_string(quest.progress) +
+            " / " + std::to_string(quest.required);
+        SDL_RenderDebugText(renderer, view.progressPosition.x, rowY + 52.0f,
+            progress.c_str());
+        rowY += 88.0f;
+    }
     SDL_SetRenderClipRect(renderer, nullptr);
 }
 

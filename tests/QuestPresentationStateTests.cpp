@@ -1,3 +1,31 @@
 #include "TestSupport.h"
 #include "../src/Quest/QuestPresentationState.h"
-int main(){TestContext t;QuestJournal j;QuestPresentationState p;for(auto state:{QuestState::AVAILABLE,QuestState::ACTIVE,QuestState::READY_TO_COMPLETE,QuestState::COMPLETED}){j.Get().state=state;j.Get().progress=state==QuestState::AVAILABLE?0:state==QuestState::ACTIVE?6:10;p.Synchronize(j);t.Expect(p.Get().state==state&&p.Get().progress==j.Get().progress&&p.Get().required==10,"Presentation mirrors authoritative journal and definition");}return t.Finish();}
+#include "../src/Quest/QuestSystem.h"
+
+int main()
+{
+    TestContext test;
+    QuestJournal journal;
+    QuestPresentationState presentation;
+    for (const auto &[state, progress] : std::vector<std::pair<QuestState, int>>{
+             {QuestState::AVAILABLE, 0},
+             {QuestState::ACTIVE, 6},
+             {QuestState::READY_TO_COMPLETE, 10},
+             {QuestState::COMPLETED, 10}})
+    {
+        test.Expect(QuestSystem::TryRestore(journal, {{
+                        QuestId::GATHERING_BASICS, state, progress}}),
+                    "Fixture restores through controlled QuestSystem API");
+        presentation.Synchronize(journal);
+        const auto &quests = presentation.GetQuests();
+        test.Expect(quests.size() == 1 &&
+                        quests.front().id == QuestId::GATHERING_BASICS &&
+                        quests.front().state == state &&
+                        quests.front().progress == progress &&
+                        quests.front().required == 10 &&
+                        quests.front().title == "Gathering Basics" &&
+                        quests.front().objective == "Logs",
+                    "Presentation copies ordered authoritative journal values");
+    }
+    return test.Finish();
+}

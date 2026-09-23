@@ -79,6 +79,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/Combat/MeleeEngagementSystem.cpp
     src/Gathering/GatheringSystem.cpp
     src/Quest/QuestDefinitionDatabase.cpp
+    src/Quest/QuestJournal.cpp
     src/Quest/QuestSystem.cpp
     src/Interaction/InteractionSystem.cpp
     src/Time/Clock.cpp

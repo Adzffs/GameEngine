@@ -22,6 +22,7 @@
 #include "../Command/CommandProcessingResult.h"
 #include "../Dialogue/DialoguePresentationState.h"
 #include "../Shop/ShopPresentationState.h"
+#include "../Quest/QuestPresentationState.h"
 
 class Map;
 class Player;
@@ -212,7 +213,8 @@ public:
     SDL_FRect GetDialogueContinueButtonRectangle() const;
     SDL_FRect GetDialogueChoiceButtonRectangle(std::size_t choiceIndex) const;
     SDL_FRect GetDialogueTradeButtonRectangle() const;
-    SDL_FRect GetDialogueQuestButtonRectangle() const;
+    SDL_FRect GetDialogueQuestButtonRectangle(
+        std::size_t actionIndex = 0) const;
     SDL_FRect GetShopRowRectangle(std::size_t index) const;
     SDL_FRect GetShopBuyButtonRectangle(std::size_t index) const;
     SDL_FRect GetShopSellButtonRectangle(std::size_t index) const;
@@ -308,6 +310,7 @@ private:
     std::optional<ServerCommandData> pendingShopCommand;
     bool shopCommandInFlight = false;
     int displayedCurrency = 0;
+    QuestPresentationState questPresentationState;
 
     bool HandleDialogueClick(float mouseX, float mouseY);
     bool HandleShopClick(float mouseX, float mouseY);

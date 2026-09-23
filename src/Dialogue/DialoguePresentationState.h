@@ -28,7 +28,8 @@ public:
         std::size_t choiceIndex) const;
     std::optional<ServerCommandData> MakeCloseCommand() const;
     std::optional<ServerCommandData> MakeTradeCommand() const;
-    std::optional<ServerCommandData> MakeQuestCommand() const;
+    std::optional<ServerCommandData> MakeQuestCommand(
+        std::size_t actionIndex) const;
     bool CanTrade() const;
     void DismissTerminal();
     void Dismiss() { event.reset(); npcName.clear(); }

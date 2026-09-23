@@ -1,6 +1,7 @@
 #include "TestSupport.h"
 #include "../src/Dialogue/DialoguePresentationState.h"
 #include "../src/Player/Player.h"
+#include "../src/Quest/QuestSystem.h"
 #include "../src/World/World.h"
 
 namespace
@@ -54,10 +55,14 @@ int main()
         world.GetActiveDialogueSession(player->GetID());
     test.Expect(available != nullptr &&
                     available->nodeId == DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME &&
-                    available->questAction == QuestDialogueAction::ACCEPT_GATHERING_BASICS,
+                    available->questActions.size() == 1 &&
+                    available->questActions.front().kind == QuestDialogueActionKind::ACCEPT &&
+                    available->questActions.front().questId == QuestId::GATHERING_BASICS,
                 "Real World opening publishes Accept for AVAILABLE");
     presentation.Synchronize(player->GetID(), world.GetNpcTalkEvents(), session);
-    auto accept = presentation.MakeQuestCommand();
+    auto accept = presentation.MakeQuestCommand(0);
+    test.Expect(!presentation.MakeQuestCommand(1).has_value(),
+                "Invalid published quest-action index rejects");
     const auto* acceptCommand = accept
         ? std::get_if<QuestAcceptCommand>(&*accept) : nullptr;
     test.Expect(acceptCommand != nullptr &&
@@ -72,19 +77,20 @@ int main()
     Reopen(world, *player);
     const NpcTalkEvent* active = LocalEvent(world, player->GetID());
     test.Expect(active != nullptr &&
-                    active->questAction == QuestDialogueAction::NONE,
+                    active->questActions.empty(),
                 "Real World opening publishes no quest action for ACTIVE");
 
-    player->GetQuestJournal().Get() = {
-        QuestId::GATHERING_BASICS, QuestState::READY_TO_COMPLETE, 10};
+    QuestSystem::TryRestore(player->GetQuestJournal(), {{
+        QuestId::GATHERING_BASICS, QuestState::READY_TO_COMPLETE, 10}});
     Reopen(world, *player);
     const NpcTalkEvent* ready = LocalEvent(world, player->GetID());
     session = world.GetActiveDialogueSession(player->GetID());
     test.Expect(ready != nullptr &&
-                    ready->questAction == QuestDialogueAction::COMPLETE_GATHERING_BASICS,
+                    ready->questActions.size() == 1 &&
+                    ready->questActions.front().kind == QuestDialogueActionKind::COMPLETE,
                 "Real World opening publishes Complete for READY_TO_COMPLETE");
     presentation.Synchronize(player->GetID(), world.GetNpcTalkEvents(), session);
-    auto complete = presentation.MakeQuestCommand();
+    auto complete = presentation.MakeQuestCommand(0);
     const auto* completeCommand = complete
         ? std::get_if<QuestCompleteCommand>(&*complete) : nullptr;
     test.Expect(completeCommand != nullptr &&
@@ -94,11 +100,12 @@ int main()
                     completeCommand->questId == QuestId::GATHERING_BASICS,
                 "Client presentation forwards exact authoritative Complete identity");
 
-    player->GetQuestJournal().Get().state = QuestState::COMPLETED;
+    QuestSystem::TryRestore(player->GetQuestJournal(), {{
+        QuestId::GATHERING_BASICS, QuestState::COMPLETED, 10}});
     Reopen(world, *player);
     const NpcTalkEvent* completed = LocalEvent(world, player->GetID());
     test.Expect(completed != nullptr &&
-                    completed->questAction == QuestDialogueAction::NONE,
+                    completed->questActions.empty(),
                 "Real World opening publishes no quest action for COMPLETED");
 
     session = world.GetActiveDialogueSession(player->GetID());
@@ -108,7 +115,7 @@ int main()
     const NpcTalkEvent* explanation = LocalEvent(world, player->GetID());
     test.Expect(explanation != nullptr &&
                     explanation->nodeId != DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME &&
-                    explanation->questAction == QuestDialogueAction::NONE,
+                    explanation->questActions.empty(),
                 "Non-opening World dialogue node publishes no quest action");
 
     const DialogueSessionId terminalPathSession =
@@ -127,7 +134,7 @@ int main()
     world.Update();
     const NpcTalkEvent* terminal = LocalEvent(world, player->GetID());
     test.Expect(terminal != nullptr && terminal->isTerminal &&
-                    terminal->questAction == QuestDialogueAction::NONE,
+                    terminal->questActions.empty(),
                 "Real World terminal node publishes no quest action");
 
     return test.Finish();

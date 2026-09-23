@@ -5,11 +5,12 @@
 #include "../Inventory/ItemType.h"
 #include "../Skills/SkillType.h"
 #include "../Quest/QuestState.h"
+#include "../Quest/QuestId.h"
 
 #include <array>
 #include <vector>
 
-inline constexpr int CURRENT_PLAYER_SAVE_VERSION = 2;
+inline constexpr int CURRENT_PLAYER_SAVE_VERSION = 3;
 
 struct SavedInventorySlot
 {
@@ -29,6 +30,13 @@ struct SavedEquipmentSlot
     ItemType itemType = ItemType::NONE;
 };
 
+struct SavedQuestRecord
+{
+    QuestId id = QuestId::NONE;
+    QuestState state = QuestState::UNAVAILABLE;
+    int progress = 0;
+};
+
 struct PlayerSaveData
 {
     int version = CURRENT_PLAYER_SAVE_VERSION;
@@ -38,6 +46,5 @@ struct PlayerSaveData
     std::array<SavedInventorySlot, Inventory::SlotCount> inventorySlots{};
     std::vector<SavedSkillXP> skills;
     std::vector<SavedEquipmentSlot> equipment;
-    QuestState gatheringBasicsState = QuestState::AVAILABLE;
-    int gatheringBasicsProgress = 0;
+    std::vector<SavedQuestRecord> quests;
 };

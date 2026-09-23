@@ -93,8 +93,9 @@ int main()
             DialogueId::DEVELOPMENT_GUIDE_INTRO,
             DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME,
             "Let me show you the gathering basics.",
-            DialogueNodeKind::CONTINUE, false, {}, false,
-            QuestDialogueAction::ACCEPT_GATHERING_BASICS};
+            DialogueNodeKind::CONTINUE, false, {}, true,
+            {{QuestDialogueActionKind::ACCEPT,
+              QuestId::GATHERING_BASICS}}};
         ActiveDialogueSession session{
             901, 44, 17, NpcType::DEVELOPMENT_GUIDE,
             DialogueId::DEVELOPMENT_GUIDE_INTRO,
@@ -116,15 +117,17 @@ int main()
                         !graphics.ConsumeDialogueCommand().has_value(),
                     "Accept click is modal and queues exactly one command");
 
-        event.questAction = QuestDialogueAction::COMPLETE_GATHERING_BASICS;
+        event.questActions = {{QuestDialogueActionKind::COMPLETE,
+            QuestId::GATHERING_BASICS}};
+        event.offersTrade = false;
         graphics.SynchronizeDialogue(44, {event}, &session);
         const SDL_FRect completeRectangle =
             graphics.GetDialogueQuestButtonRectangle();
         test.Expect(acceptRectangle.x == completeRectangle.x &&
-                        acceptRectangle.y == completeRectangle.y &&
+                        acceptRectangle.y == completeRectangle.y + 44.0f &&
                         acceptRectangle.w == completeRectangle.w &&
                         acceptRectangle.h == completeRectangle.h,
-                    "Accept and Complete rendering share their hit-test rectangle");
+                    "Quest action layout follows Trade when present and closes its gap when absent");
         ClickCenter(graphics, completeRectangle);
         auto complete = graphics.ConsumeDialogueCommand();
         const auto* completeCommand = complete
