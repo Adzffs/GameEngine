@@ -1,9 +1,9 @@
 # Content Brief Template
 
-**Content ID:** `ITEM-___ / RECIPE-___ / QUEST-___ / PET-___ / BOSS-___ / REGION-___`  
-**Name:**  
-**Status:**  
-**First appears in milestone:**  
+**Content ID:** `ITEM-___ / RECIPE-___ / QUEST-___ / PET-___ / BOSS-___ / REGION-___`
+**Name:**
+**Status:**
+**First appears in milestone:**
 
 ## Player purpose
 

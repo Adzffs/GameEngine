@@ -1,8 +1,8 @@
 # Milestone Brief Template
 
-**Milestone ID and name:**  
-**Status:**  
-**Player outcome:**  
+**Milestone ID and name:**
+**Status:**
+**Player outcome:**
 
 ## Why this milestone matters
 
@@ -16,7 +16,7 @@
 Link tracker IDs.
 
 ## Acceptance and exit evidence
-- [ ] 
+- [ ]
 
 ## Test and review requirements
 

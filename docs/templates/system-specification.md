@@ -1,9 +1,9 @@
 # System Specification Template
 
-**System ID:** `SYS-___`  
-**Status:** Proposal / Needs Audit / In Progress / Done  
-**Owner:**  
-**Related milestone:**  
+**System ID:** `SYS-___`
+**Status:** Proposal / Needs Audit / In Progress / Done
+**Owner:**
+**Related milestone:**
 
 ## Purpose and boundaries
 What responsibility does this system own? What belongs elsewhere?
@@ -12,7 +12,7 @@ What responsibility does this system own? What belongs elsewhere?
 Describe the player-visible rules and flow.
 
 ## Invariants
-- 
+-
 
 ## Data model and stable IDs
 List state, ownership, definitions, serialization and validation constraints.

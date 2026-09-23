@@ -1,8 +1,8 @@
 # Work Session Log Template
 
-**Date:**  
-**Branch and base commit:**  
-**Tracker IDs:**  
+**Date:**
+**Branch and base commit:**
+**Tracker IDs:**
 
 ## Goal for this session
 

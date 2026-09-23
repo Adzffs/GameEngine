@@ -1,10 +1,10 @@
 # Feature Brief Template
 
-**ID:** `W-___`  
-**Status:** Planned  
-**Owner:**  
-**Design version:**  
-**Target/base commit:**  
+**ID:** `W-___`
+**Status:** Planned
+**Owner:**
+**Design version:**
+**Target/base commit:**
 
 ## Player outcome
 What can the player do or understand after this feature?
@@ -14,13 +14,13 @@ What game need does this address? Which design pillar or milestone does it suppo
 
 ## Scope
 ### Included
-- 
+-
 
 ### Excluded
-- 
+-
 
 ## Player flow
-1. 
+1.
 
 ## Rules and acceptance criteria
 - [ ] Given … when … then …
@@ -38,7 +38,7 @@ Who validates the action and owns the outcome? What prevents stale, duplicate or
 What changes? Is it saved? Are migrations needed? What happens on restart, full inventory or disconnect?
 
 ## Failure and edge cases
-- 
+-
 
 ## Tests and evidence
 List unit, World integration, client, lifecycle, CI and playtest evidence required.

@@ -1,9 +1,9 @@
 # Test Evidence Record Template
 
-**Evidence ID:** `V-___`  
-**Claim tested:**  
-**Commit/ref:**  
-**Date/environment:**  
+**Evidence ID:** `V-___`
+**Claim tested:**
+**Commit/ref:**
+**Date/environment:**
 
 ## Test name or exact command
 

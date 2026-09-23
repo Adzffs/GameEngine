@@ -1,16 +1,16 @@
 # Decision Record Template
 
-**Decision ID:** `D-___`  
-**Status:** Open / Decided / Deferred / Revisit / Superseded  
-**Date:**  
-**Owner:**  
+**Decision ID:** `D-___`
+**Status:** Open / Decided / Deferred / Revisit / Superseded
+**Date:**
+**Owner:**
 
 ## Question
 
 ## Context
 
 ## Options considered
-- 
+-
 
 ## Decision
 
