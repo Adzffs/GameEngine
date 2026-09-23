@@ -3,6 +3,7 @@
 #include "../src/Graphics/Graphics.h"
 #include "../src/Player/Player.h"
 #include "../src/Quest/QuestSystem.h"
+#include "../src/Quest/QuestPresentationState.h"
 
 #include <iostream>
 
@@ -140,23 +141,23 @@ int main()
     test.Expect(view.state == "AVAILABLE" && view.progress == "Logs: 0 / 10",
                 "Available quest has a clear label");
 
-    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 0}});
+    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 0}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}});
     view = graphics.BuildQuestPanelView(player);
     test.Expect(view.state == "ACTIVE" && view.progress == "Logs: 0 / 10",
                 "Active quest displays authoritative zero progress");
-    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 6}});
+    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 6}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}});
     view = graphics.BuildQuestPanelView(player);
     test.Expect(view.progress == "Logs: 6 / 10",
                 "Active quest displays authoritative updated progress");
 
-    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::READY_TO_COMPLETE, 10}});
+    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::READY_TO_COMPLETE, 10}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}});
     view = graphics.BuildQuestPanelView(player);
     test.Expect(view.state == "READY TO COMPLETE" &&
                     view.progress == "Logs: 10 / 10" &&
                     player.GetQuestJournal().TryGet(QuestId::GATHERING_BASICS)->progress == 10,
                 "Ready quest has a clear completion label");
 
-    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::COMPLETED, 10}});
+    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::COMPLETED, 10}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}});
     view = graphics.BuildQuestPanelView(player);
     test.Expect(view.state == "COMPLETED" && view.progress == "Logs: 10 / 10",
                 "Completed quest has a clear label");
@@ -170,6 +171,23 @@ int main()
     SelectTab(graphics, 1);
     test.Expect(graphics.BuildQuestPanelView(player).visible,
                 "Switching back to Quests restores quest content without tab leakage");
+
+    QuestSystem::TryRestore(player.GetQuestJournal(), {
+        {QuestId::GATHERING_BASICS, QuestState::ACTIVE, 6},
+        {QuestId::MINING_BASICS, QuestState::ACTIVE, 3}});
+    QuestPresentationState authoritativePresentation;
+    authoritativePresentation.Synchronize(player.GetQuestJournal());
+    const auto productionRows = graphics.BuildQuestRowLayout(
+        authoritativePresentation.GetQuests());
+    test.Expect(productionRows.size() == 2 &&
+                    productionRows[0].quest.id == QuestId::GATHERING_BASICS &&
+                    productionRows[0].quest.progress == 6 &&
+                    productionRows[1].quest.id == QuestId::MINING_BASICS &&
+                    productionRows[1].quest.progress == 3 &&
+                    Graphics::GetQuestProgressLabel(productionRows[1].quest) ==
+                        "Copper ores: 3 / 5" &&
+                    !Overlaps(productionRows[0].bounds, productionRows[1].bounds),
+                "Production Quest panel shows two independent rows in catalogue order");
 
     const std::vector<QuestPresentation> syntheticQuests{
         {static_cast<QuestId>(10), QuestState::AVAILABLE, 0, 10,
@@ -293,7 +311,7 @@ int main()
             {QuestState::COMPLETED, 10}}};
         for (const auto& [state, progress] : states)
         {
-            QuestSystem::TryRestore(nativePlayer.GetQuestJournal(), {{QuestId::GATHERING_BASICS, state, progress}});
+            QuestSystem::TryRestore(nativePlayer.GetQuestJournal(), {{QuestId::GATHERING_BASICS, state, progress}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}});
             const auto nativeView = nativeGraphics.BuildQuestPanelView(nativePlayer);
             SDL_SetRenderDrawColor(renderer, 5, 7, 9, 255);
             SDL_RenderClear(renderer);

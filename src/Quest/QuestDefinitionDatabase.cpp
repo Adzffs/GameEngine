@@ -16,6 +16,16 @@ namespace
          10,
          {NpcType::DEVELOPMENT_GUIDE,
           DialogueId::DEVELOPMENT_GUIDE_INTRO,
+          DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME}},
+        {QuestId::MINING_BASICS,
+         "Mining Basics",
+         QuestState::AVAILABLE,
+         ItemType::COPPER_ORE,
+         5,
+         ItemType::COINS,
+         10,
+         {NpcType::DEVELOPMENT_GUIDE,
+          DialogueId::DEVELOPMENT_GUIDE_INTRO,
           DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME}}};
 
     bool IsKnownItem(ItemType itemType)

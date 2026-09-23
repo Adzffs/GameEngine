@@ -16,9 +16,10 @@ int main()
 {
     TestContext test;
     const auto &definitions = QuestDefinitionDatabase::GetAll();
-    test.Expect(definitions.size() == 1 &&
-                    definitions.front().id == QuestId::GATHERING_BASICS,
-                "Canonical catalogue contains Gathering Basics in stable order");
+    test.Expect(definitions.size() == 2 &&
+                    definitions[0].id == QuestId::GATHERING_BASICS &&
+                    definitions[1].id == QuestId::MINING_BASICS,
+                "Canonical catalogue contains both quests in stable ID order");
     const QuestDefinition *definition =
         QuestDefinitionDatabase::TryGet(QuestId::GATHERING_BASICS);
     test.Expect(definition != nullptr &&
@@ -28,6 +29,19 @@ int main()
                     definition->rewardItem == ItemType::COINS &&
                     definition->rewardAmount == 10,
                 "Gathering Basics definition remains exact");
+    const QuestDefinition *mining =
+        QuestDefinitionDatabase::TryGet(QuestId::MINING_BASICS);
+    test.Expect(mining != nullptr &&
+                    mining->name == std::string_view("Mining Basics") &&
+                    mining->initialState == QuestState::AVAILABLE &&
+                    mining->objectiveItem == ItemType::COPPER_ORE &&
+                    mining->requiredAmount == 5 &&
+                    mining->rewardItem == ItemType::COINS &&
+                    mining->rewardAmount == 10 &&
+                    mining->giver.npcType == NpcType::DEVELOPMENT_GUIDE &&
+                    mining->giver.dialogueId == DialogueId::DEVELOPMENT_GUIDE_INTRO &&
+                    mining->giver.interactionNodeId == DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME,
+                "Mining Basics definition remains exact");
     test.Expect(definition != nullptr &&
                     definition->giver.npcType == NpcType::DEVELOPMENT_GUIDE &&
                     definition->giver.dialogueId ==
@@ -39,6 +53,8 @@ int main()
                     ContentValidator::ValidateQuestDefinitions(definitions).IsValid(),
                 "Production quest catalogue validates");
     test.Expect(!IsValidQuestId(QuestId::NONE) &&
+                    IsValidQuestId(QuestId::GATHERING_BASICS) &&
+                    IsValidQuestId(QuestId::MINING_BASICS) &&
                     QuestDefinitionDatabase::TryGet(QuestId::NONE) == nullptr,
                 "NONE and unknown quest IDs reject");
 

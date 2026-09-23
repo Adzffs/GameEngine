@@ -55,14 +55,18 @@ int main()
         world.GetActiveDialogueSession(player->GetID());
     test.Expect(available != nullptr &&
                     available->nodeId == DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME &&
-                    available->questActions.size() == 1 &&
+                    available->questActions.size() == 2 &&
                     available->questActions.front().kind == QuestDialogueActionKind::ACCEPT &&
                     available->questActions.front().questId == QuestId::GATHERING_BASICS,
                 "Real World opening publishes Accept for AVAILABLE");
     presentation.Synchronize(player->GetID(), world.GetNpcTalkEvents(), session);
     auto accept = presentation.MakeQuestCommand(0);
-    test.Expect(!presentation.MakeQuestCommand(1).has_value(),
-                "Invalid published quest-action index rejects");
+    const auto miningAccept = presentation.MakeQuestCommand(1);
+    const auto* miningAcceptCommand = miningAccept
+        ? std::get_if<QuestAcceptCommand>(&*miningAccept) : nullptr;
+    test.Expect(miningAcceptCommand != nullptr &&
+                    miningAcceptCommand->questId == QuestId::MINING_BASICS,
+                "Second authoritative action forwards Mining Basics");
     const auto* acceptCommand = accept
         ? std::get_if<QuestAcceptCommand>(&*accept) : nullptr;
     test.Expect(acceptCommand != nullptr &&
@@ -77,11 +81,13 @@ int main()
     Reopen(world, *player);
     const NpcTalkEvent* active = LocalEvent(world, player->GetID());
     test.Expect(active != nullptr &&
-                    active->questActions.empty(),
-                "Real World opening publishes no quest action for ACTIVE");
+                    active->questActions.size() == 1 &&
+                    active->questActions.front().questId == QuestId::MINING_BASICS,
+                "Real World opening retains independent Mining acceptance");
 
-    QuestSystem::TryRestore(player->GetQuestJournal(), {{
-        QuestId::GATHERING_BASICS, QuestState::READY_TO_COMPLETE, 10}});
+    QuestSystem::TryRestore(player->GetQuestJournal(), {
+        {QuestId::GATHERING_BASICS, QuestState::READY_TO_COMPLETE, 10},
+        {QuestId::MINING_BASICS, QuestState::ACTIVE, 0}});
     Reopen(world, *player);
     const NpcTalkEvent* ready = LocalEvent(world, player->GetID());
     session = world.GetActiveDialogueSession(player->GetID());
@@ -100,8 +106,9 @@ int main()
                     completeCommand->questId == QuestId::GATHERING_BASICS,
                 "Client presentation forwards exact authoritative Complete identity");
 
-    QuestSystem::TryRestore(player->GetQuestJournal(), {{
-        QuestId::GATHERING_BASICS, QuestState::COMPLETED, 10}});
+    QuestSystem::TryRestore(player->GetQuestJournal(), {
+        {QuestId::GATHERING_BASICS, QuestState::COMPLETED, 10},
+        {QuestId::MINING_BASICS, QuestState::ACTIVE, 0}});
     Reopen(world, *player);
     const NpcTalkEvent* completed = LocalEvent(world, player->GetID());
     test.Expect(completed != nullptr &&

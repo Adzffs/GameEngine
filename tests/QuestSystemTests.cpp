@@ -11,6 +11,13 @@ namespace
     {
         return journal.TryGet(QuestId::GATHERING_BASICS);
     }
+    std::vector<QuestRecord> Records(
+        QuestState gatheringState, int gatheringProgress,
+        QuestState miningState = QuestState::AVAILABLE, int miningProgress = 0)
+    {
+        return {{QuestId::GATHERING_BASICS, gatheringState, gatheringProgress},
+                {QuestId::MINING_BASICS, miningState, miningProgress}};
+    }
 }
 
 struct QuestJournalTestAccess
@@ -47,7 +54,8 @@ int main()
     QuestJournal journal;
     const QuestRecord *initial = Gathering(journal);
     test.Expect(initial != nullptr && initial->state == QuestState::AVAILABLE &&
-                    initial->progress == 0 && journal.GetRecords().size() == 1,
+                    initial->progress == 0 && journal.GetRecords().size() == 2 &&
+                    journal.TryGet(QuestId::MINING_BASICS)->state == QuestState::AVAILABLE,
                 "Default journal derives canonical initial records");
     test.Expect(QuestSystem::Accept(journal, QuestId::GATHERING_BASICS) &&
                     !QuestSystem::Accept(journal, QuestId::GATHERING_BASICS) &&
@@ -79,15 +87,16 @@ int main()
                 "Completion cannot reward twice");
 
     QuestJournal restored;
-    test.Expect(QuestSystem::TryRestore(restored, {{
-                    QuestId::GATHERING_BASICS, QuestState::ACTIVE, 4}}) &&
+    test.Expect(QuestSystem::TryRestore(restored, Records(
+                    QuestState::ACTIVE, 4)) &&
                     Gathering(restored)->progress == 4,
                 "Transactional restoration accepts complete valid schema");
     const QuestRecord before = *Gathering(restored);
     const std::vector<std::vector<QuestRecord>> rejected{
         {{QuestId::NONE, QuestState::AVAILABLE, 0}},
         {{static_cast<QuestId>(999), QuestState::AVAILABLE, 0}},
-        {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 10}},
+        {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 10},
+         {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}},
         {},
         {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 4},
          {QuestId::GATHERING_BASICS, QuestState::ACTIVE, 4}}};
@@ -100,8 +109,8 @@ int main()
     }
 
     QuestJournal fullJournal;
-    QuestSystem::TryRestore(fullJournal, {{QuestId::GATHERING_BASICS,
-        QuestState::READY_TO_COMPLETE, 10}});
+    QuestSystem::TryRestore(fullJournal, Records(
+        QuestState::READY_TO_COMPLETE, 10));
     Inventory full;
     for (int index = 0; index < Inventory::SlotCount; ++index)
         full.AddItem(ItemType::LOG, 1);

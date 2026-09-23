@@ -278,11 +278,11 @@ int main()
     WriteBytes(corrupt, canonical.substr(0, canonical.size() - 1));
     test.Expect(PlayerSaveFileStore::Load(corrupt).IsSuccess(), "valid file without final newline loads");
     std::string unsupportedVersion = canonical;
-    const std::size_t versionPosition = unsupportedVersion.find("version=3");
+    const std::size_t versionPosition = unsupportedVersion.find("version=4");
     test.Expect(versionPosition != std::string::npos,
                 "unsupported-version fixture finds canonical version record");
     if (versionPosition != std::string::npos)
-        unsupportedVersion.replace(versionPosition, 9, "version=4");
+        unsupportedVersion.replace(versionPosition, 9, "version=5");
     WriteBytes(corrupt, unsupportedVersion);
     test.Expect(PlayerSaveFileStore::Load(corrupt).Contains(PlayerSaveFileIssueCode::DECODE_FAILED), "unsupported file version fails through codec");
 

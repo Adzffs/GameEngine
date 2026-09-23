@@ -108,8 +108,18 @@ namespace
     }
     std::string_view QuestStateToken(QuestState s){switch(s){case QuestState::AVAILABLE:return "AVAILABLE";case QuestState::ACTIVE:return "ACTIVE";case QuestState::READY_TO_COMPLETE:return "READY_TO_COMPLETE";case QuestState::COMPLETED:return "COMPLETED";default:return "UNAVAILABLE";}}
     std::optional<QuestState> ParseQuestState(std::string_view s){if(s=="UNAVAILABLE")return QuestState::UNAVAILABLE;if(s=="AVAILABLE")return QuestState::AVAILABLE;if(s=="ACTIVE")return QuestState::ACTIVE;if(s=="READY_TO_COMPLETE")return QuestState::READY_TO_COMPLETE;if(s=="COMPLETED")return QuestState::COMPLETED;return std::nullopt;}
-    std::string_view QuestIdToken(QuestId id){return id==QuestId::GATHERING_BASICS?"GATHERING_BASICS":"NONE";}
-    std::optional<QuestId> ParseQuestId(std::string_view token){if(token=="GATHERING_BASICS")return QuestId::GATHERING_BASICS;return std::nullopt;}
+    std::string_view QuestIdToken(QuestId id)
+    {
+        if (id == QuestId::GATHERING_BASICS) return "GATHERING_BASICS";
+        if (id == QuestId::MINING_BASICS) return "MINING_BASICS";
+        return "NONE";
+    }
+    std::optional<QuestId> ParseQuestId(std::string_view token)
+    {
+        if (token == "GATHERING_BASICS") return QuestId::GATHERING_BASICS;
+        if (token == "MINING_BASICS") return QuestId::MINING_BASICS;
+        return std::nullopt;
+    }
 }
 
 bool PlayerSaveTextDecodeResult::IsSuccess() const { return issues.empty() && saveData.has_value(); }
@@ -247,7 +257,8 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
     }
     if (versionLine == -1)
     { result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD, -1, "Missing version"); return result; }
-    if (version != 1 && version != 2 && version != CURRENT_PLAYER_SAVE_VERSION)
+    if (version != 1 && version != 2 && version != 3 &&
+        version != CURRENT_PLAYER_SAVE_VERSION)
     { result.AddIssue(PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, versionLine, "Unsupported player save version"); return result; }
 
     PlayerSaveData save;
@@ -300,7 +311,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         }
         if (key == "quest_count")
         {
-            if (version != 3 || questCountSeen)
+            if ((version != 3 && version != 4) || questCountSeen)
             {
                 result.AddIssue(PlayerSaveTextIssueCode::DUPLICATE_FIELD,
                     lineNumber, "Unexpected or duplicate quest_count");
@@ -430,6 +441,21 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
             result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD, -1,
                 "Version 3 requires its historical one-quest catalogue");
     }
+    if (version == 4)
+    {
+        if (!questCountSeen)
+            result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD, -1,
+                "Missing quest_count");
+        else if (declaredQuestCount != 2 ||
+                 declaredQuestCount != static_cast<int>(parsedQuests.size()))
+            result.AddIssue(PlayerSaveTextIssueCode::INVALID_COUNT, -1,
+                "Version 4 requires exactly two quest records");
+        if (parsedQuests.size() != 2 ||
+            parsedQuests[0].id != QuestId::GATHERING_BASICS ||
+            parsedQuests[1].id != QuestId::MINING_BASICS)
+            result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD, -1,
+                "Version 4 requires canonical catalogue order");
+    }
     if (!result.GetIssues().empty()) return result;
 
     save.skills.reserve(5); save.equipment.reserve(5);
@@ -446,7 +472,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         for (const QuestDefinition &definition : QuestDefinitionDatabase::GetAll())
             save.quests.push_back({definition.id, definition.initialState, 0});
     }
-    else if (save.version == 2)
+    else if (save.version == 2 || save.version == 3)
     {
         for (const QuestDefinition &definition : QuestDefinitionDatabase::GetAll())
             save.quests.push_back({definition.id, definition.initialState, 0});

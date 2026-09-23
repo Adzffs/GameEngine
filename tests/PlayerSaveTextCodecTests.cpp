@@ -130,11 +130,11 @@ int main()
 
     PlayerSaveData save = ValidSave();
     const std::string canonical = Encode(save);
-    std::string golden = "GAMEENGINE_PLAYER_SAVE\nversion=3\nposition_x=3\nposition_y=2\ncurrent_health=87\ninventory_count=28\n";
+    std::string golden = "GAMEENGINE_PLAYER_SAVE\nversion=4\nposition_x=3\nposition_y=2\ncurrent_health=87\ninventory_count=28\n";
     golden += "inventory.0=BRONZE_AXE,1\ninventory.1=COINS,150\n";
     for (int i = 2; i < 28; ++i) golden += "inventory." + std::to_string(i) + "=NONE,0\n";
     golden += "skill_count=5\nskill.ATTACK=0\nskill.DEFENCE=0\nskill.WOODCUTTING=1200\nskill.MINING=500\nskill.SMITHING=300\n";
-    golden += "equipment_count=5\nequipment.HEAD=NONE\nequipment.BODY=NONE\nequipment.LEGS=NONE\nequipment.WEAPON=BRONZE_SWORD\nequipment.SHIELD=WOODEN_SHIELD\nquest_count=1\nquest.GATHERING_BASICS=AVAILABLE,0\nEND_GAMEENGINE_PLAYER_SAVE\n";
+    golden += "equipment_count=5\nequipment.HEAD=NONE\nequipment.BODY=NONE\nequipment.LEGS=NONE\nequipment.WEAPON=BRONZE_SWORD\nequipment.SHIELD=WOODEN_SHIELD\nquest_count=2\nquest.GATHERING_BASICS=AVAILABLE,0\nquest.MINING_BASICS=AVAILABLE,0\nEND_GAMEENGINE_PLAYER_SAVE\n";
     test.ExpectEqual(canonical, golden, "complete canonical golden output");
     test.Expect(!canonical.empty() && canonical.back() == '\n', "canonical output has final LF");
     test.Expect(canonical.find('\r') == std::string::npos, "canonical output uses LF only");
@@ -146,7 +146,7 @@ int main()
     test.Expect(!PlayerSaveTextCodec::TryEncode(save, unchanged, invalidReport), "invalid save fails encoding");
     test.ExpectEqual(unchanged, std::string("sentinel"), "failed encoding leaves output unchanged");
     PlayerSaveData invalid = ValidSave(); invalid.version = 1; EncodeRejectsUnchanged(test, invalid, "legacy version encoding");
-    invalid = ValidSave(); invalid.version = 4; EncodeRejectsUnchanged(test, invalid, "future version encoding");
+    invalid = ValidSave(); invalid.version = 5; EncodeRejectsUnchanged(test, invalid, "future version encoding");
     invalid = ValidSave(); invalid.inventorySlots[0] = {ItemType::NONE, 1}; EncodeRejectsUnchanged(test, invalid, "invalid inventory");
     invalid = ValidSave(); invalid.skills.pop_back(); EncodeRejectsUnchanged(test, invalid, "missing skill");
     invalid = ValidSave(); invalid.skills[1].skillType = SkillType::ATTACK; EncodeRejectsUnchanged(test, invalid, "duplicate skill");
@@ -165,13 +165,14 @@ int main()
     }
     test.Expect(exactInventory, "all 28 decoded inventory indexes remain exact");
     test.ExpectEqual(Encode(*decoded.GetSaveData()), canonical, "encode decode encode byte-identical");
-    std::string legacy = Replace(canonical, "version=3", "version=1");
-    legacy = Replace(legacy, "quest_count=1\n", "");
+    std::string legacy = Replace(canonical, "version=4", "version=1");
+    legacy = Replace(legacy, "quest_count=2\n", "");
     legacy = Replace(legacy, "quest.GATHERING_BASICS=AVAILABLE,0\n", "");
+    legacy = Replace(legacy, "quest.MINING_BASICS=AVAILABLE,0\n", "");
     const auto migratedLegacy = PlayerSaveTextCodec::Decode(legacy);
     test.Expect(migratedLegacy.IsSuccess() && migratedLegacy.GetSaveData() &&
                     migratedLegacy.GetSaveData()->version == CURRENT_PLAYER_SAVE_VERSION &&
-                    migratedLegacy.GetSaveData()->quests.size() == 1 &&
+                    migratedLegacy.GetSaveData()->quests.size() == 2 &&
                     migratedLegacy.GetSaveData()->quests.front().state == QuestState::AVAILABLE &&
                     migratedLegacy.GetSaveData()->quests.front().progress == 0,
                 "genuine version-1 text migrates to canonical in-memory quest defaults");
@@ -203,12 +204,13 @@ int main()
         fullyReorderedCrlf += canonicalLines[i];
     }
     const auto fullCanonicalization = PlayerSaveTextCodec::Decode(fullyReorderedCrlf);
-    test.Expect(fullCanonicalization.IsSuccess(), "reordered scalars inventory skills and equipment decode from CRLF without final newline");
-    const std::string recanonicalized = fullCanonicalization.IsSuccess() ? Encode(*fullCanonicalization.GetSaveData()) : std::string{};
-    test.ExpectEqual(recanonicalized, canonical, "fully reordered input canonicalizes to exact LF golden text");
-    const auto secondCanonicalization = PlayerSaveTextCodec::Decode(recanonicalized);
+    test.Expect(!fullCanonicalization.IsSuccess(),
+                "Version 4 rejects globally reordered quest records");
+    test.Expect(fullCanonicalization.Contains(PlayerSaveTextIssueCode::MISSING_FIELD),
+                "Incorrect v4 quest order reports a schema issue");
+    const auto secondCanonicalization = PlayerSaveTextCodec::Decode(canonical);
     test.Expect(secondCanonicalization.IsSuccess() && Encode(*secondCanonicalization.GetSaveData()) == canonical,
-                "second canonical decode encode remains byte-identical");
+                "canonical decode encode remains byte-identical");
 
     Rejects(test, "", PlayerSaveTextIssueCode::EMPTY_INPUT, "empty input");
     Rejects(test, "\xEF\xBB\xBF" + canonical, PlayerSaveTextIssueCode::INVALID_HEADER, "BOM");
@@ -241,10 +243,10 @@ int main()
 
     Rejects(test, Replace(canonical,"position_x=3","position_x"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "missing equals");
     Rejects(test, Replace(canonical,"position_x=3","position_x==3"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "extra equals");
-    Rejects(test, Replace(canonical,"version=3","version==3"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "malformed version extra equals");
-    Rejects(test, Replace(canonical,"version=3","version=3=4"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "malformed version value separator");
-    Rejects(test, Replace(canonical,"version=3","version="), PlayerSaveTextIssueCode::MALFORMED_RECORD, "empty version value");
-    Rejects(test, Replace(canonical,"version=3","=3"), PlayerSaveTextIssueCode::MISSING_FIELD, "empty version key");
+    Rejects(test, Replace(canonical,"version=4","version==4"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "malformed version extra equals");
+    Rejects(test, Replace(canonical,"version=4","version=4=5"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "malformed version value separator");
+    Rejects(test, Replace(canonical,"version=4","version="), PlayerSaveTextIssueCode::MALFORMED_RECORD, "empty version value");
+    Rejects(test, Replace(canonical,"version=4","=4"), PlayerSaveTextIssueCode::MISSING_FIELD, "empty version key");
     Rejects(test, Replace(canonical,"position_x=3"," position_x=3"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "leading space");
     Rejects(test, Replace(canonical,"position_x=3","position_x=3 "), PlayerSaveTextIssueCode::MALFORMED_RECORD, "trailing space");
     Rejects(test, Replace(canonical,"position_x=3","mystery=3"), PlayerSaveTextIssueCode::UNKNOWN_FIELD, "unknown field");
@@ -263,10 +265,10 @@ int main()
     Rejects(test, Replace(canonical,"position_x=3","position_x=2147483648"), PlayerSaveTextIssueCode::INTEGER_OUT_OF_RANGE, "integer overflow");
     test.Expect(PlayerSaveTextCodec::Decode(Replace(canonical,"position_x=3","position_x=-2147483648")).IsSuccess(), "INT_MIN position decodes");
     test.Expect(PlayerSaveTextCodec::Decode(Replace(canonical,"position_x=3","position_x=2147483647")).IsSuccess(), "INT_MAX position decodes");
-    Rejects(test, Replace(canonical,"version=3","version=4"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "unsupported version");
-    Rejects(test, Replace(canonical,"version=3","version=0"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "zero version");
-    Rejects(test, Replace(canonical,"version=3","version=-1"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "negative version");
-    Rejects(test, Replace(canonical,"version=3","version=2147483647"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "future INT_MAX version");
+    Rejects(test, Replace(canonical,"version=4","version=5"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "unsupported version");
+    Rejects(test, Replace(canonical,"version=4","version=0"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "zero version");
+    Rejects(test, Replace(canonical,"version=4","version=-1"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "negative version");
+    Rejects(test, Replace(canonical,"version=4","version=2147483647"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "future INT_MAX version");
     Rejects(test, Replace(canonical,"inventory_count=28","inventory_count=999999999"), PlayerSaveTextIssueCode::INVALID_COUNT, "attacker count");
     Rejects(test, Replace(canonical,"skill_count=5","skill_count=05"), PlayerSaveTextIssueCode::NON_CANONICAL_INTEGER, "noncanonical count");
     Rejects(test, Replace(canonical,"equipment_count=5\n",""), PlayerSaveTextIssueCode::MISSING_FIELD, "missing count");

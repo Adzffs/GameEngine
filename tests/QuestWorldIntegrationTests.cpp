@@ -45,7 +45,7 @@ Player* PlayerOf(World&w,int id){return dynamic_cast<Player*>(w.GetEntityByID(id
 Player* NewPlayer(World&w){auto*p=PlayerOf(w,w.CreatePlayer());p->GetPosition().SetPosition(2,3);return p;}
 const ActiveDialogueSession* Open(World&w,Player&p){w.EnqueueCommand(NpcInteractionCommand{p.GetID(),1,NpcInteractionType::TALK});w.Update();return w.GetActiveDialogueSession(p.GetID());}
 const QuestRecord& Quest(const Player&p){return *p.GetQuestJournal().TryGet(QuestId::GATHERING_BASICS);}
-void Restore(Player&p,QuestState state,int progress){QuestSystem::TryRestore(p.GetQuestJournal(),{{QuestId::GATHERING_BASICS,state,progress}});}
+void Restore(Player&p,QuestState state,int progress){QuestSystem::TryRestore(p.GetQuestJournal(),{{QuestId::GATHERING_BASICS,state,progress},{QuestId::MINING_BASICS,QuestState::AVAILABLE,0}});}
 bool Accept(World&w,Player&p){auto*s=Open(w,p);if(!s)return false;w.EnqueueCommand(QuestAcceptCommand{p.GetID(),1,s->sessionId,QuestId::GATHERING_BASICS});w.Update();return Quest(p).state==QuestState::ACTIVE;}
 int Slot(const Inventory&i,ItemType type){const auto&s=i.GetSlots();for(int n=0;n<(int)s.size();++n)if(!s[n].IsEmpty()&&s[n].GetItemType()==type)return n;return -1;}
 const ResourceNode* Resource(const World&w,ResourceType type){for(const auto&r:w.GetResources())if(r.GetResourceType()==type)return &r;return nullptr;}

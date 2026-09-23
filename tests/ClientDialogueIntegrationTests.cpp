@@ -221,14 +221,19 @@ int main()
         const auto welcomeLayout = graphics.GetDialoguePanelLayout();
         const SDL_FRect trade = graphics.GetDialogueTradeButtonRectangle();
         const SDL_FRect accept = graphics.GetDialogueQuestButtonRectangle(0);
+        const SDL_FRect acceptMining = graphics.GetDialogueQuestButtonRectangle(1);
         const SDL_FRect continueButton =
             graphics.GetDialogueContinueButtonRectangle();
         bool pairwiseDisjoint = !Overlaps(trade, accept) &&
+            !Overlaps(trade, acceptMining) &&
             !Overlaps(trade, continueButton) &&
-            !Overlaps(accept, continueButton);
+            !Overlaps(accept, acceptMining) &&
+            !Overlaps(accept, continueButton) &&
+            !Overlaps(acceptMining, continueButton);
         test.Expect(trade.w > 0.0f && accept.w > 0.0f &&
+                        acceptMining.w > 0.0f &&
                         continueButton.w > 0.0f && pairwiseDisjoint,
-                    "Real welcome presents distinct Trade, Accept and Continue rectangles");
+                    "Real welcome presents distinct Trade, two Accepts and Continue rectangles");
         bool controlsInsidePanel = true;
         for (const auto &control : welcomeLayout.controls)
             controlsInsidePanel = controlsInsidePanel &&
@@ -240,6 +245,18 @@ int main()
                     welcomeLayout.panelBounds.y + welcomeLayout.panelBounds.h;
         test.Expect(controlsInsidePanel,
                     "Every welcome control remains inside the dialogue panel");
+
+        ClickCenter(graphics, acceptMining);
+        auto miningCommand = graphics.ConsumeDialogueCommand();
+        const auto* miningAccept = miningCommand
+            ? std::get_if<QuestAcceptCommand>(&*miningCommand) : nullptr;
+        test.Expect(miningAccept != nullptr &&
+                        miningAccept->actorEntityID == playerID &&
+                        miningAccept->npcEntityID == guide->GetID() &&
+                        miningAccept->dialogueSessionId ==
+                            world.GetActiveDialogueSession(playerID)->sessionId &&
+                        miningAccept->questId == QuestId::MINING_BASICS,
+                    "Second welcome Accept forwards exact Mining Basics identity");
 
         ClickCenter(graphics, trade);
         auto tradeCommand = graphics.ConsumeDialogueCommand();
@@ -268,9 +285,11 @@ int main()
         GraphicsTestAccess::Click(graphics, 900.0f, 638.0f);
         auto formerOverlap = graphics.ConsumeDialogueCommand();
         test.Expect(formerOverlap &&
-                        std::holds_alternative<DialogueContinueCommand>(
-                            *formerOverlap),
-                    "Former overlap region cannot submit Accept as Continue");
+                        std::holds_alternative<QuestAcceptCommand>(
+                            *formerOverlap) &&
+                        std::get<QuestAcceptCommand>(*formerOverlap).questId ==
+                            QuestId::MINING_BASICS,
+                    "Former overlap region now belongs only to visible Mining Accept");
 
         ActiveDialogueSession mismatched =
             *world.GetActiveDialogueSession(playerID);

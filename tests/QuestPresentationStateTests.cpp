@@ -13,12 +13,13 @@ int main()
              {QuestState::READY_TO_COMPLETE, 10},
              {QuestState::COMPLETED, 10}})
     {
-        test.Expect(QuestSystem::TryRestore(journal, {{
-                        QuestId::GATHERING_BASICS, state, progress}}),
+        test.Expect(QuestSystem::TryRestore(journal, {
+                        {QuestId::GATHERING_BASICS, state, progress},
+                        {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}}),
                     "Fixture restores through controlled QuestSystem API");
         presentation.Synchronize(journal);
         const auto &quests = presentation.GetQuests();
-        test.Expect(quests.size() == 1 &&
+        test.Expect(quests.size() == 2 &&
                         quests.front().id == QuestId::GATHERING_BASICS &&
                         quests.front().state == state &&
                         quests.front().progress == progress &&
@@ -26,6 +27,11 @@ int main()
                         quests.front().title == "Gathering Basics" &&
                         quests.front().objective == "Logs",
                     "Presentation copies ordered authoritative journal values");
+        test.Expect(quests[1].id == QuestId::MINING_BASICS &&
+                        quests[1].required == 5 &&
+                        quests[1].title == "Mining Basics" &&
+                        quests[1].objective == "Copper ores",
+                    "Presentation includes Mining Basics second in catalogue order");
     }
     return test.Finish();
 }
