@@ -769,38 +769,86 @@ void Graphics::ReconcileShopCommandResult(CommandResultCode result, bool closeCo
 
 SDL_FRect Graphics::GetDialogueCloseButtonRectangle() const
 {
-    return SDL_FRect{960.0f, 462.0f, 80.0f, 30.0f};
+    for (const DialogueControlLayout &control : GetDialoguePanelLayout().controls)
+        if (control.type == DialogueControlType::GENERAL_CLOSE)
+            return control.bounds;
+    return {};
 }
 
 SDL_FRect Graphics::GetDialogueContinueButtonRectangle() const
 {
-    return SDL_FRect{850.0f, 626.0f, 190.0f, 38.0f};
+    for (const DialogueControlLayout &control : GetDialoguePanelLayout().controls)
+        if (control.type == DialogueControlType::PRIMARY)
+            return control.bounds;
+    return {};
 }
 
 SDL_FRect Graphics::GetDialogueChoiceButtonRectangle(
     std::size_t choiceIndex) const
 {
-    return SDL_FRect{
-        240.0f,
-        558.0f + static_cast<float>(choiceIndex) * 44.0f,
-        800.0f,
-        38.0f};
+    for (const DialogueControlLayout &control : GetDialoguePanelLayout().controls)
+        if (control.type == DialogueControlType::AUTHORED_CHOICE &&
+            control.index == choiceIndex)
+            return control.bounds;
+    return {};
 }
 
-SDL_FRect Graphics::GetDialogueTradeButtonRectangle() const {
-    const auto *event = dialoguePresentationState.GetEvent();
-    const std::size_t index = event == nullptr ? 0 : event->choices.size();
-    return GetDialogueChoiceButtonRectangle(index);
+SDL_FRect Graphics::GetDialogueTradeButtonRectangle() const
+{
+    for (const DialogueControlLayout &control : GetDialoguePanelLayout().controls)
+        if (control.type == DialogueControlType::TRADE)
+            return control.bounds;
+    return {};
 }
 SDL_FRect Graphics::GetDialogueQuestButtonRectangle(
     std::size_t actionIndex) const
 {
+    for (const DialogueControlLayout &control : GetDialoguePanelLayout().controls)
+        if (control.type == DialogueControlType::QUEST_ACTION &&
+            control.index == actionIndex)
+            return control.bounds;
+    return {};
+}
+
+Graphics::DialoguePanelLayout Graphics::GetDialoguePanelLayout() const
+{
+    DialoguePanelLayout layout{{220.0f, 450.0f, 840.0f, 230.0f}, {}};
     const NpcTalkEvent *event = dialoguePresentationState.GetEvent();
-    const std::size_t authoredChoices = event == nullptr ? 0 : event->choices.size();
-    const std::size_t tradeOffset =
-        dialoguePresentationState.CanTrade() ? 1 : 0;
-    return GetDialogueChoiceButtonRectangle(
-        authoredChoices + tradeOffset + actionIndex);
+    if (event == nullptr) return layout;
+
+    layout.controls.push_back({DialogueControlType::GENERAL_CLOSE, 0,
+        {960.0f, 462.0f, 80.0f, 30.0f}});
+
+    std::vector<std::pair<DialogueControlType, std::size_t>> actions;
+    if (event->nodeKind == DialogueNodeKind::CHOICE)
+        for (std::size_t index = 0; index < event->choices.size(); ++index)
+            actions.push_back({DialogueControlType::AUTHORED_CHOICE, index});
+    if (dialoguePresentationState.CanTrade())
+        actions.push_back({DialogueControlType::TRADE, 0});
+    for (std::size_t index = 0; index < event->questActions.size(); ++index)
+        actions.push_back({DialogueControlType::QUEST_ACTION, index});
+    if (event->nodeKind == DialogueNodeKind::CONTINUE || event->isTerminal)
+        actions.push_back({DialogueControlType::PRIMARY, 0});
+
+    if (actions.empty()) return layout;
+    constexpr float left = 240.0f;
+    constexpr float width = 800.0f;
+    constexpr float top = 558.0f;
+    constexpr float bottom = 668.0f;
+    constexpr float gap = 4.0f;
+    constexpr float preferredHeight = 38.0f;
+    const float available = bottom - top -
+        gap * static_cast<float>(actions.size() - 1);
+    const float height = std::min(preferredHeight,
+        available / static_cast<float>(actions.size()));
+    const float totalHeight = height * static_cast<float>(actions.size()) +
+        gap * static_cast<float>(actions.size() - 1);
+    const float firstY = bottom - totalHeight;
+    for (std::size_t index = 0; index < actions.size(); ++index)
+        layout.controls.push_back({actions[index].first, actions[index].second,
+            {left, firstY + static_cast<float>(index) * (height + gap),
+             width, height}});
+    return layout;
 }
 SDL_FRect Graphics::GetShopRowRectangle(std::size_t i) const { return SDL_FRect{160.0f,150.0f+static_cast<float>(i)*48.0f,960.0f,42.0f}; }
 SDL_FRect Graphics::GetShopBuyButtonRectangle(std::size_t i) const { auto r=GetShopRowRectangle(i); return SDL_FRect{r.x+r.w-300.0f,r.y+4.0f,120.0f,r.h-8.0f}; }
@@ -821,72 +869,42 @@ bool Graphics::HandleDialogueClick(float mouseX, float mouseY)
 {
     if (!dialoguePresentationState.IsOpen()) return false;
     if (pendingDialogueCommand.has_value()) return true;
-
-    if (IsPointInsideRectangle(
-            mouseX, mouseY, GetDialogueCloseButtonRectangle()))
-    {
-        if (dialoguePresentationState.GetEvent()->isTerminal)
-        {
-            dialoguePresentationState.DismissTerminal();
-        }
-        else
-        {
-            pendingDialogueCommand = dialoguePresentationState.MakeCloseCommand();
-        }
-        return true;
-    }
-
     const NpcTalkEvent *event = dialoguePresentationState.GetEvent();
-    for (std::size_t actionIndex = 0;
-         actionIndex < event->questActions.size(); ++actionIndex)
+    const DialoguePanelLayout layout = GetDialoguePanelLayout();
+    for (const DialogueControlLayout &control : layout.controls)
     {
-        if (IsPointInsideRectangle(
-                mouseX, mouseY,
-                GetDialogueQuestButtonRectangle(actionIndex)))
+        if (!IsPointInsideRectangle(mouseX, mouseY, control.bounds)) continue;
+        switch (control.type)
         {
-            pendingDialogueCommand =
-                dialoguePresentationState.MakeQuestCommand(actionIndex);
-            return true;
-        }
-    }
-    if (dialoguePresentationState.CanTrade() && IsPointInsideRectangle(mouseX, mouseY, GetDialogueTradeButtonRectangle()))
-    {
-        pendingDialogueCommand=dialoguePresentationState.MakeTradeCommand();
-        return true;
-    }
-
-    if (event->nodeKind == DialogueNodeKind::CONTINUE &&
-        IsPointInsideRectangle(
-            mouseX, mouseY, GetDialogueContinueButtonRectangle()))
-    {
-        pendingDialogueCommand =
-            dialoguePresentationState.MakeContinueCommand();
-        return true;
-    }
-
-    if (event->isTerminal &&
-        IsPointInsideRectangle(
-            mouseX, mouseY, GetDialogueContinueButtonRectangle()))
-    {
-        dialoguePresentationState.DismissTerminal();
-        return true;
-    }
-
-    if (event->nodeKind == DialogueNodeKind::CHOICE)
-    {
-        for (std::size_t index = 0; index < event->choices.size(); ++index)
-        {
-            if (IsPointInsideRectangle(
-                    mouseX, mouseY,
-                    GetDialogueChoiceButtonRectangle(index)))
-            {
+        case DialogueControlType::GENERAL_CLOSE:
+            if (event->isTerminal)
+                dialoguePresentationState.DismissTerminal();
+            else
                 pendingDialogueCommand =
-                    dialoguePresentationState.MakeChoiceCommand(index);
-                return true;
-            }
+                    dialoguePresentationState.MakeCloseCommand();
+            break;
+        case DialogueControlType::AUTHORED_CHOICE:
+            pendingDialogueCommand =
+                dialoguePresentationState.MakeChoiceCommand(control.index);
+            break;
+        case DialogueControlType::TRADE:
+            pendingDialogueCommand =
+                dialoguePresentationState.MakeTradeCommand();
+            break;
+        case DialogueControlType::QUEST_ACTION:
+            pendingDialogueCommand =
+                dialoguePresentationState.MakeQuestCommand(control.index);
+            break;
+        case DialogueControlType::PRIMARY:
+            if (event->isTerminal)
+                dialoguePresentationState.DismissTerminal();
+            else
+                pendingDialogueCommand =
+                    dialoguePresentationState.MakeContinueCommand();
+            break;
         }
+        return true;
     }
-
     return true;
 }
 
@@ -3055,23 +3073,16 @@ void Graphics::DrawDialoguePanel()
     const NpcTalkEvent *event = dialoguePresentationState.GetEvent();
     if (event == nullptr) return;
 
-    const SDL_FRect panel{220.0f, 450.0f, 840.0f, 230.0f};
+    const DialoguePanelLayout layout = GetDialoguePanelLayout();
+    const SDL_FRect panel = layout.panelBounds;
     SDL_SetRenderDrawColor(renderer, 24, 22, 20, 248);
     SDL_RenderFillRect(renderer, &panel);
     SDL_SetRenderDrawColor(renderer, 205, 180, 120, 255);
     SDL_RenderRect(renderer, &panel);
 
-    const SDL_FRect closeButton = GetDialogueCloseButtonRectangle();
-    SDL_SetRenderDrawColor(renderer, 70, 55, 45, 255);
-    SDL_RenderFillRect(renderer, &closeButton);
-    SDL_SetRenderDrawColor(renderer, 220, 200, 160, 255);
-    SDL_RenderRect(renderer, &closeButton);
-
     SDL_SetRenderDrawColor(renderer, 255, 244, 210, 255);
     SDL_RenderDebugText(renderer, 240.0f, 468.0f,
                         dialoguePresentationState.GetNpcName().c_str());
-    SDL_RenderDebugText(renderer, closeButton.x + 20.0f,
-                        closeButton.y + 9.0f, "CLOSE");
 
     std::string firstLine = event->text.substr(0, 92);
     SDL_RenderDebugText(renderer, 240.0f, 510.0f, firstLine.c_str());
@@ -3081,54 +3092,47 @@ void Graphics::DrawDialoguePanel()
         SDL_RenderDebugText(renderer, 240.0f, 528.0f, secondLine.c_str());
     }
 
-    if (event->nodeKind == DialogueNodeKind::CHOICE)
+    for (const DialogueControlLayout &control : layout.controls)
     {
-        for (std::size_t index = 0; index < event->choices.size(); ++index)
+        std::string label;
+        switch (control.type)
         {
-            const SDL_FRect button = GetDialogueChoiceButtonRectangle(index);
-            SDL_SetRenderDrawColor(renderer, 55, 50, 45, 255);
-            SDL_RenderFillRect(renderer, &button);
-            SDL_SetRenderDrawColor(renderer, 190, 170, 130, 255);
-            SDL_RenderRect(renderer, &button);
-            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-            const std::string label = std::to_string(index + 1) + ". " +
-                                      event->choices[index].text;
-            SDL_RenderDebugText(renderer, button.x + 12.0f,
-                                button.y + 12.0f, label.c_str());
+        case DialogueControlType::GENERAL_CLOSE:
+            label = "CLOSE";
+            break;
+        case DialogueControlType::AUTHORED_CHOICE:
+            label = std::to_string(control.index + 1) + ". " +
+                event->choices[control.index].text;
+            break;
+        case DialogueControlType::TRADE:
+            label = "Trade";
+            break;
+        case DialogueControlType::QUEST_ACTION:
+        {
+            const QuestDialogueAction &action =
+                event->questActions[control.index];
+            const QuestDefinition *definition =
+                QuestDefinitionDatabase::TryGet(action.questId);
+            if (definition == nullptr) continue;
+            label = std::string(
+                action.kind == QuestDialogueActionKind::ACCEPT
+                    ? "Accept " : "Complete ") + definition->name;
+            break;
         }
-    }
-    else
-    {
-        const SDL_FRect button = GetDialogueContinueButtonRectangle();
+        case DialogueControlType::PRIMARY:
+            label = event->isTerminal ? "CLOSE" : "CONTINUE";
+            break;
+        }
+        const SDL_FRect button = control.bounds;
         SDL_SetRenderDrawColor(renderer, 55, 50, 45, 255);
         SDL_RenderFillRect(renderer, &button);
         SDL_SetRenderDrawColor(renderer, 190, 170, 130, 255);
         SDL_RenderRect(renderer, &button);
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderDebugText(
-            renderer, button.x + 55.0f, button.y + 12.0f,
-            event->isTerminal ? "CLOSE" : "CONTINUE");
-    }
-    if (dialoguePresentationState.CanTrade()) {
-        const SDL_FRect b=GetDialogueTradeButtonRectangle(); SDL_SetRenderDrawColor(renderer,55,50,45,255); SDL_RenderFillRect(renderer,&b); SDL_SetRenderDrawColor(renderer,190,170,130,255); SDL_RenderRect(renderer,&b); SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,b.x+12,b.y+12,"Trade");
-    }
-    for (std::size_t actionIndex = 0;
-         actionIndex < event->questActions.size(); ++actionIndex)
-    {
-        const QuestDialogueAction &action = event->questActions[actionIndex];
-        const QuestDefinition *definition =
-            QuestDefinitionDatabase::TryGet(action.questId);
-        if (definition == nullptr) continue;
-        const SDL_FRect button = GetDialogueQuestButtonRectangle(actionIndex);
-        SDL_SetRenderDrawColor(renderer,55,50,45,255);
-        SDL_RenderFillRect(renderer,&button);
-        SDL_SetRenderDrawColor(renderer,190,170,130,255);
-        SDL_RenderRect(renderer,&button);
-        SDL_SetRenderDrawColor(renderer,255,255,255,255);
-        const std::string label =
-            std::string(action.kind == QuestDialogueActionKind::ACCEPT
-                ? "Accept " : "Complete ") + definition->name;
-        SDL_RenderDebugText(renderer,button.x+12,button.y+12,label.c_str());
+        const float labelX = button.x +
+            (control.type == DialogueControlType::GENERAL_CLOSE ? 20.0f : 12.0f);
+        SDL_RenderDebugText(renderer, labelX,
+            button.y + (button.h - 8.0f) * 0.5f, label.c_str());
     }
 }
 
@@ -3141,6 +3145,55 @@ void Graphics::DrawShopPanel()
     for(std::size_t i=0;i<e->entries.size();++i){ const auto&r=GetShopRowRectangle(i); const auto& row=e->entries[i]; SDL_SetRenderDrawColor(renderer,55,50,45,255); SDL_RenderFillRect(renderer,&r); SDL_SetRenderDrawColor(renderer,190,170,130,255); SDL_RenderRect(renderer,&r); SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,r.x+16,r.y+13,ItemDatabase::Get(row.itemType).GetName().c_str()); auto drawButton=[&](SDL_FRect b,const char* label,int price){SDL_SetRenderDrawColor(renderer,70,90,65,255); SDL_RenderFillRect(renderer,&b); SDL_SetRenderDrawColor(renderer,220,200,160,255); SDL_RenderRect(renderer,&b); SDL_SetRenderDrawColor(renderer,255,255,255,255); std::string caption=std::string(label)+" "+std::to_string(price); SDL_RenderDebugText(renderer,b.x+18,b.y+11,caption.c_str());}; if(row.buyPrice) drawButton(GetShopBuyButtonRectangle(i),"BUY",*row.buyPrice); if(row.sellPrice) drawButton(GetShopSellButtonRectangle(i),"SELL",*row.sellPrice); }
     const auto b=GetShopCloseButtonRectangle(); SDL_SetRenderDrawColor(renderer,70,55,45,255); SDL_RenderFillRect(renderer,&b); SDL_SetRenderDrawColor(renderer,220,200,160,255); SDL_RenderRect(renderer,&b); SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,b.x+20,b.y+9,"CLOSE");
 }
+
+std::vector<Graphics::QuestRowLayout> Graphics::BuildQuestRowLayout(
+    const std::vector<QuestPresentation> &quests) const
+{
+    const SDL_FRect content = GetSidePanelLayout().contentBounds;
+    constexpr float headingSpace = 32.0f;
+    constexpr float rowHeight = 80.0f;
+    constexpr float rowGap = 8.0f;
+    std::vector<QuestRowLayout> rows;
+    rows.reserve(quests.size());
+    for (std::size_t index = 0; index < quests.size(); ++index)
+    {
+        const float originY = content.y + headingSpace +
+            static_cast<float>(index) * (rowHeight + rowGap);
+        const float clippedTop = std::clamp(
+            originY, content.y, content.y + content.h);
+        const float clippedBottom = std::min(
+            originY + rowHeight, content.y + content.h);
+        const float clippedHeight = std::max(0.0f, clippedBottom - clippedTop);
+        rows.push_back({quests[index],
+            {content.x, clippedTop, content.w, clippedHeight},
+            {content.x, originY},
+            {content.x, originY + 28.0f},
+            {content.x, originY + 52.0f},
+            originY,
+            clippedHeight < rowHeight});
+    }
+    return rows;
+}
+
+std::string Graphics::GetQuestStateLabel(QuestState state)
+{
+    switch (state)
+    {
+    case QuestState::UNAVAILABLE: return "UNAVAILABLE";
+    case QuestState::AVAILABLE: return "AVAILABLE";
+    case QuestState::ACTIVE: return "ACTIVE";
+    case QuestState::READY_TO_COMPLETE: return "READY TO COMPLETE";
+    case QuestState::COMPLETED: return "COMPLETED";
+    }
+    return "UNAVAILABLE";
+}
+
+std::string Graphics::GetQuestProgressLabel(const QuestPresentation &quest)
+{
+    return quest.objective + ": " + std::to_string(quest.progress) + " / " +
+        std::to_string(quest.required);
+}
+
 Graphics::QuestPanelView Graphics::BuildQuestPanelView(const Player &player) const
 {
     const SidePanelLayout layout = GetSidePanelLayout();
@@ -3151,48 +3204,32 @@ Graphics::QuestPanelView Graphics::BuildQuestPanelView(const Player &player) con
     const auto &quests = presentationState.GetQuests();
     const QuestPresentation empty{};
     const QuestPresentation &record = quests.empty() ? empty : quests.front();
+    const auto rows = BuildQuestRowLayout(quests);
+    const SDL_FPoint titlePosition = rows.empty()
+        ? SDL_FPoint{content.x, content.y + 32.0f}
+        : rows.front().titlePosition;
+    const SDL_FPoint statePosition = rows.empty()
+        ? SDL_FPoint{content.x, content.y + 60.0f}
+        : rows.front().statePosition;
+    const SDL_FPoint progressPosition = rows.empty()
+        ? SDL_FPoint{content.x, content.y + 84.0f}
+        : rows.front().progressPosition;
 
     QuestPanelView view{
         bounds,
         content,
         {content.x, content.y},
-        {content.x, content.y + 32.0f},
-        {content.x, content.y + 60.0f},
-        {content.x, content.y + 84.0f},
+        titlePosition,
+        statePosition,
+        progressPosition,
         "QUESTS",
         record.title.empty() ? "Unknown quest" : record.title,
         "UNAVAILABLE",
         "",
         selectedTab == SidePanelTab::QUESTS};
 
-    switch (record.state)
-    {
-    case QuestState::UNAVAILABLE:
-        view.state = "UNAVAILABLE";
-        view.progress = record.objective + ": 0 / " +
-            std::to_string(record.required);
-        break;
-    case QuestState::AVAILABLE:
-        view.state = "AVAILABLE";
-        view.progress = record.objective + ": 0 / " +
-            std::to_string(record.required);
-        break;
-    case QuestState::ACTIVE:
-        view.state = "ACTIVE";
-        view.progress = record.objective + ": " + std::to_string(record.progress) + " / " +
-            std::to_string(record.required);
-        break;
-    case QuestState::READY_TO_COMPLETE:
-        view.state = "READY TO COMPLETE";
-        view.progress = record.objective + ": " + std::to_string(record.progress) + " / " +
-            std::to_string(record.required);
-        break;
-    case QuestState::COMPLETED:
-        view.state = "COMPLETED";
-        view.progress = record.objective + ": " + std::to_string(record.progress) + " / " +
-            std::to_string(record.required);
-        break;
-    }
+    view.state = GetQuestStateLabel(record.state);
+    view.progress = GetQuestProgressLabel(record);
     return view;
 }
 
@@ -3201,36 +3238,34 @@ void Graphics::DrawQuestPanel(const Player &player)
     questPresentationState.Synchronize(player.GetQuestJournal());
     const QuestPanelView view = BuildQuestPanelView(player);
     DrawSidePanelFrame(view.heading.c_str());
+    DrawQuestRows(questPresentationState.GetQuests());
+}
 
+void Graphics::DrawQuestRows(const std::vector<QuestPresentation> &quests)
+{
+    const auto rows = BuildQuestRowLayout(quests);
+    const SDL_FRect contentBounds = GetSidePanelLayout().contentBounds;
     const SDL_Rect clipRectangle{
-        static_cast<int>(view.contentBounds.x),
-        static_cast<int>(view.contentBounds.y),
-        static_cast<int>(view.contentBounds.w),
-        static_cast<int>(view.contentBounds.h)};
+        static_cast<int>(contentBounds.x),
+        static_cast<int>(contentBounds.y),
+        static_cast<int>(contentBounds.w),
+        static_cast<int>(contentBounds.h)};
     SDL_SetRenderClipRect(renderer, &clipRectangle);
-    float rowY = view.titlePosition.y;
-    for (const QuestPresentation &quest : questPresentationState.GetQuests())
+    for (const QuestRowLayout &row : rows)
     {
+        if (row.bounds.h <= 0.0f) continue;
+        const QuestPresentation &quest = row.quest;
         SDL_SetRenderDrawColor(renderer, 255, 215, 100, 255);
-        SDL_RenderDebugText(renderer, view.titlePosition.x, rowY,
+        SDL_RenderDebugText(renderer, row.titlePosition.x, row.titlePosition.y,
             quest.title.c_str());
-        std::string state;
-        switch (quest.state)
-        {
-        case QuestState::UNAVAILABLE: state = "UNAVAILABLE"; break;
-        case QuestState::AVAILABLE: state = "AVAILABLE"; break;
-        case QuestState::ACTIVE: state = "ACTIVE"; break;
-        case QuestState::READY_TO_COMPLETE: state = "READY TO COMPLETE"; break;
-        case QuestState::COMPLETED: state = "COMPLETED"; break;
-        }
+        const std::string state = GetQuestStateLabel(quest.state);
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderDebugText(renderer, view.statePosition.x, rowY + 28.0f,
+        SDL_RenderDebugText(renderer, row.statePosition.x, row.statePosition.y,
             state.c_str());
-        const std::string progress = quest.objective + ": " + std::to_string(quest.progress) +
-            " / " + std::to_string(quest.required);
-        SDL_RenderDebugText(renderer, view.progressPosition.x, rowY + 52.0f,
+        const std::string progress = GetQuestProgressLabel(quest);
+        SDL_RenderDebugText(renderer, row.progressPosition.x,
+            row.progressPosition.y,
             progress.c_str());
-        rowY += 88.0f;
     }
     SDL_SetRenderClipRect(renderer, nullptr);
 }

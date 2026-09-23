@@ -161,7 +161,42 @@ public:
         SDL_FRect contentBounds;
         std::array<SDL_FRect, 7> tabBounds;
     };
+    enum class DialogueControlType
+    {
+        GENERAL_CLOSE,
+        AUTHORED_CHOICE,
+        TRADE,
+        QUEST_ACTION,
+        PRIMARY
+    };
+    struct DialogueControlLayout
+    {
+        DialogueControlType type;
+        std::size_t index;
+        SDL_FRect bounds;
+    };
+    struct DialoguePanelLayout
+    {
+        SDL_FRect panelBounds;
+        std::vector<DialogueControlLayout> controls;
+    };
+    struct QuestRowLayout
+    {
+        QuestPresentation quest;
+        SDL_FRect bounds;
+        SDL_FPoint titlePosition;
+        SDL_FPoint statePosition;
+        SDL_FPoint progressPosition;
+        float originY;
+        bool clipped;
+    };
     SidePanelLayout GetSidePanelLayout() const;
+    DialoguePanelLayout GetDialoguePanelLayout() const;
+    std::vector<QuestRowLayout> BuildQuestRowLayout(
+        const std::vector<QuestPresentation> &quests) const;
+    static std::string GetQuestStateLabel(QuestState state);
+    static std::string GetQuestProgressLabel(
+        const QuestPresentation &quest);
     SDL_FRect GetSidePanelRectangle() const;
     QuestPanelView BuildQuestPanelView(const Player &player) const;
     bool HandleSidePanelClick(
@@ -221,6 +256,7 @@ public:
     SDL_FRect GetShopCloseButtonRectangle() const;
     void DrawShopPanel();
     void DrawQuestPanel(const Player &player);
+    void DrawQuestRows(const std::vector<QuestPresentation> &quests);
     void DrawDialoguePanel();
     void DrawNPCs(
         const std::vector<std::unique_ptr<Entity>> &entities);

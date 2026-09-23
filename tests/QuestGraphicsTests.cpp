@@ -21,6 +21,11 @@ struct GraphicsTestAccess
     {
         graphics.DrawInventory(inventory);
     }
+    static void DrawQuestRows(Graphics& graphics,
+        const std::vector<QuestPresentation>& quests)
+    {
+        graphics.DrawQuestRows(quests);
+    }
 };
 
 namespace
@@ -29,6 +34,19 @@ bool IsInside(const SDL_FRect &bounds, const SDL_FPoint &point)
 {
     return point.x >= bounds.x && point.x < bounds.x + bounds.w &&
         point.y >= bounds.y && point.y < bounds.y + bounds.h;
+}
+
+bool IsInside(const SDL_FRect &outer, const SDL_FRect &inner)
+{
+    return inner.x >= outer.x && inner.y >= outer.y &&
+        inner.x + inner.w <= outer.x + outer.w &&
+        inner.y + inner.h <= outer.y + outer.h;
+}
+
+bool Overlaps(const SDL_FRect &left, const SDL_FRect &right)
+{
+    return left.x < right.x + right.w && left.x + left.w > right.x &&
+        left.y < right.y + right.h && left.y + left.h > right.y;
 }
 
 struct Pixel
@@ -133,6 +151,53 @@ int main()
     test.Expect(graphics.BuildQuestPanelView(player).visible,
                 "Switching back to Quests restores quest content without tab leakage");
 
+    const std::vector<QuestPresentation> syntheticQuests{
+        {static_cast<QuestId>(10), QuestState::AVAILABLE, 0, 10,
+            "Available Quest", "Logs"},
+        {static_cast<QuestId>(11), QuestState::ACTIVE, 6, 10,
+            "Active Quest", "Logs"},
+        {static_cast<QuestId>(12), QuestState::READY_TO_COMPLETE, 10, 10,
+            "Ready Quest", "Logs"},
+        {static_cast<QuestId>(13), QuestState::COMPLETED, 10, 10,
+            "Completed Quest", "Logs"},
+        {static_cast<QuestId>(14), QuestState::ACTIVE, 2, 10,
+            "Overflow Quest", "Logs"}};
+    const auto syntheticRows = graphics.BuildQuestRowLayout(syntheticQuests);
+    bool retainedOrder = syntheticRows.size() == syntheticQuests.size();
+    bool insideContent = true;
+    bool disjoint = true;
+    bool consistentSpacing = true;
+    for (std::size_t index = 0; index < syntheticRows.size(); ++index)
+    {
+        retainedOrder = retainedOrder &&
+            syntheticRows[index].quest.id == syntheticQuests[index].id;
+        insideContent = insideContent &&
+            IsInside(view.contentBounds, syntheticRows[index].bounds);
+        if (index > 0)
+        {
+            disjoint = disjoint && !Overlaps(
+                syntheticRows[index - 1].bounds, syntheticRows[index].bounds);
+            consistentSpacing = consistentSpacing &&
+                syntheticRows[index].originY -
+                    syntheticRows[index - 1].originY == 88.0f;
+        }
+    }
+    test.Expect(retainedOrder,
+                "Synthetic quest rows retain deterministic catalogue order");
+    test.Expect(disjoint && consistentSpacing,
+                "Synthetic quest rows are distinct with consistent spacing");
+    test.Expect(insideContent && !syntheticRows[0].clipped &&
+                    syntheticRows[3].clipped && syntheticRows[4].clipped,
+                "Rows remain bounded and overflow rows are marked clipped");
+    test.Expect(Graphics::GetQuestStateLabel(QuestState::AVAILABLE) == "AVAILABLE" &&
+                    Graphics::GetQuestStateLabel(QuestState::ACTIVE) == "ACTIVE" &&
+                    Graphics::GetQuestStateLabel(QuestState::READY_TO_COMPLETE) ==
+                        "READY TO COMPLETE" &&
+                    Graphics::GetQuestStateLabel(QuestState::COMPLETED) == "COMPLETED" &&
+                    Graphics::GetQuestProgressLabel(syntheticQuests[1]) ==
+                        "Logs: 6 / 10",
+                "Runtime row labels cover every visible quest state");
+
     Graphics nativeGraphics;
     if (nativeGraphics.Initialize())
     {
@@ -158,6 +223,19 @@ int main()
                   << " content={" << layout.contentBounds.x << ',' << layout.contentBounds.y
                   << ',' << layout.contentBounds.w << ',' << layout.contentBounds.h << "}"
                   << std::endl;
+
+        SDL_SetRenderDrawColor(renderer, 5, 7, 9, 255);
+        SDL_RenderClear(renderer);
+        GraphicsTestAccess::DrawQuestRows(nativeGraphics, syntheticQuests);
+        SDL_Surface* syntheticPixels = SDL_RenderReadPixels(renderer, nullptr);
+        test.Expect(syntheticPixels != nullptr &&
+                        ReadPixel(syntheticPixels,
+                            static_cast<int>(layout.contentBounds.x) - 2,
+                            static_cast<int>(layout.contentBounds.y) + 40).red == 5 &&
+                        HasYellowText(syntheticPixels,
+                            syntheticRows.front().titlePosition),
+                    "Native multi-row drawing is clipped to shared Quest content bounds");
+        if (syntheticPixels != nullptr) SDL_DestroySurface(syntheticPixels);
 
         Player nativePlayer(101, PlayerInitializationMode::EMPTY);
         SelectTab(nativeGraphics, 1);

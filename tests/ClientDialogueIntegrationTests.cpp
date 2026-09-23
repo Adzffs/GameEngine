@@ -63,6 +63,12 @@ struct EngineTestAccess
 
 namespace
 {
+    bool Overlaps(const SDL_FRect &left, const SDL_FRect &right)
+    {
+        return left.x < right.x + right.w && left.x + left.w > right.x &&
+            left.y < right.y + right.h && left.y + left.h > right.y;
+    }
+
     void ClickCenter(Graphics &graphics, const SDL_FRect &rectangle)
     {
         GraphicsTestAccess::Click(
@@ -123,11 +129,10 @@ int main()
         graphics.SynchronizeDialogue(44, {event}, &session);
         const SDL_FRect completeRectangle =
             graphics.GetDialogueQuestButtonRectangle();
-        test.Expect(acceptRectangle.x == completeRectangle.x &&
-                        acceptRectangle.y == completeRectangle.y + 44.0f &&
-                        acceptRectangle.w == completeRectangle.w &&
-                        acceptRectangle.h == completeRectangle.h,
-                    "Quest action layout follows Trade when present and closes its gap when absent");
+        test.Expect(completeRectangle.w > 0.0f &&
+                        !Overlaps(completeRectangle,
+                            graphics.GetDialogueContinueButtonRectangle()),
+                    "Quest action layout remains distinct when Trade is absent");
         ClickCenter(graphics, completeRectangle);
         auto complete = graphics.ConsumeDialogueCommand();
         const auto* completeCommand = complete
@@ -212,6 +217,70 @@ int main()
                         graphics.GetDialoguePresentationState().GetEvent()->nodeId ==
                             DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME,
                     "Engine presents the authoritative welcome event after approach");
+
+        const auto welcomeLayout = graphics.GetDialoguePanelLayout();
+        const SDL_FRect trade = graphics.GetDialogueTradeButtonRectangle();
+        const SDL_FRect accept = graphics.GetDialogueQuestButtonRectangle(0);
+        const SDL_FRect continueButton =
+            graphics.GetDialogueContinueButtonRectangle();
+        bool pairwiseDisjoint = !Overlaps(trade, accept) &&
+            !Overlaps(trade, continueButton) &&
+            !Overlaps(accept, continueButton);
+        test.Expect(trade.w > 0.0f && accept.w > 0.0f &&
+                        continueButton.w > 0.0f && pairwiseDisjoint,
+                    "Real welcome presents distinct Trade, Accept and Continue rectangles");
+        bool controlsInsidePanel = true;
+        for (const auto &control : welcomeLayout.controls)
+            controlsInsidePanel = controlsInsidePanel &&
+                control.bounds.x >= welcomeLayout.panelBounds.x &&
+                control.bounds.y >= welcomeLayout.panelBounds.y &&
+                control.bounds.x + control.bounds.w <=
+                    welcomeLayout.panelBounds.x + welcomeLayout.panelBounds.w &&
+                control.bounds.y + control.bounds.h <=
+                    welcomeLayout.panelBounds.y + welcomeLayout.panelBounds.h;
+        test.Expect(controlsInsidePanel,
+                    "Every welcome control remains inside the dialogue panel");
+
+        ClickCenter(graphics, trade);
+        auto tradeCommand = graphics.ConsumeDialogueCommand();
+        const auto *tradeInteraction = tradeCommand
+            ? std::get_if<NpcInteractionCommand>(&*tradeCommand) : nullptr;
+        test.Expect(tradeInteraction != nullptr &&
+                        tradeInteraction->actorEntityID == playerID &&
+                        tradeInteraction->targetNpcEntityID == guide->GetID() &&
+                        tradeInteraction->interactionType ==
+                            NpcInteractionType::TRADE,
+                    "Trade center routes only the authoritative Trade action");
+        GraphicsTestAccess::Click(graphics, accept.x, accept.y);
+        auto boundaryAccept = graphics.ConsumeDialogueCommand();
+        test.Expect(boundaryAccept &&
+                        std::holds_alternative<QuestAcceptCommand>(*boundaryAccept) &&
+                        !graphics.ConsumeDialogueCommand().has_value(),
+                    "Accept boundary routes exactly one quest command");
+        GraphicsTestAccess::Click(graphics,
+            continueButton.x + continueButton.w - 0.01f,
+            continueButton.y + 4.0f);
+        auto boundaryContinue = graphics.ConsumeDialogueCommand();
+        test.Expect(boundaryContinue &&
+                        std::holds_alternative<DialogueContinueCommand>(
+                            *boundaryContinue),
+                    "Continue boundary routes only Continue");
+        GraphicsTestAccess::Click(graphics, 900.0f, 638.0f);
+        auto formerOverlap = graphics.ConsumeDialogueCommand();
+        test.Expect(formerOverlap &&
+                        std::holds_alternative<DialogueContinueCommand>(
+                            *formerOverlap),
+                    "Former overlap region cannot submit Accept as Continue");
+
+        ActiveDialogueSession mismatched =
+            *world.GetActiveDialogueSession(playerID);
+        ++mismatched.sessionId;
+        graphics.SynchronizeDialogue(playerID, world.GetNpcTalkEvents(),
+            &mismatched);
+        test.Expect(!GraphicsTestAccess::Click(graphics, accept.x, accept.y) &&
+                        !graphics.ConsumeDialogueCommand().has_value(),
+                    "Mismatched authoritative session exposes no dialogue action");
+        EngineTestAccess::Synchronize(engine);
 
         const int beforeX = world.GetEntityByID(playerID)->GetPosition().GetX();
         const int beforeY = world.GetEntityByID(playerID)->GetPosition().GetY();
