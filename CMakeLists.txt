@@ -68,6 +68,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/NPC/NpcSpawnManager.cpp
     src/Inventory/Inventory.cpp
     src/Inventory/InventorySlot.cpp
+    src/Inventory/InventoryStackOperations.cpp
     src/Skills/Skill.cpp
     src/Skills/SkillSet.cpp
     src/Equipment/Equipment.cpp
@@ -178,6 +179,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(EntityDeathEventTests tests/EntityDeathEventTests.cpp)
     add_gameengine_headless_test(RewardTableTests tests/RewardTableTests.cpp)
     add_gameengine_headless_test(InventoryTransactionTests tests/InventoryTransactionTests.cpp)
+    add_gameengine_headless_test(InventoryStackOperationsTests tests/InventoryStackOperationsTests.cpp)
     add_gameengine_headless_test(PlayerSaveStateTests tests/PlayerSaveStateTests.cpp)
     add_gameengine_headless_test(PlayerSaveTextCodecTests tests/PlayerSaveTextCodecTests.cpp)
     add_gameengine_headless_test(PlayerSaveFileStoreTests tests/PlayerSaveFileStoreTests.cpp)
