@@ -3,6 +3,7 @@
 #include "../src/Content/ContentValidator.h"
 #include "../src/Inventory/ItemType.h"
 #include "../src/Item/ItemDatabase.h"
+#include "../src/Item/ItemTagDatabase.h"
 #include "../src/Persistence/PersistenceTokenCodec.h"
 #include "../src/Player/Player.h"
 #include "../src/Player/PlayerInitializationMode.h"
@@ -76,7 +77,10 @@ int main()
         CraftingRecipeMatcher::FindMatch(grid) == nullptr,
         "Shapeless recipe rejects extra materials");
 
-    grid = shield.GetCraftingPattern().slots;
+    grid = {
+        ItemType::WOODEN_PLANKS, ItemType::NONE, ItemType::WOODEN_PLANKS,
+        ItemType::WOODEN_PLANKS, ItemType::WOODEN_PLANKS, ItemType::WOODEN_PLANKS,
+        ItemType::NONE, ItemType::WOODEN_PLANKS, ItemType::NONE};
     test.Expect(
         CraftingRecipeMatcher::FindMatch(grid) == &shield,
         "Exact authored shield grid matches the shield recipe");
@@ -113,6 +117,88 @@ int main()
             translatedPattern,
             rotatedPatternGrid),
         "Translated shaped patterns still reject rotation and mirroring");
+
+    const CraftingPattern asymmetricPattern{
+        CraftingPatternType::SHAPED,
+        {
+            ItemType::LOG, ItemType::WOODEN_PLANKS, ItemType::NONE,
+            ItemType::LOG, ItemType::NONE, ItemType::NONE,
+        },
+        false,
+        4};
+    const CraftingRecipeMatcher::Grid mirroredAsymmetricGrid{
+        ItemType::WOODEN_PLANKS, ItemType::LOG, ItemType::NONE,
+        ItemType::NONE, ItemType::LOG, ItemType::NONE,
+    };
+    test.Expect(
+        !CraftingRecipeMatcher::Matches(
+            asymmetricPattern,
+            mirroredAsymmetricGrid),
+        "Asymmetric recipe rejects horizontal mirror when disabled");
+    CraftingPattern mirrorEnabled = asymmetricPattern;
+    mirrorEnabled.allowHorizontalMirror = true;
+    test.Expect(
+        CraftingRecipeMatcher::Matches(
+            mirrorEnabled,
+            mirroredAsymmetricGrid),
+        "Asymmetric recipe accepts horizontal mirror when enabled");
+    test.ExpectEqual(
+        mirrorEnabled.priority,
+        4,
+        "Crafting pattern preserves explicit conflict priority");
+
+    const CraftingPattern logTagPattern{
+        CraftingPatternType::SHAPELESS,
+        {CraftingIngredient::ForTag(ItemTag::LOGS)}};
+    for (ItemType log : {ItemType::LOG, ItemType::OAK_LOG,
+                         ItemType::WILLOW_LOG})
+    {
+        CraftingRecipeMatcher::Grid taggedGrid{};
+        taggedGrid[4] = log;
+        test.Expect(
+            CraftingRecipeMatcher::Matches(logTagPattern, taggedGrid),
+            "LOGS tag matches each authoritative log material");
+    }
+    CraftingRecipeMatcher::Grid oreGrid{};
+    oreGrid[0] = ItemType::COPPER_ORE;
+    test.Expect(
+        !CraftingRecipeMatcher::Matches(logTagPattern, oreGrid),
+        "LOGS tag rejects non-log materials");
+    test.Expect(
+        ItemTagDatabase::IsValid(ItemTag::ORES) &&
+            ItemTagDatabase::Contains(ItemTag::ORES, ItemType::IRON_ORE) &&
+            !ItemTagDatabase::Contains(ItemTag::ORES, ItemType::COAL),
+        "Item tags have explicit validated membership");
+
+    const CraftingPattern exactAndTagPattern{
+        CraftingPatternType::SHAPELESS,
+        {ItemType::LOG, CraftingIngredient::ForTag(ItemTag::LOGS)}};
+    CraftingRecipeMatcher::Grid ambiguousGrid{};
+    ambiguousGrid[0] = ItemType::LOG;
+    ambiguousGrid[1] = ItemType::OAK_LOG;
+    test.Expect(
+        CraftingRecipeMatcher::Matches(exactAndTagPattern, ambiguousGrid),
+        "Shapeless matching assigns exact ingredients before broad tags");
+
+    const RecipeDefinition validTaggedRecipe(
+        RecipeType::WOODEN_PLANKS, "Tagged logs", StationType::CRAFTING_TABLE,
+        SkillType::NONE, 0, 0, 1, {{ItemType::LOG, 1}},
+        ItemType::WOODEN_PLANKS, 4, logTagPattern, false);
+    test.Expect(
+        ContentValidator::ValidateRecipeDefinition(
+            RecipeType::WOODEN_PLANKS, validTaggedRecipe).IsValid(),
+        "Content validation accepts a valid tag backed by a declared material");
+    CraftingPattern invalidTagPattern = logTagPattern;
+    invalidTagPattern.slots[0] = CraftingIngredient::ForTag(
+        static_cast<ItemTag>(999));
+    const RecipeDefinition invalidTaggedRecipe(
+        RecipeType::WOODEN_PLANKS, "Invalid tag", StationType::CRAFTING_TABLE,
+        SkillType::NONE, 0, 0, 1, {{ItemType::LOG, 1}},
+        ItemType::WOODEN_PLANKS, 4, invalidTagPattern, false);
+    test.Expect(
+        !ContentValidator::ValidateRecipeDefinition(
+            RecipeType::WOODEN_PLANKS, invalidTaggedRecipe).IsValid(),
+        "Content validation rejects unknown crafting tags");
 
     Player player(1, PlayerInitializationMode::EMPTY);
     player.GetInventory().AddItem(ItemType::LOG, 1);

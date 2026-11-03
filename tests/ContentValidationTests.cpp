@@ -982,7 +982,7 @@ int main()
                  .IsValid() &&
                 !CraftingRecipeMatcher::Matches(
                     unknownPatternType.GetCraftingPattern(),
-                    unknownPatternType.GetCraftingPattern().slots),
+                    CraftingRecipeMatcher::Grid{ItemType::LOG}),
             "Unknown crafting pattern types are rejected and never match");
 
         std::vector<RequirementSystem::Requirement> ingredientMismatchRequirements{

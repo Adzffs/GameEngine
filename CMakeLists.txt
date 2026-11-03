@@ -88,6 +88,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/Time/TickPerformance.cpp
     src/Item/ItemDefinition.cpp
     src/Item/ItemDatabase.cpp
+    src/Item/ItemTagDatabase.cpp
     src/World/Object/Resource/ResourceDefinition.cpp
     src/World/Object/Resource/ResourceDatabase.cpp
     src/Recipe/RecipeDefinition.cpp

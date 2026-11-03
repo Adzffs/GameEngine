@@ -67,6 +67,14 @@ namespace
         grid[4] = ItemType::LOG;
         return grid;
     }
+
+    CraftingRecipeMatcher::Grid ShieldGrid()
+    {
+        return {
+            ItemType::WOODEN_PLANKS, ItemType::NONE, ItemType::WOODEN_PLANKS,
+            ItemType::WOODEN_PLANKS, ItemType::WOODEN_PLANKS, ItemType::WOODEN_PLANKS,
+            ItemType::NONE, ItemType::WOODEN_PLANKS, ItemType::NONE};
+    }
 }
 
 int main()
@@ -112,10 +120,7 @@ int main()
             world.EnqueueCommand(
                 CraftRecipeCommand{
                     player->GetID(),
-                    RecipeDatabase::Get(
-                        RecipeType::WOODEN_SHIELD)
-                        .GetCraftingPattern()
-                        .slots});
+                    ShieldGrid()});
         world.Update();
         test.Expect(
             FindResult(world, shieldCommand) ==

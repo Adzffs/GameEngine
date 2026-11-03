@@ -17,4 +17,8 @@ public:
 
     static const RecipeDefinition *FindMatch(
         const Grid &grid);
+
+    static bool IngredientMatches(
+        const CraftingIngredient &ingredient,
+        ItemType itemType);
 };

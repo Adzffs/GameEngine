@@ -3,8 +3,10 @@
 
 #include "../Equipment/EquipmentSlotType.h"
 #include "../Item/ItemDatabase.h"
+#include "../Item/ItemTagDatabase.h"
 #include "../Item/ToolType.h"
 #include "../Recipe/RecipeDatabase.h"
+#include "../Recipe/CraftingRecipeMatcher.h"
 #include "../Recipe/RecipeIngredient.h"
 #include "../Requirement/RequirementEvaluator.h"
 #include "../Reward/RewardTableRegistry.h"
@@ -1556,14 +1558,28 @@ void ContentValidator::AppendRecipeValidation(
         std::map<ItemType, int> patternCounts;
         std::map<ItemType, int> ingredientCounts;
 
-        for (ItemType itemType : pattern.slots)
+        bool containsTag = false;
+        for (const CraftingIngredient &slot : pattern.slots)
         {
-            if (itemType == ItemType::NONE)
+            if (slot.type == CraftingIngredientType::EMPTY)
             {
                 continue;
             }
 
-            if (!IsValidItemType(itemType))
+            if (slot.type == CraftingIngredientType::TAG)
+            {
+                containsTag = true;
+                if (!ItemTagDatabase::IsValid(slot.itemTag))
+                {
+                    report.AddError(
+                        "Recipe", contentID,
+                        "crafting pattern contains an invalid item tag");
+                }
+                continue;
+            }
+
+            if (slot.type != CraftingIngredientType::ITEM ||
+                !IsValidItemType(slot.itemType))
             {
                 report.AddError(
                     "Recipe",
@@ -1572,7 +1588,7 @@ void ContentValidator::AppendRecipeValidation(
                 continue;
             }
 
-            patternCounts[itemType]++;
+            patternCounts[slot.itemType]++;
         }
 
         for (const RecipeIngredient &ingredient : ingredients)
@@ -1580,8 +1596,39 @@ void ContentValidator::AppendRecipeValidation(
             ingredientCounts[ingredient.itemType] += ingredient.amount;
         }
 
-        if (patternCounts.empty() ||
-            patternCounts != ingredientCounts)
+        if (containsTag)
+        {
+            CraftingPattern ingredientSetPattern = pattern;
+            ingredientSetPattern.type = CraftingPatternType::SHAPELESS;
+            CraftingRecipeMatcher::Grid declaredIngredients{};
+            std::size_t index = 0;
+            bool tooManyIngredients = false;
+            for (const RecipeIngredient &ingredient : ingredients)
+            {
+                for (int amount = 0; amount < ingredient.amount; ++amount)
+                {
+                    if (index < declaredIngredients.size())
+                    {
+                        declaredIngredients[index++] = ingredient.itemType;
+                    }
+                    else
+                    {
+                        tooManyIngredients = true;
+                    }
+                }
+            }
+            if (tooManyIngredients ||
+                !CraftingRecipeMatcher::Matches(
+                    ingredientSetPattern, declaredIngredients))
+            {
+                report.AddError(
+                    "Recipe", contentID,
+                    "crafting tags must match declared ingredient quantities");
+            }
+        }
+
+        if ((patternCounts.empty() && !containsTag) ||
+            (!containsTag && patternCounts != ingredientCounts))
         {
             report.AddError(
                 "Recipe",
