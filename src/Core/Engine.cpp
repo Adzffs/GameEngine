@@ -127,6 +127,7 @@ bool Engine::Run()
     {
         SynchronizeDialoguePresentation();
         SynchronizeShopPresentation();
+        SynchronizeRecipeCommand();
         graphics.ProcessEvents(running);
 
         if (!running)
@@ -136,18 +137,7 @@ bool Engine::Run()
 
         EnqueuePendingDialogueCommand();
         EnqueuePendingShopCommand();
-
-        RecipeType requestedRecipe =
-            RecipeType::NONE;
-
-        if (graphics.ConsumeRecipeRequest(
-                requestedRecipe))
-        {
-            world.EnqueueCommand(
-                StartRecipeCommand{
-                    playerID,
-                    requestedRecipe});
-        }
+        EnqueuePendingRecipeCommand();
 
         int clickedInventorySlot = -1;
 
@@ -268,6 +258,7 @@ bool Engine::Run()
 
         SynchronizeDialoguePresentation();
         SynchronizeShopPresentation();
+        SynchronizeRecipeCommand();
 
         Player *player =
             dynamic_cast<Player *>(
@@ -402,6 +393,82 @@ void Engine::ClearPendingShopCommand()
 {
     pendingShopCommand.reset();
     graphics.SetShopCommandInFlight(false);
+}
+
+void Engine::SynchronizeRecipeCommand()
+{
+    for (const CommandProcessingResult &result :
+         world.GetCommandProcessingResults())
+    {
+        if (!pendingRecipeCommand.has_value() ||
+            result.commandID !=
+                pendingRecipeCommand->commandID ||
+            result.actorEntityID !=
+                pendingRecipeCommand->actorEntityID)
+        {
+            continue;
+        }
+
+        graphics.ReconcileRecipeCommandResult(
+            result.resultCode);
+        ClearPendingRecipeCommand();
+        break;
+    }
+
+    if (pendingRecipeCommand.has_value() &&
+        (!graphics.IsStationMenuOpen() ||
+         graphics.GetOpenStationType() !=
+             pendingRecipeCommand->stationType))
+    {
+        ClearPendingRecipeCommand();
+    }
+}
+
+bool Engine::EnqueuePendingRecipeCommand()
+{
+    if (pendingRecipeCommand.has_value() ||
+        !graphics.IsStationMenuOpen())
+    {
+        return false;
+    }
+
+    std::optional<ServerCommandData> command;
+    PendingRecipeCommandType commandType =
+        PendingRecipeCommandType::NONE;
+
+    CraftingRecipeMatcher::Grid grid{};
+    RecipeType recipeType = RecipeType::NONE;
+
+    if (graphics.ConsumeCraftingGridRequest(grid))
+    {
+        command = CraftRecipeCommand{playerID, grid};
+        commandType =
+            PendingRecipeCommandType::CRAFTING_GRID;
+    }
+    else if (graphics.ConsumeRecipeRequest(recipeType))
+    {
+        command = StartRecipeCommand{playerID, recipeType};
+        commandType =
+            PendingRecipeCommandType::FURNACE_RECIPE;
+    }
+    else
+    {
+        return false;
+    }
+
+    pendingRecipeCommand = PendingRecipeCommand{
+        world.EnqueueCommand(std::move(*command)),
+        playerID,
+        graphics.GetOpenStationType(),
+        commandType};
+    graphics.SetRecipeCommandInFlight(true);
+    return true;
+}
+
+void Engine::ClearPendingRecipeCommand()
+{
+    pendingRecipeCommand.reset();
+    graphics.SetRecipeCommandInFlight(false);
 }
 
 bool Engine::FinalizeWorldAfterRun()

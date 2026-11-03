@@ -12,7 +12,9 @@ RecipeDefinition::RecipeDefinition(
     int actionDurationTicks,
     std::vector<RecipeIngredient> ingredients,
     ItemType outputItem,
-    int outputAmount)
+    int outputAmount,
+    CraftingPattern craftingPattern,
+    bool repeatsWhileValid)
     : recipeType(recipeType),
       name(std::move(name)),
       requiredStationType(requiredStationType),
@@ -22,7 +24,9 @@ RecipeDefinition::RecipeDefinition(
       actionDurationTicks(actionDurationTicks),
       ingredients(std::move(ingredients)),
       outputItem(outputItem),
-      outputAmount(outputAmount)
+      outputAmount(outputAmount),
+      craftingPattern(std::move(craftingPattern)),
+      repeatsWhileValid(repeatsWhileValid)
 {
     if (requiredSkill != SkillType::NONE ||
         requiredLevel != 0)
@@ -99,4 +103,14 @@ ItemType RecipeDefinition::GetOutputItem() const
 int RecipeDefinition::GetOutputAmount() const
 {
     return outputAmount;
+}
+
+const CraftingPattern &RecipeDefinition::GetCraftingPattern() const
+{
+    return craftingPattern;
+}
+
+bool RecipeDefinition::RepeatsWhileValid() const
+{
+    return repeatsWhileValid;
 }

@@ -8,7 +8,9 @@
 #include "EngineConfiguration.h"
 #include "../Persistence/WorldPlayerPersistenceLifecycle.h"
 
+#include <cstdint>
 #include <memory>
+#include <optional>
 
 struct EngineTestAccess;
 
@@ -44,6 +46,8 @@ private:
     bool EnqueuePendingDialogueCommand();
     void SynchronizeShopPresentation();
     bool EnqueuePendingShopCommand();
+    void SynchronizeRecipeCommand();
+    bool EnqueuePendingRecipeCommand();
     enum class PendingShopCommandType { NONE, BUY, SELL, CLOSE };
     struct PendingShopCommand
     {
@@ -54,4 +58,20 @@ private:
     };
     std::optional<PendingShopCommand> pendingShopCommand;
     void ClearPendingShopCommand();
+    enum class PendingRecipeCommandType
+    {
+        NONE,
+        FURNACE_RECIPE,
+        CRAFTING_GRID
+    };
+    struct PendingRecipeCommand
+    {
+        std::uint64_t commandID = 0;
+        int actorEntityID = 0;
+        StationType stationType = StationType::NONE;
+        PendingRecipeCommandType type =
+            PendingRecipeCommandType::NONE;
+    };
+    std::optional<PendingRecipeCommand> pendingRecipeCommand;
+    void ClearPendingRecipeCommand();
 };

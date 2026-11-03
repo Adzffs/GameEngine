@@ -18,6 +18,7 @@
 #include "../Inventory/Inventory.h"
 #include "../Equipment/Equipment.h"
 #include "../Recipe/RecipeType.h"
+#include "../Recipe/CraftingRecipeMatcher.h"
 #include "../Command/ServerCommand.h"
 #include "../Command/CommandProcessingResult.h"
 #include "../Dialogue/DialoguePresentationState.h"
@@ -51,7 +52,12 @@ public:
     bool ConsumeWeaponSlotClick();
     bool ConsumeRecipeRequest(
         RecipeType &recipeType);
+    bool ConsumeCraftingGridRequest(
+        CraftingRecipeMatcher::Grid &grid);
     bool ConsumeStationMenuClose();
+    void SetRecipeCommandInFlight(bool inFlight);
+    bool IsRecipeCommandInFlight() const;
+    void ReconcileRecipeCommandResult(CommandResultCode result);
     std::optional<ServerCommandData> ConsumeDialogueCommand();
     std::optional<ServerCommandData> ConsumeShopCommand();
     void SetShopCommandInFlight(bool inFlight);
@@ -70,6 +76,8 @@ public:
 
     void OpenStationMenu(
         StationType stationType);
+    bool IsStationMenuOpen() const;
+    StationType GetOpenStationType() const;
     void DrawStationMenu();
     void DrawActionProgress(
         const Action *activeAction);
@@ -190,10 +198,29 @@ public:
         float originY;
         bool clipped;
     };
+    struct FurnaceMenuLayout
+    {
+        SDL_FRect panelBounds;
+        SDL_FRect closeButton;
+        std::array<SDL_FRect, 3> recipeButtons;
+    };
+    struct CraftingTableLayout
+    {
+        SDL_FRect panelBounds;
+        SDL_FRect closeButton;
+        std::array<SDL_FRect, 9> gridSlots;
+        std::array<SDL_FRect, 2> ingredientButtons;
+        SDL_FRect clearButton;
+        SDL_FRect craftButton;
+        SDL_FRect previewBounds;
+    };
     SidePanelLayout GetSidePanelLayout() const;
     DialoguePanelLayout GetDialoguePanelLayout() const;
     std::vector<QuestRowLayout> BuildQuestRowLayout(
         const std::vector<QuestPresentation> &quests) const;
+    FurnaceMenuLayout GetFurnaceMenuLayout() const;
+    CraftingTableLayout GetCraftingTableLayout() const;
+    const CraftingRecipeMatcher::Grid &GetCraftingGrid() const;
     static std::string GetQuestStateLabel(QuestState state);
     static std::string GetQuestProgressLabel(
         const QuestPresentation &quest);
@@ -336,6 +363,15 @@ private:
     bool weaponSlotClickPending;
     bool recipeRequestPending;
     RecipeType requestedRecipeType;
+    bool craftingGridRequestPending = false;
+    CraftingRecipeMatcher::Grid requestedCraftingGrid{};
+    CraftingRecipeMatcher::Grid craftingGrid{};
+    ItemType selectedCraftingItem = ItemType::NONE;
+    bool recipeCommandInFlight = false;
+    bool recipeActionActive = false;
+    int displayedLogCount = 0;
+    int displayedPlankCount = 0;
+    std::string stationFeedback;
 
     bool stationMenuOpen;
     StationType openStationType;
@@ -350,4 +386,10 @@ private:
 
     bool HandleDialogueClick(float mouseX, float mouseY);
     bool HandleShopClick(float mouseX, float mouseY);
+    void DismissStationMenu(bool queueCloseCommand);
+    int GetDisplayedCraftingItemCount(ItemType itemType) const;
+    int GetCraftingGridItemCount(ItemType itemType) const;
+    void DrawCraftingItemIcon(
+        ItemType itemType,
+        const SDL_FRect &bounds);
 };

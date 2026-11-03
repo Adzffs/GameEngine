@@ -21,7 +21,8 @@ namespace DevelopmentWorldContent
     GetStarterStationPlacements()
     {
         static const std::vector<DevelopmentStationPlacementDefinition> definitions{
-            {StationType::FURNACE, 14, 9}};
+            {StationType::FURNACE, 14, 9},
+            {StationType::CRAFTING_TABLE, 17, 9}};
 
         return definitions;
     }

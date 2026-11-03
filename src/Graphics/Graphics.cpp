@@ -6,6 +6,7 @@
 #include "../NPC/NPC.h"
 #include "../NPC/NpcDefinitionDatabase.h"
 #include "../Item/ItemDatabase.h"
+#include "../Recipe/RecipeDatabase.h"
 #include "../Quest/QuestDefinitionDatabase.h"
 #include "../Combat/Combatant.h"
 #include "../World/Object/Resource/ResourceDatabase.h"
@@ -134,9 +135,149 @@ bool Graphics::Initialize()
 void Graphics::OpenStationMenu(
     StationType stationType)
 {
-    openStationType = stationType;
-    stationMenuOpen =
-        stationType != StationType::NONE;
+    DismissStationMenu(false);
+    const bool supportedStation =
+        stationType == StationType::FURNACE ||
+        stationType == StationType::CRAFTING_TABLE;
+    openStationType = supportedStation
+        ? stationType
+        : StationType::NONE;
+    stationMenuOpen = supportedStation;
+    stationFeedback.clear();
+}
+
+bool Graphics::IsStationMenuOpen() const
+{
+    return stationMenuOpen;
+}
+
+StationType Graphics::GetOpenStationType() const
+{
+    return openStationType;
+}
+
+void Graphics::DismissStationMenu(
+    bool queueCloseCommand)
+{
+    const bool wasOpen = stationMenuOpen;
+    stationMenuOpen = false;
+    openStationType = StationType::NONE;
+    recipeRequestPending = false;
+    requestedRecipeType = RecipeType::NONE;
+    craftingGridRequestPending = false;
+    requestedCraftingGrid.fill(ItemType::NONE);
+    craftingGrid.fill(ItemType::NONE);
+    selectedCraftingItem = ItemType::NONE;
+    stationFeedback.clear();
+    stationMenuClosePending = false;
+
+    if (queueCloseCommand && wasOpen)
+    {
+        stationMenuClosePending = true;
+    }
+}
+
+Graphics::FurnaceMenuLayout Graphics::GetFurnaceMenuLayout() const
+{
+    constexpr float menuWidth = 360.0f;
+    constexpr float menuHeight = 280.0f;
+    const float menuX =
+        (WindowWidth - menuWidth) / 2.0f;
+    const float menuY =
+        (WindowHeight - menuHeight) / 2.0f;
+
+    FurnaceMenuLayout layout;
+    layout.panelBounds = {
+        menuX, menuY, menuWidth, menuHeight};
+    layout.closeButton = {
+        menuX + menuWidth - 86.0f,
+        menuY + 12.0f,
+        68.0f,
+        28.0f};
+    layout.recipeButtons = {{
+        {menuX + 18.0f, menuY + 52.0f, menuWidth - 36.0f, 42.0f},
+        {menuX + 18.0f, menuY + 104.0f, menuWidth - 36.0f, 42.0f},
+        {menuX + 18.0f, menuY + 156.0f, menuWidth - 36.0f, 42.0f},
+    }};
+    return layout;
+}
+
+Graphics::CraftingTableLayout Graphics::GetCraftingTableLayout() const
+{
+    constexpr float menuWidth = 680.0f;
+    constexpr float menuHeight = 470.0f;
+    constexpr float slotSize = 64.0f;
+    constexpr float slotGap = 8.0f;
+    const float menuX =
+        (WindowWidth - menuWidth) / 2.0f;
+    const float menuY =
+        (WindowHeight - menuHeight) / 2.0f;
+
+    CraftingTableLayout layout;
+    layout.panelBounds = {
+        menuX, menuY, menuWidth, menuHeight};
+    layout.closeButton = {
+        menuX + menuWidth - 98.0f,
+        menuY + 16.0f,
+        80.0f,
+        32.0f};
+
+    const float gridX = menuX + 40.0f;
+    const float gridY = menuY + 92.0f;
+    for (std::size_t index = 0;
+         index < layout.gridSlots.size();
+         ++index)
+    {
+        const float column = static_cast<float>(index % 3);
+        const float row = static_cast<float>(index / 3);
+        layout.gridSlots[index] = {
+            gridX + column * (slotSize + slotGap),
+            gridY + row * (slotSize + slotGap),
+            slotSize,
+            slotSize};
+    }
+
+    layout.ingredientButtons = {{
+        {menuX + 300.0f, menuY + 92.0f, 330.0f, 48.0f},
+        {menuX + 300.0f, menuY + 150.0f, 330.0f, 48.0f},
+    }};
+    layout.previewBounds = {
+        menuX + 300.0f, menuY + 218.0f, 330.0f, 88.0f};
+    layout.clearButton = {
+        menuX + 40.0f, menuY + 338.0f, 150.0f, 42.0f};
+    layout.craftButton = {
+        menuX + 480.0f, menuY + 338.0f, 150.0f, 42.0f};
+    return layout;
+}
+
+const CraftingRecipeMatcher::Grid &Graphics::GetCraftingGrid() const
+{
+    return craftingGrid;
+}
+
+int Graphics::GetDisplayedCraftingItemCount(
+    ItemType itemType) const
+{
+    if (itemType == ItemType::LOG)
+    {
+        return displayedLogCount;
+    }
+
+    if (itemType == ItemType::WOODEN_PLANKS)
+    {
+        return displayedPlankCount;
+    }
+
+    return 0;
+}
+
+int Graphics::GetCraftingGridItemCount(
+    ItemType itemType) const
+{
+    return static_cast<int>(std::count(
+        craftingGrid.begin(),
+        craftingGrid.end(),
+        itemType));
 }
 
 bool Graphics::IsPointInsideRectangle(
@@ -154,78 +295,133 @@ void Graphics::HandleStationMenuClick(
     float mouseX,
     float mouseY)
 {
-    if (!stationMenuOpen ||
-        openStationType !=
-            StationType::FURNACE)
+    if (!stationMenuOpen || recipeCommandInFlight)
     {
         return;
     }
 
-    constexpr float menuWidth =
-        360.0f;
+    if (openStationType == StationType::FURNACE)
+    {
+        const FurnaceMenuLayout layout =
+            GetFurnaceMenuLayout();
 
-    constexpr float menuHeight =
-        280.0f;
+        if (IsPointInsideRectangle(
+                mouseX, mouseY, layout.closeButton))
+        {
+            DismissStationMenu(true);
+            return;
+        }
 
-    const float menuX =
-        (WindowWidth - menuWidth) /
-        2.0f;
+        if (recipeActionActive)
+        {
+            return;
+        }
 
-    const float menuY =
-        (WindowHeight - menuHeight) /
-        2.0f;
+        const std::array<RecipeType, 3> recipes{
+            RecipeType::BRONZE_BAR,
+            RecipeType::IRON_BAR,
+            RecipeType::STEEL_BAR};
 
-    SDL_FRect bronzeButton{
-        menuX + 18.0f,
-        menuY + 52.0f,
-        menuWidth - 36.0f,
-        42.0f};
+        for (std::size_t index = 0;
+             index < recipes.size();
+             ++index)
+        {
+            if (IsPointInsideRectangle(
+                    mouseX,
+                    mouseY,
+                    layout.recipeButtons[index]))
+            {
+                requestedRecipeType = recipes[index];
+                recipeRequestPending = true;
+                stationFeedback.clear();
+                return;
+            }
+        }
 
-    SDL_FRect ironButton{
-        menuX + 18.0f,
-        menuY + 104.0f,
-        menuWidth - 36.0f,
-        42.0f};
+        return;
+    }
 
-    SDL_FRect steelButton{
-        menuX + 18.0f,
-        menuY + 156.0f,
-        menuWidth - 36.0f,
-        42.0f};
+    if (openStationType != StationType::CRAFTING_TABLE)
+    {
+        return;
+    }
+
+    const CraftingTableLayout layout =
+        GetCraftingTableLayout();
 
     if (IsPointInsideRectangle(
-            mouseX,
-            mouseY,
-            bronzeButton))
+            mouseX, mouseY, layout.closeButton))
     {
-        requestedRecipeType =
-            RecipeType::BRONZE_BAR;
+        DismissStationMenu(true);
+        return;
+    }
 
-        recipeRequestPending = true;
+    const std::array<ItemType, 2> ingredients{
+        ItemType::LOG,
+        ItemType::WOODEN_PLANKS};
+
+    for (std::size_t index = 0;
+         index < ingredients.size();
+         ++index)
+    {
+        if (IsPointInsideRectangle(
+                mouseX,
+                mouseY,
+                layout.ingredientButtons[index]) &&
+            GetDisplayedCraftingItemCount(ingredients[index]) > 0)
+        {
+            selectedCraftingItem = ingredients[index];
+            stationFeedback.clear();
+            return;
+        }
+    }
+
+    for (std::size_t index = 0;
+         index < layout.gridSlots.size();
+         ++index)
+    {
+        if (!IsPointInsideRectangle(
+                mouseX,
+                mouseY,
+                layout.gridSlots[index]))
+        {
+            continue;
+        }
+
+        if (craftingGrid[index] != ItemType::NONE)
+        {
+            craftingGrid[index] = ItemType::NONE;
+            stationFeedback.clear();
+            return;
+        }
+
+        if (selectedCraftingItem != ItemType::NONE &&
+            GetCraftingGridItemCount(selectedCraftingItem) <
+                GetDisplayedCraftingItemCount(selectedCraftingItem))
+        {
+            craftingGrid[index] = selectedCraftingItem;
+            stationFeedback.clear();
+        }
+
         return;
     }
 
     if (IsPointInsideRectangle(
-            mouseX,
-            mouseY,
-            ironButton))
+            mouseX, mouseY, layout.clearButton))
     {
-        requestedRecipeType =
-            RecipeType::IRON_BAR;
-
-        recipeRequestPending = true;
+        craftingGrid.fill(ItemType::NONE);
+        stationFeedback.clear();
         return;
     }
 
     if (IsPointInsideRectangle(
-            mouseX,
-            mouseY,
-            steelButton))
+            mouseX, mouseY, layout.craftButton) &&
+        !recipeActionActive &&
+        CraftingRecipeMatcher::FindMatch(craftingGrid) != nullptr)
     {
-        requestedRecipeType =
-            RecipeType::STEEL_BAR;
-
-        recipeRequestPending = true;
+        requestedCraftingGrid = craftingGrid;
+        craftingGridRequestPending = true;
+        stationFeedback.clear();
     }
 }
 
@@ -236,25 +432,11 @@ void Graphics::DrawStationMenu()
         return;
     }
 
-    constexpr float menuWidth =
-        360.0f;
-
-    constexpr float menuHeight =
-        280.0f;
-
-    const float menuX =
-        (WindowWidth - menuWidth) /
-        2.0f;
-
-    const float menuY =
-        (WindowHeight - menuHeight) /
-        2.0f;
-
-    SDL_FRect menuRectangle{
-        menuX,
-        menuY,
-        menuWidth,
-        menuHeight};
+    const bool furnace =
+        openStationType == StationType::FURNACE;
+    const SDL_FRect menuRectangle = furnace
+        ? GetFurnaceMenuLayout().panelBounds
+        : GetCraftingTableLayout().panelBounds;
 
     SDL_SetRenderDrawColor(
         renderer,
@@ -278,104 +460,242 @@ void Graphics::DrawStationMenu()
         renderer,
         &menuRectangle);
 
-    if (openStationType !=
-        StationType::FURNACE)
+    if (furnace)
+    {
+        const FurnaceMenuLayout layout =
+            GetFurnaceMenuLayout();
+        SDL_SetRenderDrawColor(
+            renderer, 60, 60, 65, 255);
+        for (const SDL_FRect &button : layout.recipeButtons)
+        {
+            SDL_RenderFillRect(renderer, &button);
+        }
+        SDL_SetRenderDrawColor(
+            renderer, 175, 175, 180, 255);
+        for (const SDL_FRect &button : layout.recipeButtons)
+        {
+            SDL_RenderRect(renderer, &button);
+        }
+        SDL_RenderRect(renderer, &layout.closeButton);
+        SDL_SetRenderDrawColor(
+            renderer, 255, 255, 255, 255);
+        SDL_RenderDebugText(
+            renderer,
+            layout.panelBounds.x + 18.0f,
+            layout.panelBounds.y + 18.0f,
+            "FURNACE");
+        SDL_RenderDebugText(renderer,
+            layout.closeButton.x + 12.0f,
+            layout.closeButton.y + 10.0f,
+            "CLOSE");
+        SDL_RenderDebugText(renderer,
+            layout.recipeButtons[0].x + 12.0f,
+            layout.recipeButtons[0].y + 14.0f,
+            "BRONZE BAR - 1 COPPER + 1 TIN");
+        SDL_RenderDebugText(renderer,
+            layout.recipeButtons[1].x + 12.0f,
+            layout.recipeButtons[1].y + 14.0f,
+            "IRON BAR - 1 IRON ORE");
+        SDL_RenderDebugText(renderer,
+            layout.recipeButtons[2].x + 12.0f,
+            layout.recipeButtons[2].y + 14.0f,
+            "STEEL BAR - 1 IRON + 2 COAL");
+        if (!stationFeedback.empty())
+        {
+            SDL_RenderDebugText(renderer,
+                layout.panelBounds.x + 18.0f,
+                layout.panelBounds.y + 224.0f,
+                stationFeedback.c_str());
+        }
+        return;
+    }
+
+    if (openStationType != StationType::CRAFTING_TABLE)
     {
         return;
     }
 
-    SDL_FRect bronzeButton{
-        menuX + 18.0f,
-        menuY + 52.0f,
-        menuWidth - 36.0f,
-        42.0f};
+    const CraftingTableLayout layout =
+        GetCraftingTableLayout();
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderDebugText(renderer,
+        layout.panelBounds.x + 24.0f,
+        layout.panelBounds.y + 24.0f,
+        "CRAFTING TABLE");
+    SDL_RenderDebugText(renderer,
+        layout.panelBounds.x + 40.0f,
+        layout.panelBounds.y + 68.0f,
+        "3 x 3 GRID");
+    SDL_RenderDebugText(renderer,
+        layout.panelBounds.x + 300.0f,
+        layout.panelBounds.y + 68.0f,
+        "MATERIALS");
 
-    SDL_FRect ironButton{
-        menuX + 18.0f,
-        menuY + 104.0f,
-        menuWidth - 36.0f,
-        42.0f};
+    SDL_SetRenderDrawColor(renderer, 65, 58, 50, 255);
+    for (const SDL_FRect &slot : layout.gridSlots)
+    {
+        SDL_RenderFillRect(renderer, &slot);
+    }
+    SDL_SetRenderDrawColor(renderer, 165, 145, 115, 255);
+    for (const SDL_FRect &slot : layout.gridSlots)
+    {
+        SDL_RenderRect(renderer, &slot);
+    }
+    for (std::size_t index = 0;
+         index < craftingGrid.size();
+         ++index)
+    {
+        DrawCraftingItemIcon(
+            craftingGrid[index],
+            layout.gridSlots[index]);
+    }
 
-    SDL_FRect steelButton{
-        menuX + 18.0f,
-        menuY + 156.0f,
-        menuWidth - 36.0f,
-        42.0f};
+    const std::array<ItemType, 2> ingredientTypes{
+        ItemType::LOG,
+        ItemType::WOODEN_PLANKS};
+    for (std::size_t index = 0;
+         index < ingredientTypes.size();
+         ++index)
+    {
+        const bool available =
+            GetDisplayedCraftingItemCount(ingredientTypes[index]) > 0;
+        const bool selected =
+            selectedCraftingItem == ingredientTypes[index];
+        SDL_SetRenderDrawColor(
+            renderer,
+            selected ? 92 : (available ? 65 : 42),
+            selected ? 105 : (available ? 72 : 42),
+            selected ? 72 : (available ? 58 : 42),
+            255);
+        SDL_RenderFillRect(
+            renderer,
+            &layout.ingredientButtons[index]);
+        SDL_SetRenderDrawColor(
+            renderer, 170, 155, 125, 255);
+        SDL_RenderRect(
+            renderer,
+            &layout.ingredientButtons[index]);
+        DrawCraftingItemIcon(
+            ingredientTypes[index],
+            layout.ingredientButtons[index]);
+    }
 
+    const std::string logText =
+        "Log x" + std::to_string(displayedLogCount);
+    const std::string plankText =
+        "Wooden planks x" + std::to_string(displayedPlankCount);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderDebugText(renderer,
+        layout.ingredientButtons[0].x + 58.0f,
+        layout.ingredientButtons[0].y + 17.0f,
+        logText.c_str());
+    SDL_RenderDebugText(renderer,
+        layout.ingredientButtons[1].x + 58.0f,
+        layout.ingredientButtons[1].y + 17.0f,
+        plankText.c_str());
+
+    SDL_SetRenderDrawColor(renderer, 45, 45, 48, 255);
+    SDL_RenderFillRect(renderer, &layout.previewBounds);
+    SDL_SetRenderDrawColor(renderer, 135, 135, 140, 255);
+    SDL_RenderRect(renderer, &layout.previewBounds);
+    const RecipeDefinition *match =
+        CraftingRecipeMatcher::FindMatch(craftingGrid);
+    if (match == nullptr)
+    {
+        SDL_RenderDebugText(renderer,
+            layout.previewBounds.x + 14.0f,
+            layout.previewBounds.y + 18.0f,
+            "Arrange materials to discover a recipe");
+    }
+    else
+    {
+        SDL_RenderDebugText(renderer,
+            layout.previewBounds.x + 14.0f,
+            layout.previewBounds.y + 14.0f,
+            match->GetName().c_str());
+        const std::string output =
+            "OUTPUT: " +
+            std::to_string(match->GetOutputAmount()) +
+            " " +
+            ItemDatabase::Get(match->GetOutputItem()).GetName();
+        SDL_RenderDebugText(renderer,
+            layout.previewBounds.x + 14.0f,
+            layout.previewBounds.y + 46.0f,
+            output.c_str());
+    }
+
+    SDL_SetRenderDrawColor(renderer, 70, 62, 52, 255);
+    SDL_RenderFillRect(renderer, &layout.clearButton);
+    const bool canCraft =
+        match != nullptr &&
+        !recipeCommandInFlight &&
+        !recipeActionActive;
     SDL_SetRenderDrawColor(
         renderer,
-        60,
-        60,
-        65,
+        canCraft ? 64 : 45,
+        canCraft ? 92 : 45,
+        canCraft ? 60 : 45,
         255);
+    SDL_RenderFillRect(renderer, &layout.craftButton);
+    SDL_SetRenderDrawColor(renderer, 180, 165, 135, 255);
+    SDL_RenderRect(renderer, &layout.clearButton);
+    SDL_RenderRect(renderer, &layout.craftButton);
+    SDL_RenderRect(renderer, &layout.closeButton);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderDebugText(renderer,
+        layout.clearButton.x + 42.0f,
+        layout.clearButton.y + 15.0f,
+        "CLEAR");
+    SDL_RenderDebugText(renderer,
+        layout.craftButton.x + 46.0f,
+        layout.craftButton.y + 15.0f,
+        "CRAFT");
+    SDL_RenderDebugText(renderer,
+        layout.closeButton.x + 18.0f,
+        layout.closeButton.y + 12.0f,
+        "CLOSE");
+    if (!stationFeedback.empty())
+    {
+        SDL_RenderDebugText(renderer,
+            layout.panelBounds.x + 40.0f,
+            layout.panelBounds.y + 410.0f,
+            stationFeedback.c_str());
+    }
+}
 
-    SDL_RenderFillRect(
-        renderer,
-        &bronzeButton);
+void Graphics::DrawCraftingItemIcon(
+    ItemType itemType,
+    const SDL_FRect &bounds)
+{
+    if (itemType == ItemType::LOG)
+    {
+        DrawLogIcon(
+            itemType,
+            bounds.x + 8.0f,
+            bounds.y + 8.0f,
+            std::min(bounds.w, bounds.h) - 16.0f);
+        return;
+    }
 
-    SDL_RenderFillRect(
-        renderer,
-        &ironButton);
+    if (itemType != ItemType::WOODEN_PLANKS)
+    {
+        return;
+    }
 
-    SDL_RenderFillRect(
-        renderer,
-        &steelButton);
-
-    SDL_SetRenderDrawColor(
-        renderer,
-        175,
-        175,
-        180,
-        255);
-
-    SDL_RenderRect(
-        renderer,
-        &bronzeButton);
-
-    SDL_RenderRect(
-        renderer,
-        &ironButton);
-
-    SDL_RenderRect(
-        renderer,
-        &steelButton);
-
-    SDL_SetRenderDrawColor(
-        renderer,
-        255,
-        255,
-        255,
-        255);
-
-    SDL_RenderDebugText(
-        renderer,
-        menuX + 18.0f,
-        menuY + 18.0f,
-        "FURNACE");
-
-    SDL_RenderDebugText(
-        renderer,
-        bronzeButton.x + 12.0f,
-        bronzeButton.y + 14.0f,
-        "BRONZE BAR - 1 COPPER + 1 TIN");
-
-    SDL_RenderDebugText(
-        renderer,
-        ironButton.x + 12.0f,
-        ironButton.y + 14.0f,
-        "IRON BAR - 1 IRON ORE");
-
-    SDL_RenderDebugText(
-        renderer,
-        steelButton.x + 12.0f,
-        steelButton.y + 14.0f,
-        "STEEL BAR - 1 IRON + 2 COAL");
-
-    SDL_RenderDebugText(
-        renderer,
-        menuX + 18.0f,
-        menuY + 240.0f,
-        "PRESS ESC TO CLOSE");
+    const float width = std::min(bounds.w - 16.0f, 44.0f);
+    const float height = 8.0f;
+    const float x = bounds.x + 8.0f;
+    const float y = bounds.y + 9.0f;
+    SDL_SetRenderDrawColor(renderer, 166, 111, 58, 255);
+    for (int index = 0; index < 3; ++index)
+    {
+        SDL_FRect plank{
+            x,
+            y + static_cast<float>(index) * 11.0f,
+            width,
+            height};
+        SDL_RenderFillRect(renderer, &plank);
+    }
 }
 
 void Graphics::DrawActionProgress(
@@ -635,12 +955,10 @@ void Graphics::ProcessEvents(bool &running)
                 }
                 if (stationMenuOpen)
                 {
-                    stationMenuOpen = false;
-
-                    openStationType =
-                        StationType::NONE;
-
-                    stationMenuClosePending = true;
+                    if (!recipeCommandInFlight)
+                    {
+                        DismissStationMenu(true);
+                    }
                 }
 
                 continue;
@@ -670,19 +988,19 @@ void Graphics::ProcessEvents(bool &running)
                 continue;
             }
 
-            if (HandleSidePanelClick(
-                    mouseX,
-                    mouseY))
-            {
-                continue;
-            }
-
             if (stationMenuOpen)
             {
                 HandleStationMenuClick(
                     event.button.x,
                     event.button.y);
 
+                continue;
+            }
+
+            if (HandleSidePanelClick(
+                    mouseX,
+                    mouseY))
+            {
                 continue;
             }
 
@@ -722,8 +1040,7 @@ void Graphics::SynchronizeDialogue(
     const NpcTalkEvent *current = dialoguePresentationState.GetEvent();
     if (current != nullptr)
     {
-        stationMenuOpen = false;
-        openStationType = StationType::NONE;
+        DismissStationMenu(false);
     }
 
     if (pendingDialogueCommand.has_value() &&
@@ -737,7 +1054,11 @@ void Graphics::SynchronizeShop(int actor,const std::vector<ShopOpenedEvent>& eve
 {
     const ShopSessionId old = shopPresentationState.GetEvent() ? shopPresentationState.GetEvent()->sessionId : InvalidShopSessionId;
     shopPresentationState.Synchronize(actor, events, active);
-    if (shopPresentationState.IsOpen()) { dialoguePresentationState.Dismiss(); stationMenuOpen=false; openStationType=StationType::NONE; }
+    if (shopPresentationState.IsOpen())
+    {
+        dialoguePresentationState.Dismiss();
+        DismissStationMenu(false);
+    }
     const auto* current=shopPresentationState.GetEvent();
     if(pendingShopCommand && (!current || current->sessionId!=old)) pendingShopCommand.reset();
 }
@@ -1109,6 +1430,56 @@ bool Graphics::ConsumeRecipeRequest(
     recipeRequestPending = false;
 
     return true;
+}
+
+bool Graphics::ConsumeCraftingGridRequest(
+    CraftingRecipeMatcher::Grid &grid)
+{
+    if (!craftingGridRequestPending)
+    {
+        return false;
+    }
+
+    grid = requestedCraftingGrid;
+    requestedCraftingGrid.fill(ItemType::NONE);
+    craftingGridRequestPending = false;
+    return true;
+}
+
+void Graphics::SetRecipeCommandInFlight(
+    bool inFlight)
+{
+    recipeCommandInFlight = inFlight;
+
+    if (inFlight)
+    {
+        recipeRequestPending = false;
+        craftingGridRequestPending = false;
+    }
+}
+
+bool Graphics::IsRecipeCommandInFlight() const
+{
+    return recipeCommandInFlight;
+}
+
+void Graphics::ReconcileRecipeCommandResult(
+    CommandResultCode result)
+{
+    if (result == CommandResultCode::ACCEPTED)
+    {
+        stationFeedback = "Crafting started";
+
+        if (openStationType == StationType::CRAFTING_TABLE)
+        {
+            craftingGrid.fill(ItemType::NONE);
+            selectedCraftingItem = ItemType::NONE;
+        }
+    }
+    else
+    {
+        stationFeedback = "Crafting rejected by server";
+    }
 }
 
 bool Graphics::ConsumeStationMenuClose()
@@ -1714,6 +2085,42 @@ void Graphics::DrawStations(
                 renderer,
                 &chimney);
 
+            break;
+        }
+
+        case StationType::CRAFTING_TABLE:
+        {
+            SDL_SetRenderDrawColor(
+                renderer, 126, 78, 38, 255);
+            SDL_FRect tableBody{
+                tileX + TileSize * 0.10f,
+                tileY + TileSize * 0.18f,
+                TileSize * 0.80f,
+                TileSize * 0.68f};
+            SDL_RenderFillRect(renderer, &tableBody);
+
+            SDL_SetRenderDrawColor(
+                renderer, 205, 151, 78, 255);
+            SDL_FRect tableTop{
+                tileX + TileSize * 0.06f,
+                tileY + TileSize * 0.12f,
+                TileSize * 0.88f,
+                TileSize * 0.18f};
+            SDL_RenderFillRect(renderer, &tableTop);
+
+            SDL_SetRenderDrawColor(
+                renderer, 75, 47, 26, 255);
+            for (int index = 1; index < 3; ++index)
+            {
+                const float offset =
+                    static_cast<float>(index) * TileSize * 0.28f;
+                SDL_FRect vertical{
+                    tileX + TileSize * 0.08f + offset,
+                    tileY + TileSize * 0.12f,
+                    1.0f,
+                    TileSize * 0.18f};
+                SDL_RenderFillRect(renderer, &vertical);
+            }
             break;
         }
 
@@ -2863,6 +3270,13 @@ void Graphics::DrawInventory(
             slotY,
             slotSize);
 
+        if (slot.GetItemType() == ItemType::WOODEN_PLANKS)
+        {
+            DrawCraftingItemIcon(
+                slot.GetItemType(),
+                SDL_FRect{slotX, slotY, slotSize, slotSize});
+        }
+
         DrawOreIcon(
             slot.GetItemType(),
             slotX,
@@ -3284,6 +3698,11 @@ void Graphics::Render(
     const Action *activeAction)
 {
     displayedCurrency = inventory.GetItemAmount(ItemType::COINS);
+    displayedLogCount = inventory.GetItemAmount(ItemType::LOG);
+    displayedPlankCount = inventory.GetItemAmount(ItemType::WOODEN_PLANKS);
+    recipeActionActive =
+        activeAction != nullptr &&
+        activeAction->GetType() == ActionType::RECIPE;
     SDL_SetRenderDrawColor(
         renderer,
         20,

@@ -91,6 +91,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/World/Object/Resource/ResourceDatabase.cpp
     src/Recipe/RecipeDefinition.cpp
     src/Recipe/RecipeDatabase.cpp
+    src/Recipe/CraftingRecipeMatcher.cpp
     src/Recipe/RecipeActionSystem.cpp
     src/Recipe/RecipeSystem.cpp
     src/Requirement/RequirementEvaluator.cpp
@@ -216,6 +217,8 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(QuestPresentationStateTests tests/QuestPresentationStateTests.cpp)
     add_gameengine_headless_test(MiningBasicsQuestTests tests/MiningBasicsQuestTests.cpp)
     add_gameengine_headless_test(RecipeActionSystemTests tests/RecipeActionSystemTests.cpp)
+    add_gameengine_headless_test(CraftingRecipeTests tests/CraftingRecipeTests.cpp)
+    add_gameengine_headless_test(CraftingTableWorldTests tests/CraftingTableWorldTests.cpp)
     add_gameengine_headless_test(MovementPathSafetyTests tests/MovementPathSafetyTests.cpp)
     add_gameengine_headless_test(MovementSystemTests tests/MovementSystemTests.cpp)
     add_gameengine_headless_test(EntityManagerLookupTests tests/EntityManagerLookupTests.cpp)
@@ -242,6 +245,7 @@ if(BUILD_TESTING)
         add_gameengine_graphics_test(CombatFeedbackTests tests/CombatFeedbackTests.cpp)
         add_gameengine_graphics_test(MonsterRetaliationTests tests/MonsterRetaliationTests.cpp)
         add_gameengine_graphics_test(QuestGraphicsTests tests/QuestGraphicsTests.cpp)
+        add_gameengine_graphics_test(CraftingTableGraphicsTests tests/CraftingTableGraphicsTests.cpp)
 
         add_executable(ClientDialogueIntegrationTests
             tests/ClientDialogueIntegrationTests.cpp
@@ -260,5 +264,14 @@ if(BUILD_TESTING)
         target_link_libraries(ClientShopIntegrationTests PRIVATE GameEngineCore SDL3::SDL3)
         add_test(NAME ClientShopIntegrationTests COMMAND ClientShopIntegrationTests)
         set_tests_properties(ClientShopIntegrationTests PROPERTIES LABELS "client")
+
+        add_executable(ClientCraftingIntegrationTests
+            tests/ClientCraftingIntegrationTests.cpp
+            src/Core/Engine.cpp
+            src/Input/InputManager.cpp
+            src/Graphics/Graphics.cpp)
+        target_link_libraries(ClientCraftingIntegrationTests PRIVATE GameEngineCore SDL3::SDL3)
+        add_test(NAME ClientCraftingIntegrationTests COMMAND ClientCraftingIntegrationTests)
+        set_tests_properties(ClientCraftingIntegrationTests PROPERTIES LABELS "client")
     endif()
 endif()

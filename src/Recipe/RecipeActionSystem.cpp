@@ -5,25 +5,6 @@
 #include "../Entity/Manager/EntityManager.h"
 #include "../Player/Player.h"
 
-namespace
-{
-    bool IsSupportedRecipeType(
-        RecipeType recipeType)
-    {
-        switch (recipeType)
-        {
-        case RecipeType::BRONZE_BAR:
-        case RecipeType::IRON_BAR:
-        case RecipeType::STEEL_BAR:
-            return true;
-
-        case RecipeType::NONE:
-        default:
-            return false;
-        }
-    }
-}
-
 RecipeActionCompletionOutcome RecipeActionSystem::EvaluateCompletedAction(
     const Action &action,
     const EntityManager &entityManager,
@@ -53,7 +34,10 @@ RecipeActionCompletionOutcome RecipeActionSystem::EvaluateCompletedAction(
         return outcome;
     }
 
-    if (!IsSupportedRecipeType(outcome.recipeType))
+    const RecipeDefinition *recipe =
+        RecipeDatabase::TryGet(outcome.recipeType);
+
+    if (recipe == nullptr)
     {
         outcome.type =
             RecipeActionCompletionOutcomeType::CANCEL;
@@ -80,18 +64,14 @@ RecipeActionCompletionOutcome RecipeActionSystem::EvaluateCompletedAction(
         return outcome;
     }
 
-    const RecipeDefinition &recipe =
-        RecipeDatabase::Get(
-            outcome.recipeType);
-
     outcome.type =
         RecipeActionCompletionOutcomeType::COMPLETE;
-    outcome.recipeName = recipe.GetName();
-    outcome.requiredSkill = recipe.GetRequiredSkill();
-    outcome.xpReward = recipe.GetXPReward();
-    outcome.ingredients = recipe.GetIngredients();
-    outcome.outputItem = recipe.GetOutputItem();
-    outcome.outputAmount = recipe.GetOutputAmount();
+    outcome.recipeName = recipe->GetName();
+    outcome.requiredSkill = recipe->GetRequiredSkill();
+    outcome.xpReward = recipe->GetXPReward();
+    outcome.ingredients = recipe->GetIngredients();
+    outcome.outputItem = recipe->GetOutputItem();
+    outcome.outputAmount = recipe->GetOutputAmount();
 
     return outcome;
 }

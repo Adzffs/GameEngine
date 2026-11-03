@@ -76,7 +76,7 @@ namespace
 int main()
 {
     TestContext test;
-    const std::array<std::pair<ItemType, std::string_view>, 22> itemTokens{{
+    const std::array<std::pair<ItemType, std::string_view>, 23> itemTokens{{
         {ItemType::NONE,"NONE"},{ItemType::LOG,"LOG"},{ItemType::OAK_LOG,"OAK_LOG"},
         {ItemType::WILLOW_LOG,"WILLOW_LOG"},{ItemType::COPPER_ORE,"COPPER_ORE"},
         {ItemType::TIN_ORE,"TIN_ORE"},{ItemType::IRON_ORE,"IRON_ORE"},{ItemType::COAL,"COAL"},
@@ -85,7 +85,8 @@ int main()
         {ItemType::IRON_AXE,"IRON_AXE"},{ItemType::STEEL_AXE,"STEEL_AXE"},{ItemType::BRONZE_PICKAXE,"BRONZE_PICKAXE"},
         {ItemType::IRON_PICKAXE,"IRON_PICKAXE"},{ItemType::STEEL_PICKAXE,"STEEL_PICKAXE"},
         {ItemType::BRONZE_SWORD,"BRONZE_SWORD"},{ItemType::DEVELOPER_GODSWORD,"DEVELOPER_GODSWORD"},
-        {ItemType::WOODEN_SHIELD,"WOODEN_SHIELD"}}};
+        {ItemType::WOODEN_SHIELD,"WOODEN_SHIELD"},
+        {ItemType::WOODEN_PLANKS,"WOODEN_PLANKS"}}};
     std::set<std::string_view> uniqueItems;
     std::set<ItemType> mappedItems;
     for (const auto &[type, expected] : itemTokens)
@@ -165,6 +166,15 @@ int main()
     }
     test.Expect(exactInventory, "all 28 decoded inventory indexes remain exact");
     test.ExpectEqual(Encode(*decoded.GetSaveData()), canonical, "encode decode encode byte-identical");
+    PlayerSaveData plankSave = ValidSave();
+    plankSave.inventorySlots[1] = {ItemType::WOODEN_PLANKS, 4};
+    const std::string plankText = Encode(plankSave);
+    const auto decodedPlanks = PlayerSaveTextCodec::Decode(plankText);
+    test.Expect(decodedPlanks.IsSuccess() && decodedPlanks.GetSaveData() &&
+                    decodedPlanks.GetSaveData()->inventorySlots[1].itemType ==
+                        ItemType::WOODEN_PLANKS &&
+                    decodedPlanks.GetSaveData()->inventorySlots[1].quantity == 4,
+                "crafted Wooden planks survive canonical save round-trip");
     std::string legacy = Replace(canonical, "version=4", "version=1");
     legacy = Replace(legacy, "quest_count=2\n", "");
     legacy = Replace(legacy, "quest.GATHERING_BASICS=AVAILABLE,0\n", "");

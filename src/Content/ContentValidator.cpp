@@ -70,7 +70,16 @@ namespace
 
     bool IsValidStationType(StationType stationType)
     {
-        return stationType == StationType::FURNACE;
+        return stationType == StationType::FURNACE ||
+               stationType == StationType::CRAFTING_TABLE;
+    }
+
+    bool IsValidCraftingPatternType(
+        CraftingPatternType patternType)
+    {
+        return patternType == CraftingPatternType::NONE ||
+               patternType == CraftingPatternType::SHAPELESS ||
+               patternType == CraftingPatternType::SHAPED;
     }
 
     bool IsValidDepletedVisualType(DepletedVisualType visualType)
@@ -137,6 +146,8 @@ namespace
             return "DEVELOPER_GODSWORD";
         case ItemType::WOODEN_SHIELD:
             return "WOODEN_SHIELD";
+        case ItemType::WOODEN_PLANKS:
+            return "WOODEN_PLANKS";
         }
 
         return "UNKNOWN_ITEM";
@@ -177,6 +188,10 @@ namespace
             return "IRON_BAR";
         case RecipeType::STEEL_BAR:
             return "STEEL_BAR";
+        case RecipeType::WOODEN_PLANKS:
+            return "WOODEN_PLANKS";
+        case RecipeType::WOODEN_SHIELD:
+            return "WOODEN_SHIELD";
         }
 
         return "UNKNOWN_RECIPE";
@@ -752,12 +767,17 @@ ContentValidationReport ContentValidator::ValidateRecipeRequirementConsistency(
         }
     }
 
-    if (matchingSkillRequirements != 1)
+    const int expectedSkillRequirements =
+        requiredSkill == SkillType::NONE && requiredLevel == 0
+            ? 0
+            : 1;
+
+    if (matchingSkillRequirements != expectedSkillRequirements)
     {
         report.AddError(
             "Recipe",
             contentID,
-            "definition must contain exactly one matching skill requirement");
+            "definition must contain the expected matching skill requirement");
     }
 
     if (expectedHeldItemRequirements !=
@@ -1418,7 +1438,13 @@ void ContentValidator::AppendRecipeValidation(
             "name must be non-empty");
     }
 
-    if (!IsKnownSkillType(
+    const bool skilllessRecipe =
+        definition.GetRequiredSkill() == SkillType::NONE &&
+        definition.GetRequiredLevel() == 0 &&
+        definition.GetXPReward() == 0;
+
+    if (!skilllessRecipe &&
+        !IsKnownSkillType(
             definition.GetRequiredSkill()))
     {
         report.AddError(
@@ -1427,7 +1453,8 @@ void ContentValidator::AppendRecipeValidation(
             "required skill is invalid");
     }
 
-    if (definition.GetRequiredLevel() <= 0)
+    if (!skilllessRecipe &&
+        definition.GetRequiredLevel() <= 0)
     {
         report.AddError(
             "Recipe",
@@ -1454,6 +1481,37 @@ void ContentValidator::AppendRecipeValidation(
 
     const std::vector<RecipeIngredient> &ingredients =
         definition.GetIngredients();
+
+    const CraftingPattern &pattern =
+        definition.GetCraftingPattern();
+
+    if (!IsValidCraftingPatternType(pattern.type))
+    {
+        report.AddError(
+            "Recipe",
+            contentID,
+            "crafting pattern type is invalid");
+    }
+
+    if (definition.GetRequiredStationType() ==
+            StationType::CRAFTING_TABLE &&
+        pattern.type == CraftingPatternType::NONE)
+    {
+        report.AddError(
+            "Recipe",
+            contentID,
+            "crafting-table recipe must define a grid pattern");
+    }
+
+    if (definition.GetRequiredStationType() !=
+            StationType::CRAFTING_TABLE &&
+        pattern.type != CraftingPatternType::NONE)
+    {
+        report.AddError(
+            "Recipe",
+            contentID,
+            "non-crafting-table recipe cannot define a grid pattern");
+    }
 
     if (ingredients.empty())
     {
@@ -1490,6 +1548,45 @@ void ContentValidator::AppendRecipeValidation(
                 "Recipe",
                 contentID,
                 "duplicate ingredient entries are not allowed");
+        }
+    }
+
+    if (pattern.type != CraftingPatternType::NONE)
+    {
+        std::map<ItemType, int> patternCounts;
+        std::map<ItemType, int> ingredientCounts;
+
+        for (ItemType itemType : pattern.slots)
+        {
+            if (itemType == ItemType::NONE)
+            {
+                continue;
+            }
+
+            if (!IsValidItemType(itemType))
+            {
+                report.AddError(
+                    "Recipe",
+                    contentID,
+                    "crafting pattern contains an invalid item");
+                continue;
+            }
+
+            patternCounts[itemType]++;
+        }
+
+        for (const RecipeIngredient &ingredient : ingredients)
+        {
+            ingredientCounts[ingredient.itemType] += ingredient.amount;
+        }
+
+        if (patternCounts.empty() ||
+            patternCounts != ingredientCounts)
+        {
+            report.AddError(
+                "Recipe",
+                contentID,
+                "crafting pattern must exactly match ingredient quantities");
         }
     }
 

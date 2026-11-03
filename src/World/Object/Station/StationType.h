@@ -3,5 +3,6 @@
 enum class StationType
 {
     NONE,
-    FURNACE
+    FURNACE,
+    CRAFTING_TABLE
 };

@@ -30,5 +30,7 @@ enum class ItemType
 
     BRONZE_SWORD,
     DEVELOPER_GODSWORD,
-    WOODEN_SHIELD
+    WOODEN_SHIELD,
+
+    WOODEN_PLANKS
 };

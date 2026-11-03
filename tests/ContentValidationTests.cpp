@@ -7,6 +7,7 @@
 #include "../src/Content/ContentValidator.h"
 #include "../src/Core/ContentStartupValidation.h"
 #include "../src/Item/ItemDatabase.h"
+#include "../src/Recipe/CraftingRecipeMatcher.h"
 #include "../src/Recipe/RecipeDatabase.h"
 #include "../src/Requirement/Requirement.h"
 #include "../src/Reward/GuaranteedRewardEntry.h"
@@ -140,7 +141,7 @@ int main()
 
         test.ExpectEqual(
             static_cast<int>(itemTypes.size()),
-            21,
+            22,
             "Every registered item type is enumerated");
         test.ExpectEqual(
             static_cast<int>(resourceTypes.size()),
@@ -148,7 +149,7 @@ int main()
             "Every registered resource type is enumerated");
         test.ExpectEqual(
             static_cast<int>(recipeTypes.size()),
-            3,
+            5,
             "Every registered recipe type is enumerated");
         test.ExpectEqual(
             static_cast<int>(rewardTableTypes.size()),
@@ -874,6 +875,115 @@ int main()
                  invalidOutputQuantity)
                  .IsValid(),
             "Recipe with non-positive output quantity is rejected");
+
+        const CraftingPattern logPattern{
+            CraftingPatternType::SHAPELESS,
+            {ItemType::LOG}};
+        RecipeDefinition validSkilllessCraftingRecipe(
+            RecipeType::WOODEN_PLANKS,
+            "Valid skillless crafting recipe",
+            StationType::CRAFTING_TABLE,
+            SkillType::NONE,
+            0,
+            0,
+            1,
+            std::vector<RecipeIngredient>{{ItemType::LOG, 1}},
+            ItemType::WOODEN_PLANKS,
+            4,
+            logPattern,
+            false);
+        test.Expect(
+            ContentValidator::ValidateRecipeDefinition(
+                RecipeType::WOODEN_PLANKS,
+                validSkilllessCraftingRecipe)
+                .IsValid(),
+            "Skillless Crafting Table recipe with an exact pattern validates");
+
+        RecipeDefinition missingCraftingPattern(
+            RecipeType::WOODEN_PLANKS,
+            "Missing crafting pattern",
+            StationType::CRAFTING_TABLE,
+            SkillType::NONE,
+            0,
+            0,
+            1,
+            std::vector<RecipeIngredient>{{ItemType::LOG, 1}},
+            ItemType::WOODEN_PLANKS,
+            4);
+        test.Expect(
+            !ContentValidator::ValidateRecipeDefinition(
+                 RecipeType::WOODEN_PLANKS,
+                 missingCraftingPattern)
+                 .IsValid(),
+            "Crafting Table recipe without a grid pattern is rejected");
+
+        RecipeDefinition mismatchedCraftingPattern(
+            RecipeType::WOODEN_PLANKS,
+            "Mismatched crafting pattern",
+            StationType::CRAFTING_TABLE,
+            SkillType::NONE,
+            0,
+            0,
+            1,
+            std::vector<RecipeIngredient>{{ItemType::LOG, 1}},
+            ItemType::WOODEN_PLANKS,
+            4,
+            CraftingPattern{
+                CraftingPatternType::SHAPELESS,
+                {ItemType::LOG, ItemType::LOG}},
+            false);
+        test.Expect(
+            !ContentValidator::ValidateRecipeDefinition(
+                 RecipeType::WOODEN_PLANKS,
+                 mismatchedCraftingPattern)
+                 .IsValid(),
+            "Pattern quantities must exactly equal authoritative ingredients");
+
+        RecipeDefinition furnaceWithGridPattern(
+            RecipeType::BRONZE_BAR,
+            "Furnace with grid pattern",
+            StationType::FURNACE,
+            SkillType::SMITHING,
+            1,
+            5,
+            2,
+            std::vector<RecipeIngredient>{{ItemType::COPPER_ORE, 1}},
+            ItemType::BRONZE_BAR,
+            1,
+            CraftingPattern{
+                CraftingPatternType::SHAPELESS,
+                {ItemType::COPPER_ORE}});
+        test.Expect(
+            !ContentValidator::ValidateRecipeDefinition(
+                 RecipeType::BRONZE_BAR,
+                 furnaceWithGridPattern)
+                 .IsValid(),
+            "Non-Crafting Table recipe cannot define a grid pattern");
+
+        RecipeDefinition unknownPatternType(
+            RecipeType::WOODEN_PLANKS,
+            "Unknown pattern type",
+            StationType::CRAFTING_TABLE,
+            SkillType::NONE,
+            0,
+            0,
+            1,
+            std::vector<RecipeIngredient>{{ItemType::LOG, 1}},
+            ItemType::WOODEN_PLANKS,
+            4,
+            CraftingPattern{
+                static_cast<CraftingPatternType>(999),
+                {ItemType::LOG}},
+            false);
+        test.Expect(
+            !ContentValidator::ValidateRecipeDefinition(
+                 RecipeType::WOODEN_PLANKS,
+                 unknownPatternType)
+                 .IsValid() &&
+                !CraftingRecipeMatcher::Matches(
+                    unknownPatternType.GetCraftingPattern(),
+                    unknownPatternType.GetCraftingPattern().slots),
+            "Unknown crafting pattern types are rejected and never match");
 
         std::vector<RequirementSystem::Requirement> ingredientMismatchRequirements{
             RequirementSystem::SkillLevelRequirement{SkillType::SMITHING, 1},

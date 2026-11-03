@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <array>
 #include <variant>
 
 #include "../Equipment/EquipmentSlotType.h"
@@ -41,6 +42,12 @@ struct StartRecipeCommand
 {
     int actorEntityID;
     RecipeType recipeType;
+};
+
+struct CraftRecipeCommand
+{
+    int actorEntityID;
+    std::array<ItemType, 9> grid;
 };
 
 struct InteractCommand
@@ -112,6 +119,7 @@ using ServerCommandData = std::variant<
     UseInventoryItemCommand,
     UnequipItemCommand,
     StartRecipeCommand,
+    CraftRecipeCommand,
     InteractCommand,
     CloseStationCommand,
     NpcInteractionCommand,

@@ -33,55 +33,31 @@ bool RecipeSystem::TryCreateRecipe(
     const RecipeDefinition &recipe =
         RecipeDatabase::Get(recipeType);
 
-    Inventory &inventory =
-        player.GetInventory();
+    std::vector<ItemAmount> removals;
+    removals.reserve(recipe.GetIngredients().size());
 
-    std::vector<RecipeIngredient>
-        removedIngredients;
-
-    auto restoreIngredients = [&]()
+    for (const RecipeIngredient &ingredient : recipe.GetIngredients())
     {
-        for (const RecipeIngredient &ingredient :
-             removedIngredients)
-        {
-            inventory.AddItem(
-                ingredient.itemType,
-                ingredient.amount);
-        }
-    };
-
-    for (const RecipeIngredient &ingredient :
-         recipe.GetIngredients())
-    {
-        bool removed =
-            inventory.RemoveItem(
-                ingredient.itemType,
-                ingredient.amount);
-
-        if (!removed)
-        {
-            restoreIngredients();
-            return false;
-        }
-
-        removedIngredients.push_back(
-            ingredient);
+        removals.push_back(
+            ItemAmount{ingredient.itemType, ingredient.amount});
     }
 
-    bool outputAdded =
-        inventory.AddItem(
-            recipe.GetOutputItem(),
-            recipe.GetOutputAmount());
-
-    if (!outputAdded)
+    if (!player.GetInventory().TryApplyTransactionAtomically(
+            removals,
+            {ItemAmount{
+                recipe.GetOutputItem(),
+                recipe.GetOutputAmount()}}))
     {
-        restoreIngredients();
         return false;
     }
 
-    player.GetSkills().AddXP(
-        recipe.GetRequiredSkill(),
-        recipe.GetXPReward());
+    if (recipe.GetRequiredSkill() != SkillType::NONE &&
+        recipe.GetXPReward() > 0)
+    {
+        player.GetSkills().AddXP(
+            recipe.GetRequiredSkill(),
+            recipe.GetXPReward());
+    }
 
     return true;
 }

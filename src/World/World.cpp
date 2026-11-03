@@ -30,6 +30,7 @@
 #include "../Core/SeededRandom.h"
 #include "../Recipe/RecipeSystem.h"
 #include "../Recipe/RecipeDatabase.h"
+#include "../Recipe/CraftingRecipeMatcher.h"
 #include "../Reward/RewardTableRegistry.h"
 #include "../Combat/Combatant.h"
 #include "../Combat/MeleeCombatFeedback.h"
@@ -1657,13 +1658,12 @@ void World::ProcessQueuedCommands()
                     std::is_same_v<CommandType,
                                    StartRecipeCommand>)
                 {
-                    const int recipeValue =
-                        static_cast<int>(data.recipeType);
+                    const RecipeDefinition *recipe =
+                        RecipeDatabase::TryGet(data.recipeType);
 
-                    if (recipeValue <=
-                            static_cast<int>(RecipeType::NONE) ||
-                        recipeValue >
-                            static_cast<int>(RecipeType::STEEL_BAR))
+                    if (recipe == nullptr ||
+                        recipe->GetCraftingPattern().type !=
+                            CraftingPatternType::NONE)
                     {
                         resultCode =
                             CommandResultCode::INVALID_COMMAND_DATA;
@@ -1671,6 +1671,49 @@ void World::ProcessQueuedCommands()
                     else if (TryStartRecipeAction(
                                  data.actorEntityID,
                                  data.recipeType))
+                    {
+                        resultCode =
+                            CommandResultCode::ACCEPTED;
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType,
+                                   CraftRecipeCommand>)
+                {
+                    bool validGrid = true;
+                    const std::vector<ItemType> &knownItems =
+                        ItemDatabase::GetAllItemTypes();
+
+                    for (ItemType itemType : data.grid)
+                    {
+                        if (itemType == ItemType::NONE)
+                        {
+                            continue;
+                        }
+
+                        if (std::find(
+                                knownItems.begin(),
+                                knownItems.end(),
+                                itemType) == knownItems.end())
+                        {
+                            validGrid = false;
+                            break;
+                        }
+                    }
+
+                    if (!validGrid)
+                    {
+                        resultCode =
+                            CommandResultCode::INVALID_COMMAND_DATA;
+                    }
+                    else if (const RecipeDefinition *recipe =
+                                 CraftingRecipeMatcher::FindMatch(data.grid);
+                             recipe != nullptr &&
+                             recipe->GetRequiredStationType() ==
+                                 StationType::CRAFTING_TABLE &&
+                             TryStartRecipeAction(
+                                 data.actorEntityID,
+                                 recipe->GetRecipeType()))
                     {
                         resultCode =
                             CommandResultCode::ACCEPTED;
@@ -2730,25 +2773,14 @@ ActionValidationResult World::ValidateRecipeAction(
         validation.reason ==
             ActionCancelReason::OUT_OF_RANGE)
     {
-        switch (recipeType)
-        {
-        case RecipeType::BRONZE_BAR:
-        case RecipeType::IRON_BAR:
-        case RecipeType::STEEL_BAR:
-        {
-            const RecipeDefinition &recipe =
-                RecipeDatabase::Get(
-                    recipeType);
+        const RecipeDefinition *recipe =
+            RecipeDatabase::TryGet(recipeType);
 
+        if (recipe != nullptr)
+        {
             CleanupInvalidActiveStationEntry(
                 entityID,
-                recipe.GetRequiredStationType());
-            break;
-        }
-
-        case RecipeType::NONE:
-        default:
-            break;
+                recipe->GetRequiredStationType());
         }
     }
 
@@ -2782,28 +2814,20 @@ ActionValidationResult World::ValidateRecipeActionReadOnly(
             "Attacker is not alive"};
     }
 
-    switch (recipeType)
-    {
-    case RecipeType::BRONZE_BAR:
-    case RecipeType::IRON_BAR:
-    case RecipeType::STEEL_BAR:
-        break;
+    const RecipeDefinition *recipe =
+        RecipeDatabase::TryGet(recipeType);
 
-    case RecipeType::NONE:
-    default:
+    if (recipe == nullptr)
+    {
         return {
             false,
             ActionCancelReason::REQUIREMENTS_FAILED,
             "The selected recipe is invalid"};
     }
 
-    const RecipeDefinition &recipe =
-        RecipeDatabase::Get(
-            recipeType);
-
     if (!IsStationUsable(
             entityID,
-            recipe.GetRequiredStationType()))
+            recipe->GetRequiredStationType()))
     {
         return {
             false,
@@ -2814,7 +2838,7 @@ ActionValidationResult World::ValidateRecipeActionReadOnly(
     RequirementSystem::RequirementResult requirements =
         RequirementSystem::RequirementEvaluator::EvaluateAll(
             *player,
-            recipe.GetRequirements());
+            recipe->GetRequirements());
 
     if (!requirements.satisfied)
     {
@@ -2828,7 +2852,7 @@ ActionValidationResult World::ValidateRecipeActionReadOnly(
         player->GetInventory();
 
     for (const RecipeIngredient &ingredient :
-         recipe.GetIngredients())
+         recipe->GetIngredients())
     {
         bool removed =
             simulatedInventory.RemoveItem(
@@ -2845,8 +2869,8 @@ ActionValidationResult World::ValidateRecipeActionReadOnly(
     }
 
     if (!simulatedInventory.CanAddItem(
-            recipe.GetOutputItem(),
-            recipe.GetOutputAmount()))
+            recipe->GetOutputItem(),
+            recipe->GetOutputAmount()))
     {
         return {
             false,
@@ -3214,6 +3238,16 @@ void World::ProcessCompletedActions(
             Logger::Game(
                 "Created: " +
                 recipeOutcome.recipeName);
+
+            const RecipeDefinition *completedRecipe =
+                RecipeDatabase::TryGet(
+                    recipeOutcome.recipeType);
+
+            if (completedRecipe == nullptr ||
+                !completedRecipe->RepeatsWhileValid())
+            {
+                continue;
+            }
 
             ActionValidationResult repeatValidation =
                 ValidateRecipeAction(

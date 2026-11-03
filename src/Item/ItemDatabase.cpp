@@ -24,7 +24,8 @@ ItemDatabase::GetAllItemTypes()
         ItemType::STEEL_PICKAXE,
         ItemType::BRONZE_SWORD,
         ItemType::DEVELOPER_GODSWORD,
-        ItemType::WOODEN_SHIELD};
+        ItemType::WOODEN_SHIELD,
+        ItemType::WOODEN_PLANKS};
 
     return itemTypes;
 }
@@ -287,6 +288,16 @@ const ItemDefinition &ItemDatabase::Get(
             return bonuses;
         }()};
 
+    static const ItemDefinition woodenPlanks{
+        ItemType::WOODEN_PLANKS,
+        "Wooden planks",
+        true,
+        EquipmentSlotType::NONE,
+        ToolType::NONE,
+        SkillType::NONE,
+        0,
+        0};
+
     switch (itemType)
     {
     case ItemType::LOG:
@@ -351,6 +362,9 @@ const ItemDefinition &ItemDatabase::Get(
 
     case ItemType::WOODEN_SHIELD:
         return woodenShield;
+
+    case ItemType::WOODEN_PLANKS:
+        return woodenPlanks;
 
     case ItemType::NONE:
     default:

@@ -5,6 +5,7 @@
 
 #include "RecipeIngredient.h"
 #include "RecipeType.h"
+#include "CraftingPattern.h"
 #include "../Inventory/ItemType.h"
 #include "../Skills/SkillType.h"
 #include "../World/Object/Station/StationType.h"
@@ -23,7 +24,9 @@ public:
         int actionDurationTicks,
         std::vector<RecipeIngredient> ingredients,
         ItemType outputItem,
-        int outputAmount);
+        int outputAmount,
+        CraftingPattern craftingPattern = {},
+        bool repeatsWhileValid = true);
 
     RecipeType GetRecipeType() const;
     const std::string &GetName() const;
@@ -42,6 +45,8 @@ public:
 
     ItemType GetOutputItem() const;
     int GetOutputAmount() const;
+    const CraftingPattern &GetCraftingPattern() const;
+    bool RepeatsWhileValid() const;
 
 private:
     RecipeType recipeType;
@@ -59,4 +64,6 @@ private:
 
     ItemType outputItem;
     int outputAmount;
+    CraftingPattern craftingPattern;
+    bool repeatsWhileValid;
 };
