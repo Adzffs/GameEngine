@@ -12,6 +12,7 @@
 #include "../Entity/Monster/Monster.h"
 #include "../Inventory/ItemType.h"
 #include "../Inventory/ItemAmount.h"
+#include "../Inventory/InventoryStackOperations.h"
 #include "../Skills/SkillType.h"
 #include "../Equipment/EquipmentSlotType.h"
 #include "../Item/ItemDatabase.h"
@@ -44,6 +45,7 @@
 #include <algorithm>
 #include <random>
 #include <type_traits>
+#include <map>
 #include "../Persistence/PlayerSaveFileStore.h"
 #include "../Persistence/PlayerSaveState.h"
 #include "../Quest/QuestSystem.h"
@@ -94,6 +96,17 @@ namespace
     {
         return std::make_unique<SeededRandom>(
             std::random_device{}());
+    }
+
+    void AddSessionTotals(
+        std::map<ItemType, long long> &totals,
+        const CraftingSessionSnapshot &session)
+    {
+        if (!session.cursor.IsEmpty())
+            totals[session.cursor.GetItemType()] += session.cursor.GetAmount();
+        for (const InventorySlot &slot : session.inputSlots)
+            if (!slot.IsEmpty())
+                totals[slot.GetItemType()] += slot.GetAmount();
     }
 }
 
@@ -903,6 +916,12 @@ World::GetActionForEntity(
         .GetActionForEntity(entityID);
 }
 
+const CraftingSessionSnapshot *World::GetCraftingSession(
+    int actorEntityID) const
+{
+    return craftingSessionSystem.Get(actorEntityID);
+}
+
 bool World::ConsumeOpenedStation(
     int entityID,
     StationType &stationType)
@@ -1064,11 +1083,110 @@ bool World::CanUseStation(
 void World::CloseStationInteraction(
     int entityID)
 {
+    TrySettleCraftingSession(entityID);
     ClearPendingStationInteraction(entityID);
 
     openedStations.erase(entityID);
 
     activeStations.erase(entityID);
+}
+
+bool World::TrySettleCraftingSession(int actorEntityID)
+{
+    const CraftingSessionSnapshot *session =
+        craftingSessionSystem.Get(actorEntityID);
+    if (session == nullptr)
+        return true;
+
+    Player *player = dynamic_cast<Player *>(
+        entityManager.GetEntityByID(actorEntityID));
+    if (player == nullptr)
+        return false;
+
+    std::map<ItemType, long long> totals;
+    AddSessionTotals(totals, *session);
+    std::vector<ItemAmount> additions;
+    for (const auto &[itemType, quantity] : totals)
+    {
+        if (quantity <= 0 || quantity > std::numeric_limits<int>::max())
+            return false;
+        additions.push_back(ItemAmount{itemType, static_cast<int>(quantity)});
+    }
+
+    if (!player->GetInventory().TryAddItemsAtomically(additions))
+        return false;
+    craftingSessionSystem.Remove(actorEntityID);
+    return true;
+}
+
+bool World::TryReplaceCraftingSessionState(
+    const ReplaceCraftingSessionStateCommand &command)
+{
+    Player *player = dynamic_cast<Player *>(
+        entityManager.GetEntityByID(command.actorEntityID));
+    const CraftingSessionSnapshot *current =
+        craftingSessionSystem.Get(command.actorEntityID);
+    const auto activeStation = activeStations.find(command.actorEntityID);
+    if (player == nullptr || !player->IsAlive() || current == nullptr ||
+        current->sessionId != command.sessionId ||
+        current->revision != command.expectedRevision ||
+        activeStation == activeStations.end() ||
+        activeStation->second != current->stationObjectID ||
+        !IsStationUsable(command.actorEntityID, StationType::CRAFTING_TABLE))
+        return false;
+
+    CraftingSessionSnapshot requested = *current;
+    requested.cursor = command.cursor;
+    requested.inputSlots = command.inputSlots;
+
+    if (!InventoryStackOperations::IsCanonicalStack(requested.cursor))
+        return false;
+    for (const InventorySlot &slot : requested.inputSlots)
+        if (!InventoryStackOperations::IsCanonicalStack(slot))
+            return false;
+
+    std::map<ItemType, long long> before;
+    std::map<ItemType, long long> after;
+    AddSessionTotals(before, *current);
+    AddSessionTotals(after, requested);
+    std::vector<ItemAmount> removals;
+    std::vector<ItemAmount> additions;
+    for (ItemType itemType : ItemDatabase::GetAllItemTypes())
+    {
+        const long long difference = after[itemType] - before[itemType];
+        if (difference > std::numeric_limits<int>::max() ||
+            difference < -static_cast<long long>(std::numeric_limits<int>::max()))
+            return false;
+        if (difference > 0)
+            removals.push_back(ItemAmount{itemType, static_cast<int>(difference)});
+        else if (difference < 0)
+            additions.push_back(ItemAmount{itemType, static_cast<int>(-difference)});
+    }
+
+    if (!player->GetInventory().TryApplyTransactionAtomically(
+            removals, additions))
+        return false;
+    if (!craftingSessionSystem.ReplaceState(
+            command.actorEntityID, command.sessionId, command.expectedRevision,
+            command.cursor, command.inputSlots))
+    {
+        player->GetInventory().TryApplyTransactionAtomically(
+            additions, removals);
+        return false;
+    }
+    return true;
+}
+
+void World::RevalidateCraftingSessions()
+{
+    for (int actorEntityID : craftingSessionSystem.GetActorEntityIDs())
+    {
+        Entity *entity = entityManager.GetEntityByID(actorEntityID);
+        Player *player = dynamic_cast<Player *>(entity);
+        if (player == nullptr || !player->IsAlive() ||
+            !IsStationUsable(actorEntityID, StationType::CRAFTING_TABLE))
+            CloseStationInteraction(actorEntityID);
+    }
 }
 
 bool World::TryStartRecipeAction(
@@ -1457,6 +1575,7 @@ void World::Update()
 
     ProcessMovementSystem();
     ProcessInteractionSystem();
+    RevalidateCraftingSessions();
 
     objectManager.Update();
 
@@ -1717,6 +1836,15 @@ void World::ProcessQueuedCommands()
                     {
                         resultCode =
                             CommandResultCode::ACCEPTED;
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType,
+                                   ReplaceCraftingSessionStateCommand>)
+                {
+                    if (TryReplaceCraftingSessionState(data))
+                    {
+                        resultCode = CommandResultCode::ACCEPTED;
                     }
                 }
                 else if constexpr (
@@ -2020,13 +2148,14 @@ void World::ProcessQueuedCommands()
                     std::is_same_v<CommandType,
                                    CloseStationCommand>)
                 {
-                    CancelActionsForEntity(
-                        data.actorEntityID,
-                        ActionCancelReason::INTERFACE_CLOSED);
-                    CloseStationInteraction(
-                        data.actorEntityID);
-                    resultCode =
-                        CommandResultCode::ACCEPTED;
+                    if (TrySettleCraftingSession(data.actorEntityID))
+                    {
+                        CancelActionsForEntity(
+                            data.actorEntityID,
+                            ActionCancelReason::INTERFACE_CLOSED);
+                        CloseStationInteraction(data.actorEntityID);
+                        resultCode = CommandResultCode::ACCEPTED;
+                    }
                 }
 
                 pendingCommandProcessingResults.push_back(
@@ -2349,9 +2478,23 @@ void World::ProcessInteractionSystem()
                 objectManager.GetStationByID(intent.targetObjectID);
             if (station != nullptr)
             {
+                const CraftingSessionSnapshot *existing =
+                    craftingSessionSystem.Get(intent.actorEntityID);
+                if (station->GetStationType() == StationType::CRAFTING_TABLE &&
+                    existing != nullptr &&
+                    existing->stationObjectID != station->GetID() &&
+                    !TrySettleCraftingSession(intent.actorEntityID))
+                {
+                    continue;
+                }
                 activeStations[intent.actorEntityID] = intent.targetObjectID;
                 openedStations[intent.actorEntityID] =
                     station->GetStationType();
+                if (station->GetStationType() == StationType::CRAFTING_TABLE)
+                {
+                    craftingSessionSystem.Open(
+                        intent.actorEntityID, station->GetID());
+                }
             }
             continue;
         }

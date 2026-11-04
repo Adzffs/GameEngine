@@ -19,6 +19,7 @@
 #include "../Equipment/Equipment.h"
 #include "../Recipe/RecipeType.h"
 #include "../Recipe/CraftingRecipeMatcher.h"
+#include "../Recipe/CraftingSession.h"
 #include "../Command/ServerCommand.h"
 #include "../Command/CommandProcessingResult.h"
 #include "../Dialogue/DialoguePresentationState.h"
@@ -58,6 +59,10 @@ public:
     void SetRecipeCommandInFlight(bool inFlight);
     bool IsRecipeCommandInFlight() const;
     void ReconcileRecipeCommandResult(CommandResultCode result);
+    void SynchronizeCraftingSession(
+        const CraftingSessionSnapshot *session);
+    const std::optional<CraftingSessionSnapshot> &
+    GetCraftingSessionSnapshot() const;
     std::optional<ServerCommandData> ConsumeDialogueCommand();
     std::optional<ServerCommandData> ConsumeShopCommand();
     void SetShopCommandInFlight(bool inFlight);
@@ -369,6 +374,7 @@ private:
     ItemType selectedCraftingItem = ItemType::NONE;
     bool recipeCommandInFlight = false;
     bool recipeActionActive = false;
+    std::optional<CraftingSessionSnapshot> craftingSessionSnapshot;
     int displayedLogCount = 0;
     int displayedPlankCount = 0;
     std::string stationFeedback;

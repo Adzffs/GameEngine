@@ -94,6 +94,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/Recipe/RecipeDefinition.cpp
     src/Recipe/RecipeDatabase.cpp
     src/Recipe/CraftingRecipeMatcher.cpp
+    src/Recipe/CraftingSessionSystem.cpp
     src/Recipe/RecipeActionSystem.cpp
     src/Recipe/RecipeSystem.cpp
     src/Requirement/RequirementEvaluator.cpp
@@ -222,6 +223,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(RecipeActionSystemTests tests/RecipeActionSystemTests.cpp)
     add_gameengine_headless_test(CraftingRecipeTests tests/CraftingRecipeTests.cpp)
     add_gameengine_headless_test(CraftingTableWorldTests tests/CraftingTableWorldTests.cpp)
+    add_gameengine_headless_test(CraftingSessionTests tests/CraftingSessionTests.cpp)
     add_gameengine_headless_test(MovementPathSafetyTests tests/MovementPathSafetyTests.cpp)
     add_gameengine_headless_test(MovementSystemTests tests/MovementSystemTests.cpp)
     add_gameengine_headless_test(EntityManagerLookupTests tests/EntityManagerLookupTests.cpp)

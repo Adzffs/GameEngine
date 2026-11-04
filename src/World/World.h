@@ -40,6 +40,7 @@
 #include "../Interaction/InteractionSystem.h"
 #include "../Gathering/GatheringSystem.h"
 #include "../Recipe/RecipeActionSystem.h"
+#include "../Recipe/CraftingSessionSystem.h"
 #include "../Dialogue/DialogueSystem.h"
 #include "../Shop/ShopOpenedEvent.h"
 #include "../Shop/ShopSystem.h"
@@ -78,6 +79,8 @@ public:
 
     const std::vector<CommandProcessingResult> &
     GetCommandProcessingResults() const;
+
+    const CraftingSessionSnapshot *GetCraftingSession(int actorEntityID) const;
 
     Map &GetMap();
 
@@ -270,6 +273,7 @@ private:
     GatheringSystem gatheringSystem;
 
     RecipeActionSystem recipeActionSystem;
+    CraftingSessionSystem craftingSessionSystem;
 
     void CreateResource(
         ResourceType resourceType,
@@ -295,6 +299,10 @@ private:
     void ProcessMeleeEngagementSystem();
     void ProcessCompletedActions(
         const std::vector<Action> &completedActions);
+    bool TryReplaceCraftingSessionState(
+        const ReplaceCraftingSessionStateCommand &command);
+    bool TrySettleCraftingSession(int actorEntityID);
+    void RevalidateCraftingSessions();
     MeleeCompletionContext BuildMeleeCompletionContext(
         int attackerEntityID,
         int defenderEntityID) const;

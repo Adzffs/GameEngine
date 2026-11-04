@@ -1482,6 +1482,23 @@ void Graphics::ReconcileRecipeCommandResult(
     }
 }
 
+void Graphics::SynchronizeCraftingSession(
+    const CraftingSessionSnapshot *session)
+{
+    if (session == nullptr)
+    {
+        craftingSessionSnapshot.reset();
+        return;
+    }
+    craftingSessionSnapshot = *session;
+}
+
+const std::optional<CraftingSessionSnapshot> &
+Graphics::GetCraftingSessionSnapshot() const
+{
+    return craftingSessionSnapshot;
+}
+
 bool Graphics::ConsumeStationMenuClose()
 {
     if (!stationMenuClosePending)

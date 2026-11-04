@@ -13,6 +13,7 @@
 #include "../Inventory/ItemType.h"
 #include "../Shop/ShopSessionId.h"
 #include "../Quest/QuestId.h"
+#include "../Recipe/CraftingSession.h"
 
 struct MoveCommand
 {
@@ -48,6 +49,15 @@ struct CraftRecipeCommand
 {
     int actorEntityID;
     std::array<ItemType, 9> grid;
+};
+
+struct ReplaceCraftingSessionStateCommand
+{
+    int actorEntityID;
+    CraftingSessionId sessionId;
+    std::uint64_t expectedRevision;
+    InventorySlot cursor;
+    std::array<InventorySlot, 9> inputSlots;
 };
 
 struct InteractCommand
@@ -120,6 +130,7 @@ using ServerCommandData = std::variant<
     UnequipItemCommand,
     StartRecipeCommand,
     CraftRecipeCommand,
+    ReplaceCraftingSessionStateCommand,
     InteractCommand,
     CloseStationCommand,
     NpcInteractionCommand,

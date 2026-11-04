@@ -128,6 +128,8 @@ bool Engine::Run()
         SynchronizeDialoguePresentation();
         SynchronizeShopPresentation();
         SynchronizeRecipeCommand();
+        graphics.SynchronizeCraftingSession(
+            world.GetCraftingSession(playerID));
         graphics.ProcessEvents(running);
 
         if (!running)
