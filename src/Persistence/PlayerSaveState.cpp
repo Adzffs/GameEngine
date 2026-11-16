@@ -80,6 +80,8 @@ PlayerSaveData PlayerSaveState::Capture(const Player &player)
     {
         saveData.quests.push_back({questId, record.state, record.progress});
     }
+    for (const BankEntry &entry : player.GetBank().GetEntries())
+        saveData.bank.push_back({entry.itemType, entry.quantity});
 
     const auto &inventorySlots = player.GetInventory().GetSlots();
     for (int index = 0; index < Inventory::SlotCount; ++index)
@@ -190,6 +192,27 @@ PlayerSaveValidationReport PlayerSaveState::ValidateInternal(
                 stackableItems.push_back(slot.itemType);
             }
         }
+    }
+
+    if (saveData.bank.size() > Bank::DistinctItemCapacity)
+        report.AddIssue(PlayerSaveValidationCode::BANK_CAPACITY_EXCEEDED, -1,
+            "Bank contains too many distinct item types");
+    std::vector<ItemType> bankItems;
+    for (std::size_t index = 0; index < saveData.bank.size(); ++index)
+    {
+        const SavedBankEntry &entry = saveData.bank[index];
+        if (!IsKnownItem(entry.itemType) || entry.itemType == ItemType::NONE)
+            report.AddIssue(PlayerSaveValidationCode::UNKNOWN_BANK_ITEM,
+                static_cast<int>(index), "Bank item type is unknown");
+        if (entry.quantity <= 0)
+            report.AddIssue(PlayerSaveValidationCode::INVALID_BANK_QUANTITY,
+                static_cast<int>(index), "Bank quantities must be positive");
+        if (std::find(bankItems.begin(), bankItems.end(), entry.itemType) !=
+            bankItems.end())
+            report.AddIssue(PlayerSaveValidationCode::DUPLICATE_BANK_ITEM,
+                static_cast<int>(index), "Bank item types must be unique");
+        else
+            bankItems.push_back(entry.itemType);
     }
 
     std::vector<SkillType> seenSkills;
@@ -408,6 +431,18 @@ std::unique_ptr<Player> PlayerSaveState::TryCreatePlayer(
             PlayerSaveValidationCode::INTERNAL_RESTORE_FAILURE,
             -1,
             "Validated inventory could not be restored");
+        return nullptr;
+    }
+
+    std::vector<BankEntry> bankEntries;
+    bankEntries.reserve(saveData.bank.size());
+    for (const SavedBankEntry &entry : saveData.bank)
+        bankEntries.push_back({entry.itemType, entry.quantity});
+    if (!player->GetBank().TryRestore(bankEntries))
+    {
+        validationReport.AddIssue(
+            PlayerSaveValidationCode::INTERNAL_RESTORE_FAILURE, -1,
+            "Validated bank could not be restored");
         return nullptr;
     }
 

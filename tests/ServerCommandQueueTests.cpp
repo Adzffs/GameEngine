@@ -258,5 +258,46 @@ int main()
             "Malformed drop and pickup requests are rejected without mutation");
     }
 
+    {
+        World world;
+        const int playerID = world.CreatePlayer();
+        Player *player = GetPlayer(world, playerID);
+        player->GetPosition().SetPosition(19, 3);
+        CraftingStation *bankStation = world.GetStationAt(20, 3);
+        test.Expect(bankStation != nullptr &&
+                bankStation->GetStationType() == StationType::BANK,
+            "Starter region exposes the authored bank station");
+        world.EnqueueCommand(InteractCommand{playerID,
+            InteractionTargetType::STATION, bankStation->GetID(), Position(20, 3)});
+        world.Update();
+        const ActiveBankSession *session = world.GetBankSession(playerID);
+        test.Expect(session != nullptr &&
+                session->sessionId != InvalidBankSessionId,
+            "Approaching the bank opens a stable per-player session");
+
+        player->GetInventory().AddItem(ItemType::COINS, 12);
+        const int coinSlot = FindSlot(player->GetInventory(), ItemType::COINS);
+        const BankSessionId sessionId = session->sessionId;
+        const std::uint64_t revision = player->GetBank().GetRevision();
+        world.EnqueueCommand(BankDepositCommand{
+            playerID, sessionId, revision, coinSlot, 5});
+        world.EnqueueCommand(BankDepositCommand{
+            playerID, sessionId, revision, coinSlot, 5});
+        world.Update();
+        test.Expect(
+            world.GetCommandProcessingResults()[0].resultCode ==
+                CommandResultCode::ACCEPTED &&
+            world.GetCommandProcessingResults()[1].resultCode ==
+                CommandResultCode::GAMEPLAY_REJECTED,
+            "A repeated stale bank request cannot duplicate a transaction");
+        test.ExpectEqual(player->GetBank().GetItemAmount(ItemType::COINS), 5,
+            "Only the first revision-matched deposit commits");
+
+        world.EnqueueCommand(BankCloseCommand{playerID, sessionId});
+        world.Update();
+        test.Expect(world.GetBankSession(playerID) == nullptr,
+            "Closing a matching bank session invalidates further requests");
+    }
+
     return test.Finish();
 }

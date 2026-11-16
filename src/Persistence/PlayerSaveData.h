@@ -10,7 +10,7 @@
 #include <array>
 #include <vector>
 
-inline constexpr int CURRENT_PLAYER_SAVE_VERSION = 4;
+inline constexpr int CURRENT_PLAYER_SAVE_VERSION = 5;
 
 struct SavedInventorySlot
 {
@@ -37,6 +37,12 @@ struct SavedQuestRecord
     int progress = 0;
 };
 
+struct SavedBankEntry
+{
+    ItemType itemType = ItemType::NONE;
+    int quantity = 0;
+};
+
 struct PlayerSaveData
 {
     int version = CURRENT_PLAYER_SAVE_VERSION;
@@ -47,4 +53,5 @@ struct PlayerSaveData
     std::vector<SavedSkillXP> skills;
     std::vector<SavedEquipmentSlot> equipment;
     std::vector<SavedQuestRecord> quests;
+    std::vector<SavedBankEntry> bank;
 };

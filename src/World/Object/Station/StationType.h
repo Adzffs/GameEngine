@@ -4,5 +4,6 @@ enum class StationType
 {
     NONE,
     FURNACE,
-    CRAFTING_TABLE
+    CRAFTING_TABLE,
+    BANK
 };

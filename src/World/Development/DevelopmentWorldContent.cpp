@@ -22,7 +22,8 @@ namespace DevelopmentWorldContent
     {
         static const std::vector<DevelopmentStationPlacementDefinition> definitions{
             {StationType::FURNACE, 14, 9},
-            {StationType::CRAFTING_TABLE, 17, 9}};
+            {StationType::CRAFTING_TABLE, 17, 9},
+            {StationType::BANK, 20, 3}};
 
         return definitions;
     }

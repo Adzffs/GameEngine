@@ -944,6 +944,12 @@ const CraftingSessionSnapshot *World::GetCraftingSession(
     return craftingSessionSystem.Get(actorEntityID);
 }
 
+const ActiveBankSession *World::GetBankSession(int actorEntityID) const
+{
+    const auto found = activeBankSessions.find(actorEntityID);
+    return found == activeBankSessions.end() ? nullptr : &found->second;
+}
+
 bool World::ConsumeOpenedStation(
     int entityID,
     StationType &stationType)
@@ -1111,6 +1117,7 @@ void World::CloseStationInteraction(
     openedStations.erase(entityID);
 
     activeStations.erase(entityID);
+    activeBankSessions.erase(entityID);
 }
 
 bool World::TrySettleCraftingSession(int actorEntityID)
@@ -1943,6 +1950,55 @@ void World::ProcessQueuedCommands()
                     }
                 }
                 else if constexpr (
+                    std::is_same_v<CommandType, BankDepositCommand> ||
+                    std::is_same_v<CommandType, BankWithdrawCommand> ||
+                    std::is_same_v<CommandType, BankDepositInventoryCommand>)
+                {
+                    const ActiveBankSession *session =
+                        GetBankSession(data.actorEntityID);
+                    if (session == nullptr || session->sessionId != data.sessionId ||
+                        !CanUseStation(data.actorEntityID, StationType::BANK) ||
+                        actor->GetBank().GetRevision() != data.expectedRevision)
+                    {
+                        resultCode = CommandResultCode::GAMEPLAY_REJECTED;
+                    }
+                    else if constexpr (
+                        std::is_same_v<CommandType, BankDepositCommand>)
+                    {
+                        if (data.quantity <= 0 || data.inventorySlotIndex < 0 ||
+                            data.inventorySlotIndex >= Inventory::SlotCount)
+                            resultCode = CommandResultCode::INVALID_COMMAND_DATA;
+                        else if (actor->GetBank().TryDeposit(actor->GetInventory(),
+                                     data.inventorySlotIndex, data.quantity))
+                            resultCode = CommandResultCode::ACCEPTED;
+                    }
+                    else if constexpr (
+                        std::is_same_v<CommandType, BankWithdrawCommand>)
+                    {
+                        if (data.quantity <= 0 || data.itemType == ItemType::NONE)
+                            resultCode = CommandResultCode::INVALID_COMMAND_DATA;
+                        else if (actor->GetBank().TryWithdraw(actor->GetInventory(),
+                                     data.itemType, data.quantity))
+                            resultCode = CommandResultCode::ACCEPTED;
+                    }
+                    else if (actor->GetBank().TryDepositInventory(
+                                 actor->GetInventory()))
+                    {
+                        resultCode = CommandResultCode::ACCEPTED;
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, BankCloseCommand>)
+                {
+                    const ActiveBankSession *session =
+                        GetBankSession(data.actorEntityID);
+                    if (session != nullptr && session->sessionId == data.sessionId)
+                    {
+                        CloseStationInteraction(data.actorEntityID);
+                        resultCode = CommandResultCode::ACCEPTED;
+                    }
+                }
+                else if constexpr (
                     std::is_same_v<CommandType,
                                    UnequipItemCommand>)
                 {
@@ -2692,6 +2748,12 @@ void World::ProcessInteractionSystem()
                 {
                     craftingSessionSystem.Open(
                         intent.actorEntityID, station->GetID());
+                }
+                else if (station->GetStationType() == StationType::BANK)
+                {
+                    activeBankSessions[intent.actorEntityID] = ActiveBankSession{
+                        nextBankSessionId++, intent.actorEntityID,
+                        station->GetID()};
                 }
             }
             continue;

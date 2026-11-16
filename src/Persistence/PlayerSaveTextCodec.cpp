@@ -3,6 +3,7 @@
 #include "PersistenceTokenCodec.h"
 #include "PlayerSaveState.h"
 #include "../Quest/QuestDefinitionDatabase.h"
+#include "../Bank/Bank.h"
 
 #include <algorithm>
 #include <array>
@@ -178,6 +179,14 @@ bool PlayerSaveTextCodec::TryEncode(const PlayerSaveData &saveData, std::string 
         encoded.push_back('='); encoded.append(*token); encoded.push_back(',');
         AppendInteger(encoded, saveData.inventorySlots[i].quantity); encoded.push_back('\n');
     }
+    AppendScalar(encoded, "bank_count", static_cast<int>(saveData.bank.size()));
+    for (const SavedBankEntry &entry : saveData.bank)
+    {
+        const auto token = PersistenceTokenCodec::TryGetItemToken(entry.itemType);
+        if (!token) return false;
+        encoded.append("bank.").append(*token).push_back('=');
+        AppendInteger(encoded, entry.quantity); encoded.push_back('\n');
+    }
     AppendScalar(encoded, "skill_count", 5);
     for (std::size_t i = 0; i < skills.size(); ++i)
     {
@@ -257,7 +266,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
     }
     if (versionLine == -1)
     { result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD, -1, "Missing version"); return result; }
-    if (version != 1 && version != 2 && version != 3 &&
+    if (version != 1 && version != 2 && version != 3 && version != 4 &&
         version != CURRENT_PLAYER_SAVE_VERSION)
     { result.AddIssue(PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, versionLine, "Unsupported player save version"); return result; }
 
@@ -271,6 +280,9 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
     bool questCountSeen = false;
     int declaredQuestCount = -1;
     std::vector<SavedQuestRecord> parsedQuests;
+    bool bankCountSeen = false;
+    int declaredBankCount = -1;
+    std::vector<SavedBankEntry> parsedBank;
     auto addInteger = [&](std::string_view value, int line, int &target)
     {
         const auto parsed = ParseInteger(value, target);
@@ -311,7 +323,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         }
         if (key == "quest_count")
         {
-            if ((version != 3 && version != 4) || questCountSeen)
+            if ((version != 3 && version != 4 && version != 5) || questCountSeen)
             {
                 result.AddIssue(PlayerSaveTextIssueCode::DUPLICATE_FIELD,
                     lineNumber, "Unexpected or duplicate quest_count");
@@ -322,6 +334,49 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
                 declaredQuestCount < 0)
                 result.AddIssue(PlayerSaveTextIssueCode::INVALID_COUNT,
                     lineNumber, "Quest count cannot be negative");
+            continue;
+        }
+        if (key == "bank_count")
+        {
+            if (version != 5 || bankCountSeen)
+            {
+                result.AddIssue(PlayerSaveTextIssueCode::DUPLICATE_FIELD,
+                    lineNumber, "Unexpected or duplicate bank_count");
+                continue;
+            }
+            bankCountSeen = true;
+            if (addInteger(value, lineNumber, declaredBankCount) &&
+                (declaredBankCount < 0 ||
+                 declaredBankCount > static_cast<int>(Bank::DistinctItemCapacity)))
+                result.AddIssue(PlayerSaveTextIssueCode::INVALID_COUNT,
+                    lineNumber, "Invalid bank item count");
+            continue;
+        }
+        if (key.starts_with("bank."))
+        {
+            if (version != 5)
+            {
+                result.AddIssue(PlayerSaveTextIssueCode::UNKNOWN_FIELD,
+                    lineNumber, "Legacy saves cannot contain bank records");
+                continue;
+            }
+            const auto item = PersistenceTokenCodec::TryParseItemToken(key.substr(5));
+            if (!item || *item == ItemType::NONE)
+            {
+                result.AddIssue(PlayerSaveTextIssueCode::UNKNOWN_ITEM_TOKEN,
+                    lineNumber, "Unknown bank item token");
+                continue;
+            }
+            if (std::any_of(parsedBank.begin(), parsedBank.end(),
+                    [&](const SavedBankEntry &entry){return entry.itemType == *item;}))
+            {
+                result.AddIssue(PlayerSaveTextIssueCode::DUPLICATE_FIELD,
+                    lineNumber, "Duplicate bank item");
+                continue;
+            }
+            int quantity = 0;
+            if (addInteger(value, lineNumber, quantity))
+                parsedBank.push_back({*item, quantity});
             continue;
         }
         if (key.starts_with("inventory."))
@@ -458,6 +513,29 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
             result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD, -1,
                 "Version 4 requires canonical catalogue order");
     }
+    if (version == 5)
+    {
+        if (!questCountSeen || declaredQuestCount != 2 ||
+            declaredQuestCount != static_cast<int>(parsedQuests.size()))
+            result.AddIssue(PlayerSaveTextIssueCode::INVALID_COUNT, -1,
+                "Version 5 requires exactly two quest records");
+        if (!bankCountSeen)
+            result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD, -1,
+                "Missing bank_count");
+        else if (declaredBankCount != static_cast<int>(parsedBank.size()))
+            result.AddIssue(PlayerSaveTextIssueCode::INVALID_COUNT, -1,
+                "bank_count does not match parsed records");
+        if (parsedQuests.size() != 2 ||
+            parsedQuests[0].id != QuestId::GATHERING_BASICS ||
+            parsedQuests[1].id != QuestId::MINING_BASICS)
+            result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD, -1,
+                "Version 5 requires canonical quest order");
+        for (std::size_t index = 1; index < parsedBank.size(); ++index)
+            if (static_cast<int>(parsedBank[index - 1].itemType) >=
+                static_cast<int>(parsedBank[index].itemType))
+                result.AddIssue(PlayerSaveTextIssueCode::SAVE_DATA_VALIDATION_FAILED,
+                    -1, "Bank records are not in canonical order");
+    }
     if (!result.GetIssues().empty()) return result;
 
     save.skills.reserve(5); save.equipment.reserve(5);
@@ -491,6 +569,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
     }
     else
         save.quests = std::move(parsedQuests);
+    save.bank = version == 5 ? std::move(parsedBank) : std::vector<SavedBankEntry>{};
     save.version = CURRENT_PLAYER_SAVE_VERSION;
     result.validationReport = PlayerSaveState::Validate(save);
     if (!result.validationReport.IsValid())

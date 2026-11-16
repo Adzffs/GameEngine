@@ -73,7 +73,8 @@ namespace
     bool IsValidStationType(StationType stationType)
     {
         return stationType == StationType::FURNACE ||
-               stationType == StationType::CRAFTING_TABLE;
+               stationType == StationType::CRAFTING_TABLE ||
+               stationType == StationType::BANK;
     }
 
     bool IsValidCraftingPatternType(

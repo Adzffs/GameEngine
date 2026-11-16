@@ -359,7 +359,7 @@ int main()
         }
     }
 
-    for (int version : {0, -1, 5})
+    for (int version : {0, -1, 6})
     {
         PlayerSaveData malformed = valid;
         malformed.version = version;
@@ -586,6 +586,24 @@ int main()
             test.ExpectEqual(normalized.currentHealth, 100,
                              "Recapture records normalized permanent health");
         }
+    }
+
+    {
+        Player source(20, PlayerInitializationMode::EMPTY);
+        source.GetInventory().AddItem(ItemType::COINS, 9);
+        test.Expect(source.GetBank().TryDeposit(source.GetInventory(), 0, 7),
+            "Bank persistence fixture deposits items");
+        const PlayerSaveData captured = PlayerSaveState::Capture(source);
+        test.Expect(captured.bank.size() == 1 &&
+                captured.bank[0].itemType == ItemType::COINS &&
+                captured.bank[0].quantity == 7,
+            "Capture records canonical bank entries");
+        PlayerSaveValidationReport report;
+        std::unique_ptr<Player> restored =
+            PlayerSaveState::TryCreatePlayer(21, captured, report);
+        test.Expect(restored != nullptr &&
+                restored->GetBank().GetItemAmount(ItemType::COINS) == 7,
+            "Bank entries survive player reconstruction");
     }
 
     return test.Finish();

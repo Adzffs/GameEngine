@@ -10,7 +10,7 @@
 #include <vector>
 
 inline constexpr std::size_t MAX_PLAYER_SAVE_TEXT_BYTES = 64 * 1024;
-inline constexpr std::size_t MAX_PLAYER_SAVE_TEXT_LINES = 128;
+inline constexpr std::size_t MAX_PLAYER_SAVE_TEXT_LINES = 256;
 inline constexpr std::size_t MAX_PLAYER_SAVE_TEXT_LINE_LENGTH = 256;
 
 enum class PlayerSaveTextIssueCode

@@ -48,6 +48,7 @@
 #include "../Persistence/WorldPlayerPersistenceResult.h"
 #include <filesystem>
 #include "GroundItem.h"
+#include "../Bank/BankSession.h"
 
 class RandomSource;
 class Monster;
@@ -82,6 +83,7 @@ public:
     GetCommandProcessingResults() const;
 
     const CraftingSessionSnapshot *GetCraftingSession(int actorEntityID) const;
+    const ActiveBankSession *GetBankSession(int actorEntityID) const;
 
     Map &GetMap();
 
@@ -373,6 +375,8 @@ private:
 
     std::map<int, StationType> openedStations;
     std::map<int, int> activeStations;
+    std::map<int, ActiveBankSession> activeBankSessions;
+    BankSessionId nextBankSessionId = 1;
 
     std::optional<MeleeAttackResult>
         lastMeleeAttackResult;

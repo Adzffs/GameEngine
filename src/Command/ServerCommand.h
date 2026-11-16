@@ -15,6 +15,7 @@
 #include "../Shop/ShopSessionId.h"
 #include "../Quest/QuestId.h"
 #include "../Recipe/CraftingSession.h"
+#include "../Bank/BankSession.h"
 
 struct MoveCommand
 {
@@ -147,6 +148,34 @@ struct ShopCloseCommand
 struct QuestAcceptCommand{int actorEntityID; int npcEntityID; DialogueSessionId dialogueSessionId; QuestId questId;};
 struct QuestCompleteCommand{int actorEntityID; int npcEntityID; DialogueSessionId dialogueSessionId; QuestId questId;};
 
+struct BankDepositCommand
+{
+    int actorEntityID;
+    BankSessionId sessionId;
+    std::uint64_t expectedRevision;
+    int inventorySlotIndex;
+    int quantity;
+};
+struct BankWithdrawCommand
+{
+    int actorEntityID;
+    BankSessionId sessionId;
+    std::uint64_t expectedRevision;
+    ItemType itemType;
+    int quantity;
+};
+struct BankDepositInventoryCommand
+{
+    int actorEntityID;
+    BankSessionId sessionId;
+    std::uint64_t expectedRevision;
+};
+struct BankCloseCommand
+{
+    int actorEntityID;
+    BankSessionId sessionId;
+};
+
 using ServerCommandData = std::variant<
     MoveCommand,
     AttackCommand,
@@ -168,7 +197,11 @@ using ServerCommandData = std::variant<
     ShopSellCommand,
     ShopCloseCommand,
     QuestAcceptCommand,
-    QuestCompleteCommand>;
+    QuestCompleteCommand,
+    BankDepositCommand,
+    BankWithdrawCommand,
+    BankDepositInventoryCommand,
+    BankCloseCommand>;
 
 struct ServerCommand
 {
