@@ -1538,6 +1538,12 @@ void Graphics::ProcessEvents(bool &running)
                 continue;
             }
 
+            if (event.button.button == SDL_BUTTON_LEFT &&
+                HandleMinimapClick(mouseX, mouseY))
+            {
+                continue;
+            }
+
             if (HandleSidePanelClick(
                     mouseX,
                     mouseY,
@@ -1553,16 +1559,16 @@ void Graphics::ProcessEvents(bool &running)
             }
 
             clickedTileX =
-                static_cast<int>(mouseX) / TileSize;
+                static_cast<int>(mouseX + cameraPixelX) / TileSize;
 
             clickedTileY =
-                static_cast<int>(mouseY) / TileSize;
+                static_cast<int>(mouseY + cameraPixelY) / TileSize;
 
             clickedMouseX =
-                static_cast<int>(mouseX);
+                static_cast<int>(mouseX + cameraPixelX);
 
             clickedMouseY =
-                static_cast<int>(mouseY);
+                static_cast<int>(mouseY + cameraPixelY);
 
             hasClickedTile = true;
             clickPending = true;
@@ -2094,17 +2100,197 @@ bool Graphics::ConsumeStationMenuClose()
     return true;
 }
 
+void Graphics::UpdateCamera(
+    int playerX,
+    int playerY,
+    const Map &map)
+{
+    constexpr float usefulWorldWidth = 930.0f;
+    constexpr float preferredPlayerScreenX = 450.0f;
+    constexpr float preferredPlayerScreenY = 350.0f;
+    const float maximumX = std::max(
+        0.0f,
+        static_cast<float>(map.GetWidth() * TileSize) - usefulWorldWidth);
+    const float maximumY = std::max(
+        0.0f,
+        static_cast<float>(map.GetHeight() * TileSize - WindowHeight));
+    const float targetX = std::clamp(
+        static_cast<float>(playerX * TileSize) + TileSize * 0.5f -
+            preferredPlayerScreenX,
+        0.0f,
+        maximumX);
+    const float targetY = std::clamp(
+        static_cast<float>(playerY * TileSize) + TileSize * 0.5f -
+            preferredPlayerScreenY,
+        0.0f,
+        maximumY);
+
+    if (!cameraInitialized)
+    {
+        cameraPixelX = targetX;
+        cameraPixelY = targetY;
+        cameraInitialized = true;
+        return;
+    }
+
+    const float smoothing = 1.0f - std::exp(
+        -8.0f * presentationDeltaSeconds);
+    cameraPixelX += (targetX - cameraPixelX) * smoothing;
+    cameraPixelY += (targetY - cameraPixelY) * smoothing;
+    if (std::abs(targetX - cameraPixelX) < 0.25f) cameraPixelX = targetX;
+    if (std::abs(targetY - cameraPixelY) < 0.25f) cameraPixelY = targetY;
+}
+
+SDL_FPoint Graphics::ScreenToWorldPoint(
+    float screenX,
+    float screenY) const
+{
+    return SDL_FPoint{
+        screenX + cameraPixelX,
+        screenY + cameraPixelY};
+}
+
+bool Graphics::HandleMinimapClick(float screenX, float screenY)
+{
+    constexpr SDL_FRect mapBounds{1040.0f, 42.0f, 210.0f, 154.0f};
+    constexpr float minimapTileSize = 7.0f;
+    if (!IsPointInsideRectangle(screenX, screenY, mapBounds))
+    {
+        return false;
+    }
+
+    walkTileX = minimapOriginX + static_cast<int>(
+        (screenX - mapBounds.x) / minimapTileSize);
+    walkTileY = minimapOriginY + static_cast<int>(
+        (screenY - mapBounds.y) / minimapTileSize);
+    walkClickPending = true;
+    return true;
+}
+
+void Graphics::DrawMinimap(
+    Map &map,
+    const std::vector<std::unique_ptr<Entity>> &entities,
+    const std::vector<ResourceNode> &resources,
+    const std::vector<CraftingStation> &stations,
+    int playerX,
+    int playerY)
+{
+    constexpr int columns = 30;
+    constexpr int rows = 22;
+    constexpr float minimapTileSize = 7.0f;
+    constexpr SDL_FRect panel{1030.0f, 18.0f, 230.0f, 188.0f};
+    constexpr SDL_FRect mapBounds{1040.0f, 42.0f, 210.0f, 154.0f};
+    minimapOriginX = std::clamp(
+        playerX - columns / 2,
+        0,
+        std::max(0, map.GetWidth() - columns));
+    minimapOriginY = std::clamp(
+        playerY - rows / 2,
+        0,
+        std::max(0, map.GetHeight() - rows));
+    minimapOriginX = std::clamp(playerX - columns / 2, 0,
+        std::max(0, map.GetWidth() - columns));
+    minimapOriginY = std::clamp(playerY - rows / 2, 0,
+        std::max(0, map.GetHeight() - rows));
+
+    SDL_SetRenderDrawColor(renderer, 17, 21, 23, 238);
+    SDL_RenderFillRect(renderer, &panel);
+    SDL_SetRenderDrawColor(renderer, 164, 139, 87, 255);
+    SDL_RenderRect(renderer, &panel);
+    SDL_SetRenderDrawColor(renderer, 235, 225, 202, 255);
+    SDL_RenderDebugText(renderer, panel.x + 10.0f, panel.y + 10.0f,
+        "AREA MAP — CLICK TO WALK");
+
+    for (int localY = 0; localY < rows; ++localY)
+    {
+        for (int localX = 0; localX < columns; ++localX)
+        {
+            const TileType tileType = map.GetTileType(
+                minimapOriginX + localX,
+                minimapOriginY + localY);
+            switch (tileType)
+            {
+            case TileType::DIRT:
+                SDL_SetRenderDrawColor(renderer, 127, 94, 57, 255);
+                break;
+            case TileType::STONE:
+                SDL_SetRenderDrawColor(renderer, 105, 108, 106, 255);
+                break;
+            case TileType::WATER:
+                SDL_SetRenderDrawColor(renderer, 43, 91, 139, 255);
+                break;
+            case TileType::TREE:
+                SDL_SetRenderDrawColor(renderer, 24, 66, 31, 255);
+                break;
+            case TileType::STATION:
+                SDL_SetRenderDrawColor(renderer, 120, 104, 72, 255);
+                break;
+            case TileType::WALL:
+                SDL_SetRenderDrawColor(renderer, 64, 64, 68, 255);
+                break;
+            case TileType::GRASS:
+            default:
+                SDL_SetRenderDrawColor(renderer, 47, 83, 48, 255);
+                break;
+            }
+            const SDL_FRect tile{
+                mapBounds.x + localX * minimapTileSize,
+                mapBounds.y + localY * minimapTileSize,
+                minimapTileSize,
+                minimapTileSize};
+            SDL_RenderFillRect(renderer, &tile);
+        }
+    }
+
+    const auto drawMarker = [this](
+        int worldX, int worldY, Uint8 red, Uint8 green, Uint8 blue,
+        float size)
+    {
+        constexpr float mapX = 1040.0f;
+        constexpr float mapY = 42.0f;
+        constexpr float scale = 7.0f;
+        const int localX = worldX - minimapOriginX;
+        const int localY = worldY - minimapOriginY;
+        if (localX < 0 || localY < 0 || localX >= 30 || localY >= 22)
+        {
+            return;
+        }
+        const SDL_FRect marker{
+            mapX + localX * scale + (scale - size) * 0.5f,
+            mapY + localY * scale + (scale - size) * 0.5f,
+            size,
+            size};
+        SDL_SetRenderDrawColor(renderer, red, green, blue, 255);
+        SDL_RenderFillRect(renderer, &marker);
+    };
+
+    for (const ResourceNode &resource : resources)
+        if (resource.IsActive())
+            drawMarker(resource.GetX(), resource.GetY(), 88, 190, 92, 3.0f);
+    for (const CraftingStation &station : stations)
+        drawMarker(station.GetX(), station.GetY(), 245, 190, 70, 5.0f);
+    for (const auto &entity : entities)
+    {
+        if (const Monster *monster = dynamic_cast<const Monster *>(entity.get()))
+        {
+            if (monster->IsAlive())
+                drawMarker(monster->GetPosition().GetX(),
+                    monster->GetPosition().GetY(), 225, 70, 70, 4.0f);
+        }
+        else if (dynamic_cast<const NPC *>(entity.get()) != nullptr)
+        {
+            drawMarker(entity->GetPosition().GetX(),
+                entity->GetPosition().GetY(), 240, 150, 55, 4.0f);
+        }
+    }
+    drawMarker(playerX, playerY, 110, 215, 255, 6.0f);
+}
+
 void Graphics::DrawMap(Map &map)
 {
-    int visibleColumns =
-        WindowWidth / TileSize;
-
-    int visibleRows =
-        WindowHeight / TileSize;
-
-    for (int y = 0; y < visibleRows; y++)
+    for (int y = 0; y < map.GetHeight(); y++)
     {
-        for (int x = 0; x < visibleColumns; x++)
+        for (int x = 0; x < map.GetWidth(); x++)
         {
             SDL_FRect tileRectangle{
                 static_cast<float>(x * TileSize),
@@ -2161,7 +2347,7 @@ void Graphics::DrawMap(Map &map)
     SDL_RenderDebugText(renderer, 424.0f, 414.0f, "WORKSHOP");
     SDL_RenderDebugText(renderer, 168.0f, 122.0f, "TRAINING FIELD");
 }
-void Graphics::DrawGrid()
+void Graphics::DrawGrid(const Map &map)
 
 {
     SDL_SetRenderDrawColor(
@@ -2171,7 +2357,7 @@ void Graphics::DrawGrid()
         38,
         110);
 
-    for (int x = 0; x <= WindowWidth; x += TileSize)
+    for (int x = 0; x <= map.GetWidth() * TileSize; x += TileSize)
     {
         SDL_RenderLine(
             renderer,
@@ -2181,7 +2367,7 @@ void Graphics::DrawGrid()
             static_cast<float>(WindowHeight));
     }
 
-    for (int y = 0; y <= WindowHeight; y += TileSize)
+    for (int y = 0; y <= map.GetHeight() * TileSize; y += TileSize)
     {
         SDL_RenderLine(
             renderer,
@@ -2537,13 +2723,20 @@ void Graphics::DrawWorldHoverFeedback()
         worldHoverTarget.name;
     const float labelWidth = std::max(150.0f,
         static_cast<float>(label.size() * 8 + 20));
-    const SDL_FRect labelBounds{12.0f, 12.0f, labelWidth, 28.0f};
+    const SDL_FRect labelBounds{
+        cameraPixelX + 12.0f,
+        cameraPixelY + 12.0f,
+        labelWidth,
+        28.0f};
     SDL_SetRenderDrawColor(renderer, 20, 18, 15, 225);
     SDL_RenderFillRect(renderer, &labelBounds);
     SDL_SetRenderDrawColor(renderer, 230, 197, 102, 255);
     SDL_RenderRect(renderer, &labelBounds);
     SDL_SetRenderDrawColor(renderer, 255, 241, 190, 255);
-    SDL_RenderDebugText(renderer, 22.0f, 22.0f, label.c_str());
+    SDL_RenderDebugText(renderer,
+        cameraPixelX + 22.0f,
+        cameraPixelY + 22.0f,
+        label.c_str());
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 }
 
@@ -2558,10 +2751,11 @@ void Graphics::OpenWorldContextMenu(float screenX, float screenY)
 
     worldContextMenu.open = true;
     worldContextMenu.target = worldHoverTarget;
-    worldContextMenu.tileX = static_cast<int>(screenX) / TileSize;
-    worldContextMenu.tileY = static_cast<int>(screenY) / TileSize;
-    worldContextMenu.screenX = static_cast<int>(screenX);
-    worldContextMenu.screenY = static_cast<int>(screenY);
+    const SDL_FPoint worldPoint = ScreenToWorldPoint(screenX, screenY);
+    worldContextMenu.tileX = static_cast<int>(worldPoint.x) / TileSize;
+    worldContextMenu.tileY = static_cast<int>(worldPoint.y) / TileSize;
+    worldContextMenu.screenX = static_cast<int>(worldPoint.x);
+    worldContextMenu.screenY = static_cast<int>(worldPoint.y);
     worldContextMenu.bounds = SDL_FRect{
         std::clamp(screenX, 4.0f, maximumX),
         std::clamp(screenY, 4.0f,
@@ -4973,6 +5167,7 @@ void Graphics::Render(
             0.05f);
     }
     lastPresentationTick = presentationTick;
+    UpdateCamera(playerX, playerY, map);
     UpdateProgressionFeedback(player, inventory);
     displayedCurrency = inventory.GetItemAmount(ItemType::COINS);
     displayedLogCount = inventory.GetItemAmount(ItemType::LOG);
@@ -4988,7 +5183,12 @@ void Graphics::Render(
     worldHoverTarget = worldHoverBlocked
         ? WorldHoverTarget{}
         : ResolveWorldHoverTarget(
-            mouseX, mouseY, entities, resources, stations, groundItems);
+            mouseX + cameraPixelX,
+            mouseY + cameraPixelY,
+            entities,
+            resources,
+            stations,
+            groundItems);
     SDL_SetRenderDrawColor(
         renderer,
         20,
@@ -4998,8 +5198,15 @@ void Graphics::Render(
 
     SDL_RenderClear(renderer);
 
+    const SDL_Rect worldViewport{
+        -static_cast<int>(std::round(cameraPixelX)),
+        -static_cast<int>(std::round(cameraPixelY)),
+        map.GetWidth() * TileSize,
+        map.GetHeight() * TileSize};
+    SDL_SetRenderViewport(renderer, &worldViewport);
+
     DrawMap(map);
-    if (showGrid) DrawGrid();
+    if (showGrid) DrawGrid(map);
     DrawClickedTile();
     DrawResources(resources);
     DrawStations(stations);
@@ -5017,6 +5224,7 @@ void Graphics::Render(
     SDL_SetRenderClipRect(renderer, nullptr);
     DrawWorldHud(player);
     DrawProgressionFeedback();
+    DrawMinimap(map, entities, resources, stations, playerX, playerY);
     DrawSidePanelTabs();
 
     switch (selectedTab)

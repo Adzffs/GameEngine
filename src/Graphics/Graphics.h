@@ -325,7 +325,7 @@ public:
         const char *title);
 
     void DrawMap(Map &map);
-    void DrawGrid();
+    void DrawGrid(const Map &map);
     void DrawClickedTile();
     void DrawPlayer(int playerX, int playerY);
     void DrawPlayerHealthBar(
@@ -473,6 +473,11 @@ private:
     float visualPlayerX = 0.0f;
     float visualPlayerY = 0.0f;
     bool visualPlayerInitialized = false;
+    float cameraPixelX = 0.0f;
+    float cameraPixelY = 0.0f;
+    bool cameraInitialized = false;
+    int minimapOriginX = 0;
+    int minimapOriginY = 0;
     Uint64 lastPresentationTick = 0;
     float presentationDeltaSeconds = 1.0f / 60.0f;
     bool gameGuideVisible = false;
@@ -519,6 +524,16 @@ private:
         ItemType itemType,
         const SDL_FRect &bounds);
     void DrawWorldHoverFeedback();
+    void UpdateCamera(int playerX, int playerY, const Map &map);
+    SDL_FPoint ScreenToWorldPoint(float screenX, float screenY) const;
+    bool HandleMinimapClick(float screenX, float screenY);
+    void DrawMinimap(
+        Map &map,
+        const std::vector<std::unique_ptr<Entity>> &entities,
+        const std::vector<ResourceNode> &resources,
+        const std::vector<CraftingStation> &stations,
+        int playerX,
+        int playerY);
     void UpdateProgressionFeedback(
         const Player &player,
         const Inventory &inventory);

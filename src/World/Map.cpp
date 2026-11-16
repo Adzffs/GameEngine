@@ -40,3 +40,13 @@ bool Map::IsInBounds(int x, int y) const
     return x >= 0 && y >= 0 &&
            x < width && y < height;
 }
+
+int Map::GetWidth() const
+{
+    return width;
+}
+
+int Map::GetHeight() const
+{
+    return height;
+}
