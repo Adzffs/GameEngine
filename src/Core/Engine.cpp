@@ -166,6 +166,11 @@ bool Engine::Run()
                 playerID, clickedInventorySlot, dropAmount});
         }
 
+        if (graphics.ConsumeTutorialSkipRequest())
+        {
+            world.EnqueueCommand(SkipTutorialCommand{playerID});
+        }
+
         if (graphics.ConsumeWeaponSlotClick())
         {
             world.EnqueueCommand(

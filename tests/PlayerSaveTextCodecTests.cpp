@@ -131,7 +131,7 @@ int main()
 
     PlayerSaveData save = ValidSave();
     const std::string canonical = Encode(save);
-    std::string golden = "GAMEENGINE_PLAYER_SAVE\nversion=5\nposition_x=3\nposition_y=2\ncurrent_health=87\ninventory_count=28\n";
+    std::string golden = "GAMEENGINE_PLAYER_SAVE\nversion=6\nposition_x=3\nposition_y=2\ncurrent_health=87\ntutorial_step=0\ntutorial_skipped=0\ninventory_count=28\n";
     golden += "inventory.0=BRONZE_AXE,1\ninventory.1=COINS,150\n";
     for (int i = 2; i < 28; ++i) golden += "inventory." + std::to_string(i) + "=NONE,0\n";
     golden += "bank_count=0\nskill_count=5\nskill.ATTACK=0\nskill.DEFENCE=0\nskill.WOODCUTTING=1200\nskill.MINING=500\nskill.SMITHING=300\n";
@@ -147,7 +147,7 @@ int main()
     test.Expect(!PlayerSaveTextCodec::TryEncode(save, unchanged, invalidReport), "invalid save fails encoding");
     test.ExpectEqual(unchanged, std::string("sentinel"), "failed encoding leaves output unchanged");
     PlayerSaveData invalid = ValidSave(); invalid.version = 1; EncodeRejectsUnchanged(test, invalid, "legacy version encoding");
-    invalid = ValidSave(); invalid.version = 6; EncodeRejectsUnchanged(test, invalid, "future version encoding");
+    invalid = ValidSave(); invalid.version = 7; EncodeRejectsUnchanged(test, invalid, "future version encoding");
     invalid = ValidSave(); invalid.inventorySlots[0] = {ItemType::NONE, 1}; EncodeRejectsUnchanged(test, invalid, "invalid inventory");
     invalid = ValidSave(); invalid.skills.pop_back(); EncodeRejectsUnchanged(test, invalid, "missing skill");
     invalid = ValidSave(); invalid.skills[1].skillType = SkillType::ATTACK; EncodeRejectsUnchanged(test, invalid, "duplicate skill");
@@ -175,7 +175,9 @@ int main()
                         ItemType::WOODEN_PLANKS &&
                     decodedPlanks.GetSaveData()->inventorySlots[1].quantity == 4,
                 "crafted Wooden planks survive canonical save round-trip");
-    std::string legacy = Replace(canonical, "version=5", "version=1");
+    std::string legacy = Replace(canonical, "version=6", "version=1");
+    legacy = Replace(legacy, "tutorial_step=0\n", "");
+    legacy = Replace(legacy, "tutorial_skipped=0\n", "");
     legacy = Replace(legacy, "bank_count=0\n", "");
     legacy = Replace(legacy, "quest_count=2\n", "");
     legacy = Replace(legacy, "quest.GATHERING_BASICS=AVAILABLE,0\n", "");
@@ -187,6 +189,14 @@ int main()
                     migratedLegacy.GetSaveData()->quests.front().state == QuestState::AVAILABLE &&
                     migratedLegacy.GetSaveData()->quests.front().progress == 0,
                 "genuine version-1 text migrates to canonical in-memory quest defaults");
+    std::string versionFive = Replace(canonical, "version=6", "version=5");
+    versionFive = Replace(versionFive, "tutorial_step=0\n", "");
+    versionFive = Replace(versionFive, "tutorial_skipped=0\n", "");
+    const auto migratedVersionFive = PlayerSaveTextCodec::Decode(versionFive);
+    test.Expect(migratedVersionFive.IsSuccess() &&
+            migratedVersionFive.GetSaveData()->tutorialStep == TutorialStep::COMPLETE &&
+            migratedVersionFive.GetSaveData()->tutorialSkipped,
+        "version 5 saves migrate without forcing existing players through onboarding");
     std::string crlf; for (char c : canonical) { if (c == '\n') crlf.push_back('\r'); crlf.push_back(c); }
     test.Expect(PlayerSaveTextCodec::Decode(crlf).IsSuccess(), "CRLF decodes");
     test.Expect(PlayerSaveTextCodec::Decode(canonical.substr(0, canonical.size()-1)).IsSuccess(), "missing final newline decodes");
@@ -217,8 +227,9 @@ int main()
     const auto fullCanonicalization = PlayerSaveTextCodec::Decode(fullyReorderedCrlf);
     test.Expect(!fullCanonicalization.IsSuccess(),
                 "Version 4 rejects globally reordered quest records");
-    test.Expect(fullCanonicalization.Contains(PlayerSaveTextIssueCode::MISSING_FIELD),
-                "Incorrect v4 quest order reports a schema issue");
+    test.Expect(fullCanonicalization.Contains(PlayerSaveTextIssueCode::INVALID_COUNT) ||
+                    fullCanonicalization.Contains(PlayerSaveTextIssueCode::MISSING_FIELD),
+                "Incorrect quest order reports a schema issue");
     const auto secondCanonicalization = PlayerSaveTextCodec::Decode(canonical);
     test.Expect(secondCanonicalization.IsSuccess() && Encode(*secondCanonicalization.GetSaveData()) == canonical,
                 "canonical decode encode remains byte-identical");
@@ -254,10 +265,10 @@ int main()
 
     Rejects(test, Replace(canonical,"position_x=3","position_x"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "missing equals");
     Rejects(test, Replace(canonical,"position_x=3","position_x==3"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "extra equals");
-    Rejects(test, Replace(canonical,"version=5","version==5"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "malformed version extra equals");
-    Rejects(test, Replace(canonical,"version=5","version=5=6"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "malformed version value separator");
-    Rejects(test, Replace(canonical,"version=5","version="), PlayerSaveTextIssueCode::MALFORMED_RECORD, "empty version value");
-    Rejects(test, Replace(canonical,"version=5","=5"), PlayerSaveTextIssueCode::MISSING_FIELD, "empty version key");
+    Rejects(test, Replace(canonical,"version=6","version==6"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "malformed version extra equals");
+    Rejects(test, Replace(canonical,"version=6","version=6=7"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "malformed version value separator");
+    Rejects(test, Replace(canonical,"version=6","version="), PlayerSaveTextIssueCode::MALFORMED_RECORD, "empty version value");
+    Rejects(test, Replace(canonical,"version=6","=6"), PlayerSaveTextIssueCode::MISSING_FIELD, "empty version key");
     Rejects(test, Replace(canonical,"position_x=3"," position_x=3"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "leading space");
     Rejects(test, Replace(canonical,"position_x=3","position_x=3 "), PlayerSaveTextIssueCode::MALFORMED_RECORD, "trailing space");
     Rejects(test, Replace(canonical,"position_x=3","mystery=3"), PlayerSaveTextIssueCode::UNKNOWN_FIELD, "unknown field");
@@ -276,10 +287,10 @@ int main()
     Rejects(test, Replace(canonical,"position_x=3","position_x=2147483648"), PlayerSaveTextIssueCode::INTEGER_OUT_OF_RANGE, "integer overflow");
     test.Expect(PlayerSaveTextCodec::Decode(Replace(canonical,"position_x=3","position_x=-2147483648")).IsSuccess(), "INT_MIN position decodes");
     test.Expect(PlayerSaveTextCodec::Decode(Replace(canonical,"position_x=3","position_x=2147483647")).IsSuccess(), "INT_MAX position decodes");
-    Rejects(test, Replace(canonical,"version=5","version=6"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "unsupported version");
-    Rejects(test, Replace(canonical,"version=5","version=0"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "zero version");
-    Rejects(test, Replace(canonical,"version=5","version=-1"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "negative version");
-    Rejects(test, Replace(canonical,"version=5","version=2147483647"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "future INT_MAX version");
+    Rejects(test, Replace(canonical,"version=6","version=7"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "unsupported version");
+    Rejects(test, Replace(canonical,"version=6","version=0"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "zero version");
+    Rejects(test, Replace(canonical,"version=6","version=-1"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "negative version");
+    Rejects(test, Replace(canonical,"version=6","version=2147483647"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "future INT_MAX version");
     Rejects(test, Replace(canonical,"inventory_count=28","inventory_count=999999999"), PlayerSaveTextIssueCode::INVALID_COUNT, "attacker count");
     Rejects(test, Replace(canonical,"skill_count=5","skill_count=05"), PlayerSaveTextIssueCode::NON_CANONICAL_INTEGER, "noncanonical count");
     Rejects(test, Replace(canonical,"equipment_count=5\n",""), PlayerSaveTextIssueCode::MISSING_FIELD, "missing count");

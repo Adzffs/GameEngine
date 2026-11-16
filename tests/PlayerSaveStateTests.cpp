@@ -359,7 +359,7 @@ int main()
         }
     }
 
-    for (int version : {0, -1, 6})
+    for (int version : {0, -1, 7})
     {
         PlayerSaveData malformed = valid;
         malformed.version = version;
@@ -593,6 +593,7 @@ int main()
         source.GetInventory().AddItem(ItemType::COINS, 9);
         test.Expect(source.GetBank().TryDeposit(source.GetInventory(), 0, 7),
             "Bank persistence fixture deposits items");
+        source.GetTutorialState().TryRestore(TutorialStep::SAFE_COMBAT, false);
         const PlayerSaveData captured = PlayerSaveState::Capture(source);
         test.Expect(captured.bank.size() == 1 &&
                 captured.bank[0].itemType == ItemType::COINS &&
@@ -604,6 +605,10 @@ int main()
         test.Expect(restored != nullptr &&
                 restored->GetBank().GetItemAmount(ItemType::COINS) == 7,
             "Bank entries survive player reconstruction");
+        test.Expect(restored != nullptr &&
+                restored->GetTutorialState().GetStep() == TutorialStep::SAFE_COMBAT &&
+                !restored->GetTutorialState().IsSkipped(),
+            "Tutorial progress survives player reconstruction");
     }
 
     return test.Finish();

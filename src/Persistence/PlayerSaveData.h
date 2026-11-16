@@ -6,11 +6,12 @@
 #include "../Skills/SkillType.h"
 #include "../Quest/QuestState.h"
 #include "../Quest/QuestId.h"
+#include "../Tutorial/TutorialState.h"
 
 #include <array>
 #include <vector>
 
-inline constexpr int CURRENT_PLAYER_SAVE_VERSION = 5;
+inline constexpr int CURRENT_PLAYER_SAVE_VERSION = 6;
 
 struct SavedInventorySlot
 {
@@ -54,4 +55,6 @@ struct PlayerSaveData
     std::vector<SavedEquipmentSlot> equipment;
     std::vector<SavedQuestRecord> quests;
     std::vector<SavedBankEntry> bank;
+    TutorialStep tutorialStep = TutorialStep::MEET_GUIDE;
+    bool tutorialSkipped = false;
 };

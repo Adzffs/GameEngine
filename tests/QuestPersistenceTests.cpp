@@ -30,7 +30,7 @@ std::string HistoricalSave(int version,const std::string& questRecord)
 
 int main(){
  TestContext t; Player player(1); QuestSystem::TryRestore(player.GetQuestJournal(),Records(QuestState::ACTIVE,2,QuestState::ACTIVE,3)); auto save=PlayerSaveState::Capture(player); std::string encoded; PlayerSaveValidationReport report;
- t.Expect(PlayerSaveTextCodec::TryEncode(save,encoded,report)&&encoded.find("version=5")!=std::string::npos&&encoded.find("quest_count=2")!=std::string::npos&&encoded.find("quest.GATHERING_BASICS=ACTIVE,2")!=std::string::npos&&encoded.find("quest.MINING_BASICS=ACTIVE,3")!=std::string::npos,"Version 5 encodes canonical ordered quest collection");
+ t.Expect(PlayerSaveTextCodec::TryEncode(save,encoded,report)&&encoded.find("version=6")!=std::string::npos&&encoded.find("quest_count=2")!=std::string::npos&&encoded.find("quest.GATHERING_BASICS=ACTIVE,2")!=std::string::npos&&encoded.find("quest.MINING_BASICS=ACTIVE,3")!=std::string::npos,"Version 6 encodes canonical ordered quest collection");
  auto decoded=PlayerSaveTextCodec::Decode(encoded); t.Expect(decoded.IsSuccess()&&decoded.GetSaveData()->version==CURRENT_PLAYER_SAVE_VERSION&&decoded.GetSaveData()->quests.size()==2&&decoded.GetSaveData()->quests[0].progress==2&&decoded.GetSaveData()->quests[1].progress==3,"Version 5 quest collection round trips");
  save.version=2; std::string unchanged="unchanged"; t.Expect(!PlayerSaveTextCodec::TryEncode(save,unchanged,report)&&unchanged=="unchanged","Legacy versions cannot be encoded");
  save=PlayerSaveState::Capture(player);save.quests.clear();unchanged="unchanged";t.Expect(!PlayerSaveTextCodec::TryEncode(save,unchanged,report)&&unchanged=="unchanged","Missing quest encoding rejects without output mutation");

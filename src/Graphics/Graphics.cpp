@@ -1219,6 +1219,11 @@ bool Graphics::HandleSidePanelClick(
             layout.contentBounds.y + 104.0f,
             layout.contentBounds.w,
             38.0f};
+        const SDL_FRect skipTutorialButton{
+            layout.contentBounds.x,
+            layout.contentBounds.y + 154.0f,
+            layout.contentBounds.w,
+            38.0f};
         if (IsPointInsideRectangle(mouseX, mouseY, gridToggle))
         {
             showGrid = !showGrid;
@@ -1227,6 +1232,11 @@ bool Graphics::HandleSidePanelClick(
         if (IsPointInsideRectangle(mouseX, mouseY, guideButton))
         {
             gameGuideVisible = true;
+            return true;
+        }
+        if (IsPointInsideRectangle(mouseX, mouseY, skipTutorialButton))
+        {
+            tutorialSkipPending = true;
             return true;
         }
     }
@@ -3436,10 +3446,12 @@ void Graphics::DrawSettings()
                         layout.contentBounds.y + 28.0f,
                         "DISPLAY & HELP");
 
-    const std::array<SDL_FRect, 2> buttons{{
+    const std::array<SDL_FRect, 3> buttons{{
         {layout.contentBounds.x, layout.contentBounds.y + 54.0f,
          layout.contentBounds.w, 38.0f},
         {layout.contentBounds.x, layout.contentBounds.y + 104.0f,
+         layout.contentBounds.w, 38.0f},
+        {layout.contentBounds.x, layout.contentBounds.y + 154.0f,
          layout.contentBounds.w, 38.0f}}};
     for (const SDL_FRect &button : buttons)
     {
@@ -3456,24 +3468,26 @@ void Graphics::DrawSettings()
                         buttons[0].y + 15.0f, gridLabel.c_str());
     SDL_RenderDebugText(renderer, buttons[1].x + 12.0f,
                         buttons[1].y + 15.0f, "OPEN GAME GUIDE");
+    SDL_RenderDebugText(renderer, buttons[2].x + 12.0f,
+                        buttons[2].y + 15.0f, "SKIP TUTORIAL");
 
     SDL_SetRenderDrawColor(renderer, 190, 195, 195, 255);
     SDL_RenderDebugText(renderer, layout.contentBounds.x,
-                        layout.contentBounds.y + 174.0f, "CONTROLS");
+                        layout.contentBounds.y + 214.0f, "CONTROLS");
     SDL_RenderDebugText(renderer, layout.contentBounds.x,
-                        layout.contentBounds.y + 199.0f,
+                        layout.contentBounds.y + 239.0f,
                         "Left click  Move / interact");
     SDL_RenderDebugText(renderer, layout.contentBounds.x,
-                        layout.contentBounds.y + 221.0f,
+                        layout.contentBounds.y + 261.0f,
                         "Right click Split item stacks");
     SDL_RenderDebugText(renderer, layout.contentBounds.x,
-                        layout.contentBounds.y + 243.0f,
+                        layout.contentBounds.y + 283.0f,
                         "Shift       Quick transfer");
     SDL_RenderDebugText(renderer, layout.contentBounds.x,
-                        layout.contentBounds.y + 265.0f,
+                        layout.contentBounds.y + 305.0f,
                         "H           Toggle guide");
     SDL_RenderDebugText(renderer, layout.contentBounds.x,
-                        layout.contentBounds.y + 287.0f,
+                        layout.contentBounds.y + 327.0f,
                         "Esc         Close window");
 }
 void Graphics::DrawSidePanelTabs()
@@ -3579,6 +3593,32 @@ void Graphics::DrawWorldHud(const Player &player)
     const std::string hp = std::to_string(player.GetCurrentHealth()) + " / " +
         std::to_string(player.GetMaximumHealth()) + " HP";
     SDL_RenderDebugText(renderer, 217.0f, 52.0f, hp.c_str());
+
+    if (!player.GetTutorialState().IsCompleted())
+    {
+        const std::array<const char *, 10> objectives{
+            "Talk to the guide at the crossroads",
+            "Gather a log from a tree",
+            "Make wooden planks at the crafting table",
+            "Mine both copper and tin ore",
+            "Smelt a bronze bar at the furnace",
+            "Craft a bronze sword",
+            "Equip a weapon from your bag",
+            "Defeat a training enemy",
+            "Take loot and deposit an item in the bank",
+            "Return to the guide and finish Gathering Basics"};
+        const int step = static_cast<int>(player.GetTutorialState().GetStep());
+        const SDL_FRect objectivePanel{18.0f, 86.0f, 430.0f, 48.0f};
+        SDL_SetRenderDrawColor(renderer, 20, 24, 28, 220);
+        SDL_RenderFillRect(renderer, &objectivePanel);
+        SDL_SetRenderDrawColor(renderer, 190, 151, 78, 255);
+        SDL_RenderRect(renderer, &objectivePanel);
+        SDL_SetRenderDrawColor(renderer, 250, 226, 170, 255);
+        const std::string heading = "NEXT STEP " + std::to_string(step + 1) + "/10";
+        SDL_RenderDebugText(renderer, 30.0f, 98.0f, heading.c_str());
+        SDL_SetRenderDrawColor(renderer, 235, 225, 202, 255);
+        SDL_RenderDebugText(renderer, 30.0f, 118.0f, objectives[step]);
+    }
 
     SDL_SetRenderDrawColor(renderer, 235, 225, 202, 220);
     SDL_RenderDebugText(renderer, 18.0f, WindowHeight - 20.0f,
@@ -4565,6 +4605,13 @@ bool Graphics::ConsumeInventoryDropRequest(int &slotIndex, int &amount)
     dropInventorySlotIndex = -1;
     dropInventoryAmount = 0;
     return true;
+}
+
+bool Graphics::ConsumeTutorialSkipRequest()
+{
+    const bool pending = tutorialSkipPending;
+    tutorialSkipPending = false;
+    return pending;
 }
 
 bool Graphics::ConsumeWeaponSlotClick()

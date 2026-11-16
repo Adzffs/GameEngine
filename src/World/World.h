@@ -295,6 +295,7 @@ private:
     void ProcessQueuedCommands();
     void ProcessMovementSystem();
     void ProcessGroundItemPickups();
+    void ProcessTutorialProgress();
     void ProcessInteractionSystem();
     bool PublishDialogueNode(const ActiveDialogueSession &session,
                              const DialogueNodeDefinition &node);

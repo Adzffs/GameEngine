@@ -170,6 +170,8 @@ bool PlayerSaveTextCodec::TryEncode(const PlayerSaveData &saveData, std::string 
     AppendScalar(encoded, "position_x", saveData.positionX);
     AppendScalar(encoded, "position_y", saveData.positionY);
     AppendScalar(encoded, "current_health", saveData.currentHealth);
+    AppendScalar(encoded, "tutorial_step", static_cast<int>(saveData.tutorialStep));
+    AppendScalar(encoded, "tutorial_skipped", saveData.tutorialSkipped ? 1 : 0);
     AppendScalar(encoded, "inventory_count", static_cast<int>(Inventory::SlotCount));
     for (std::size_t i = 0; i < saveData.inventorySlots.size(); ++i)
     {
@@ -266,7 +268,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
     }
     if (versionLine == -1)
     { result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD, -1, "Missing version"); return result; }
-    if (version != 1 && version != 2 && version != 3 && version != 4 &&
+    if (version != 1 && version != 2 && version != 3 && version != 4 && version != 5 &&
         version != CURRENT_PLAYER_SAVE_VERSION)
     { result.AddIssue(PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, versionLine, "Unsupported player save version"); return result; }
 
@@ -283,6 +285,10 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
     bool bankCountSeen = false;
     int declaredBankCount = -1;
     std::vector<SavedBankEntry> parsedBank;
+    bool tutorialStepSeen = false;
+    bool tutorialSkippedSeen = false;
+    int tutorialStepValue = 0;
+    int tutorialSkippedValue = 0;
     auto addInteger = [&](std::string_view value, int line, int &target)
     {
         const auto parsed = ParseInteger(value, target);
@@ -311,6 +317,20 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         if (key == "position_x") { scalar(1, lineNumber, value, save.positionX); continue; }
         if (key == "position_y") { scalar(2, lineNumber, value, save.positionY); continue; }
         if (key == "current_health") { scalar(3, lineNumber, value, save.currentHealth); continue; }
+        if (key == "tutorial_step" || key == "tutorial_skipped")
+        {
+            bool &seen = key == "tutorial_step" ? tutorialStepSeen : tutorialSkippedSeen;
+            int &target = key == "tutorial_step" ? tutorialStepValue : tutorialSkippedValue;
+            if (version != 6 || seen)
+            {
+                result.AddIssue(PlayerSaveTextIssueCode::DUPLICATE_FIELD,
+                    lineNumber, "Unexpected or duplicate tutorial field");
+                continue;
+            }
+            seen = true;
+            addInteger(value, lineNumber, target);
+            continue;
+        }
         if (key == "inventory_count" || key == "skill_count" || key == "equipment_count")
         {
             const std::size_t index = key == "inventory_count" ? 4 : key == "skill_count" ? 5 : 6;
@@ -323,7 +343,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         }
         if (key == "quest_count")
         {
-            if ((version != 3 && version != 4 && version != 5) || questCountSeen)
+            if ((version != 3 && version != 4 && version != 5 && version != 6) || questCountSeen)
             {
                 result.AddIssue(PlayerSaveTextIssueCode::DUPLICATE_FIELD,
                     lineNumber, "Unexpected or duplicate quest_count");
@@ -338,7 +358,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         }
         if (key == "bank_count")
         {
-            if (version != 5 || bankCountSeen)
+            if ((version != 5 && version != 6) || bankCountSeen)
             {
                 result.AddIssue(PlayerSaveTextIssueCode::DUPLICATE_FIELD,
                     lineNumber, "Unexpected or duplicate bank_count");
@@ -354,7 +374,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         }
         if (key.starts_with("bank."))
         {
-            if (version != 5)
+            if (version != 5 && version != 6)
             {
                 result.AddIssue(PlayerSaveTextIssueCode::UNKNOWN_FIELD,
                     lineNumber, "Legacy saves cannot contain bank records");
@@ -536,6 +556,28 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
                 result.AddIssue(PlayerSaveTextIssueCode::SAVE_DATA_VALIDATION_FAILED,
                     -1, "Bank records are not in canonical order");
     }
+    if (version == 6)
+    {
+        if (!tutorialStepSeen || !tutorialSkippedSeen)
+            result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD, -1,
+                "Missing tutorial state");
+        if (tutorialStepValue < static_cast<int>(TutorialStep::MEET_GUIDE) ||
+            tutorialStepValue > static_cast<int>(TutorialStep::COMPLETE) ||
+            (tutorialSkippedValue != 0 && tutorialSkippedValue != 1))
+            result.AddIssue(PlayerSaveTextIssueCode::SAVE_DATA_VALIDATION_FAILED,
+                -1, "Invalid tutorial state");
+        if (!questCountSeen || declaredQuestCount != 2 ||
+            declaredQuestCount != static_cast<int>(parsedQuests.size()) ||
+            parsedQuests.size() != 2 ||
+            parsedQuests[0].id != QuestId::GATHERING_BASICS ||
+            parsedQuests[1].id != QuestId::MINING_BASICS)
+            result.AddIssue(PlayerSaveTextIssueCode::INVALID_COUNT, -1,
+                "Version 6 requires the canonical quest catalogue");
+        if (!bankCountSeen ||
+            declaredBankCount != static_cast<int>(parsedBank.size()))
+            result.AddIssue(PlayerSaveTextIssueCode::INVALID_COUNT, -1,
+                "Version 6 bank count is invalid");
+    }
     if (!result.GetIssues().empty()) return result;
 
     save.skills.reserve(5); save.equipment.reserve(5);
@@ -569,7 +611,18 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
     }
     else
         save.quests = std::move(parsedQuests);
-    save.bank = version == 5 ? std::move(parsedBank) : std::vector<SavedBankEntry>{};
+    save.bank = (version == 5 || version == 6)
+        ? std::move(parsedBank) : std::vector<SavedBankEntry>{};
+    if (version == 6)
+    {
+        save.tutorialStep = static_cast<TutorialStep>(tutorialStepValue);
+        save.tutorialSkipped = tutorialSkippedValue == 1;
+    }
+    else
+    {
+        save.tutorialStep = TutorialStep::COMPLETE;
+        save.tutorialSkipped = true;
+    }
     save.version = CURRENT_PLAYER_SAVE_VERSION;
     result.validationReport = PlayerSaveState::Validate(save);
     if (!result.validationReport.IsValid())

@@ -175,6 +175,10 @@ struct BankCloseCommand
     int actorEntityID;
     BankSessionId sessionId;
 };
+struct SkipTutorialCommand
+{
+    int actorEntityID;
+};
 
 using ServerCommandData = std::variant<
     MoveCommand,
@@ -201,7 +205,8 @@ using ServerCommandData = std::variant<
     BankDepositCommand,
     BankWithdrawCommand,
     BankDepositInventoryCommand,
-    BankCloseCommand>;
+    BankCloseCommand,
+    SkipTutorialCommand>;
 
 struct ServerCommand
 {

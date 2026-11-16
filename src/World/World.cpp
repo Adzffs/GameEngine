@@ -1663,6 +1663,7 @@ void World::Update()
     ScheduleMonsterRespawnsFromDeathEvents();
     PublishActionLifecycleEvents();
     TickPlayerStatusEffects();
+    ProcessTutorialProgress();
 
     publishedCommandProcessingResults =
         std::move(pendingCommandProcessingResults);
@@ -1672,6 +1673,68 @@ void World::Update()
     pendingShopOpenedEvents.clear();
     publishedShopTransactionEvents = std::move(pendingShopTransactionEvents);
     pendingShopTransactionEvents.clear();
+}
+
+void World::ProcessTutorialProgress()
+{
+    for (const auto &owner : entityManager.GetEntities())
+    {
+        Player *player = dynamic_cast<Player *>(owner.get());
+        if (player == nullptr || player->GetTutorialState().IsCompleted()) continue;
+        const TutorialStep step = player->GetTutorialState().GetStep();
+        const Inventory &inventory = player->GetInventory();
+        bool complete = false;
+        switch (step)
+        {
+        case TutorialStep::MEET_GUIDE:
+            complete = dialogueSystem.GetSession(player->GetID()) != nullptr;
+            break;
+        case TutorialStep::GATHER_LOG:
+            complete = inventory.HasItem(ItemType::LOG) ||
+                inventory.HasItem(ItemType::OAK_LOG) ||
+                inventory.HasItem(ItemType::WILLOW_LOG);
+            break;
+        case TutorialStep::MAKE_PLANKS:
+            complete = inventory.HasItem(ItemType::WOODEN_PLANKS);
+            break;
+        case TutorialStep::MINE_ORES:
+            complete = inventory.HasItem(ItemType::COPPER_ORE) &&
+                inventory.HasItem(ItemType::TIN_ORE);
+            break;
+        case TutorialStep::SMELT_BRONZE:
+            complete = inventory.HasItem(ItemType::BRONZE_BAR);
+            break;
+        case TutorialStep::CRAFT_WEAPON:
+            complete = inventory.HasItem(ItemType::BRONZE_SWORD) ||
+                player->GetEquipment().IsEquipped(ItemType::BRONZE_SWORD);
+            break;
+        case TutorialStep::EQUIP_WEAPON:
+            complete = player->GetEquipment().GetEquippedItem(
+                EquipmentSlotType::WEAPON) != ItemType::NONE;
+            break;
+        case TutorialStep::SAFE_COMBAT:
+            complete = std::any_of(entityDiedEvents.begin(), entityDiedEvents.end(),
+                [&](const EntityDiedEvent &event)
+                {
+                    return event.killerEntityID == player->GetID();
+                });
+            break;
+        case TutorialStep::LOOT_AND_BANK:
+            complete = !player->GetBank().GetEntries().empty();
+            break;
+        case TutorialStep::RETURN_AND_CHOOSE:
+        {
+            const QuestRecord *gathering = player->GetQuestJournal().TryGet(
+                QuestId::GATHERING_BASICS);
+            complete = gathering != nullptr &&
+                gathering->state == QuestState::COMPLETED;
+            break;
+        }
+        case TutorialStep::COMPLETE:
+            break;
+        }
+        if (complete) player->GetTutorialState().Advance();
+    }
 }
 
 void World::ProcessGroundItemPickups()
@@ -1995,6 +2058,15 @@ void World::ProcessQueuedCommands()
                     if (session != nullptr && session->sessionId == data.sessionId)
                     {
                         CloseStationInteraction(data.actorEntityID);
+                        resultCode = CommandResultCode::ACCEPTED;
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, SkipTutorialCommand>)
+                {
+                    if (actor->IsAlive())
+                    {
+                        actor->GetTutorialState().Skip();
                         resultCode = CommandResultCode::ACCEPTED;
                     }
                 }

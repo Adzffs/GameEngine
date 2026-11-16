@@ -299,5 +299,34 @@ int main()
             "Closing a matching bank session invalidates further requests");
     }
 
+    {
+        World world;
+        const int playerID = world.CreatePlayer();
+        Player *player = GetPlayer(world, playerID);
+        player->GetTutorialState().TryRestore(TutorialStep::GATHER_LOG, false);
+        player->GetInventory().AddItem(ItemType::LOG, 1); world.Update();
+        test.Expect(player->GetTutorialState().GetStep() == TutorialStep::MAKE_PLANKS,
+            "Tutorial advances from authoritative gathered inventory");
+        player->GetInventory().AddItem(ItemType::WOODEN_PLANKS, 1); world.Update();
+        player->GetInventory().AddItem(ItemType::COPPER_ORE, 1);
+        player->GetInventory().AddItem(ItemType::TIN_ORE, 1); world.Update();
+        player->GetInventory().AddItem(ItemType::BRONZE_BAR, 1); world.Update();
+        player->GetInventory().AddItem(ItemType::BRONZE_SWORD, 1); world.Update();
+        test.Expect(player->GetTutorialState().GetStep() == TutorialStep::EQUIP_WEAPON,
+            "Crafting milestones advance in the authored sequence");
+        const int swordSlot = FindSlot(player->GetInventory(), ItemType::BRONZE_SWORD);
+        world.TryEquipInventoryItem(playerID, swordSlot); world.Update();
+        test.Expect(player->GetTutorialState().GetStep() == TutorialStep::SAFE_COMBAT,
+            "Equipping a real weapon advances preparation onboarding");
+        player->GetTutorialState().TryRestore(TutorialStep::LOOT_AND_BANK, false);
+        player->GetInventory().AddItem(ItemType::COINS, 1);
+        const int coinSlot = FindSlot(player->GetInventory(), ItemType::COINS);
+        player->GetBank().TryDeposit(player->GetInventory(), coinSlot, 1);
+        world.Update();
+        test.Expect(player->GetTutorialState().GetStep() ==
+                TutorialStep::RETURN_AND_CHOOSE,
+            "A committed bank deposit advances the loot-and-bank lesson");
+    }
+
     return test.Finish();
 }

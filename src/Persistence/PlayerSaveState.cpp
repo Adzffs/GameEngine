@@ -75,6 +75,8 @@ PlayerSaveData PlayerSaveState::Capture(const Player &player)
     saveData.positionX = player.GetPosition().GetX();
     saveData.positionY = player.GetPosition().GetY();
     saveData.currentHealth = player.GetCurrentHealth();
+    saveData.tutorialStep = player.GetTutorialState().GetStep();
+    saveData.tutorialSkipped = player.GetTutorialState().IsSkipped();
     for (const auto &[questId, record] :
          player.GetQuestJournal().GetRecords())
     {
@@ -128,6 +130,13 @@ PlayerSaveValidationReport PlayerSaveState::ValidateInternal(
             -1,
             "Current health must be positive");
     }
+    const int tutorialStep = static_cast<int>(saveData.tutorialStep);
+    if (tutorialStep < static_cast<int>(TutorialStep::MEET_GUIDE) ||
+        tutorialStep > static_cast<int>(TutorialStep::COMPLETE) ||
+        (saveData.tutorialSkipped &&
+         saveData.tutorialStep != TutorialStep::COMPLETE))
+        report.AddIssue(PlayerSaveValidationCode::INVALID_TUTORIAL_STATE, -1,
+            "Tutorial state is not canonical");
     QuestJournal questValidationJournal;
     std::vector<QuestRecord> questRecords;
     questRecords.reserve(saveData.quests.size());
@@ -375,6 +384,14 @@ std::unique_ptr<Player> PlayerSaveState::TryCreatePlayer(
     std::unique_ptr<Player> player = std::make_unique<Player>(
         runtimeEntityID,
         PlayerInitializationMode::EMPTY);
+    if (!player->GetTutorialState().TryRestore(
+            saveData.tutorialStep, saveData.tutorialSkipped))
+    {
+        validationReport.AddIssue(
+            PlayerSaveValidationCode::INTERNAL_RESTORE_FAILURE, -1,
+            "Validated tutorial state could not be restored");
+        return nullptr;
+    }
     std::vector<QuestRecord> restoredQuestRecords;
     restoredQuestRecords.reserve(saveData.quests.size());
     for (const SavedQuestRecord &saved : saveData.quests)

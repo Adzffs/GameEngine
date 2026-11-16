@@ -55,6 +55,7 @@ public:
     bool ConsumeInventorySlotClick(
         int &slotIndex);
     bool ConsumeInventoryDropRequest(int &slotIndex, int &amount);
+    bool ConsumeTutorialSkipRequest();
 
     bool ConsumeWeaponSlotClick();
     bool ConsumeRecipeRequest(
@@ -446,6 +447,7 @@ private:
     bool inventoryDropPending = false;
     int dropInventorySlotIndex = -1;
     int dropInventoryAmount = 0;
+    bool tutorialSkipPending = false;
 
     bool weaponSlotClickPending;
     bool recipeRequestPending;
