@@ -39,6 +39,7 @@ namespace
             left.positionX != right.positionX ||
             left.positionY != right.positionY ||
             left.currentHealth != right.currentHealth ||
+            left.combatStyle != right.combatStyle ||
             left.skills.size() != right.skills.size() ||
             left.equipment.size() != right.equipment.size())
         {
@@ -303,6 +304,7 @@ int main()
         original.GetSkills().AddXP(SkillType::ATTACK, 5000);
         original.GetSkills().AddXP(SkillType::DEFENCE, 2000);
         original.GetSkills().AddXP(SkillType::WOODCUTTING, INT_MAX);
+        original.TrySetCombatStyle(CombatStyle::AGGRESSIVE);
         std::array<InventorySlot, Inventory::SlotCount> slots{};
         slots[3].SetItem(ItemType::COINS, INT_MAX);
         slots[20].SetItem(ItemType::LOG, 1);
@@ -350,6 +352,8 @@ int main()
                 "INT_MAX XP level calculation terminates at level 99");
             test.Expect(restored->GetStatusEffectManager().GetActiveEffects().empty(),
                         "Restored Player has no status effects");
+            test.Expect(restored->GetCombatStyle() == CombatStyle::AGGRESSIVE,
+                        "Selected combat style restores exactly");
             PlayerSaveData recaptured = PlayerSaveState::Capture(*restored);
             test.Expect(SameSave(captured, recaptured),
                         "Capture restore capture round trip preserves every persistent field");
@@ -359,12 +363,19 @@ int main()
         }
     }
 
-    for (int version : {0, -1, 7})
+    for (int version : {0, -1, 8})
     {
         PlayerSaveData malformed = valid;
         malformed.version = version;
         ExpectRejected(test, malformed, PlayerSaveValidationCode::UNSUPPORTED_VERSION,
                        "Unsupported version rejects");
+    }
+    {
+        PlayerSaveData malformed = valid;
+        malformed.combatStyle = static_cast<CombatStyle>(99);
+        ExpectRejected(test, malformed,
+            PlayerSaveValidationCode::INVALID_COMBAT_STYLE,
+            "Unknown persisted combat style rejects");
     }
     for (int health : {0, -1})
     {

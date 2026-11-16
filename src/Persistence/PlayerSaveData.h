@@ -7,11 +7,12 @@
 #include "../Quest/QuestState.h"
 #include "../Quest/QuestId.h"
 #include "../Tutorial/TutorialState.h"
+#include "../Combat/CombatStyle.h"
 
 #include <array>
 #include <vector>
 
-inline constexpr int CURRENT_PLAYER_SAVE_VERSION = 6;
+inline constexpr int CURRENT_PLAYER_SAVE_VERSION = 7;
 
 struct SavedInventorySlot
 {
@@ -57,4 +58,5 @@ struct PlayerSaveData
     std::vector<SavedBankEntry> bank;
     TutorialStep tutorialStep = TutorialStep::MEET_GUIDE;
     bool tutorialSkipped = false;
+    CombatStyle combatStyle = CombatStyle::ACCURATE;
 };

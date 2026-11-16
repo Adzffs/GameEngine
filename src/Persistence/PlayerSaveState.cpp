@@ -77,6 +77,7 @@ PlayerSaveData PlayerSaveState::Capture(const Player &player)
     saveData.currentHealth = player.GetCurrentHealth();
     saveData.tutorialStep = player.GetTutorialState().GetStep();
     saveData.tutorialSkipped = player.GetTutorialState().IsSkipped();
+    saveData.combatStyle = player.GetCombatStyle();
     for (const auto &[questId, record] :
          player.GetQuestJournal().GetRecords())
     {
@@ -137,6 +138,9 @@ PlayerSaveValidationReport PlayerSaveState::ValidateInternal(
          saveData.tutorialStep != TutorialStep::COMPLETE))
         report.AddIssue(PlayerSaveValidationCode::INVALID_TUTORIAL_STATE, -1,
             "Tutorial state is not canonical");
+    if (!IsValidCombatStyle(saveData.combatStyle))
+        report.AddIssue(PlayerSaveValidationCode::INVALID_COMBAT_STYLE, -1,
+            "Combat style is not canonical");
     QuestJournal questValidationJournal;
     std::vector<QuestRecord> questRecords;
     questRecords.reserve(saveData.quests.size());
@@ -384,6 +388,13 @@ std::unique_ptr<Player> PlayerSaveState::TryCreatePlayer(
     std::unique_ptr<Player> player = std::make_unique<Player>(
         runtimeEntityID,
         PlayerInitializationMode::EMPTY);
+    if (!player->TrySetCombatStyle(saveData.combatStyle))
+    {
+        validationReport.AddIssue(
+            PlayerSaveValidationCode::INTERNAL_RESTORE_FAILURE, -1,
+            "Validated combat style could not be restored");
+        return nullptr;
+    }
     if (!player->GetTutorialState().TryRestore(
             saveData.tutorialStep, saveData.tutorialSkipped))
     {
