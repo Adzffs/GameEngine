@@ -63,6 +63,19 @@ public:
         const CraftingSessionSnapshot *session);
     const std::optional<CraftingSessionSnapshot> &
     GetCraftingSessionSnapshot() const;
+    struct CraftingInteractionRequest
+    {
+        int unifiedSlotIndex = -1;
+        ItemType inventoryItemType = ItemType::NONE;
+        bool rightClick = false;
+        bool shiftHeld = false;
+        bool collectMatching = false;
+        std::vector<int> dragSlotIndices;
+        bool clearCrafting = false;
+    };
+    std::optional<CraftingInteractionRequest> ConsumeCraftingInteractionRequest();
+    void SetCraftingInteractionInFlight(bool inFlight);
+    void ReconcileCraftingInteractionResult(CommandResultCode result);
     std::optional<ServerCommandData> ConsumeDialogueCommand();
     std::optional<ServerCommandData> ConsumeShopCommand();
     void SetShopCommandInFlight(bool inFlight);
@@ -214,6 +227,7 @@ public:
         SDL_FRect panelBounds;
         SDL_FRect closeButton;
         std::array<SDL_FRect, 9> gridSlots;
+        std::array<SDL_FRect, Inventory::SlotCount> inventorySlots;
         std::array<SDL_FRect, 2> ingredientButtons;
         SDL_FRect clearButton;
         SDL_FRect craftButton;
@@ -240,7 +254,10 @@ public:
 
     void HandleStationMenuClick(
         float mouseX,
-        float mouseY);
+        float mouseY,
+        bool rightClick = false,
+        bool shiftHeld = false,
+        bool doubleClick = false);
 
     bool IsPointInsideRectangle(
         float pointX,
@@ -375,8 +392,14 @@ private:
     bool recipeCommandInFlight = false;
     bool recipeActionActive = false;
     std::optional<CraftingSessionSnapshot> craftingSessionSnapshot;
+    std::optional<CraftingInteractionRequest> pendingCraftingInteraction;
+    bool craftingInteractionInFlight = false;
+    bool craftingDragActive = false;
+    bool craftingDragRightClick = false;
+    std::vector<int> craftingDragSlotIndices;
     int displayedLogCount = 0;
     int displayedPlankCount = 0;
+    std::array<InventorySlot, Inventory::SlotCount> displayedInventorySlots{};
     std::string stationFeedback;
 
     bool stationMenuOpen;

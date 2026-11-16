@@ -274,5 +274,43 @@ int main()
                     "Stale or item-creating shared replacements leave all containers unchanged");
     }
 
+    {
+        Inventory inventory;
+        inventory.AddItem(ItemType::COINS, 12);
+        inventory.AddItem(ItemType::LOG, 1);
+        CraftingSessionSnapshot session{};
+        session.sessionId = 42;
+        session.actorEntityID = 7;
+        CraftingInteractionModel model(inventory, session);
+        int coinSlot = -1;
+        int logSlot = -1;
+        int emptySlot = -1;
+        for (int index = 0; index < Inventory::SlotCount; ++index)
+        {
+            if (model.GetSlots()[index].GetItemType() == ItemType::COINS) coinSlot = index;
+            if (model.GetSlots()[index].GetItemType() == ItemType::LOG) logSlot = index;
+            if (model.GetSlots()[index].IsEmpty() && emptySlot < 0) emptySlot = index;
+        }
+        test.Expect(model.TryLeftClick(coinSlot),
+                    "Left click picks up an inventory stack into the shared cursor");
+        const std::array<int, 3> leftDrag{
+            Inventory::SlotCount, Inventory::SlotCount + 1, Inventory::SlotCount + 2};
+        test.Expect(model.TryLeftDrag(leftDrag) && model.GetCursor().IsEmpty() &&
+                        model.GetSlots()[Inventory::SlotCount].GetAmount() == 4,
+                    "Left drag distributes evenly across crafting slots");
+        test.Expect(model.TryRightClick(Inventory::SlotCount) &&
+                        model.GetCursor().GetAmount() == 2,
+                    "Right click splits a crafting stack into the shared cursor");
+        const std::array<int, 2> rightDrag{
+            Inventory::SlotCount + 3, emptySlot};
+        test.Expect(model.TryRightDrag(rightDrag) && model.GetCursor().IsEmpty(),
+                    "Right drag places one across crafting and inventory slots");
+        test.Expect(model.TryShiftTransfer(logSlot),
+                    "Shift transfer moves inventory items into the crafting surface");
+        test.Expect(model.TryLeftClick(Inventory::SlotCount + 1) &&
+                        model.TryCollectMatching(),
+                    "Double-click model collection gathers matching stacks across both containers");
+    }
+
     return test.Finish();
 }

@@ -168,6 +168,9 @@ void Graphics::DismissStationMenu(
     requestedCraftingGrid.fill(ItemType::NONE);
     craftingGrid.fill(ItemType::NONE);
     selectedCraftingItem = ItemType::NONE;
+    pendingCraftingInteraction.reset();
+    craftingDragActive = false;
+    craftingDragSlotIndices.clear();
     stationFeedback.clear();
     stationMenuClosePending = false;
 
@@ -204,7 +207,7 @@ Graphics::FurnaceMenuLayout Graphics::GetFurnaceMenuLayout() const
 
 Graphics::CraftingTableLayout Graphics::GetCraftingTableLayout() const
 {
-    constexpr float menuWidth = 680.0f;
+    constexpr float menuWidth = 820.0f;
     constexpr float menuHeight = 470.0f;
     constexpr float slotSize = 64.0f;
     constexpr float slotGap = 8.0f;
@@ -237,16 +240,30 @@ Graphics::CraftingTableLayout Graphics::GetCraftingTableLayout() const
             slotSize};
     }
 
+    const float inventoryX = menuX + 300.0f;
+    const float inventoryY = menuY + 92.0f;
+    constexpr float inventorySlotSize = 36.0f;
+    constexpr float inventoryGap = 4.0f;
+    for (std::size_t index = 0; index < layout.inventorySlots.size(); ++index)
+    {
+        const float column = static_cast<float>(index % 4);
+        const float row = static_cast<float>(index / 4);
+        layout.inventorySlots[index] = {
+            inventoryX + column * (inventorySlotSize + inventoryGap),
+            inventoryY + row * (inventorySlotSize + inventoryGap),
+            inventorySlotSize, inventorySlotSize};
+    }
+
     layout.ingredientButtons = {{
-        {menuX + 300.0f, menuY + 92.0f, 330.0f, 48.0f},
-        {menuX + 300.0f, menuY + 150.0f, 330.0f, 48.0f},
+        {menuX + 490.0f, menuY + 92.0f, 280.0f, 48.0f},
+        {menuX + 490.0f, menuY + 150.0f, 280.0f, 48.0f},
     }};
     layout.previewBounds = {
-        menuX + 300.0f, menuY + 218.0f, 330.0f, 88.0f};
+        menuX + 490.0f, menuY + 218.0f, 280.0f, 88.0f};
     layout.clearButton = {
         menuX + 40.0f, menuY + 338.0f, 150.0f, 42.0f};
     layout.craftButton = {
-        menuX + 480.0f, menuY + 338.0f, 150.0f, 42.0f};
+        menuX + 620.0f, menuY + 338.0f, 150.0f, 42.0f};
     return layout;
 }
 
@@ -293,9 +310,12 @@ bool Graphics::IsPointInsideRectangle(
 
 void Graphics::HandleStationMenuClick(
     float mouseX,
-    float mouseY)
+    float mouseY,
+    bool rightClick,
+    bool shiftHeld,
+    bool doubleClick)
 {
-    if (!stationMenuOpen || recipeCommandInFlight)
+    if (!stationMenuOpen || recipeCommandInFlight || craftingInteractionInFlight)
     {
         return;
     }
@@ -356,6 +376,26 @@ void Graphics::HandleStationMenuClick(
         return;
     }
 
+    for (std::size_t index = 0; index < layout.inventorySlots.size(); ++index)
+    {
+        if (!IsPointInsideRectangle(mouseX, mouseY, layout.inventorySlots[index]))
+            continue;
+        const int unifiedIndex = static_cast<int>(index);
+        if (craftingSessionSnapshot.has_value() &&
+            !craftingSessionSnapshot->cursor.IsEmpty() && !shiftHeld && !doubleClick)
+        {
+            craftingDragActive = true;
+            craftingDragRightClick = rightClick;
+            craftingDragSlotIndices = {unifiedIndex};
+        }
+        else
+            pendingCraftingInteraction = CraftingInteractionRequest{
+                unifiedIndex, ItemType::NONE, rightClick, shiftHeld,
+                doubleClick, {}, false};
+        stationFeedback.clear();
+        return;
+    }
+
     const std::array<ItemType, 2> ingredients{
         ItemType::LOG,
         ItemType::WOODEN_PLANKS};
@@ -370,6 +410,8 @@ void Graphics::HandleStationMenuClick(
                 layout.ingredientButtons[index]) &&
             GetDisplayedCraftingItemCount(ingredients[index]) > 0)
         {
+            pendingCraftingInteraction = CraftingInteractionRequest{
+                -1, ingredients[index], rightClick, shiftHeld, doubleClick, {}, false};
             selectedCraftingItem = ingredients[index];
             stationFeedback.clear();
             return;
@@ -388,27 +430,34 @@ void Graphics::HandleStationMenuClick(
             continue;
         }
 
+        const int unifiedIndex = Inventory::SlotCount + static_cast<int>(index);
+        if (craftingSessionSnapshot.has_value() &&
+            !craftingSessionSnapshot->cursor.IsEmpty() && !shiftHeld && !doubleClick)
+        {
+            craftingDragActive = true;
+            craftingDragRightClick = rightClick;
+            craftingDragSlotIndices = {unifiedIndex};
+        }
+        else
+        {
+            pendingCraftingInteraction = CraftingInteractionRequest{
+                unifiedIndex, ItemType::NONE, rightClick, shiftHeld, doubleClick, {}, false};
+        }
         if (craftingGrid[index] != ItemType::NONE)
-        {
             craftingGrid[index] = ItemType::NONE;
-            stationFeedback.clear();
-            return;
-        }
-
-        if (selectedCraftingItem != ItemType::NONE &&
-            GetCraftingGridItemCount(selectedCraftingItem) <
-                GetDisplayedCraftingItemCount(selectedCraftingItem))
-        {
+        else if (selectedCraftingItem != ItemType::NONE &&
+                 GetCraftingGridItemCount(selectedCraftingItem) <
+                     GetDisplayedCraftingItemCount(selectedCraftingItem))
             craftingGrid[index] = selectedCraftingItem;
-            stationFeedback.clear();
-        }
-
+        stationFeedback.clear();
         return;
     }
 
     if (IsPointInsideRectangle(
             mouseX, mouseY, layout.clearButton))
     {
+        pendingCraftingInteraction = CraftingInteractionRequest{
+            -1, ItemType::NONE, false, false, false, {}, true};
         craftingGrid.fill(ItemType::NONE);
         stationFeedback.clear();
         return;
@@ -529,7 +578,7 @@ void Graphics::DrawStationMenu()
     SDL_RenderDebugText(renderer,
         layout.panelBounds.x + 300.0f,
         layout.panelBounds.y + 68.0f,
-        "MATERIALS");
+        "INVENTORY");
 
     SDL_SetRenderDrawColor(renderer, 65, 58, 50, 255);
     for (const SDL_FRect &slot : layout.gridSlots)
@@ -548,6 +597,32 @@ void Graphics::DrawStationMenu()
         DrawCraftingItemIcon(
             craftingGrid[index],
             layout.gridSlots[index]);
+    }
+
+    for (std::size_t index = 0; index < layout.inventorySlots.size(); ++index)
+    {
+        const SDL_FRect &bounds = layout.inventorySlots[index];
+        SDL_SetRenderDrawColor(renderer, 55, 55, 55, 255);
+        SDL_RenderFillRect(renderer, &bounds);
+        SDL_SetRenderDrawColor(renderer, 120, 120, 120, 255);
+        SDL_RenderRect(renderer, &bounds);
+        const InventorySlot &slot = displayedInventorySlots[index];
+        if (slot.IsEmpty()) continue;
+        DrawCraftingItemIcon(slot.GetItemType(), bounds);
+        DrawLogIcon(slot.GetItemType(), bounds.x, bounds.y, bounds.w);
+        DrawOreIcon(slot.GetItemType(), bounds.x, bounds.y, bounds.w);
+        DrawAxeIcon(slot.GetItemType(), bounds.x, bounds.y, bounds.w);
+        DrawSwordIcon(slot.GetItemType(), bounds.x, bounds.y, bounds.w);
+        DrawPickaxeIcon(slot.GetItemType(), bounds.x, bounds.y, bounds.w);
+        DrawBarIcon(slot.GetItemType(), bounds.x, bounds.y, bounds.w);
+        DrawFoodIcon(slot.GetItemType(), bounds.x, bounds.y, bounds.w);
+        if (slot.GetAmount() > 1)
+        {
+            const std::string amount = std::to_string(slot.GetAmount());
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderDebugText(renderer, bounds.x + 3.0f, bounds.y + 23.0f,
+                                amount.c_str());
+        }
     }
 
     const std::array<ItemType, 2> ingredientTypes{
@@ -660,6 +735,39 @@ void Graphics::DrawStationMenu()
             layout.panelBounds.x + 40.0f,
             layout.panelBounds.y + 410.0f,
             stationFeedback.c_str());
+    }
+
+    if (craftingSessionSnapshot.has_value() &&
+        !craftingSessionSnapshot->cursor.IsEmpty())
+    {
+        float mouseX = 0.0f;
+        float mouseY = 0.0f;
+        SDL_GetMouseState(&mouseX, &mouseY);
+        const SDL_FRect cursorBounds{mouseX - 24.0f, mouseY - 24.0f, 48.0f, 48.0f};
+        DrawCraftingItemIcon(
+            craftingSessionSnapshot->cursor.GetItemType(), cursorBounds);
+        DrawLogIcon(craftingSessionSnapshot->cursor.GetItemType(),
+                    cursorBounds.x, cursorBounds.y, cursorBounds.w);
+        DrawOreIcon(craftingSessionSnapshot->cursor.GetItemType(),
+                    cursorBounds.x, cursorBounds.y, cursorBounds.w);
+        DrawAxeIcon(craftingSessionSnapshot->cursor.GetItemType(),
+                    cursorBounds.x, cursorBounds.y, cursorBounds.w);
+        DrawSwordIcon(craftingSessionSnapshot->cursor.GetItemType(),
+                      cursorBounds.x, cursorBounds.y, cursorBounds.w);
+        DrawPickaxeIcon(craftingSessionSnapshot->cursor.GetItemType(),
+                        cursorBounds.x, cursorBounds.y, cursorBounds.w);
+        DrawBarIcon(craftingSessionSnapshot->cursor.GetItemType(),
+                    cursorBounds.x, cursorBounds.y, cursorBounds.w);
+        DrawFoodIcon(craftingSessionSnapshot->cursor.GetItemType(),
+                     cursorBounds.x, cursorBounds.y, cursorBounds.w);
+        if (craftingSessionSnapshot->cursor.GetAmount() > 1)
+        {
+            const std::string amount =
+                std::to_string(craftingSessionSnapshot->cursor.GetAmount());
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderDebugText(renderer, mouseX + 10.0f, mouseY + 10.0f,
+                                amount.c_str());
+        }
     }
 }
 
@@ -936,6 +1044,42 @@ void Graphics::ProcessEvents(bool &running)
 
     while (SDL_PollEvent(&event))
     {
+        if (craftingDragActive && event.type == SDL_EVENT_MOUSE_MOTION &&
+            stationMenuOpen && openStationType == StationType::CRAFTING_TABLE)
+        {
+            const CraftingTableLayout layout = GetCraftingTableLayout();
+            for (std::size_t index = 0; index < layout.inventorySlots.size(); ++index)
+                if (IsPointInsideRectangle(event.motion.x, event.motion.y,
+                                           layout.inventorySlots[index]))
+                {
+                    const int unified = static_cast<int>(index);
+                    if (std::find(craftingDragSlotIndices.begin(),
+                                  craftingDragSlotIndices.end(), unified) ==
+                        craftingDragSlotIndices.end())
+                        craftingDragSlotIndices.push_back(unified);
+                }
+            for (std::size_t index = 0; index < layout.gridSlots.size(); ++index)
+                if (IsPointInsideRectangle(event.motion.x, event.motion.y,
+                                           layout.gridSlots[index]))
+                {
+                    const int unified = Inventory::SlotCount + static_cast<int>(index);
+                    if (std::find(craftingDragSlotIndices.begin(),
+                                  craftingDragSlotIndices.end(), unified) ==
+                        craftingDragSlotIndices.end())
+                        craftingDragSlotIndices.push_back(unified);
+                }
+            continue;
+        }
+        if (craftingDragActive && event.type == SDL_EVENT_MOUSE_BUTTON_UP)
+        {
+            pendingCraftingInteraction = CraftingInteractionRequest{
+                craftingDragSlotIndices.empty() ? -1 : craftingDragSlotIndices.front(),
+                ItemType::NONE, craftingDragRightClick, false, false,
+                craftingDragSlotIndices, false};
+            craftingDragActive = false;
+            craftingDragSlotIndices.clear();
+            continue;
+        }
         if (event.type == SDL_EVENT_QUIT)
         {
             running = false;
@@ -966,7 +1110,8 @@ void Graphics::ProcessEvents(bool &running)
         }
 
         if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
-            event.button.button == SDL_BUTTON_LEFT)
+            (event.button.button == SDL_BUTTON_LEFT ||
+             event.button.button == SDL_BUTTON_RIGHT))
         {
             if (renderer != nullptr &&
                 !SDL_ConvertEventToRenderCoordinates(renderer, &event))
@@ -992,7 +1137,10 @@ void Graphics::ProcessEvents(bool &running)
             {
                 HandleStationMenuClick(
                     event.button.x,
-                    event.button.y);
+                    event.button.y,
+                    event.button.button == SDL_BUTTON_RIGHT,
+                    (SDL_GetModState() & SDL_KMOD_SHIFT) != 0,
+                    event.button.clicks > 1);
 
                 continue;
             }
@@ -1491,12 +1639,34 @@ void Graphics::SynchronizeCraftingSession(
         return;
     }
     craftingSessionSnapshot = *session;
+    for (std::size_t index = 0; index < craftingGrid.size(); ++index)
+        craftingGrid[index] = session->inputSlots[index].GetItemType();
 }
 
 const std::optional<CraftingSessionSnapshot> &
 Graphics::GetCraftingSessionSnapshot() const
 {
     return craftingSessionSnapshot;
+}
+
+std::optional<Graphics::CraftingInteractionRequest>
+Graphics::ConsumeCraftingInteractionRequest()
+{
+    std::optional<CraftingInteractionRequest> request = pendingCraftingInteraction;
+    pendingCraftingInteraction.reset();
+    return request;
+}
+
+void Graphics::SetCraftingInteractionInFlight(bool inFlight)
+{
+    craftingInteractionInFlight = inFlight;
+}
+
+void Graphics::ReconcileCraftingInteractionResult(CommandResultCode result)
+{
+    stationFeedback = result == CommandResultCode::ACCEPTED
+        ? "Inventory updated"
+        : "Inventory interaction rejected by server";
 }
 
 bool Graphics::ConsumeStationMenuClose()
@@ -3717,6 +3887,7 @@ void Graphics::Render(
     displayedCurrency = inventory.GetItemAmount(ItemType::COINS);
     displayedLogCount = inventory.GetItemAmount(ItemType::LOG);
     displayedPlankCount = inventory.GetItemAmount(ItemType::WOODEN_PLANKS);
+    displayedInventorySlots = inventory.GetSlots();
     recipeActionActive =
         activeAction != nullptr &&
         activeAction->GetType() == ActionType::RECIPE;

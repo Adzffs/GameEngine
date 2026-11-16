@@ -10,6 +10,7 @@
 #include "../Player/Player.h"
 #include "../Skills/SkillType.h"
 #include "../Recipe/RecipeType.h"
+#include "../Recipe/CraftingInteractionModel.h"
 #include "EngineClickRouting.h"
 
 namespace
@@ -130,6 +131,7 @@ bool Engine::Run()
         SynchronizeRecipeCommand();
         graphics.SynchronizeCraftingSession(
             world.GetCraftingSession(playerID));
+        SynchronizeCraftingInteraction();
         graphics.ProcessEvents(running);
 
         if (!running)
@@ -140,6 +142,7 @@ bool Engine::Run()
         EnqueuePendingDialogueCommand();
         EnqueuePendingShopCommand();
         EnqueuePendingRecipeCommand();
+        EnqueuePendingCraftingInteraction();
 
         int clickedInventorySlot = -1;
 
@@ -428,7 +431,7 @@ void Engine::SynchronizeRecipeCommand()
 
 bool Engine::EnqueuePendingRecipeCommand()
 {
-    if (pendingRecipeCommand.has_value() ||
+    if (pendingRecipeCommand.has_value() || pendingCraftingInteraction.has_value() ||
         !graphics.IsStationMenuOpen())
     {
         return false;
@@ -443,6 +446,25 @@ bool Engine::EnqueuePendingRecipeCommand()
 
     if (graphics.ConsumeCraftingGridRequest(grid))
     {
+        Player *player = dynamic_cast<Player *>(world.GetEntityByID(playerID));
+        const CraftingSessionSnapshot *session = world.GetCraftingSession(playerID);
+        if (player != nullptr && session != nullptr)
+        {
+            CraftingInteractionModel model(player->GetInventory(), *session);
+            bool moved = false;
+            for (int index = 0; index < CraftingInteractionModel::CraftingSlotCount; ++index)
+                moved = model.TryShiftTransfer(Inventory::SlotCount + index) || moved;
+            if (moved)
+            {
+                const ReplaceCraftingInteractionStateCommand staged = model.BuildCommand();
+                pendingCraftingInteraction = PendingCraftingInteraction{
+                    world.EnqueueCommand(staged), staged.actorEntityID,
+                    staged.sessionId, staged.expectedRevision, grid};
+                graphics.SetCraftingInteractionInFlight(true);
+                graphics.SetRecipeCommandInFlight(true);
+                return true;
+            }
+        }
         command = CraftRecipeCommand{playerID, grid};
         commandType =
             PendingRecipeCommandType::CRAFTING_GRID;
@@ -465,6 +487,91 @@ bool Engine::EnqueuePendingRecipeCommand()
         commandType};
     graphics.SetRecipeCommandInFlight(true);
     return true;
+}
+
+bool Engine::EnqueuePendingCraftingInteraction()
+{
+    if (pendingCraftingInteraction.has_value()) return false;
+    std::optional<Graphics::CraftingInteractionRequest> request =
+        graphics.ConsumeCraftingInteractionRequest();
+    if (!request.has_value()) return false;
+    Player *player = dynamic_cast<Player *>(world.GetEntityByID(playerID));
+    const CraftingSessionSnapshot *session = world.GetCraftingSession(playerID);
+    if (player == nullptr || session == nullptr) return false;
+
+    CraftingInteractionModel model(player->GetInventory(), *session);
+    int slotIndex = request->unifiedSlotIndex;
+    if (slotIndex < 0 && request->inventoryItemType != ItemType::NONE)
+        slotIndex = FindInventorySlot(player->GetInventory(), request->inventoryItemType);
+    if (slotIndex < 0 && !request->clearCrafting) return false;
+
+    bool changed = false;
+    if (request->clearCrafting)
+    {
+        for (int index = 0; index < CraftingInteractionModel::CraftingSlotCount; ++index)
+            changed = model.TryShiftTransfer(Inventory::SlotCount + index) || changed;
+    }
+    else if (!request->dragSlotIndices.empty())
+        changed = request->rightClick
+            ? model.TryRightDrag(request->dragSlotIndices)
+            : model.TryLeftDrag(request->dragSlotIndices);
+    else if (request->collectMatching)
+    {
+        if (model.GetCursor().IsEmpty())
+            changed = model.TryLeftClick(slotIndex);
+        changed = model.TryCollectMatching() || changed;
+    }
+    else if (request->shiftHeld)
+        changed = model.TryShiftTransfer(slotIndex);
+    else
+        changed = request->rightClick
+            ? model.TryRightClick(slotIndex)
+            : model.TryLeftClick(slotIndex);
+    if (!changed) return false;
+    const ReplaceCraftingInteractionStateCommand command = model.BuildCommand();
+    pendingCraftingInteraction = PendingCraftingInteraction{
+        world.EnqueueCommand(command), command.actorEntityID,
+        command.sessionId, command.expectedRevision, std::nullopt};
+    graphics.SetCraftingInteractionInFlight(true);
+    return true;
+}
+
+void Engine::SynchronizeCraftingInteraction()
+{
+    if (!pendingCraftingInteraction.has_value()) return;
+    for (const CommandProcessingResult &result : world.GetCommandProcessingResults())
+    {
+        if (result.commandID != pendingCraftingInteraction->commandID ||
+            result.actorEntityID != pendingCraftingInteraction->actorEntityID) continue;
+        graphics.ReconcileCraftingInteractionResult(result.resultCode);
+        if (pendingCraftingInteraction->deferredCraftingGrid.has_value())
+        {
+            if (result.resultCode == CommandResultCode::ACCEPTED)
+            {
+                const CraftingRecipeMatcher::Grid grid =
+                    *pendingCraftingInteraction->deferredCraftingGrid;
+                pendingRecipeCommand = PendingRecipeCommand{
+                    world.EnqueueCommand(CraftRecipeCommand{playerID, grid}),
+                    playerID, StationType::CRAFTING_TABLE,
+                    PendingRecipeCommandType::CRAFTING_GRID};
+            }
+            else
+                graphics.SetRecipeCommandInFlight(false);
+        }
+        pendingCraftingInteraction.reset();
+        graphics.SetCraftingInteractionInFlight(false);
+        return;
+    }
+    const CraftingSessionSnapshot *session =
+        world.GetCraftingSession(pendingCraftingInteraction->actorEntityID);
+    if (session == nullptr ||
+        session->sessionId != pendingCraftingInteraction->sessionID)
+    {
+        if (pendingCraftingInteraction->deferredCraftingGrid.has_value())
+            graphics.SetRecipeCommandInFlight(false);
+        pendingCraftingInteraction.reset();
+        graphics.SetCraftingInteractionInFlight(false);
+    }
 }
 
 void Engine::ClearPendingRecipeCommand()
