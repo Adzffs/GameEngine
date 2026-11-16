@@ -4157,7 +4157,9 @@ void Graphics::DrawFoodIcon(
 }
 
 void Graphics::DrawInventory(
-    const Inventory &inventory)
+    const Inventory &inventory,
+    const Equipment *equipment,
+    const Player *player)
 {
     constexpr int columns = 7;
     constexpr int rows = 4;
@@ -4328,11 +4330,54 @@ void Graphics::DrawInventory(
     if (hoveredSlot >= 0 && !inventory.GetSlots()[hoveredSlot].IsEmpty())
     {
         const InventorySlot &slot = inventory.GetSlots()[hoveredSlot];
-        const std::string itemName = ItemDatabase::Get(slot.GetItemType()).GetName();
+        const ItemDefinition &definition = ItemDatabase::Get(slot.GetItemType());
+        const std::string itemName = definition.GetName();
         SDL_RenderDebugText(renderer, panelX + 13.0f, helpY, itemName.c_str());
         SDL_SetRenderDrawColor(renderer, 185, 190, 190, 255);
-        SDL_RenderDebugText(renderer, panelX + 13.0f, helpY + 22.0f,
-                            "Left: use/equip   Right: drop 1");
+        if (definition.IsFood())
+        {
+            const std::string healing = "Heals " + std::to_string(
+                definition.GetFoodDefinition()->healAmount) + " HP";
+            SDL_RenderDebugText(renderer, panelX + 13.0f, helpY + 22.0f,
+                healing.c_str());
+        }
+        else if (definition.IsEquippable() && equipment != nullptr)
+        {
+            StatBlock previous;
+            const ItemType equipped = equipment->GetEquippedItem(
+                definition.GetEquipmentSlot());
+            if (equipped != ItemType::NONE)
+                previous = ItemDatabase::Get(equipped).GetEquipmentStatBonuses();
+            const StatBlock &next = definition.GetEquipmentStatBonuses();
+            auto signedValue = [](int value)
+            {
+                return std::string(value >= 0 ? "+" : "") +
+                    std::to_string(value);
+            };
+            const std::string comparison =
+                "ATK " + signedValue(next.Get(StatType::ATTACK_ACCURACY) -
+                    previous.Get(StatType::ATTACK_ACCURACY)) +
+                "  STR " + signedValue(next.Get(StatType::MELEE_STRENGTH) -
+                    previous.Get(StatType::MELEE_STRENGTH)) +
+                "  DEF " + signedValue(next.Get(StatType::DEFENCE) -
+                    previous.Get(StatType::DEFENCE));
+            SDL_RenderDebugText(renderer, panelX + 13.0f, helpY + 22.0f,
+                comparison.c_str());
+            if (definition.HasSkillRequirement() && player != nullptr)
+            {
+                const int level = player->GetSkills().GetSkill(
+                    definition.GetRequiredSkill()).GetLevel();
+                const std::string requirement = "Requires level " +
+                    std::to_string(definition.GetRequiredSkillLevel()) +
+                    (level >= definition.GetRequiredSkillLevel()
+                        ? " - READY" : " - NOT MET");
+                SDL_RenderDebugText(renderer, panelX + 13.0f, helpY + 42.0f,
+                    requirement.c_str());
+            }
+        }
+        else
+            SDL_RenderDebugText(renderer, panelX + 13.0f, helpY + 22.0f,
+                                "Left: use/equip   Right: drop 1");
     }
     else
     {
@@ -4345,7 +4390,8 @@ void Graphics::DrawInventory(
 }
 
 void Graphics::DrawEquipment(
-    const Equipment &equipment)
+    const Equipment &equipment,
+    const Inventory *inventory)
 {
     const SidePanelLayout layout = GetSidePanelLayout();
     const float panelX = layout.panelBounds.x;
@@ -4462,6 +4508,36 @@ void Graphics::DrawEquipment(
             slot.y,
             slotSize);
     }
+
+    const StatBlock totals = equipment.GetTotalStatBonuses();
+    const float summaryX = panelX + 210.0f;
+    SDL_SetRenderDrawColor(renderer, 235, 215, 165, 255);
+    SDL_RenderDebugText(renderer, summaryX, panelY + 50.0f, "PREPARATION");
+    SDL_SetRenderDrawColor(renderer, 220, 220, 215, 255);
+    const std::string attack = "Attack  " + std::to_string(
+        totals.Get(StatType::ATTACK_ACCURACY));
+    const std::string strength = "Strength " + std::to_string(
+        totals.Get(StatType::MELEE_STRENGTH));
+    const std::string defence = "Defence " + std::to_string(
+        totals.Get(StatType::DEFENCE));
+    SDL_RenderDebugText(renderer, summaryX, panelY + 78.0f, attack.c_str());
+    SDL_RenderDebugText(renderer, summaryX, panelY + 98.0f, strength.c_str());
+    SDL_RenderDebugText(renderer, summaryX, panelY + 118.0f, defence.c_str());
+    const bool hasWeapon = equipment.GetEquippedItem(
+        EquipmentSlotType::WEAPON) != ItemType::NONE;
+    int foodCount = 0;
+    if (inventory != nullptr)
+        for (const InventorySlot &slot : inventory->GetSlots())
+            if (!slot.IsEmpty() && ItemDatabase::Get(slot.GetItemType()).IsFood())
+                foodCount += slot.GetAmount();
+    SDL_SetRenderDrawColor(renderer,
+        hasWeapon ? 120 : 225, hasWeapon ? 210 : 105, 90, 255);
+    SDL_RenderDebugText(renderer, summaryX, panelY + 154.0f,
+        hasWeapon ? "Weapon: READY" : "Weapon: MISSING");
+    SDL_SetRenderDrawColor(renderer,
+        foodCount > 0 ? 120 : 225, foodCount > 0 ? 210 : 150, 90, 255);
+    const std::string food = "Food: " + std::to_string(foodCount);
+    SDL_RenderDebugText(renderer, summaryX, panelY + 176.0f, food.c_str());
 }
 
 bool Graphics::ConsumeInventorySlotClick(
@@ -4775,11 +4851,11 @@ void Graphics::Render(
     switch (selectedTab)
     {
     case SidePanelTab::INVENTORY:
-        DrawInventory(inventory);
+        DrawInventory(inventory, &equipment, &player);
         break;
 
     case SidePanelTab::EQUIPMENT:
-        DrawEquipment(equipment);
+        DrawEquipment(equipment, &inventory);
         break;
 
     case SidePanelTab::SKILLS:

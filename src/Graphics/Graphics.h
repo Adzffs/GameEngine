@@ -377,10 +377,13 @@ public:
         const std::vector<CraftingStation> &stations);
     void DrawGroundItems(const std::vector<GroundItem> &groundItems);
     void DrawInventory(
-        const Inventory &inventory);
+        const Inventory &inventory,
+        const Equipment *equipment = nullptr,
+        const Player *player = nullptr);
     void DrawSkills(const Player &player);
     void DrawEquipment(
-        const Equipment &equipment);
+        const Equipment &equipment,
+        const Inventory *inventory = nullptr);
     void DrawAxeIcon(
         ItemType itemType,
         float x,
