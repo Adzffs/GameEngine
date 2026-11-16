@@ -222,6 +222,18 @@ public:
     const std::vector<EntityDiedEvent> &
     GetEntityDiedEvents() const;
 
+    struct PlayerDeathRecovery
+    {
+        int playerEntityID;
+        int killerEntityID;
+        int deathX;
+        int deathY;
+        int respawnTick;
+    };
+
+    const PlayerDeathRecovery *GetPlayerDeathRecovery(
+        int playerEntityID) const;
+
     const std::vector<ActionLifecycleEvent> &
     GetActionLifecycleEvents() const;
 
@@ -448,6 +460,7 @@ private:
         int killerEntityID);
 
     void ProcessDeadCombatantCleanup();
+    void ProcessPlayerRespawns();
     void ProcessEntityDeathRewards();
     void TickPlayerStatusEffects();
     void ScheduleMonsterRespawnsFromDeathEvents();
@@ -473,6 +486,8 @@ private:
 
     std::set<int> processedDeathEntityIDs;
     std::vector<EntityDiedEvent> entityDiedEvents;
+    std::map<int, PlayerDeathRecovery> playerDeathRecoveries;
+    static constexpr int PlayerRespawnDelayTicks = 4;
     TickScheduler tickScheduler;
     std::unordered_map<int, std::uint64_t>
         monsterRespawnEventIDs;

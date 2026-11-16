@@ -10,6 +10,7 @@
 #include "../src/Recipe/RecipeType.h"
 #include "../src/Stats/CombatRatings.h"
 #include "../src/World/Event/EntityDiedEvent.h"
+#include "../src/World/Development/DevelopmentWorldContent.h"
 #include "../src/World/Object/Station/CraftingStation.h"
 #include "../src/World/World.h"
 
@@ -512,6 +513,56 @@ int main()
                 attackerID,
                 "Monster kill records monster as killer");
         }
+
+        const World::PlayerDeathRecovery *recovery =
+            world.GetPlayerDeathRecovery(defenderID);
+        test.Expect(recovery != nullptr,
+            "Player death schedules a visible recovery state");
+        if (recovery != nullptr)
+        {
+            test.ExpectEqual(recovery->killerEntityID, attackerID,
+                "Recovery state explains which entity caused the death");
+            test.ExpectEqual(recovery->deathX, 10,
+                "Recovery state records the death location");
+            test.ExpectEqual(recovery->deathY, 10,
+                "Recovery state records the death location Y");
+        }
+
+        const auto countOccupiedSlots = [](const Inventory &inventory)
+        {
+            int count = 0;
+            for (const InventorySlot &slot : inventory.GetSlots())
+            {
+                if (!slot.IsEmpty()) ++count;
+            }
+            return count;
+        };
+        const int inventorySlotsBeforeRespawn =
+            countOccupiedSlots(defender->GetInventory());
+        for (int tick = 0; tick < 3; ++tick)
+        {
+            world.Update();
+        }
+
+        test.Expect(!defender->IsAlive(),
+            "Player remains dead until the recovery delay expires");
+        world.Update();
+        test.Expect(defender->IsAlive(),
+            "Player respawns when the recovery delay expires");
+        test.ExpectEqual(defender->GetCurrentHealth(),
+            defender->GetMaximumHealth(),
+            "Respawn restores the player to full health");
+        test.ExpectEqual(defender->GetPosition().GetX(),
+            DevelopmentWorldContent::PlayerSpawnX,
+            "Respawn returns the player to the village safe point X");
+        test.ExpectEqual(defender->GetPosition().GetY(),
+            DevelopmentWorldContent::PlayerSpawnY,
+            "Respawn returns the player to the village safe point Y");
+        test.ExpectEqual(countOccupiedSlots(defender->GetInventory()),
+            inventorySlotsBeforeRespawn,
+            "Recovery foundation does not lose or duplicate inventory");
+        test.Expect(world.GetPlayerDeathRecovery(defenderID) == nullptr,
+            "Completed recovery no longer remains pending");
     }
 
     {

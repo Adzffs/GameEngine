@@ -1561,6 +1561,15 @@ World::GetEntityDiedEvents() const
     return entityDiedEvents;
 }
 
+const World::PlayerDeathRecovery *World::GetPlayerDeathRecovery(
+    int playerEntityID) const
+{
+    const auto recovery = playerDeathRecoveries.find(playerEntityID);
+    return recovery == playerDeathRecoveries.end()
+        ? nullptr
+        : &recovery->second;
+}
+
 const std::vector<ActionLifecycleEvent> &
 World::GetActionLifecycleEvents() const
 {
@@ -1661,6 +1670,8 @@ void World::Update()
     currentTick++;
 
     ProcessScheduledEvents();
+
+    ProcessPlayerRespawns();
 
     UpdateMeleeCombatFeedback();
     ProcessDeadCombatantCleanup();
@@ -4682,6 +4693,16 @@ void World::HandleCombatantDeath(
         return;
     }
 
+    if (firstProcessedDeath)
+    {
+        playerDeathRecoveries[deadEntityID] = PlayerDeathRecovery{
+            deadEntityID,
+            killerEntityID,
+            player->GetPosition().GetX(),
+            player->GetPosition().GetY(),
+            currentTick + PlayerRespawnDelayTicks};
+    }
+
     interactionSystem.ClearInteraction(deadEntityID);
 
     openedStations.erase(
@@ -4689,6 +4710,43 @@ void World::HandleCombatantDeath(
 
     activeStations.erase(
         deadEntityID);
+}
+
+void World::ProcessPlayerRespawns()
+{
+    for (auto recovery = playerDeathRecoveries.begin();
+         recovery != playerDeathRecoveries.end();)
+    {
+        if (currentTick < recovery->second.respawnTick)
+        {
+            ++recovery;
+            continue;
+        }
+
+        Player *player = dynamic_cast<Player *>(
+            entityManager.GetEntityByID(recovery->first));
+
+        if (player == nullptr)
+        {
+            recovery = playerDeathRecoveries.erase(recovery);
+            continue;
+        }
+
+        if (!player->IsAlive())
+        {
+            player->GetPosition().SetPosition(
+                DevelopmentWorldContent::PlayerSpawnX,
+                DevelopmentWorldContent::PlayerSpawnY);
+            player->RestoreHealthToFull();
+            processedDeathEntityIDs.erase(player->GetID());
+            ClearCombatFeedbackInvolvingEntity(player->GetID());
+            Logger::Game(
+                "[COMBAT] Player " + std::to_string(player->GetID()) +
+                " recovered at the village safe point");
+        }
+
+        recovery = playerDeathRecoveries.erase(recovery);
+    }
 }
 
 void World::RecordEntityDiedEvent(
