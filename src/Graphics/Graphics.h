@@ -250,6 +250,8 @@ public:
         float mouseY);
 
     void DrawSidePanelTabs();
+    void DrawGameGuide(const Player &player);
+    void DrawWorldHud(const Player &player);
     void DrawSidePanelFrame(const char *title, float headingYOffset = 10.0f);
 
     void HandleStationMenuClick(
@@ -401,6 +403,13 @@ private:
     int displayedPlankCount = 0;
     std::array<InventorySlot, Inventory::SlotCount> displayedInventorySlots{};
     std::string stationFeedback;
+
+    float visualPlayerX = 0.0f;
+    float visualPlayerY = 0.0f;
+    bool visualPlayerInitialized = false;
+    bool gameGuideVisible = true;
+    float mouseX = 0.0f;
+    float mouseY = 0.0f;
 
     bool stationMenuOpen;
     StationType openStationType;

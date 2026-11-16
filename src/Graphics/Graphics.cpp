@@ -16,6 +16,7 @@
 #include <array>
 #include <algorithm>
 #include <map>
+#include <cmath>
 
 namespace
 {
@@ -129,6 +130,8 @@ bool Graphics::Initialize()
                   << SDL_GetError() << std::endl;
         return false;
     }
+
+    SDL_SetWindowTitle(window, "Embervale - Adventure Prototype");
 
     return true;
 }
@@ -1044,6 +1047,13 @@ void Graphics::ProcessEvents(bool &running)
 
     while (SDL_PollEvent(&event))
     {
+        if (event.type == SDL_EVENT_MOUSE_MOTION)
+        {
+            if (renderer != nullptr)
+                SDL_ConvertEventToRenderCoordinates(renderer, &event);
+            mouseX = event.motion.x;
+            mouseY = event.motion.y;
+        }
         if (craftingDragActive && event.type == SDL_EVENT_MOUSE_MOTION &&
             stationMenuOpen && openStationType == StationType::CRAFTING_TABLE)
         {
@@ -1088,6 +1098,11 @@ void Graphics::ProcessEvents(bool &running)
         if (event.type == SDL_EVENT_KEY_DOWN &&
             !event.key.repeat)
         {
+            if (event.key.scancode == SDL_SCANCODE_H)
+            {
+                gameGuideVisible = !gameGuideVisible;
+                continue;
+            }
             if (event.key.scancode ==
                 SDL_SCANCODE_ESCAPE)
             {
@@ -1120,6 +1135,14 @@ void Graphics::ProcessEvents(bool &running)
             }
             float mouseX = event.button.x;
             float mouseY = event.button.y;
+            this->mouseX = mouseX;
+            this->mouseY = mouseY;
+
+            if (gameGuideVisible)
+            {
+                gameGuideVisible = false;
+                continue;
+            }
 
             if (shopPresentationState.IsOpen())
             {
@@ -1703,9 +1726,9 @@ void Graphics::DrawMap(Map &map)
             {
                 SDL_SetRenderDrawColor(
                     renderer,
-                    45,
-                    85,
-                    45,
+                    static_cast<Uint8>(42 + ((x + y) % 3) * 3),
+                    static_cast<Uint8>(76 + ((x * 3 + y) % 4) * 3),
+                    static_cast<Uint8>(43 + ((x + y * 2) % 3) * 2),
                     255);
             }
             else
@@ -1729,10 +1752,10 @@ void Graphics::DrawGrid()
 {
     SDL_SetRenderDrawColor(
         renderer,
-        50,
-        50,
-        50,
-        255);
+        35,
+        55,
+        38,
+        110);
 
     for (int x = 0; x <= WindowWidth; x += TileSize)
     {
@@ -1786,34 +1809,63 @@ void Graphics::DrawPlayer(
     int playerX,
     int playerY)
 {
+    if (!visualPlayerInitialized)
+    {
+        visualPlayerX = static_cast<float>(playerX);
+        visualPlayerY = static_cast<float>(playerY);
+        visualPlayerInitialized = true;
+    }
+    const float targetX = static_cast<float>(playerX);
+    const float targetY = static_cast<float>(playerY);
+    visualPlayerX += (targetX - visualPlayerX) * 0.22f;
+    visualPlayerY += (targetY - visualPlayerY) * 0.22f;
+    if (std::abs(targetX - visualPlayerX) < 0.01f) visualPlayerX = targetX;
+    if (std::abs(targetY - visualPlayerY) < 0.01f) visualPlayerY = targetY;
+
     SDL_FRect playerRectangle =
-        MakeEntityTileRectangle(
-            playerX,
-            playerY,
-            4.0f,
-            0,
-            0);
+        SDL_FRect{visualPlayerX * TileSize + 4.0f,
+                  visualPlayerY * TileSize + 4.0f,
+                  TileSize - 8.0f, TileSize - 8.0f};
+
+    const float pulse = 0.5f + 0.5f * std::sin(
+        static_cast<float>(SDL_GetTicks()) * 0.008f);
+
+    SDL_FRect shadow{playerRectangle.x + 3.0f,
+                     playerRectangle.y + playerRectangle.h - 3.0f,
+                     playerRectangle.w - 6.0f, 6.0f};
+    SDL_SetRenderDrawColor(renderer, 12, 20, 25, 120);
+    SDL_RenderFillRect(renderer, &shadow);
 
     SDL_SetRenderDrawColor(
         renderer,
-        50,
-        150,
-        255,
+        static_cast<Uint8>(45 + pulse * 18),
+        static_cast<Uint8>(135 + pulse * 20),
+        225,
         255);
 
     SDL_RenderFillRect(
         renderer,
         &playerRectangle);
+
+    SDL_SetRenderDrawColor(renderer, 165, 225, 255, 255);
+    SDL_RenderRect(renderer, &playerRectangle);
+
+    SDL_FRect facingMark{playerRectangle.x + playerRectangle.w * 0.35f,
+                         playerRectangle.y + 3.0f,
+                         playerRectangle.w * 0.30f, 3.0f};
+    SDL_RenderFillRect(renderer, &facingMark);
 }
 
 void Graphics::DrawPlayerHealthBar(
     const Player &player)
 {
-    SDL_FRect background =
-        GetPlayerHealthBarBackgroundRectangle(player);
-
-    SDL_FRect fill =
-        GetPlayerHealthBarFillRectangle(player);
+    SDL_FRect background{visualPlayerX * TileSize + 4.0f,
+                         visualPlayerY * TileSize - 7.0f,
+                         TileSize - 8.0f, 5.0f};
+    SDL_FRect fill{background.x, background.y,
+                   background.w * CalculateHealthRatio(
+                       player.GetCurrentHealth(), player.GetMaximumHealth()),
+                   background.h};
 
     SDL_SetRenderDrawColor(
         renderer,
@@ -2009,6 +2061,13 @@ void Graphics::DrawMonsters(
             SDL_FRect monsterRectangle =
                 GetMonsterScreenRectangle(*monster);
 
+            SDL_FRect shadow{
+                monsterRectangle.x + 2.0f,
+                monsterRectangle.y + monsterRectangle.h - 3.0f,
+                monsterRectangle.w - 4.0f, 6.0f};
+            SDL_SetRenderDrawColor(renderer, 25, 12, 14, 150);
+            SDL_RenderFillRect(renderer, &shadow);
+
             SDL_SetRenderDrawColor(
                 renderer,
                 155,
@@ -2030,6 +2089,14 @@ void Graphics::DrawMonsters(
             SDL_RenderRect(
                 renderer,
                 &monsterRectangle);
+
+            SDL_FRect eyeLeft{monsterRectangle.x + 5.0f,
+                              monsterRectangle.y + 7.0f, 3.0f, 3.0f};
+            SDL_FRect eyeRight{monsterRectangle.x + monsterRectangle.w - 8.0f,
+                               monsterRectangle.y + 7.0f, 3.0f, 3.0f};
+            SDL_SetRenderDrawColor(renderer, 255, 210, 115, 255);
+            SDL_RenderFillRect(renderer, &eyeLeft);
+            SDL_RenderFillRect(renderer, &eyeRight);
             continue;
         }
 
@@ -2170,9 +2237,9 @@ void Graphics::DrawMonsterCombatFeedback(
 
         SDL_SetRenderDrawColor(
             renderer,
-            feedback.hit ? 255 : 230,
-            feedback.hit ? 220 : 230,
-            feedback.hit ? 70 : 230,
+            feedback.hit ? 255 : 205,
+            feedback.hit ? 92 : 220,
+            feedback.hit ? 70 : 235,
             255);
 
         std::string feedbackText = feedback.hit
@@ -2181,9 +2248,13 @@ void Graphics::DrawMonsterCombatFeedback(
 
         SDL_RenderDebugText(
             renderer,
-            textPosition.x,
-            textPosition.y,
+            textPosition.x - 2.0f,
+            textPosition.y - 7.0f,
             feedbackText.c_str());
+
+        SDL_FRect impact{textPosition.x - 6.0f, textPosition.y + 4.0f,
+                         22.0f, 2.0f};
+        SDL_RenderFillRect(renderer, &impact);
     }
 }
 void Graphics::DrawStations(
@@ -2640,11 +2711,11 @@ void Graphics::DrawResources(
 }
 Graphics::SidePanelLayout Graphics::GetSidePanelLayout() const
 {
-    constexpr float panelWidth = 192.0f;
+    constexpr float panelWidth = 330.0f;
     constexpr float panelHeight = 348.0f;
     constexpr float panelMargin = 20.0f;
     constexpr float contentInset = 10.0f;
-    constexpr float tabWidth = 25.0f;
+    constexpr float tabWidth = 45.0f;
     constexpr float tabHeight = 30.0f;
     constexpr float tabGap = 2.0f;
     constexpr float tabOffset = 4.0f;
@@ -2679,9 +2750,9 @@ SDL_FRect Graphics::GetSidePanelRectangle() const
 void Graphics::DrawSidePanelFrame(const char *title, float headingYOffset)
 {
     const SidePanelLayout layout = GetSidePanelLayout();
-    SDL_SetRenderDrawColor(renderer, 30, 30, 30, 240);
+    SDL_SetRenderDrawColor(renderer, 24, 27, 31, 245);
     SDL_RenderFillRect(renderer, &layout.panelBounds);
-    SDL_SetRenderDrawColor(renderer, 180, 180, 180, 255);
+    SDL_SetRenderDrawColor(renderer, 164, 139, 87, 255);
     SDL_RenderRect(renderer, &layout.panelBounds);
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderDebugText(
@@ -2795,13 +2866,13 @@ void Graphics::DrawSidePanelTabs()
         SidePanelTab::SETTINGS};
 
     const std::array<const char *, 7> labels{
-        "SK",
-        "QU",
-        "IN",
-        "EQ",
-        "PR",
-        "MA",
-        "SE"};
+        "SKILL",
+        "QUEST",
+        "BAG",
+        "GEAR",
+        "FAITH",
+        "MAGIC",
+        "SET"};
 
     for (std::size_t tabIndex = 0;
          tabIndex < tabs.size();
@@ -2813,18 +2884,18 @@ void Graphics::DrawSidePanelTabs()
         {
             SDL_SetRenderDrawColor(
                 renderer,
-                120,
-                95,
-                55,
+                146,
+                104,
+                48,
                 255);
         }
         else
         {
             SDL_SetRenderDrawColor(
                 renderer,
-                45,
-                45,
-                45,
+                35,
+                39,
+                44,
                 255);
         }
 
@@ -2834,9 +2905,9 @@ void Graphics::DrawSidePanelTabs()
 
         SDL_SetRenderDrawColor(
             renderer,
-            160,
-            160,
-            160,
+            164,
+            139,
+            87,
             255);
 
         SDL_RenderRect(
@@ -2852,10 +2923,99 @@ void Graphics::DrawSidePanelTabs()
 
         SDL_RenderDebugText(
             renderer,
-            tabRectangle.x + 4.0f,
+            tabRectangle.x + 3.0f,
             tabRectangle.y + 11.0f,
             labels[tabIndex]);
     }
+}
+
+void Graphics::DrawWorldHud(const Player &player)
+{
+    const float healthRatio = CalculateHealthRatio(
+        player.GetCurrentHealth(), player.GetMaximumHealth());
+    const SDL_FRect panel{18.0f, 18.0f, 245.0f, 60.0f};
+    SDL_SetRenderDrawColor(renderer, 20, 24, 28, 225);
+    SDL_RenderFillRect(renderer, &panel);
+    SDL_SetRenderDrawColor(renderer, 164, 139, 87, 255);
+    SDL_RenderRect(renderer, &panel);
+
+    SDL_SetRenderDrawColor(renderer, 235, 225, 202, 255);
+    SDL_RenderDebugText(renderer, 32.0f, 29.0f, "ADVENTURER");
+    const SDL_FRect barBackground{32.0f, 50.0f, 180.0f, 12.0f};
+    SDL_SetRenderDrawColor(renderer, 45, 31, 34, 255);
+    SDL_RenderFillRect(renderer, &barBackground);
+    SDL_FRect barFill = barBackground;
+    barFill.w *= healthRatio;
+    SDL_SetRenderDrawColor(renderer,
+        healthRatio < 0.30f ? 220 : 174,
+        healthRatio < 0.30f ? 55 : 57,
+        healthRatio < 0.30f ? 45 : 63, 255);
+    SDL_RenderFillRect(renderer, &barFill);
+    SDL_SetRenderDrawColor(renderer, 235, 225, 202, 255);
+    const std::string hp = std::to_string(player.GetCurrentHealth()) + " / " +
+        std::to_string(player.GetMaximumHealth()) + " HP";
+    SDL_RenderDebugText(renderer, 217.0f, 52.0f, hp.c_str());
+
+    SDL_SetRenderDrawColor(renderer, 235, 225, 202, 220);
+    SDL_RenderDebugText(renderer, 18.0f, WindowHeight - 20.0f,
+                        "Click to move/interact   H: Guide   Esc: Close");
+}
+
+void Graphics::DrawGameGuide(const Player &player)
+{
+    (void)player;
+    if (!gameGuideVisible) return;
+
+    const SDL_FRect shade{0.0f, 0.0f,
+        static_cast<float>(WindowWidth), static_cast<float>(WindowHeight)};
+    SDL_SetRenderDrawColor(renderer, 8, 10, 12, 190);
+    SDL_RenderFillRect(renderer, &shade);
+
+    const SDL_FRect panel{310.0f, 126.0f, 660.0f, 458.0f};
+    SDL_SetRenderDrawColor(renderer, 25, 29, 32, 252);
+    SDL_RenderFillRect(renderer, &panel);
+    SDL_SetRenderDrawColor(renderer, 190, 151, 78, 255);
+    SDL_RenderRect(renderer, &panel);
+
+    SDL_SetRenderDrawColor(renderer, 250, 226, 170, 255);
+    SDL_RenderDebugText(renderer, 350.0f, 160.0f,
+                        "WELCOME TO EMBERVALE");
+    SDL_SetRenderDrawColor(renderer, 225, 225, 215, 255);
+    SDL_RenderDebugText(renderer, 350.0f, 198.0f,
+                        "Build your strength, craft better gear, and tame the wilds.");
+
+    SDL_SetRenderDrawColor(renderer, 115, 185, 235, 255);
+    SDL_RenderDebugText(renderer, 350.0f, 242.0f, "1  MOVE & EXPLORE");
+    SDL_SetRenderDrawColor(renderer, 220, 220, 210, 255);
+    SDL_RenderDebugText(renderer, 350.0f, 264.0f,
+                        "Click a ground tile. Your destination glows gold.");
+
+    SDL_SetRenderDrawColor(renderer, 224, 143, 82, 255);
+    SDL_RenderDebugText(renderer, 350.0f, 306.0f, "2  GATHER & CRAFT");
+    SDL_SetRenderDrawColor(renderer, 220, 220, 210, 255);
+    SDL_RenderDebugText(renderer, 350.0f, 328.0f,
+                        "Click trees, rocks, the furnace, or the crafting table.");
+
+    SDL_SetRenderDrawColor(renderer, 216, 85, 85, 255);
+    SDL_RenderDebugText(renderer, 350.0f, 370.0f, "3  FIGHT SMART");
+    SDL_SetRenderDrawColor(renderer, 220, 220, 210, 255);
+    SDL_RenderDebugText(renderer, 350.0f, 392.0f,
+                        "Click a creature to engage. Watch your health and gear.");
+
+    SDL_SetRenderDrawColor(renderer, 198, 174, 102, 255);
+    SDL_RenderDebugText(renderer, 350.0f, 434.0f, "YOUR FIRST GOAL");
+    SDL_SetRenderDrawColor(renderer, 240, 232, 206, 255);
+    SDL_RenderDebugText(renderer, 350.0f, 456.0f,
+                        "Talk to the nearby villager and begin your first quest.");
+
+    const SDL_FRect button{470.0f, 514.0f, 340.0f, 42.0f};
+    SDL_SetRenderDrawColor(renderer, 132, 92, 41, 255);
+    SDL_RenderFillRect(renderer, &button);
+    SDL_SetRenderDrawColor(renderer, 230, 192, 112, 255);
+    SDL_RenderRect(renderer, &button);
+    SDL_SetRenderDrawColor(renderer, 255, 244, 214, 255);
+    SDL_RenderDebugText(renderer, 547.0f, 531.0f,
+                        "CLICK ANYWHERE TO BEGIN");
 }
 
 void Graphics::DrawAxeIcon(
@@ -3915,6 +4075,7 @@ void Graphics::Render(
     SDL_SetRenderViewport(renderer, nullptr);
     SDL_SetRenderScale(renderer, 1.0f, 1.0f);
     SDL_SetRenderClipRect(renderer, nullptr);
+    DrawWorldHud(player);
     DrawSidePanelTabs();
 
     switch (selectedTab)
@@ -3953,6 +4114,8 @@ void Graphics::Render(
 
     DrawStationMenu();
     if (shopPresentationState.IsOpen()) DrawShopPanel(); else DrawDialoguePanel();
+
+    DrawGameGuide(player);
 
     SDL_RenderPresent(renderer);
 }
