@@ -2112,23 +2112,40 @@ void Graphics::DrawMap(Map &map)
                 static_cast<float>(TileSize),
                 static_cast<float>(TileSize)};
 
-            if (map.IsValidPosition(x, y))
+            switch (map.GetTileType(x, y))
             {
+            case TileType::GRASS:
                 SDL_SetRenderDrawColor(
                     renderer,
                     static_cast<Uint8>(42 + ((x + y) % 3) * 3),
                     static_cast<Uint8>(76 + ((x * 3 + y) % 4) * 3),
                     static_cast<Uint8>(43 + ((x + y * 2) % 3) * 2),
                     255);
-            }
-            else
-            {
-                SDL_SetRenderDrawColor(
-                    renderer,
-                    35,
-                    45,
-                    70,
-                    255);
+                break;
+            case TileType::DIRT:
+                SDL_SetRenderDrawColor(renderer,
+                    static_cast<Uint8>(111 + (x + y) % 3 * 4),
+                    static_cast<Uint8>(86 + (x * 2 + y) % 3 * 3),
+                    55, 255);
+                break;
+            case TileType::STONE:
+                SDL_SetRenderDrawColor(renderer,
+                    static_cast<Uint8>(91 + (x + y) % 3 * 4),
+                    static_cast<Uint8>(94 + (x * 2 + y) % 3 * 3),
+                    92, 255);
+                break;
+            case TileType::WATER:
+                SDL_SetRenderDrawColor(renderer, 35, 70, 105, 255);
+                break;
+            case TileType::TREE:
+                SDL_SetRenderDrawColor(renderer, 31, 62, 35, 255);
+                break;
+            case TileType::STATION:
+                SDL_SetRenderDrawColor(renderer, 73, 68, 60, 255);
+                break;
+            case TileType::WALL:
+                SDL_SetRenderDrawColor(renderer, 58, 58, 62, 255);
+                break;
             }
 
             SDL_RenderFillRect(
@@ -2136,6 +2153,13 @@ void Graphics::DrawMap(Map &map)
                 &tileRectangle);
         }
     }
+
+    SDL_SetRenderDrawColor(renderer, 225, 214, 176, 180);
+    SDL_RenderDebugText(renderer, 34.0f, 154.0f, "VILLAGE SQUARE");
+    SDL_RenderDebugText(renderer, 112.0f, 226.0f, "WOODLAND");
+    SDL_RenderDebugText(renderer, 112.0f, 414.0f, "COPPER MINE");
+    SDL_RenderDebugText(renderer, 424.0f, 414.0f, "WORKSHOP");
+    SDL_RenderDebugText(renderer, 168.0f, 122.0f, "TRAINING FIELD");
 }
 void Graphics::DrawGrid()
 

@@ -17,6 +17,11 @@ void Map::SetTileType(int x, int y, TileType type)
     GetTile(x, y).SetType(type);
 }
 
+TileType Map::GetTileType(int x, int y)
+{
+    return GetTile(x, y).GetType();
+}
+
 Tile &Map::GetTile(int x, int y)
 {
     return tiles[static_cast<size_t>(y) * width + x];

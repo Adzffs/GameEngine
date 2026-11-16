@@ -2,6 +2,7 @@
 
 #include "../Object/Resource/ResourceType.h"
 #include "../Object/Station/StationType.h"
+#include "../Tile/TileType.h"
 
 #include <vector>
 
@@ -19,6 +20,15 @@ struct DevelopmentStationPlacementDefinition
     int y;
 };
 
+struct DevelopmentTerrainRegionDefinition
+{
+    TileType tileType;
+    int minimumX;
+    int minimumY;
+    int maximumX;
+    int maximumY;
+};
+
 namespace DevelopmentWorldContent
 {
     constexpr int MapWidth = 100;
@@ -31,4 +41,7 @@ namespace DevelopmentWorldContent
 
     const std::vector<DevelopmentStationPlacementDefinition> &
     GetStarterStationPlacements();
+
+    const std::vector<DevelopmentTerrainRegionDefinition> &
+    GetStarterTerrainRegions();
 }

@@ -171,6 +171,22 @@ World::World(
     rewardTableRoller = std::make_unique<RewardTableRoller>(
         *this->rewardRandomSource);
 
+    for (const DevelopmentTerrainRegionDefinition &region :
+         DevelopmentWorldContent::GetStarterTerrainRegions())
+    {
+        for (int y = region.minimumY; y <= region.maximumY; ++y)
+        {
+            for (int x = region.minimumX; x <= region.maximumX; ++x)
+            {
+                // Preserve the original pond as a recognizable boundary.
+                if (map.GetTileType(x, y) != TileType::WATER)
+                {
+                    map.SetTileType(x, y, region.tileType);
+                }
+            }
+        }
+    }
+
     for (const NpcSpawnDefinition &spawn : NpcSpawnDatabase::GetStarterSpawns())
     {
         npcSpawnManager.AddSpawn(spawn);

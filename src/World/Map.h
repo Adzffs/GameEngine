@@ -12,6 +12,7 @@ public:
     bool IsInBounds(int x, int y) const;
 
     void SetTileType(int x, int y, TileType type);
+    TileType GetTileType(int x, int y);
 
 private:
     int width;
