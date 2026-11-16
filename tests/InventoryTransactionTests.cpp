@@ -2,6 +2,7 @@
 
 #include "../src/Inventory/Inventory.h"
 #include "../src/Inventory/InventorySlot.h"
+#include "../src/Bank/Bank.h"
 #include "../src/Inventory/ItemAmount.h"
 #include "../src/Inventory/ItemType.h"
 #include "../src/Item/ItemDatabase.h"
@@ -655,6 +656,31 @@ int main()
             "Selling an item frees a coin slot");
         test.ExpectEqual(inventory.GetItemAmount(ItemType::COINS), 1,
                          "Freed sale slot receives coins");
+    }
+
+    {
+        Inventory inventory;
+        Bank bank;
+        inventory.AddItem(ItemType::COINS, 20);
+        inventory.AddItem(ItemType::LOG, 2);
+        test.Expect(bank.TryDeposit(inventory, 0, 5),
+            "Bank deposits a requested quantity from an inventory slot");
+        test.ExpectEqual(bank.GetItemAmount(ItemType::COINS), 5,
+            "Deposited quantity is stored canonically");
+        test.Expect(bank.TryWithdraw(inventory, ItemType::COINS, 3),
+            "Bank withdraws into available inventory space");
+        test.ExpectEqual(bank.GetItemAmount(ItemType::COINS), 2,
+            "Withdrawal removes the exact stored quantity");
+        const std::uint64_t revision = bank.GetRevision();
+        test.Expect(bank.TryDepositInventory(inventory),
+            "Deposit inventory transfers every remaining item atomically");
+        test.Expect(bank.GetRevision() == revision + 1,
+            "Deposit inventory advances one stable transaction revision");
+        test.ExpectEqual(inventory.GetItemAmount(ItemType::COINS), 0,
+            "Deposit inventory clears transferred stacks");
+        test.Expect(!bank.TryWithdraw(inventory, ItemType::COINS,
+                bank.GetItemAmount(ItemType::COINS) + 1),
+            "Over-withdrawal is rejected without changing bank state");
     }
 
     return test.Finish();

@@ -12,6 +12,7 @@
 #include "../StatusEffect/StatusEffectManager.h"
 #include "PlayerInitializationMode.h"
 #include "../Quest/QuestJournal.h"
+#include "../Bank/Bank.h"
 
 class World;
 
@@ -27,6 +28,8 @@ public:
 
     Inventory &GetInventory();
     const Inventory &GetInventory() const;
+    Bank &GetBank() { return bank; }
+    const Bank &GetBank() const { return bank; }
 
     SkillSet &GetSkills();
     const SkillSet &GetSkills() const;
@@ -60,6 +63,7 @@ public:
 
 private:
     Inventory inventory;
+    Bank bank;
 
     SkillSet skills;
 
