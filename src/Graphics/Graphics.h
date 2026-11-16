@@ -158,6 +158,34 @@ public:
         const Player &player,
         const Action *activeAction);
 
+    enum class WorldHoverTargetType
+    {
+        NONE,
+        FRIENDLY_NPC,
+        MONSTER,
+        STATION,
+        RESOURCE
+    };
+    struct WorldHoverTarget
+    {
+        WorldHoverTargetType type = WorldHoverTargetType::NONE;
+        int id = -1;
+        SDL_FRect bounds{};
+        std::string name;
+        std::string primaryAction;
+
+        bool HasTarget() const
+        {
+            return type != WorldHoverTargetType::NONE;
+        }
+    };
+    WorldHoverTarget ResolveWorldHoverTarget(
+        float screenX,
+        float screenY,
+        const std::vector<std::unique_ptr<Entity>> &entities,
+        const std::vector<ResourceNode> &resources,
+        const std::vector<CraftingStation> &stations) const;
+
     enum class SidePanelTab
     {
         SKILLS,
@@ -409,10 +437,13 @@ private:
     float visualPlayerX = 0.0f;
     float visualPlayerY = 0.0f;
     bool visualPlayerInitialized = false;
+    Uint64 lastPresentationTick = 0;
+    float presentationDeltaSeconds = 1.0f / 60.0f;
     bool gameGuideVisible = false;
     bool showGrid = false;
     float mouseX = 0.0f;
     float mouseY = 0.0f;
+    WorldHoverTarget worldHoverTarget;
 
     bool stationMenuOpen;
     StationType openStationType;
@@ -433,4 +464,5 @@ private:
     void DrawCraftingItemIcon(
         ItemType itemType,
         const SDL_FRect &bounds);
+    void DrawWorldHoverFeedback();
 };

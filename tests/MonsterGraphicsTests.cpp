@@ -4,6 +4,7 @@
 
 #include "../src/Entity/Monster/Monster.h"
 #include "../src/Graphics/Graphics.h"
+#include "../src/NPC/NPC.h"
 #include "../src/Player/Player.h"
 #include "../src/Stats/CombatRatings.h"
 #include "../src/World/World.h"
@@ -285,6 +286,57 @@ int main()
         test.Expect(
             !hit.has_value(),
             "Out-of-map coordinates safely return no result");
+    }
+
+    {
+        std::vector<std::unique_ptr<Entity>> entities;
+        entities.push_back(std::make_unique<Monster>(
+            20, 4, 4, CombatRatings{8, 8, 8, 40}));
+        entities.push_back(std::make_unique<NPC>(
+            21, 4, 4, NpcType::DEVELOPMENT_GUIDE));
+        const std::vector<ResourceNode> resources;
+        const std::vector<CraftingStation> stations;
+
+        const Graphics::WorldHoverTarget target =
+            graphics.ResolveWorldHoverTarget(
+                133.0f, 133.0f, entities, resources, stations);
+
+        test.Expect(
+            target.type == Graphics::WorldHoverTargetType::FRIENDLY_NPC &&
+                target.id == 21 && target.primaryAction == "Talk-to",
+            "Friendly NPC hover takes deterministic priority over an overlapping monster");
+    }
+
+    {
+        const std::vector<std::unique_ptr<Entity>> entities;
+        const std::vector<ResourceNode> resources{
+            ResourceNode(30, ResourceType::NORMAL_TREE, 2, 2)};
+        const std::vector<CraftingStation> stations{
+            CraftingStation(31, StationType::FURNACE, 2, 2)};
+
+        const Graphics::WorldHoverTarget stationTarget =
+            graphics.ResolveWorldHoverTarget(
+                70.0f, 70.0f, entities, resources, stations);
+        test.Expect(
+            stationTarget.type == Graphics::WorldHoverTargetType::STATION &&
+                stationTarget.name == "Furnace" &&
+                stationTarget.primaryAction == "Smelt",
+            "Station hover takes priority over an overlapping resource");
+
+        const Graphics::WorldHoverTarget resourceTarget =
+            graphics.ResolveWorldHoverTarget(
+                70.0f, 70.0f, entities, resources, {});
+        test.Expect(
+            resourceTarget.type == Graphics::WorldHoverTargetType::RESOURCE &&
+                resourceTarget.name == "Normal tree" &&
+                resourceTarget.primaryAction == "Gather",
+            "Active resources expose their authored name and gathering action");
+
+        const Graphics::WorldHoverTarget miss =
+            graphics.ResolveWorldHoverTarget(
+                10.0f, 10.0f, entities, resources, stations);
+        test.Expect(!miss.HasTarget(),
+            "Empty ground does not report an interactive hover target");
     }
 
     return test.Finish();

@@ -1841,8 +1841,10 @@ void Graphics::DrawPlayer(
     }
     const float targetX = static_cast<float>(playerX);
     const float targetY = static_cast<float>(playerY);
-    visualPlayerX += (targetX - visualPlayerX) * 0.22f;
-    visualPlayerY += (targetY - visualPlayerY) * 0.22f;
+    const float smoothing = 1.0f - std::exp(
+        -14.0f * presentationDeltaSeconds);
+    visualPlayerX += (targetX - visualPlayerX) * smoothing;
+    visualPlayerY += (targetY - visualPlayerY) * smoothing;
     if (std::abs(targetX - visualPlayerX) < 0.01f) visualPlayerX = targetX;
     if (std::abs(targetY - visualPlayerY) < 0.01f) visualPlayerY = targetY;
 
@@ -2034,6 +2036,120 @@ std::optional<int> Graphics::GetFriendlyNpcAtScreenPosition(
         }
     }
     return std::nullopt;
+}
+
+Graphics::WorldHoverTarget Graphics::ResolveWorldHoverTarget(
+    float screenX,
+    float screenY,
+    const std::vector<std::unique_ptr<Entity>> &entities,
+    const std::vector<ResourceNode> &resources,
+    const std::vector<CraftingStation> &stations) const
+{
+    for (const auto &entity : entities)
+    {
+        const NPC *npc = dynamic_cast<const NPC *>(entity.get());
+        const NpcDefinition *definition = npc == nullptr
+            ? nullptr
+            : NpcDefinitionDatabase::TryGet(npc->GetNpcType());
+        if (npc == nullptr || definition == nullptr ||
+            definition->kind != NpcKind::FRIENDLY)
+        {
+            continue;
+        }
+
+        const SDL_FRect bounds = GetFriendlyNpcScreenRectangle(*npc);
+        if (IsPointInsideRectangle(screenX, screenY, bounds))
+        {
+            return {WorldHoverTargetType::FRIENDLY_NPC, npc->GetID(),
+                bounds, definition->name, "Talk-to"};
+        }
+    }
+
+    for (const auto &entity : entities)
+    {
+        const Monster *monster = dynamic_cast<const Monster *>(entity.get());
+        if (monster == nullptr || !monster->IsAlive())
+        {
+            continue;
+        }
+
+        const SDL_FRect bounds = GetMonsterScreenRectangle(*monster);
+        if (IsPointInsideRectangle(screenX, screenY, bounds))
+        {
+            const NpcDefinition *definition =
+                NpcDefinitionDatabase::TryGet(monster->GetNpcType());
+            const std::string name = definition == nullptr
+                ? "Enemy"
+                : definition->name;
+            return {WorldHoverTargetType::MONSTER, monster->GetID(),
+                bounds, name, "Attack"};
+        }
+    }
+
+    for (const CraftingStation &station : stations)
+    {
+        const SDL_FRect bounds{
+            static_cast<float>(station.GetX() * TileSize),
+            static_cast<float>(station.GetY() * TileSize),
+            static_cast<float>(TileSize), static_cast<float>(TileSize)};
+        if (!IsPointInsideRectangle(screenX, screenY, bounds))
+        {
+            continue;
+        }
+
+        const bool furnace = station.GetStationType() == StationType::FURNACE;
+        return {WorldHoverTargetType::STATION, station.GetID(), bounds,
+            furnace ? "Furnace" : "Crafting table",
+            furnace ? "Smelt" : "Craft"};
+    }
+
+    for (const ResourceNode &resource : resources)
+    {
+        if (!resource.IsActive())
+        {
+            continue;
+        }
+        const SDL_FRect bounds{
+            static_cast<float>(resource.GetX() * TileSize),
+            static_cast<float>(resource.GetY() * TileSize),
+            static_cast<float>(TileSize), static_cast<float>(TileSize)};
+        if (IsPointInsideRectangle(screenX, screenY, bounds))
+        {
+            const ResourceDefinition &definition =
+                ResourceDatabase::Get(resource.GetResourceType());
+            return {WorldHoverTargetType::RESOURCE, resource.GetID(), bounds,
+                definition.GetName(), "Gather"};
+        }
+    }
+
+    return {};
+}
+
+void Graphics::DrawWorldHoverFeedback()
+{
+    if (!worldHoverTarget.HasTarget())
+    {
+        return;
+    }
+
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(renderer, 255, 220, 90, 52);
+    SDL_RenderFillRect(renderer, &worldHoverTarget.bounds);
+    SDL_SetRenderDrawColor(renderer, 255, 226, 105, 255);
+    SDL_RenderRect(renderer, &worldHoverTarget.bounds);
+
+    const std::string label = worldHoverTarget.primaryAction + " " +
+        worldHoverTarget.name;
+    const float labelWidth = std::max(150.0f,
+        static_cast<float>(label.size() * 8 + 20));
+    const SDL_FRect labelBounds{12.0f, 12.0f, labelWidth, 28.0f};
+    SDL_SetRenderDrawColor(renderer, 20, 18, 15, 225);
+    SDL_RenderFillRect(renderer, &labelBounds);
+    SDL_SetRenderDrawColor(renderer, 230, 197, 102, 255);
+    SDL_RenderRect(renderer, &labelBounds);
+    SDL_SetRenderDrawColor(renderer, 255, 241, 190, 255);
+    SDL_RenderDebugText(renderer, 22.0f, 22.0f, label.c_str());
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 }
 
 void Graphics::DrawNPCs(
@@ -4157,6 +4273,16 @@ void Graphics::Render(
     const Player &player,
     const Action *activeAction)
 {
+    const Uint64 presentationTick = SDL_GetTicks();
+    if (lastPresentationTick != 0)
+    {
+        presentationDeltaSeconds = std::clamp(
+            static_cast<float>(presentationTick - lastPresentationTick) /
+                1000.0f,
+            1.0f / 240.0f,
+            0.05f);
+    }
+    lastPresentationTick = presentationTick;
     displayedCurrency = inventory.GetItemAmount(ItemType::COINS);
     displayedLogCount = inventory.GetItemAmount(ItemType::LOG);
     displayedPlankCount = inventory.GetItemAmount(ItemType::WOODEN_PLANKS);
@@ -4164,6 +4290,13 @@ void Graphics::Render(
     recipeActionActive =
         activeAction != nullptr &&
         activeAction->GetType() == ActionType::RECIPE;
+    const bool worldHoverBlocked = stationMenuOpen ||
+        shopPresentationState.IsOpen() ||
+        dialoguePresentationState.IsOpen() || gameGuideVisible ||
+        IsPointInsideRectangle(mouseX, mouseY, GetSidePanelRectangle());
+    worldHoverTarget = worldHoverBlocked
+        ? WorldHoverTarget{}
+        : ResolveWorldHoverTarget(mouseX, mouseY, entities, resources, stations);
     SDL_SetRenderDrawColor(
         renderer,
         20,
@@ -4184,6 +4317,7 @@ void Graphics::Render(
     DrawPlayerHealthBar(player);
     DrawMonsterHealthBars(entities);
     DrawMonsterCombatFeedback(entities, combatFeedbacks);
+    DrawWorldHoverFeedback();
 
     SDL_SetRenderViewport(renderer, nullptr);
     SDL_SetRenderScale(renderer, 1.0f, 1.0f);
