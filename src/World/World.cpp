@@ -880,6 +880,12 @@ bool World::HasPendingMeleeEngagement(
     return meleeEngagementSystem.HasEngagement(entityID);
 }
 
+std::optional<int> World::GetMeleeTargetEntityID(
+    int attackerEntityID) const
+{
+    return meleeEngagementSystem.GetTargetEntityID(attackerEntityID);
+}
+
 void World::ProcessMeleeEngagementSystem()
 {
     const std::vector<MeleeEngagementIntent> intents =

@@ -167,7 +167,8 @@ public:
         const Inventory &inventory,
         const Equipment &equipment,
         const Player &player,
-        const Action *activeAction);
+        const Action *activeAction,
+        int selectedCombatTargetID = -1);
 
     enum class WorldHoverTargetType
     {
@@ -367,7 +368,13 @@ public:
     void DrawNPCs(
         const std::vector<std::unique_ptr<Entity>> &entities);
     void DrawMonsters(
-        const std::vector<std::unique_ptr<Entity>> &entities);
+        const std::vector<std::unique_ptr<Entity>> &entities,
+        int selectedCombatTargetID,
+        int localPlayerID);
+    void DrawCombatTargetPanel(
+        const std::vector<std::unique_ptr<Entity>> &entities,
+        int selectedCombatTargetID,
+        int localPlayerID);
     void DrawMonsterHealthBars(
         const std::vector<std::unique_ptr<Entity>> &entities);
     void DrawMonsterCombatFeedback(

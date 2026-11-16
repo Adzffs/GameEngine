@@ -2904,7 +2904,9 @@ void Graphics::DrawNPCs(
 }
 
 void Graphics::DrawMonsters(
-    const std::vector<std::unique_ptr<Entity>> &entities)
+    const std::vector<std::unique_ptr<Entity>> &entities,
+    int selectedCombatTargetID,
+    int localPlayerID)
 {
     for (const auto &entity : entities)
     {
@@ -2920,6 +2922,21 @@ void Graphics::DrawMonsters(
         {
             SDL_FRect monsterRectangle =
                 GetMonsterScreenRectangle(*monster);
+            const bool selected = monster->GetID() == selectedCombatTargetID;
+            const bool aggressive = monster->HasAggressionDefinition();
+            const bool attackingPlayer =
+                monster->GetAggressionTargetEntityID() == localPlayerID;
+
+            if (selected)
+            {
+                const SDL_FRect targetRing{
+                    monsterRectangle.x - 5.0f,
+                    monsterRectangle.y + monsterRectangle.h - 6.0f,
+                    monsterRectangle.w + 10.0f,
+                    10.0f};
+                SDL_SetRenderDrawColor(renderer, 255, 211, 70, 255);
+                SDL_RenderRect(renderer, &targetRing);
+            }
 
             SDL_FRect shadow{
                 monsterRectangle.x + 2.0f,
@@ -2928,22 +2945,20 @@ void Graphics::DrawMonsters(
             SDL_SetRenderDrawColor(renderer, 25, 12, 14, 150);
             SDL_RenderFillRect(renderer, &shadow);
 
-            SDL_SetRenderDrawColor(
-                renderer,
-                155,
-                50,
-                60,
+            SDL_SetRenderDrawColor(renderer,
+                aggressive ? 164 : 70,
+                aggressive ? 48 : 135,
+                aggressive ? 48 : 78,
                 255);
 
             SDL_RenderFillRect(
                 renderer,
                 &monsterRectangle);
 
-            SDL_SetRenderDrawColor(
-                renderer,
-                220,
-                110,
-                120,
+            SDL_SetRenderDrawColor(renderer,
+                aggressive ? 235 : 135,
+                aggressive ? 105 : 205,
+                aggressive ? 95 : 145,
                 255);
 
             SDL_RenderRect(
@@ -2957,6 +2972,14 @@ void Graphics::DrawMonsters(
             SDL_SetRenderDrawColor(renderer, 255, 210, 115, 255);
             SDL_RenderFillRect(renderer, &eyeLeft);
             SDL_RenderFillRect(renderer, &eyeRight);
+            if (attackingPlayer)
+            {
+                SDL_SetRenderDrawColor(renderer, 255, 95, 75, 255);
+                SDL_RenderDebugText(renderer,
+                    monsterRectangle.x + 8.0f,
+                    monsterRectangle.y - 20.0f,
+                    "!");
+            }
             continue;
         }
 
@@ -3005,6 +3028,63 @@ void Graphics::DrawMonsters(
             corpseRectangle.y + 1.0f,
             corpseRectangle.x + 1.0f,
             corpseRectangle.y + corpseRectangle.h - 1.0f);
+    }
+}
+
+void Graphics::DrawCombatTargetPanel(
+    const std::vector<std::unique_ptr<Entity>> &entities,
+    int selectedCombatTargetID,
+    int localPlayerID)
+{
+    const Monster *selected = nullptr;
+    const Monster *attacker = nullptr;
+    for (const auto &entity : entities)
+    {
+        const Monster *monster = dynamic_cast<const Monster *>(entity.get());
+        if (monster == nullptr || !monster->IsAlive()) continue;
+        if (monster->GetID() == selectedCombatTargetID) selected = monster;
+        if (monster->GetAggressionTargetEntityID() == localPlayerID)
+            attacker = monster;
+    }
+    const Monster *displayed = selected != nullptr ? selected : attacker;
+    if (displayed == nullptr) return;
+
+    const NpcDefinition *definition =
+        NpcDefinitionDatabase::TryGet(displayed->GetNpcType());
+    const CombatRatings ratings = displayed->GetCombatRatings();
+    const int level = std::max(1,
+        (ratings.attackAccuracy + ratings.meleeStrength + ratings.defence) / 3);
+    const bool aggressive = displayed->HasAggressionDefinition();
+    const bool incoming =
+        displayed->GetAggressionTargetEntityID() == localPlayerID;
+    const SDL_FRect panel{300.0f, 18.0f, 360.0f, 60.0f};
+    SDL_SetRenderDrawColor(renderer, 20, 24, 28, 235);
+    SDL_RenderFillRect(renderer, &panel);
+    SDL_SetRenderDrawColor(renderer,
+        incoming ? 235 : 220,
+        incoming ? 80 : 178,
+        incoming ? 65 : 75,
+        255);
+    SDL_RenderRect(renderer, &panel);
+    const std::string name = definition == nullptr ? "Enemy" : definition->name;
+    const std::string heading = name + "  Lv " + std::to_string(level) +
+        "  " + (aggressive ? "AGGRESSIVE" : "PASSIVE");
+    SDL_RenderDebugText(renderer, panel.x + 12.0f, panel.y + 12.0f,
+        heading.c_str());
+    const SDL_FRect healthBackground{
+        panel.x + 12.0f, panel.y + 36.0f, panel.w - 24.0f, 12.0f};
+    SDL_SetRenderDrawColor(renderer, 53, 35, 38, 255);
+    SDL_RenderFillRect(renderer, &healthBackground);
+    SDL_FRect healthFill = healthBackground;
+    healthFill.w *= CalculateHealthRatio(
+        displayed->GetCurrentHealth(), displayed->GetMaximumHealth());
+    SDL_SetRenderDrawColor(renderer, 190, 58, 65, 255);
+    SDL_RenderFillRect(renderer, &healthFill);
+    if (incoming)
+    {
+        SDL_SetRenderDrawColor(renderer, 255, 225, 185, 255);
+        SDL_RenderDebugText(renderer, panel.x + panel.w - 96.0f,
+            panel.y + 12.0f, "INCOMING!");
     }
 }
 
@@ -5155,7 +5235,8 @@ void Graphics::Render(
     const Inventory &inventory,
     const Equipment &equipment,
     const Player &player,
-    const Action *activeAction)
+    const Action *activeAction,
+    int selectedCombatTargetID)
 {
     const Uint64 presentationTick = SDL_GetTicks();
     if (lastPresentationTick != 0)
@@ -5211,7 +5292,7 @@ void Graphics::Render(
     DrawResources(resources);
     DrawStations(stations);
     DrawGroundItems(groundItems);
-    DrawMonsters(entities);
+    DrawMonsters(entities, selectedCombatTargetID, player.GetID());
     DrawNPCs(entities);
     DrawPlayer(playerX, playerY);
     DrawPlayerHealthBar(player);
@@ -5223,6 +5304,8 @@ void Graphics::Render(
     SDL_SetRenderScale(renderer, 1.0f, 1.0f);
     SDL_SetRenderClipRect(renderer, nullptr);
     DrawWorldHud(player);
+    DrawCombatTargetPanel(
+        entities, selectedCombatTargetID, player.GetID());
     DrawProgressionFeedback();
     DrawMinimap(map, entities, resources, stations, playerX, playerY);
     DrawSidePanelTabs();

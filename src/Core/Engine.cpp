@@ -326,7 +326,8 @@ bool Engine::Run()
                 player->GetEquipment(),
                 *player,
                 world.GetActionForEntity(
-                    playerID));
+                    playerID),
+                world.GetMeleeTargetEntityID(playerID).value_or(-1));
         }
     }
 

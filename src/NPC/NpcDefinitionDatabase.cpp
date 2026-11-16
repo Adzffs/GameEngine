@@ -13,7 +13,7 @@ namespace
 
     const NpcDefinition PassiveDevelopmentMonster{
         NpcType::PASSIVE_DEVELOPMENT_MONSTER,
-        "Passive development monster",
+        "Mossling",
         NpcKind::MONSTER,
         NpcCombatDefinition{CombatRatings{5, 4, 3, 30}, 5,
             RewardTableType::DEVELOPMENT_MONSTER, std::nullopt, 8},
@@ -21,7 +21,7 @@ namespace
 
     const NpcDefinition AggressiveDevelopmentMonster{
         NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER,
-        "Aggressive development monster",
+        "Ashfang",
         NpcKind::MONSTER,
         NpcCombatDefinition{CombatRatings{5, 4, 3, 30}, 5,
             RewardTableType::DEVELOPMENT_MONSTER,

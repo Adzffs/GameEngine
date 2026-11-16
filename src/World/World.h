@@ -206,6 +206,9 @@ public:
     bool HasPendingMeleeEngagement(
         int attackerEntityID) const;
 
+    std::optional<int> GetMeleeTargetEntityID(
+        int attackerEntityID) const;
+
     int GetCurrentTick() const;
 
     // Temporary global seam used by tests and manual debugging.
