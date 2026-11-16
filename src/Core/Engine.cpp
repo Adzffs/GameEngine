@@ -129,6 +129,7 @@ bool Engine::Run()
     {
         SynchronizeDialoguePresentation();
         SynchronizeShopPresentation();
+        SynchronizeBankPresentation();
         SynchronizeRecipeCommand();
         graphics.SynchronizeCraftingSession(
             world.GetCraftingSession(playerID));
@@ -142,6 +143,7 @@ bool Engine::Run()
 
         EnqueuePendingDialogueCommand();
         EnqueuePendingShopCommand();
+        EnqueuePendingBankCommand();
         EnqueuePendingRecipeCommand();
         EnqueuePendingCraftingInteraction();
 
@@ -278,6 +280,7 @@ bool Engine::Run()
 
         SynchronizeDialoguePresentation();
         SynchronizeShopPresentation();
+        SynchronizeBankPresentation();
         SynchronizeRecipeCommand();
 
         Player *player =
@@ -373,6 +376,22 @@ void Engine::SynchronizeShopPresentation()
             ClearPendingShopCommand();
         }
     }
+}
+
+void Engine::SynchronizeBankPresentation()
+{
+    Player *player = dynamic_cast<Player *>(world.GetEntityByID(playerID));
+    if (player == nullptr) return;
+    graphics.SynchronizeBank(
+        playerID, world.GetBankSession(playerID), player->GetBank());
+}
+
+bool Engine::EnqueuePendingBankCommand()
+{
+    std::optional<ServerCommandData> command = graphics.ConsumeBankCommand();
+    if (!command.has_value()) return false;
+    world.EnqueueCommand(std::move(*command));
+    return true;
 }
 
 bool Engine::EnqueuePendingShopCommand()

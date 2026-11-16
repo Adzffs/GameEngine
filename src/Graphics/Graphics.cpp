@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <map>
 #include <cmath>
+#include <cctype>
 
 namespace
 {
@@ -141,12 +142,15 @@ void Graphics::OpenStationMenu(
     DismissStationMenu(false);
     const bool supportedStation =
         stationType == StationType::FURNACE ||
-        stationType == StationType::CRAFTING_TABLE;
+        stationType == StationType::CRAFTING_TABLE ||
+        stationType == StationType::BANK;
     openStationType = supportedStation
         ? stationType
         : StationType::NONE;
     stationMenuOpen = supportedStation;
     stationFeedback.clear();
+    if (stationType == StationType::BANK && window != nullptr)
+        SDL_StartTextInput(window);
 }
 
 bool Graphics::IsStationMenuOpen() const
@@ -163,6 +167,7 @@ void Graphics::DismissStationMenu(
     bool queueCloseCommand)
 {
     const bool wasOpen = stationMenuOpen;
+    const StationType closingType = openStationType;
     stationMenuOpen = false;
     openStationType = StationType::NONE;
     recipeRequestPending = false;
@@ -176,8 +181,16 @@ void Graphics::DismissStationMenu(
     craftingDragSlotIndices.clear();
     stationFeedback.clear();
     stationMenuClosePending = false;
+    if (closingType == StationType::BANK && window != nullptr)
+        SDL_StopTextInput(window);
 
-    if (queueCloseCommand && wasOpen)
+    if (queueCloseCommand && wasOpen && closingType == StationType::BANK &&
+        bankSessionId != InvalidBankSessionId)
+    {
+        pendingBankCommand = BankCloseCommand{
+            bankActorEntityID, bankSessionId};
+    }
+    else if (queueCloseCommand && wasOpen)
     {
         stationMenuClosePending = true;
     }
@@ -320,6 +333,12 @@ void Graphics::HandleStationMenuClick(
 {
     if (!stationMenuOpen || recipeCommandInFlight || craftingInteractionInFlight)
     {
+        return;
+    }
+
+    if (openStationType == StationType::BANK)
+    {
+        HandleBankPanelClick(mouseX, mouseY);
         return;
     }
 
@@ -481,6 +500,12 @@ void Graphics::DrawStationMenu()
 {
     if (!stationMenuOpen)
     {
+        return;
+    }
+
+    if (openStationType == StationType::BANK)
+    {
+        DrawBankPanel();
         return;
     }
 
@@ -771,6 +796,176 @@ void Graphics::DrawStationMenu()
             SDL_RenderDebugText(renderer, mouseX + 10.0f, mouseY + 10.0f,
                                 amount.c_str());
         }
+    }
+}
+
+void Graphics::SynchronizeBank(
+    int actorEntityID, const ActiveBankSession *session, const Bank &bank)
+{
+    bankActorEntityID = actorEntityID;
+    if (session == nullptr)
+    {
+        bankSessionId = InvalidBankSessionId;
+        displayedBankEntries.clear();
+        if (openStationType == StationType::BANK) DismissStationMenu(false);
+        return;
+    }
+    bankSessionId = session->sessionId;
+    bankRevision = bank.GetRevision();
+    displayedBankEntries = bank.GetEntries();
+}
+
+std::optional<ServerCommandData> Graphics::ConsumeBankCommand()
+{
+    auto command = pendingBankCommand;
+    pendingBankCommand.reset();
+    return command;
+}
+
+void Graphics::HandleBankPanelClick(float screenX, float screenY)
+{
+    if (pendingBankCommand || bankSessionId == InvalidBankSessionId) return;
+    const SDL_FRect panel{220.0f, 54.0f, 840.0f, 612.0f};
+    const SDL_FRect close{panel.x + panel.w - 82.0f, panel.y + 14.0f, 64.0f, 28.0f};
+    if (IsPointInsideRectangle(screenX, screenY, close))
+    {
+        DismissStationMenu(true);
+        return;
+    }
+    const std::array<int, 4> quantities{1, 5, 10, -1};
+    for (std::size_t index = 0; index < quantities.size(); ++index)
+    {
+        const SDL_FRect button{panel.x + 20.0f + index * 58.0f,
+            panel.y + 64.0f, 50.0f, 28.0f};
+        if (IsPointInsideRectangle(screenX, screenY, button))
+        {
+            bankQuantityMode = quantities[index];
+            return;
+        }
+    }
+    const SDL_FRect depositAll{panel.x + 610.0f, panel.y + 64.0f, 190.0f, 28.0f};
+    if (IsPointInsideRectangle(screenX, screenY, depositAll))
+    {
+        pendingBankCommand = BankDepositInventoryCommand{
+            bankActorEntityID, bankSessionId, bankRevision};
+        return;
+    }
+
+    std::vector<BankEntry> filtered;
+    for (const BankEntry &entry : displayedBankEntries)
+    {
+        std::string name = ItemDatabase::Get(entry.itemType).GetName();
+        std::string lowered = name;
+        std::transform(lowered.begin(), lowered.end(), lowered.begin(),
+            [](unsigned char value){return static_cast<char>(std::tolower(value));});
+        std::string query = bankSearch;
+        std::transform(query.begin(), query.end(), query.begin(),
+            [](unsigned char value){return static_cast<char>(std::tolower(value));});
+        if (query.empty() || lowered.find(query) != std::string::npos)
+            filtered.push_back(entry);
+    }
+    for (std::size_t index = 0; index < filtered.size(); ++index)
+    {
+        const SDL_FRect slot{panel.x + 20.0f + (index % 8) * 50.0f,
+            panel.y + 142.0f + (index / 8) * 50.0f, 44.0f, 44.0f};
+        if (IsPointInsideRectangle(screenX, screenY, slot))
+        {
+            const int quantity = bankQuantityMode < 0
+                ? filtered[index].quantity
+                : std::min(bankQuantityMode, filtered[index].quantity);
+            pendingBankCommand = BankWithdrawCommand{bankActorEntityID,
+                bankSessionId, bankRevision, filtered[index].itemType, quantity};
+            return;
+        }
+    }
+    for (int index = 0; index < Inventory::SlotCount; ++index)
+    {
+        const SDL_FRect slot{panel.x + 470.0f + (index % 7) * 46.0f,
+            panel.y + 142.0f + (index / 7) * 50.0f, 40.0f, 44.0f};
+        if (!displayedInventorySlots[index].IsEmpty() &&
+            IsPointInsideRectangle(screenX, screenY, slot))
+        {
+            const int available = displayedInventorySlots[index].GetAmount();
+            const int quantity = bankQuantityMode < 0
+                ? available : std::min(bankQuantityMode, available);
+            pendingBankCommand = BankDepositCommand{bankActorEntityID,
+                bankSessionId, bankRevision, index, quantity};
+            return;
+        }
+    }
+}
+
+void Graphics::DrawBankPanel()
+{
+    const SDL_FRect panel{220.0f, 54.0f, 840.0f, 612.0f};
+    SDL_SetRenderDrawColor(renderer, 28, 25, 20, 250);
+    SDL_RenderFillRect(renderer, &panel);
+    SDL_SetRenderDrawColor(renderer, 196, 166, 92, 255);
+    SDL_RenderRect(renderer, &panel);
+    SDL_SetRenderDrawColor(renderer, 255, 242, 205, 255);
+    SDL_RenderDebugText(renderer, panel.x + 20.0f, panel.y + 20.0f, "BANK");
+    SDL_RenderDebugText(renderer, panel.x + 470.0f, panel.y + 112.0f, "INVENTORY");
+    const std::string search = "SEARCH: " + (bankSearch.empty() ? std::string("type to filter") : bankSearch);
+    SDL_RenderDebugText(renderer, panel.x + 280.0f, panel.y + 72.0f, search.c_str());
+    const std::array<const char *, 4> labels{"1", "5", "10", "ALL"};
+    const std::array<int, 4> quantities{1, 5, 10, -1};
+    for (std::size_t index = 0; index < labels.size(); ++index)
+    {
+        const SDL_FRect button{panel.x + 20.0f + index * 58.0f,
+            panel.y + 64.0f, 50.0f, 28.0f};
+        SDL_SetRenderDrawColor(renderer,
+            bankQuantityMode == quantities[index] ? 105 : 58,
+            bankQuantityMode == quantities[index] ? 88 : 55, 45, 255);
+        SDL_RenderFillRect(renderer, &button);
+        SDL_SetRenderDrawColor(renderer, 200, 174, 110, 255);
+        SDL_RenderRect(renderer, &button);
+        SDL_RenderDebugText(renderer, button.x + 16.0f, button.y + 10.0f, labels[index]);
+    }
+    const SDL_FRect depositAll{panel.x + 610.0f, panel.y + 64.0f, 190.0f, 28.0f};
+    const SDL_FRect close{panel.x + panel.w - 82.0f, panel.y + 14.0f, 64.0f, 28.0f};
+    SDL_SetRenderDrawColor(renderer, 64, 86, 58, 255);
+    SDL_RenderFillRect(renderer, &depositAll);
+    SDL_SetRenderDrawColor(renderer, 200, 174, 110, 255);
+    SDL_RenderRect(renderer, &depositAll); SDL_RenderRect(renderer, &close);
+    SDL_RenderDebugText(renderer, depositAll.x + 35.0f, depositAll.y + 10.0f, "DEPOSIT INVENTORY");
+    SDL_RenderDebugText(renderer, close.x + 12.0f, close.y + 10.0f, "CLOSE");
+
+    std::vector<BankEntry> filtered;
+    std::string query = bankSearch;
+    std::transform(query.begin(), query.end(), query.begin(),
+        [](unsigned char value){return static_cast<char>(std::tolower(value));});
+    for (const BankEntry &entry : displayedBankEntries)
+    {
+        std::string name = ItemDatabase::Get(entry.itemType).GetName();
+        std::transform(name.begin(), name.end(), name.begin(),
+            [](unsigned char value){return static_cast<char>(std::tolower(value));});
+        if (query.empty() || name.find(query) != std::string::npos) filtered.push_back(entry);
+    }
+    auto drawItem = [&](ItemType type, const SDL_FRect &slot, int amount)
+    {
+        SDL_SetRenderDrawColor(renderer, 54, 50, 43, 255); SDL_RenderFillRect(renderer, &slot);
+        SDL_SetRenderDrawColor(renderer, 135, 117, 78, 255); SDL_RenderRect(renderer, &slot);
+        DrawCraftingItemIcon(type, slot); DrawLogIcon(type, slot.x, slot.y, slot.w);
+        DrawOreIcon(type, slot.x, slot.y, slot.w); DrawAxeIcon(type, slot.x, slot.y, slot.w);
+        DrawSwordIcon(type, slot.x, slot.y, slot.w); DrawPickaxeIcon(type, slot.x, slot.y, slot.w);
+        DrawBarIcon(type, slot.x, slot.y, slot.w); DrawFoodIcon(type, slot.x, slot.y, slot.w);
+        if (amount > 1) { const std::string text = std::to_string(amount);
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderDebugText(renderer, slot.x + 3.0f, slot.y + 29.0f, text.c_str()); }
+    };
+    for (std::size_t index = 0; index < filtered.size(); ++index)
+        drawItem(filtered[index].itemType,
+            SDL_FRect{panel.x + 20.0f + (index % 8) * 50.0f,
+                panel.y + 142.0f + (index / 8) * 50.0f, 44.0f, 44.0f},
+            filtered[index].quantity);
+    for (int index = 0; index < Inventory::SlotCount; ++index)
+    {
+        const SDL_FRect slot{panel.x + 470.0f + (index % 7) * 46.0f,
+            panel.y + 142.0f + (index / 7) * 50.0f, 40.0f, 44.0f};
+        const InventorySlot &item = displayedInventorySlots[index];
+        if (item.IsEmpty()) { SDL_SetRenderDrawColor(renderer, 45, 43, 39, 255);
+            SDL_RenderFillRect(renderer, &slot); SDL_SetRenderDrawColor(renderer, 90, 82, 65, 255); SDL_RenderRect(renderer, &slot); }
+        else drawItem(item.GetItemType(), slot, item.GetAmount());
     }
 }
 
@@ -1130,6 +1325,13 @@ void Graphics::ProcessEvents(bool &running)
         if (event.type == SDL_EVENT_KEY_DOWN &&
             !event.key.repeat)
         {
+            if (stationMenuOpen && openStationType == StationType::BANK &&
+                event.key.scancode == SDL_SCANCODE_BACKSPACE &&
+                !bankSearch.empty())
+            {
+                bankSearch.pop_back();
+                continue;
+            }
             if (event.key.scancode == SDL_SCANCODE_H)
             {
                 gameGuideVisible = !gameGuideVisible;
@@ -1159,6 +1361,16 @@ void Graphics::ProcessEvents(bool &running)
 
                 continue;
             }
+        }
+
+        if (event.type == SDL_EVENT_TEXT_INPUT && stationMenuOpen &&
+            openStationType == StationType::BANK && bankSearch.size() < 24)
+        {
+            for (const char *cursor = event.text.text;
+                 *cursor != '\0' && bankSearch.size() < 24; ++cursor)
+                if (std::isalnum(static_cast<unsigned char>(*cursor)) || *cursor == ' ')
+                    bankSearch.push_back(*cursor);
+            continue;
         }
 
         if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
@@ -2132,9 +2344,10 @@ Graphics::WorldHoverTarget Graphics::ResolveWorldHoverTarget(
         if (IsPointInsideRectangle(screenX, screenY, bounds))
         {
             const bool furnace = station.GetStationType() == StationType::FURNACE;
+            const bool bank = station.GetStationType() == StationType::BANK;
             return {WorldHoverTargetType::STATION, station.GetID(), bounds,
-                furnace ? "Furnace" : "Crafting table",
-                furnace ? "Smelt" : "Craft"};
+                furnace ? "Furnace" : (bank ? "Bank chest" : "Crafting table"),
+                furnace ? "Smelt" : (bank ? "Bank" : "Craft")};
         }
     }
 
@@ -2700,6 +2913,22 @@ void Graphics::DrawStations(
                     TileSize * 0.18f};
                 SDL_RenderFillRect(renderer, &vertical);
             }
+            break;
+        }
+
+        case StationType::BANK:
+        {
+            SDL_SetRenderDrawColor(renderer, 94, 62, 32, 255);
+            SDL_FRect chest{tileX + 3.0f, tileY + 10.0f,
+                TileSize - 6.0f, TileSize - 13.0f};
+            SDL_RenderFillRect(renderer, &chest);
+            SDL_SetRenderDrawColor(renderer, 210, 171, 67, 255);
+            SDL_RenderRect(renderer, &chest);
+            SDL_FRect band{tileX + 3.0f, tileY + 16.0f,
+                TileSize - 6.0f, 4.0f};
+            SDL_RenderFillRect(renderer, &band);
+            SDL_FRect lock{tileX + 14.0f, tileY + 17.0f, 5.0f, 7.0f};
+            SDL_RenderFillRect(renderer, &lock);
             break;
         }
 

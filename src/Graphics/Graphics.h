@@ -26,6 +26,8 @@
 #include "../Dialogue/DialoguePresentationState.h"
 #include "../Shop/ShopPresentationState.h"
 #include "../Quest/QuestPresentationState.h"
+#include "../Bank/Bank.h"
+#include "../Bank/BankSession.h"
 
 class Map;
 class Player;
@@ -82,6 +84,9 @@ public:
     void ReconcileCraftingInteractionResult(CommandResultCode result);
     std::optional<ServerCommandData> ConsumeDialogueCommand();
     std::optional<ServerCommandData> ConsumeShopCommand();
+    void SynchronizeBank(int actorEntityID, const ActiveBankSession *session,
+                         const Bank &bank);
+    std::optional<ServerCommandData> ConsumeBankCommand();
     void SetShopCommandInFlight(bool inFlight);
     bool IsShopCommandInFlight() const;
     void ReconcileShopCommandResult(CommandResultCode result, bool closeCommand);
@@ -480,6 +485,13 @@ private:
     std::optional<ServerCommandData> pendingDialogueCommand;
     ShopPresentationState shopPresentationState;
     std::optional<ServerCommandData> pendingShopCommand;
+    std::optional<ServerCommandData> pendingBankCommand;
+    int bankActorEntityID = -1;
+    BankSessionId bankSessionId = InvalidBankSessionId;
+    std::uint64_t bankRevision = 0;
+    std::vector<BankEntry> displayedBankEntries;
+    int bankQuantityMode = 1;
+    std::string bankSearch;
     bool shopCommandInFlight = false;
     int displayedCurrency = 0;
     QuestPresentationState questPresentationState;
@@ -496,4 +508,6 @@ private:
     void OpenWorldContextMenu(float screenX, float screenY);
     bool HandleWorldContextMenuClick(float screenX, float screenY);
     void DrawWorldContextMenu();
+    void DrawBankPanel();
+    void HandleBankPanelClick(float screenX, float screenY);
 };

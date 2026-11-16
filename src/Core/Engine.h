@@ -46,6 +46,8 @@ private:
     bool EnqueuePendingDialogueCommand();
     void SynchronizeShopPresentation();
     bool EnqueuePendingShopCommand();
+    void SynchronizeBankPresentation();
+    bool EnqueuePendingBankCommand();
     void SynchronizeRecipeCommand();
     bool EnqueuePendingRecipeCommand();
     bool EnqueuePendingCraftingInteraction();
