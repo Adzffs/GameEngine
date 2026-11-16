@@ -102,7 +102,7 @@ int CountPixelsDifferentFrom(
 void SelectTab(Graphics &graphics, std::size_t index)
 {
     const SDL_FRect panel = graphics.GetSidePanelRectangle();
-    constexpr float tabWidth = 25.0f;
+    constexpr float tabWidth = 45.0f;
     constexpr float tabHeight = 30.0f;
     constexpr float tabGap = 2.0f;
     graphics.HandleSidePanelClick(
@@ -118,9 +118,9 @@ int main()
     Player player(100, PlayerInitializationMode::EMPTY);
 
     const SDL_FRect panel = graphics.GetSidePanelRectangle();
-    test.ExpectNear(panel.x, 1068.0f, 0.001f, "Quest panel uses established side-panel X");
+    test.ExpectNear(panel.x, 930.0f, 0.001f, "Quest panel uses refreshed side-panel X");
     test.ExpectNear(panel.y, 352.0f, 0.001f, "Quest panel uses established side-panel Y");
-    test.ExpectNear(panel.w, 192.0f, 0.001f, "Quest panel uses established side-panel width");
+    test.ExpectNear(panel.w, 330.0f, 0.001f, "Quest panel uses readable side-panel width");
     test.ExpectNear(panel.h, 348.0f, 0.001f, "Quest panel uses established side-panel height");
 
     SelectTab(graphics, 1);
@@ -331,7 +331,7 @@ int main()
                     static_cast<int>(layout.panelBounds.y) + 2);
                 test.Expect(outside.red == 5 && outside.green == 7 && outside.blue == 9,
                             "Quest render does not paint over the world outside the panel");
-                test.Expect(body.red == 30 && body.green == 30 && body.blue == 30,
+                test.Expect(body.red == 24 && body.green == 27 && body.blue == 31,
                             "Quest render draws the standard dark panel body");
                 test.Expect(HasYellowText(pixels, nativeView.titlePosition),
                             "Quest title is rendered inside the panel for every state");
@@ -350,10 +350,10 @@ int main()
         test.Expect(skillPixels != nullptr && inventoryPixels != nullptr &&
                         ReadPixel(skillPixels,
                             static_cast<int>(layout.panelBounds.x) + 2,
-                            static_cast<int>(layout.panelBounds.y) + 2).red == 30 &&
+                            static_cast<int>(layout.panelBounds.y) + 2).red == 24 &&
                         ReadPixel(inventoryPixels,
                             static_cast<int>(layout.panelBounds.x) + 2,
-                            static_cast<int>(layout.panelBounds.y) + 2).red == 30,
+                            static_cast<int>(layout.panelBounds.y) + 2).red == 24,
                     "Skills, Inventory and Quests render the same runtime panel body");
         if (skillPixels != nullptr) SDL_DestroySurface(skillPixels);
         if (inventoryPixels != nullptr) SDL_DestroySurface(inventoryPixels);

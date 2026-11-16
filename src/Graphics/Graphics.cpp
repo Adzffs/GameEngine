@@ -955,11 +955,11 @@ bool Graphics::HandleSidePanelClick(
     if (selectedTab ==
         SidePanelTab::INVENTORY)
     {
-        constexpr int columns = 4;
+        constexpr int columns = 7;
 
         constexpr float slotSize = 40.0f;
         constexpr float slotGap = 4.0f;
-        constexpr float padding = 10.0f;
+        constexpr float padding = 13.0f;
         constexpr float headerHeight = 24.0f;
 
         for (int slotIndex = 0;
@@ -1001,6 +1001,30 @@ bool Graphics::HandleSidePanelClick(
 
                 return true;
             }
+        }
+    }
+
+    if (selectedTab == SidePanelTab::SETTINGS)
+    {
+        const SDL_FRect gridToggle{
+            layout.contentBounds.x,
+            layout.contentBounds.y + 54.0f,
+            layout.contentBounds.w,
+            38.0f};
+        const SDL_FRect guideButton{
+            layout.contentBounds.x,
+            layout.contentBounds.y + 104.0f,
+            layout.contentBounds.w,
+            38.0f};
+        if (IsPointInsideRectangle(mouseX, mouseY, gridToggle))
+        {
+            showGrid = !showGrid;
+            return true;
+        }
+        if (IsPointInsideRectangle(mouseX, mouseY, guideButton))
+        {
+            gameGuideVisible = true;
+            return true;
         }
     }
 
@@ -2852,6 +2876,57 @@ void Graphics::DrawPlaceholderPanel(
         panelY + 160.0f,
         "COMING SOON");
 }
+
+void Graphics::DrawSettings()
+{
+    const SidePanelLayout layout = GetSidePanelLayout();
+    DrawSidePanelFrame("SETTINGS");
+
+    SDL_SetRenderDrawColor(renderer, 190, 195, 195, 255);
+    SDL_RenderDebugText(renderer, layout.contentBounds.x,
+                        layout.contentBounds.y + 28.0f,
+                        "DISPLAY & HELP");
+
+    const std::array<SDL_FRect, 2> buttons{{
+        {layout.contentBounds.x, layout.contentBounds.y + 54.0f,
+         layout.contentBounds.w, 38.0f},
+        {layout.contentBounds.x, layout.contentBounds.y + 104.0f,
+         layout.contentBounds.w, 38.0f}}};
+    for (const SDL_FRect &button : buttons)
+    {
+        SDL_SetRenderDrawColor(renderer, 42, 47, 52, 255);
+        SDL_RenderFillRect(renderer, &button);
+        SDL_SetRenderDrawColor(renderer, 164, 139, 87, 255);
+        SDL_RenderRect(renderer, &button);
+    }
+
+    SDL_SetRenderDrawColor(renderer, 235, 225, 202, 255);
+    const std::string gridLabel = std::string("WORLD GRID: ") +
+        (showGrid ? "ON" : "OFF");
+    SDL_RenderDebugText(renderer, buttons[0].x + 12.0f,
+                        buttons[0].y + 15.0f, gridLabel.c_str());
+    SDL_RenderDebugText(renderer, buttons[1].x + 12.0f,
+                        buttons[1].y + 15.0f, "OPEN GAME GUIDE");
+
+    SDL_SetRenderDrawColor(renderer, 190, 195, 195, 255);
+    SDL_RenderDebugText(renderer, layout.contentBounds.x,
+                        layout.contentBounds.y + 174.0f, "CONTROLS");
+    SDL_RenderDebugText(renderer, layout.contentBounds.x,
+                        layout.contentBounds.y + 199.0f,
+                        "Left click  Move / interact");
+    SDL_RenderDebugText(renderer, layout.contentBounds.x,
+                        layout.contentBounds.y + 221.0f,
+                        "Right click Split item stacks");
+    SDL_RenderDebugText(renderer, layout.contentBounds.x,
+                        layout.contentBounds.y + 243.0f,
+                        "Shift       Quick transfer");
+    SDL_RenderDebugText(renderer, layout.contentBounds.x,
+                        layout.contentBounds.y + 265.0f,
+                        "H           Toggle guide");
+    SDL_RenderDebugText(renderer, layout.contentBounds.x,
+                        layout.contentBounds.y + 287.0f,
+                        "Esc         Close window");
+}
 void Graphics::DrawSidePanelTabs()
 {
     const SidePanelLayout layout = GetSidePanelLayout();
@@ -3535,17 +3610,16 @@ void Graphics::DrawFoodIcon(
 void Graphics::DrawInventory(
     const Inventory &inventory)
 {
-    constexpr int columns = 4;
-    constexpr int rows = 7;
+    constexpr int columns = 7;
+    constexpr int rows = 4;
 
     constexpr float slotSize = 40.0f;
     constexpr float slotGap = 4.0f;
-    constexpr float padding = 10.0f;
+    constexpr float padding = 13.0f;
     constexpr float headerHeight = 24.0f;
 
     static_assert(
-        padding * 2.0f + columns * slotSize + (columns - 1) * slotGap == 192.0f &&
-        padding * 2.0f + headerHeight + rows * slotSize + (rows - 1) * slotGap == 348.0f);
+        padding * 2.0f + columns * slotSize + (columns - 1) * slotGap == 330.0f);
     const SidePanelLayout layout = GetSidePanelLayout();
     const float panelX = layout.panelBounds.x;
     const float panelY = layout.panelBounds.y;
@@ -3679,6 +3753,45 @@ void Graphics::DrawInventory(
                 slotY + 27.0f,
                 amountText.c_str());
         }
+    }
+
+    int hoveredSlot = -1;
+    for (int slotIndex = 0; slotIndex < Inventory::SlotCount; ++slotIndex)
+    {
+        const int column = slotIndex % columns;
+        const int row = slotIndex / columns;
+        const SDL_FRect slot{
+            panelX + padding + column * (slotSize + slotGap),
+            panelY + padding + headerHeight + row * (slotSize + slotGap),
+            slotSize, slotSize};
+        if (IsPointInsideRectangle(mouseX, mouseY, slot))
+        {
+            hoveredSlot = slotIndex;
+            break;
+        }
+    }
+
+    const float helpY = panelY + 238.0f;
+    SDL_SetRenderDrawColor(renderer, 164, 139, 87, 255);
+    SDL_RenderLine(renderer, panelX + 13.0f, helpY - 12.0f,
+                   panelX + 317.0f, helpY - 12.0f);
+    SDL_SetRenderDrawColor(renderer, 235, 225, 202, 255);
+    if (hoveredSlot >= 0 && !inventory.GetSlots()[hoveredSlot].IsEmpty())
+    {
+        const InventorySlot &slot = inventory.GetSlots()[hoveredSlot];
+        const std::string itemName = ItemDatabase::Get(slot.GetItemType()).GetName();
+        SDL_RenderDebugText(renderer, panelX + 13.0f, helpY, itemName.c_str());
+        SDL_SetRenderDrawColor(renderer, 185, 190, 190, 255);
+        SDL_RenderDebugText(renderer, panelX + 13.0f, helpY + 22.0f,
+                            "Click to use or equip");
+    }
+    else
+    {
+        SDL_RenderDebugText(renderer, panelX + 13.0f, helpY,
+                            "Hover an item for details");
+        SDL_SetRenderDrawColor(renderer, 185, 190, 190, 255);
+        SDL_RenderDebugText(renderer, panelX + 13.0f, helpY + 22.0f,
+                            "28 slots - items stack automatically");
     }
 }
 
@@ -4061,7 +4174,7 @@ void Graphics::Render(
     SDL_RenderClear(renderer);
 
     DrawMap(map);
-    DrawGrid();
+    if (showGrid) DrawGrid();
     DrawClickedTile();
     DrawResources(resources);
     DrawStations(stations);
@@ -4105,7 +4218,7 @@ void Graphics::Render(
         break;
 
     case SidePanelTab::SETTINGS:
-        DrawPlaceholderPanel("SETTINGS");
+        DrawSettings();
         break;
     }
 

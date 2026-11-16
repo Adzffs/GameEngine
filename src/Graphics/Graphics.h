@@ -40,6 +40,7 @@ public:
     ~Graphics();
 
     bool Initialize();
+    void ShowGameGuide() { gameGuideVisible = true; }
     void ProcessEvents(bool &running);
     bool ConsumeClickedTile(int &tileX, int &tileY);
     bool ConsumeClickedTile(
@@ -252,6 +253,7 @@ public:
     void DrawSidePanelTabs();
     void DrawGameGuide(const Player &player);
     void DrawWorldHud(const Player &player);
+    void DrawSettings();
     void DrawSidePanelFrame(const char *title, float headingYOffset = 10.0f);
 
     void HandleStationMenuClick(
@@ -407,7 +409,8 @@ private:
     float visualPlayerX = 0.0f;
     float visualPlayerY = 0.0f;
     bool visualPlayerInitialized = false;
-    bool gameGuideVisible = true;
+    bool gameGuideVisible = false;
+    bool showGrid = false;
     float mouseX = 0.0f;
     float mouseY = 0.0f;
 

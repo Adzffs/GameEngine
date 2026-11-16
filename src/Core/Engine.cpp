@@ -120,6 +120,7 @@ void Engine::AddDevelopmentEquipment()
 bool Engine::Run()
 {
     if (!graphics.Initialize()) return false;
+    graphics.ShowGameGuide();
     if (!InitializeWorldForRun()) return false;
 
     Logger::Info("Server Started");
