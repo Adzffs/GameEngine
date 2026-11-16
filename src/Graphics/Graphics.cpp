@@ -908,7 +908,8 @@ void Graphics::DrawActionProgress(
 
 bool Graphics::HandleSidePanelClick(
     float mouseX,
-    float mouseY)
+    float mouseY,
+    bool rightClick)
 {
     const SidePanelLayout layout = GetSidePanelLayout();
     const float panelX = layout.panelBounds.x;
@@ -993,6 +994,13 @@ bool Graphics::HandleSidePanelClick(
 
             if (insideSlot)
             {
+                if (rightClick && !displayedInventorySlots[slotIndex].IsEmpty())
+                {
+                    dropInventorySlotIndex = slotIndex;
+                    dropInventoryAmount = 1;
+                    inventoryDropPending = true;
+                    return true;
+                }
                 clickedInventorySlotIndex =
                     slotIndex;
 
@@ -1212,7 +1220,8 @@ void Graphics::ProcessEvents(bool &running)
 
             if (HandleSidePanelClick(
                     mouseX,
-                    mouseY))
+                    mouseY,
+                    event.button.button == SDL_BUTTON_RIGHT))
             {
                 continue;
             }
@@ -2080,8 +2089,23 @@ Graphics::WorldHoverTarget Graphics::ResolveWorldHoverTarget(
     float screenY,
     const std::vector<std::unique_ptr<Entity>> &entities,
     const std::vector<ResourceNode> &resources,
-    const std::vector<CraftingStation> &stations) const
+    const std::vector<CraftingStation> &stations,
+    const std::vector<GroundItem> &groundItems) const
 {
+    for (const GroundItem &item : groundItems)
+    {
+        const SDL_FRect bounds{
+            static_cast<float>(item.position.GetX() * TileSize + 5),
+            static_cast<float>(item.position.GetY() * TileSize + 5),
+            static_cast<float>(TileSize - 10),
+            static_cast<float>(TileSize - 10)};
+        if (IsPointInsideRectangle(screenX, screenY, bounds))
+        {
+            return {WorldHoverTargetType::GROUND_ITEM, item.id, bounds,
+                ItemDatabase::Get(item.itemType).GetName(), "Take"};
+        }
+    }
+
     // Mirror EngineWorldClickDecision's established object-first priority.
     for (const ResourceNode &resource : resources)
     {
@@ -3004,6 +3028,29 @@ void Graphics::DrawResources(
         SDL_RenderFillRect(
             renderer,
             &leavesRectangle);
+    }
+}
+
+void Graphics::DrawGroundItems(const std::vector<GroundItem> &groundItems)
+{
+    for (const GroundItem &item : groundItems)
+    {
+        const float x = static_cast<float>(item.position.GetX() * TileSize);
+        const float y = static_cast<float>(item.position.GetY() * TileSize);
+        const SDL_FRect shadow{x + 8.0f, y + 21.0f, 16.0f, 6.0f};
+        SDL_SetRenderDrawColor(renderer, 25, 22, 18, 130);
+        SDL_RenderFillRect(renderer, &shadow);
+        const SDL_FRect icon{x + 9.0f, y + 8.0f, 14.0f, 14.0f};
+        SDL_SetRenderDrawColor(renderer, 224, 190, 78, 255);
+        SDL_RenderFillRect(renderer, &icon);
+        SDL_SetRenderDrawColor(renderer, 255, 231, 142, 255);
+        SDL_RenderRect(renderer, &icon);
+        if (item.amount > 1)
+        {
+            const std::string amount = std::to_string(item.amount);
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderDebugText(renderer, x + 20.0f, y + 5.0f, amount.c_str());
+        }
     }
 }
 Graphics::SidePanelLayout Graphics::GetSidePanelLayout() const
@@ -4056,7 +4103,7 @@ void Graphics::DrawInventory(
         SDL_RenderDebugText(renderer, panelX + 13.0f, helpY, itemName.c_str());
         SDL_SetRenderDrawColor(renderer, 185, 190, 190, 255);
         SDL_RenderDebugText(renderer, panelX + 13.0f, helpY + 22.0f,
-                            "Click to use or equip");
+                            "Left: use/equip   Right: drop 1");
     }
     else
     {
@@ -4201,6 +4248,17 @@ bool Graphics::ConsumeInventorySlotClick(
     inventorySlotClickPending = false;
     clickedInventorySlotIndex = -1;
 
+    return true;
+}
+
+bool Graphics::ConsumeInventoryDropRequest(int &slotIndex, int &amount)
+{
+    if (!inventoryDropPending) return false;
+    slotIndex = dropInventorySlotIndex;
+    amount = dropInventoryAmount;
+    inventoryDropPending = false;
+    dropInventorySlotIndex = -1;
+    dropInventoryAmount = 0;
     return true;
 }
 
@@ -4422,6 +4480,7 @@ void Graphics::Render(
     const std::vector<std::unique_ptr<Entity>> &entities,
     const std::vector<ResourceNode> &resources,
     const std::vector<CraftingStation> &stations,
+    const std::vector<GroundItem> &groundItems,
     const std::map<int, MeleeCombatFeedback> &combatFeedbacks,
     int playerX,
     int playerY,
@@ -4453,7 +4512,8 @@ void Graphics::Render(
         IsPointInsideRectangle(mouseX, mouseY, GetSidePanelRectangle());
     worldHoverTarget = worldHoverBlocked
         ? WorldHoverTarget{}
-        : ResolveWorldHoverTarget(mouseX, mouseY, entities, resources, stations);
+        : ResolveWorldHoverTarget(
+            mouseX, mouseY, entities, resources, stations, groundItems);
     SDL_SetRenderDrawColor(
         renderer,
         20,
@@ -4468,6 +4528,7 @@ void Graphics::Render(
     DrawClickedTile();
     DrawResources(resources);
     DrawStations(stations);
+    DrawGroundItems(groundItems);
     DrawMonsters(entities);
     DrawNPCs(entities);
     DrawPlayer(playerX, playerY);

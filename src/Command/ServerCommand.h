@@ -34,6 +34,19 @@ struct UseInventoryItemCommand
     int inventorySlotIndex;
 };
 
+struct DropInventoryItemCommand
+{
+    int actorEntityID;
+    int inventorySlotIndex;
+    int amount;
+};
+
+struct TakeGroundItemCommand
+{
+    int actorEntityID;
+    int groundItemID;
+};
+
 struct UnequipItemCommand
 {
     int actorEntityID;
@@ -138,6 +151,8 @@ using ServerCommandData = std::variant<
     MoveCommand,
     AttackCommand,
     UseInventoryItemCommand,
+    DropInventoryItemCommand,
+    TakeGroundItemCommand,
     UnequipItemCommand,
     StartRecipeCommand,
     CraftRecipeCommand,

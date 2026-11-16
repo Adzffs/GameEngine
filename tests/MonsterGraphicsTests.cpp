@@ -399,5 +399,21 @@ int main()
             "Examine presents the selected target name without issuing a command");
     }
 
+    {
+        const std::vector<std::unique_ptr<Entity>> entities;
+        const std::vector<ResourceNode> resources;
+        const std::vector<CraftingStation> stations;
+        const std::vector<GroundItem> groundItems{
+            GroundItem{70, ItemType::COAL, 3, Position(3, 2)}};
+        const Graphics::WorldHoverTarget target =
+            graphics.ResolveWorldHoverTarget(
+                106.0f, 74.0f, entities, resources, stations, groundItems);
+        test.Expect(
+            target.type == Graphics::WorldHoverTargetType::GROUND_ITEM &&
+                target.id == 70 && target.name == "Coal" &&
+                target.primaryAction == "Take",
+            "Ground items expose a Take hover target with the authored item name");
+    }
+
     return test.Finish();
 }

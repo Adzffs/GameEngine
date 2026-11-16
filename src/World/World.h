@@ -47,6 +47,7 @@
 #include "../Shop/ShopTransactionEvent.h"
 #include "../Persistence/WorldPlayerPersistenceResult.h"
 #include <filesystem>
+#include "GroundItem.h"
 
 class RandomSource;
 class Monster;
@@ -116,6 +117,9 @@ public:
 
     const std::vector<CraftingStation> &
     GetStations() const;
+    const std::vector<GroundItem> &GetGroundItems() const;
+    const GroundItem *GetGroundItemByID(int id) const;
+    const GroundItem *GetGroundItemAt(int x, int y) const;
 
     CraftingStation *GetStationAt(
         int x,
@@ -288,6 +292,7 @@ private:
     void ProcessMovementRequests();
     void ProcessQueuedCommands();
     void ProcessMovementSystem();
+    void ProcessGroundItemPickups();
     void ProcessInteractionSystem();
     bool PublishDialogueNode(const ActiveDialogueSession &session,
                              const DialogueNodeDefinition &node);
@@ -379,6 +384,10 @@ private:
         publishedActionLifecycleEvents;
 
     ServerCommandQueue serverCommandQueue;
+
+    std::vector<GroundItem> groundItems;
+    int nextGroundItemID = 1;
+    std::map<int, int> pendingGroundItemPickups;
 
     std::vector<CommandProcessingResult>
         pendingCommandProcessingResults;

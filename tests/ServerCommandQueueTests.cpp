@@ -222,5 +222,41 @@ int main()
             "Full-health second food command is rejected without consuming");
     }
 
+    {
+        World world;
+        const int playerID = world.CreatePlayer();
+        Player *player = GetPlayer(world, playerID);
+        player->GetPosition().SetPosition(3, 3);
+        player->GetInventory().AddItem(ItemType::COAL, 2);
+        const int coalSlot = FindSlot(player->GetInventory(), ItemType::COAL);
+
+        world.EnqueueCommand(DropInventoryItemCommand{playerID, coalSlot, 1});
+        world.Update();
+        test.Expect(world.GetCommandProcessingResults()[0].resultCode ==
+                CommandResultCode::ACCEPTED &&
+                world.GetGroundItems().size() == 1 &&
+                world.GetGroundItems()[0].amount == 1,
+            "Dropping removes an inventory quantity and creates an authoritative ground item");
+
+        const int groundItemID = world.GetGroundItems()[0].id;
+        world.EnqueueCommand(TakeGroundItemCommand{playerID, groundItemID});
+        world.Update();
+        test.Expect(world.GetCommandProcessingResults()[0].resultCode ==
+                CommandResultCode::ACCEPTED &&
+                world.GetGroundItems().empty() &&
+                player->GetInventory().GetItemAmount(ItemType::COAL) == 2,
+            "Taking an adjacent ground item restores it atomically to inventory");
+
+        world.EnqueueCommand(DropInventoryItemCommand{playerID, -1, 1});
+        world.EnqueueCommand(TakeGroundItemCommand{playerID, 999999});
+        world.Update();
+        test.Expect(
+            world.GetCommandProcessingResults()[0].resultCode ==
+                CommandResultCode::INVALID_COMMAND_DATA &&
+            world.GetCommandProcessingResults()[1].resultCode ==
+                CommandResultCode::INVALID_COMMAND_DATA,
+            "Malformed drop and pickup requests are rejected without mutation");
+    }
+
     return test.Finish();
 }

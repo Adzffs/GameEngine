@@ -156,6 +156,14 @@ bool Engine::Run()
                     clickedInventorySlot});
         }
 
+        int dropAmount = 0;
+        if (graphics.ConsumeInventoryDropRequest(
+                clickedInventorySlot, dropAmount))
+        {
+            world.EnqueueCommand(DropInventoryItemCommand{
+                playerID, clickedInventorySlot, dropAmount});
+        }
+
         if (graphics.ConsumeWeaponSlotClick())
         {
             world.EnqueueCommand(
@@ -302,6 +310,7 @@ bool Engine::Run()
                 world.GetEntities(),
                 world.GetResources(),
                 world.GetStations(),
+                world.GetGroundItems(),
                 world.GetMeleeCombatFeedbacks(),
                 player->GetPosition().GetX(),
                 player->GetPosition().GetY(),

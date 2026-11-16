@@ -596,6 +596,28 @@ World::GetStations() const
     return objectManager.GetStations();
 }
 
+const std::vector<GroundItem> &World::GetGroundItems() const
+{
+    return groundItems;
+}
+
+const GroundItem *World::GetGroundItemByID(int id) const
+{
+    const auto found = std::find_if(groundItems.begin(), groundItems.end(),
+        [id](const GroundItem &item) { return item.id == id; });
+    return found == groundItems.end() ? nullptr : &*found;
+}
+
+const GroundItem *World::GetGroundItemAt(int x, int y) const
+{
+    const auto found = std::find_if(groundItems.begin(), groundItems.end(),
+        [=](const GroundItem &item)
+        {
+            return item.position.GetX() == x && item.position.GetY() == y;
+        });
+    return found == groundItems.end() ? nullptr : &*found;
+}
+
 CraftingStation *World::GetStationAt(
     int x,
     int y)
@@ -1615,6 +1637,7 @@ void World::Update()
     ProcessDeadCombatantCleanup();
 
     ProcessMovementSystem();
+    ProcessGroundItemPickups();
     ProcessInteractionSystem();
     RevalidateCraftingSessions();
 
@@ -1642,6 +1665,47 @@ void World::Update()
     pendingShopOpenedEvents.clear();
     publishedShopTransactionEvents = std::move(pendingShopTransactionEvents);
     pendingShopTransactionEvents.clear();
+}
+
+void World::ProcessGroundItemPickups()
+{
+    for (auto pending = pendingGroundItemPickups.begin();
+         pending != pendingGroundItemPickups.end();)
+    {
+        Player *actor = dynamic_cast<Player *>(
+            entityManager.GetEntityByID(pending->first));
+        const auto item = std::find_if(groundItems.begin(), groundItems.end(),
+            [&](const GroundItem &candidate)
+            {
+                return candidate.id == pending->second;
+            });
+        if (actor == nullptr || !actor->IsAlive() || item == groundItems.end())
+        {
+            pending = pendingGroundItemPickups.erase(pending);
+            continue;
+        }
+
+        const int dx = std::abs(actor->GetPosition().GetX() -
+            item->position.GetX());
+        const int dy = std::abs(actor->GetPosition().GetY() -
+            item->position.GetY());
+        if (dx <= 1 && dy <= 1)
+        {
+            if (actor->GetInventory().CanAddItem(item->itemType, item->amount) &&
+                actor->GetInventory().AddItem(item->itemType, item->amount))
+            {
+                groundItems.erase(item);
+            }
+            pending = pendingGroundItemPickups.erase(pending);
+            continue;
+        }
+        if (!HasActiveMovementPath(actor->GetID()))
+        {
+            pending = pendingGroundItemPickups.erase(pending);
+            continue;
+        }
+        ++pending;
+    }
 }
 
 const std::vector<NpcTalkEvent> &World::GetNpcTalkEvents() const
@@ -1790,6 +1854,92 @@ void World::ProcessQueuedCommands()
                     {
                         resultCode =
                             CommandResultCode::ACCEPTED;
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, DropInventoryItemCommand>)
+                {
+                    if (data.inventorySlotIndex < 0 ||
+                        data.inventorySlotIndex >= Inventory::SlotCount ||
+                        data.amount <= 0)
+                    {
+                        resultCode = CommandResultCode::INVALID_COMMAND_DATA;
+                    }
+                    else
+                    {
+                        const InventorySlot &slot = actor->GetInventory()
+                            .GetSlots()[data.inventorySlotIndex];
+                        if (!slot.IsEmpty() && slot.GetAmount() >= data.amount)
+                        {
+                            const ItemType itemType = slot.GetItemType();
+                            const int x = actor->GetPosition().GetX();
+                            const int y = actor->GetPosition().GetY();
+                            if (actor->GetInventory().RemoveItemFromSlot(
+                                    data.inventorySlotIndex, data.amount))
+                            {
+                                auto existing = std::find_if(
+                                    groundItems.begin(), groundItems.end(),
+                                    [=](const GroundItem &item)
+                                    {
+                                        return item.itemType == itemType &&
+                                            item.position.GetX() == x &&
+                                            item.position.GetY() == y;
+                                    });
+                                if (existing == groundItems.end() ||
+                                    existing->amount >
+                                        std::numeric_limits<int>::max() - data.amount)
+                                {
+                                    groundItems.push_back(GroundItem{
+                                        nextGroundItemID++, itemType, data.amount,
+                                        Position(x, y)});
+                                }
+                                else
+                                {
+                                    existing->amount += data.amount;
+                                }
+                                resultCode = CommandResultCode::ACCEPTED;
+                            }
+                        }
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, TakeGroundItemCommand>)
+                {
+                    const auto found = std::find_if(
+                        groundItems.begin(), groundItems.end(),
+                        [&](const GroundItem &item)
+                        {
+                            return item.id == data.groundItemID;
+                        });
+                    if (found == groundItems.end())
+                    {
+                        resultCode = CommandResultCode::INVALID_COMMAND_DATA;
+                    }
+                    else
+                    {
+                        const int dx = std::abs(actor->GetPosition().GetX() -
+                            found->position.GetX());
+                        const int dy = std::abs(actor->GetPosition().GetY() -
+                            found->position.GetY());
+                        if (actor->IsAlive() && dx <= 1 && dy <= 1 &&
+                            actor->GetInventory().CanAddItem(
+                                found->itemType, found->amount) &&
+                            actor->GetInventory().AddItem(
+                                found->itemType, found->amount))
+                        {
+                            groundItems.erase(found);
+                            resultCode = CommandResultCode::ACCEPTED;
+                        }
+                        else if (actor->IsAlive() && (dx > 1 || dy > 1))
+                        {
+                            pendingGroundItemPickups[data.actorEntityID] =
+                                data.groundItemID;
+                            QueueMovementDestination(MovementDestinationRequest(
+                                data.actorEntityID,
+                                found->position.GetX(),
+                                found->position.GetY()));
+                            resultCode = CommandResultCode::ACCEPTED;
+                        }
                     }
                 }
                 else if constexpr (

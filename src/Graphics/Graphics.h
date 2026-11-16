@@ -14,6 +14,7 @@
 #include "../World/Object/Resource/ResourceNode.h"
 #include "../World/Object/Station/CraftingStation.h"
 #include "../World/Object/Station/StationType.h"
+#include "../World/GroundItem.h"
 
 #include "../Inventory/Inventory.h"
 #include "../Equipment/Equipment.h"
@@ -51,6 +52,7 @@ public:
     bool ConsumeWalkTile(int &tileX, int &tileY);
     bool ConsumeInventorySlotClick(
         int &slotIndex);
+    bool ConsumeInventoryDropRequest(int &slotIndex, int &amount);
 
     bool ConsumeWeaponSlotClick();
     bool ConsumeRecipeRequest(
@@ -151,6 +153,7 @@ public:
         const std::vector<std::unique_ptr<Entity>> &entities,
         const std::vector<ResourceNode> &resources,
         const std::vector<CraftingStation> &stations,
+        const std::vector<GroundItem> &groundItems,
         const std::map<int, MeleeCombatFeedback> &combatFeedbacks,
         int playerX,
         int playerY,
@@ -162,6 +165,7 @@ public:
     enum class WorldHoverTargetType
     {
         NONE,
+        GROUND_ITEM,
         FRIENDLY_NPC,
         MONSTER,
         STATION,
@@ -185,7 +189,8 @@ public:
         float screenY,
         const std::vector<std::unique_ptr<Entity>> &entities,
         const std::vector<ResourceNode> &resources,
-        const std::vector<CraftingStation> &stations) const;
+        const std::vector<CraftingStation> &stations,
+        const std::vector<GroundItem> &groundItems = {}) const;
 
     struct WorldContextMenu
     {
@@ -288,7 +293,8 @@ public:
     QuestPanelView BuildQuestPanelView(const Player &player) const;
     bool HandleSidePanelClick(
         float mouseX,
-        float mouseY);
+        float mouseY,
+        bool rightClick = false);
 
     void DrawSidePanelTabs();
     void DrawGameGuide(const Player &player);
@@ -364,6 +370,7 @@ public:
         const std::vector<ResourceNode> &resources);
     void DrawStations(
         const std::vector<CraftingStation> &stations);
+    void DrawGroundItems(const std::vector<GroundItem> &groundItems);
     void DrawInventory(
         const Inventory &inventory);
     void DrawSkills(const Player &player);
@@ -428,6 +435,9 @@ private:
 
     bool inventorySlotClickPending;
     int clickedInventorySlotIndex;
+    bool inventoryDropPending = false;
+    int dropInventorySlotIndex = -1;
+    int dropInventoryAmount = 0;
 
     bool weaponSlotClickPending;
     bool recipeRequestPending;
