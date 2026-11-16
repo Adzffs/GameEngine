@@ -57,6 +57,7 @@ public:
         int &slotIndex);
     bool ConsumeInventoryDropRequest(int &slotIndex, int &amount);
     bool ConsumeTutorialSkipRequest();
+    std::optional<CombatStyle> ConsumeCombatStyleRequest();
 
     bool ConsumeWeaponSlotClick();
     bool ConsumeRecipeRequest(
@@ -392,7 +393,8 @@ public:
     void DrawSkills(const Player &player);
     void DrawEquipment(
         const Equipment &equipment,
-        const Inventory *inventory = nullptr);
+        const Inventory *inventory = nullptr,
+        const Player *player = nullptr);
     void DrawAxeIcon(
         ItemType itemType,
         float x,
@@ -456,6 +458,7 @@ private:
     int dropInventorySlotIndex = -1;
     int dropInventoryAmount = 0;
     bool tutorialSkipPending = false;
+    std::optional<CombatStyle> combatStyleRequest;
 
     bool weaponSlotClickPending;
     bool recipeRequestPending;

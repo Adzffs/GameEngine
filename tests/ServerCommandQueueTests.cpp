@@ -328,5 +328,25 @@ int main()
             "A committed bank deposit advances the loot-and-bank lesson");
     }
 
+    {
+        World world;
+        const int playerID = world.CreatePlayer();
+        Player *player = GetPlayer(world, playerID);
+        world.EnqueueCommand(SetCombatStyleCommand{
+            playerID, CombatStyle::DEFENSIVE});
+        world.Update();
+        test.Expect(player->GetCombatStyle() == CombatStyle::DEFENSIVE &&
+                world.GetCommandProcessingResults()[0].resultCode ==
+                    CommandResultCode::ACCEPTED,
+            "Server authoritatively accepts a valid combat style change");
+        world.EnqueueCommand(SetCombatStyleCommand{
+            playerID, static_cast<CombatStyle>(99)});
+        world.Update();
+        test.Expect(player->GetCombatStyle() == CombatStyle::DEFENSIVE &&
+                world.GetCommandProcessingResults()[0].resultCode ==
+                    CommandResultCode::INVALID_COMMAND_DATA,
+            "Server rejects an invalid combat style without mutation");
+    }
+
     return test.Finish();
 }

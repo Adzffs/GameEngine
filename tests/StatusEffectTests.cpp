@@ -980,7 +980,7 @@ int main()
 
         test.ExpectEqual(
             reduced.attackAccuracy,
-            0,
+            3,
             "Attack accuracy cannot fall below zero");
         test.ExpectEqual(
             reduced.meleeStrength,

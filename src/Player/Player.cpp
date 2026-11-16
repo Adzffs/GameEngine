@@ -277,11 +277,25 @@ void Player::RestoreHealthToFull()
 
 CombatRatings Player::GetCombatRatings() const
 {
-    return CombatRatings{
+    CombatRatings ratings{
         GetTotalStat(StatType::ATTACK_ACCURACY),
         GetTotalStat(StatType::MELEE_STRENGTH),
         GetTotalStat(StatType::DEFENCE),
         GetTotalStat(StatType::MAX_HEALTH)};
+    if (combatStyle == CombatStyle::ACCURATE)
+        ratings.attackAccuracy += 3;
+    else if (combatStyle == CombatStyle::AGGRESSIVE)
+        ratings.meleeStrength += 10;
+    else if (combatStyle == CombatStyle::DEFENSIVE)
+        ratings.defence += 3;
+    return ratings;
+}
+
+bool Player::TrySetCombatStyle(CombatStyle style)
+{
+    if (!IsValidCombatStyle(style)) return false;
+    combatStyle = style;
+    return true;
 }
 
 CombatFormulas::MeleeCombatProfile Player::GetMeleeCombatProfile() const

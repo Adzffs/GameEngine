@@ -3,6 +3,7 @@
 #include "../Entity/Entity.h"
 #include "../Combat/Combatant.h"
 #include "../Combat/CombatFormulas.h"
+#include "../Combat/CombatStyle.h"
 #include "../Inventory/Inventory.h"
 #include "../Skills/SkillSet.h"
 #include "../Equipment/Equipment.h"
@@ -59,6 +60,8 @@ public:
     void RestoreHealthToFull();
 
     CombatRatings GetCombatRatings() const override;
+    CombatStyle GetCombatStyle() const { return combatStyle; }
+    bool TrySetCombatStyle(CombatStyle style);
     CombatFormulas::MeleeCombatProfile GetMeleeCombatProfile() const;
 
     // Call after changes that can affect derived stats such as maximum health.
@@ -77,4 +80,5 @@ private:
 
     HealthPool healthPool;
     QuestJournal questJournal;
+    CombatStyle combatStyle = CombatStyle::ACCURATE;
 };

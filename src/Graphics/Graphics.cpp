@@ -1343,6 +1343,24 @@ bool Graphics::HandleSidePanelClick(
     if (selectedTab ==
         SidePanelTab::EQUIPMENT)
     {
+        const std::array<CombatStyle, 3> styles{
+            CombatStyle::ACCURATE,
+            CombatStyle::AGGRESSIVE,
+            CombatStyle::DEFENSIVE};
+        for (std::size_t index = 0; index < styles.size(); ++index)
+        {
+            const SDL_FRect styleButton{
+                panelX + 12.0f + static_cast<float>(index) * 108.0f,
+                panelY + 266.0f,
+                100.0f,
+                38.0f};
+            if (IsPointInsideRectangle(mouseX, mouseY, styleButton))
+            {
+                combatStyleRequest = styles[index];
+                return true;
+            }
+        }
+
         constexpr float weaponXOffset =
             16.0f;
 
@@ -4827,7 +4845,8 @@ void Graphics::DrawInventory(
 
 void Graphics::DrawEquipment(
     const Equipment &equipment,
-    const Inventory *inventory)
+    const Inventory *inventory,
+    const Player *player)
 {
     const SidePanelLayout layout = GetSidePanelLayout();
     const float panelX = layout.panelBounds.x;
@@ -4974,6 +4993,43 @@ void Graphics::DrawEquipment(
         foodCount > 0 ? 120 : 225, foodCount > 0 ? 210 : 150, 90, 255);
     const std::string food = "Food: " + std::to_string(foodCount);
     SDL_RenderDebugText(renderer, summaryX, panelY + 176.0f, food.c_str());
+
+    const std::array<const char *, 3> styleNames{
+        "ACCURATE", "AGGRESSIVE", "DEFENSIVE"};
+    const std::array<const char *, 3> styleEffects{
+        "+3 accuracy", "+10 strength", "+3 defence"};
+    const CombatStyle selectedStyle = player == nullptr
+        ? CombatStyle::ACCURATE
+        : player->GetCombatStyle();
+    SDL_SetRenderDrawColor(renderer, 235, 215, 165, 255);
+    SDL_RenderDebugText(renderer, panelX + 12.0f, panelY + 240.0f,
+        "COMBAT STYLE");
+    for (int index = 0; index < 3; ++index)
+    {
+        const bool selected = static_cast<int>(selectedStyle) == index;
+        const SDL_FRect button{
+            panelX + 12.0f + index * 108.0f,
+            panelY + 266.0f,
+            100.0f,
+            38.0f};
+        SDL_SetRenderDrawColor(renderer,
+            selected ? 118 : 48,
+            selected ? 91 : 52,
+            selected ? 42 : 56,
+            255);
+        SDL_RenderFillRect(renderer, &button);
+        SDL_SetRenderDrawColor(renderer,
+            selected ? 245 : 145,
+            selected ? 196 : 145,
+            selected ? 80 : 145,
+            255);
+        SDL_RenderRect(renderer, &button);
+        SDL_RenderDebugText(renderer, button.x + 7.0f, button.y + 14.0f,
+            styleNames[index]);
+        SDL_SetRenderDrawColor(renderer, 190, 195, 195, 255);
+        SDL_RenderDebugText(renderer, button.x + 4.0f, button.y + 48.0f,
+            styleEffects[index]);
+    }
 }
 
 bool Graphics::ConsumeInventorySlotClick(
@@ -5008,6 +5064,13 @@ bool Graphics::ConsumeTutorialSkipRequest()
     const bool pending = tutorialSkipPending;
     tutorialSkipPending = false;
     return pending;
+}
+
+std::optional<CombatStyle> Graphics::ConsumeCombatStyleRequest()
+{
+    std::optional<CombatStyle> request = combatStyleRequest;
+    combatStyleRequest.reset();
+    return request;
 }
 
 bool Graphics::ConsumeWeaponSlotClick()
@@ -5317,7 +5380,7 @@ void Graphics::Render(
         break;
 
     case SidePanelTab::EQUIPMENT:
-        DrawEquipment(equipment, &inventory);
+        DrawEquipment(equipment, &inventory, &player);
         break;
 
     case SidePanelTab::SKILLS:

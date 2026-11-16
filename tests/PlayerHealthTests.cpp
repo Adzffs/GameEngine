@@ -336,7 +336,7 @@ int main()
 
         test.ExpectEqual(
             baseRatings.attackAccuracy,
-            player.GetTotalStat(StatType::ATTACK_ACCURACY),
+            player.GetTotalStat(StatType::ATTACK_ACCURACY) + 3,
             "Base attack accuracy rating matches the total stat");
         test.ExpectEqual(
             baseRatings.meleeStrength,
@@ -447,7 +447,7 @@ int main()
 
         test.ExpectEqual(
             removedEquipmentRatings.attackAccuracy,
-            player.GetBaseStat(StatType::ATTACK_ACCURACY),
+            player.GetBaseStat(StatType::ATTACK_ACCURACY) + 3,
             "Removing equipment returns attack accuracy rating to its base value");
         test.ExpectEqual(
             removedEquipmentRatings.meleeStrength,

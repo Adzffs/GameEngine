@@ -2093,6 +2093,15 @@ void World::ProcessQueuedCommands()
                     }
                 }
                 else if constexpr (
+                    std::is_same_v<CommandType, SetCombatStyleCommand>)
+                {
+                    if (!IsValidCombatStyle(data.style))
+                        resultCode = CommandResultCode::INVALID_COMMAND_DATA;
+                    else if (actor->IsAlive() &&
+                             actor->TrySetCombatStyle(data.style))
+                        resultCode = CommandResultCode::ACCEPTED;
+                }
+                else if constexpr (
                     std::is_same_v<CommandType,
                                    UnequipItemCommand>)
                 {

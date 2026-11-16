@@ -171,6 +171,13 @@ bool Engine::Run()
             world.EnqueueCommand(SkipTutorialCommand{playerID});
         }
 
+        if (const std::optional<CombatStyle> style =
+                graphics.ConsumeCombatStyleRequest();
+            style.has_value())
+        {
+            world.EnqueueCommand(SetCombatStyleCommand{playerID, *style});
+        }
+
         if (graphics.ConsumeWeaponSlotClick())
         {
             world.EnqueueCommand(

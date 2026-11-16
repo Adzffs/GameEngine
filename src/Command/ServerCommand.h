@@ -16,6 +16,7 @@
 #include "../Quest/QuestId.h"
 #include "../Recipe/CraftingSession.h"
 #include "../Bank/BankSession.h"
+#include "../Combat/CombatStyle.h"
 
 struct MoveCommand
 {
@@ -179,6 +180,11 @@ struct SkipTutorialCommand
 {
     int actorEntityID;
 };
+struct SetCombatStyleCommand
+{
+    int actorEntityID;
+    CombatStyle style;
+};
 
 using ServerCommandData = std::variant<
     MoveCommand,
@@ -206,7 +212,8 @@ using ServerCommandData = std::variant<
     BankWithdrawCommand,
     BankDepositInventoryCommand,
     BankCloseCommand,
-    SkipTutorialCommand>;
+    SkipTutorialCommand,
+    SetCombatStyleCommand>;
 
 struct ServerCommand
 {

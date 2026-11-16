@@ -282,11 +282,11 @@ int main()
 
         test.ExpectEqual(
             player.GetCombatRatings().attackAccuracy,
-            10,
+            13,
             "Attack XP raises attack accuracy to the expected level");
         test.ExpectEqual(
             trainedProfile.attackRoll,
-            10,
+            13,
             "Attack XP changes the derived attack roll");
         test.ExpectEqual(
             trainedProfile.maximumHit,
@@ -317,7 +317,7 @@ int main()
 
         test.ExpectEqual(
             beforeSword.attackRoll,
-            6,
+            9,
             "A level 6 attacker has attack roll 6 before weapon bonuses");
         test.ExpectEqual(
             beforeSword.maximumHit,
@@ -333,7 +333,7 @@ int main()
 
         test.ExpectEqual(
             swordProfile.attackRoll,
-            9,
+            12,
             "Bronze sword attack bonus flows through Player ratings");
         test.ExpectEqual(
             swordProfile.maximumHit,
@@ -415,13 +415,35 @@ int main()
 
             test.ExpectEqual(
                 developmentProfile.attackRoll,
-                151,
+                154,
                 "Developer Godsword raises the attack roll through the normal rating path");
             test.ExpectEqual(
                 developmentProfile.maximumHit,
                 15,
                 "Developer Godsword raises the maximum hit through the normal rating path");
         }
+    }
+
+    {
+        Player styledPlayer(2004, PlayerInitializationMode::EMPTY);
+        const CombatRatings accurate = styledPlayer.GetCombatRatings();
+        test.ExpectEqual(accurate.attackAccuracy, 4,
+            "Accurate style grants its documented accuracy bonus");
+        test.Expect(styledPlayer.TrySetCombatStyle(CombatStyle::AGGRESSIVE),
+            "Aggressive style is accepted");
+        const CombatRatings aggressive = styledPlayer.GetCombatRatings();
+        test.ExpectEqual(aggressive.meleeStrength, 11,
+            "Aggressive style grants its documented strength bonus");
+        test.ExpectEqual(
+            CombatFormulas::CalculateMaximumHit(aggressive), 2,
+            "Aggressive strength bonus increases maximum hit");
+        test.Expect(styledPlayer.TrySetCombatStyle(CombatStyle::DEFENSIVE),
+            "Defensive style is accepted");
+        test.ExpectEqual(styledPlayer.GetCombatRatings().defence, 4,
+            "Defensive style grants its documented defence bonus");
+        test.Expect(!styledPlayer.TrySetCombatStyle(
+                static_cast<CombatStyle>(99)),
+            "Unknown combat styles are rejected");
     }
 
     return test.Finish();
