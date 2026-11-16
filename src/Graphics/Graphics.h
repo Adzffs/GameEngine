@@ -169,7 +169,11 @@ public:
         const Equipment &equipment,
         const Player &player,
         const Action *activeAction,
-        int selectedCombatTargetID = -1);
+        int selectedCombatTargetID = -1,
+        int deathRecoveryTicksRemaining = -1,
+        int deathKillerEntityID = -1,
+        int deathX = 0,
+        int deathY = 0);
 
     enum class WorldHoverTargetType
     {
@@ -376,6 +380,11 @@ public:
         const std::vector<std::unique_ptr<Entity>> &entities,
         int selectedCombatTargetID,
         int localPlayerID);
+    void DrawDeathRecoveryOverlay(
+        int ticksRemaining,
+        int killerEntityID,
+        int deathX,
+        int deathY);
     void DrawMonsterHealthBars(
         const std::vector<std::unique_ptr<Entity>> &entities);
     void DrawMonsterCombatFeedback(

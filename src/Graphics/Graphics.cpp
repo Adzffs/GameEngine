@@ -5299,7 +5299,11 @@ void Graphics::Render(
     const Equipment &equipment,
     const Player &player,
     const Action *activeAction,
-    int selectedCombatTargetID)
+    int selectedCombatTargetID,
+    int deathRecoveryTicksRemaining,
+    int deathKillerEntityID,
+    int deathX,
+    int deathY)
 {
     const Uint64 presentationTick = SDL_GetTicks();
     if (lastPresentationTick != 0)
@@ -5414,5 +5418,55 @@ void Graphics::Render(
 
     DrawGameGuide(player);
 
+    if (deathRecoveryTicksRemaining >= 0)
+    {
+        DrawDeathRecoveryOverlay(
+            deathRecoveryTicksRemaining,
+            deathKillerEntityID,
+            deathX,
+            deathY);
+    }
+
     SDL_RenderPresent(renderer);
+}
+
+void Graphics::DrawDeathRecoveryOverlay(
+    int ticksRemaining,
+    int killerEntityID,
+    int deathX,
+    int deathY)
+{
+    const SDL_FRect shade{0.0f, 0.0f, 1280.0f, 720.0f};
+    SDL_SetRenderDrawColor(renderer, 8, 7, 9, 190);
+    SDL_RenderFillRect(renderer, &shade);
+
+    const SDL_FRect panel{350.0f, 220.0f, 580.0f, 250.0f};
+    SDL_SetRenderDrawColor(renderer, 31, 27, 29, 255);
+    SDL_RenderFillRect(renderer, &panel);
+    SDL_SetRenderDrawColor(renderer, 196, 116, 102, 255);
+    SDL_RenderRect(renderer, &panel);
+
+    SDL_SetRenderDrawColor(renderer, 245, 214, 198, 255);
+    SDL_RenderDebugText(renderer, 550.0f, 248.0f, "YOU WERE DEFEATED");
+
+    const std::string cause = killerEntityID >= 0
+        ? "Defeated by enemy " + std::to_string(killerEntityID) + "."
+        : "You were defeated by the dangers of the world.";
+    SDL_SetRenderDrawColor(renderer, 235, 230, 220, 255);
+    SDL_RenderDebugText(renderer, 405.0f, 302.0f, cause.c_str());
+
+    const std::string location =
+        "Death location: (" + std::to_string(deathX) + ", " +
+        std::to_string(deathY) + ")";
+    SDL_RenderDebugText(renderer, 405.0f, 329.0f, location.c_str());
+    SDL_RenderDebugText(renderer, 405.0f, 356.0f,
+        "Your equipment and inventory are safe.");
+    SDL_RenderDebugText(renderer, 405.0f, 383.0f,
+        "You will recover at the village safe point.");
+
+    const std::string countdown = ticksRemaining > 0
+        ? "Recovering in " + std::to_string(ticksRemaining) + "..."
+        : "Recovering now...";
+    SDL_SetRenderDrawColor(renderer, 244, 190, 112, 255);
+    SDL_RenderDebugText(renderer, 548.0f, 429.0f, countdown.c_str());
 }

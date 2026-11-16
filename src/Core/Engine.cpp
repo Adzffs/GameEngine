@@ -312,6 +312,8 @@ bool Engine::Run()
 
         if (player != nullptr)
         {
+            const World::PlayerDeathRecovery *deathRecovery =
+                world.GetPlayerDeathRecovery(playerID);
             const Skill &woodcutting =
                 player->GetSkills().GetSkill(
                     SkillType::WOODCUTTING);
@@ -334,7 +336,16 @@ bool Engine::Run()
                 *player,
                 world.GetActionForEntity(
                     playerID),
-                world.GetMeleeTargetEntityID(playerID).value_or(-1));
+                world.GetMeleeTargetEntityID(playerID).value_or(-1),
+                deathRecovery == nullptr
+                    ? -1
+                    : std::max(0, deathRecovery->respawnTick -
+                        world.GetCurrentTick()),
+                deathRecovery == nullptr
+                    ? -1
+                    : deathRecovery->killerEntityID,
+                deathRecovery == nullptr ? 0 : deathRecovery->deathX,
+                deathRecovery == nullptr ? 0 : deathRecovery->deathY);
         }
     }
 
