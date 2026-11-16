@@ -301,6 +301,8 @@ private:
         const std::vector<Action> &completedActions);
     bool TryReplaceCraftingSessionState(
         const ReplaceCraftingSessionStateCommand &command);
+    bool TryReplaceCraftingInteractionState(
+        const ReplaceCraftingInteractionStateCommand &command);
     bool TrySettleCraftingSession(int actorEntityID);
     void RevalidateCraftingSessions();
     MeleeCompletionContext BuildMeleeCompletionContext(

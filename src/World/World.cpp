@@ -1177,6 +1177,47 @@ bool World::TryReplaceCraftingSessionState(
     return true;
 }
 
+bool World::TryReplaceCraftingInteractionState(
+    const ReplaceCraftingInteractionStateCommand &command)
+{
+    Player *player = dynamic_cast<Player *>(entityManager.GetEntityByID(command.actorEntityID));
+    const CraftingSessionSnapshot *current = craftingSessionSystem.Get(command.actorEntityID);
+    const auto activeStation = activeStations.find(command.actorEntityID);
+    if (player == nullptr || !player->IsAlive() || current == nullptr ||
+        current->sessionId != command.sessionId || current->revision != command.expectedRevision ||
+        activeStation == activeStations.end() || activeStation->second != current->stationObjectID ||
+        !IsStationUsable(command.actorEntityID, StationType::CRAFTING_TABLE)) return false;
+
+    for (const InventorySlot &slot : command.inventorySlots)
+        if (!InventoryStackOperations::IsCanonicalStack(slot)) return false;
+    if (!InventoryStackOperations::IsCanonicalStack(command.cursor)) return false;
+    for (const InventorySlot &slot : command.inputSlots)
+        if (!InventoryStackOperations::IsCanonicalStack(slot)) return false;
+
+    std::map<ItemType, long long> before;
+    std::map<ItemType, long long> after;
+    for (const InventorySlot &slot : player->GetInventory().GetSlots())
+        if (!slot.IsEmpty()) before[slot.GetItemType()] += slot.GetAmount();
+    AddSessionTotals(before, *current);
+    for (const InventorySlot &slot : command.inventorySlots)
+        if (!slot.IsEmpty()) after[slot.GetItemType()] += slot.GetAmount();
+    CraftingSessionSnapshot requested = *current;
+    requested.cursor = command.cursor;
+    requested.inputSlots = command.inputSlots;
+    AddSessionTotals(after, requested);
+    if (before != after) return false;
+
+    const auto originalInventory = player->GetInventory().GetSlots();
+    if (!player->GetInventory().TryReplaceSlotsAtomically(command.inventorySlots)) return false;
+    if (!craftingSessionSystem.ReplaceState(command.actorEntityID, command.sessionId,
+            command.expectedRevision, command.cursor, command.inputSlots))
+    {
+        player->GetInventory().TryReplaceSlotsAtomically(originalInventory);
+        return false;
+    }
+    return true;
+}
+
 void World::RevalidateCraftingSessions()
 {
     for (int actorEntityID : craftingSessionSystem.GetActorEntityIDs())
@@ -1846,6 +1887,13 @@ void World::ProcessQueuedCommands()
                     {
                         resultCode = CommandResultCode::ACCEPTED;
                     }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType,
+                                   ReplaceCraftingInteractionStateCommand>)
+                {
+                    if (TryReplaceCraftingInteractionState(data))
+                        resultCode = CommandResultCode::ACCEPTED;
                 }
                 else if constexpr (
                     std::is_same_v<CommandType, InteractCommand>)

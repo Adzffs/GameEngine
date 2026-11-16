@@ -2,6 +2,7 @@
 
 #include "../src/Command/CommandProcessingResult.h"
 #include "../src/Player/Player.h"
+#include "../src/Recipe/CraftingInteractionModel.h"
 #include "../src/World/World.h"
 
 namespace
@@ -94,6 +95,32 @@ int main()
         test.Expect(OpenCraftingTable(world, *player) &&
                         world.GetCraftingSession(player->GetID())->sessionId == sessionId,
                     "Reopening the same active table preserves session identity");
+    }
+
+    {
+        World world;
+        Player *player = CreatePlayer(world);
+        OpenCraftingTable(world, *player);
+        player->GetInventory().AddItem(ItemType::COINS, 9);
+        const CraftingSessionSnapshot opened = *world.GetCraftingSession(player->GetID());
+        CraftingInteractionModel model(player->GetInventory(), opened);
+        int coinSlot = -1;
+        for (int index = 0; index < Inventory::SlotCount; ++index)
+            if (model.GetSlots()[index].GetItemType() == ItemType::COINS) coinSlot = index;
+        test.Expect(coinSlot >= 0 && model.TryRightClick(coinSlot) &&
+                        model.GetCursor().GetAmount() == 5,
+                    "Shared model right-click picks up rounded-up half");
+        test.Expect(model.TryRightClick(Inventory::SlotCount + 4) &&
+                        model.GetSlots()[Inventory::SlotCount + 4].GetAmount() == 1 &&
+                        model.GetCursor().GetAmount() == 4,
+                    "Shared model places one item into the crafting grid");
+        const std::uint64_t commandID = world.EnqueueCommand(model.BuildCommand());
+        world.Update();
+        test.Expect(ResultFor(world, commandID) == CommandResultCode::ACCEPTED &&
+                        world.GetCraftingSession(player->GetID())->cursor.GetAmount() == 4 &&
+                        world.GetCraftingSession(player->GetID())->inputSlots[4].GetAmount() == 1 &&
+                        player->GetInventory().GetItemAmount(ItemType::COINS) == 4,
+                    "Shared model command commits through authoritative World validation");
     }
 
     {
@@ -208,6 +235,43 @@ int main()
                     "Forced invalidation safely retains items when inventory is full");
         test.Expect(!world.HasActiveStation(player->GetID()),
                     "Invalidated retained session cannot keep station authority");
+    }
+
+    {
+        World world;
+        Player *player = CreatePlayer(world);
+        OpenCraftingTable(world, *player);
+        player->GetInventory().AddItem(ItemType::COINS, 9);
+        const CraftingSessionSnapshot opened = *world.GetCraftingSession(player->GetID());
+        ReplaceCraftingInteractionStateCommand interaction{};
+        interaction.actorEntityID = player->GetID();
+        interaction.sessionId = opened.sessionId;
+        interaction.expectedRevision = opened.revision;
+        interaction.inventorySlots = player->GetInventory().GetSlots();
+        int coinSlot = -1;
+        for (int index = 0; index < Inventory::SlotCount; ++index)
+            if (interaction.inventorySlots[index].GetItemType() == ItemType::COINS)
+                coinSlot = index;
+        if (coinSlot >= 0) interaction.inventorySlots[coinSlot].SetItem(ItemType::COINS, 2);
+        interaction.cursor.SetItem(ItemType::COINS, 3);
+        interaction.inputSlots[4].SetItem(ItemType::COINS, 4);
+        const std::uint64_t accepted = world.EnqueueCommand(interaction);
+        world.Update();
+        const CraftingSessionSnapshot *updated = world.GetCraftingSession(player->GetID());
+        test.Expect(ResultFor(world, accepted) == CommandResultCode::ACCEPTED &&
+                        updated != nullptr && updated->revision == 1 &&
+                        player->GetInventory().GetItemAmount(ItemType::COINS) == 2 &&
+                        updated->cursor.GetAmount() == 3 && updated->inputSlots[4].GetAmount() == 4,
+                    "Shared inventory, cursor and crafting state commits atomically");
+
+        ReplaceCraftingInteractionStateCommand duplicate = interaction;
+        if (coinSlot >= 0) duplicate.inventorySlots[coinSlot].SetItem(ItemType::COINS, 3);
+        const std::uint64_t duplicateID = world.EnqueueCommand(duplicate);
+        world.Update();
+        test.Expect(ResultFor(world, duplicateID) == CommandResultCode::GAMEPLAY_REJECTED &&
+                        player->GetInventory().GetItemAmount(ItemType::COINS) == 2 &&
+                        world.GetCraftingSession(player->GetID())->revision == 1,
+                    "Stale or item-creating shared replacements leave all containers unchanged");
     }
 
     return test.Finish();

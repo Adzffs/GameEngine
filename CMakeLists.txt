@@ -95,6 +95,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/Recipe/RecipeDatabase.cpp
     src/Recipe/CraftingRecipeMatcher.cpp
     src/Recipe/CraftingSessionSystem.cpp
+    src/Recipe/CraftingInteractionModel.cpp
     src/Recipe/RecipeActionSystem.cpp
     src/Recipe/RecipeSystem.cpp
     src/Requirement/RequirementEvaluator.cpp

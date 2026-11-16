@@ -11,6 +11,7 @@
 #include "../Dialogue/DialogueSessionId.h"
 #include "../Dialogue/DialogueChoiceId.h"
 #include "../Inventory/ItemType.h"
+#include "../Inventory/Inventory.h"
 #include "../Shop/ShopSessionId.h"
 #include "../Quest/QuestId.h"
 #include "../Recipe/CraftingSession.h"
@@ -56,6 +57,16 @@ struct ReplaceCraftingSessionStateCommand
     int actorEntityID;
     CraftingSessionId sessionId;
     std::uint64_t expectedRevision;
+    InventorySlot cursor;
+    std::array<InventorySlot, 9> inputSlots;
+};
+
+struct ReplaceCraftingInteractionStateCommand
+{
+    int actorEntityID;
+    CraftingSessionId sessionId;
+    std::uint64_t expectedRevision;
+    std::array<InventorySlot, Inventory::SlotCount> inventorySlots;
     InventorySlot cursor;
     std::array<InventorySlot, 9> inputSlots;
 };
@@ -131,6 +142,7 @@ using ServerCommandData = std::variant<
     StartRecipeCommand,
     CraftRecipeCommand,
     ReplaceCraftingSessionStateCommand,
+    ReplaceCraftingInteractionStateCommand,
     InteractCommand,
     CloseStationCommand,
     NpcInteractionCommand,
