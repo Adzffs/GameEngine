@@ -21,6 +21,19 @@
 
 namespace
 {
+    const char *GetSkillDisplayName(SkillType skillType)
+    {
+        switch (skillType)
+        {
+        case SkillType::ATTACK: return "Attack";
+        case SkillType::DEFENCE: return "Defence";
+        case SkillType::WOODCUTTING: return "Woodcutting";
+        case SkillType::MINING: return "Mining";
+        case SkillType::SMITHING: return "Smithing";
+        default: return "Skill";
+        }
+    }
+
     Entity *GetEntityByID(
         const std::vector<std::unique_ptr<Entity>> &entities,
         int entityID)
@@ -52,6 +65,91 @@ namespace
                 inset,
             static_cast<float>(Graphics::TileSize) - inset * 2.0f,
             static_cast<float>(Graphics::TileSize) - inset * 2.0f};
+    }
+}
+
+void Graphics::UpdateProgressionFeedback(
+    const Player &player,
+    const Inventory &inventory)
+{
+    for (ActiveProgressionNotice &notice : progressionNotices)
+    {
+        notice.remainingSeconds -= presentationDeltaSeconds;
+    }
+    std::erase_if(progressionNotices,
+        [](const ActiveProgressionNotice &notice)
+        {
+            return notice.remainingSeconds <= 0.0f;
+        });
+
+    const std::vector<ProgressionEvent> events =
+        progressionPresentationState.Synchronize(
+            player.GetSkills(), inventory);
+    for (const ProgressionEvent &event : events)
+    {
+        std::string text;
+        float lifetime = 2.4f;
+        if (event.type == ProgressionEventType::XP_GAINED)
+        {
+            text = "+" + std::to_string(event.amount) + " " +
+                GetSkillDisplayName(event.skillType) + " XP";
+        }
+        else if (event.type == ProgressionEventType::LEVEL_GAINED)
+        {
+            text = std::string(GetSkillDisplayName(event.skillType)) +
+                " reached level " +
+                std::to_string(event.level) + "!";
+            lifetime = 4.0f;
+        }
+        else
+        {
+            text = "+" + std::to_string(event.amount) + " " +
+                ItemDatabase::Get(event.itemType).GetName();
+        }
+        progressionNotices.push_back({event.type, std::move(text), lifetime});
+    }
+
+    constexpr std::size_t MaximumNotices = 6;
+    if (progressionNotices.size() > MaximumNotices)
+    {
+        progressionNotices.erase(
+            progressionNotices.begin(),
+            progressionNotices.end() - MaximumNotices);
+    }
+}
+
+void Graphics::DrawProgressionFeedback()
+{
+    float y = 22.0f;
+    for (const ActiveProgressionNotice &notice : progressionNotices)
+    {
+        const bool levelUp =
+            notice.type == ProgressionEventType::LEVEL_GAINED;
+        const SDL_FRect panel{
+            levelUp ? 430.0f : 680.0f,
+            y,
+            levelUp ? 400.0f : 260.0f,
+            levelUp ? 42.0f : 32.0f};
+        SDL_SetRenderDrawColor(renderer, 20, 24, 28, 235);
+        SDL_RenderFillRect(renderer, &panel);
+        if (levelUp)
+        {
+            SDL_SetRenderDrawColor(renderer, 245, 190, 74, 255);
+        }
+        else if (notice.type == ProgressionEventType::XP_GAINED)
+        {
+            SDL_SetRenderDrawColor(renderer, 105, 190, 235, 255);
+        }
+        else
+        {
+            SDL_SetRenderDrawColor(renderer, 115, 205, 130, 255);
+        }
+        SDL_RenderRect(renderer, &panel);
+        SDL_RenderDebugText(renderer,
+            panel.x + (levelUp ? 22.0f : 12.0f),
+            panel.y + (levelUp ? 16.0f : 12.0f),
+            notice.text.c_str());
+        y += panel.h + 7.0f;
     }
 }
 
@@ -4851,6 +4949,7 @@ void Graphics::Render(
             0.05f);
     }
     lastPresentationTick = presentationTick;
+    UpdateProgressionFeedback(player, inventory);
     displayedCurrency = inventory.GetItemAmount(ItemType::COINS);
     displayedLogCount = inventory.GetItemAmount(ItemType::LOG);
     displayedPlankCount = inventory.GetItemAmount(ItemType::WOODEN_PLANKS);
@@ -4893,6 +4992,7 @@ void Graphics::Render(
     SDL_SetRenderScale(renderer, 1.0f, 1.0f);
     SDL_SetRenderClipRect(renderer, nullptr);
     DrawWorldHud(player);
+    DrawProgressionFeedback();
     DrawSidePanelTabs();
 
     switch (selectedTab)

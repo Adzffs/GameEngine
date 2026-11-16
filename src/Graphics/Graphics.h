@@ -28,6 +28,7 @@
 #include "../Quest/QuestPresentationState.h"
 #include "../Bank/Bank.h"
 #include "../Bank/BankSession.h"
+#include "../Progression/ProgressionPresentationState.h"
 
 class Map;
 class Player;
@@ -482,6 +483,14 @@ private:
     WorldContextMenu worldContextMenu;
     std::string examineMessage;
     Uint64 examineMessageUntil = 0;
+    struct ActiveProgressionNotice
+    {
+        ProgressionEventType type;
+        std::string text;
+        float remainingSeconds;
+    };
+    ProgressionPresentationState progressionPresentationState;
+    std::vector<ActiveProgressionNotice> progressionNotices;
 
     bool stationMenuOpen;
     StationType openStationType;
@@ -510,6 +519,10 @@ private:
         ItemType itemType,
         const SDL_FRect &bounds);
     void DrawWorldHoverFeedback();
+    void UpdateProgressionFeedback(
+        const Player &player,
+        const Inventory &inventory);
+    void DrawProgressionFeedback();
     void OpenWorldContextMenu(float screenX, float screenY);
     bool HandleWorldContextMenuClick(float screenX, float screenY);
     void DrawWorldContextMenu();
