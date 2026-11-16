@@ -48,6 +48,7 @@ public:
         int &tileY,
         int &mouseX,
         int &mouseY);
+    bool ConsumeWalkTile(int &tileX, int &tileY);
     bool ConsumeInventorySlotClick(
         int &slotIndex);
 
@@ -185,6 +186,17 @@ public:
         const std::vector<std::unique_ptr<Entity>> &entities,
         const std::vector<ResourceNode> &resources,
         const std::vector<CraftingStation> &stations) const;
+
+    struct WorldContextMenu
+    {
+        bool open = false;
+        WorldHoverTarget target;
+        int tileX = 0;
+        int tileY = 0;
+        int screenX = 0;
+        int screenY = 0;
+        SDL_FRect bounds{};
+    };
 
     enum class SidePanelTab
     {
@@ -397,6 +409,9 @@ public:
 
     bool clickPending;
     bool hasClickedTile;
+    bool walkClickPending = false;
+    int walkTileX = 0;
+    int walkTileY = 0;
 
     int clickedTileX;
     int clickedTileY;
@@ -444,6 +459,9 @@ private:
     float mouseX = 0.0f;
     float mouseY = 0.0f;
     WorldHoverTarget worldHoverTarget;
+    WorldContextMenu worldContextMenu;
+    std::string examineMessage;
+    Uint64 examineMessageUntil = 0;
 
     bool stationMenuOpen;
     StationType openStationType;
@@ -465,4 +483,7 @@ private:
         ItemType itemType,
         const SDL_FRect &bounds);
     void DrawWorldHoverFeedback();
+    void OpenWorldContextMenu(float screenX, float screenY);
+    bool HandleWorldContextMenuClick(float screenX, float screenY);
+    void DrawWorldContextMenu();
 };

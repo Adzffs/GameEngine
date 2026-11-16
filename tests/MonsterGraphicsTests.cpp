@@ -9,6 +9,33 @@
 #include "../src/Stats/CombatRatings.h"
 #include "../src/World/World.h"
 
+struct GraphicsTestAccess
+{
+    static void SetHoverTarget(
+        Graphics &graphics,
+        const Graphics::WorldHoverTarget &target)
+    {
+        graphics.worldHoverTarget = target;
+    }
+
+    static void OpenContextMenu(Graphics &graphics, float x, float y)
+    {
+        graphics.OpenWorldContextMenu(x, y);
+    }
+
+    static bool SelectContextRow(Graphics &graphics, int row)
+    {
+        return graphics.HandleWorldContextMenuClick(
+            graphics.worldContextMenu.bounds.x + 8.0f,
+            graphics.worldContextMenu.bounds.y + row * 24.0f + 8.0f);
+    }
+
+    static const std::string &ExamineMessage(const Graphics &graphics)
+    {
+        return graphics.examineMessage;
+    }
+};
+
 namespace
 {
     Monster *GetMonster(
@@ -302,9 +329,9 @@ int main()
                 133.0f, 133.0f, entities, resources, stations);
 
         test.Expect(
-            target.type == Graphics::WorldHoverTargetType::FRIENDLY_NPC &&
-                target.id == 21 && target.primaryAction == "Talk-to",
-            "Friendly NPC hover takes deterministic priority over an overlapping monster");
+            target.type == Graphics::WorldHoverTargetType::MONSTER &&
+                target.id == 20 && target.primaryAction == "Attack",
+            "Monster hover follows the established click priority over an overlapping NPC");
     }
 
     {
@@ -314,14 +341,14 @@ int main()
         const std::vector<CraftingStation> stations{
             CraftingStation(31, StationType::FURNACE, 2, 2)};
 
-        const Graphics::WorldHoverTarget stationTarget =
+        const Graphics::WorldHoverTarget overlappingTarget =
             graphics.ResolveWorldHoverTarget(
                 70.0f, 70.0f, entities, resources, stations);
         test.Expect(
-            stationTarget.type == Graphics::WorldHoverTargetType::STATION &&
-                stationTarget.name == "Furnace" &&
-                stationTarget.primaryAction == "Smelt",
-            "Station hover takes priority over an overlapping resource");
+            overlappingTarget.type == Graphics::WorldHoverTargetType::RESOURCE &&
+                overlappingTarget.name == "Normal tree" &&
+                overlappingTarget.primaryAction == "Gather",
+            "Resource hover follows the established click priority over a station");
 
         const Graphics::WorldHoverTarget resourceTarget =
             graphics.ResolveWorldHoverTarget(
@@ -337,6 +364,39 @@ int main()
                 10.0f, 10.0f, entities, resources, stations);
         test.Expect(!miss.HasTarget(),
             "Empty ground does not report an interactive hover target");
+    }
+
+    {
+        Graphics contextGraphics;
+        GraphicsTestAccess::SetHoverTarget(contextGraphics,
+            {Graphics::WorldHoverTargetType::RESOURCE, 44,
+                SDL_FRect{64.0f, 64.0f, 32.0f, 32.0f},
+                "Normal tree", "Gather"});
+
+        GraphicsTestAccess::OpenContextMenu(contextGraphics, 70.0f, 70.0f);
+        test.Expect(GraphicsTestAccess::SelectContextRow(contextGraphics, 0),
+            "Primary context action consumes the menu click");
+        int tileX = 0;
+        int tileY = 0;
+        int screenX = 0;
+        int screenY = 0;
+        test.Expect(contextGraphics.ConsumeClickedTile(
+                tileX, tileY, screenX, screenY) &&
+                tileX == 2 && tileY == 2 && screenX == 70 && screenY == 70,
+            "Primary context action preserves the selected world target coordinates");
+
+        GraphicsTestAccess::OpenContextMenu(contextGraphics, 70.0f, 70.0f);
+        GraphicsTestAccess::SelectContextRow(contextGraphics, 1);
+        test.Expect(contextGraphics.ConsumeWalkTile(tileX, tileY) &&
+                tileX == 2 && tileY == 2,
+            "Walk here bypasses object interaction and queues movement only");
+
+        GraphicsTestAccess::OpenContextMenu(contextGraphics, 70.0f, 70.0f);
+        GraphicsTestAccess::SelectContextRow(contextGraphics, 2);
+        test.Expect(
+            GraphicsTestAccess::ExamineMessage(contextGraphics).find(
+                "Normal tree") != std::string::npos,
+            "Examine presents the selected target name without issuing a command");
     }
 
     return test.Finish();

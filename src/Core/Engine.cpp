@@ -169,6 +169,12 @@ bool Engine::Run()
         int clickedMouseX;
         int clickedMouseY;
 
+        if (graphics.ConsumeWalkTile(clickedTileX, clickedTileY))
+        {
+            world.EnqueueCommand(MoveCommand{
+                playerID, Position(clickedTileX, clickedTileY)});
+        }
+
         if (graphics.ConsumeClickedTile(
                 clickedTileX,
                 clickedTileY,

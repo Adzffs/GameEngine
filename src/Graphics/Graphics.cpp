@@ -1130,6 +1130,11 @@ void Graphics::ProcessEvents(bool &running)
             if (event.key.scancode ==
                 SDL_SCANCODE_ESCAPE)
             {
+                if (worldContextMenu.open)
+                {
+                    worldContextMenu.open = false;
+                    continue;
+                }
                 if (shopPresentationState.IsOpen())
                 {
                     if (!pendingShopCommand)
@@ -1192,10 +1197,29 @@ void Graphics::ProcessEvents(bool &running)
                 continue;
             }
 
+            if (worldContextMenu.open)
+            {
+                if (event.button.button == SDL_BUTTON_LEFT)
+                {
+                    HandleWorldContextMenuClick(mouseX, mouseY);
+                }
+                else
+                {
+                    worldContextMenu.open = false;
+                }
+                continue;
+            }
+
             if (HandleSidePanelClick(
                     mouseX,
                     mouseY))
             {
+                continue;
+            }
+
+            if (event.button.button == SDL_BUTTON_RIGHT)
+            {
+                OpenWorldContextMenu(mouseX, mouseY);
                 continue;
             }
 
@@ -1606,6 +1630,19 @@ bool Graphics::ConsumeClickedTile(
 
     clickPending = false;
 
+    return true;
+}
+
+bool Graphics::ConsumeWalkTile(int &tileX, int &tileY)
+{
+    if (!walkClickPending)
+    {
+        return false;
+    }
+
+    tileX = walkTileX;
+    tileY = walkTileY;
+    walkClickPending = false;
     return true;
 }
 
@@ -2045,6 +2082,52 @@ Graphics::WorldHoverTarget Graphics::ResolveWorldHoverTarget(
     const std::vector<ResourceNode> &resources,
     const std::vector<CraftingStation> &stations) const
 {
+    // Mirror EngineWorldClickDecision's established object-first priority.
+    for (const ResourceNode &resource : resources)
+    {
+        if (!resource.IsActive()) continue;
+        const SDL_FRect bounds{
+            static_cast<float>(resource.GetX() * TileSize),
+            static_cast<float>(resource.GetY() * TileSize),
+            static_cast<float>(TileSize), static_cast<float>(TileSize)};
+        if (IsPointInsideRectangle(screenX, screenY, bounds))
+        {
+            const ResourceDefinition &definition =
+                ResourceDatabase::Get(resource.GetResourceType());
+            return {WorldHoverTargetType::RESOURCE, resource.GetID(), bounds,
+                definition.GetName(), "Gather"};
+        }
+    }
+
+    for (const CraftingStation &station : stations)
+    {
+        const SDL_FRect bounds{
+            static_cast<float>(station.GetX() * TileSize),
+            static_cast<float>(station.GetY() * TileSize),
+            static_cast<float>(TileSize), static_cast<float>(TileSize)};
+        if (IsPointInsideRectangle(screenX, screenY, bounds))
+        {
+            const bool furnace = station.GetStationType() == StationType::FURNACE;
+            return {WorldHoverTargetType::STATION, station.GetID(), bounds,
+                furnace ? "Furnace" : "Crafting table",
+                furnace ? "Smelt" : "Craft"};
+        }
+    }
+
+    for (const auto &entity : entities)
+    {
+        const Monster *monster = dynamic_cast<const Monster *>(entity.get());
+        if (monster == nullptr || !monster->IsAlive()) continue;
+        const SDL_FRect bounds = GetMonsterScreenRectangle(*monster);
+        if (IsPointInsideRectangle(screenX, screenY, bounds))
+        {
+            const NpcDefinition *definition =
+                NpcDefinitionDatabase::TryGet(monster->GetNpcType());
+            return {WorldHoverTargetType::MONSTER, monster->GetID(), bounds,
+                definition == nullptr ? "Enemy" : definition->name, "Attack"};
+        }
+    }
+
     for (const auto &entity : entities)
     {
         const NPC *npc = dynamic_cast<const NPC *>(entity.get());
@@ -2062,63 +2145,6 @@ Graphics::WorldHoverTarget Graphics::ResolveWorldHoverTarget(
         {
             return {WorldHoverTargetType::FRIENDLY_NPC, npc->GetID(),
                 bounds, definition->name, "Talk-to"};
-        }
-    }
-
-    for (const auto &entity : entities)
-    {
-        const Monster *monster = dynamic_cast<const Monster *>(entity.get());
-        if (monster == nullptr || !monster->IsAlive())
-        {
-            continue;
-        }
-
-        const SDL_FRect bounds = GetMonsterScreenRectangle(*monster);
-        if (IsPointInsideRectangle(screenX, screenY, bounds))
-        {
-            const NpcDefinition *definition =
-                NpcDefinitionDatabase::TryGet(monster->GetNpcType());
-            const std::string name = definition == nullptr
-                ? "Enemy"
-                : definition->name;
-            return {WorldHoverTargetType::MONSTER, monster->GetID(),
-                bounds, name, "Attack"};
-        }
-    }
-
-    for (const CraftingStation &station : stations)
-    {
-        const SDL_FRect bounds{
-            static_cast<float>(station.GetX() * TileSize),
-            static_cast<float>(station.GetY() * TileSize),
-            static_cast<float>(TileSize), static_cast<float>(TileSize)};
-        if (!IsPointInsideRectangle(screenX, screenY, bounds))
-        {
-            continue;
-        }
-
-        const bool furnace = station.GetStationType() == StationType::FURNACE;
-        return {WorldHoverTargetType::STATION, station.GetID(), bounds,
-            furnace ? "Furnace" : "Crafting table",
-            furnace ? "Smelt" : "Craft"};
-    }
-
-    for (const ResourceNode &resource : resources)
-    {
-        if (!resource.IsActive())
-        {
-            continue;
-        }
-        const SDL_FRect bounds{
-            static_cast<float>(resource.GetX() * TileSize),
-            static_cast<float>(resource.GetY() * TileSize),
-            static_cast<float>(TileSize), static_cast<float>(TileSize)};
-        if (IsPointInsideRectangle(screenX, screenY, bounds))
-        {
-            const ResourceDefinition &definition =
-                ResourceDatabase::Get(resource.GetResourceType());
-            return {WorldHoverTargetType::RESOURCE, resource.GetID(), bounds,
-                definition.GetName(), "Gather"};
         }
     }
 
@@ -2150,6 +2176,137 @@ void Graphics::DrawWorldHoverFeedback()
     SDL_SetRenderDrawColor(renderer, 255, 241, 190, 255);
     SDL_RenderDebugText(renderer, 22.0f, 22.0f, label.c_str());
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+}
+
+void Graphics::OpenWorldContextMenu(float screenX, float screenY)
+{
+    constexpr float rowHeight = 24.0f;
+    constexpr float menuWidth = 210.0f;
+    const int rowCount = worldHoverTarget.HasTarget() ? 4 : 2;
+    const float menuHeight = rowHeight * static_cast<float>(rowCount);
+    const SDL_FRect worldBounds = GetSidePanelRectangle();
+    const float maximumX = std::max(0.0f, worldBounds.x - menuWidth - 4.0f);
+
+    worldContextMenu.open = true;
+    worldContextMenu.target = worldHoverTarget;
+    worldContextMenu.tileX = static_cast<int>(screenX) / TileSize;
+    worldContextMenu.tileY = static_cast<int>(screenY) / TileSize;
+    worldContextMenu.screenX = static_cast<int>(screenX);
+    worldContextMenu.screenY = static_cast<int>(screenY);
+    worldContextMenu.bounds = SDL_FRect{
+        std::clamp(screenX, 4.0f, maximumX),
+        std::clamp(screenY, 4.0f,
+            static_cast<float>(WindowHeight) - menuHeight - 4.0f),
+        menuWidth,
+        menuHeight};
+}
+
+bool Graphics::HandleWorldContextMenuClick(float screenX, float screenY)
+{
+    if (!worldContextMenu.open)
+    {
+        return false;
+    }
+
+    if (!IsPointInsideRectangle(screenX, screenY, worldContextMenu.bounds))
+    {
+        worldContextMenu.open = false;
+        return true;
+    }
+
+    constexpr float rowHeight = 24.0f;
+    const int selectedRow = static_cast<int>(
+        (screenY - worldContextMenu.bounds.y) / rowHeight);
+    const bool hasTarget = worldContextMenu.target.HasTarget();
+
+    if (hasTarget && selectedRow == 0)
+    {
+        clickedTileX = worldContextMenu.tileX;
+        clickedTileY = worldContextMenu.tileY;
+        clickedMouseX = worldContextMenu.screenX;
+        clickedMouseY = worldContextMenu.screenY;
+        hasClickedTile = true;
+        clickPending = true;
+    }
+    else if ((hasTarget && selectedRow == 1) ||
+             (!hasTarget && selectedRow == 0))
+    {
+        walkTileX = worldContextMenu.tileX;
+        walkTileY = worldContextMenu.tileY;
+        walkClickPending = true;
+    }
+    else if (hasTarget && selectedRow == 2)
+    {
+        examineMessage = worldContextMenu.target.name +
+            " — " + worldContextMenu.target.primaryAction +
+            " is its main interaction.";
+        examineMessageUntil = SDL_GetTicks() + 4500;
+    }
+
+    worldContextMenu.open = false;
+    return true;
+}
+
+void Graphics::DrawWorldContextMenu()
+{
+    if (!examineMessage.empty() && SDL_GetTicks() < examineMessageUntil)
+    {
+        const float width = std::min(620.0f,
+            std::max(260.0f, static_cast<float>(examineMessage.size() * 8 + 24)));
+        const SDL_FRect messageBounds{
+            12.0f, static_cast<float>(WindowHeight) - 48.0f, width, 32.0f};
+        SDL_SetRenderDrawColor(renderer, 22, 19, 15, 235);
+        SDL_RenderFillRect(renderer, &messageBounds);
+        SDL_SetRenderDrawColor(renderer, 205, 178, 105, 255);
+        SDL_RenderRect(renderer, &messageBounds);
+        SDL_SetRenderDrawColor(renderer, 250, 238, 205, 255);
+        SDL_RenderDebugText(renderer, messageBounds.x + 10.0f,
+            messageBounds.y + 11.0f, examineMessage.c_str());
+    }
+
+    if (!worldContextMenu.open)
+    {
+        return;
+    }
+
+    SDL_SetRenderDrawColor(renderer, 25, 22, 18, 248);
+    SDL_RenderFillRect(renderer, &worldContextMenu.bounds);
+    SDL_SetRenderDrawColor(renderer, 218, 188, 106, 255);
+    SDL_RenderRect(renderer, &worldContextMenu.bounds);
+
+    std::vector<std::string> rows;
+    if (worldContextMenu.target.HasTarget())
+    {
+        rows.push_back(worldContextMenu.target.primaryAction + " " +
+            worldContextMenu.target.name);
+        rows.push_back("Walk here");
+        rows.push_back("Examine " + worldContextMenu.target.name);
+        rows.push_back("Cancel");
+    }
+    else
+    {
+        rows.push_back("Walk here");
+        rows.push_back("Cancel");
+    }
+
+    constexpr float rowHeight = 24.0f;
+    for (std::size_t index = 0; index < rows.size(); ++index)
+    {
+        const SDL_FRect row{worldContextMenu.bounds.x,
+            worldContextMenu.bounds.y + static_cast<float>(index) * rowHeight,
+            worldContextMenu.bounds.w, rowHeight};
+        if (IsPointInsideRectangle(mouseX, mouseY, row))
+        {
+            SDL_SetRenderDrawColor(renderer, 80, 67, 43, 255);
+            SDL_RenderFillRect(renderer, &row);
+        }
+        SDL_SetRenderDrawColor(renderer,
+            index == 0 ? 255 : 232,
+            index == 0 ? 218 : 226,
+            index == 0 ? 112 : 205, 255);
+        SDL_RenderDebugText(renderer, row.x + 10.0f, row.y + 8.0f,
+            rows[index].c_str());
+    }
 }
 
 void Graphics::DrawNPCs(
@@ -4290,7 +4447,7 @@ void Graphics::Render(
     recipeActionActive =
         activeAction != nullptr &&
         activeAction->GetType() == ActionType::RECIPE;
-    const bool worldHoverBlocked = stationMenuOpen ||
+    const bool worldHoverBlocked = stationMenuOpen || worldContextMenu.open ||
         shopPresentationState.IsOpen() ||
         dialoguePresentationState.IsOpen() || gameGuideVisible ||
         IsPointInsideRectangle(mouseX, mouseY, GetSidePanelRectangle());
@@ -4361,6 +4518,8 @@ void Graphics::Render(
 
     DrawStationMenu();
     if (shopPresentationState.IsOpen()) DrawShopPanel(); else DrawDialoguePanel();
+
+    DrawWorldContextMenu();
 
     DrawGameGuide(player);
 
