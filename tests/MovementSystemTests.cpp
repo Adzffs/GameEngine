@@ -232,8 +232,18 @@ namespace
         test.Expect(player->GetPosition().GetX() == 3 &&
                         player->GetPosition().GetY() == 2,
                     "Running takes a direction-changing corner as one visible step");
-        test.ExpectEqual(player->GetRunStamina(), 98,
-                         "A corner step does not spend stamina on a hidden shortcut");
+        test.ExpectEqual(player->GetRunStamina(), 97,
+                         "A visible running corner step still consumes stamina");
+
+        system.CancelMovement(playerID);
+        player->GetPosition().SetPosition(10, 10);
+        system.QueueDestination(playerID, Position(15, 10), entities, map);
+        system.QueueDestination(playerID, Position(10, 15), entities, map);
+        system.QueueDestination(playerID, Position(6, 10), entities, map);
+        system.Process(entities, map);
+        test.Expect(player->GetPosition().GetX() == 8 &&
+                        player->GetPosition().GetY() == 10,
+                    "Rapid destination spam follows only the latest requested route");
     }
 
     void TestDeterminismAndStaleState(TestContext &test)
