@@ -78,6 +78,21 @@ bool QuestDefinitionDatabase::IsValidDefinition(
                 NpcDefinitionDatabase::TryGet(definition.objectiveNpc) != nullptr &&
                 definition.objectiveText != nullptr &&
                 definition.objectiveText[0] != '\0';
+    const bool noAlternateCompletion =
+        definition.alternateCompletion.npcType == NpcType::NONE &&
+        definition.alternateCompletion.dialogueId == DialogueId::NONE &&
+        definition.alternateCompletion.interactionNodeId == DialogueNodeId::NONE &&
+        definition.alternateCompletion.rewardItem == ItemType::NONE &&
+        definition.alternateCompletion.rewardAmount == 0;
+    const bool validAlternateCompletion =
+        definition.alternateCompletion.npcType != NpcType::NONE &&
+        definition.alternateCompletion.npcType != definition.giver.npcType &&
+        NpcDefinitionDatabase::TryGet(
+            definition.alternateCompletion.npcType) != nullptr &&
+        definition.alternateCompletion.dialogueId != DialogueId::NONE &&
+        definition.alternateCompletion.interactionNodeId != DialogueNodeId::NONE &&
+        IsKnownItem(definition.alternateCompletion.rewardItem) &&
+        definition.alternateCompletion.rewardAmount > 0;
     return IsValidQuestId(definition.id) && definition.name != nullptr &&
         definition.name[0] != '\0' && validInitialState &&
         IsValidQuestObjectiveType(definition.objectiveType) && validObjective &&
@@ -85,7 +100,8 @@ bool QuestDefinitionDatabase::IsValidDefinition(
         IsKnownItem(definition.rewardItem) && definition.rewardAmount > 0 &&
         definition.giver.npcType != NpcType::NONE &&
         definition.giver.dialogueId != DialogueId::NONE &&
-        definition.giver.interactionNodeId != DialogueNodeId::NONE;
+        definition.giver.interactionNodeId != DialogueNodeId::NONE &&
+        (noAlternateCompletion || validAlternateCompletion);
 }
 
 bool QuestDefinitionDatabase::IsValidCatalogue(

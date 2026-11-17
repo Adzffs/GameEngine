@@ -14,6 +14,15 @@ struct QuestGiverDefinition
     DialogueNodeId interactionNodeId;
 };
 
+struct QuestCompletionDefinition
+{
+    NpcType npcType = NpcType::NONE;
+    DialogueId dialogueId = DialogueId::NONE;
+    DialogueNodeId interactionNodeId = DialogueNodeId::NONE;
+    ItemType rewardItem = ItemType::NONE;
+    int rewardAmount = 0;
+};
+
 struct QuestDefinition
 {
     QuestId id;
@@ -27,4 +36,5 @@ struct QuestDefinition
     QuestObjectiveType objectiveType = QuestObjectiveType::GATHER_ITEM;
     NpcType objectiveNpc = NpcType::NONE;
     const char *objectiveText = nullptr;
+    QuestCompletionDefinition alternateCompletion{};
 };

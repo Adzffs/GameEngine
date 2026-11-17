@@ -58,6 +58,12 @@ struct QuestSystemTestAccess
         return QuestSystem::RecordCraftedAgainstDefinitions(
             journal, itemType, quantity, definitions);
     }
+    static bool CompleteWithReward(QuestJournal &journal, QuestId questId,
+        Inventory &inventory, ItemType rewardItem, int rewardAmount)
+    {
+        return QuestSystem::CompleteWithReward(
+            journal, questId, inventory, rewardItem, rewardAmount);
+    }
 };
 
 int main()
@@ -197,5 +203,18 @@ int main()
                     craftingJournal.TryGet(crafting.id)->state ==
                         QuestState::READY_TO_COMPLETE,
                 "Successful crafted output advances and caps a crafting objective");
+
+    QuestJournal choiceJournal;
+    QuestSystem::TryRestore(choiceJournal, Records(
+        QuestState::READY_TO_COMPLETE, 10));
+    Inventory choiceInventory;
+    test.Expect(QuestSystemTestAccess::CompleteWithReward(choiceJournal,
+                    QuestId::GATHERING_BASICS, choiceInventory,
+                    ItemType::COOKED_MEAT, 3) &&
+                    choiceInventory.GetItemAmount(ItemType::COOKED_MEAT) == 3 &&
+                    choiceInventory.GetItemAmount(ItemType::COINS) == 0 &&
+                    !QuestSystem::Complete(choiceJournal,
+                        QuestId::GATHERING_BASICS, choiceInventory),
+                "A chosen alternate reward completes once and blocks the other outcome");
     return test.Finish();
 }

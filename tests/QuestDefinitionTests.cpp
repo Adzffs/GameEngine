@@ -114,6 +114,20 @@ int main()
     crafting.objectiveItem = ItemType::NONE;
     test.Expect(!QuestDefinitionDatabase::IsValidDefinition(crafting),
                 "Crafting objectives reject an unknown output item");
+    QuestDefinition choice = *definition;
+    choice.alternateCompletion = {
+        NpcType::NESSA_THORNE, DialogueId::NESSA_THORNE_INTRO,
+        DialogueNodeId::NESSA_THORNE_WELCOME, ItemType::COOKED_MEAT, 3};
+    test.Expect(QuestDefinitionDatabase::IsValidDefinition(choice),
+                "A complete alternate recipient and reward validates");
+    choice.alternateCompletion.rewardItem = ItemType::NONE;
+    test.Expect(!QuestDefinitionDatabase::IsValidDefinition(choice),
+                "A partial alternate completion definition rejects");
+    choice.alternateCompletion = {
+        definition->giver.npcType, definition->giver.dialogueId,
+        definition->giver.interactionNodeId, ItemType::COOKED_MEAT, 3};
+    test.Expect(!QuestDefinitionDatabase::IsValidDefinition(choice),
+                "Alternate completion must represent a real choice of recipient");
     invalid = *definition; invalid.requiredAmount = 0;
     test.Expect(!QuestDefinitionDatabase::IsValidDefinition(invalid),
                 "Non-positive requirement rejects");

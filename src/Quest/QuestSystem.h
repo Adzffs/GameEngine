@@ -20,6 +20,7 @@ public:
 
 private:
     friend struct QuestSystemTestAccess;
+    friend class World;
     static std::vector<QuestId> RecordGatheredAgainstDefinitions(
         QuestJournal &, ItemType, int quantity,
         const std::vector<QuestDefinition> &definitions);
@@ -29,6 +30,8 @@ private:
     static std::vector<QuestId> RecordCraftedAgainstDefinitions(
         QuestJournal &, ItemType, int quantity,
         const std::vector<QuestDefinition> &definitions);
+    static bool CompleteWithReward(
+        QuestJournal &, QuestId, Inventory &, ItemType, int);
     static bool IsValidRecord(
         const QuestRecord &, const QuestDefinition &);
 };

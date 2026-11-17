@@ -135,10 +135,21 @@ bool QuestSystem::Complete(
     QuestJournal &journal, QuestId questId, Inventory &inventory)
 {
     const QuestDefinition *definition = QuestDefinitionDatabase::TryGet(questId);
+    if (definition == nullptr) return false;
+    return CompleteWithReward(journal, questId, inventory,
+        definition->rewardItem, definition->rewardAmount);
+}
+
+bool QuestSystem::CompleteWithReward(
+    QuestJournal &journal, QuestId questId, Inventory &inventory,
+    ItemType rewardItem, int rewardAmount)
+{
     auto found = journal.records.find(questId);
-    if (definition == nullptr || found == journal.records.end() ||
+    if (QuestDefinitionDatabase::TryGet(questId) == nullptr ||
+        found == journal.records.end() ||
         found->second.state != QuestState::READY_TO_COMPLETE ||
-        !inventory.AddItem(definition->rewardItem, definition->rewardAmount))
+        rewardItem == ItemType::NONE || rewardAmount <= 0 ||
+        !inventory.AddItem(rewardItem, rewardAmount))
         return false;
     found->second.state = QuestState::COMPLETED;
     return true;

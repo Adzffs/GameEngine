@@ -2678,16 +2678,30 @@ void World::ProcessQueuedCommands()
                     const bool adjacent = player != nullptr && npc != nullptr &&
                         std::abs(player->GetPosition().GetX() - npc->GetPosition().GetX()) <= 1 &&
                         std::abs(player->GetPosition().GetY() - npc->GetPosition().GetY()) <= 1;
+                    const bool primaryContext = quest != nullptr && npc != nullptr &&
+                        npc->GetNpcType() == quest->giver.npcType &&
+                        session != nullptr &&
+                        session->dialogueId == quest->giver.dialogueId &&
+                        session->currentNodeId == quest->giver.interactionNodeId;
+                    const bool alternateContext = quest != nullptr && npc != nullptr &&
+                        quest->alternateCompletion.npcType != NpcType::NONE &&
+                        npc->GetNpcType() == quest->alternateCompletion.npcType &&
+                        session != nullptr &&
+                        session->dialogueId == quest->alternateCompletion.dialogueId &&
+                        session->currentNodeId ==
+                            quest->alternateCompletion.interactionNodeId;
+                    const bool commandContext =
+                        std::is_same_v<CommandType, QuestAcceptCommand>
+                            ? primaryContext
+                            : (primaryContext || alternateContext);
                     const bool validContext = player != nullptr && player->IsAlive() &&
                         quest != nullptr && record != nullptr && npc != nullptr &&
                         npcDefinition != nullptr && npcDefinition->kind == NpcKind::FRIENDLY &&
-                        npc->GetNpcType() == quest->giver.npcType &&
                         session != nullptr && session->actorEntityID == data.actorEntityID &&
                         session->sessionId == data.dialogueSessionId &&
                         session->npcEntityID == data.npcEntityID &&
                         session->npcType == npc->GetNpcType() &&
-                        session->dialogueId == quest->giver.dialogueId &&
-                        session->currentNodeId == quest->giver.interactionNodeId && adjacent;
+                        commandContext && adjacent;
                     if (validContext)
                     {
                         bool accepted = false;
@@ -2695,9 +2709,17 @@ void World::ProcessQueuedCommands()
                             accepted = QuestSystem::Accept(
                                 player->GetQuestJournal(), data.questId);
                         else
-                            accepted = QuestSystem::Complete(
+                        {
+                            const ItemType rewardItem = alternateContext
+                                ? quest->alternateCompletion.rewardItem
+                                : quest->rewardItem;
+                            const int rewardAmount = alternateContext
+                                ? quest->alternateCompletion.rewardAmount
+                                : quest->rewardAmount;
+                            accepted = QuestSystem::CompleteWithReward(
                                 player->GetQuestJournal(), data.questId,
-                                player->GetInventory());
+                                player->GetInventory(), rewardItem, rewardAmount);
+                        }
                         if (accepted) resultCode = CommandResultCode::ACCEPTED;
                     }
                 }
@@ -3299,14 +3321,20 @@ bool World::PublishDialogueNode(const ActiveDialogueSession &session,
     {
         for (const QuestDefinition &quest : QuestDefinitionDatabase::GetAll())
         {
-            if (quest.giver.npcType != session.npcType ||
-                quest.giver.dialogueId != session.dialogueId ||
-                quest.giver.interactionNodeId != node.id)
+            const bool primaryContext =
+                quest.giver.npcType == session.npcType &&
+                quest.giver.dialogueId == session.dialogueId &&
+                quest.giver.interactionNodeId == node.id;
+            const bool alternateContext =
+                quest.alternateCompletion.npcType == session.npcType &&
+                quest.alternateCompletion.dialogueId == session.dialogueId &&
+                quest.alternateCompletion.interactionNodeId == node.id;
+            if (!primaryContext && !alternateContext)
                 continue;
             const QuestRecord *record =
                 questPlayer->GetQuestJournal().TryGet(quest.id);
             if (record == nullptr) continue;
-            if (record->state == QuestState::AVAILABLE)
+            if (record->state == QuestState::AVAILABLE && primaryContext)
                 questActions.push_back({QuestDialogueActionKind::ACCEPT, quest.id});
             else if (record->state == QuestState::READY_TO_COMPLETE)
                 questActions.push_back({QuestDialogueActionKind::COMPLETE, quest.id});
