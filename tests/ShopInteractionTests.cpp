@@ -41,7 +41,7 @@ int main()
     test.ExpectEqual(world.GetShopOpenedEvents().size(), std::size_t{1},
                      "Adjacent trade opens on tick one");
     const ShopOpenedEvent opened = world.GetShopOpenedEvents().front();
-    test.Expect(opened.sessionId != InvalidShopSessionId && opened.entries.size() == 9,
+    test.Expect(opened.sessionId != InvalidShopSessionId && opened.entries.size() == 10,
                 "Open event owns session and ordered entries");
     world.EnqueueCommand(ShopBuyCommand{player->GetID(), opened.sessionId,
         ItemType::COOKED_MEAT, 2});
@@ -59,6 +59,13 @@ int main()
                      "Sell adds exact coins");
     test.ExpectEqual(player->GetInventory().GetItemAmount(ItemType::COOKED_MEAT), 1,
                      "Sell removes exact item");
+    world.EnqueueCommand(ShopBuyCommand{player->GetID(), opened.sessionId,
+        ItemType::HEALING_TONIC, 2});
+    world.Update();
+    test.ExpectEqual(player->GetInventory().GetItemAmount(ItemType::COINS), 47,
+                     "Premium recovery purchase removes its exact coin cost");
+    test.ExpectEqual(player->GetInventory().GetItemAmount(ItemType::HEALING_TONIC), 2,
+                     "Purchased healing tonics stack in one inventory entry");
     const Inventory before = player->GetInventory();
     world.EnqueueCommand(ShopBuyCommand{player->GetID(), opened.sessionId,
         ItemType::LOG, 1});

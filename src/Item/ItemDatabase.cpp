@@ -25,7 +25,8 @@ ItemDatabase::GetAllItemTypes()
         ItemType::BRONZE_SWORD,
         ItemType::DEVELOPER_GODSWORD,
         ItemType::WOODEN_SHIELD,
-        ItemType::WOODEN_PLANKS};
+        ItemType::WOODEN_PLANKS,
+        ItemType::HEALING_TONIC};
 
     return itemTypes;
 }
@@ -298,6 +299,18 @@ const ItemDefinition &ItemDatabase::Get(
         0,
         0};
 
+    static const ItemDefinition healingTonic{
+        ItemType::HEALING_TONIC,
+        "Healing tonic",
+        true,
+        EquipmentSlotType::NONE,
+        ToolType::NONE,
+        SkillType::NONE,
+        0,
+        0,
+        StatBlock(),
+        FoodDefinition{12}};
+
     switch (itemType)
     {
     case ItemType::LOG:
@@ -365,6 +378,9 @@ const ItemDefinition &ItemDatabase::Get(
 
     case ItemType::WOODEN_PLANKS:
         return woodenPlanks;
+
+    case ItemType::HEALING_TONIC:
+        return healingTonic;
 
     case ItemType::NONE:
     default:

@@ -32,5 +32,7 @@ enum class ItemType
     DEVELOPER_GODSWORD,
     WOODEN_SHIELD,
 
-    WOODEN_PLANKS
+    WOODEN_PLANKS,
+
+    HEALING_TONIC
 };

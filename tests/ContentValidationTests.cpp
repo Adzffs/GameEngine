@@ -141,7 +141,7 @@ int main()
 
         test.ExpectEqual(
             static_cast<int>(itemTypes.size()),
-            22,
+            23,
             "Every registered item type is enumerated");
         test.ExpectEqual(
             static_cast<int>(resourceTypes.size()),

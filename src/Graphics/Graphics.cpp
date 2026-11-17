@@ -5028,9 +5028,24 @@ void Graphics::DrawFoodIcon(
     float y,
     float size)
 {
-    if (itemType !=
-        ItemType::COOKED_MEAT)
+    if (itemType != ItemType::COOKED_MEAT &&
+        itemType != ItemType::HEALING_TONIC)
     {
+        return;
+    }
+
+    if (itemType == ItemType::HEALING_TONIC)
+    {
+        SDL_SetRenderDrawColor(renderer, 82, 185, 190, 255);
+        const SDL_FRect bottle{
+            x + size * 0.30f, y + size * 0.25f,
+            size * 0.40f, size * 0.52f};
+        SDL_RenderFillRect(renderer, &bottle);
+        SDL_SetRenderDrawColor(renderer, 210, 230, 220, 255);
+        const SDL_FRect stopper{
+            x + size * 0.40f, y + size * 0.16f,
+            size * 0.20f, size * 0.14f};
+        SDL_RenderFillRect(renderer, &stopper);
         return;
     }
 

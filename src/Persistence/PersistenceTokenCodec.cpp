@@ -50,7 +50,8 @@ namespace
         std::pair{ItemType::BRONZE_SWORD, std::string_view{"BRONZE_SWORD"}},
         std::pair{ItemType::DEVELOPER_GODSWORD, std::string_view{"DEVELOPER_GODSWORD"}},
         std::pair{ItemType::WOODEN_SHIELD, std::string_view{"WOODEN_SHIELD"}},
-        std::pair{ItemType::WOODEN_PLANKS, std::string_view{"WOODEN_PLANKS"}}};
+        std::pair{ItemType::WOODEN_PLANKS, std::string_view{"WOODEN_PLANKS"}},
+        std::pair{ItemType::HEALING_TONIC, std::string_view{"HEALING_TONIC"}}};
 
     constexpr std::array SKILL_MAPPINGS{
         std::pair{SkillType::ATTACK, std::string_view{"ATTACK"}},

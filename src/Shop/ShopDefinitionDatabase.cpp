@@ -14,6 +14,7 @@ namespace
             {ItemType::TIN_ORE, std::nullopt, 2},
             {ItemType::COAL, std::nullopt, 4},
             {ItemType::COOKED_MEAT, 8, 3},
+            {ItemType::HEALING_TONIC, 20, 6},
             {ItemType::BRONZE_AXE, 25, 10},
             {ItemType::BRONZE_PICKAXE, 25, 10},
             {ItemType::BRONZE_SWORD, 40, 15},

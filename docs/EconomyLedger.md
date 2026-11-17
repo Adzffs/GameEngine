@@ -28,6 +28,7 @@ This ledger is the balancing contract for the starter region. It records what ev
 | Steel bar | 3 | Furnace: 1 Iron ore + 2 Coal; Stoneback/Cinder Warden drop | Steel axe and pickaxe | 4 ticks, Smithing 20, 20 XP; gear costs 2–3 bars | Not traded | Prestige gathering tier with both crafted and combat-assisted routes | Retain high input cost and compare both acquisition routes |
 | Coins | 1 | Ashfang and Cinder Warden drops | Food and starter equipment purchases | Combat-paced; no gathering conversion | Currency | Gives combat an economic identity | Add useful repeat purchases before adding more coin sources |
 | Cooked meat | 1 | Ashfang guaranteed drop; shop | Consumed for 5 health | Immediate consumable | Buy 8 / sell 3 | Repeatable combat sink and recovery tool | Tune healing against encounter damage after playtest telemetry |
+| Healing tonic | 2 | Shop | Consumed for 12 health | Immediate consumable; stackable | Buy 20 / sell 6 | Premium recurring coin sink that trades slightly worse healing value for major inventory compression | Measure purchase mix against Cooked meat during longer trips |
 | Bronze axe | 1 | Development starting inventory; shop | Equipped tool | Permanent | Buy 25 / sell 10 | Baseline Woodcutting access | Remove from shop only if a safe replacement path exists |
 | Iron axe | 2 | Forge: 2 Iron bars + 1 Wooden plank | Equipped tool | Permanent; Woodcutting 5 requirement | Not traded | Deterministic mid-tier Woodcutting upgrade | Measure upgrade time |
 | Steel axe | 3 | Forge: 2 Steel bars + 1 Wooden plank; Cinder Warden rare drop | Equipped tool | Permanent; Woodcutting 10 requirement | Not traded | Deterministic route plus an exciting accelerating drop | Compare crafted and combat acquisition times |
@@ -41,7 +42,7 @@ This ledger is the balancing contract for the starter region. It records what ev
 
 ## Confirmed imbalances
 
-1. **The shop is mostly a recovery shop, not a repeat-visit economy.** Cooked meat is its only recurring purchase.
+1. **The shop remains recovery-focused.** Cooked meat provides efficient healing, while stackable Healing tonic creates a premium repeat purchase for longer trips.
 2. **Combat and crafting need more ongoing interdependence.** Ore and bar drops now accelerate equipment, but permanent gear is only a one-time sink.
 
 ## Implementation order

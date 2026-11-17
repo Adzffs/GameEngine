@@ -217,6 +217,20 @@ int main()
             static_cast<int>(ToolType::NONE),
             "Cooked meat is not a tool");
 
+        const ItemDefinition &healingTonic =
+            ItemDatabase::Get(ItemType::HEALING_TONIC);
+        test.Expect(
+            healingTonic.IsFood() && healingTonic.IsStackable(),
+            "Healing tonic is stackable recovery for inventory-conscious trips");
+        test.ExpectEqual(
+            healingTonic.GetFoodDefinition()->healAmount,
+            12,
+            "Healing tonic restores twelve health");
+        test.ExpectEqual(
+            static_cast<int>(ItemType::HEALING_TONIC),
+            23,
+            "Healing tonic keeps a stable appended item ID");
+
         bool foundCookedMeat = false;
 
         for (ItemType itemType : ItemDatabase::GetAllItemTypes())
