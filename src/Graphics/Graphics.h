@@ -374,6 +374,7 @@ public:
     SDL_FRect GetShopBuyButtonRectangle(std::size_t index) const;
     SDL_FRect GetShopSellButtonRectangle(std::size_t index) const;
     SDL_FRect GetShopCloseButtonRectangle() const;
+    std::string GetShopItemDetail(ItemType itemType) const;
     void DrawShopPanel();
     void DrawQuestPanel(const Player &player);
     void DrawQuestRows(const std::vector<QuestPresentation> &quests);

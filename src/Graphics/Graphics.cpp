@@ -1926,6 +1926,22 @@ SDL_FRect Graphics::GetShopBuyButtonRectangle(std::size_t i) const { auto r=GetS
 SDL_FRect Graphics::GetShopSellButtonRectangle(std::size_t i) const { auto r=GetShopRowRectangle(i); return SDL_FRect{r.x+r.w-160.0f,r.y+4.0f,120.0f,r.h-8.0f}; }
 SDL_FRect Graphics::GetShopCloseButtonRectangle() const { return SDL_FRect{1020.0f,100.0f,90.0f,32.0f}; }
 
+std::string Graphics::GetShopItemDetail(ItemType itemType) const
+{
+    const ItemDefinition &item = ItemDatabase::Get(itemType);
+    std::string detail;
+    if (const FoodDefinition *food = item.GetFoodDefinition())
+        detail = "HEALS " + std::to_string(food->healAmount);
+    else if (item.IsEquippable())
+        detail = "EQUIPMENT";
+    else
+        detail = "MATERIAL";
+    if (item.IsStackable()) detail += " | STACKS";
+    detail += " | OWNED " +
+        std::to_string(GetDisplayedInventoryItemCount(itemType));
+    return detail;
+}
+
 bool Graphics::HandleShopClick(float x,float y)
 {
     if(!shopPresentationState.IsOpen() || pendingShopCommand ||
@@ -5635,12 +5651,72 @@ void Graphics::DrawDialoguePanel()
 
 void Graphics::DrawShopPanel()
 {
-    const auto* e=shopPresentationState.GetEvent(); if(!e)return;
-    const SDL_FRect panel{120,70,1040,620}; SDL_SetRenderDrawColor(renderer,24,22,20,248); SDL_RenderFillRect(renderer,&panel); SDL_SetRenderDrawColor(renderer,205,180,120,255); SDL_RenderRect(renderer,&panel);
-    SDL_SetRenderDrawColor(renderer,255,244,210,255); SDL_RenderDebugText(renderer,160,95,e->shopName.c_str()); SDL_RenderDebugText(renderer,160,115,("Currency: "+std::to_string(displayedCurrency)+"    BUY (left)        SELL (right)     Quantity: 1").c_str());
-    if (shopPresentationState.HasRejection()) SDL_RenderDebugText(renderer,160,135,"Transaction rejected by server");
-    for(std::size_t i=0;i<e->entries.size();++i){ const auto&r=GetShopRowRectangle(i); const auto& row=e->entries[i]; SDL_SetRenderDrawColor(renderer,55,50,45,255); SDL_RenderFillRect(renderer,&r); SDL_SetRenderDrawColor(renderer,190,170,130,255); SDL_RenderRect(renderer,&r); SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,r.x+16,r.y+13,ItemDatabase::Get(row.itemType).GetName().c_str()); auto drawButton=[&](SDL_FRect b,const char* label,int price){SDL_SetRenderDrawColor(renderer,70,90,65,255); SDL_RenderFillRect(renderer,&b); SDL_SetRenderDrawColor(renderer,220,200,160,255); SDL_RenderRect(renderer,&b); SDL_SetRenderDrawColor(renderer,255,255,255,255); std::string caption=std::string(label)+" "+std::to_string(price); SDL_RenderDebugText(renderer,b.x+18,b.y+11,caption.c_str());}; if(row.buyPrice) drawButton(GetShopBuyButtonRectangle(i),"BUY",*row.buyPrice); if(row.sellPrice) drawButton(GetShopSellButtonRectangle(i),"SELL",*row.sellPrice); }
-    const auto b=GetShopCloseButtonRectangle(); SDL_SetRenderDrawColor(renderer,70,55,45,255); SDL_RenderFillRect(renderer,&b); SDL_SetRenderDrawColor(renderer,220,200,160,255); SDL_RenderRect(renderer,&b); SDL_SetRenderDrawColor(renderer,255,255,255,255); SDL_RenderDebugText(renderer,b.x+20,b.y+9,"CLOSE");
+    const ShopOpenedEvent *event = shopPresentationState.GetEvent();
+    if (event == nullptr) return;
+    const SDL_FRect panel{120, 70, 1040, 620};
+    SDL_SetRenderDrawColor(renderer, 24, 22, 20, 248);
+    SDL_RenderFillRect(renderer, &panel);
+    SDL_SetRenderDrawColor(renderer, 205, 180, 120, 255);
+    SDL_RenderRect(renderer, &panel);
+    SDL_SetRenderDrawColor(renderer, 255, 244, 210, 255);
+    SDL_RenderDebugText(renderer, 160, 95, event->shopName.c_str());
+    const std::string currency = "Coins: " + std::to_string(displayedCurrency) +
+        "    Prices are for one item";
+    SDL_RenderDebugText(renderer, 160, 115, currency.c_str());
+    if (shopPresentationState.HasRejection())
+        SDL_RenderDebugText(renderer, 160, 135,
+            "Transaction rejected by server");
+
+    for (std::size_t index = 0; index < event->entries.size(); ++index)
+    {
+        const SDL_FRect rowBounds = GetShopRowRectangle(index);
+        const ShopEventEntry &row = event->entries[index];
+        const int owned = GetDisplayedInventoryItemCount(row.itemType);
+        SDL_SetRenderDrawColor(renderer, 55, 50, 45, 255);
+        SDL_RenderFillRect(renderer, &rowBounds);
+        SDL_SetRenderDrawColor(renderer, 190, 170, 130, 255);
+        SDL_RenderRect(renderer, &rowBounds);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderDebugText(renderer, rowBounds.x + 16.0f,
+            rowBounds.y + 9.0f,
+            ItemDatabase::Get(row.itemType).GetName().c_str());
+        const std::string detail = GetShopItemDetail(row.itemType);
+        SDL_SetRenderDrawColor(renderer, 190, 195, 190, 255);
+        SDL_RenderDebugText(renderer, rowBounds.x + 16.0f,
+            rowBounds.y + 25.0f, detail.c_str());
+
+        const auto drawButton = [&](SDL_FRect button, const char *label,
+            int price, bool available)
+        {
+            SDL_SetRenderDrawColor(renderer,
+                available ? 70 : 48, available ? 90 : 48,
+                available ? 65 : 48, 255);
+            SDL_RenderFillRect(renderer, &button);
+            SDL_SetRenderDrawColor(renderer,
+                available ? 220 : 125, available ? 200 : 125,
+                available ? 160 : 125, 255);
+            SDL_RenderRect(renderer, &button);
+            const std::string caption = std::string(label) + " " +
+                std::to_string(price);
+            SDL_RenderDebugText(renderer, button.x + 18.0f,
+                button.y + 11.0f, caption.c_str());
+        };
+        if (row.buyPrice)
+            drawButton(GetShopBuyButtonRectangle(index), "BUY", *row.buyPrice,
+                displayedCurrency >= *row.buyPrice);
+        if (row.sellPrice)
+            drawButton(GetShopSellButtonRectangle(index), "SELL", *row.sellPrice,
+                owned > 0);
+    }
+
+    const SDL_FRect closeButton = GetShopCloseButtonRectangle();
+    SDL_SetRenderDrawColor(renderer, 70, 55, 45, 255);
+    SDL_RenderFillRect(renderer, &closeButton);
+    SDL_SetRenderDrawColor(renderer, 220, 200, 160, 255);
+    SDL_RenderRect(renderer, &closeButton);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderDebugText(renderer, closeButton.x + 20.0f,
+        closeButton.y + 9.0f, "CLOSE");
 }
 
 std::vector<Graphics::QuestRowLayout> Graphics::BuildQuestRowLayout(
