@@ -49,6 +49,16 @@ struct GraphicsTestAccess
     {
         return graphics.recipeCanCraftOnly;
     }
+
+    static int RecipeBookPage(const Graphics &graphics)
+    {
+        return graphics.recipeBookPage;
+    }
+
+    static RecipeType SelectedRecipe(const Graphics &graphics)
+    {
+        return graphics.selectedRecipeBookRecipe;
+    }
 };
 
 namespace
@@ -140,6 +150,22 @@ int main()
             sidePanel.contentBounds.y + 33.0f) &&
             GraphicsTestAccess::RecipeFilterEnabled(graphics),
         "Recipe book can toggle the can-craft-only filter");
+    graphics.HandleSidePanelClick(
+        sidePanel.contentBounds.x + 5.0f,
+        sidePanel.contentBounds.y + 33.0f);
+    test.Expect(
+        graphics.HandleSidePanelClick(
+            sidePanel.contentBounds.x + sidePanel.contentBounds.w - 20.0f,
+            sidePanel.contentBounds.y + 33.0f) &&
+            GraphicsTestAccess::RecipeBookPage(graphics) == 1,
+        "Recipe book pages through the full recipe catalogue");
+    test.Expect(
+        graphics.HandleSidePanelClick(
+            sidePanel.contentBounds.x + 5.0f,
+            sidePanel.contentBounds.y + 91.0f) &&
+            GraphicsTestAccess::SelectedRecipe(graphics) ==
+                RecipeType::BRONZE_PICKAXE,
+        "Recipe book selects a discovered recipe for its details");
 
     SDL_Renderer *renderer =
         GraphicsTestAccess::Renderer(graphics);

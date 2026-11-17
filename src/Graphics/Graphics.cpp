@@ -1469,12 +1469,50 @@ bool Graphics::HandleSidePanelClick(
         const SDL_FRect filterButton{
             layout.contentBounds.x,
             layout.contentBounds.y + 28.0f,
-            layout.contentBounds.w,
+            layout.contentBounds.w - 90.0f,
             28.0f};
+        const SDL_FRect previousButton{
+            layout.contentBounds.x + layout.contentBounds.w - 84.0f,
+            layout.contentBounds.y + 28.0f, 38.0f, 28.0f};
+        const SDL_FRect nextButton{
+            layout.contentBounds.x + layout.contentBounds.w - 40.0f,
+            layout.contentBounds.y + 28.0f, 40.0f, 28.0f};
         if (IsPointInsideRectangle(mouseX, mouseY, filterButton))
         {
             recipeCanCraftOnly = !recipeCanCraftOnly;
+            recipeBookPage = 0;
+            selectedRecipeBookRecipe = RecipeType::NONE;
             return true;
+        }
+        const std::vector<RecipeType> entries = BuildDisplayedRecipeBookEntries();
+        const int pageCount = std::max(1,
+            (static_cast<int>(entries.size()) + 6) / 7);
+        if (IsPointInsideRectangle(mouseX, mouseY, previousButton))
+        {
+            recipeBookPage = std::max(0, recipeBookPage - 1);
+            selectedRecipeBookRecipe = RecipeType::NONE;
+            return true;
+        }
+        if (IsPointInsideRectangle(mouseX, mouseY, nextButton))
+        {
+            recipeBookPage = std::min(pageCount - 1, recipeBookPage + 1);
+            selectedRecipeBookRecipe = RecipeType::NONE;
+            return true;
+        }
+        for (int rowIndex = 0; rowIndex < 7; ++rowIndex)
+        {
+            const int entryIndex = recipeBookPage * 7 + rowIndex;
+            if (entryIndex >= static_cast<int>(entries.size())) break;
+            const SDL_FRect row{
+                layout.contentBounds.x,
+                layout.contentBounds.y + 66.0f + rowIndex * 20.0f,
+                layout.contentBounds.w, 19.0f};
+            if (IsPointInsideRectangle(mouseX, mouseY, row))
+            {
+                if (IsDisplayedRecipeKnown(entries[entryIndex]))
+                    selectedRecipeBookRecipe = entries[entryIndex];
+                return true;
+            }
         }
     }
 
@@ -4114,6 +4152,21 @@ void Graphics::DrawPlaceholderPanel(
         "COMING SOON");
 }
 
+std::vector<RecipeType> Graphics::BuildDisplayedRecipeBookEntries() const
+{
+    std::vector<RecipeType> entries;
+    for (RecipeType recipeType : RecipeDatabase::GetAllRecipeTypes())
+    {
+        const RecipeDefinition &recipe = RecipeDatabase::Get(recipeType);
+        const bool known = IsDisplayedRecipeKnown(recipeType);
+        if (recipeCanCraftOnly &&
+            (!known || !HasDisplayedRecipeRequirements(recipe)))
+            continue;
+        entries.push_back(recipeType);
+    }
+    return entries;
+}
+
 void Graphics::DrawRecipeBook()
 {
     const SidePanelLayout layout = GetSidePanelLayout();
@@ -4122,8 +4175,14 @@ void Graphics::DrawRecipeBook()
     const SDL_FRect filterButton{
         layout.contentBounds.x,
         layout.contentBounds.y + 28.0f,
-        layout.contentBounds.w,
+        layout.contentBounds.w - 90.0f,
         28.0f};
+    const SDL_FRect previousButton{
+        layout.contentBounds.x + layout.contentBounds.w - 84.0f,
+        layout.contentBounds.y + 28.0f, 38.0f, 28.0f};
+    const SDL_FRect nextButton{
+        layout.contentBounds.x + layout.contentBounds.w - 40.0f,
+        layout.contentBounds.y + 28.0f, 40.0f, 28.0f};
     SDL_SetRenderDrawColor(renderer,
         recipeCanCraftOnly ? 64 : 40,
         recipeCanCraftOnly ? 92 : 44,
@@ -4138,22 +4197,44 @@ void Graphics::DrawRecipeBook()
     SDL_RenderDebugText(renderer, filterButton.x + 10.0f,
         filterButton.y + 10.0f, filterLabel.c_str());
 
-    float rowY = layout.contentBounds.y + 66.0f;
-    int shown = 0;
-    for (RecipeType recipeType : RecipeDatabase::GetAllRecipeTypes())
+    const std::vector<RecipeType> entries = BuildDisplayedRecipeBookEntries();
+    const int pageCount = std::max(1,
+        (static_cast<int>(entries.size()) + 6) / 7);
+    recipeBookPage = std::clamp(recipeBookPage, 0, pageCount - 1);
+    for (const SDL_FRect &button : {previousButton, nextButton})
     {
+        SDL_SetRenderDrawColor(renderer, 40, 44, 48, 255);
+        SDL_RenderFillRect(renderer, &button);
+        SDL_SetRenderDrawColor(renderer, 164, 139, 87, 255);
+        SDL_RenderRect(renderer, &button);
+    }
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderDebugText(renderer, previousButton.x + 14.0f,
+        previousButton.y + 10.0f, "<");
+    SDL_RenderDebugText(renderer, nextButton.x + 15.0f,
+        nextButton.y + 10.0f, ">");
+
+    int shown = 0;
+    for (int rowIndex = 0; rowIndex < 7; ++rowIndex)
+    {
+        const int entryIndex = recipeBookPage * 7 + rowIndex;
+        if (entryIndex >= static_cast<int>(entries.size())) break;
+        const RecipeType recipeType = entries[entryIndex];
         const RecipeDefinition &recipe = RecipeDatabase::Get(recipeType);
         const bool known = IsDisplayedRecipeKnown(recipeType);
         const bool craftable = known && HasDisplayedRecipeRequirements(recipe);
-        if (recipeCanCraftOnly && !craftable) continue;
 
         SDL_SetRenderDrawColor(renderer,
-            craftable ? 80 : (known ? 55 : 38),
-            craftable ? 120 : (known ? 58 : 40),
-            craftable ? 82 : (known ? 62 : 44), 255);
+            recipeType == selectedRecipeBookRecipe ? 112 :
+                (craftable ? 80 : (known ? 55 : 38)),
+            recipeType == selectedRecipeBookRecipe ? 82 :
+                (craftable ? 120 : (known ? 58 : 40)),
+            recipeType == selectedRecipeBookRecipe ? 48 :
+                (craftable ? 82 : (known ? 62 : 44)), 255);
         const SDL_FRect row{
-            layout.contentBounds.x, rowY,
-            layout.contentBounds.w, 17.0f};
+            layout.contentBounds.x,
+            layout.contentBounds.y + 66.0f + rowIndex * 20.0f,
+            layout.contentBounds.w, 19.0f};
         SDL_RenderFillRect(renderer, &row);
         SDL_SetRenderDrawColor(renderer,
             known ? 235 : 135, known ? 235 : 135, known ? 235 : 140, 255);
@@ -4164,9 +4245,8 @@ void Graphics::DrawRecipeBook()
         const std::string text = known
             ? recipe.GetName() + " | " + compactStatus
             : "???? | Explore to discover";
-        SDL_RenderDebugText(renderer, row.x + 5.0f, row.y + 5.0f,
+        SDL_RenderDebugText(renderer, row.x + 5.0f, row.y + 6.0f,
             text.c_str());
-        rowY += 18.0f;
         ++shown;
     }
 
@@ -4177,6 +4257,50 @@ void Graphics::DrawRecipeBook()
             layout.contentBounds.y + 82.0f,
             "No known recipes are craftable");
     }
+
+    const float detailY = layout.contentBounds.y + 211.0f;
+    if (selectedRecipeBookRecipe == RecipeType::NONE ||
+        !IsDisplayedRecipeKnown(selectedRecipeBookRecipe))
+    {
+        SDL_SetRenderDrawColor(renderer, 175, 180, 180, 255);
+        SDL_RenderDebugText(renderer, layout.contentBounds.x, detailY,
+            "Select a known recipe for details");
+        return;
+    }
+
+    const RecipeDefinition &selected =
+        RecipeDatabase::Get(selectedRecipeBookRecipe);
+    const char *station = selected.GetRequiredStationType() == StationType::FURNACE
+        ? "Forge" : "Crafting table";
+    const std::string skill = selected.GetRequiredSkill() == SkillType::NONE
+        ? "No skill requirement"
+        : std::string(GetSkillDisplayName(selected.GetRequiredSkill())) +
+            " " + std::to_string(selected.GetRequiredLevel());
+    std::string ingredients = "Needs: ";
+    for (std::size_t index = 0; index < selected.GetIngredients().size(); ++index)
+    {
+        if (index > 0) ingredients += " + ";
+        const RecipeIngredient &ingredient = selected.GetIngredients()[index];
+        ingredients += std::to_string(ingredient.amount) + " " +
+            ItemDatabase::Get(ingredient.itemType).GetName();
+    }
+    const std::string output = "Makes: " +
+        std::to_string(selected.GetOutputAmount()) + " " +
+        ItemDatabase::Get(selected.GetOutputItem()).GetName();
+    const std::string timing = "Time: " +
+        std::to_string(selected.GetActionDurationTicks()) + " ticks  XP: " +
+        std::to_string(selected.GetXPReward());
+    SDL_SetRenderDrawColor(renderer, 225, 225, 220, 255);
+    SDL_RenderDebugText(renderer, layout.contentBounds.x, detailY,
+        (std::string("Station: ") + station).c_str());
+    SDL_RenderDebugText(renderer, layout.contentBounds.x, detailY + 20.0f,
+        skill.c_str());
+    SDL_RenderDebugText(renderer, layout.contentBounds.x, detailY + 40.0f,
+        ingredients.c_str());
+    SDL_RenderDebugText(renderer, layout.contentBounds.x, detailY + 60.0f,
+        output.c_str());
+    SDL_RenderDebugText(renderer, layout.contentBounds.x, detailY + 80.0f,
+        timing.c_str());
 }
 
 void Graphics::DrawSettings()

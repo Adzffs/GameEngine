@@ -336,6 +336,7 @@ public:
     void DrawPlaceholderPanel(
         const char *title);
     void DrawRecipeBook();
+    std::vector<RecipeType> BuildDisplayedRecipeBookEntries() const;
 
     void DrawMap(Map &map);
     void DrawGrid(const Map &map);
@@ -504,6 +505,8 @@ private:
     std::vector<RecipeType> displayedKnownRecipes;
     bool recipeKnowledgeInitialized = false;
     bool recipeCanCraftOnly = false;
+    int recipeBookPage = 0;
+    RecipeType selectedRecipeBookRecipe = RecipeType::NONE;
     std::array<InventorySlot, Inventory::SlotCount> displayedInventorySlots{};
     std::string stationFeedback;
 
