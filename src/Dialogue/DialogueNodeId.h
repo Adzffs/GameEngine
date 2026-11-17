@@ -13,7 +13,9 @@ enum class DialogueNodeId
     ELIA_REED_WELCOME = 8,
     NESSA_THORNE_WELCOME = 9,
     BRANN_DEEPWELL_WELCOME = 10,
-    SERA_FLINT_WELCOME = 11
+    SERA_FLINT_WELCOME = 11,
+    TORREN_ASH_FAREWELL = 12,
+    NESSA_THORNE_FAREWELL = 13
 };
 
 constexpr bool IsValidDialogueNodeId(DialogueNodeId id)
@@ -28,5 +30,7 @@ constexpr bool IsValidDialogueNodeId(DialogueNodeId id)
            id == DialogueNodeId::ELIA_REED_WELCOME ||
            id == DialogueNodeId::NESSA_THORNE_WELCOME ||
            id == DialogueNodeId::BRANN_DEEPWELL_WELCOME ||
-           id == DialogueNodeId::SERA_FLINT_WELCOME;
+           id == DialogueNodeId::SERA_FLINT_WELCOME ||
+           id == DialogueNodeId::TORREN_ASH_FAREWELL ||
+           id == DialogueNodeId::NESSA_THORNE_FAREWELL;
 }

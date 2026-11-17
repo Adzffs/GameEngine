@@ -48,6 +48,11 @@ namespace
         DialogueNodeId::TORREN_ASH_WELCOME,
         {{DialogueNodeId::TORREN_ASH_WELCOME,
           "Mara sent you? Good. Bring me honest metal and I'll make it earn its weight.",
+          DialogueNodeKind::CONTINUE,
+          DialogueNodeId::TORREN_ASH_FAREWELL,
+          {}},
+         {DialogueNodeId::TORREN_ASH_FAREWELL,
+          "A wooden shield is simple work. Deciding who needs it most is not.",
           DialogueNodeKind::TERMINAL,
           std::nullopt,
           {}}}};
@@ -61,6 +66,10 @@ namespace
         DialogueId::NESSA_THORNE_INTRO, DialogueNodeId::NESSA_THORNE_WELCOME,
         {{DialogueNodeId::NESSA_THORNE_WELCOME,
           "Take what the woodland can spare, and notice what it refuses to give.",
+          DialogueNodeKind::CONTINUE,
+          DialogueNodeId::NESSA_THORNE_FAREWELL, {}},
+         {DialogueNodeId::NESSA_THORNE_FAREWELL,
+          "A shield at the woodland path could bring a scout home alive.",
           DialogueNodeKind::TERMINAL, std::nullopt, {}}}};
     const DialogueDefinition BrannDeepwellIntro{
         DialogueId::BRANN_DEEPWELL_INTRO, DialogueNodeId::BRANN_DEEPWELL_WELCOME,

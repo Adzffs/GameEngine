@@ -99,7 +99,8 @@ int main()
     QuestSystem::TryRestore(player->GetQuestJournal(), {
         {QuestId::GATHERING_BASICS, QuestState::READY_TO_COMPLETE, 10},
         {QuestId::MINING_BASICS, QuestState::ACTIVE, 0},
-        {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}});
+        {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0},
+        {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}});
     Reopen(world, *player);
     const NpcTalkEvent* ready = LocalEvent(world, player->GetID());
     session = world.GetActiveDialogueSession(player->GetID());
@@ -121,7 +122,8 @@ int main()
     QuestSystem::TryRestore(player->GetQuestJournal(), {
         {QuestId::GATHERING_BASICS, QuestState::COMPLETED, 10},
         {QuestId::MINING_BASICS, QuestState::ACTIVE, 0},
-        {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}});
+        {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0},
+        {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}});
     Reopen(world, *player);
     const NpcTalkEvent* completed = LocalEvent(world, player->GetID());
     test.Expect(completed != nullptr &&
@@ -216,6 +218,60 @@ int main()
                         QuestId::TRACKS_IN_THE_ASH)->state == QuestState::COMPLETED &&
                     investigator->GetInventory().GetItemAmount(ItemType::COINS) == 15,
                 "Returning the evidence to Mara completes the mystery and rewards it once");
+
+    const auto resolveCraftingDilemma = [&](NpcType recipientType,
+        ItemType expectedReward, int expectedAmount)
+    {
+        World choiceWorld(21U, 22U, 23U);
+        Player* crafter = CreatePlayer(choiceWorld);
+        NPC* torren = FindNpc(choiceWorld, NpcType::TORREN_ASH);
+        NPC* recipient = FindNpc(choiceWorld, recipientType);
+        if (torren == nullptr || recipient == nullptr) return false;
+        crafter->GetPosition().SetPosition(
+            torren->GetPosition().GetX() - 1, torren->GetPosition().GetY());
+        choiceWorld.EnqueueCommand(NpcInteractionCommand{
+            crafter->GetID(), torren->GetID(), NpcInteractionType::TALK});
+        choiceWorld.Update();
+        const ActiveDialogueSession* choiceSession =
+            choiceWorld.GetActiveDialogueSession(crafter->GetID());
+        if (choiceSession == nullptr) return false;
+        choiceWorld.EnqueueCommand(QuestAcceptCommand{
+            crafter->GetID(), torren->GetID(), choiceSession->sessionId,
+            QuestId::SHIELD_OR_SHELTER});
+        choiceWorld.Update();
+        QuestSystem::RecordCrafted(crafter->GetQuestJournal(),
+            ItemType::WOODEN_SHIELD, 1);
+        if (recipientType != NpcType::TORREN_ASH)
+        {
+            crafter->GetPosition().SetPosition(
+                recipient->GetPosition().GetX() - 1,
+                recipient->GetPosition().GetY());
+            choiceWorld.EnqueueCommand(NpcInteractionCommand{
+                crafter->GetID(), recipient->GetID(), NpcInteractionType::TALK});
+            choiceWorld.Update();
+            choiceSession = choiceWorld.GetActiveDialogueSession(crafter->GetID());
+        }
+        if (choiceSession == nullptr) return false;
+        choiceWorld.EnqueueCommand(QuestCompleteCommand{
+            crafter->GetID(), recipient->GetID(), choiceSession->sessionId,
+            QuestId::SHIELD_OR_SHELTER});
+        choiceWorld.Update();
+        const QuestRecord* record = crafter->GetQuestJournal().TryGet(
+            QuestId::SHIELD_OR_SHELTER);
+        const ItemType otherReward = expectedReward == ItemType::COINS
+            ? ItemType::COOKED_MEAT : ItemType::COINS;
+        return record != nullptr && record->state == QuestState::COMPLETED &&
+            crafter->GetInventory().GetItemAmount(expectedReward) == expectedAmount &&
+            crafter->GetInventory().GetItemAmount(otherReward) == 0 &&
+            !QuestSystem::Complete(crafter->GetQuestJournal(),
+                QuestId::SHIELD_OR_SHELTER, crafter->GetInventory());
+    };
+    test.Expect(resolveCraftingDilemma(
+                    NpcType::TORREN_ASH, ItemType::COINS, 25),
+                "Returning the shield plan to Torren chooses the coin outcome");
+    test.Expect(resolveCraftingDilemma(
+                    NpcType::NESSA_THORNE, ItemType::COOKED_MEAT, 3),
+                "Taking the shield plan to Nessa chooses the supply outcome");
 
     return test.Finish();
 }

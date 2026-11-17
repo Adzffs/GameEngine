@@ -40,7 +40,25 @@ namespace
           DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME},
          QuestObjectiveType::TALK_TO_CHARACTER,
          NpcType::SERA_FLINT,
-         "Find Sera Flint at the east road and ask about the Ashfang tracks"}};
+         "Find Sera Flint at the east road and ask about the Ashfang tracks"},
+        {QuestId::SHIELD_OR_SHELTER,
+         "Shield or Shelter",
+         QuestState::AVAILABLE,
+         ItemType::WOODEN_SHIELD,
+         1,
+         ItemType::COINS,
+         25,
+         {NpcType::TORREN_ASH,
+          DialogueId::TORREN_ASH_INTRO,
+          DialogueNodeId::TORREN_ASH_WELCOME},
+         QuestObjectiveType::CRAFT_ITEM,
+         NpcType::NONE,
+         "Craft a wooden shield, then choose whether Torren or Nessa receives it",
+         {NpcType::NESSA_THORNE,
+          DialogueId::NESSA_THORNE_INTRO,
+          DialogueNodeId::NESSA_THORNE_WELCOME,
+          ItemType::COOKED_MEAT,
+          3}}};
 
     bool IsKnownItem(ItemType itemType)
     {

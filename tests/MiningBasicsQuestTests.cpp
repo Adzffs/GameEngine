@@ -101,13 +101,14 @@ int main()
     TestContext test;
 
     const auto& definitions = QuestDefinitionDatabase::GetAll();
-    test.Expect(definitions.size() == 3 &&
+    test.Expect(definitions.size() == 4 &&
                     definitions[0].id == QuestId::GATHERING_BASICS &&
                     definitions[1].id == QuestId::MINING_BASICS &&
-                    definitions[2].id == QuestId::TRACKS_IN_THE_ASH,
+                    definitions[2].id == QuestId::TRACKS_IN_THE_ASH &&
+                    definitions[3].id == QuestId::SHIELD_OR_SHELTER,
                 "Quest catalogue order is stable");
     QuestJournal defaults;
-    test.Expect(defaults.GetRecords().size() == 3 &&
+    test.Expect(defaults.GetRecords().size() == 4 &&
                     defaults.TryGet(QuestId::GATHERING_BASICS)->state == QuestState::AVAILABLE &&
                     defaults.TryGet(QuestId::MINING_BASICS)->state == QuestState::AVAILABLE,
                 "Both quests initialize independently available");
@@ -239,7 +240,8 @@ int main()
         test.Expect(QuestSystem::TryRestore(journal, {
                         {QuestId::GATHERING_BASICS, QuestState::READY_TO_COMPLETE, 10},
                         {QuestId::MINING_BASICS, QuestState::READY_TO_COMPLETE, 5},
-                        {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}}),
+                        {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0},
+                        {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}}),
                     "Both quests restore ready for reward test");
         Inventory inventory;
         test.Expect(QuestSystem::Complete(journal, QuestId::GATHERING_BASICS, inventory) &&
@@ -251,7 +253,8 @@ int main()
         QuestSystem::TryRestore(fullJournal, {
             {QuestId::GATHERING_BASICS, QuestState::AVAILABLE, 0},
             {QuestId::MINING_BASICS, QuestState::READY_TO_COMPLETE, 5},
-            {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}});
+            {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0},
+            {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}});
         Inventory full;
         for (int slot = 0; slot < Inventory::SlotCount; ++slot)
             full.AddItem(ItemType::LOG, 1);

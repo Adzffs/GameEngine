@@ -141,23 +141,23 @@ int main()
     test.Expect(view.state == "AVAILABLE" && view.progress == "Logs: 0 / 10",
                 "Available quest has a clear label");
 
-    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 0}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}});
+    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 0}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}, {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}});
     view = graphics.BuildQuestPanelView(player);
     test.Expect(view.state == "ACTIVE" && view.progress == "Logs: 0 / 10",
                 "Active quest displays authoritative zero progress");
-    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 6}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}});
+    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 6}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}, {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}});
     view = graphics.BuildQuestPanelView(player);
     test.Expect(view.progress == "Logs: 6 / 10",
                 "Active quest displays authoritative updated progress");
 
-    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::READY_TO_COMPLETE, 10}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}});
+    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::READY_TO_COMPLETE, 10}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}, {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}});
     view = graphics.BuildQuestPanelView(player);
     test.Expect(view.state == "READY TO COMPLETE" &&
                     view.progress == "Logs: 10 / 10" &&
                     player.GetQuestJournal().TryGet(QuestId::GATHERING_BASICS)->progress == 10,
                 "Ready quest has a clear completion label");
 
-    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::COMPLETED, 10}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}});
+    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::COMPLETED, 10}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}, {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}});
     view = graphics.BuildQuestPanelView(player);
     test.Expect(view.state == "COMPLETED" && view.progress == "Logs: 10 / 10",
                 "Completed quest has a clear label");
@@ -175,12 +175,13 @@ int main()
     QuestSystem::TryRestore(player.GetQuestJournal(), {
         {QuestId::GATHERING_BASICS, QuestState::ACTIVE, 6},
         {QuestId::MINING_BASICS, QuestState::ACTIVE, 3},
-        {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}});
+        {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0},
+        {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}});
     QuestPresentationState authoritativePresentation;
     authoritativePresentation.Synchronize(player.GetQuestJournal());
     const auto productionRows = graphics.BuildQuestRowLayout(
         authoritativePresentation.GetQuests());
-    test.Expect(productionRows.size() == 3 &&
+    test.Expect(productionRows.size() == 4 &&
                     productionRows[0].quest.id == QuestId::GATHERING_BASICS &&
                     productionRows[0].quest.progress == 6 &&
                     productionRows[1].quest.id == QuestId::MINING_BASICS &&
@@ -312,7 +313,7 @@ int main()
             {QuestState::COMPLETED, 10}}};
         for (const auto& [state, progress] : states)
         {
-            QuestSystem::TryRestore(nativePlayer.GetQuestJournal(), {{QuestId::GATHERING_BASICS, state, progress}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}});
+            QuestSystem::TryRestore(nativePlayer.GetQuestJournal(), {{QuestId::GATHERING_BASICS, state, progress}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}, {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}});
             const auto nativeView = nativeGraphics.BuildQuestPanelView(nativePlayer);
             SDL_SetRenderDrawColor(renderer, 5, 7, 9, 255);
             SDL_RenderClear(renderer);
