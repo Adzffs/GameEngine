@@ -1729,6 +1729,31 @@ void World::RecordMeleeCombatFeedback(
         MeleeCombatFeedbackLifetimeTicks};
 }
 
+void World::AwardMeleeStyleExperience(
+    int attackerEntityID,
+    const MeleeAttackResult &result)
+{
+    if (!result.didHit || result.actualDamageApplied <= 0) return;
+    Player *player = dynamic_cast<Player *>(
+        entityManager.GetEntityByID(attackerEntityID));
+    if (player == nullptr) return;
+
+    const int damage = result.actualDamageApplied;
+    switch (player->GetCombatStyle())
+    {
+    case CombatStyle::ACCURATE:
+        player->GetSkills().AddXP(SkillType::ATTACK, damage * 4);
+        break;
+    case CombatStyle::AGGRESSIVE:
+        player->GetSkills().AddXP(SkillType::ATTACK, damage * 5);
+        break;
+    case CombatStyle::DEFENSIVE:
+        player->GetSkills().AddXP(SkillType::ATTACK, damage * 2);
+        player->GetSkills().AddXP(SkillType::DEFENCE, damage * 2);
+        break;
+    }
+}
+
 void World::Update()
 {
     Logger::Debug("Updating World");
@@ -3750,6 +3775,9 @@ void World::ProcessCompletedActions(
             RecordMeleeCombatFeedback(
                 action.GetOwnerID(),
                 action.GetTargetID(),
+                *lastMeleeAttackResult);
+            AwardMeleeStyleExperience(
+                action.GetOwnerID(),
                 *lastMeleeAttackResult);
 
             if (!defender->IsAlive())

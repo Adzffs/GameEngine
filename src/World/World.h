@@ -447,6 +447,9 @@ private:
         int attackerEntityID,
         int defenderEntityID,
         const MeleeAttackResult &result);
+    void AwardMeleeStyleExperience(
+        int attackerEntityID,
+        const MeleeAttackResult &result);
 
     void TryStartMonsterRetaliation(
         int monsterEntityID,

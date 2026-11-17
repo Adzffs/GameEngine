@@ -5155,6 +5155,13 @@ void Graphics::DrawEquipment(
         SDL_RenderDebugText(renderer, button.x + 4.0f, button.y + 48.0f,
             styleEffects[index]);
     }
+    const std::array<const char *, 3> trainingEffects{
+        "Training: focused Attack XP",
+        "Training: fastest Attack XP",
+        "Training: split Attack + Defence XP"};
+    SDL_SetRenderDrawColor(renderer, 230, 205, 145, 255);
+    SDL_RenderDebugText(renderer, panelX + 12.0f, panelY + 334.0f,
+        trainingEffects[static_cast<int>(selectedStyle)]);
 }
 
 bool Graphics::ConsumeInventorySlotClick(
