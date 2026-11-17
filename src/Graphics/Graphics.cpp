@@ -85,7 +85,7 @@ void Graphics::UpdateProgressionFeedback(
 
     const std::vector<ProgressionEvent> events =
         progressionPresentationState.Synchronize(
-            player.GetSkills(), inventory);
+            player.GetSkills(), inventory, player.GetQuestJournal());
     for (const ProgressionEvent &event : events)
     {
         std::string text;
@@ -102,10 +102,20 @@ void Graphics::UpdateProgressionFeedback(
                 std::to_string(event.level) + "!";
             lifetime = 4.0f;
         }
-        else
+        else if (event.type == ProgressionEventType::ITEM_ACQUIRED)
         {
             text = "+" + std::to_string(event.amount) + " " +
                 ItemDatabase::Get(event.itemType).GetName();
+        }
+        else
+        {
+            const QuestDefinition *quest =
+                QuestDefinitionDatabase::TryGet(event.questId);
+            const std::string name = quest == nullptr ? "Quest" : quest->name;
+            text = event.type == ProgressionEventType::QUEST_COMPLETED
+                ? "Quest complete: " + name
+                : "New quest: " + name;
+            lifetime = 4.0f;
         }
         progressionNotices.push_back({event.type, std::move(text), lifetime});
     }

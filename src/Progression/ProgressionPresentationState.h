@@ -2,6 +2,7 @@
 
 #include "../Inventory/Inventory.h"
 #include "../Skills/SkillSet.h"
+#include "../Quest/QuestJournal.h"
 
 #include <array>
 #include <map>
@@ -12,7 +13,9 @@ enum class ProgressionEventType
 {
     XP_GAINED,
     LEVEL_GAINED,
-    ITEM_ACQUIRED
+    ITEM_ACQUIRED,
+    QUEST_COMPLETED,
+    QUEST_UNLOCKED
 };
 
 struct ProgressionEvent
@@ -22,6 +25,7 @@ struct ProgressionEvent
     ItemType itemType = ItemType::NONE;
     int amount = 0;
     int level = 0;
+    QuestId questId = QuestId::NONE;
 };
 
 class ProgressionPresentationState
@@ -29,7 +33,8 @@ class ProgressionPresentationState
 public:
     std::vector<ProgressionEvent> Synchronize(
         const SkillSet &skills,
-        const Inventory &inventory)
+        const Inventory &inventory,
+        const QuestJournal &quests)
     {
         const std::array<SkillType, 5> skillTypes{
             SkillType::ATTACK,
@@ -56,6 +61,8 @@ public:
                 previousLevels[index] = skill.GetLevel();
             }
             previousItems = std::move(currentItems);
+            for (const auto &[questId, record] : quests.GetRecords())
+                previousQuestStates[questId] = record.state;
             initialized = true;
             return {};
         }
@@ -91,6 +98,20 @@ public:
             }
         }
         previousItems = std::move(currentItems);
+        for (const auto &[questId, record] : quests.GetRecords())
+        {
+            const QuestState previous = previousQuestStates.contains(questId)
+                ? previousQuestStates.at(questId) : QuestState::UNAVAILABLE;
+            if (record.state == QuestState::COMPLETED &&
+                previous != QuestState::COMPLETED)
+                events.push_back({ProgressionEventType::QUEST_COMPLETED,
+                    SkillType::NONE, ItemType::NONE, 0, 0, questId});
+            else if (record.state == QuestState::AVAILABLE &&
+                previous == QuestState::UNAVAILABLE)
+                events.push_back({ProgressionEventType::QUEST_UNLOCKED,
+                    SkillType::NONE, ItemType::NONE, 0, 0, questId});
+            previousQuestStates[questId] = record.state;
+        }
         return events;
     }
 
@@ -99,4 +120,5 @@ private:
     std::array<int, 5> previousXP{};
     std::array<int, 5> previousLevels{};
     std::map<ItemType, int> previousItems;
+    std::map<QuestId, QuestState> previousQuestStates;
 };
