@@ -71,7 +71,25 @@ namespace
           DialogueNodeId::SERA_FLINT_WELCOME},
          QuestObjectiveType::DEFEAT_CHARACTER,
          NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER,
-         "Defeat three Ashfangs threatening the east road"}};
+         "Defeat three Ashfangs threatening the east road"},
+        {QuestId::HEART_OF_THE_ASH,
+         "Heart of the Ash",
+         QuestState::AVAILABLE,
+         ItemType::NONE,
+         1,
+         ItemType::COINS,
+         75,
+         {NpcType::DEVELOPMENT_GUIDE,
+          DialogueId::DEVELOPMENT_GUIDE_INTRO,
+          DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME},
+         QuestObjectiveType::DEFEAT_CHARACTER,
+         NpcType::ELITE_DEVELOPMENT_MONSTER,
+         "Defeat the Ashfang alpha beyond the east road, then choose who receives its trophy",
+         {NpcType::BRANN_DEEPWELL,
+          DialogueId::BRANN_DEEPWELL_INTRO,
+          DialogueNodeId::BRANN_DEEPWELL_WELCOME,
+          ItemType::STEEL_BAR,
+          2}}};
 
     bool IsKnownItem(ItemType itemType)
     {

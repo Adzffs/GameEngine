@@ -18,11 +18,12 @@ int main()
                         {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0},
                         {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0},
                         {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0},
-                        {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}}),
+                        {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0},
+                        {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}}),
                     "Fixture restores through controlled QuestSystem API");
         presentation.Synchronize(journal);
         const auto &quests = presentation.GetQuests();
-        test.Expect(quests.size() == 5 &&
+        test.Expect(quests.size() == 6 &&
                         quests.front().id == QuestId::GATHERING_BASICS &&
                         quests.front().state == state &&
                         quests.front().progress == progress &&

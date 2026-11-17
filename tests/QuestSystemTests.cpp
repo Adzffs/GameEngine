@@ -19,7 +19,8 @@ namespace
                 {QuestId::MINING_BASICS, miningState, miningProgress},
                 {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0},
                 {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0},
-                {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}};
+                {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0},
+                {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}};
     }
 }
 
@@ -84,7 +85,7 @@ int main()
     QuestJournal journal;
     const QuestRecord *initial = Gathering(journal);
     test.Expect(initial != nullptr && initial->state == QuestState::AVAILABLE &&
-                    initial->progress == 0 && journal.GetRecords().size() == 5 &&
+                    initial->progress == 0 && journal.GetRecords().size() == 6 &&
                     journal.TryGet(QuestId::MINING_BASICS)->state == QuestState::AVAILABLE,
                 "Default journal derives canonical initial records");
     test.Expect(QuestSystem::Accept(journal, QuestId::GATHERING_BASICS) &&

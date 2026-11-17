@@ -75,6 +75,10 @@ namespace
         DialogueId::BRANN_DEEPWELL_INTRO, DialogueNodeId::BRANN_DEEPWELL_WELCOME,
         {{DialogueNodeId::BRANN_DEEPWELL_WELCOME,
           "Old route's perfectly safe. Mostly safe. Safer if you walk ahead.",
+          DialogueNodeKind::CONTINUE,
+          DialogueNodeId::BRANN_DEEPWELL_FAREWELL, {}},
+         {DialogueNodeId::BRANN_DEEPWELL_FAREWELL,
+          "Bring me the alpha's trophy and I'll turn the old road's salvage into useful steel.",
           DialogueNodeKind::TERMINAL, std::nullopt, {}}}};
     const DialogueDefinition SeraFlintIntro{
         DialogueId::SERA_FLINT_INTRO, DialogueNodeId::SERA_FLINT_WELCOME,

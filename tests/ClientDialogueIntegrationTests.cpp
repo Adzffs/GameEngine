@@ -288,8 +288,8 @@ int main()
                         std::holds_alternative<QuestAcceptCommand>(
                             *formerOverlap) &&
                         std::get<QuestAcceptCommand>(*formerOverlap).questId ==
-                            QuestId::TRACKS_IN_THE_ASH,
-                    "Former overlap region belongs to the visible investigation Accept");
+                            QuestId::HEART_OF_THE_ASH,
+                    "Lower welcome region belongs to the visible conclusion Accept");
 
         ActiveDialogueSession mismatched =
             *world.GetActiveDialogueSession(playerID);

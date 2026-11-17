@@ -13,7 +13,7 @@
 #include <array>
 #include <vector>
 
-inline constexpr int CURRENT_PLAYER_SAVE_VERSION = 12;
+inline constexpr int CURRENT_PLAYER_SAVE_VERSION = 13;
 
 struct SavedInventorySlot
 {

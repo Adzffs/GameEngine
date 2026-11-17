@@ -16,12 +16,13 @@ int main()
 {
     TestContext test;
     const auto &definitions = QuestDefinitionDatabase::GetAll();
-    test.Expect(definitions.size() == 5 &&
+    test.Expect(definitions.size() == 6 &&
                     definitions[0].id == QuestId::GATHERING_BASICS &&
                     definitions[1].id == QuestId::MINING_BASICS &&
                     definitions[2].id == QuestId::TRACKS_IN_THE_ASH &&
                     definitions[3].id == QuestId::SHIELD_OR_SHELTER &&
-                    definitions[4].id == QuestId::FANGS_AT_THE_GATE,
+                    definitions[4].id == QuestId::FANGS_AT_THE_GATE &&
+                    definitions[5].id == QuestId::HEART_OF_THE_ASH,
                 "Canonical catalogue contains all quests in stable ID order");
     const QuestDefinition *definition =
         QuestDefinitionDatabase::TryGet(QuestId::GATHERING_BASICS);
@@ -140,6 +141,18 @@ int main()
     combat.objectiveNpc = NpcType::SERA_FLINT;
     test.Expect(!QuestDefinitionDatabase::IsValidDefinition(combat),
                 "Combat objectives reject friendly characters as targets");
+    const QuestDefinition *conclusion =
+        QuestDefinitionDatabase::TryGet(QuestId::HEART_OF_THE_ASH);
+    test.Expect(conclusion != nullptr &&
+                    conclusion->objectiveNpc ==
+                        NpcType::ELITE_DEVELOPMENT_MONSTER &&
+                    conclusion->requiredAmount == 1 &&
+                    conclusion->giver.npcType == NpcType::DEVELOPMENT_GUIDE &&
+                    conclusion->alternateCompletion.npcType ==
+                        NpcType::BRANN_DEEPWELL &&
+                    conclusion->alternateCompletion.rewardItem ==
+                        ItemType::STEEL_BAR,
+                "Starter conclusion combines the elite fight with a reward choice");
     invalid = *definition; invalid.requiredAmount = 0;
     test.Expect(!QuestDefinitionDatabase::IsValidDefinition(invalid),
                 "Non-positive requirement rejects");

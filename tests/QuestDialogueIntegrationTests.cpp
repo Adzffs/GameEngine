@@ -66,7 +66,7 @@ int main()
         world.GetActiveDialogueSession(player->GetID());
     test.Expect(available != nullptr &&
                     available->nodeId == DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME &&
-                    available->questActions.size() == 3 &&
+                    available->questActions.size() == 4 &&
                     available->questActions.front().kind == QuestDialogueActionKind::ACCEPT &&
                     available->questActions.front().questId == QuestId::GATHERING_BASICS,
                 "Real World opening publishes Accept for AVAILABLE");
@@ -92,7 +92,7 @@ int main()
     Reopen(world, *player);
     const NpcTalkEvent* active = LocalEvent(world, player->GetID());
     test.Expect(active != nullptr &&
-                    active->questActions.size() == 2 &&
+                    active->questActions.size() == 3 &&
                     active->questActions.front().questId == QuestId::MINING_BASICS,
                 "Real World opening retains independent Mining acceptance");
 
@@ -100,12 +100,12 @@ int main()
         {QuestId::GATHERING_BASICS, QuestState::READY_TO_COMPLETE, 10},
         {QuestId::MINING_BASICS, QuestState::ACTIVE, 0},
         {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0},
-        {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}, {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}});
+        {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}, {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}, {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}});
     Reopen(world, *player);
     const NpcTalkEvent* ready = LocalEvent(world, player->GetID());
     session = world.GetActiveDialogueSession(player->GetID());
     test.Expect(ready != nullptr &&
-                    ready->questActions.size() == 2 &&
+                    ready->questActions.size() == 3 &&
                     ready->questActions.front().kind == QuestDialogueActionKind::COMPLETE,
                 "Real World opening publishes Complete for READY_TO_COMPLETE");
     presentation.Synchronize(player->GetID(), world.GetNpcTalkEvents(), session);
@@ -123,11 +123,11 @@ int main()
         {QuestId::GATHERING_BASICS, QuestState::COMPLETED, 10},
         {QuestId::MINING_BASICS, QuestState::ACTIVE, 0},
         {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0},
-        {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}, {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}});
+        {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}, {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}, {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}});
     Reopen(world, *player);
     const NpcTalkEvent* completed = LocalEvent(world, player->GetID());
     test.Expect(completed != nullptr &&
-                    completed->questActions.size() == 1 &&
+                    completed->questActions.size() == 2 &&
                     completed->questActions.front().questId == QuestId::TRACKS_IN_THE_ASH,
                 "Completed Gathering no longer publishes its action");
 
@@ -313,6 +313,62 @@ int main()
                     defender->GetInventory().GetItemAmount(
                         ItemType::COOKED_MEAT) == 5,
                 "Reporting to Sera completes the escalation and grants supplies");
+
+    World conclusionWorld(41U, 42U, 43U);
+    Player* champion = CreatePlayer(conclusionWorld);
+    NPC* maraConclusion = FindNpc(
+        conclusionWorld, NpcType::DEVELOPMENT_GUIDE);
+    NPC* brannConclusion = FindNpc(
+        conclusionWorld, NpcType::BRANN_DEEPWELL);
+    if (maraConclusion != nullptr)
+    {
+        champion->GetPosition().SetPosition(
+            maraConclusion->GetPosition().GetX() - 1,
+            maraConclusion->GetPosition().GetY());
+        conclusionWorld.EnqueueCommand(NpcInteractionCommand{
+            champion->GetID(), maraConclusion->GetID(),
+            NpcInteractionType::TALK});
+        conclusionWorld.Update();
+    }
+    const ActiveDialogueSession* conclusionStart =
+        conclusionWorld.GetActiveDialogueSession(champion->GetID());
+    if (conclusionStart != nullptr && maraConclusion != nullptr)
+    {
+        conclusionWorld.EnqueueCommand(QuestAcceptCommand{
+            champion->GetID(), maraConclusion->GetID(),
+            conclusionStart->sessionId, QuestId::HEART_OF_THE_ASH});
+        conclusionWorld.Update();
+    }
+    QuestSystem::RecordDefeated(champion->GetQuestJournal(),
+        NpcType::ELITE_DEVELOPMENT_MONSTER);
+    if (brannConclusion != nullptr)
+    {
+        champion->GetPosition().SetPosition(
+            brannConclusion->GetPosition().GetX() - 1,
+            brannConclusion->GetPosition().GetY());
+        conclusionWorld.EnqueueCommand(NpcInteractionCommand{
+            champion->GetID(), brannConclusion->GetID(),
+            NpcInteractionType::TALK});
+        conclusionWorld.Update();
+    }
+    const ActiveDialogueSession* conclusionHandIn =
+        conclusionWorld.GetActiveDialogueSession(champion->GetID());
+    if (conclusionHandIn != nullptr && brannConclusion != nullptr)
+    {
+        conclusionWorld.EnqueueCommand(QuestCompleteCommand{
+            champion->GetID(), brannConclusion->GetID(),
+            conclusionHandIn->sessionId, QuestId::HEART_OF_THE_ASH});
+        conclusionWorld.Update();
+    }
+    const QuestRecord* conclusion = champion->GetQuestJournal().TryGet(
+        QuestId::HEART_OF_THE_ASH);
+    test.Expect(conclusion != nullptr &&
+                    conclusion->state == QuestState::COMPLETED &&
+                    champion->GetInventory().GetItemAmount(
+                        ItemType::STEEL_BAR) == 2 &&
+                    champion->GetInventory().GetItemAmount(
+                        ItemType::COINS) == 0,
+                "Giving Brann the alpha trophy chooses useful steel over coins");
 
     return test.Finish();
 }

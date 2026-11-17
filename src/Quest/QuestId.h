@@ -6,7 +6,8 @@ enum class QuestId : int
     MINING_BASICS = 2,
     TRACKS_IN_THE_ASH = 3,
     SHIELD_OR_SHELTER = 4,
-    FANGS_AT_THE_GATE = 5
+    FANGS_AT_THE_GATE = 5,
+    HEART_OF_THE_ASH = 6
 };
 constexpr bool IsValidQuestId(QuestId id)
 {
@@ -14,5 +15,6 @@ constexpr bool IsValidQuestId(QuestId id)
            id == QuestId::MINING_BASICS ||
            id == QuestId::TRACKS_IN_THE_ASH ||
            id == QuestId::SHIELD_OR_SHELTER ||
-           id == QuestId::FANGS_AT_THE_GATE;
+           id == QuestId::FANGS_AT_THE_GATE ||
+           id == QuestId::HEART_OF_THE_ASH;
 }

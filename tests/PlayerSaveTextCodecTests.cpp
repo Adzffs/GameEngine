@@ -132,11 +132,11 @@ int main()
 
     PlayerSaveData save = ValidSave();
     const std::string canonical = Encode(save);
-    std::string golden = "GAMEENGINE_PLAYER_SAVE\nversion=12\nposition_x=3\nposition_y=2\ncurrent_health=87\ntutorial_step=0\ntutorial_skipped=0\ncombat_style=0\nrecipe_mask=4722\nrecovery_active=0\nrecovery_x=0\nrecovery_y=0\nrecovery_ticks=0\nrecovery_count=0\ninventory_count=28\n";
+    std::string golden = "GAMEENGINE_PLAYER_SAVE\nversion=13\nposition_x=3\nposition_y=2\ncurrent_health=87\ntutorial_step=0\ntutorial_skipped=0\ncombat_style=0\nrecipe_mask=4722\nrecovery_active=0\nrecovery_x=0\nrecovery_y=0\nrecovery_ticks=0\nrecovery_count=0\ninventory_count=28\n";
     golden += "inventory.0=BRONZE_AXE,1\ninventory.1=COINS,150\n";
     for (int i = 2; i < 28; ++i) golden += "inventory." + std::to_string(i) + "=NONE,0\n";
     golden += "bank_count=0\nskill_count=5\nskill.ATTACK=0\nskill.DEFENCE=0\nskill.WOODCUTTING=1200\nskill.MINING=500\nskill.SMITHING=300\n";
-    golden += "equipment_count=5\nequipment.HEAD=NONE\nequipment.BODY=NONE\nequipment.LEGS=NONE\nequipment.WEAPON=BRONZE_SWORD\nequipment.SHIELD=WOODEN_SHIELD\nquest_count=5\nquest.GATHERING_BASICS=AVAILABLE,0\nquest.MINING_BASICS=AVAILABLE,0\nquest.TRACKS_IN_THE_ASH=AVAILABLE,0\nquest.SHIELD_OR_SHELTER=AVAILABLE,0\nquest.FANGS_AT_THE_GATE=AVAILABLE,0\nEND_GAMEENGINE_PLAYER_SAVE\n";
+    golden += "equipment_count=5\nequipment.HEAD=NONE\nequipment.BODY=NONE\nequipment.LEGS=NONE\nequipment.WEAPON=BRONZE_SWORD\nequipment.SHIELD=WOODEN_SHIELD\nquest_count=6\nquest.GATHERING_BASICS=AVAILABLE,0\nquest.MINING_BASICS=AVAILABLE,0\nquest.TRACKS_IN_THE_ASH=AVAILABLE,0\nquest.SHIELD_OR_SHELTER=AVAILABLE,0\nquest.FANGS_AT_THE_GATE=AVAILABLE,0\nquest.HEART_OF_THE_ASH=AVAILABLE,0\nEND_GAMEENGINE_PLAYER_SAVE\n";
     test.ExpectEqual(canonical, golden, "complete canonical golden output");
     test.Expect(!canonical.empty() && canonical.back() == '\n', "canonical output has final LF");
     test.Expect(canonical.find('\r') == std::string::npos, "canonical output uses LF only");
@@ -212,34 +212,37 @@ int main()
                 ItemType::COAL &&
             decodedRecovery.GetSaveData()->recoveryPile.items[0].quantity == 7,
         "protected recovery pile survives canonical save round-trip");
-    std::string legacy = Replace(canonical, "version=12", "version=1");
+    std::string legacy = Replace(canonical, "version=13", "version=1");
     legacy = Replace(legacy, "recipe_mask=4722\n", "");
     legacy = Replace(legacy, "tutorial_step=0\n", "");
     legacy = Replace(legacy, "tutorial_skipped=0\n", "");
     legacy = Replace(legacy, "combat_style=0\n", "");
     legacy = Replace(legacy, "recovery_active=0\nrecovery_x=0\nrecovery_y=0\nrecovery_ticks=0\nrecovery_count=0\n", "");
     legacy = Replace(legacy, "bank_count=0\n", "");
-    legacy = Replace(legacy, "quest_count=5\n", "");
+    legacy = Replace(legacy, "quest_count=6\n", "");
     legacy = Replace(legacy, "quest.GATHERING_BASICS=AVAILABLE,0\n", "");
     legacy = Replace(legacy, "quest.MINING_BASICS=AVAILABLE,0\n", "");
     legacy = Replace(legacy, "quest.TRACKS_IN_THE_ASH=AVAILABLE,0\n", "");
     legacy = Replace(legacy, "quest.SHIELD_OR_SHELTER=AVAILABLE,0\n", "");
     legacy = Replace(legacy, "quest.FANGS_AT_THE_GATE=AVAILABLE,0\n", "");
+    legacy = Replace(legacy, "quest.HEART_OF_THE_ASH=AVAILABLE,0\n", "");
     const auto migratedLegacy = PlayerSaveTextCodec::Decode(legacy);
     test.Expect(migratedLegacy.IsSuccess() && migratedLegacy.GetSaveData() &&
                     migratedLegacy.GetSaveData()->version == CURRENT_PLAYER_SAVE_VERSION &&
-                    migratedLegacy.GetSaveData()->quests.size() == 5 &&
+                    migratedLegacy.GetSaveData()->quests.size() == 6 &&
                     migratedLegacy.GetSaveData()->quests.front().state == QuestState::AVAILABLE &&
                     migratedLegacy.GetSaveData()->quests.front().progress == 0,
                 "genuine version-1 text migrates to canonical in-memory quest defaults");
-    std::string historicalTwoQuest = Replace(canonical, "quest_count=5", "quest_count=2");
+    std::string historicalTwoQuest = Replace(canonical, "quest_count=6", "quest_count=2");
     historicalTwoQuest = Replace(historicalTwoQuest,
         "quest.TRACKS_IN_THE_ASH=AVAILABLE,0\n", "");
     historicalTwoQuest = Replace(historicalTwoQuest,
         "quest.SHIELD_OR_SHELTER=AVAILABLE,0\n", "");
     historicalTwoQuest = Replace(historicalTwoQuest,
         "quest.FANGS_AT_THE_GATE=AVAILABLE,0\n", "");
-    std::string versionFive = Replace(historicalTwoQuest, "version=12", "version=5");
+    historicalTwoQuest = Replace(historicalTwoQuest,
+        "quest.HEART_OF_THE_ASH=AVAILABLE,0\n", "");
+    std::string versionFive = Replace(historicalTwoQuest, "version=13", "version=5");
     versionFive = Replace(versionFive, "recipe_mask=4722\n", "");
     versionFive = Replace(versionFive, "tutorial_step=0\n", "");
     versionFive = Replace(versionFive, "tutorial_skipped=0\n", "");
@@ -250,7 +253,7 @@ int main()
             migratedVersionFive.GetSaveData()->tutorialStep == TutorialStep::COMPLETE &&
             migratedVersionFive.GetSaveData()->tutorialSkipped,
         "version 5 saves migrate without forcing existing players through onboarding");
-    std::string versionSix = Replace(historicalTwoQuest, "version=12", "version=6");
+    std::string versionSix = Replace(historicalTwoQuest, "version=13", "version=6");
     versionSix = Replace(versionSix, "recipe_mask=4722\n", "");
     versionSix = Replace(versionSix, "combat_style=0\n", "");
     versionSix = Replace(versionSix, "recovery_active=0\nrecovery_x=0\nrecovery_y=0\nrecovery_ticks=0\nrecovery_count=0\n", "");
@@ -258,14 +261,14 @@ int main()
     test.Expect(migratedVersionSix.IsSuccess() &&
             migratedVersionSix.GetSaveData()->combatStyle == CombatStyle::ACCURATE,
         "version 6 saves migrate to the safe Accurate combat style");
-    std::string versionSeven = Replace(historicalTwoQuest, "version=12", "version=7");
+    std::string versionSeven = Replace(historicalTwoQuest, "version=13", "version=7");
     versionSeven = Replace(versionSeven, "recipe_mask=4722\n", "");
     versionSeven = Replace(versionSeven, "recovery_active=0\nrecovery_x=0\nrecovery_y=0\nrecovery_ticks=0\nrecovery_count=0\n", "");
     const auto migratedVersionSeven = PlayerSaveTextCodec::Decode(versionSeven);
     test.Expect(migratedVersionSeven.IsSuccess() &&
             !migratedVersionSeven.GetSaveData()->recoveryPile.active,
         "version 7 saves migrate with no recovery pile");
-    std::string versionEight = Replace(historicalTwoQuest, "version=12", "version=8");
+    std::string versionEight = Replace(historicalTwoQuest, "version=13", "version=8");
     versionEight = Replace(versionEight, "recipe_mask=4722\n", "");
     const auto migratedVersionEight = PlayerSaveTextCodec::Decode(versionEight);
     test.Expect(migratedVersionEight.IsSuccess() &&
@@ -273,43 +276,62 @@ int main()
                 RecipeBook::GetStarterRecipes(),
         "version 8 saves migrate with canonical starter recipe knowledge");
     const std::string versionNine = Replace(
-        historicalTwoQuest, "version=12", "version=9");
+        historicalTwoQuest, "version=13", "version=9");
     const auto migratedVersionNine = PlayerSaveTextCodec::Decode(versionNine);
     test.Expect(migratedVersionNine.IsSuccess() &&
-            migratedVersionNine.GetSaveData()->quests.size() == 5 &&
+            migratedVersionNine.GetSaveData()->quests.size() == 6 &&
             migratedVersionNine.GetSaveData()->quests[2].id ==
                 QuestId::TRACKS_IN_THE_ASH &&
             migratedVersionNine.GetSaveData()->quests[2].state ==
                 QuestState::AVAILABLE,
         "version 9 saves gain the investigation without losing prior progress");
     std::string historicalThreeQuest = Replace(
-        canonical, "quest_count=5", "quest_count=3");
+        canonical, "quest_count=6", "quest_count=3");
     historicalThreeQuest = Replace(historicalThreeQuest,
         "quest.SHIELD_OR_SHELTER=AVAILABLE,0\n", "");
     historicalThreeQuest = Replace(historicalThreeQuest,
         "quest.FANGS_AT_THE_GATE=AVAILABLE,0\n", "");
+    historicalThreeQuest = Replace(historicalThreeQuest,
+        "quest.HEART_OF_THE_ASH=AVAILABLE,0\n", "");
     historicalThreeQuest = Replace(
-        historicalThreeQuest, "version=12", "version=10");
+        historicalThreeQuest, "version=13", "version=10");
     const auto migratedVersionTen =
         PlayerSaveTextCodec::Decode(historicalThreeQuest);
     test.Expect(migratedVersionTen.IsSuccess() &&
-            migratedVersionTen.GetSaveData()->quests.size() == 5 &&
+            migratedVersionTen.GetSaveData()->quests.size() == 6 &&
             migratedVersionTen.GetSaveData()->quests[3].id ==
                 QuestId::SHIELD_OR_SHELTER,
         "version 10 saves gain the crafting dilemma");
     std::string historicalFourQuest = Replace(
-        canonical, "quest_count=5", "quest_count=4");
+        canonical, "quest_count=6", "quest_count=4");
     historicalFourQuest = Replace(historicalFourQuest,
         "quest.FANGS_AT_THE_GATE=AVAILABLE,0\n", "");
+    historicalFourQuest = Replace(historicalFourQuest,
+        "quest.HEART_OF_THE_ASH=AVAILABLE,0\n", "");
     historicalFourQuest = Replace(
-        historicalFourQuest, "version=12", "version=11");
+        historicalFourQuest, "version=13", "version=11");
     const auto migratedVersionEleven =
         PlayerSaveTextCodec::Decode(historicalFourQuest);
     test.Expect(migratedVersionEleven.IsSuccess() &&
-            migratedVersionEleven.GetSaveData()->quests.size() == 5 &&
+            migratedVersionEleven.GetSaveData()->quests.size() == 6 &&
             migratedVersionEleven.GetSaveData()->quests[4].id ==
                 QuestId::FANGS_AT_THE_GATE,
         "version 11 saves gain the combat escalation");
+    std::string historicalFiveQuest = Replace(
+        canonical, "quest_count=6", "quest_count=5");
+    historicalFiveQuest = Replace(historicalFiveQuest,
+        "quest.HEART_OF_THE_ASH=AVAILABLE,0\n", "");
+    historicalFiveQuest = Replace(
+        historicalFiveQuest, "version=13", "version=12");
+    const auto migratedVersionTwelve =
+        PlayerSaveTextCodec::Decode(historicalFiveQuest);
+    test.Expect(migratedVersionTwelve.IsSuccess() &&
+            migratedVersionTwelve.GetSaveData()->quests.size() == 6 &&
+            migratedVersionTwelve.GetSaveData()->quests[5].id ==
+                QuestId::HEART_OF_THE_ASH &&
+            migratedVersionTwelve.GetSaveData()->quests[5].state ==
+                QuestState::AVAILABLE,
+        "version 12 saves gain the starter-region conclusion");
     Rejects(test, Replace(canonical, "combat_style=0", "combat_style=99"),
         PlayerSaveTextIssueCode::SAVE_DATA_VALIDATION_FAILED,
         "unknown combat style rejects");
@@ -387,10 +409,10 @@ int main()
 
     Rejects(test, Replace(canonical,"position_x=3","position_x"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "missing equals");
     Rejects(test, Replace(canonical,"position_x=3","position_x==3"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "extra equals");
-    Rejects(test, Replace(canonical,"version=12","version==12"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "malformed version extra equals");
-    Rejects(test, Replace(canonical,"version=12","version=12=13"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "malformed version value separator");
-    Rejects(test, Replace(canonical,"version=12","version="), PlayerSaveTextIssueCode::MALFORMED_RECORD, "empty version value");
-    Rejects(test, Replace(canonical,"version=12","=12"), PlayerSaveTextIssueCode::MISSING_FIELD, "empty version key");
+    Rejects(test, Replace(canonical,"version=13","version==13"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "malformed version extra equals");
+    Rejects(test, Replace(canonical,"version=13","version=13=14"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "malformed version value separator");
+    Rejects(test, Replace(canonical,"version=13","version="), PlayerSaveTextIssueCode::MALFORMED_RECORD, "empty version value");
+    Rejects(test, Replace(canonical,"version=13","=13"), PlayerSaveTextIssueCode::MISSING_FIELD, "empty version key");
     Rejects(test, Replace(canonical,"position_x=3"," position_x=3"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "leading space");
     Rejects(test, Replace(canonical,"position_x=3","position_x=3 "), PlayerSaveTextIssueCode::MALFORMED_RECORD, "trailing space");
     Rejects(test, Replace(canonical,"position_x=3","mystery=3"), PlayerSaveTextIssueCode::UNKNOWN_FIELD, "unknown field");
@@ -409,10 +431,10 @@ int main()
     Rejects(test, Replace(canonical,"position_x=3","position_x=2147483648"), PlayerSaveTextIssueCode::INTEGER_OUT_OF_RANGE, "integer overflow");
     test.Expect(PlayerSaveTextCodec::Decode(Replace(canonical,"position_x=3","position_x=-2147483648")).IsSuccess(), "INT_MIN position decodes");
     test.Expect(PlayerSaveTextCodec::Decode(Replace(canonical,"position_x=3","position_x=2147483647")).IsSuccess(), "INT_MAX position decodes");
-    Rejects(test, Replace(canonical,"version=12","version=13"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "unsupported version");
-    Rejects(test, Replace(canonical,"version=12","version=0"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "zero version");
-    Rejects(test, Replace(canonical,"version=12","version=-1"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "negative version");
-    Rejects(test, Replace(canonical,"version=12","version=2147483647"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "future INT_MAX version");
+    Rejects(test, Replace(canonical,"version=13","version=14"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "unsupported version");
+    Rejects(test, Replace(canonical,"version=13","version=0"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "zero version");
+    Rejects(test, Replace(canonical,"version=13","version=-1"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "negative version");
+    Rejects(test, Replace(canonical,"version=13","version=2147483647"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "future INT_MAX version");
     Rejects(test, Replace(canonical,"inventory_count=28","inventory_count=999999999"), PlayerSaveTextIssueCode::INVALID_COUNT, "attacker count");
     Rejects(test, Replace(canonical,"skill_count=5","skill_count=05"), PlayerSaveTextIssueCode::NON_CANONICAL_INTEGER, "noncanonical count");
     Rejects(test, Replace(canonical,"equipment_count=5\n",""), PlayerSaveTextIssueCode::MISSING_FIELD, "missing count");
