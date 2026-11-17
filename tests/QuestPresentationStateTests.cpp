@@ -36,7 +36,8 @@ int main()
                         quests[gatheringIndex].objective == "Logs" &&
                         quests[gatheringIndex].category == QuestCategory::TUTORIAL &&
                         quests[gatheringIndex].reward == "Coins" &&
-                        quests[gatheringIndex].rewardAmount == 10,
+                        quests[gatheringIndex].rewardAmount == 10 &&
+                        !quests[gatheringIndex].guidance.empty(),
                     "Presentation copies objective, category and reward values");
         test.Expect(quests[miningIndex].id == QuestId::MINING_BASICS &&
                         quests[miningIndex].required == 5 &&
@@ -44,5 +45,21 @@ int main()
                         quests[miningIndex].objective == "Copper ores",
                     "Active work stays ahead of completed journal history");
     }
+    test.Expect(QuestSystem::TryRestore(journal, {
+                    {QuestId::GATHERING_BASICS, QuestState::AVAILABLE, 0},
+                    {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0},
+                    {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0},
+                    {QuestId::SHIELD_OR_SHELTER,
+                        QuestState::READY_TO_COMPLETE, 1},
+                    {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0},
+                    {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}}),
+                "Choice guidance fixture restores");
+    presentation.Synchronize(journal);
+    test.Expect(!presentation.GetQuests().empty() &&
+                    presentation.GetQuests().front().id ==
+                        QuestId::SHIELD_OR_SHELTER &&
+                    presentation.GetQuests().front().guidance ==
+                        "Choose: Torren Ash or Nessa Thorne",
+                "Ready choice quests name both valid hand-in recipients");
     return test.Finish();
 }

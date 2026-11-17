@@ -5808,6 +5808,7 @@ std::string Graphics::GetQuestStateLabel(QuestState state)
 
 std::string Graphics::GetQuestProgressLabel(const QuestPresentation &quest)
 {
+    if (!quest.guidance.empty()) return quest.guidance;
     return quest.objective + ": " + std::to_string(quest.progress) + " / " +
         std::to_string(quest.required);
 }

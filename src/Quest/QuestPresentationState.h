@@ -3,6 +3,7 @@
 #include "QuestDefinitionDatabase.h"
 #include "QuestJournal.h"
 #include "../Item/ItemDatabase.h"
+#include "../NPC/NpcDefinitionDatabase.h"
 
 #include <algorithm>
 #include <string>
@@ -20,6 +21,7 @@ struct QuestPresentation
     QuestCategory category = QuestCategory::SIDE;
     std::string reward;
     int rewardAmount = 0;
+    std::string guidance;
 };
 
 class QuestPresentationState
@@ -44,11 +46,45 @@ public:
                 objective = ItemDatabase::Get(definition->objectiveItem).GetName();
                 if (definition->requiredAmount != 1) objective += "s";
             }
+            const NpcDefinition *giver =
+                NpcDefinitionDatabase::TryGet(definition->giver.npcType);
+            const std::string giverName = giver == nullptr
+                ? "the quest giver" : giver->name;
+            std::string guidance;
+            switch (record.state)
+            {
+            case QuestState::UNAVAILABLE:
+                guidance = "Locked";
+                break;
+            case QuestState::AVAILABLE:
+                guidance = "Start: Speak to " + giverName;
+                break;
+            case QuestState::ACTIVE:
+                guidance = objective + ": " + std::to_string(record.progress) +
+                    " / " + std::to_string(definition->requiredAmount);
+                break;
+            case QuestState::READY_TO_COMPLETE:
+                if (definition->alternateCompletion.npcType != NpcType::NONE)
+                {
+                    const NpcDefinition *alternate =
+                        NpcDefinitionDatabase::TryGet(
+                            definition->alternateCompletion.npcType);
+                    guidance = "Choose: " + giverName + " or " +
+                        (alternate == nullptr ? "alternate recipient" :
+                            alternate->name);
+                }
+                else
+                    guidance = "Return to " + giverName;
+                break;
+            case QuestState::COMPLETED:
+                guidance = "Completed";
+                break;
+            }
             replacement.push_back({questId, record.state, record.progress,
                 definition->requiredAmount, definition->name,
                 std::move(objective), definition->category,
                 ItemDatabase::Get(definition->rewardItem).GetName(),
-                definition->rewardAmount});
+                definition->rewardAmount, std::move(guidance)});
         }
         std::stable_sort(replacement.begin(), replacement.end(),
             [](const QuestPresentation &left, const QuestPresentation &right)

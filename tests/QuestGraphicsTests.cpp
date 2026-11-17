@@ -138,7 +138,8 @@ int main()
                     IsInside(view.contentBounds, view.statePosition) &&
                     IsInside(view.contentBounds, view.progressPosition),
                 "Every quest text origin lies inside the shared content bounds");
-    test.Expect(view.state == "AVAILABLE" && view.progress == "Logs: 0 / 10",
+    test.Expect(view.state == "AVAILABLE" &&
+                    view.progress == "Start: Speak to Mara Vale",
                 "Available quest has a clear label");
 
     QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 0}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}, {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}, {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}, {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}});
@@ -153,7 +154,7 @@ int main()
     QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::READY_TO_COMPLETE, 10}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}, {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}, {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}, {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}});
     view = graphics.BuildQuestPanelView(player);
     test.Expect(view.state == "READY TO COMPLETE" &&
-                    view.progress == "Logs: 10 / 10" &&
+                    view.progress == "Return to Mara Vale" &&
                     player.GetQuestJournal().TryGet(QuestId::GATHERING_BASICS)->progress == 10,
                 "Ready quest has a clear completion label");
 
@@ -161,7 +162,7 @@ int main()
     view = graphics.BuildQuestPanelView(player);
     test.Expect(view.state == "AVAILABLE" &&
                     view.title == "Mining Basics" &&
-                    view.progress == "Copper ores: 0 / 5",
+                    view.progress == "Start: Speak to Mara Vale",
                 "Completed quest history no longer hides the next available goal");
 
     SelectTab(graphics, 0);
