@@ -30,9 +30,15 @@ public:
             const QuestDefinition *definition =
                 QuestDefinitionDatabase::TryGet(questId);
             if (definition == nullptr) continue;
-            std::string objective =
-                ItemDatabase::Get(definition->objectiveItem).GetName();
-            if (definition->requiredAmount != 1) objective += "s";
+            std::string objective;
+            if (definition->objectiveType == QuestObjectiveType::TALK_TO_CHARACTER)
+                objective = definition->objectiveText == nullptr
+                    ? "Speak with the character" : definition->objectiveText;
+            else
+            {
+                objective = ItemDatabase::Get(definition->objectiveItem).GetName();
+                if (definition->requiredAmount != 1) objective += "s";
+            }
             replacement.push_back({questId, record.state, record.progress,
                 definition->requiredAmount, definition->name,
                 std::move(objective)});

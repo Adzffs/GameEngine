@@ -90,6 +90,21 @@ int main()
     invalid = *definition; invalid.objectiveItem = ItemType::NONE;
     test.Expect(!QuestDefinitionDatabase::IsValidDefinition(invalid),
                 "Unknown objective item rejects");
+    QuestDefinition investigation = *definition;
+    investigation.objectiveType = QuestObjectiveType::TALK_TO_CHARACTER;
+    investigation.objectiveItem = ItemType::NONE;
+    investigation.objectiveNpc = NpcType::SERA_FLINT;
+    investigation.objectiveText = "Ask Sera about the tracks";
+    investigation.requiredAmount = 1;
+    test.Expect(QuestDefinitionDatabase::IsValidDefinition(investigation),
+                "A specific-character investigation objective validates");
+    investigation.objectiveNpc = NpcType::NONE;
+    test.Expect(!QuestDefinitionDatabase::IsValidDefinition(investigation),
+                "Investigation objectives require a real character");
+    investigation.objectiveNpc = NpcType::SERA_FLINT;
+    investigation.objectiveText = "";
+    test.Expect(!QuestDefinitionDatabase::IsValidDefinition(investigation),
+                "Investigation objectives require player-facing journal text");
     invalid = *definition; invalid.requiredAmount = 0;
     test.Expect(!QuestDefinitionDatabase::IsValidDefinition(invalid),
                 "Non-positive requirement rejects");

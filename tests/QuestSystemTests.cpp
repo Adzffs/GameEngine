@@ -43,6 +43,13 @@ struct QuestSystemTestAccess
         return QuestSystem::RecordGatheredAgainstDefinitions(
             journal, itemType, quantity, definitions);
     }
+    static std::vector<QuestId> RecordTalkedTo(
+        QuestJournal &journal, NpcType npcType,
+        const std::vector<QuestDefinition> &definitions)
+    {
+        return QuestSystem::RecordTalkedToAgainstDefinitions(
+            journal, npcType, definitions);
+    }
 };
 
 int main()
@@ -135,5 +142,28 @@ int main()
                     multiple.TryGet(static_cast<QuestId>(2))->progress == 1 &&
                     multiple.TryGet(static_cast<QuestId>(3))->progress == 1,
                 "Multiple matching synthetic records progress in canonical order");
+
+    QuestDefinition investigation = first;
+    investigation.objectiveType = QuestObjectiveType::TALK_TO_CHARACTER;
+    investigation.objectiveItem = ItemType::NONE;
+    investigation.objectiveNpc = NpcType::SERA_FLINT;
+    investigation.objectiveText = "Ask Sera about the tracks";
+    investigation.requiredAmount = 1;
+    std::vector<QuestDefinition> investigationDefinitions{investigation};
+    QuestJournal investigationJournal =
+        QuestJournalTestAccess::FromDefinitions(investigationDefinitions);
+    QuestJournalTestAccess::ActivateAll(investigationJournal);
+    test.Expect(
+        QuestSystemTestAccess::RecordTalkedTo(investigationJournal,
+            NpcType::BRANN_DEEPWELL, investigationDefinitions).empty() &&
+        investigationJournal.TryGet(investigation.id)->progress == 0,
+        "Talking to the wrong character does not advance an investigation");
+    const auto investigated = QuestSystemTestAccess::RecordTalkedTo(
+        investigationJournal, NpcType::SERA_FLINT, investigationDefinitions);
+    test.Expect(investigated == std::vector<QuestId>{investigation.id} &&
+                    investigationJournal.TryGet(investigation.id)->progress == 1 &&
+                    investigationJournal.TryGet(investigation.id)->state ==
+                        QuestState::READY_TO_COMPLETE,
+                "Talking to the authored character completes an investigation objective");
     return test.Finish();
 }

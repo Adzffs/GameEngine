@@ -1,6 +1,7 @@
 #include "QuestDefinitionDatabase.h"
 
 #include "../Item/ItemDatabase.h"
+#include "../NPC/NpcDefinitionDatabase.h"
 
 #include <set>
 
@@ -55,9 +56,18 @@ bool QuestDefinitionDatabase::IsValidDefinition(
     const bool validInitialState =
         definition.initialState == QuestState::AVAILABLE ||
         definition.initialState == QuestState::UNAVAILABLE;
+    const bool validObjective =
+        definition.objectiveType == QuestObjectiveType::GATHER_ITEM
+            ? IsKnownItem(definition.objectiveItem)
+            : definition.objectiveType == QuestObjectiveType::TALK_TO_CHARACTER &&
+                definition.objectiveItem == ItemType::NONE &&
+                NpcDefinitionDatabase::TryGet(definition.objectiveNpc) != nullptr &&
+                definition.objectiveText != nullptr &&
+                definition.objectiveText[0] != '\0';
     return IsValidQuestId(definition.id) && definition.name != nullptr &&
         definition.name[0] != '\0' && validInitialState &&
-        IsKnownItem(definition.objectiveItem) && definition.requiredAmount > 0 &&
+        IsValidQuestObjectiveType(definition.objectiveType) && validObjective &&
+        definition.requiredAmount > 0 &&
         IsKnownItem(definition.rewardItem) && definition.rewardAmount > 0 &&
         definition.giver.npcType != NpcType::NONE &&
         definition.giver.dialogueId != DialogueId::NONE &&

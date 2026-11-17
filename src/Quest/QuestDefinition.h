@@ -1,6 +1,7 @@
 #pragma once
 #include "QuestId.h"
 #include "QuestState.h"
+#include "QuestObjectiveType.h"
 #include "../Dialogue/DialogueId.h"
 #include "../Dialogue/DialogueNodeId.h"
 #include "../Inventory/ItemType.h"
@@ -23,4 +24,7 @@ struct QuestDefinition
     ItemType rewardItem;
     int rewardAmount;
     QuestGiverDefinition giver;
+    QuestObjectiveType objectiveType = QuestObjectiveType::GATHER_ITEM;
+    NpcType objectiveNpc = NpcType::NONE;
+    const char *objectiveText = nullptr;
 };
