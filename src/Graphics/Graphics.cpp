@@ -2355,6 +2355,8 @@ void Graphics::UpdateCamera(
     int playerY,
     const Map &map)
 {
+    cameraWorldPixelWidth = static_cast<float>(map.GetWidth() * TileSize);
+    cameraWorldPixelHeight = static_cast<float>(map.GetHeight() * TileSize);
     const float screenWorldWidth =
         (sidePanelOpen ? 930.0f : static_cast<float>(WindowWidth)) /
         cameraZoom;
@@ -2379,6 +2381,15 @@ void Graphics::UpdateCamera(
             preferredPlayerScreenY,
         0.0f,
         maximumY);
+
+    if (cameraTransformLockedForNextRender)
+    {
+        cameraPixelX = std::clamp(cameraPixelX, 0.0f, maximumX);
+        cameraPixelY = std::clamp(cameraPixelY, 0.0f, maximumY);
+        cameraTransformLockedForNextRender = false;
+        cameraInitialized = true;
+        return;
+    }
 
     if (!cameraInitialized)
     {
@@ -2424,6 +2435,23 @@ void Graphics::AdjustCameraZoom(
         cameraPixelY = anchoredWorldY - anchorScreenY / newZoom;
     }
     cameraZoom = newZoom;
+    if (cameraWorldPixelWidth > 0.0f && cameraWorldPixelHeight > 0.0f)
+    {
+        const float visibleWidth =
+            (sidePanelOpen ? 930.0f : static_cast<float>(WindowWidth)) /
+            cameraZoom;
+        const float visibleHeight = static_cast<float>(WindowHeight) /
+            cameraZoom;
+        cameraPixelX = std::clamp(
+            cameraPixelX,
+            0.0f,
+            std::max(0.0f, cameraWorldPixelWidth - visibleWidth));
+        cameraPixelY = std::clamp(
+            cameraPixelY,
+            0.0f,
+            std::max(0.0f, cameraWorldPixelHeight - visibleHeight));
+    }
+    cameraTransformLockedForNextRender = true;
 }
 
 bool Graphics::HandleMinimapClick(float screenX, float screenY)

@@ -105,6 +105,24 @@ int main()
     test.ExpectNear(afterAnchoredZoom.y, beforeAnchoredZoom.y, 0.001f,
         "Zoom keeps the vertical world point beneath the cursor fixed");
 
+    Graphics rapidZoomGraphics;
+    GraphicsTestAccess::UpdateCamera(rapidZoomGraphics, 40, 40, map);
+    const SDL_FPoint rapidZoomAnchorBefore = GraphicsTestAccess::ScreenToWorldPoint(
+        rapidZoomGraphics, 520.0f, 360.0f);
+    for (int index = 0; index < 5; ++index)
+    {
+        rapidZoomGraphics.AdjustCameraZoom(1, 520.0f, 360.0f);
+        rapidZoomGraphics.AdjustCameraZoom(-1, 520.0f, 360.0f);
+    }
+    rapidZoomGraphics.AdjustCameraZoom(1, 520.0f, 360.0f);
+    GraphicsTestAccess::UpdateCamera(rapidZoomGraphics, 40, 40, map);
+    const SDL_FPoint rapidZoomAnchorAfter = GraphicsTestAccess::ScreenToWorldPoint(
+        rapidZoomGraphics, 520.0f, 360.0f);
+    test.ExpectNear(rapidZoomAnchorAfter.x, rapidZoomAnchorBefore.x, 0.001f,
+        "Rapid zoom input and the following render share one horizontal transform");
+    test.ExpectNear(rapidZoomAnchorAfter.y, rapidZoomAnchorBefore.y, 0.001f,
+        "Rapid zoom input and the following render share one vertical transform");
+
     GraphicsTestAccess::SetMinimapOrigin(graphics, 20, 30);
     test.Expect(GraphicsTestAccess::HandleMinimapClick(
         graphics, 1040.0f + 5.0f * 7.0f + 1.0f,

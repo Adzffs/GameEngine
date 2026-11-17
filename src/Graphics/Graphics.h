@@ -527,6 +527,9 @@ private:
     float cameraPixelX = 0.0f;
     float cameraPixelY = 0.0f;
     float cameraZoom = 1.0f;
+    float cameraWorldPixelWidth = 0.0f;
+    float cameraWorldPixelHeight = 0.0f;
+    bool cameraTransformLockedForNextRender = false;
     bool cameraInitialized = false;
     bool runTogglePending = false;
     int minimapOriginX = 0;
