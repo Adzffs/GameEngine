@@ -73,7 +73,8 @@ namespace
     bool IsValidStationType(StationType stationType)
     {
         return stationType == StationType::FURNACE ||
-               stationType == StationType::CRAFTING_TABLE;
+               stationType == StationType::CRAFTING_TABLE ||
+               stationType == StationType::BANK;
     }
 
     bool IsValidCraftingPatternType(
@@ -194,6 +195,15 @@ namespace
             return "WOODEN_PLANKS";
         case RecipeType::WOODEN_SHIELD:
             return "WOODEN_SHIELD";
+        case RecipeType::BRONZE_AXE: return "BRONZE_AXE";
+        case RecipeType::IRON_AXE: return "IRON_AXE";
+        case RecipeType::STEEL_AXE: return "STEEL_AXE";
+        case RecipeType::BRONZE_PICKAXE: return "BRONZE_PICKAXE";
+        case RecipeType::IRON_PICKAXE: return "IRON_PICKAXE";
+        case RecipeType::STEEL_PICKAXE: return "STEEL_PICKAXE";
+        case RecipeType::BRONZE_SWORD: return "BRONZE_SWORD";
+        case RecipeType::OAK_PLANKS: return "OAK_PLANKS";
+        case RecipeType::WILLOW_PLANKS: return "WILLOW_PLANKS";
         }
 
         return "UNKNOWN_RECIPE";
@@ -207,6 +217,12 @@ namespace
             return "NONE";
         case RewardTableType::DEVELOPMENT_MONSTER:
             return "DEVELOPMENT_MONSTER";
+        case RewardTableType::AGGRESSIVE_MONSTER:
+            return "AGGRESSIVE_MONSTER";
+        case RewardTableType::DURABLE_MONSTER:
+            return "DURABLE_MONSTER";
+        case RewardTableType::ELITE_MONSTER:
+            return "ELITE_MONSTER";
         }
 
         return "UNKNOWN_REWARD_TABLE";
@@ -475,7 +491,7 @@ ContentValidationReport ContentValidator::ValidateRewardTableEntries(
             "stored total weight must match weighted entries");
     }
 
-    if (rewardTableType == RewardTableType::DEVELOPMENT_MONSTER)
+    if (rewardTableType != RewardTableType::NONE)
     {
         if (guaranteedEntries.empty() &&
             weightedEntries.empty())
@@ -1730,6 +1746,12 @@ void ContentValidator::AppendNpcDefinitionValidation(
         report.AddError("NpcDefinition", contentID, "NPC kind is unknown");
     if (definition.kind == NpcKind::FRIENDLY && definition.combat.has_value())
         report.AddError("NpcDefinition", contentID, "friendly definition must not contain combat data");
+    if (definition.kind == NpcKind::FRIENDLY &&
+        (definition.role.empty() || definition.motivation.empty() ||
+         definition.speechStyle.empty() || definition.relationship.empty() ||
+         definition.examineText.empty()))
+        report.AddError("NpcDefinition", contentID,
+            "friendly characters require role, motivation, voice, relationship and examine text");
     if (definition.kind == NpcKind::MONSTER && !definition.combat.has_value())
         report.AddError("NpcDefinition", contentID, "monster definition must contain combat data");
     if (definition.kind == NpcKind::MONSTER && !definition.interactions.empty())

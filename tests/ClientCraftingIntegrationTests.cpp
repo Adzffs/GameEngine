@@ -304,6 +304,7 @@ int main()
         IsInside(layout.panelBounds, layout.craftButton) &&
         IsInside(layout.panelBounds, layout.previewBounds);
     bool gridDisjoint = true;
+    bool inventoryDisjoint = true;
     for (std::size_t left = 0;
          left < layout.gridSlots.size();
          ++left)
@@ -320,9 +321,21 @@ int main()
                     layout.gridSlots[right]);
         }
     }
+    for (std::size_t left = 0; left < layout.inventorySlots.size(); ++left)
+    {
+        layoutInsidePanel = layoutInsidePanel &&
+            IsInside(layout.panelBounds, layout.inventorySlots[left]);
+        for (std::size_t right = left + 1;
+             right < layout.inventorySlots.size(); ++right)
+            inventoryDisjoint = inventoryDisjoint &&
+                !Overlaps(layout.inventorySlots[left], layout.inventorySlots[right]);
+        for (const SDL_FRect &gridSlot : layout.gridSlots)
+            inventoryDisjoint = inventoryDisjoint &&
+                !Overlaps(layout.inventorySlots[left], gridSlot);
+    }
     test.Expect(
         layoutInsidePanel &&
-            gridDisjoint &&
+            gridDisjoint && inventoryDisjoint &&
             !Overlaps(layout.clearButton, layout.craftButton) &&
             !Overlaps(layout.craftButton, layout.closeButton),
         "Crafting controls are distinct and remain inside the modal");

@@ -11,9 +11,12 @@
 #include "../Dialogue/DialogueSessionId.h"
 #include "../Dialogue/DialogueChoiceId.h"
 #include "../Inventory/ItemType.h"
+#include "../Inventory/Inventory.h"
 #include "../Shop/ShopSessionId.h"
 #include "../Quest/QuestId.h"
 #include "../Recipe/CraftingSession.h"
+#include "../Bank/BankSession.h"
+#include "../Combat/CombatStyle.h"
 
 struct MoveCommand
 {
@@ -31,6 +34,19 @@ struct UseInventoryItemCommand
 {
     int actorEntityID;
     int inventorySlotIndex;
+};
+
+struct DropInventoryItemCommand
+{
+    int actorEntityID;
+    int inventorySlotIndex;
+    int amount;
+};
+
+struct TakeGroundItemCommand
+{
+    int actorEntityID;
+    int groundItemID;
 };
 
 struct UnequipItemCommand
@@ -56,6 +72,16 @@ struct ReplaceCraftingSessionStateCommand
     int actorEntityID;
     CraftingSessionId sessionId;
     std::uint64_t expectedRevision;
+    InventorySlot cursor;
+    std::array<InventorySlot, 9> inputSlots;
+};
+
+struct ReplaceCraftingInteractionStateCommand
+{
+    int actorEntityID;
+    CraftingSessionId sessionId;
+    std::uint64_t expectedRevision;
+    std::array<InventorySlot, Inventory::SlotCount> inventorySlots;
     InventorySlot cursor;
     std::array<InventorySlot, 9> inputSlots;
 };
@@ -123,14 +149,54 @@ struct ShopCloseCommand
 struct QuestAcceptCommand{int actorEntityID; int npcEntityID; DialogueSessionId dialogueSessionId; QuestId questId;};
 struct QuestCompleteCommand{int actorEntityID; int npcEntityID; DialogueSessionId dialogueSessionId; QuestId questId;};
 
+struct BankDepositCommand
+{
+    int actorEntityID;
+    BankSessionId sessionId;
+    std::uint64_t expectedRevision;
+    int inventorySlotIndex;
+    int quantity;
+};
+struct BankWithdrawCommand
+{
+    int actorEntityID;
+    BankSessionId sessionId;
+    std::uint64_t expectedRevision;
+    ItemType itemType;
+    int quantity;
+};
+struct BankDepositInventoryCommand
+{
+    int actorEntityID;
+    BankSessionId sessionId;
+    std::uint64_t expectedRevision;
+};
+struct BankCloseCommand
+{
+    int actorEntityID;
+    BankSessionId sessionId;
+};
+struct SkipTutorialCommand
+{
+    int actorEntityID;
+};
+struct SetCombatStyleCommand
+{
+    int actorEntityID;
+    CombatStyle style;
+};
+
 using ServerCommandData = std::variant<
     MoveCommand,
     AttackCommand,
     UseInventoryItemCommand,
+    DropInventoryItemCommand,
+    TakeGroundItemCommand,
     UnequipItemCommand,
     StartRecipeCommand,
     CraftRecipeCommand,
     ReplaceCraftingSessionStateCommand,
+    ReplaceCraftingInteractionStateCommand,
     InteractCommand,
     CloseStationCommand,
     NpcInteractionCommand,
@@ -141,7 +207,13 @@ using ServerCommandData = std::variant<
     ShopSellCommand,
     ShopCloseCommand,
     QuestAcceptCommand,
-    QuestCompleteCommand>;
+    QuestCompleteCommand,
+    BankDepositCommand,
+    BankWithdrawCommand,
+    BankDepositInventoryCommand,
+    BankCloseCommand,
+    SkipTutorialCommand,
+    SetCombatStyleCommand>;
 
 struct ServerCommand
 {

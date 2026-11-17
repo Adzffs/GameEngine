@@ -476,6 +476,7 @@ int main()
             player->GetInventory().AddItem(
                 ItemType::COAL,
                 2);
+            player->GetRecipeBook().Discover(RecipeType::STEEL_BAR);
 
             bool shouldFail = smithingLevel < requiredLevel;
 

@@ -13,6 +13,7 @@
 #include "../src/World/World.h"
 
 #include <optional>
+#include <array>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -150,16 +151,32 @@ int main()
         test.Expect(
             world.GetMeleeCombatFeedbacks().empty(),
             "Starting a melee attack does not immediately create feedback");
+        test.Expect(world.GetMeleeAttackPresentations().count(playerID) == 1,
+            "Starting a melee attack creates a wind-up presentation");
+        if (world.GetMeleeAttackPresentations().count(playerID) == 1)
+        {
+            const MeleeAttackPresentation &presentation =
+                world.GetMeleeAttackPresentations().at(playerID);
+            test.ExpectEqual(presentation.defenderEntityID, monsterID,
+                "Wind-up identifies the intended defender");
+            test.ExpectEqual(presentation.totalTicks, 2,
+                "Wind-up uses authoritative attack duration");
+        }
 
         world.Update();
 
         test.Expect(
             world.GetMeleeCombatFeedbacks().empty(),
             "Feedback is not created before the attack completes");
+        test.Expect(world.GetMeleeAttackPresentations().count(playerID) == 1 &&
+                world.GetMeleeAttackPresentations().at(playerID).remainingTicks == 1,
+            "Wind-up advances toward contact on the world tick");
 
         world.Update();
 
         const auto &feedbacks = world.GetMeleeCombatFeedbacks();
+        test.Expect(world.GetMeleeAttackPresentations().empty(),
+            "Contact replaces the wind-up presentation with result feedback");
 
         test.Expect(
             feedbacks.count(monsterID) == 1,
@@ -268,6 +285,9 @@ int main()
                 feedback.actualDamageApplied,
                 0,
                 "Miss feedback shows zero actual damage");
+            test.ExpectEqual(Graphics::GetCombatFeedbackLabel(feedback),
+                std::string("MISS"),
+                "Miss presentation is explicitly labelled");
         }
     }
 
@@ -309,6 +329,9 @@ int main()
                 feedback.actualDamageApplied,
                 0,
                 "Zero-damage hit remains distinguishable from a miss");
+            test.ExpectEqual(Graphics::GetCombatFeedbackLabel(feedback),
+                std::string("BLOCK"),
+                "Zero-damage hit is presented as a block");
         }
     }
 
@@ -509,6 +532,52 @@ int main()
                 3,
                 "Repeated attack refreshes the defender feedback lifetime");
         }
+    }
+
+    {
+        const auto resolveStyle = [](CombatStyle style)
+        {
+            World world(std::make_unique<SequenceRandomSource>(
+                std::vector<int>{6, 2, 2}));
+            const int playerID = world.CreatePlayer();
+            const int monsterID = world.CreateMonster(
+                6, 2, MakeRatings(8, 8, 1, 30));
+            Player *player = GetPlayer(world, playerID);
+            BoostAttackSkill(*player);
+            player->TrySetCombatStyle(style);
+            player->GetPosition().SetPosition(5, 2);
+            const int attackBefore =
+                player->GetSkills().GetSkill(SkillType::ATTACK).GetXP();
+            const int defenceBefore =
+                player->GetSkills().GetSkill(SkillType::DEFENCE).GetXP();
+            world.TryStartMeleeAttack(playerID, monsterID, 1);
+            world.Update();
+            const int damage = world.GetLastMeleeAttackResult().has_value()
+                ? world.GetLastMeleeAttackResult()->actualDamageApplied
+                : 0;
+            return std::array<int, 3>{
+                damage,
+                player->GetSkills().GetSkill(SkillType::ATTACK).GetXP() -
+                    attackBefore,
+                player->GetSkills().GetSkill(SkillType::DEFENCE).GetXP() -
+                    defenceBefore};
+        };
+
+        const auto accurate = resolveStyle(CombatStyle::ACCURATE);
+        const auto aggressive = resolveStyle(CombatStyle::AGGRESSIVE);
+        const auto defensive = resolveStyle(CombatStyle::DEFENSIVE);
+        test.Expect(accurate[0] > 0 && aggressive[0] > 0 && defensive[0] > 0,
+            "Style progression fixture resolves real damage");
+        test.ExpectEqual(accurate[1], accurate[0] * 4,
+            "Accurate style focuses earned XP into Attack");
+        test.ExpectEqual(accurate[2], 0,
+            "Accurate style does not award Defence XP");
+        test.ExpectEqual(aggressive[1], aggressive[0] * 5,
+            "Aggressive style awards the strongest current damage-training XP");
+        test.ExpectEqual(defensive[1], defensive[0] * 2,
+            "Defensive style retains partial Attack progression");
+        test.ExpectEqual(defensive[2], defensive[0] * 2,
+            "Defensive style splits progression into Defence");
     }
 
     return test.Finish();

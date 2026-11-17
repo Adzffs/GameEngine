@@ -31,6 +31,7 @@
 #include "../Core/SeededRandom.h"
 #include "../Recipe/RecipeSystem.h"
 #include "../Recipe/RecipeDatabase.h"
+#include "../Recipe/RecipeProductionPacing.h"
 #include "../Recipe/CraftingRecipeMatcher.h"
 #include "../Reward/RewardTableRegistry.h"
 #include "../Combat/Combatant.h"
@@ -171,6 +172,22 @@ World::World(
     rewardTableRoller = std::make_unique<RewardTableRoller>(
         *this->rewardRandomSource);
 
+    for (const DevelopmentTerrainRegionDefinition &region :
+         DevelopmentWorldContent::GetStarterTerrainRegions())
+    {
+        for (int y = region.minimumY; y <= region.maximumY; ++y)
+        {
+            for (int x = region.minimumX; x <= region.maximumX; ++x)
+            {
+                // Preserve the original pond as a recognizable boundary.
+                if (map.GetTileType(x, y) != TileType::WATER)
+                {
+                    map.SetTileType(x, y, region.tileType);
+                }
+            }
+        }
+    }
+
     for (const NpcSpawnDefinition &spawn : NpcSpawnDatabase::GetStarterSpawns())
     {
         npcSpawnManager.AddSpawn(spawn);
@@ -182,6 +199,9 @@ World::World(
     for (const NpcSpawnDefinition &spawn :
          NpcSpawnDatabase::GetStarterMonsterSpawns())
     {
+        if (spawn.spawnId == NpcSpawnId::DURABLE_DEVELOPMENT_SPAWN ||
+            spawn.spawnId == NpcSpawnId::ELITE_DEVELOPMENT_SPAWN)
+            continue;
         CreateMonster(spawn.npcType, spawn);
     }
 
@@ -236,7 +256,47 @@ void World::CreateStation(
 }
 int World::CreatePlayer()
 {
-    return entityManager.CreatePlayer();
+    const int playerID = entityManager.CreatePlayer();
+    if (playerID > 0)
+    {
+        EnsureAdvancedStarterMonsters();
+        EnsureStarterSupportingCharacters();
+    }
+    return playerID;
+}
+
+void World::EnsureAdvancedStarterMonsters()
+{
+    if (advancedStarterMonstersCreated) return;
+    const NpcSpawnDefinition *durable =
+        NpcSpawnDatabase::TryGet(NpcSpawnId::DURABLE_DEVELOPMENT_SPAWN);
+    const NpcSpawnDefinition *elite =
+        NpcSpawnDatabase::TryGet(NpcSpawnId::ELITE_DEVELOPMENT_SPAWN);
+    if (durable == nullptr || elite == nullptr) return;
+    const int durableID = CreateMonster(durable->npcType, *durable);
+    const int eliteID = CreateMonster(elite->npcType, *elite);
+    advancedStarterMonstersCreated = durableID > 0 && eliteID > 0;
+}
+
+void World::EnsureStarterSupportingCharacters()
+{
+    if (starterSupportingCharactersCreated) return;
+    const std::array<NpcSpawnId, 5> supportingSpawns{
+        NpcSpawnId::TORREN_ASH_SPAWN,
+        NpcSpawnId::ELIA_REED_SPAWN,
+        NpcSpawnId::NESSA_THORNE_SPAWN,
+        NpcSpawnId::BRANN_DEEPWELL_SPAWN,
+        NpcSpawnId::SERA_FLINT_SPAWN};
+    bool createdAll = true;
+    for (NpcSpawnId spawnId : supportingSpawns)
+    {
+        const NpcSpawnDefinition *spawn = NpcSpawnDatabase::TryGet(spawnId);
+        if (spawn == nullptr ||
+            (npcSpawnManager.GetActiveCount(spawnId) == 0 &&
+             CreateNpc(spawn->npcType, *spawn) == 0))
+            createdAll = false;
+    }
+    starterSupportingCharactersCreated = createdAll;
 }
 
 WorldPlayerLoadResult World::LoadOrCreatePlayerFromFile(
@@ -310,6 +370,8 @@ WorldPlayerLoadResult World::LoadOrCreatePlayerFromFile(
     }
 
     result.SetPlayerEntityID(registeredID);
+    EnsureAdvancedStarterMonsters();
+    EnsureStarterSupportingCharacters();
     result.SetStatus(fileStatus == PlayerSaveFileLoadStatus::NOT_FOUND
                          ? WorldPlayerLoadStatus::CREATED_NEW
                          : WorldPlayerLoadStatus::LOADED_EXISTING);
@@ -382,7 +444,21 @@ WorldPlayerLoadResult World::TryRegisterLoadedPlayer(
         return result;
     }
 
+    if (saveData.recoveryPile.active)
+    {
+        PlayerRecoveryPile pile;
+        pile.ownerPlayerEntityID = registeredID;
+        pile.position.SetPosition(saveData.recoveryPile.positionX,
+                                  saveData.recoveryPile.positionY);
+        pile.expiryTick = currentTick + saveData.recoveryPile.remainingTicks;
+        for (const SavedBankEntry &entry : saveData.recoveryPile.items)
+            pile.items.push_back({entry.itemType, entry.quantity});
+        playerRecoveryPiles[registeredID] = std::move(pile);
+    }
+
     result.SetPlayerEntityID(registeredID);
+    EnsureAdvancedStarterMonsters();
+    EnsureStarterSupportingCharacters();
     result.SetStatus(WorldPlayerLoadStatus::LOADED_EXISTING);
     return result;
 }
@@ -424,8 +500,23 @@ WorldPlayerSaveResult World::SavePlayerToFile(
         return result;
     }
 
+    PlayerSaveData saveData = PlayerSaveState::Capture(*player);
+    const auto pile = playerRecoveryPiles.find(playerEntityID);
+    if (pile != playerRecoveryPiles.end())
+    {
+        saveData.recoveryPile.active = true;
+        saveData.recoveryPile.positionX = pile->second.position.GetX();
+        saveData.recoveryPile.positionY = pile->second.position.GetY();
+        saveData.recoveryPile.remainingTicks =
+            std::max(1, pile->second.expiryTick - currentTick);
+        std::map<ItemType, int> totals;
+        for (const ItemAmount &item : pile->second.items)
+            totals[item.itemType] += item.quantity;
+        for (const auto &[itemType, quantity] : totals)
+            saveData.recoveryPile.items.push_back({itemType, quantity});
+    }
     PlayerSaveFileSaveResult fileResult =
-        PlayerSaveFileStore::Save(savePath, PlayerSaveState::Capture(*player));
+        PlayerSaveFileStore::Save(savePath, saveData);
     const bool saved = fileResult.IsSuccess();
     result.SetFileSaveResult(std::move(fileResult));
     if (!saved)
@@ -596,6 +687,35 @@ World::GetStations() const
     return objectManager.GetStations();
 }
 
+const std::vector<GroundItem> &World::GetGroundItems() const
+{
+    return groundItems;
+}
+
+const GroundItem *World::GetGroundItemByID(int id) const
+{
+    const auto found = std::find_if(groundItems.begin(), groundItems.end(),
+        [id](const GroundItem &item) { return item.id == id; });
+    return found == groundItems.end() ? nullptr : &*found;
+}
+
+const GroundItem *World::GetGroundItemAt(int x, int y) const
+{
+    const auto found = std::find_if(groundItems.begin(), groundItems.end(),
+        [=](const GroundItem &item)
+        {
+            return item.position.GetX() == x && item.position.GetY() == y;
+        });
+    return found == groundItems.end() ? nullptr : &*found;
+}
+
+const PlayerRecoveryPile *World::GetPlayerRecoveryPile(
+    int playerEntityID) const
+{
+    const auto pile = playerRecoveryPiles.find(playerEntityID);
+    return pile == playerRecoveryPiles.end() ? nullptr : &pile->second;
+}
+
 CraftingStation *World::GetStationAt(
     int x,
     int y)
@@ -644,7 +764,8 @@ void World::QueueStationInteraction(
 bool World::QueueMeleeEngagementRequest(
     int attackerEntityID,
     int defenderEntityID,
-    int durationTicks)
+    int durationTicks,
+    bool instantOpeningAttack)
 {
     if (durationTicks < 1)
     {
@@ -742,7 +863,8 @@ bool World::QueueMeleeEngagementRequest(
             attackerEntityID,
             defenderEntityID,
             durationTicks,
-            entityManager))
+            entityManager,
+            instantOpeningAttack))
     {
         return false;
     }
@@ -757,7 +879,8 @@ bool World::QueueMeleeEngagementRequest(
         bool started = TryStartMeleeEngagement(
             attackerEntityID,
             defenderEntityID,
-            durationTicks);
+            durationTicks,
+            instantOpeningAttack);
 
         meleeEngagementSystem.ClearEngagement(
             attackerEntityID);
@@ -842,6 +965,12 @@ bool World::HasPendingMeleeEngagement(
     return meleeEngagementSystem.HasEngagement(entityID);
 }
 
+std::optional<int> World::GetMeleeTargetEntityID(
+    int attackerEntityID) const
+{
+    return meleeEngagementSystem.GetTargetEntityID(attackerEntityID);
+}
+
 void World::ProcessMeleeEngagementSystem()
 {
     const std::vector<MeleeEngagementIntent> intents =
@@ -867,7 +996,8 @@ void World::ProcessMeleeEngagementSystem()
             const bool started = TryStartMeleeEngagement(
                 intent.attackerEntityID,
                 intent.targetEntityID,
-                intent.durationTicks);
+                intent.durationTicks,
+                intent.instantOpeningAttack);
             meleeEngagementSystem.ClearEngagement(
                 intent.attackerEntityID);
             (void)started;
@@ -920,6 +1050,12 @@ const CraftingSessionSnapshot *World::GetCraftingSession(
     int actorEntityID) const
 {
     return craftingSessionSystem.Get(actorEntityID);
+}
+
+const ActiveBankSession *World::GetBankSession(int actorEntityID) const
+{
+    const auto found = activeBankSessions.find(actorEntityID);
+    return found == activeBankSessions.end() ? nullptr : &found->second;
 }
 
 bool World::ConsumeOpenedStation(
@@ -1089,6 +1225,7 @@ void World::CloseStationInteraction(
     openedStations.erase(entityID);
 
     activeStations.erase(entityID);
+    activeBankSessions.erase(entityID);
 }
 
 bool World::TrySettleCraftingSession(int actorEntityID)
@@ -1177,6 +1314,47 @@ bool World::TryReplaceCraftingSessionState(
     return true;
 }
 
+bool World::TryReplaceCraftingInteractionState(
+    const ReplaceCraftingInteractionStateCommand &command)
+{
+    Player *player = dynamic_cast<Player *>(entityManager.GetEntityByID(command.actorEntityID));
+    const CraftingSessionSnapshot *current = craftingSessionSystem.Get(command.actorEntityID);
+    const auto activeStation = activeStations.find(command.actorEntityID);
+    if (player == nullptr || !player->IsAlive() || current == nullptr ||
+        current->sessionId != command.sessionId || current->revision != command.expectedRevision ||
+        activeStation == activeStations.end() || activeStation->second != current->stationObjectID ||
+        !IsStationUsable(command.actorEntityID, StationType::CRAFTING_TABLE)) return false;
+
+    for (const InventorySlot &slot : command.inventorySlots)
+        if (!InventoryStackOperations::IsCanonicalStack(slot)) return false;
+    if (!InventoryStackOperations::IsCanonicalStack(command.cursor)) return false;
+    for (const InventorySlot &slot : command.inputSlots)
+        if (!InventoryStackOperations::IsCanonicalStack(slot)) return false;
+
+    std::map<ItemType, long long> before;
+    std::map<ItemType, long long> after;
+    for (const InventorySlot &slot : player->GetInventory().GetSlots())
+        if (!slot.IsEmpty()) before[slot.GetItemType()] += slot.GetAmount();
+    AddSessionTotals(before, *current);
+    for (const InventorySlot &slot : command.inventorySlots)
+        if (!slot.IsEmpty()) after[slot.GetItemType()] += slot.GetAmount();
+    CraftingSessionSnapshot requested = *current;
+    requested.cursor = command.cursor;
+    requested.inputSlots = command.inputSlots;
+    AddSessionTotals(after, requested);
+    if (before != after) return false;
+
+    const auto originalInventory = player->GetInventory().GetSlots();
+    if (!player->GetInventory().TryReplaceSlotsAtomically(command.inventorySlots)) return false;
+    if (!craftingSessionSystem.ReplaceState(command.actorEntityID, command.sessionId,
+            command.expectedRevision, command.cursor, command.inputSlots))
+    {
+        player->GetInventory().TryReplaceSlotsAtomically(originalInventory);
+        return false;
+    }
+    return true;
+}
+
 void World::RevalidateCraftingSessions()
 {
     for (int actorEntityID : craftingSessionSystem.GetActorEntityIDs())
@@ -1244,12 +1422,17 @@ bool World::TryStartRecipeAction(
     const RecipeDefinition &recipe =
         RecipeDatabase::Get(
             recipeType);
+    const int skillLevel = recipe.GetRequiredSkill() == SkillType::NONE
+        ? 1
+        : player->GetSkills().GetSkill(recipe.GetRequiredSkill()).GetLevel();
+    const int durationTicks = RecipeProductionPacing::GetDurationTicks(
+        recipe, skillLevel);
 
     StartAction(
         Action(
             ActionType::RECIPE,
             recipe.GetName(),
-            recipe.GetActionDurationTicks(),
+            durationTicks,
             entityID,
             static_cast<int>(
                 recipeType),
@@ -1277,13 +1460,15 @@ bool World::TryStartMeleeAttack(
 bool World::TryStartMeleeEngagement(
     int attackerEntityID,
     int defenderEntityID,
-    int durationTicks)
+    int durationTicks,
+    bool instantOpeningAttack)
 {
     if (!meleeEngagementSystem.RequestEngagement(
             attackerEntityID,
             defenderEntityID,
             durationTicks,
-            entityManager))
+            entityManager,
+            instantOpeningAttack))
     {
         return false;
     }
@@ -1292,7 +1477,8 @@ bool World::TryStartMeleeEngagement(
         attackerEntityID,
         defenderEntityID,
         durationTicks,
-        true);
+        true,
+        instantOpeningAttack);
 
     if (!started)
     {
@@ -1358,7 +1544,8 @@ bool World::TryStartMeleeAction(
     int attackerEntityID,
     int defenderEntityID,
     int durationTicks,
-    bool repeating)
+    bool repeating,
+    bool instantOpeningAttack)
 {
     ActionValidationResult validation =
         ValidateMeleeStartAction(
@@ -1386,7 +1573,14 @@ bool World::TryStartMeleeAction(
             durationTicks,
             attackerEntityID,
             defenderEntityID,
-            repeating));
+            repeating,
+            instantOpeningAttack));
+
+    if (!instantOpeningAttack)
+    {
+        meleeAttackPresentations[attackerEntityID] = MeleeAttackPresentation{
+            attackerEntityID, defenderEntityID, durationTicks, durationTicks};
+    }
 
     return true;
 }
@@ -1463,10 +1657,25 @@ World::GetMeleeCombatFeedbacks() const
     return meleeCombatFeedbacks;
 }
 
+const std::map<int, MeleeAttackPresentation> &
+World::GetMeleeAttackPresentations() const
+{
+    return meleeAttackPresentations;
+}
+
 const std::vector<EntityDiedEvent> &
 World::GetEntityDiedEvents() const
 {
     return entityDiedEvents;
+}
+
+const World::PlayerDeathRecovery *World::GetPlayerDeathRecovery(
+    int playerEntityID) const
+{
+    const auto recovery = playerDeathRecoveries.find(playerEntityID);
+    return recovery == playerDeathRecoveries.end()
+        ? nullptr
+        : &recovery->second;
 }
 
 const std::vector<ActionLifecycleEvent> &
@@ -1538,17 +1747,56 @@ void World::UpdateMeleeCombatFeedback()
     }
 }
 
+void World::UpdateMeleeAttackPresentations()
+{
+    for (auto presentation = meleeAttackPresentations.begin();
+         presentation != meleeAttackPresentations.end();)
+    {
+        presentation->second.remainingTicks--;
+        if (presentation->second.remainingTicks <= 0)
+            presentation = meleeAttackPresentations.erase(presentation);
+        else
+            ++presentation;
+    }
+}
+
 void World::RecordMeleeCombatFeedback(
     int attackerEntityID,
     int defenderEntityID,
     const MeleeAttackResult &result)
 {
+    meleeAttackPresentations.erase(attackerEntityID);
     meleeCombatFeedbacks[defenderEntityID] = MeleeCombatFeedback{
         attackerEntityID,
         defenderEntityID,
         result.didHit,
         result.actualDamageApplied,
         MeleeCombatFeedbackLifetimeTicks};
+}
+
+void World::AwardMeleeStyleExperience(
+    int attackerEntityID,
+    const MeleeAttackResult &result)
+{
+    if (!result.didHit || result.actualDamageApplied <= 0) return;
+    Player *player = dynamic_cast<Player *>(
+        entityManager.GetEntityByID(attackerEntityID));
+    if (player == nullptr) return;
+
+    const int damage = result.actualDamageApplied;
+    switch (player->GetCombatStyle())
+    {
+    case CombatStyle::ACCURATE:
+        player->GetSkills().AddXP(SkillType::ATTACK, damage * 4);
+        break;
+    case CombatStyle::AGGRESSIVE:
+        player->GetSkills().AddXP(SkillType::ATTACK, damage * 5);
+        break;
+    case CombatStyle::DEFENSIVE:
+        player->GetSkills().AddXP(SkillType::ATTACK, damage * 2);
+        player->GetSkills().AddXP(SkillType::DEFENCE, damage * 2);
+        break;
+    }
 }
 
 void World::Update()
@@ -1570,10 +1818,15 @@ void World::Update()
 
     ProcessScheduledEvents();
 
+    ProcessPlayerRespawns();
+
     UpdateMeleeCombatFeedback();
+    UpdateMeleeAttackPresentations();
     ProcessDeadCombatantCleanup();
 
     ProcessMovementSystem();
+    ProcessGroundItemPickups();
+    ProcessPlayerRecoveryPiles();
     ProcessInteractionSystem();
     RevalidateCraftingSessions();
 
@@ -1592,6 +1845,7 @@ void World::Update()
     ScheduleMonsterRespawnsFromDeathEvents();
     PublishActionLifecycleEvents();
     TickPlayerStatusEffects();
+    ProcessTutorialProgress();
 
     publishedCommandProcessingResults =
         std::move(pendingCommandProcessingResults);
@@ -1601,6 +1855,155 @@ void World::Update()
     pendingShopOpenedEvents.clear();
     publishedShopTransactionEvents = std::move(pendingShopTransactionEvents);
     pendingShopTransactionEvents.clear();
+}
+
+void World::ProcessTutorialProgress()
+{
+    for (const auto &owner : entityManager.GetEntities())
+    {
+        Player *player = dynamic_cast<Player *>(owner.get());
+        if (player == nullptr || player->GetTutorialState().IsCompleted()) continue;
+        const TutorialStep step = player->GetTutorialState().GetStep();
+        const Inventory &inventory = player->GetInventory();
+        bool complete = false;
+        switch (step)
+        {
+        case TutorialStep::MEET_GUIDE:
+            complete = dialogueSystem.GetSession(player->GetID()) != nullptr;
+            break;
+        case TutorialStep::GATHER_LOG:
+            complete = inventory.HasItem(ItemType::LOG) ||
+                inventory.HasItem(ItemType::OAK_LOG) ||
+                inventory.HasItem(ItemType::WILLOW_LOG);
+            break;
+        case TutorialStep::MAKE_PLANKS:
+            complete = inventory.HasItem(ItemType::WOODEN_PLANKS);
+            break;
+        case TutorialStep::MINE_ORES:
+            complete = inventory.HasItem(ItemType::COPPER_ORE) &&
+                inventory.HasItem(ItemType::TIN_ORE);
+            break;
+        case TutorialStep::SMELT_BRONZE:
+            complete = inventory.HasItem(ItemType::BRONZE_BAR);
+            break;
+        case TutorialStep::CRAFT_WEAPON:
+            complete = inventory.HasItem(ItemType::BRONZE_SWORD) ||
+                player->GetEquipment().IsEquipped(ItemType::BRONZE_SWORD);
+            break;
+        case TutorialStep::EQUIP_WEAPON:
+            complete = player->GetEquipment().GetEquippedItem(
+                EquipmentSlotType::WEAPON) != ItemType::NONE;
+            break;
+        case TutorialStep::SAFE_COMBAT:
+            complete = std::any_of(entityDiedEvents.begin(), entityDiedEvents.end(),
+                [&](const EntityDiedEvent &event)
+                {
+                    return event.killerEntityID == player->GetID();
+                });
+            break;
+        case TutorialStep::LOOT_AND_BANK:
+            complete = !player->GetBank().GetEntries().empty();
+            break;
+        case TutorialStep::RETURN_AND_CHOOSE:
+        {
+            const QuestRecord *gathering = player->GetQuestJournal().TryGet(
+                QuestId::GATHERING_BASICS);
+            complete = gathering != nullptr &&
+                gathering->state == QuestState::COMPLETED;
+            break;
+        }
+        case TutorialStep::COMPLETE:
+            break;
+        }
+        if (complete) player->GetTutorialState().Advance();
+    }
+}
+
+void World::ProcessGroundItemPickups()
+{
+    for (auto pending = pendingGroundItemPickups.begin();
+         pending != pendingGroundItemPickups.end();)
+    {
+        Player *actor = dynamic_cast<Player *>(
+            entityManager.GetEntityByID(pending->first));
+        const auto item = std::find_if(groundItems.begin(), groundItems.end(),
+            [&](const GroundItem &candidate)
+            {
+                return candidate.id == pending->second;
+            });
+        if (actor == nullptr || !actor->IsAlive() || item == groundItems.end())
+        {
+            pending = pendingGroundItemPickups.erase(pending);
+            continue;
+        }
+
+        const int dx = std::abs(actor->GetPosition().GetX() -
+            item->position.GetX());
+        const int dy = std::abs(actor->GetPosition().GetY() -
+            item->position.GetY());
+        if (dx <= 1 && dy <= 1)
+        {
+            if (actor->GetInventory().CanAddItem(item->itemType, item->amount) &&
+                actor->GetInventory().AddItem(item->itemType, item->amount))
+            {
+                groundItems.erase(item);
+            }
+            pending = pendingGroundItemPickups.erase(pending);
+            continue;
+        }
+        if (!HasActiveMovementPath(actor->GetID()))
+        {
+            pending = pendingGroundItemPickups.erase(pending);
+            continue;
+        }
+        ++pending;
+    }
+}
+
+void World::ProcessPlayerRecoveryPiles()
+{
+    for (auto pile = playerRecoveryPiles.begin();
+         pile != playerRecoveryPiles.end();)
+    {
+        Player *owner = dynamic_cast<Player *>(
+            entityManager.GetEntityByID(pile->first));
+        if (owner == nullptr)
+        {
+            pile = playerRecoveryPiles.erase(pile);
+            continue;
+        }
+
+        if (currentTick >= pile->second.expiryTick)
+        {
+            Logger::Game(
+                "[RECOVERY] Protected pile for player " +
+                std::to_string(owner->GetID()) + " expired");
+            pile = playerRecoveryPiles.erase(pile);
+            continue;
+        }
+
+        const int dx = std::abs(owner->GetPosition().GetX() -
+            pile->second.position.GetX());
+        const int dy = std::abs(owner->GetPosition().GetY() -
+            pile->second.position.GetY());
+        if (!owner->IsAlive() || dx > 1 || dy > 1)
+        {
+            ++pile;
+            continue;
+        }
+
+        if (!owner->GetInventory().TryAddItemsAtomically(
+                pile->second.items))
+        {
+            ++pile;
+            continue;
+        }
+
+        Logger::Game(
+            "[RECOVERY] Player " + std::to_string(owner->GetID()) +
+            " recovered their protected inventory pile");
+        pile = playerRecoveryPiles.erase(pile);
+    }
 }
 
 const std::vector<NpcTalkEvent> &World::GetNpcTalkEvents() const
@@ -1723,7 +2126,8 @@ void World::ProcessQueuedCommands()
                     else if (QueueMeleeEngagementRequest(
                                  data.actorEntityID,
                                  data.targetEntityID,
-                                 4))
+                                 4,
+                                 true))
                     {
                         resultCode =
                             CommandResultCode::ACCEPTED;
@@ -1750,6 +2154,159 @@ void World::ProcessQueuedCommands()
                         resultCode =
                             CommandResultCode::ACCEPTED;
                     }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, DropInventoryItemCommand>)
+                {
+                    if (data.inventorySlotIndex < 0 ||
+                        data.inventorySlotIndex >= Inventory::SlotCount ||
+                        data.amount <= 0)
+                    {
+                        resultCode = CommandResultCode::INVALID_COMMAND_DATA;
+                    }
+                    else
+                    {
+                        const InventorySlot &slot = actor->GetInventory()
+                            .GetSlots()[data.inventorySlotIndex];
+                        if (!slot.IsEmpty() && slot.GetAmount() >= data.amount)
+                        {
+                            const ItemType itemType = slot.GetItemType();
+                            const int x = actor->GetPosition().GetX();
+                            const int y = actor->GetPosition().GetY();
+                            if (actor->GetInventory().RemoveItemFromSlot(
+                                    data.inventorySlotIndex, data.amount))
+                            {
+                                auto existing = std::find_if(
+                                    groundItems.begin(), groundItems.end(),
+                                    [=](const GroundItem &item)
+                                    {
+                                        return item.itemType == itemType &&
+                                            item.position.GetX() == x &&
+                                            item.position.GetY() == y;
+                                    });
+                                if (existing == groundItems.end() ||
+                                    existing->amount >
+                                        std::numeric_limits<int>::max() - data.amount)
+                                {
+                                    groundItems.push_back(GroundItem{
+                                        nextGroundItemID++, itemType, data.amount,
+                                        Position(x, y)});
+                                }
+                                else
+                                {
+                                    existing->amount += data.amount;
+                                }
+                                resultCode = CommandResultCode::ACCEPTED;
+                            }
+                        }
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, TakeGroundItemCommand>)
+                {
+                    const auto found = std::find_if(
+                        groundItems.begin(), groundItems.end(),
+                        [&](const GroundItem &item)
+                        {
+                            return item.id == data.groundItemID;
+                        });
+                    if (found == groundItems.end())
+                    {
+                        resultCode = CommandResultCode::INVALID_COMMAND_DATA;
+                    }
+                    else
+                    {
+                        const int dx = std::abs(actor->GetPosition().GetX() -
+                            found->position.GetX());
+                        const int dy = std::abs(actor->GetPosition().GetY() -
+                            found->position.GetY());
+                        if (actor->IsAlive() && dx <= 1 && dy <= 1 &&
+                            actor->GetInventory().CanAddItem(
+                                found->itemType, found->amount) &&
+                            actor->GetInventory().AddItem(
+                                found->itemType, found->amount))
+                        {
+                            groundItems.erase(found);
+                            resultCode = CommandResultCode::ACCEPTED;
+                        }
+                        else if (actor->IsAlive() && (dx > 1 || dy > 1))
+                        {
+                            pendingGroundItemPickups[data.actorEntityID] =
+                                data.groundItemID;
+                            QueueMovementDestination(MovementDestinationRequest(
+                                data.actorEntityID,
+                                found->position.GetX(),
+                                found->position.GetY()));
+                            resultCode = CommandResultCode::ACCEPTED;
+                        }
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, BankDepositCommand> ||
+                    std::is_same_v<CommandType, BankWithdrawCommand> ||
+                    std::is_same_v<CommandType, BankDepositInventoryCommand>)
+                {
+                    const ActiveBankSession *session =
+                        GetBankSession(data.actorEntityID);
+                    if (session == nullptr || session->sessionId != data.sessionId ||
+                        !CanUseStation(data.actorEntityID, StationType::BANK) ||
+                        actor->GetBank().GetRevision() != data.expectedRevision)
+                    {
+                        resultCode = CommandResultCode::GAMEPLAY_REJECTED;
+                    }
+                    else if constexpr (
+                        std::is_same_v<CommandType, BankDepositCommand>)
+                    {
+                        if (data.quantity <= 0 || data.inventorySlotIndex < 0 ||
+                            data.inventorySlotIndex >= Inventory::SlotCount)
+                            resultCode = CommandResultCode::INVALID_COMMAND_DATA;
+                        else if (actor->GetBank().TryDeposit(actor->GetInventory(),
+                                     data.inventorySlotIndex, data.quantity))
+                            resultCode = CommandResultCode::ACCEPTED;
+                    }
+                    else if constexpr (
+                        std::is_same_v<CommandType, BankWithdrawCommand>)
+                    {
+                        if (data.quantity <= 0 || data.itemType == ItemType::NONE)
+                            resultCode = CommandResultCode::INVALID_COMMAND_DATA;
+                        else if (actor->GetBank().TryWithdraw(actor->GetInventory(),
+                                     data.itemType, data.quantity))
+                            resultCode = CommandResultCode::ACCEPTED;
+                    }
+                    else if (actor->GetBank().TryDepositInventory(
+                                 actor->GetInventory()))
+                    {
+                        resultCode = CommandResultCode::ACCEPTED;
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, BankCloseCommand>)
+                {
+                    const ActiveBankSession *session =
+                        GetBankSession(data.actorEntityID);
+                    if (session != nullptr && session->sessionId == data.sessionId)
+                    {
+                        CloseStationInteraction(data.actorEntityID);
+                        resultCode = CommandResultCode::ACCEPTED;
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, SkipTutorialCommand>)
+                {
+                    if (actor->IsAlive())
+                    {
+                        actor->GetTutorialState().Skip();
+                        resultCode = CommandResultCode::ACCEPTED;
+                    }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType, SetCombatStyleCommand>)
+                {
+                    if (!IsValidCombatStyle(data.style))
+                        resultCode = CommandResultCode::INVALID_COMMAND_DATA;
+                    else if (actor->IsAlive() &&
+                             actor->TrySetCombatStyle(data.style))
+                        resultCode = CommandResultCode::ACCEPTED;
                 }
                 else if constexpr (
                     std::is_same_v<CommandType,
@@ -1829,13 +2386,19 @@ void World::ProcessQueuedCommands()
                                  CraftingRecipeMatcher::FindMatch(data.grid);
                              recipe != nullptr &&
                              recipe->GetRequiredStationType() ==
-                                 StationType::CRAFTING_TABLE &&
-                             TryStartRecipeAction(
-                                 data.actorEntityID,
-                                 recipe->GetRecipeType()))
+                                 StationType::CRAFTING_TABLE)
                     {
-                        resultCode =
-                            CommandResultCode::ACCEPTED;
+                        Player *player = dynamic_cast<Player *>(
+                            entityManager.GetEntityByID(data.actorEntityID));
+                        if (player != nullptr && IsStationUsable(
+                                data.actorEntityID, StationType::CRAFTING_TABLE))
+                        {
+                            player->GetRecipeBook().Discover(
+                                recipe->GetRecipeType());
+                            if (TryStartRecipeAction(data.actorEntityID,
+                                    recipe->GetRecipeType()))
+                                resultCode = CommandResultCode::ACCEPTED;
+                        }
                     }
                 }
                 else if constexpr (
@@ -1846,6 +2409,13 @@ void World::ProcessQueuedCommands()
                     {
                         resultCode = CommandResultCode::ACCEPTED;
                     }
+                }
+                else if constexpr (
+                    std::is_same_v<CommandType,
+                                   ReplaceCraftingInteractionStateCommand>)
+                {
+                    if (TryReplaceCraftingInteractionState(data))
+                        resultCode = CommandResultCode::ACCEPTED;
                 }
                 else if constexpr (
                     std::is_same_v<CommandType, InteractCommand>)
@@ -2121,16 +2691,30 @@ void World::ProcessQueuedCommands()
                     const bool adjacent = player != nullptr && npc != nullptr &&
                         std::abs(player->GetPosition().GetX() - npc->GetPosition().GetX()) <= 1 &&
                         std::abs(player->GetPosition().GetY() - npc->GetPosition().GetY()) <= 1;
+                    const bool primaryContext = quest != nullptr && npc != nullptr &&
+                        npc->GetNpcType() == quest->giver.npcType &&
+                        session != nullptr &&
+                        session->dialogueId == quest->giver.dialogueId &&
+                        session->currentNodeId == quest->giver.interactionNodeId;
+                    const bool alternateContext = quest != nullptr && npc != nullptr &&
+                        quest->alternateCompletion.npcType != NpcType::NONE &&
+                        npc->GetNpcType() == quest->alternateCompletion.npcType &&
+                        session != nullptr &&
+                        session->dialogueId == quest->alternateCompletion.dialogueId &&
+                        session->currentNodeId ==
+                            quest->alternateCompletion.interactionNodeId;
+                    const bool commandContext =
+                        std::is_same_v<CommandType, QuestAcceptCommand>
+                            ? primaryContext
+                            : (primaryContext || alternateContext);
                     const bool validContext = player != nullptr && player->IsAlive() &&
                         quest != nullptr && record != nullptr && npc != nullptr &&
                         npcDefinition != nullptr && npcDefinition->kind == NpcKind::FRIENDLY &&
-                        npc->GetNpcType() == quest->giver.npcType &&
                         session != nullptr && session->actorEntityID == data.actorEntityID &&
                         session->sessionId == data.dialogueSessionId &&
                         session->npcEntityID == data.npcEntityID &&
                         session->npcType == npc->GetNpcType() &&
-                        session->dialogueId == quest->giver.dialogueId &&
-                        session->currentNodeId == quest->giver.interactionNodeId && adjacent;
+                        commandContext && adjacent;
                     if (validContext)
                     {
                         bool accepted = false;
@@ -2138,9 +2722,17 @@ void World::ProcessQueuedCommands()
                             accepted = QuestSystem::Accept(
                                 player->GetQuestJournal(), data.questId);
                         else
-                            accepted = QuestSystem::Complete(
+                        {
+                            const ItemType rewardItem = alternateContext
+                                ? quest->alternateCompletion.rewardItem
+                                : quest->rewardItem;
+                            const int rewardAmount = alternateContext
+                                ? quest->alternateCompletion.rewardAmount
+                                : quest->rewardAmount;
+                            accepted = QuestSystem::CompleteWithReward(
                                 player->GetQuestJournal(), data.questId,
-                                player->GetInventory());
+                                player->GetInventory(), rewardItem, rewardAmount);
+                        }
                         if (accepted) resultCode = CommandResultCode::ACCEPTED;
                     }
                 }
@@ -2495,6 +3087,12 @@ void World::ProcessInteractionSystem()
                     craftingSessionSystem.Open(
                         intent.actorEntityID, station->GetID());
                 }
+                else if (station->GetStationType() == StationType::BANK)
+                {
+                    activeBankSessions[intent.actorEntityID] = ActiveBankSession{
+                        nextBankSessionId++, intent.actorEntityID,
+                        station->GetID()};
+                }
             }
             continue;
         }
@@ -2534,8 +3132,13 @@ void World::ProcessInteractionSystem()
                     {
                         if (!PublishDialogueNode(*session, *startNode))
                             dialogueSystem.Close(intent.actorEntityID, sessionId);
-                        else if (startNode->kind == DialogueNodeKind::TERMINAL)
-                            dialogueSystem.Close(intent.actorEntityID, sessionId);
+                        else
+                        {
+                            QuestSystem::RecordTalkedTo(
+                                actor->GetQuestJournal(), npc->GetNpcType());
+                            if (startNode->kind == DialogueNodeKind::TERMINAL)
+                                dialogueSystem.Close(intent.actorEntityID, sessionId);
+                        }
                     }
                     catch (...)
                     {
@@ -2731,14 +3334,20 @@ bool World::PublishDialogueNode(const ActiveDialogueSession &session,
     {
         for (const QuestDefinition &quest : QuestDefinitionDatabase::GetAll())
         {
-            if (quest.giver.npcType != session.npcType ||
-                quest.giver.dialogueId != session.dialogueId ||
-                quest.giver.interactionNodeId != node.id)
+            const bool primaryContext =
+                quest.giver.npcType == session.npcType &&
+                quest.giver.dialogueId == session.dialogueId &&
+                quest.giver.interactionNodeId == node.id;
+            const bool alternateContext =
+                quest.alternateCompletion.npcType == session.npcType &&
+                quest.alternateCompletion.dialogueId == session.dialogueId &&
+                quest.alternateCompletion.interactionNodeId == node.id;
+            if (!primaryContext && !alternateContext)
                 continue;
             const QuestRecord *record =
                 questPlayer->GetQuestJournal().TryGet(quest.id);
             if (record == nullptr) continue;
-            if (record->state == QuestState::AVAILABLE)
+            if (record->state == QuestState::AVAILABLE && primaryContext)
                 questActions.push_back({QuestDialogueActionKind::ACCEPT, quest.id});
             else if (record->state == QuestState::READY_TO_COMPLETE)
                 questActions.push_back({QuestDialogueActionKind::COMPLETE, quest.id});
@@ -2966,6 +3575,14 @@ ActionValidationResult World::ValidateRecipeActionReadOnly(
             false,
             ActionCancelReason::REQUIREMENTS_FAILED,
             "The selected recipe is invalid"};
+    }
+
+    if (!player->GetRecipeBook().IsKnown(recipeType))
+    {
+        return {
+            false,
+            ActionCancelReason::REQUIREMENTS_FAILED,
+            "You have not discovered this recipe"};
     }
 
     if (!IsStationUsable(
@@ -3252,6 +3869,9 @@ void World::ProcessCompletedActions(
                 action.GetOwnerID(),
                 action.GetTargetID(),
                 *lastMeleeAttackResult);
+            AwardMeleeStyleExperience(
+                action.GetOwnerID(),
+                *lastMeleeAttackResult);
 
             if (!defender->IsAlive())
             {
@@ -3378,9 +3998,24 @@ void World::ProcessCompletedActions(
 
             RecordActionCompletedEvent(action);
 
+            QuestSystem::RecordCrafted(
+                player->GetQuestJournal(), recipeOutcome.outputItem,
+                recipeOutcome.outputAmount);
+
             Logger::Game(
                 "Created: " +
                 recipeOutcome.recipeName);
+
+            if (recipeOutcome.outputItem == ItemType::IRON_BAR)
+            {
+                player->GetRecipeBook().Discover(RecipeType::IRON_AXE);
+                player->GetRecipeBook().Discover(RecipeType::IRON_PICKAXE);
+            }
+            else if (recipeOutcome.outputItem == ItemType::STEEL_BAR)
+            {
+                player->GetRecipeBook().Discover(RecipeType::STEEL_AXE);
+                player->GetRecipeBook().Discover(RecipeType::STEEL_PICKAXE);
+            }
 
             const RecipeDefinition *completedRecipe =
                 RecipeDatabase::TryGet(
@@ -3511,6 +4146,24 @@ void World::ProcessCompletedActions(
             QuestSystem::RecordGathered(
                 player->GetQuestJournal(), gatheringOutcome.rewardItem,
                 gatheringOutcome.rewardAmount);
+
+            switch (gatheringOutcome.rewardItem)
+            {
+            case ItemType::OAK_LOG:
+                player->GetRecipeBook().Discover(RecipeType::OAK_PLANKS);
+                break;
+            case ItemType::WILLOW_LOG:
+                player->GetRecipeBook().Discover(RecipeType::WILLOW_PLANKS);
+                break;
+            case ItemType::IRON_ORE:
+                player->GetRecipeBook().Discover(RecipeType::IRON_BAR);
+                break;
+            case ItemType::COAL:
+                player->GetRecipeBook().Discover(RecipeType::STEEL_BAR);
+                break;
+            default:
+                break;
+            }
 
             int previousLevel =
                 player->GetSkills()
@@ -4287,6 +4940,12 @@ void World::HandleCombatantDeath(
         RecordEntityDiedEvent(
             deadEntityID,
             killerEntityID);
+        Player *killer = dynamic_cast<Player *>(
+            entityManager.GetEntityByID(killerEntityID));
+        NPC *defeatedNpc = dynamic_cast<NPC *>(entity);
+        if (killer != nullptr && defeatedNpc != nullptr)
+            QuestSystem::RecordDefeated(
+                killer->GetQuestJournal(), defeatedNpc->GetNpcType());
     }
 
     CancelActionsForEntity(
@@ -4299,6 +4958,16 @@ void World::HandleCombatantDeath(
 
     ClearPendingMeleeInteractionsInvolvingEntity(
         deadEntityID);
+
+    for (auto presentation = meleeAttackPresentations.begin();
+         presentation != meleeAttackPresentations.end();)
+    {
+        if (presentation->second.attackerEntityID == deadEntityID ||
+            presentation->second.defenderEntityID == deadEntityID)
+            presentation = meleeAttackPresentations.erase(presentation);
+        else
+            ++presentation;
+    }
 
     Monster *monster =
         dynamic_cast<Monster *>(entity);
@@ -4319,6 +4988,40 @@ void World::HandleCombatantDeath(
         return;
     }
 
+    if (firstProcessedDeath)
+    {
+        std::vector<ItemAmount> recoveredItems;
+        std::array<InventorySlot, Inventory::SlotCount> emptySlots{};
+        for (const InventorySlot &slot : player->GetInventory().GetSlots())
+        {
+            if (!slot.IsEmpty())
+            {
+                recoveredItems.push_back(
+                    ItemAmount{slot.GetItemType(), slot.GetAmount()});
+            }
+        }
+
+        if (!recoveredItems.empty() &&
+            player->GetInventory().TryReplaceSlotsAtomically(emptySlots))
+        {
+            PlayerRecoveryPile &pile = playerRecoveryPiles[deadEntityID];
+            pile.ownerPlayerEntityID = deadEntityID;
+            pile.position.SetPosition(
+                player->GetPosition().GetX(),
+                player->GetPosition().GetY());
+            pile.items.insert(
+                pile.items.end(), recoveredItems.begin(), recoveredItems.end());
+            pile.expiryTick = currentTick + PlayerRecoveryPileLifetimeTicks;
+        }
+
+        playerDeathRecoveries[deadEntityID] = PlayerDeathRecovery{
+            deadEntityID,
+            killerEntityID,
+            player->GetPosition().GetX(),
+            player->GetPosition().GetY(),
+            currentTick + PlayerRespawnDelayTicks};
+    }
+
     interactionSystem.ClearInteraction(deadEntityID);
 
     openedStations.erase(
@@ -4326,6 +5029,43 @@ void World::HandleCombatantDeath(
 
     activeStations.erase(
         deadEntityID);
+}
+
+void World::ProcessPlayerRespawns()
+{
+    for (auto recovery = playerDeathRecoveries.begin();
+         recovery != playerDeathRecoveries.end();)
+    {
+        if (currentTick < recovery->second.respawnTick)
+        {
+            ++recovery;
+            continue;
+        }
+
+        Player *player = dynamic_cast<Player *>(
+            entityManager.GetEntityByID(recovery->first));
+
+        if (player == nullptr)
+        {
+            recovery = playerDeathRecoveries.erase(recovery);
+            continue;
+        }
+
+        if (!player->IsAlive())
+        {
+            player->GetPosition().SetPosition(
+                DevelopmentWorldContent::PlayerSpawnX,
+                DevelopmentWorldContent::PlayerSpawnY);
+            player->RestoreHealthToFull();
+            processedDeathEntityIDs.erase(player->GetID());
+            ClearCombatFeedbackInvolvingEntity(player->GetID());
+            Logger::Game(
+                "[COMBAT] Player " + std::to_string(player->GetID()) +
+                " recovered at the village safe point");
+        }
+
+        recovery = playerDeathRecoveries.erase(recovery);
+    }
 }
 
 void World::RecordEntityDiedEvent(

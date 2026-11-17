@@ -56,7 +56,101 @@ std::vector<QuestId> QuestSystem::RecordGatheredAgainstDefinitions(
         auto found = journal.records.find(definition.id);
         if (found == journal.records.end() ||
             found->second.state != QuestState::ACTIVE ||
+            definition.objectiveType != QuestObjectiveType::GATHER_ITEM ||
             definition.objectiveItem != itemType)
+            continue;
+        QuestRecord &record = found->second;
+        const std::int64_t total =
+            static_cast<std::int64_t>(record.progress) + quantity;
+        record.progress = static_cast<int>(std::min<std::int64_t>(
+            total, definition.requiredAmount));
+        if (record.progress == definition.requiredAmount)
+            record.state = QuestState::READY_TO_COMPLETE;
+        changed.push_back(definition.id);
+    }
+    return changed;
+}
+
+std::vector<QuestId> QuestSystem::RecordTalkedTo(
+    QuestJournal &journal, NpcType npcType)
+{
+    return RecordTalkedToAgainstDefinitions(journal, npcType,
+        QuestDefinitionDatabase::GetAll());
+}
+
+std::vector<QuestId> QuestSystem::RecordTalkedToAgainstDefinitions(
+    QuestJournal &journal, NpcType npcType,
+    const std::vector<QuestDefinition> &definitions)
+{
+    std::vector<QuestId> changed;
+    if (npcType == NpcType::NONE) return changed;
+    for (const QuestDefinition &definition : definitions)
+    {
+        auto found = journal.records.find(definition.id);
+        if (found == journal.records.end() ||
+            found->second.state != QuestState::ACTIVE ||
+            definition.objectiveType != QuestObjectiveType::TALK_TO_CHARACTER ||
+            definition.objectiveNpc != npcType)
+            continue;
+        QuestRecord &record = found->second;
+        record.progress = definition.requiredAmount;
+        record.state = QuestState::READY_TO_COMPLETE;
+        changed.push_back(definition.id);
+    }
+    return changed;
+}
+
+std::vector<QuestId> QuestSystem::RecordCrafted(
+    QuestJournal &journal, ItemType itemType, int quantity)
+{
+    return RecordCraftedAgainstDefinitions(journal, itemType, quantity,
+        QuestDefinitionDatabase::GetAll());
+}
+
+std::vector<QuestId> QuestSystem::RecordCraftedAgainstDefinitions(
+    QuestJournal &journal, ItemType itemType, int quantity,
+    const std::vector<QuestDefinition> &definitions)
+{
+    std::vector<QuestId> changed;
+    if (itemType == ItemType::NONE || quantity <= 0) return changed;
+    for (const QuestDefinition &definition : definitions)
+    {
+        auto found = journal.records.find(definition.id);
+        if (found == journal.records.end() ||
+            found->second.state != QuestState::ACTIVE ||
+            definition.objectiveType != QuestObjectiveType::CRAFT_ITEM ||
+            definition.objectiveItem != itemType)
+            continue;
+        QuestRecord &record = found->second;
+        record.progress = std::min(definition.requiredAmount,
+            record.progress + quantity);
+        if (record.progress == definition.requiredAmount)
+            record.state = QuestState::READY_TO_COMPLETE;
+        changed.push_back(definition.id);
+    }
+    return changed;
+}
+
+std::vector<QuestId> QuestSystem::RecordDefeated(
+    QuestJournal &journal, NpcType npcType, int quantity)
+{
+    return RecordDefeatedAgainstDefinitions(journal, npcType, quantity,
+        QuestDefinitionDatabase::GetAll());
+}
+
+std::vector<QuestId> QuestSystem::RecordDefeatedAgainstDefinitions(
+    QuestJournal &journal, NpcType npcType, int quantity,
+    const std::vector<QuestDefinition> &definitions)
+{
+    std::vector<QuestId> changed;
+    if (npcType == NpcType::NONE || quantity <= 0) return changed;
+    for (const QuestDefinition &definition : definitions)
+    {
+        auto found = journal.records.find(definition.id);
+        if (found == journal.records.end() ||
+            found->second.state != QuestState::ACTIVE ||
+            definition.objectiveType != QuestObjectiveType::DEFEAT_CHARACTER ||
+            definition.objectiveNpc != npcType)
             continue;
         QuestRecord &record = found->second;
         const std::int64_t total =
@@ -74,12 +168,31 @@ bool QuestSystem::Complete(
     QuestJournal &journal, QuestId questId, Inventory &inventory)
 {
     const QuestDefinition *definition = QuestDefinitionDatabase::TryGet(questId);
+    if (definition == nullptr) return false;
+    return CompleteWithReward(journal, questId, inventory,
+        definition->rewardItem, definition->rewardAmount);
+}
+
+bool QuestSystem::CompleteWithReward(
+    QuestJournal &journal, QuestId questId, Inventory &inventory,
+    ItemType rewardItem, int rewardAmount)
+{
     auto found = journal.records.find(questId);
-    if (definition == nullptr || found == journal.records.end() ||
+    if (QuestDefinitionDatabase::TryGet(questId) == nullptr ||
+        found == journal.records.end() ||
         found->second.state != QuestState::READY_TO_COMPLETE ||
-        !inventory.AddItem(definition->rewardItem, definition->rewardAmount))
+        rewardItem == ItemType::NONE || rewardAmount <= 0 ||
+        !inventory.AddItem(rewardItem, rewardAmount))
         return false;
     found->second.state = QuestState::COMPLETED;
+    for (const QuestDefinition &candidate : QuestDefinitionDatabase::GetAll())
+    {
+        auto locked = journal.records.find(candidate.id);
+        if (candidate.prerequisiteQuest == questId &&
+            locked != journal.records.end() &&
+            locked->second.state == QuestState::UNAVAILABLE)
+            locked->second.state = QuestState::AVAILABLE;
+    }
     return true;
 }
 

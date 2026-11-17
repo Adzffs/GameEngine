@@ -1,5 +1,7 @@
 #include "TestSupport.h"
 #include "../src/Content/ContentValidator.h"
+#include "../src/Economy/EconomyBalanceModel.h"
+#include "../src/Recipe/RecipeDatabase.h"
 #include "../src/Shop/ShopDefinitionDatabase.h"
 
 int main()
@@ -16,14 +18,14 @@ int main()
     test.Expect(shop->currencyItemType == ItemType::COINS, "Currency is coins");
     const ItemType order[] = {ItemType::LOG, ItemType::COPPER_ORE,
         ItemType::TIN_ORE, ItemType::COAL, ItemType::COOKED_MEAT,
-        ItemType::BRONZE_AXE, ItemType::BRONZE_PICKAXE,
+        ItemType::HEALING_TONIC, ItemType::BRONZE_AXE, ItemType::BRONZE_PICKAXE,
         ItemType::BRONZE_SWORD, ItemType::WOODEN_SHIELD};
-    test.ExpectEqual(shop->entries.size(), std::size_t{9}, "Nine ordered entries");
+    test.ExpectEqual(shop->entries.size(), std::size_t{10}, "Ten ordered entries");
     for (std::size_t i = 0; i < shop->entries.size(); ++i)
         test.Expect(shop->entries[i].itemType == order[i], "Entry order is authored");
     const std::optional<int> buys[] = {1, std::nullopt,
-        std::nullopt, std::nullopt, 8, 25, 25, 40, 30};
-    const std::optional<int> sells[] = {1, 2, 2, 4, 3, 10, 10, 15, 12};
+        std::nullopt, std::nullopt, 8, 20, 25, 25, 40, 30};
+    const std::optional<int> sells[] = {1, 2, 2, 4, 3, 6, 10, 10, 15, 12};
     for (std::size_t i = 0; i < shop->entries.size(); ++i)
     {
         test.Expect(shop->entries[i].buyPrice == buys[i], "Exact authored buy price");
@@ -31,6 +33,37 @@ int main()
     }
     test.Expect(ContentValidator::ValidateShopDefinition(shop->id, *shop).IsValid(),
                 "Authored shop validates");
+
+    const std::optional<double> meatHealing =
+        EconomyBalanceModel::GetHealingPerCoin(ItemType::COOKED_MEAT, *shop);
+    const std::optional<double> tonicHealing =
+        EconomyBalanceModel::GetHealingPerCoin(ItemType::HEALING_TONIC, *shop);
+    test.Expect(
+        meatHealing.has_value() && tonicHealing.has_value() &&
+            *meatHealing > *tonicHealing,
+        "Cooked meat remains the efficient option and tonic pays for convenience");
+
+    const RecipeDefinition &bronzeBar =
+        RecipeDatabase::Get(RecipeType::BRONZE_BAR);
+    test.Expect(
+        EconomyBalanceModel::GetRecipeItemsPerMinute(bronzeBar, 1) > 33.3 &&
+            EconomyBalanceModel::GetRecipeItemsPerMinute(bronzeBar, 1) < 33.4 &&
+            EconomyBalanceModel::GetRecipeXPPerMinute(bronzeBar, 1) == 200.0,
+        "Balance model records the station-only Bronze production ceiling");
+
+    ShopDefinition arbitrageFixture = *shop;
+    arbitrageFixture.entries[1].buyPrice = 2;
+    arbitrageFixture.entries[2].buyPrice = 2;
+    arbitrageFixture.entries.push_back({ItemType::BRONZE_BAR, std::nullopt, 5});
+    const std::optional<int> safeMargin =
+        EconomyBalanceModel::GetCraftingMargin(bronzeBar, arbitrageFixture);
+    test.Expect(safeMargin.has_value() && *safeMargin == 1,
+        "Balance model exposes a profitable buy-craft-sell loop");
+    arbitrageFixture.entries.back().sellPrice = 3;
+    const std::optional<int> safeLoss =
+        EconomyBalanceModel::GetCraftingMargin(bronzeBar, arbitrageFixture);
+    test.Expect(safeLoss.has_value() && *safeLoss == -1,
+        "Balance model exposes a safely lossy crafting trade");
 
     ShopDefinition invalid = *shop;
     invalid.entries.push_back(invalid.entries.front());

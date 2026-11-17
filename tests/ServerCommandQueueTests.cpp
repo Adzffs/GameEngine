@@ -145,9 +145,11 @@ int main()
 
         const Action *action = world.GetActionForEntity(playerID);
         test.Expect(action != nullptr,
-                    "Adjacent attack starts existing melee action");
-        test.Expect(action != nullptr && action->GetStartTick() == 0,
-                    "Command action starts at pre-increment tick");
+                    "Adjacent attack enters its repeating cooldown");
+        test.Expect(world.GetLastMeleeAttackResult().has_value(),
+                    "Command opening attack resolves on its first update");
+        test.Expect(action != nullptr && action->GetStartTick() == 1,
+                    "Cooldown begins when the instant opening attack resolves");
         test.ExpectEqual(
             world.GetCommandProcessingResults()[0].commandID,
             attackID,
@@ -220,6 +222,132 @@ int main()
                 results[1].resultCode ==
                     CommandResultCode::GAMEPLAY_REJECTED,
             "Full-health second food command is rejected without consuming");
+    }
+
+    {
+        World world;
+        const int playerID = world.CreatePlayer();
+        Player *player = GetPlayer(world, playerID);
+        player->GetPosition().SetPosition(3, 3);
+        player->GetInventory().AddItem(ItemType::COAL, 2);
+        const int coalSlot = FindSlot(player->GetInventory(), ItemType::COAL);
+
+        world.EnqueueCommand(DropInventoryItemCommand{playerID, coalSlot, 1});
+        world.Update();
+        test.Expect(world.GetCommandProcessingResults()[0].resultCode ==
+                CommandResultCode::ACCEPTED &&
+                world.GetGroundItems().size() == 1 &&
+                world.GetGroundItems()[0].amount == 1,
+            "Dropping removes an inventory quantity and creates an authoritative ground item");
+
+        const int groundItemID = world.GetGroundItems()[0].id;
+        world.EnqueueCommand(TakeGroundItemCommand{playerID, groundItemID});
+        world.Update();
+        test.Expect(world.GetCommandProcessingResults()[0].resultCode ==
+                CommandResultCode::ACCEPTED &&
+                world.GetGroundItems().empty() &&
+                player->GetInventory().GetItemAmount(ItemType::COAL) == 2,
+            "Taking an adjacent ground item restores it atomically to inventory");
+
+        world.EnqueueCommand(DropInventoryItemCommand{playerID, -1, 1});
+        world.EnqueueCommand(TakeGroundItemCommand{playerID, 999999});
+        world.Update();
+        test.Expect(
+            world.GetCommandProcessingResults()[0].resultCode ==
+                CommandResultCode::INVALID_COMMAND_DATA &&
+            world.GetCommandProcessingResults()[1].resultCode ==
+                CommandResultCode::INVALID_COMMAND_DATA,
+            "Malformed drop and pickup requests are rejected without mutation");
+    }
+
+    {
+        World world;
+        const int playerID = world.CreatePlayer();
+        Player *player = GetPlayer(world, playerID);
+        player->GetPosition().SetPosition(19, 3);
+        CraftingStation *bankStation = world.GetStationAt(20, 3);
+        test.Expect(bankStation != nullptr &&
+                bankStation->GetStationType() == StationType::BANK,
+            "Starter region exposes the authored bank station");
+        world.EnqueueCommand(InteractCommand{playerID,
+            InteractionTargetType::STATION, bankStation->GetID(), Position(20, 3)});
+        world.Update();
+        const ActiveBankSession *session = world.GetBankSession(playerID);
+        test.Expect(session != nullptr &&
+                session->sessionId != InvalidBankSessionId,
+            "Approaching the bank opens a stable per-player session");
+
+        player->GetInventory().AddItem(ItemType::COINS, 12);
+        const int coinSlot = FindSlot(player->GetInventory(), ItemType::COINS);
+        const BankSessionId sessionId = session->sessionId;
+        const std::uint64_t revision = player->GetBank().GetRevision();
+        world.EnqueueCommand(BankDepositCommand{
+            playerID, sessionId, revision, coinSlot, 5});
+        world.EnqueueCommand(BankDepositCommand{
+            playerID, sessionId, revision, coinSlot, 5});
+        world.Update();
+        test.Expect(
+            world.GetCommandProcessingResults()[0].resultCode ==
+                CommandResultCode::ACCEPTED &&
+            world.GetCommandProcessingResults()[1].resultCode ==
+                CommandResultCode::GAMEPLAY_REJECTED,
+            "A repeated stale bank request cannot duplicate a transaction");
+        test.ExpectEqual(player->GetBank().GetItemAmount(ItemType::COINS), 5,
+            "Only the first revision-matched deposit commits");
+
+        world.EnqueueCommand(BankCloseCommand{playerID, sessionId});
+        world.Update();
+        test.Expect(world.GetBankSession(playerID) == nullptr,
+            "Closing a matching bank session invalidates further requests");
+    }
+
+    {
+        World world;
+        const int playerID = world.CreatePlayer();
+        Player *player = GetPlayer(world, playerID);
+        player->GetTutorialState().TryRestore(TutorialStep::GATHER_LOG, false);
+        player->GetInventory().AddItem(ItemType::LOG, 1); world.Update();
+        test.Expect(player->GetTutorialState().GetStep() == TutorialStep::MAKE_PLANKS,
+            "Tutorial advances from authoritative gathered inventory");
+        player->GetInventory().AddItem(ItemType::WOODEN_PLANKS, 1); world.Update();
+        player->GetInventory().AddItem(ItemType::COPPER_ORE, 1);
+        player->GetInventory().AddItem(ItemType::TIN_ORE, 1); world.Update();
+        player->GetInventory().AddItem(ItemType::BRONZE_BAR, 1); world.Update();
+        player->GetInventory().AddItem(ItemType::BRONZE_SWORD, 1); world.Update();
+        test.Expect(player->GetTutorialState().GetStep() == TutorialStep::EQUIP_WEAPON,
+            "Crafting milestones advance in the authored sequence");
+        const int swordSlot = FindSlot(player->GetInventory(), ItemType::BRONZE_SWORD);
+        world.TryEquipInventoryItem(playerID, swordSlot); world.Update();
+        test.Expect(player->GetTutorialState().GetStep() == TutorialStep::SAFE_COMBAT,
+            "Equipping a real weapon advances preparation onboarding");
+        player->GetTutorialState().TryRestore(TutorialStep::LOOT_AND_BANK, false);
+        player->GetInventory().AddItem(ItemType::COINS, 1);
+        const int coinSlot = FindSlot(player->GetInventory(), ItemType::COINS);
+        player->GetBank().TryDeposit(player->GetInventory(), coinSlot, 1);
+        world.Update();
+        test.Expect(player->GetTutorialState().GetStep() ==
+                TutorialStep::RETURN_AND_CHOOSE,
+            "A committed bank deposit advances the loot-and-bank lesson");
+    }
+
+    {
+        World world;
+        const int playerID = world.CreatePlayer();
+        Player *player = GetPlayer(world, playerID);
+        world.EnqueueCommand(SetCombatStyleCommand{
+            playerID, CombatStyle::DEFENSIVE});
+        world.Update();
+        test.Expect(player->GetCombatStyle() == CombatStyle::DEFENSIVE &&
+                world.GetCommandProcessingResults()[0].resultCode ==
+                    CommandResultCode::ACCEPTED,
+            "Server authoritatively accepts a valid combat style change");
+        world.EnqueueCommand(SetCombatStyleCommand{
+            playerID, static_cast<CombatStyle>(99)});
+        world.Update();
+        test.Expect(player->GetCombatStyle() == CombatStyle::DEFENSIVE &&
+                world.GetCommandProcessingResults()[0].resultCode ==
+                    CommandResultCode::INVALID_COMMAND_DATA,
+            "Server rejects an invalid combat style without mutation");
     }
 
     return test.Finish();

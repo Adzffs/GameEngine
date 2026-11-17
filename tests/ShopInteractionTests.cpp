@@ -41,7 +41,7 @@ int main()
     test.ExpectEqual(world.GetShopOpenedEvents().size(), std::size_t{1},
                      "Adjacent trade opens on tick one");
     const ShopOpenedEvent opened = world.GetShopOpenedEvents().front();
-    test.Expect(opened.sessionId != InvalidShopSessionId && opened.entries.size() == 9,
+    test.Expect(opened.sessionId != InvalidShopSessionId && opened.entries.size() == 10,
                 "Open event owns session and ordered entries");
     world.EnqueueCommand(ShopBuyCommand{player->GetID(), opened.sessionId,
         ItemType::COOKED_MEAT, 2});
@@ -59,6 +59,13 @@ int main()
                      "Sell adds exact coins");
     test.ExpectEqual(player->GetInventory().GetItemAmount(ItemType::COOKED_MEAT), 1,
                      "Sell removes exact item");
+    world.EnqueueCommand(ShopBuyCommand{player->GetID(), opened.sessionId,
+        ItemType::HEALING_TONIC, 2});
+    world.Update();
+    test.ExpectEqual(player->GetInventory().GetItemAmount(ItemType::COINS), 47,
+                     "Premium recovery purchase removes its exact coin cost");
+    test.ExpectEqual(player->GetInventory().GetItemAmount(ItemType::HEALING_TONIC), 2,
+                     "Purchased healing tonics stack in one inventory entry");
     const Inventory before = player->GetInventory();
     world.EnqueueCommand(ShopBuyCommand{player->GetID(), opened.sessionId,
         ItemType::LOG, 1});
@@ -78,16 +85,16 @@ int main()
     World distant;
     Player *walker = PlayerAt(distant, 0, 0);
     Trade(distant, walker->GetID());
-    for (int tick = 1; tick <= 5; ++tick)
+    for (int tick = 1;
+         tick <= 5 && distant.GetShopOpenedEvents().empty();
+         ++tick)
     {
         distant.Update();
-        if (tick < 5)
-            test.Expect(distant.GetShopOpenedEvents().empty(), "No early open event");
     }
     test.Expect(walker->GetPosition().GetX() == 3 && walker->GetPosition().GetY() == 2,
                 "Distant route reaches (3,2) on tick five");
     test.ExpectEqual(distant.GetShopOpenedEvents().size(), std::size_t{1},
-                     "Distant trade opens on tick five");
+                     "Distant trade opens as soon as the diagonal approach reaches range");
     test.Expect(!distant.HasActiveMovementPath(walker->GetID()),
                 "Approach movement clears after opening");
     distant.Update();

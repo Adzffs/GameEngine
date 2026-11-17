@@ -46,8 +46,12 @@ private:
     bool EnqueuePendingDialogueCommand();
     void SynchronizeShopPresentation();
     bool EnqueuePendingShopCommand();
+    void SynchronizeBankPresentation();
+    bool EnqueuePendingBankCommand();
     void SynchronizeRecipeCommand();
     bool EnqueuePendingRecipeCommand();
+    bool EnqueuePendingCraftingInteraction();
+    void SynchronizeCraftingInteraction();
     enum class PendingShopCommandType { NONE, BUY, SELL, CLOSE };
     struct PendingShopCommand
     {
@@ -74,4 +78,13 @@ private:
     };
     std::optional<PendingRecipeCommand> pendingRecipeCommand;
     void ClearPendingRecipeCommand();
+    struct PendingCraftingInteraction
+    {
+        std::uint64_t commandID = 0;
+        int actorEntityID = 0;
+        CraftingSessionId sessionID = InvalidCraftingSessionId;
+        std::uint64_t expectedRevision = 0;
+        std::optional<CraftingRecipeMatcher::Grid> deferredCraftingGrid;
+    };
+    std::optional<PendingCraftingInteraction> pendingCraftingInteraction;
 };

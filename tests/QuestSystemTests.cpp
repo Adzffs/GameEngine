@@ -16,7 +16,11 @@ namespace
         QuestState miningState = QuestState::AVAILABLE, int miningProgress = 0)
     {
         return {{QuestId::GATHERING_BASICS, gatheringState, gatheringProgress},
-                {QuestId::MINING_BASICS, miningState, miningProgress}};
+                {QuestId::MINING_BASICS, miningState, miningProgress},
+                {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0},
+                {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0},
+                {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0},
+                {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}};
     }
 }
 
@@ -43,6 +47,33 @@ struct QuestSystemTestAccess
         return QuestSystem::RecordGatheredAgainstDefinitions(
             journal, itemType, quantity, definitions);
     }
+    static std::vector<QuestId> RecordTalkedTo(
+        QuestJournal &journal, NpcType npcType,
+        const std::vector<QuestDefinition> &definitions)
+    {
+        return QuestSystem::RecordTalkedToAgainstDefinitions(
+            journal, npcType, definitions);
+    }
+    static std::vector<QuestId> RecordCrafted(
+        QuestJournal &journal, ItemType itemType, int quantity,
+        const std::vector<QuestDefinition> &definitions)
+    {
+        return QuestSystem::RecordCraftedAgainstDefinitions(
+            journal, itemType, quantity, definitions);
+    }
+    static bool CompleteWithReward(QuestJournal &journal, QuestId questId,
+        Inventory &inventory, ItemType rewardItem, int rewardAmount)
+    {
+        return QuestSystem::CompleteWithReward(
+            journal, questId, inventory, rewardItem, rewardAmount);
+    }
+    static std::vector<QuestId> RecordDefeated(
+        QuestJournal &journal, NpcType npcType, int quantity,
+        const std::vector<QuestDefinition> &definitions)
+    {
+        return QuestSystem::RecordDefeatedAgainstDefinitions(
+            journal, npcType, quantity, definitions);
+    }
 };
 
 int main()
@@ -54,9 +85,45 @@ int main()
     QuestJournal journal;
     const QuestRecord *initial = Gathering(journal);
     test.Expect(initial != nullptr && initial->state == QuestState::AVAILABLE &&
-                    initial->progress == 0 && journal.GetRecords().size() == 2 &&
-                    journal.TryGet(QuestId::MINING_BASICS)->state == QuestState::AVAILABLE,
+                    initial->progress == 0 && journal.GetRecords().size() == 6 &&
+                    journal.TryGet(QuestId::MINING_BASICS)->state == QuestState::AVAILABLE &&
+                    journal.TryGet(QuestId::SHIELD_OR_SHELTER)->state ==
+                        QuestState::UNAVAILABLE &&
+                    journal.TryGet(QuestId::FANGS_AT_THE_GATE)->state ==
+                        QuestState::UNAVAILABLE &&
+                    journal.TryGet(QuestId::HEART_OF_THE_ASH)->state ==
+                        QuestState::UNAVAILABLE,
                 "Default journal derives canonical initial records");
+    QuestJournal storyArc;
+    test.Expect(QuestSystem::TryRestore(storyArc, {
+                    {QuestId::GATHERING_BASICS, QuestState::AVAILABLE, 0},
+                    {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0},
+                    {QuestId::TRACKS_IN_THE_ASH,
+                        QuestState::READY_TO_COMPLETE, 1},
+                    {QuestId::SHIELD_OR_SHELTER, QuestState::UNAVAILABLE, 0},
+                    {QuestId::FANGS_AT_THE_GATE, QuestState::UNAVAILABLE, 0},
+                    {QuestId::HEART_OF_THE_ASH, QuestState::UNAVAILABLE, 0}}),
+                "Story unlock fixture restores");
+    Inventory storyRewards;
+    test.Expect(QuestSystem::Complete(storyArc, QuestId::TRACKS_IN_THE_ASH,
+                    storyRewards) &&
+                    storyArc.TryGet(QuestId::SHIELD_OR_SHELTER)->state ==
+                        QuestState::AVAILABLE &&
+                    QuestSystem::Accept(storyArc, QuestId::SHIELD_OR_SHELTER) &&
+                    !QuestSystem::RecordCrafted(storyArc,
+                        ItemType::WOODEN_SHIELD, 1).empty() &&
+                    QuestSystem::Complete(storyArc, QuestId::SHIELD_OR_SHELTER,
+                        storyRewards) &&
+                    storyArc.TryGet(QuestId::FANGS_AT_THE_GATE)->state ==
+                        QuestState::AVAILABLE &&
+                    QuestSystem::Accept(storyArc, QuestId::FANGS_AT_THE_GATE) &&
+                    !QuestSystem::RecordDefeated(storyArc,
+                        NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER, 3).empty() &&
+                    QuestSystem::Complete(storyArc, QuestId::FANGS_AT_THE_GATE,
+                        storyRewards) &&
+                    storyArc.TryGet(QuestId::HEART_OF_THE_ASH)->state ==
+                        QuestState::AVAILABLE,
+                "Completing each story chapter unlocks the next authored quest");
     test.Expect(QuestSystem::Accept(journal, QuestId::GATHERING_BASICS) &&
                     !QuestSystem::Accept(journal, QuestId::GATHERING_BASICS) &&
                     !QuestSystem::Accept(journal, static_cast<QuestId>(999)),
@@ -96,7 +163,10 @@ int main()
         {{QuestId::NONE, QuestState::AVAILABLE, 0}},
         {{static_cast<QuestId>(999), QuestState::AVAILABLE, 0}},
         {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 10},
-         {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}},
+         {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0},
+         {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0},
+         {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0},
+         {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}},
         {},
         {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 4},
          {QuestId::GATHERING_BASICS, QuestState::ACTIVE, 4}}};
@@ -135,5 +205,91 @@ int main()
                     multiple.TryGet(static_cast<QuestId>(2))->progress == 1 &&
                     multiple.TryGet(static_cast<QuestId>(3))->progress == 1,
                 "Multiple matching synthetic records progress in canonical order");
+
+    QuestDefinition investigation = first;
+    investigation.objectiveType = QuestObjectiveType::TALK_TO_CHARACTER;
+    investigation.objectiveItem = ItemType::NONE;
+    investigation.objectiveNpc = NpcType::SERA_FLINT;
+    investigation.objectiveText = "Ask Sera about the tracks";
+    investigation.requiredAmount = 1;
+    std::vector<QuestDefinition> investigationDefinitions{investigation};
+    QuestJournal investigationJournal =
+        QuestJournalTestAccess::FromDefinitions(investigationDefinitions);
+    QuestJournalTestAccess::ActivateAll(investigationJournal);
+    test.Expect(
+        QuestSystemTestAccess::RecordTalkedTo(investigationJournal,
+            NpcType::BRANN_DEEPWELL, investigationDefinitions).empty() &&
+        investigationJournal.TryGet(investigation.id)->progress == 0,
+        "Talking to the wrong character does not advance an investigation");
+    const auto investigated = QuestSystemTestAccess::RecordTalkedTo(
+        investigationJournal, NpcType::SERA_FLINT, investigationDefinitions);
+    test.Expect(investigated == std::vector<QuestId>{investigation.id} &&
+                    investigationJournal.TryGet(investigation.id)->progress == 1 &&
+                    investigationJournal.TryGet(investigation.id)->state ==
+                        QuestState::READY_TO_COMPLETE,
+                "Talking to the authored character completes an investigation objective");
+
+    QuestDefinition crafting = first;
+    crafting.objectiveType = QuestObjectiveType::CRAFT_ITEM;
+    crafting.objectiveItem = ItemType::WOODEN_PLANKS;
+    crafting.requiredAmount = 4;
+    std::vector<QuestDefinition> craftingDefinitions{crafting};
+    QuestJournal craftingJournal =
+        QuestJournalTestAccess::FromDefinitions(craftingDefinitions);
+    QuestJournalTestAccess::ActivateAll(craftingJournal);
+    test.Expect(QuestSystemTestAccess::RecordCrafted(craftingJournal,
+                    ItemType::LOG, 4, craftingDefinitions).empty() &&
+                    QuestSystemTestAccess::RecordCrafted(craftingJournal,
+                    ItemType::WOODEN_PLANKS, 0, craftingDefinitions).empty(),
+                "Wrong outputs and failed crafts do not advance crafting objectives");
+    QuestSystemTestAccess::RecordCrafted(craftingJournal,
+        ItemType::WOODEN_PLANKS, 2, craftingDefinitions);
+    const auto crafted = QuestSystemTestAccess::RecordCrafted(craftingJournal,
+        ItemType::WOODEN_PLANKS, 5, craftingDefinitions);
+    test.Expect(crafted == std::vector<QuestId>{crafting.id} &&
+                    craftingJournal.TryGet(crafting.id)->progress == 4 &&
+                    craftingJournal.TryGet(crafting.id)->state ==
+                        QuestState::READY_TO_COMPLETE,
+                "Successful crafted output advances and caps a crafting objective");
+
+    QuestJournal choiceJournal;
+    QuestSystem::TryRestore(choiceJournal, Records(
+        QuestState::READY_TO_COMPLETE, 10));
+    Inventory choiceInventory;
+    test.Expect(QuestSystemTestAccess::CompleteWithReward(choiceJournal,
+                    QuestId::GATHERING_BASICS, choiceInventory,
+                    ItemType::COOKED_MEAT, 3) &&
+                    choiceInventory.GetItemAmount(ItemType::COOKED_MEAT) == 3 &&
+                    choiceInventory.GetItemAmount(ItemType::COINS) == 0 &&
+                    !QuestSystem::Complete(choiceJournal,
+                        QuestId::GATHERING_BASICS, choiceInventory),
+                "A chosen alternate reward completes once and blocks the other outcome");
+
+    QuestDefinition combat = first;
+    combat.objectiveType = QuestObjectiveType::DEFEAT_CHARACTER;
+    combat.objectiveItem = ItemType::NONE;
+    combat.objectiveNpc = NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER;
+    combat.objectiveText = "Defeat three Ashfangs on the east road";
+    combat.requiredAmount = 3;
+    std::vector<QuestDefinition> combatDefinitions{combat};
+    QuestJournal combatJournal =
+        QuestJournalTestAccess::FromDefinitions(combatDefinitions);
+    QuestJournalTestAccess::ActivateAll(combatJournal);
+    test.Expect(QuestSystemTestAccess::RecordDefeated(combatJournal,
+                    NpcType::PASSIVE_DEVELOPMENT_MONSTER, 3,
+                    combatDefinitions).empty() &&
+                    QuestSystemTestAccess::RecordDefeated(combatJournal,
+                    NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER, 0,
+                    combatDefinitions).empty(),
+                "Wrong enemies and invalid kill counts do not advance combat objectives");
+    QuestSystemTestAccess::RecordDefeated(combatJournal,
+        NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER, 1, combatDefinitions);
+    const auto defeated = QuestSystemTestAccess::RecordDefeated(combatJournal,
+        NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER, 5, combatDefinitions);
+    test.Expect(defeated == std::vector<QuestId>{combat.id} &&
+                    combatJournal.TryGet(combat.id)->progress == 3 &&
+                    combatJournal.TryGet(combat.id)->state ==
+                        QuestState::READY_TO_COMPLETE,
+                "Authored enemy defeats advance and cap combat objectives");
     return test.Finish();
 }

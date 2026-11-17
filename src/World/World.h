@@ -17,6 +17,7 @@
 #include <map>
 #include "../Combat/CombatService.h"
 #include "../Combat/MeleeCombatFeedback.h"
+#include "../Combat/MeleeAttackPresentation.h"
 #include "../Combat/MeleeEngagementSystem.h"
 #include "../Reward/ItemReward.h"
 #include "../Reward/RewardTableRoller.h"
@@ -47,6 +48,9 @@
 #include "../Shop/ShopTransactionEvent.h"
 #include "../Persistence/WorldPlayerPersistenceResult.h"
 #include <filesystem>
+#include "GroundItem.h"
+#include "PlayerRecoveryPile.h"
+#include "../Bank/BankSession.h"
 
 class RandomSource;
 class Monster;
@@ -81,6 +85,7 @@ public:
     GetCommandProcessingResults() const;
 
     const CraftingSessionSnapshot *GetCraftingSession(int actorEntityID) const;
+    const ActiveBankSession *GetBankSession(int actorEntityID) const;
 
     Map &GetMap();
 
@@ -116,6 +121,11 @@ public:
 
     const std::vector<CraftingStation> &
     GetStations() const;
+    const std::vector<GroundItem> &GetGroundItems() const;
+    const GroundItem *GetGroundItemByID(int id) const;
+    const GroundItem *GetGroundItemAt(int x, int y) const;
+    const PlayerRecoveryPile *GetPlayerRecoveryPile(
+        int playerEntityID) const;
 
     CraftingStation *GetStationAt(
         int x,
@@ -137,7 +147,8 @@ public:
     bool QueueMeleeEngagementRequest(
         int attackerEntityID,
         int defenderEntityID,
-        int durationTicks);
+        int durationTicks,
+        bool instantOpeningAttack = false);
     void CancelActionsForEntity(
         int entityID,
         ActionCancelReason reason =
@@ -187,7 +198,8 @@ public:
     bool TryStartMeleeEngagement(
         int attackerEntityID,
         int defenderEntityID,
-        int durationTicks);
+        int durationTicks,
+        bool instantOpeningAttack = false);
 
     bool TryApplyStatusEffect(
         int playerEntityID,
@@ -200,6 +212,9 @@ public:
     bool HasPendingMeleeEngagement(
         int attackerEntityID) const;
 
+    std::optional<int> GetMeleeTargetEntityID(
+        int attackerEntityID) const;
+
     int GetCurrentTick() const;
 
     // Temporary global seam used by tests and manual debugging.
@@ -209,9 +224,23 @@ public:
 
     const std::map<int, MeleeCombatFeedback> &
     GetMeleeCombatFeedbacks() const;
+    const std::map<int, MeleeAttackPresentation> &
+    GetMeleeAttackPresentations() const;
 
     const std::vector<EntityDiedEvent> &
     GetEntityDiedEvents() const;
+
+    struct PlayerDeathRecovery
+    {
+        int playerEntityID;
+        int killerEntityID;
+        int deathX;
+        int deathY;
+        int respawnTick;
+    };
+
+    const PlayerDeathRecovery *GetPlayerDeathRecovery(
+        int playerEntityID) const;
 
     const std::vector<ActionLifecycleEvent> &
     GetActionLifecycleEvents() const;
@@ -284,10 +313,17 @@ private:
         StationType stationType,
         int x,
         int y);
+    void EnsureAdvancedStarterMonsters();
+    void EnsureStarterSupportingCharacters();
+    bool advancedStarterMonstersCreated = false;
+    bool starterSupportingCharactersCreated = false;
 
     void ProcessMovementRequests();
     void ProcessQueuedCommands();
     void ProcessMovementSystem();
+    void ProcessGroundItemPickups();
+    void ProcessPlayerRecoveryPiles();
+    void ProcessTutorialProgress();
     void ProcessInteractionSystem();
     bool PublishDialogueNode(const ActiveDialogueSession &session,
                              const DialogueNodeDefinition &node);
@@ -301,6 +337,8 @@ private:
         const std::vector<Action> &completedActions);
     bool TryReplaceCraftingSessionState(
         const ReplaceCraftingSessionStateCommand &command);
+    bool TryReplaceCraftingInteractionState(
+        const ReplaceCraftingInteractionStateCommand &command);
     bool TrySettleCraftingSession(int actorEntityID);
     void RevalidateCraftingSessions();
     MeleeCompletionContext BuildMeleeCompletionContext(
@@ -339,7 +377,8 @@ private:
         int attackerEntityID,
         int defenderEntityID,
         int durationTicks,
-        bool repeating);
+        bool repeating,
+        bool instantOpeningAttack = false);
     bool IsValidMonsterAggressionTarget(
         const Monster &monster,
         int targetEntityID);
@@ -366,6 +405,8 @@ private:
 
     std::map<int, StationType> openedStations;
     std::map<int, int> activeStations;
+    std::map<int, ActiveBankSession> activeBankSessions;
+    BankSessionId nextBankSessionId = 1;
 
     std::optional<MeleeAttackResult>
         lastMeleeAttackResult;
@@ -377,6 +418,12 @@ private:
         publishedActionLifecycleEvents;
 
     ServerCommandQueue serverCommandQueue;
+
+    std::vector<GroundItem> groundItems;
+    int nextGroundItemID = 1;
+    std::map<int, int> pendingGroundItemPickups;
+    std::map<int, PlayerRecoveryPile> playerRecoveryPiles;
+    static constexpr int PlayerRecoveryPileLifetimeTicks = 600;
 
     std::vector<CommandProcessingResult>
         pendingCommandProcessingResults;
@@ -395,13 +442,18 @@ private:
 
     std::map<int, MeleeCombatFeedback>
         meleeCombatFeedbacks;
+    std::map<int, MeleeAttackPresentation> meleeAttackPresentations;
 
     static constexpr int MeleeCombatFeedbackLifetimeTicks = 3;
 
     void UpdateMeleeCombatFeedback();
+    void UpdateMeleeAttackPresentations();
     void RecordMeleeCombatFeedback(
         int attackerEntityID,
         int defenderEntityID,
+        const MeleeAttackResult &result);
+    void AwardMeleeStyleExperience(
+        int attackerEntityID,
         const MeleeAttackResult &result);
 
     void TryStartMonsterRetaliation(
@@ -429,6 +481,7 @@ private:
         int killerEntityID);
 
     void ProcessDeadCombatantCleanup();
+    void ProcessPlayerRespawns();
     void ProcessEntityDeathRewards();
     void TickPlayerStatusEffects();
     void ScheduleMonsterRespawnsFromDeathEvents();
@@ -454,6 +507,8 @@ private:
 
     std::set<int> processedDeathEntityIDs;
     std::vector<EntityDiedEvent> entityDiedEvents;
+    std::map<int, PlayerDeathRecovery> playerDeathRecoveries;
+    static constexpr int PlayerRespawnDelayTicks = 4;
     TickScheduler tickScheduler;
     std::unordered_map<int, std::uint64_t>
         monsterRespawnEventIDs;

@@ -39,6 +39,7 @@ namespace
             left.positionX != right.positionX ||
             left.positionY != right.positionY ||
             left.currentHealth != right.currentHealth ||
+            left.combatStyle != right.combatStyle ||
             left.skills.size() != right.skills.size() ||
             left.equipment.size() != right.equipment.size())
         {
@@ -102,10 +103,10 @@ int main()
                          "Default Player retains bronze axe");
         test.ExpectEqual(defaults.GetInventory().GetItemAmount(ItemType::BRONZE_PICKAXE), 1,
                          "Default Player retains bronze pickaxe");
-        test.ExpectEqual(defaults.GetInventory().GetItemAmount(ItemType::IRON_PICKAXE), 1,
-                         "Default Player retains iron pickaxe");
-        test.ExpectEqual(defaults.GetInventory().GetItemAmount(ItemType::STEEL_PICKAXE), 1,
-                         "Default Player retains steel pickaxe");
+        test.ExpectEqual(defaults.GetInventory().GetItemAmount(ItemType::IRON_PICKAXE), 0,
+                         "Default Player must earn the iron pickaxe upgrade");
+        test.ExpectEqual(defaults.GetInventory().GetItemAmount(ItemType::STEEL_PICKAXE), 0,
+                         "Default Player must earn the steel pickaxe upgrade");
         test.ExpectEqual(
             defaults.GetSkills().GetSkill(SkillType::WOODCUTTING).GetXP(),
             DevelopmentConfig::TEST_WOODCUTTING_XP,
@@ -119,11 +120,9 @@ int main()
             DevelopmentConfig::TEST_SMITHING_XP,
             "Default Player retains development Smithing XP");
 
-        const std::array<ItemType, 4> expectedStarterItems{
+        const std::array<ItemType, 2> expectedStarterItems{
             ItemType::BRONZE_AXE,
-            ItemType::BRONZE_PICKAXE,
-            ItemType::IRON_PICKAXE,
-            ItemType::STEEL_PICKAXE};
+            ItemType::BRONZE_PICKAXE};
         const auto &defaultSlots = defaults.GetInventory().GetSlots();
         for (std::size_t index = 0; index < expectedStarterItems.size(); ++index)
         {
@@ -303,6 +302,7 @@ int main()
         original.GetSkills().AddXP(SkillType::ATTACK, 5000);
         original.GetSkills().AddXP(SkillType::DEFENCE, 2000);
         original.GetSkills().AddXP(SkillType::WOODCUTTING, INT_MAX);
+        original.TrySetCombatStyle(CombatStyle::AGGRESSIVE);
         std::array<InventorySlot, Inventory::SlotCount> slots{};
         slots[3].SetItem(ItemType::COINS, INT_MAX);
         slots[20].SetItem(ItemType::LOG, 1);
@@ -350,6 +350,8 @@ int main()
                 "INT_MAX XP level calculation terminates at level 99");
             test.Expect(restored->GetStatusEffectManager().GetActiveEffects().empty(),
                         "Restored Player has no status effects");
+            test.Expect(restored->GetCombatStyle() == CombatStyle::AGGRESSIVE,
+                        "Selected combat style restores exactly");
             PlayerSaveData recaptured = PlayerSaveState::Capture(*restored);
             test.Expect(SameSave(captured, recaptured),
                         "Capture restore capture round trip preserves every persistent field");
@@ -359,12 +361,38 @@ int main()
         }
     }
 
-    for (int version : {0, -1, 5})
+    for (int version : {0, -1, CURRENT_PLAYER_SAVE_VERSION + 1})
     {
         PlayerSaveData malformed = valid;
         malformed.version = version;
         ExpectRejected(test, malformed, PlayerSaveValidationCode::UNSUPPORTED_VERSION,
                        "Unsupported version rejects");
+    }
+    {
+        Player recipePlayer(72, PlayerInitializationMode::EMPTY);
+        recipePlayer.GetRecipeBook().Discover(RecipeType::IRON_BAR);
+        recipePlayer.GetRecipeBook().Discover(RecipeType::OAK_PLANKS);
+        PlayerSaveData recipeSave = PlayerSaveState::Capture(recipePlayer);
+        PlayerSaveValidationReport recipeReport;
+        std::unique_ptr<Player> restored = PlayerSaveState::TryCreatePlayer(
+            73, recipeSave, recipeReport);
+        test.Expect(restored != nullptr && recipeReport.IsValid() &&
+                restored->GetRecipeBook().IsKnown(RecipeType::IRON_BAR) &&
+                restored->GetRecipeBook().IsKnown(RecipeType::OAK_PLANKS) &&
+                restored->GetRecipeBook().ConsumeNewDiscoveries().empty(),
+            "Recipe discoveries restore without replaying notifications");
+
+        recipeSave.knownRecipes.push_back(recipeSave.knownRecipes.front());
+        ExpectRejected(test, recipeSave,
+            PlayerSaveValidationCode::INVALID_RECIPE_BOOK,
+            "Duplicate persisted recipe rejects");
+    }
+    {
+        PlayerSaveData malformed = valid;
+        malformed.combatStyle = static_cast<CombatStyle>(99);
+        ExpectRejected(test, malformed,
+            PlayerSaveValidationCode::INVALID_COMBAT_STYLE,
+            "Unknown persisted combat style rejects");
     }
     for (int health : {0, -1})
     {
@@ -586,6 +614,29 @@ int main()
             test.ExpectEqual(normalized.currentHealth, 100,
                              "Recapture records normalized permanent health");
         }
+    }
+
+    {
+        Player source(20, PlayerInitializationMode::EMPTY);
+        source.GetInventory().AddItem(ItemType::COINS, 9);
+        test.Expect(source.GetBank().TryDeposit(source.GetInventory(), 0, 7),
+            "Bank persistence fixture deposits items");
+        source.GetTutorialState().TryRestore(TutorialStep::SAFE_COMBAT, false);
+        const PlayerSaveData captured = PlayerSaveState::Capture(source);
+        test.Expect(captured.bank.size() == 1 &&
+                captured.bank[0].itemType == ItemType::COINS &&
+                captured.bank[0].quantity == 7,
+            "Capture records canonical bank entries");
+        PlayerSaveValidationReport report;
+        std::unique_ptr<Player> restored =
+            PlayerSaveState::TryCreatePlayer(21, captured, report);
+        test.Expect(restored != nullptr &&
+                restored->GetBank().GetItemAmount(ItemType::COINS) == 7,
+            "Bank entries survive player reconstruction");
+        test.Expect(restored != nullptr &&
+                restored->GetTutorialState().GetStep() == TutorialStep::SAFE_COMBAT &&
+                !restored->GetTutorialState().IsSkipped(),
+            "Tutorial progress survives player reconstruction");
     }
 
     return test.Finish();

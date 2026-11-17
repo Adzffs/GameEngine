@@ -13,6 +13,18 @@ int main()
                 "NONE dialogue fails safely");
     test.Expect(DialogueDefinitionDatabase::TryGet(static_cast<DialogueId>(999)) == nullptr,
                 "Unknown dialogue fails safely");
+    const DialogueDefinition *torrenDialogue =
+        DialogueDefinitionDatabase::TryGet(DialogueId::TORREN_ASH_INTRO);
+    test.Expect(torrenDialogue != nullptr &&
+                    torrenDialogue->startNodeId == DialogueNodeId::TORREN_ASH_WELCOME &&
+                    torrenDialogue->nodes.size() == 2 &&
+                    torrenDialogue->nodes[0].kind == DialogueNodeKind::CONTINUE &&
+                    torrenDialogue->nodes[0].nextNodeId ==
+                        DialogueNodeId::TORREN_ASH_FAREWELL &&
+                    torrenDialogue->nodes[1].kind == DialogueNodeKind::TERMINAL &&
+                    ContentValidator::ValidateDialogueDefinition(
+                        *torrenDialogue).IsValid(),
+                "Torren has valid authored workshop dialogue");
     if (dialogue != nullptr)
     {
         test.Expect(dialogue->startNodeId == DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME,
@@ -32,13 +44,13 @@ int main()
         test.Expect(welcome != nullptr && explanation != nullptr && prompt != nullptr &&
                         gathering != nullptr && combat != nullptr && future != nullptr,
                     "All stable nodes resolve");
-        test.Expect(welcome->text == "Welcome to the development world.",
+        test.Expect(welcome->text == "Welcome to Embervale. I'm Mara, the village warden.",
                     "Welcome text is exact");
         test.Expect(explanation->text ==
-            "This area is used to test gathering, combat, and NPC systems.",
+            "The wilds provide what we need, but lately they have been pushing back.",
             "Explanation text is exact");
         test.Expect(future->text ==
-            "More adventures will be added as the world grows.",
+            "Return when you're ready. Embervale has work for capable hands.",
             "Terminal text is exact");
         test.Expect(welcome->nextNodeId == DialogueNodeId::DEVELOPMENT_GUIDE_EXPLANATION,
                     "Welcome points to explanation");

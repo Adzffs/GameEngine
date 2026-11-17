@@ -102,7 +102,7 @@ int CountPixelsDifferentFrom(
 void SelectTab(Graphics &graphics, std::size_t index)
 {
     const SDL_FRect panel = graphics.GetSidePanelRectangle();
-    constexpr float tabWidth = 25.0f;
+    constexpr float tabWidth = 45.0f;
     constexpr float tabHeight = 30.0f;
     constexpr float tabGap = 2.0f;
     graphics.HandleSidePanelClick(
@@ -118,9 +118,9 @@ int main()
     Player player(100, PlayerInitializationMode::EMPTY);
 
     const SDL_FRect panel = graphics.GetSidePanelRectangle();
-    test.ExpectNear(panel.x, 1068.0f, 0.001f, "Quest panel uses established side-panel X");
+    test.ExpectNear(panel.x, 930.0f, 0.001f, "Quest panel uses refreshed side-panel X");
     test.ExpectNear(panel.y, 352.0f, 0.001f, "Quest panel uses established side-panel Y");
-    test.ExpectNear(panel.w, 192.0f, 0.001f, "Quest panel uses established side-panel width");
+    test.ExpectNear(panel.w, 330.0f, 0.001f, "Quest panel uses readable side-panel width");
     test.ExpectNear(panel.h, 348.0f, 0.001f, "Quest panel uses established side-panel height");
 
     SelectTab(graphics, 1);
@@ -138,29 +138,40 @@ int main()
                     IsInside(view.contentBounds, view.statePosition) &&
                     IsInside(view.contentBounds, view.progressPosition),
                 "Every quest text origin lies inside the shared content bounds");
-    test.Expect(view.state == "AVAILABLE" && view.progress == "Logs: 0 / 10",
+    test.Expect(view.state == "AVAILABLE" &&
+                    view.progress == "Start: Speak to Mara Vale",
                 "Available quest has a clear label");
+    SelectTab(graphics, 1);
+    test.Expect(!graphics.IsSidePanelOpen() &&
+                    !graphics.BuildQuestPanelView(player).visible,
+                "Clicking the active tab collapses the side panel");
+    SelectTab(graphics, 1);
+    test.Expect(graphics.IsSidePanelOpen() &&
+                    graphics.BuildQuestPanelView(player).visible,
+                "Clicking a collapsed tab restores only that panel");
 
-    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 0}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}});
+    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 0}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}, {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}, {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}, {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}});
     view = graphics.BuildQuestPanelView(player);
     test.Expect(view.state == "ACTIVE" && view.progress == "Logs: 0 / 10",
                 "Active quest displays authoritative zero progress");
-    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 6}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}});
+    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 6}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}, {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}, {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}, {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}});
     view = graphics.BuildQuestPanelView(player);
     test.Expect(view.progress == "Logs: 6 / 10",
                 "Active quest displays authoritative updated progress");
 
-    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::READY_TO_COMPLETE, 10}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}});
+    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::READY_TO_COMPLETE, 10}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}, {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}, {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}, {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}});
     view = graphics.BuildQuestPanelView(player);
     test.Expect(view.state == "READY TO COMPLETE" &&
-                    view.progress == "Logs: 10 / 10" &&
+                    view.progress == "Return to Mara Vale" &&
                     player.GetQuestJournal().TryGet(QuestId::GATHERING_BASICS)->progress == 10,
                 "Ready quest has a clear completion label");
 
-    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::COMPLETED, 10}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}});
+    QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::COMPLETED, 10}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}, {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}, {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}, {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}});
     view = graphics.BuildQuestPanelView(player);
-    test.Expect(view.state == "COMPLETED" && view.progress == "Logs: 10 / 10",
-                "Completed quest has a clear label");
+    test.Expect(view.state == "AVAILABLE" &&
+                    view.title == "Mining Basics" &&
+                    view.progress == "Start: Speak to Mara Vale",
+                "Completed quest history no longer hides the next available goal");
 
     SelectTab(graphics, 0);
     test.Expect(!graphics.BuildQuestPanelView(player).visible,
@@ -174,20 +185,23 @@ int main()
 
     QuestSystem::TryRestore(player.GetQuestJournal(), {
         {QuestId::GATHERING_BASICS, QuestState::ACTIVE, 6},
-        {QuestId::MINING_BASICS, QuestState::ACTIVE, 3}});
+        {QuestId::MINING_BASICS, QuestState::ACTIVE, 3},
+        {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0},
+        {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}, {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}, {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}});
     QuestPresentationState authoritativePresentation;
     authoritativePresentation.Synchronize(player.GetQuestJournal());
     const auto productionRows = graphics.BuildQuestRowLayout(
         authoritativePresentation.GetQuests());
-    test.Expect(productionRows.size() == 2 &&
+    test.Expect(productionRows.size() == 6 &&
                     productionRows[0].quest.id == QuestId::GATHERING_BASICS &&
                     productionRows[0].quest.progress == 6 &&
                     productionRows[1].quest.id == QuestId::MINING_BASICS &&
                     productionRows[1].quest.progress == 3 &&
                     Graphics::GetQuestProgressLabel(productionRows[1].quest) ==
                         "Copper ores: 3 / 5" &&
-                    !Overlaps(productionRows[0].bounds, productionRows[1].bounds),
-                "Production Quest panel shows two independent rows in catalogue order");
+                    !Overlaps(productionRows[0].bounds, productionRows[1].bounds) &&
+                    !productionRows.back().clipped,
+                "Production Quest panel keeps the full starter arc visible");
 
     const std::vector<QuestPresentation> syntheticQuests{
         {static_cast<QuestId>(10), QuestState::AVAILABLE, 0, 10,
@@ -199,6 +213,10 @@ int main()
         {static_cast<QuestId>(13), QuestState::COMPLETED, 10, 10,
             "Completed Quest", "Logs"},
         {static_cast<QuestId>(14), QuestState::ACTIVE, 2, 10,
+            "Fifth Quest", "Logs"},
+        {static_cast<QuestId>(15), QuestState::ACTIVE, 3, 10,
+            "Sixth Quest", "Logs"},
+        {static_cast<QuestId>(16), QuestState::ACTIVE, 4, 10,
             "Overflow Quest", "Logs"}};
     const auto syntheticRows = graphics.BuildQuestRowLayout(syntheticQuests);
     bool retainedOrder = syntheticRows.size() == syntheticQuests.size();
@@ -217,7 +235,7 @@ int main()
                 syntheticRows[index - 1].bounds, syntheticRows[index].bounds);
             consistentSpacing = consistentSpacing &&
                 syntheticRows[index].originY -
-                    syntheticRows[index - 1].originY == 88.0f;
+                    syntheticRows[index - 1].originY == 48.0f;
         }
     }
     test.Expect(retainedOrder,
@@ -225,15 +243,20 @@ int main()
     test.Expect(disjoint && consistentSpacing,
                 "Synthetic quest rows are distinct with consistent spacing");
     test.Expect(insideContent && !syntheticRows[0].clipped &&
-                    syntheticRows[3].clipped && syntheticRows[4].clipped,
-                "Rows remain bounded and overflow rows are marked clipped");
+                    !syntheticRows[4].clipped && !syntheticRows[5].clipped &&
+                    syntheticRows[6].clipped,
+                "Six compact rows fit while later overflow remains clipped");
     test.Expect(Graphics::GetQuestStateLabel(QuestState::AVAILABLE) == "AVAILABLE" &&
                     Graphics::GetQuestStateLabel(QuestState::ACTIVE) == "ACTIVE" &&
                     Graphics::GetQuestStateLabel(QuestState::READY_TO_COMPLETE) ==
                         "READY TO COMPLETE" &&
                     Graphics::GetQuestStateLabel(QuestState::COMPLETED) == "COMPLETED" &&
                     Graphics::GetQuestProgressLabel(syntheticQuests[1]) ==
-                        "Logs: 6 / 10",
+                        "Logs: 6 / 10" &&
+                    Graphics::GetQuestCategoryLabel(QuestCategory::MAIN) ==
+                        "MAIN" &&
+                    Graphics::GetQuestCategoryLabel(QuestCategory::TUTORIAL) ==
+                        "TUTORIAL",
                 "Runtime row labels cover every visible quest state");
 
     Graphics nativeGraphics;
@@ -268,13 +291,13 @@ int main()
         SDL_Surface* syntheticPixels = SDL_RenderReadPixels(renderer, nullptr);
         const Pixel background{5, 7, 9, 255};
         const SDL_FRect insideGlyphRegion{
-            syntheticRows[3].titlePosition.x,
-            syntheticRows[3].titlePosition.y,
+            syntheticRows[6].titlePosition.x,
+            syntheticRows[6].titlePosition.y,
             145.0f,
             9.0f};
         const SDL_FRect belowContentGlyphRegion{
-            syntheticRows[3].progressPosition.x,
-            syntheticRows[3].progressPosition.y,
+            syntheticRows[6].progressPosition.x,
+            syntheticRows[6].progressPosition.y,
             145.0f,
             9.0f};
         test.Expect(syntheticPixels != nullptr &&
@@ -311,7 +334,7 @@ int main()
             {QuestState::COMPLETED, 10}}};
         for (const auto& [state, progress] : states)
         {
-            QuestSystem::TryRestore(nativePlayer.GetQuestJournal(), {{QuestId::GATHERING_BASICS, state, progress}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}});
+            QuestSystem::TryRestore(nativePlayer.GetQuestJournal(), {{QuestId::GATHERING_BASICS, state, progress}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}, {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}, {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}, {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}});
             const auto nativeView = nativeGraphics.BuildQuestPanelView(nativePlayer);
             SDL_SetRenderDrawColor(renderer, 5, 7, 9, 255);
             SDL_RenderClear(renderer);
@@ -331,7 +354,7 @@ int main()
                     static_cast<int>(layout.panelBounds.y) + 2);
                 test.Expect(outside.red == 5 && outside.green == 7 && outside.blue == 9,
                             "Quest render does not paint over the world outside the panel");
-                test.Expect(body.red == 30 && body.green == 30 && body.blue == 30,
+                test.Expect(body.red == 24 && body.green == 27 && body.blue == 31,
                             "Quest render draws the standard dark panel body");
                 test.Expect(HasYellowText(pixels, nativeView.titlePosition),
                             "Quest title is rendered inside the panel for every state");
@@ -350,10 +373,10 @@ int main()
         test.Expect(skillPixels != nullptr && inventoryPixels != nullptr &&
                         ReadPixel(skillPixels,
                             static_cast<int>(layout.panelBounds.x) + 2,
-                            static_cast<int>(layout.panelBounds.y) + 2).red == 30 &&
+                            static_cast<int>(layout.panelBounds.y) + 2).red == 24 &&
                         ReadPixel(inventoryPixels,
                             static_cast<int>(layout.panelBounds.x) + 2,
-                            static_cast<int>(layout.panelBounds.y) + 2).red == 30,
+                            static_cast<int>(layout.panelBounds.y) + 2).red == 24,
                     "Skills, Inventory and Quests render the same runtime panel body");
         if (skillPixels != nullptr) SDL_DestroySurface(skillPixels);
         if (inventoryPixels != nullptr) SDL_DestroySurface(inventoryPixels);

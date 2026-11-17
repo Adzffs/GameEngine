@@ -75,11 +75,17 @@ PlayerSaveData PlayerSaveState::Capture(const Player &player)
     saveData.positionX = player.GetPosition().GetX();
     saveData.positionY = player.GetPosition().GetY();
     saveData.currentHealth = player.GetCurrentHealth();
+    saveData.tutorialStep = player.GetTutorialState().GetStep();
+    saveData.tutorialSkipped = player.GetTutorialState().IsSkipped();
+    saveData.combatStyle = player.GetCombatStyle();
+    saveData.knownRecipes = player.GetRecipeBook().GetKnownRecipes();
     for (const auto &[questId, record] :
          player.GetQuestJournal().GetRecords())
     {
         saveData.quests.push_back({questId, record.state, record.progress});
     }
+    for (const BankEntry &entry : player.GetBank().GetEntries())
+        saveData.bank.push_back({entry.itemType, entry.quantity});
 
     const auto &inventorySlots = player.GetInventory().GetSlots();
     for (int index = 0; index < Inventory::SlotCount; ++index)
@@ -117,7 +123,7 @@ PlayerSaveValidationReport PlayerSaveState::ValidateInternal(
         report.AddIssue(
             PlayerSaveValidationCode::UNSUPPORTED_VERSION,
             -1,
-            "Only canonical player save version 3 is supported");
+            "Only the current canonical player save version is supported");
     }
     if (saveData.currentHealth <= 0)
     {
@@ -125,6 +131,49 @@ PlayerSaveValidationReport PlayerSaveState::ValidateInternal(
             PlayerSaveValidationCode::INVALID_CURRENT_HEALTH,
             -1,
             "Current health must be positive");
+    }
+    const int tutorialStep = static_cast<int>(saveData.tutorialStep);
+    if (tutorialStep < static_cast<int>(TutorialStep::MEET_GUIDE) ||
+        tutorialStep > static_cast<int>(TutorialStep::COMPLETE) ||
+        (saveData.tutorialSkipped &&
+         saveData.tutorialStep != TutorialStep::COMPLETE))
+        report.AddIssue(PlayerSaveValidationCode::INVALID_TUTORIAL_STATE, -1,
+            "Tutorial state is not canonical");
+    if (!IsValidCombatStyle(saveData.combatStyle))
+        report.AddIssue(PlayerSaveValidationCode::INVALID_COMBAT_STYLE, -1,
+            "Combat style is not canonical");
+    RecipeBook recipeBookValidation;
+    if (!recipeBookValidation.TryRestore(saveData.knownRecipes))
+        report.AddIssue(PlayerSaveValidationCode::INVALID_RECIPE_BOOK, -1,
+            "Known recipes contain an invalid or duplicate recipe ID");
+    if (saveData.recoveryPile.active)
+    {
+        if (saveData.recoveryPile.remainingTicks <= 0 ||
+            saveData.recoveryPile.items.empty())
+            report.AddIssue(PlayerSaveValidationCode::INVALID_RECOVERY_PILE,
+                -1, "Active recovery pile requires items and remaining time");
+    }
+    else if (saveData.recoveryPile.remainingTicks != 0 ||
+             !saveData.recoveryPile.items.empty())
+        report.AddIssue(PlayerSaveValidationCode::INVALID_RECOVERY_PILE,
+            -1, "Inactive recovery pile must be empty");
+    std::vector<ItemType> recoveryItems;
+    for (std::size_t index = 0;
+         index < saveData.recoveryPile.items.size(); ++index)
+    {
+        const SavedBankEntry &entry = saveData.recoveryPile.items[index];
+        if (!IsKnownItem(entry.itemType) || entry.itemType == ItemType::NONE)
+            report.AddIssue(PlayerSaveValidationCode::UNKNOWN_RECOVERY_ITEM,
+                static_cast<int>(index), "Recovery item type is unknown");
+        if (entry.quantity <= 0)
+            report.AddIssue(PlayerSaveValidationCode::INVALID_RECOVERY_QUANTITY,
+                static_cast<int>(index), "Recovery quantities must be positive");
+        if (std::find(recoveryItems.begin(), recoveryItems.end(), entry.itemType) !=
+            recoveryItems.end())
+            report.AddIssue(PlayerSaveValidationCode::DUPLICATE_RECOVERY_ITEM,
+                static_cast<int>(index), "Recovery item types must be unique");
+        else
+            recoveryItems.push_back(entry.itemType);
     }
     QuestJournal questValidationJournal;
     std::vector<QuestRecord> questRecords;
@@ -190,6 +239,27 @@ PlayerSaveValidationReport PlayerSaveState::ValidateInternal(
                 stackableItems.push_back(slot.itemType);
             }
         }
+    }
+
+    if (saveData.bank.size() > Bank::DistinctItemCapacity)
+        report.AddIssue(PlayerSaveValidationCode::BANK_CAPACITY_EXCEEDED, -1,
+            "Bank contains too many distinct item types");
+    std::vector<ItemType> bankItems;
+    for (std::size_t index = 0; index < saveData.bank.size(); ++index)
+    {
+        const SavedBankEntry &entry = saveData.bank[index];
+        if (!IsKnownItem(entry.itemType) || entry.itemType == ItemType::NONE)
+            report.AddIssue(PlayerSaveValidationCode::UNKNOWN_BANK_ITEM,
+                static_cast<int>(index), "Bank item type is unknown");
+        if (entry.quantity <= 0)
+            report.AddIssue(PlayerSaveValidationCode::INVALID_BANK_QUANTITY,
+                static_cast<int>(index), "Bank quantities must be positive");
+        if (std::find(bankItems.begin(), bankItems.end(), entry.itemType) !=
+            bankItems.end())
+            report.AddIssue(PlayerSaveValidationCode::DUPLICATE_BANK_ITEM,
+                static_cast<int>(index), "Bank item types must be unique");
+        else
+            bankItems.push_back(entry.itemType);
     }
 
     std::vector<SkillType> seenSkills;
@@ -352,6 +422,28 @@ std::unique_ptr<Player> PlayerSaveState::TryCreatePlayer(
     std::unique_ptr<Player> player = std::make_unique<Player>(
         runtimeEntityID,
         PlayerInitializationMode::EMPTY);
+    if (!player->TrySetCombatStyle(saveData.combatStyle))
+    {
+        validationReport.AddIssue(
+            PlayerSaveValidationCode::INTERNAL_RESTORE_FAILURE, -1,
+            "Validated combat style could not be restored");
+        return nullptr;
+    }
+    if (!player->GetRecipeBook().TryRestore(saveData.knownRecipes))
+    {
+        validationReport.AddIssue(
+            PlayerSaveValidationCode::INTERNAL_RESTORE_FAILURE, -1,
+            "Validated recipe knowledge could not be restored");
+        return nullptr;
+    }
+    if (!player->GetTutorialState().TryRestore(
+            saveData.tutorialStep, saveData.tutorialSkipped))
+    {
+        validationReport.AddIssue(
+            PlayerSaveValidationCode::INTERNAL_RESTORE_FAILURE, -1,
+            "Validated tutorial state could not be restored");
+        return nullptr;
+    }
     std::vector<QuestRecord> restoredQuestRecords;
     restoredQuestRecords.reserve(saveData.quests.size());
     for (const SavedQuestRecord &saved : saveData.quests)
@@ -408,6 +500,18 @@ std::unique_ptr<Player> PlayerSaveState::TryCreatePlayer(
             PlayerSaveValidationCode::INTERNAL_RESTORE_FAILURE,
             -1,
             "Validated inventory could not be restored");
+        return nullptr;
+    }
+
+    std::vector<BankEntry> bankEntries;
+    bankEntries.reserve(saveData.bank.size());
+    for (const SavedBankEntry &entry : saveData.bank)
+        bankEntries.push_back({entry.itemType, entry.quantity});
+    if (!player->GetBank().TryRestore(bankEntries))
+    {
+        validationReport.AddIssue(
+            PlayerSaveValidationCode::INTERNAL_RESTORE_FAILURE, -1,
+            "Validated bank could not be restored");
         return nullptr;
     }
 

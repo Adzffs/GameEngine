@@ -16,7 +16,8 @@ public:
         int attackerEntityID,
         int targetEntityID,
         int durationTicks,
-        const EntityManager &entityManager);
+        const EntityManager &entityManager,
+        bool instantOpeningAttack = false);
 
     bool ClearEngagement(int attackerEntityID);
     std::size_t ClearEngagementsInvolving(int entityID);
@@ -32,6 +33,7 @@ private:
     {
         int targetEntityID;
         int durationTicks;
+        bool instantOpeningAttack;
     };
 
     std::unordered_map<int, Engagement> engagementByAttackerID;

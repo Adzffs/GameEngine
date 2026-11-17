@@ -131,13 +131,14 @@ namespace
                     "Intermediate success emits STEP_SUCCEEDED");
         test.ExpectEqual(
             MovementSystemTestAccess::RemainingSteps(system, entityID),
-            std::size_t{5},
+            std::size_t{3},
             "Successful movement removes exactly one stored step");
         test.ExpectEqual(
-            std::abs(entities.GetEntityByID(entityID)->GetPosition().GetX() - 2) +
-                std::abs(entities.GetEntityByID(entityID)->GetPosition().GetY() - 2),
+            std::max(
+                std::abs(entities.GetEntityByID(entityID)->GetPosition().GetX() - 2),
+                std::abs(entities.GetEntityByID(entityID)->GetPosition().GetY() - 2)),
             1,
-            "A process call never performs diagonal or multi-tile movement");
+            "A process call permits one diagonal tile without skipping tiles");
     }
 
     void TestRecalculation(TestContext &test)
@@ -196,6 +197,55 @@ namespace
                     "New movement works after cancellation");
     }
 
+    void TestPlayerRunning(TestContext &test)
+    {
+        EntityManager entities;
+        Map map(20, 20);
+        MovementSystem system;
+        const int playerID = entities.CreatePlayer();
+        Player *player = dynamic_cast<Player *>(entities.GetEntityByID(playerID));
+        player->GetPosition().SetPosition(2, 2);
+        player->ToggleRunning();
+
+        test.Expect(system.QueueDestination(
+                        playerID, Position(6, 2), entities, map),
+                    "Running destination is accepted");
+        const auto outcomes = system.Process(entities, map);
+
+        test.ExpectEqual(player->GetPosition().GetX(), 4,
+                         "Running advances two path tiles per movement update");
+        test.ExpectEqual(player->GetRunStamina(), 99,
+                         "A two-tile running update consumes stamina");
+        test.Expect(outcomes.size() == 1 &&
+                        outcomes[0].type == MovementOutcomeType::STEP_SUCCEEDED,
+                    "Running keeps the normal movement outcome contract");
+
+        system.Process(entities, map);
+        test.ExpectEqual(player->GetPosition().GetX(), 6,
+                         "Running reaches the target using the shortest path");
+        test.ExpectEqual(player->GetRunStamina(), 98,
+                         "Continued running consumes stamina once per update");
+
+        player->GetPosition().SetPosition(2, 2);
+        system.QueueDestination(playerID, Position(4, 3), entities, map);
+        system.Process(entities, map);
+        test.Expect(player->GetPosition().GetX() == 4 &&
+                        player->GetPosition().GetY() == 3,
+                    "Running combines two safe path steps into OSRS-style L movement");
+        test.ExpectEqual(player->GetRunStamina(), 97,
+                         "An L-shaped running update consumes stamina once");
+
+        system.CancelMovement(playerID);
+        player->GetPosition().SetPosition(10, 10);
+        system.QueueDestination(playerID, Position(15, 10), entities, map);
+        system.QueueDestination(playerID, Position(10, 15), entities, map);
+        system.QueueDestination(playerID, Position(6, 10), entities, map);
+        system.Process(entities, map);
+        test.Expect(player->GetPosition().GetX() == 8 &&
+                        player->GetPosition().GetY() == 10,
+                    "Rapid destination spam follows only the latest requested route");
+    }
+
     void TestDeterminismAndStaleState(TestContext &test)
     {
         EntityManager entities;
@@ -238,6 +288,7 @@ int main()
     TestContext test;
     TestOwnershipAndQueue(test);
     TestStepProgression(test);
+    TestPlayerRunning(test);
     TestRecalculation(test);
     TestDeterminismAndStaleState(test);
     return test.Finish();

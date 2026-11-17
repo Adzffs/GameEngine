@@ -17,6 +17,11 @@ void Map::SetTileType(int x, int y, TileType type)
     GetTile(x, y).SetType(type);
 }
 
+TileType Map::GetTileType(int x, int y)
+{
+    return GetTile(x, y).GetType();
+}
+
 Tile &Map::GetTile(int x, int y)
 {
     return tiles[static_cast<size_t>(y) * width + x];
@@ -34,4 +39,14 @@ bool Map::IsInBounds(int x, int y) const
 {
     return x >= 0 && y >= 0 &&
            x < width && y < height;
+}
+
+int Map::GetWidth() const
+{
+    return width;
+}
+
+int Map::GetHeight() const
+{
+    return height;
 }

@@ -7,10 +7,15 @@
 #include "../src/NPC/NpcSpawnDatabase.h"
 #include "../src/World/World.h"
 
+#include <string>
+#include <utility>
+#include <vector>
+
 int main()
 {
     TestContext test;
     const NpcDefinition *guide = NpcDefinitionDatabase::TryGet(NpcType::DEVELOPMENT_GUIDE);
+    const NpcDefinition *torren = NpcDefinitionDatabase::TryGet(NpcType::TORREN_ASH);
     test.Expect(guide != nullptr, "Development guide definition resolves");
     if (guide != nullptr)
     {
@@ -23,6 +28,12 @@ int main()
                     "Guide references development supplies");
         test.Expect(guide->dialogueId == DialogueId::DEVELOPMENT_GUIDE_INTRO,
                     "Guide references the authored dialogue");
+        test.Expect(guide->name == "Mara Vale" &&
+                        !guide->role.empty() && !guide->motivation.empty() &&
+                        !guide->speechStyle.empty() &&
+                        !guide->relationship.empty() &&
+                        !guide->examineText.empty(),
+                    "Mara has a complete authored character identity");
 
         NpcDefinition invalidFriendly = *guide;
         invalidFriendly.combat = NpcCombatDefinition{CombatRatings{1,1,1,1}, 1,
@@ -41,9 +52,40 @@ int main()
         missingDialogue.dialogueId = DialogueId::NONE;
         test.Expect(!ContentValidator::ValidateNpcDefinition(missingDialogue).IsValid(),
                     "TALK without a dialogue is rejected");
+        NpcDefinition missingCharacterIdentity = *guide;
+        missingCharacterIdentity.motivation.clear();
+        test.Expect(!ContentValidator::ValidateNpcDefinition(
+                        missingCharacterIdentity).IsValid(),
+                    "Friendly characters require a motivation");
+    }
+    test.Expect(torren != nullptr && torren->name == "Torren Ash" &&
+                    torren->dialogueId == DialogueId::TORREN_ASH_INTRO &&
+                    torren->interactions.size() == 1 &&
+                    torren->interactions[0] == NpcInteractionType::TALK &&
+                    !torren->role.empty() && !torren->relationship.empty(),
+                "Torren has a complete workshop character definition");
+    const std::vector<std::pair<NpcType, std::string>> supportingCast{
+        {NpcType::TORREN_ASH, "Torren Ash"},
+        {NpcType::ELIA_REED, "Elia Reed"},
+        {NpcType::NESSA_THORNE, "Nessa Thorne"},
+        {NpcType::BRANN_DEEPWELL, "Brann Deepwell"},
+        {NpcType::SERA_FLINT, "Sera Flint"}};
+    for (const auto &[type, name] : supportingCast)
+    {
+        const NpcDefinition *character = NpcDefinitionDatabase::TryGet(type);
+        test.Expect(character != nullptr && character->name == name &&
+                        character->kind == NpcKind::FRIENDLY &&
+                        !character->role.empty() &&
+                        !character->motivation.empty() &&
+                        !character->speechStyle.empty() &&
+                        !character->relationship.empty() &&
+                        !character->examineText.empty(),
+                    "Every supporting villager has a complete character identity");
     }
 
     const auto &spawns = NpcSpawnDatabase::GetStarterSpawns();
+    test.ExpectEqual(spawns.size(), std::size_t{10},
+                    "Starter world defines six villagers and four monsters");
     test.Expect(spawns.front().spawnId == NpcSpawnId::DEVELOPMENT_GUIDE_SPAWN,
                 "Guide spawn is first in authored order");
     test.ExpectEqual(spawns.front().spawnPosition.GetX(), 3, "Guide X is preserved");
@@ -51,6 +93,12 @@ int main()
     test.ExpectEqual(spawns.front().maximumActiveCount, 1, "Guide capacity is one");
     test.ExpectEqual(spawns.front().wanderRadius, 0, "Guide wandering is disabled");
     test.Expect(!spawns.front().respawns, "Guide respawning is disabled");
+    const NpcSpawnDefinition *torrenSpawn =
+        NpcSpawnDatabase::TryGet(NpcSpawnId::TORREN_ASH_SPAWN);
+    test.Expect(torrenSpawn != nullptr &&
+                    torrenSpawn->spawnPosition.GetX() == 16 &&
+                    torrenSpawn->spawnPosition.GetY() == 10,
+                "Torren has a stable workshop spawn");
 
     World world;
     NPC *runtimeGuide = dynamic_cast<NPC *>(world.GetEntityByID(1));
@@ -69,6 +117,22 @@ int main()
     test.Expect(dynamic_cast<Monster *>(world.GetEntityByID(3)) != nullptr,
                 "Aggressive monster remains entity three");
     test.ExpectEqual(world.CreatePlayer(), 4, "Player remains entity four");
+    NPC *runtimeTorren = dynamic_cast<NPC *>(world.GetEntityByID(7));
+    test.Expect(runtimeTorren != nullptr &&
+                    runtimeTorren->GetNpcType() == NpcType::TORREN_ASH &&
+                    runtimeTorren->GetNpcSpawnId() == NpcSpawnId::TORREN_ASH_SPAWN,
+                "Torren enters the live world after the player and advanced encounters");
+    const std::vector<NpcType> runtimeCast{
+        NpcType::TORREN_ASH, NpcType::ELIA_REED, NpcType::NESSA_THORNE,
+        NpcType::BRANN_DEEPWELL, NpcType::SERA_FLINT};
+    for (std::size_t index = 0; index < runtimeCast.size(); ++index)
+    {
+        NPC *character = dynamic_cast<NPC *>(
+            world.GetEntityByID(7 + static_cast<int>(index)));
+        test.Expect(character != nullptr &&
+                        character->GetNpcType() == runtimeCast[index],
+                    "Every supporting villager enters the live starter world");
+    }
     test.ExpectEqual(world.GetNpcSpawnManager().GetActiveCount(
                          NpcSpawnId::DEVELOPMENT_GUIDE_SPAWN), 1,
                      "Guide consumes authored spawn capacity");
@@ -80,7 +144,7 @@ int main()
                      "Invalid guide creation fails without an entity");
     test.ExpectEqual(world.CreateNpc(NpcType::DEVELOPMENT_GUIDE, spawns.front()), 0,
                      "Guide spawn capacity rejects duplicate creation");
-    test.ExpectEqual(world.CreatePlayer(), 5,
+    test.ExpectEqual(world.CreatePlayer(), 12,
                      "Invalid guide creation consumes no entity ID");
 
     if (guide != nullptr)

@@ -1,6 +1,7 @@
 #include "TestSupport.h"
 
 #include "../src/Graphics/Graphics.h"
+#include "../src/Recipe/RecipeDatabase.h"
 
 struct GraphicsTestAccess
 {
@@ -16,6 +17,47 @@ struct GraphicsTestAccess
     {
         graphics.displayedLogCount = logs;
         graphics.displayedPlankCount = planks;
+    }
+
+    static void SetInventory(Graphics &graphics, const Inventory &inventory)
+    {
+        graphics.displayedInventorySlots = inventory.GetSlots();
+    }
+
+    static void SetSkillLevels(
+        Graphics &graphics, int woodcutting, int mining, int smithing)
+    {
+        graphics.displayedWoodcuttingLevel = woodcutting;
+        graphics.displayedMiningLevel = mining;
+        graphics.displayedSmithingLevel = smithing;
+    }
+
+    static std::string RecipeStatus(
+        const Graphics &graphics, RecipeType recipeType,
+        bool ingredientsAreInGrid = false)
+    {
+        return graphics.GetDisplayedRecipeStatus(
+            RecipeDatabase::Get(recipeType), ingredientsAreInGrid);
+    }
+
+    static Graphics::SidePanelTab SelectedTab(const Graphics &graphics)
+    {
+        return graphics.selectedTab;
+    }
+
+    static bool RecipeFilterEnabled(const Graphics &graphics)
+    {
+        return graphics.recipeCanCraftOnly;
+    }
+
+    static int RecipeBookPage(const Graphics &graphics)
+    {
+        return graphics.recipeBookPage;
+    }
+
+    static RecipeType SelectedRecipe(const Graphics &graphics)
+    {
+        return graphics.selectedRecipeBookRecipe;
     }
 };
 
@@ -63,11 +105,67 @@ int main()
     TestContext test;
     Graphics graphics;
 
+    Inventory requirementsInventory;
+    requirementsInventory.AddItem(ItemType::COPPER_ORE, 1);
+    requirementsInventory.AddItem(ItemType::TIN_ORE, 1);
+    requirementsInventory.AddItem(ItemType::OAK_LOG, 1);
+    GraphicsTestAccess::SetInventory(graphics, requirementsInventory);
+    GraphicsTestAccess::SetSkillLevels(graphics, 1, 1, 1);
+    test.Expect(
+        GraphicsTestAccess::RecipeStatus(
+            graphics, RecipeType::BRONZE_BAR) == "READY",
+        "Recipe feedback recognizes sufficient level-one forge materials");
+    test.Expect(
+        GraphicsTestAccess::RecipeStatus(
+            graphics, RecipeType::OAK_PLANKS, true) == "NEED LEVEL 5",
+        "Recipe feedback explains a missing skill requirement");
+    GraphicsTestAccess::SetSkillLevels(graphics, 5, 1, 1);
+    test.Expect(
+        GraphicsTestAccess::RecipeStatus(
+            graphics, RecipeType::OAK_PLANKS, true) == "READY",
+        "Recipe feedback changes to ready when the level requirement is met");
+    test.Expect(
+        GraphicsTestAccess::RecipeStatus(
+            graphics, RecipeType::BRONZE_SWORD) == "NEED MATERIALS",
+        "Recipe feedback distinguishes missing materials from missing levels");
+
     if (!graphics.Initialize())
     {
         test.Expect(false, "Native SDL renderer initializes");
         return test.Finish();
     }
+
+    const Graphics::SidePanelLayout sidePanel =
+        graphics.GetSidePanelLayout();
+    test.Expect(
+        graphics.HandleSidePanelClick(
+            sidePanel.tabBounds[4].x + 5.0f,
+            sidePanel.tabBounds[4].y + 5.0f) &&
+            GraphicsTestAccess::SelectedTab(graphics) ==
+                Graphics::SidePanelTab::RECIPES,
+        "Book tab replaces the unused Magic placeholder");
+    test.Expect(
+        graphics.HandleSidePanelClick(
+            sidePanel.contentBounds.x + 5.0f,
+            sidePanel.contentBounds.y + 33.0f) &&
+            GraphicsTestAccess::RecipeFilterEnabled(graphics),
+        "Recipe book can toggle the can-craft-only filter");
+    graphics.HandleSidePanelClick(
+        sidePanel.contentBounds.x + 5.0f,
+        sidePanel.contentBounds.y + 33.0f);
+    test.Expect(
+        graphics.HandleSidePanelClick(
+            sidePanel.contentBounds.x + sidePanel.contentBounds.w - 20.0f,
+            sidePanel.contentBounds.y + 33.0f) &&
+            GraphicsTestAccess::RecipeBookPage(graphics) == 1,
+        "Recipe book pages through the full recipe catalogue");
+    test.Expect(
+        graphics.HandleSidePanelClick(
+            sidePanel.contentBounds.x + 5.0f,
+            sidePanel.contentBounds.y + 91.0f) &&
+            GraphicsTestAccess::SelectedRecipe(graphics) ==
+                RecipeType::BRONZE_PICKAXE,
+        "Recipe book selects a discovered recipe for its details");
 
     SDL_Renderer *renderer =
         GraphicsTestAccess::Renderer(graphics);
@@ -170,6 +268,48 @@ int main()
             IsColor(ReadPixel(pixels, 20.0f, 20.0f), 3, 5, 7),
             "Enabled crafting UI remains bounded to the modal");
         SDL_DestroySurface(pixels);
+    }
+
+    {
+        Inventory inventory;
+        inventory.AddItem(ItemType::COINS, 12);
+        Bank bank;
+        ActiveBankSession session{7, 42, 99};
+        graphics.OpenStationMenu(StationType::BANK);
+        graphics.SynchronizeBank(42, &session, bank);
+        GraphicsTestAccess::SetInventory(graphics, inventory);
+
+        graphics.HandleStationMenuClick(220.0f + 20.0f + 58.0f,
+            54.0f + 70.0f);
+        graphics.HandleStationMenuClick(220.0f + 475.0f,
+            54.0f + 150.0f);
+        const std::optional<ServerCommandData> deposit =
+            graphics.ConsumeBankCommand();
+        test.Expect(deposit.has_value() &&
+                std::holds_alternative<BankDepositCommand>(*deposit) &&
+                std::get<BankDepositCommand>(*deposit).quantity == 5 &&
+                std::get<BankDepositCommand>(*deposit).sessionId == 7,
+            "Bank inventory clicks emit revision-scoped deposit commands using quantity mode");
+
+        bank.TryRestore({BankEntry{ItemType::COINS, 9}});
+        graphics.SynchronizeBank(42, &session, bank);
+        graphics.HandleStationMenuClick(220.0f + 25.0f,
+            54.0f + 150.0f);
+        const std::optional<ServerCommandData> withdrawal =
+            graphics.ConsumeBankCommand();
+        test.Expect(withdrawal.has_value() &&
+                std::holds_alternative<BankWithdrawCommand>(*withdrawal) &&
+                std::get<BankWithdrawCommand>(*withdrawal).quantity == 5,
+            "Bank storage clicks emit exact withdrawal commands");
+
+        SDL_SetRenderDrawColor(renderer, 3, 5, 7, 255);
+        SDL_RenderClear(renderer);
+        graphics.DrawStationMenu();
+        pixels = SDL_RenderReadPixels(renderer, nullptr);
+        test.Expect(pixels != nullptr &&
+                !IsColor(ReadPixel(pixels, 230.0f, 64.0f), 3, 5, 7),
+            "Bank panel renders as a bounded in-game modal");
+        if (pixels != nullptr) SDL_DestroySurface(pixels);
     }
 
     return test.Finish();

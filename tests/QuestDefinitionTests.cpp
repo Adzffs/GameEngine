@@ -16,10 +16,14 @@ int main()
 {
     TestContext test;
     const auto &definitions = QuestDefinitionDatabase::GetAll();
-    test.Expect(definitions.size() == 2 &&
+    test.Expect(definitions.size() == 6 &&
                     definitions[0].id == QuestId::GATHERING_BASICS &&
-                    definitions[1].id == QuestId::MINING_BASICS,
-                "Canonical catalogue contains both quests in stable ID order");
+                    definitions[1].id == QuestId::MINING_BASICS &&
+                    definitions[2].id == QuestId::TRACKS_IN_THE_ASH &&
+                    definitions[3].id == QuestId::SHIELD_OR_SHELTER &&
+                    definitions[4].id == QuestId::FANGS_AT_THE_GATE &&
+                    definitions[5].id == QuestId::HEART_OF_THE_ASH,
+                "Canonical catalogue contains all quests in stable ID order");
     const QuestDefinition *definition =
         QuestDefinitionDatabase::TryGet(QuestId::GATHERING_BASICS);
     test.Expect(definition != nullptr &&
@@ -90,6 +94,78 @@ int main()
     invalid = *definition; invalid.objectiveItem = ItemType::NONE;
     test.Expect(!QuestDefinitionDatabase::IsValidDefinition(invalid),
                 "Unknown objective item rejects");
+    QuestDefinition investigation = *definition;
+    investigation.objectiveType = QuestObjectiveType::TALK_TO_CHARACTER;
+    investigation.objectiveItem = ItemType::NONE;
+    investigation.objectiveNpc = NpcType::SERA_FLINT;
+    investigation.objectiveText = "Ask Sera about the tracks";
+    investigation.requiredAmount = 1;
+    test.Expect(QuestDefinitionDatabase::IsValidDefinition(investigation),
+                "A specific-character investigation objective validates");
+    investigation.objectiveNpc = NpcType::NONE;
+    test.Expect(!QuestDefinitionDatabase::IsValidDefinition(investigation),
+                "Investigation objectives require a real character");
+    investigation.objectiveNpc = NpcType::SERA_FLINT;
+    investigation.objectiveText = "";
+    test.Expect(!QuestDefinitionDatabase::IsValidDefinition(investigation),
+                "Investigation objectives require player-facing journal text");
+    QuestDefinition crafting = *definition;
+    crafting.objectiveType = QuestObjectiveType::CRAFT_ITEM;
+    crafting.objectiveItem = ItemType::WOODEN_PLANKS;
+    test.Expect(QuestDefinitionDatabase::IsValidDefinition(crafting),
+                "Crafting objectives accept a known output item");
+    crafting.objectiveItem = ItemType::NONE;
+    test.Expect(!QuestDefinitionDatabase::IsValidDefinition(crafting),
+                "Crafting objectives reject an unknown output item");
+    QuestDefinition choice = *definition;
+    choice.alternateCompletion = {
+        NpcType::NESSA_THORNE, DialogueId::NESSA_THORNE_INTRO,
+        DialogueNodeId::NESSA_THORNE_WELCOME, ItemType::COOKED_MEAT, 3};
+    test.Expect(QuestDefinitionDatabase::IsValidDefinition(choice),
+                "A complete alternate recipient and reward validates");
+    choice.alternateCompletion.rewardItem = ItemType::NONE;
+    test.Expect(!QuestDefinitionDatabase::IsValidDefinition(choice),
+                "A partial alternate completion definition rejects");
+    choice.alternateCompletion = {
+        definition->giver.npcType, definition->giver.dialogueId,
+        definition->giver.interactionNodeId, ItemType::COOKED_MEAT, 3};
+    test.Expect(!QuestDefinitionDatabase::IsValidDefinition(choice),
+                "Alternate completion must represent a real choice of recipient");
+    QuestDefinition combat = *definition;
+    combat.objectiveType = QuestObjectiveType::DEFEAT_CHARACTER;
+    combat.objectiveItem = ItemType::NONE;
+    combat.objectiveNpc = NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER;
+    combat.objectiveText = "Defeat the Ashfangs";
+    test.Expect(QuestDefinitionDatabase::IsValidDefinition(combat),
+                "Combat objectives accept a known monster type");
+    combat.objectiveNpc = NpcType::SERA_FLINT;
+    test.Expect(!QuestDefinitionDatabase::IsValidDefinition(combat),
+                "Combat objectives reject friendly characters as targets");
+    const QuestDefinition *conclusion =
+        QuestDefinitionDatabase::TryGet(QuestId::HEART_OF_THE_ASH);
+    test.Expect(conclusion != nullptr &&
+                    conclusion->objectiveNpc ==
+                        NpcType::ELITE_DEVELOPMENT_MONSTER &&
+                    conclusion->requiredAmount == 1 &&
+                    conclusion->giver.npcType == NpcType::DEVELOPMENT_GUIDE &&
+                    conclusion->alternateCompletion.npcType ==
+                        NpcType::BRANN_DEEPWELL &&
+                    conclusion->alternateCompletion.rewardItem ==
+                        ItemType::STEEL_BAR,
+                "Starter conclusion combines the elite fight with a reward choice");
+    QuestDefinition gated = *definition;
+    gated.id = QuestId::FANGS_AT_THE_GATE;
+    gated.initialState = QuestState::UNAVAILABLE;
+    gated.prerequisiteQuest = QuestId::SHIELD_OR_SHELTER;
+    test.Expect(QuestDefinitionDatabase::IsValidDefinition(gated),
+                "A locked quest may reference an earlier valid prerequisite");
+    gated.initialState = QuestState::AVAILABLE;
+    test.Expect(!QuestDefinitionDatabase::IsValidDefinition(gated),
+                "A prerequisite quest cannot start available");
+    gated.initialState = QuestState::UNAVAILABLE;
+    gated.prerequisiteQuest = gated.id;
+    test.Expect(!QuestDefinitionDatabase::IsValidDefinition(gated),
+                "A quest cannot require itself");
     invalid = *definition; invalid.requiredAmount = 0;
     test.Expect(!QuestDefinitionDatabase::IsValidDefinition(invalid),
                 "Non-positive requirement rejects");

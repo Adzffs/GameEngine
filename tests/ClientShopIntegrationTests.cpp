@@ -11,6 +11,11 @@ struct GraphicsTestAccess
     {
         graphics.shopPresentationState.Dismiss();
     }
+    static void SetInventory(Graphics &graphics, const Inventory &inventory)
+    {
+        graphics.displayedInventorySlots = inventory.GetSlots();
+        graphics.displayedCurrency = inventory.GetItemAmount(ItemType::COINS);
+    }
 };
 
 struct WorldTestAccess
@@ -127,6 +132,14 @@ int main()
                 "Authoritative shop opens in client presentation");
     player->GetInventory().AddItem(ItemType::COINS, 100);
     player->GetInventory().AddItem(ItemType::LOG, 2);
+    player->GetInventory().AddItem(ItemType::HEALING_TONIC, 2);
+    GraphicsTestAccess::SetInventory(graphics, player->GetInventory());
+    test.Expect(
+        graphics.GetShopItemDetail(ItemType::COOKED_MEAT) ==
+            "HEALS 5 | OWNED 0" &&
+        graphics.GetShopItemDetail(ItemType::HEALING_TONIC) ==
+            "HEALS 12 | STACKS | OWNED 2",
+        "Shop rows explain healing, stacking, and current ownership");
 
     const SDL_FRect buy = graphics.GetShopBuyButtonRectangle(0);
     const SDL_FRect sell = graphics.GetShopSellButtonRectangle(0);

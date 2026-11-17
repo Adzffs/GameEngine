@@ -19,6 +19,15 @@ namespace EngineClickRouting
         int mouseX,
         int mouseY)
     {
+        if (const GroundItem *groundItem =
+                world.GetGroundItemAt(clickedTileX, clickedTileY);
+            groundItem != nullptr)
+        {
+            world.EnqueueCommand(TakeGroundItemCommand{
+                playerID, groundItem->id});
+            return true;
+        }
+
         std::optional<int> monsterID =
             graphics.GetMonsterAtScreenPosition(
                 mouseX,

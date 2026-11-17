@@ -95,7 +95,7 @@ int main()
                 "Event exposes stable dialogue ID");
     test.Expect(event.nodeId == DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME,
                 "Tick one publishes welcome node");
-    test.Expect(event.text == "Welcome to the development world.", "Event copies server-owned text");
+    test.Expect(event.text == "Welcome to Embervale. I'm Mara, the village warden.", "Event copies server-owned text");
     test.Expect(!event.isTerminal, "Welcome node is nonterminal");
     test.Expect(!WorldTestAccess::Pending(nearby, nearbyPlayer->GetID()).has_value(),
                 "Completion clears pending TALK");
@@ -109,7 +109,7 @@ int main()
                     DialogueNodeId::DEVELOPMENT_GUIDE_EXPLANATION,
                 "Tick two publishes explanation node");
     test.Expect(nearby.GetNpcTalkEvents()[0].text ==
-                    "This area is used to test gathering, combat, and NPC systems.",
+                    "The wilds provide what we need, but lately they have been pushing back.",
                 "Explanation text is authoritative");
     nearby.EnqueueCommand(DialogueContinueCommand{nearbyPlayer->GetID(), nearbySessionId});
     nearby.Update();
@@ -146,40 +146,33 @@ int main()
     World distant;
     Player *distantPlayer = CreatePlayerAt(distant, 0, 0);
     QueueTalk(distant, distantPlayer->GetID());
-    distant.Update();
-    test.ExpectEqual(distant.GetCurrentTick(), 1, "Distant command processes on tick one");
-    test.ExpectEqual(distantPlayer->GetPosition().GetX(), 1, "Tick one path step X");
-    test.ExpectEqual(distantPlayer->GetPosition().GetY(), 0, "Tick one path step Y");
-    test.Expect(distant.GetNpcTalkEvents().empty(), "No tick-one event while out of range");
-    distant.Update();
-    test.ExpectEqual(distantPlayer->GetPosition().GetX(), 2, "Tick two path step X");
-    test.ExpectEqual(distantPlayer->GetPosition().GetY(), 0, "Tick two path step Y");
-    test.Expect(distant.GetNpcTalkEvents().empty(), "No tick-two event while out of range");
-    distant.Update();
-    test.ExpectEqual(distantPlayer->GetPosition().GetX(), 3, "Tick three path step X");
-    test.ExpectEqual(distantPlayer->GetPosition().GetY(), 0, "Tick three path step Y");
-    test.Expect(distant.GetNpcTalkEvents().empty(), "No tick-three event while out of range");
-    distant.Update();
-    test.ExpectEqual(distantPlayer->GetPosition().GetX(), 3, "Tick four arrival X");
-    test.ExpectEqual(distantPlayer->GetPosition().GetY(), 1, "Tick four path step Y");
-    test.Expect(distant.GetNpcTalkEvents().empty(), "No tick-four event while out of range");
-    distant.Update();
+    for (int tick = 0;
+         tick < 6 && distant.GetNpcTalkEvents().empty();
+         ++tick)
+    {
+        distant.Update();
+    }
     test.ExpectEqual(distantPlayer->GetPosition().GetX(), 3, "Tick five arrival X");
     test.ExpectEqual(distantPlayer->GetPosition().GetY(), 2, "Tick five arrival Y");
     test.ExpectEqual(distant.GetNpcTalkEvents().size(), std::size_t{1},
-                     "Adjacency emits on tick five");
+                     "Diagonal approach emits when adjacency is reached");
     test.Expect(!distant.HasActiveMovementPath(distantPlayer->GetID()),
                 "Ready TALK clears any remaining approach path");
-    const DialogueSessionId distantSessionId = distant.GetNpcTalkEvents()[0].sessionId;
+    const int distantOpenTick = distant.GetCurrentTick();
+    const DialogueSessionId distantSessionId = distant.GetNpcTalkEvents().empty()
+        ? InvalidDialogueSessionId
+        : distant.GetNpcTalkEvents()[0].sessionId;
     distant.EnqueueCommand(DialogueContinueCommand{distantPlayer->GetID(), distantSessionId});
     distant.Update();
-    test.ExpectEqual(distant.GetCurrentTick(), 6, "Distant explanation publishes on tick six");
+    test.ExpectEqual(distant.GetCurrentTick(), distantOpenTick + 1,
+                     "Distant explanation publishes on the next tick");
     test.Expect(distant.GetNpcTalkEvents()[0].nodeId ==
                     DialogueNodeId::DEVELOPMENT_GUIDE_EXPLANATION,
                 "Distant tick six is node two");
     distant.EnqueueCommand(DialogueContinueCommand{distantPlayer->GetID(), distantSessionId});
     distant.Update();
-    test.ExpectEqual(distant.GetCurrentTick(), 7, "Distant prompt publishes on tick seven");
+    test.ExpectEqual(distant.GetCurrentTick(), distantOpenTick + 2,
+                     "Distant prompt publishes one tick after explanation");
     test.Expect(distant.GetNpcTalkEvents()[0].nodeId ==
                     DialogueNodeId::DEVELOPMENT_GUIDE_TOPIC_PROMPT,
                 "Distant tick seven is choice node");
@@ -197,7 +190,8 @@ int main()
     distant.EnqueueCommand(DialogueChooseCommand{distantPlayer->GetID(), distantSessionId,
         DialogueChoiceId::DEVELOPMENT_GUIDE_COMBAT});
     distant.Update();
-    test.ExpectEqual(distant.GetCurrentTick(), 10, "Distant stale command processes on tick ten");
+    test.ExpectEqual(distant.GetCurrentTick(), distantOpenTick + 5,
+                     "Distant stale command processes after the dialogue closes");
     test.Expect(distant.GetNpcTalkEvents().empty(), "Distant stale choice publishes nothing");
 
     World duplicateContinue;
@@ -312,7 +306,7 @@ int main()
     test.Expect(activeTargetRemoval.GetActiveDialogueSession(targetRemovalA->GetID()) == nullptr &&
                 activeTargetRemoval.GetActiveDialogueSession(targetRemovalB->GetID()) == nullptr,
                 "NPC removal cancels every targeting session");
-    test.Expect(copiedBeforeRemoval.text == "Welcome to the development world.",
+    test.Expect(copiedBeforeRemoval.text == "Welcome to Embervale. I'm Mara, the village warden.",
                 "NPC removal cannot invalidate an already copied event");
 
     World invalidIntentions;

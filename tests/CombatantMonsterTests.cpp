@@ -259,7 +259,7 @@ int main()
                 1,
                 "Starter monster spawns on the configured Y tile");
 
-            CombatRatings expectedRatings{5, 4, 3, 30};
+            CombatRatings expectedRatings{3, 2, 2, 20};
 
             test.Expect(
                 AreEqual(
@@ -268,11 +268,11 @@ int main()
                 "Starter monster uses the configured combat ratings");
             test.ExpectEqual(
                 starterMonster->GetCurrentHealth(),
-                30,
+                20,
                 "Starter monster begins at full health");
             test.ExpectEqual(
                 starterMonster->GetMaximumHealth(),
-                30,
+                20,
                 "Starter monster maximum health matches the configured rating");
         }
 

@@ -83,7 +83,7 @@ namespace
             resourceType,
             "Valid resource",
             SkillType::WOODCUTTING,
-            1,
+            4,
             ToolType::AXE,
             10,
             ItemType::LOG,
@@ -141,7 +141,7 @@ int main()
 
         test.ExpectEqual(
             static_cast<int>(itemTypes.size()),
-            22,
+            23,
             "Every registered item type is enumerated");
         test.ExpectEqual(
             static_cast<int>(resourceTypes.size()),
@@ -149,11 +149,11 @@ int main()
             "Every registered resource type is enumerated");
         test.ExpectEqual(
             static_cast<int>(recipeTypes.size()),
-            5,
+            14,
             "Every registered recipe type is enumerated");
         test.ExpectEqual(
             static_cast<int>(rewardTableTypes.size()),
-            1,
+            4,
             "Every registered reward table type is enumerated");
 
         bool itemIDsMatch = true;

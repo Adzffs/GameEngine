@@ -10,7 +10,21 @@ namespace NpcSpawnDatabase
             {NpcSpawnId::PASSIVE_DEVELOPMENT_SPAWN, NpcType::PASSIVE_DEVELOPMENT_MONSTER,
              Position{6, 1}, 2, 5, 1, true},
             {NpcSpawnId::AGGRESSIVE_DEVELOPMENT_SPAWN, NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER,
-             Position{18, 2}, 0, 0, 1, true}};
+             Position{18, 2}, 0, 0, 1, true},
+            {NpcSpawnId::DURABLE_DEVELOPMENT_SPAWN, NpcType::DURABLE_DEVELOPMENT_MONSTER,
+             Position{16, 11}, 1, 7, 1, true},
+            {NpcSpawnId::ELITE_DEVELOPMENT_SPAWN, NpcType::ELITE_DEVELOPMENT_MONSTER,
+             Position{22, 3}, 0, 0, 1, true},
+            {NpcSpawnId::TORREN_ASH_SPAWN, NpcType::TORREN_ASH,
+             Position{16, 10}, 0, 0, 1, false},
+            {NpcSpawnId::ELIA_REED_SPAWN, NpcType::ELIA_REED,
+             Position{21, 2}, 0, 0, 1, false},
+            {NpcSpawnId::NESSA_THORNE_SPAWN, NpcType::NESSA_THORNE,
+             Position{4, 6}, 0, 0, 1, false},
+            {NpcSpawnId::BRANN_DEEPWELL_SPAWN, NpcType::BRANN_DEEPWELL,
+             Position{9, 10}, 0, 0, 1, false},
+            {NpcSpawnId::SERA_FLINT_SPAWN, NpcType::SERA_FLINT,
+             Position{17, 1}, 0, 0, 1, false}};
         return spawns;
     }
 
@@ -20,7 +34,11 @@ namespace NpcSpawnDatabase
             {NpcSpawnId::PASSIVE_DEVELOPMENT_SPAWN, NpcType::PASSIVE_DEVELOPMENT_MONSTER,
              Position{6, 1}, 2, 5, 1, true},
             {NpcSpawnId::AGGRESSIVE_DEVELOPMENT_SPAWN, NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER,
-             Position{18, 2}, 0, 0, 1, true}};
+             Position{18, 2}, 0, 0, 1, true},
+            {NpcSpawnId::DURABLE_DEVELOPMENT_SPAWN, NpcType::DURABLE_DEVELOPMENT_MONSTER,
+             Position{16, 11}, 1, 7, 1, true},
+            {NpcSpawnId::ELITE_DEVELOPMENT_SPAWN, NpcType::ELITE_DEVELOPMENT_MONSTER,
+             Position{22, 3}, 0, 0, 1, true}};
         return spawns;
     }
 

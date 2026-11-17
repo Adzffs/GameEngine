@@ -10,10 +10,12 @@
 #include "../src/Recipe/RecipeType.h"
 #include "../src/Stats/CombatRatings.h"
 #include "../src/World/Event/EntityDiedEvent.h"
+#include "../src/World/Development/DevelopmentWorldContent.h"
 #include "../src/World/Object/Station/CraftingStation.h"
 #include "../src/World/World.h"
 
 #include <memory>
+#include <filesystem>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -482,6 +484,8 @@ int main()
         Player *defender = GetPlayer(world, defenderID);
         Monster *attacker = GetMonster(world, attackerID);
 
+        defender->GetInventory().AddItem(ItemType::COAL, 3);
+
         attacker->GetPosition().SetPosition(11, 10);
         defender->GetPosition().SetPosition(10, 10);
         defender->ApplyDamage(defender->GetCurrentHealth() - 1);
@@ -512,6 +516,90 @@ int main()
                 attackerID,
                 "Monster kill records monster as killer");
         }
+
+        const World::PlayerDeathRecovery *recovery =
+            world.GetPlayerDeathRecovery(defenderID);
+        test.Expect(recovery != nullptr,
+            "Player death schedules a visible recovery state");
+        if (recovery != nullptr)
+        {
+            test.ExpectEqual(recovery->killerEntityID, attackerID,
+                "Recovery state explains which entity caused the death");
+            test.ExpectEqual(recovery->deathX, 10,
+                "Recovery state records the death location");
+            test.ExpectEqual(recovery->deathY, 10,
+                "Recovery state records the death location Y");
+        }
+
+        const PlayerRecoveryPile *pile =
+            world.GetPlayerRecoveryPile(defenderID);
+        test.Expect(pile != nullptr,
+            "Player death protects ordinary inventory in a recovery pile");
+        test.ExpectEqual(defender->GetInventory().GetItemAmount(ItemType::COAL),
+            0, "Recovered items leave the respawn inventory");
+        for (int tick = 0; tick < 3; ++tick)
+        {
+            world.Update();
+        }
+
+        test.Expect(!defender->IsAlive(),
+            "Player remains dead until the recovery delay expires");
+        world.Update();
+        test.Expect(defender->IsAlive(),
+            "Player respawns when the recovery delay expires");
+        test.ExpectEqual(defender->GetCurrentHealth(),
+            defender->GetMaximumHealth(),
+            "Respawn restores the player to full health");
+        test.ExpectEqual(defender->GetPosition().GetX(),
+            DevelopmentWorldContent::PlayerSpawnX,
+            "Respawn returns the player to the village safe point X");
+        test.ExpectEqual(defender->GetPosition().GetY(),
+            DevelopmentWorldContent::PlayerSpawnY,
+            "Respawn returns the player to the village safe point Y");
+        test.Expect(world.GetPlayerDeathRecovery(defenderID) == nullptr,
+            "Completed recovery no longer remains pending");
+
+        const std::filesystem::path recoverySavePath =
+            std::filesystem::temp_directory_path() /
+            "gameengine_recovery_pile_roundtrip.save";
+        std::filesystem::remove(recoverySavePath);
+        test.Expect(world.SavePlayerToFile(defenderID, recoverySavePath).IsSuccess(),
+            "Outstanding recovery pile saves with the living player");
+        World loadedWorld(71U, 72U, 73U);
+        const WorldPlayerLoadResult loaded =
+            loadedWorld.LoadOrCreatePlayerFromFile(recoverySavePath);
+        Player *loadedPlayer = dynamic_cast<Player *>(
+            loadedWorld.GetEntityByID(loaded.GetPlayerEntityID()));
+        const PlayerRecoveryPile *loadedPile = loadedPlayer == nullptr
+            ? nullptr
+            : loadedWorld.GetPlayerRecoveryPile(loadedPlayer->GetID());
+        test.Expect(loaded.IsSuccess() && loadedPlayer != nullptr &&
+                loadedPile != nullptr &&
+                loadedPlayer->GetInventory().GetItemAmount(ItemType::COAL) == 0,
+            "Load restores protected items only in the recovery pile");
+        if (loadedPlayer != nullptr && loadedPile != nullptr)
+        {
+            loadedPlayer->GetPosition().SetPosition(
+                loadedPile->position.GetX(), loadedPile->position.GetY());
+            loadedWorld.Update();
+            test.ExpectEqual(
+                loadedPlayer->GetInventory().GetItemAmount(ItemType::COAL), 3,
+                "Loaded recovery pile can be reclaimed exactly once");
+            test.Expect(loadedWorld.GetPlayerRecoveryPile(
+                    loadedPlayer->GetID()) == nullptr,
+                "Loaded recovery claim removes persisted pile state");
+        }
+        std::filesystem::remove(recoverySavePath);
+
+        defender->GetPosition().SetPosition(10, 10);
+        world.Update();
+        test.ExpectEqual(defender->GetInventory().GetItemAmount(ItemType::COAL),
+            3, "Returning to the death location restores pile items");
+        test.Expect(world.GetPlayerRecoveryPile(defenderID) == nullptr,
+            "Claimed recovery pile cannot be collected twice");
+        world.Update();
+        test.ExpectEqual(defender->GetInventory().GetItemAmount(ItemType::COAL),
+            3, "Repeated updates cannot duplicate recovered items");
     }
 
     {

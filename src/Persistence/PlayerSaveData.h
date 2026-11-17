@@ -6,11 +6,14 @@
 #include "../Skills/SkillType.h"
 #include "../Quest/QuestState.h"
 #include "../Quest/QuestId.h"
+#include "../Tutorial/TutorialState.h"
+#include "../Combat/CombatStyle.h"
+#include "../Recipe/RecipeType.h"
 
 #include <array>
 #include <vector>
 
-inline constexpr int CURRENT_PLAYER_SAVE_VERSION = 4;
+inline constexpr int CURRENT_PLAYER_SAVE_VERSION = 13;
 
 struct SavedInventorySlot
 {
@@ -37,6 +40,21 @@ struct SavedQuestRecord
     int progress = 0;
 };
 
+struct SavedBankEntry
+{
+    ItemType itemType = ItemType::NONE;
+    int quantity = 0;
+};
+
+struct SavedRecoveryPile
+{
+    bool active = false;
+    int positionX = 0;
+    int positionY = 0;
+    int remainingTicks = 0;
+    std::vector<SavedBankEntry> items;
+};
+
 struct PlayerSaveData
 {
     int version = CURRENT_PLAYER_SAVE_VERSION;
@@ -47,4 +65,10 @@ struct PlayerSaveData
     std::vector<SavedSkillXP> skills;
     std::vector<SavedEquipmentSlot> equipment;
     std::vector<SavedQuestRecord> quests;
+    std::vector<SavedBankEntry> bank;
+    TutorialStep tutorialStep = TutorialStep::MEET_GUIDE;
+    bool tutorialSkipped = false;
+    CombatStyle combatStyle = CombatStyle::ACCURATE;
+    std::vector<RecipeType> knownRecipes;
+    SavedRecoveryPile recoveryPile;
 };

@@ -132,8 +132,8 @@ int main()
     {
         test.ExpectEqual(retaliationAction->GetStartTick(), 5,
                          "Retaliation action starts on exact attack tick five");
-        test.ExpectEqual(retaliationAction->GetCompletionTick(), 10,
-                         "Passive attack timing remains exactly five ticks");
+        test.ExpectEqual(retaliationAction->GetCompletionTick(), 11,
+                         "Passive practice attack keeps its readable six-tick cadence");
         test.ExpectEqual(retaliationAction->GetTargetID(), playerId,
                          "Retaliation establishes the attacking player as target");
     }

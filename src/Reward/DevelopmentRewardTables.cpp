@@ -4,6 +4,26 @@
 
 namespace DevelopmentRewardTables
 {
+    namespace
+    {
+        RewardTable MakeTable(
+            ItemType guaranteedType, int guaranteedMinimum,
+            int guaranteedMaximum, ItemType commonType,
+            int commonMinimum, int commonMaximum, ItemType rareType,
+            int rareMinimum, int rareMaximum)
+        {
+            RewardTable table;
+            if (!table.AddGuaranteed(guaranteedType, guaranteedMinimum,
+                    guaranteedMaximum).valid ||
+                !table.AddWeighted(commonType, commonMinimum, commonMaximum,
+                    80).valid ||
+                !table.AddWeighted(rareType, rareMinimum, rareMaximum,
+                    20).valid)
+                throw std::logic_error("Invalid authored monster reward table");
+            return table;
+        }
+    }
+
     const RewardTable &
     GetDevelopmentMonsterRewardTable()
     {
@@ -65,6 +85,33 @@ namespace DevelopmentRewardTables
             return rewardTable;
         }();
 
+        return table;
+    }
+
+    const RewardTable &GetAggressiveMonsterRewardTable()
+    {
+        static const RewardTable table = MakeTable(
+            ItemType::COOKED_MEAT, 1, 1,
+            ItemType::COINS, 3, 7,
+            ItemType::IRON_ORE, 1, 2);
+        return table;
+    }
+
+    const RewardTable &GetDurableMonsterRewardTable()
+    {
+        static const RewardTable table = MakeTable(
+            ItemType::IRON_ORE, 2, 3,
+            ItemType::COAL, 2, 4,
+            ItemType::STEEL_BAR, 1, 1);
+        return table;
+    }
+
+    const RewardTable &GetEliteMonsterRewardTable()
+    {
+        static const RewardTable table = MakeTable(
+            ItemType::STEEL_BAR, 2, 3,
+            ItemType::COINS, 20, 35,
+            ItemType::STEEL_AXE, 1, 1);
         return table;
     }
 }

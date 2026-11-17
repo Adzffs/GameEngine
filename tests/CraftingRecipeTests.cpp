@@ -9,6 +9,7 @@
 #include "../src/Player/PlayerInitializationMode.h"
 #include "../src/Recipe/CraftingRecipeMatcher.h"
 #include "../src/Recipe/RecipeDatabase.h"
+#include "../src/Recipe/RecipeProductionPacing.h"
 #include "../src/Recipe/RecipeSystem.h"
 
 int main()
@@ -23,6 +24,18 @@ int main()
         static_cast<int>(RecipeType::WOODEN_SHIELD),
         5,
         "Wooden-shield recipe keeps a stable appended numeric ID");
+    test.ExpectEqual(
+        static_cast<int>(RecipeType::BRONZE_AXE), 6,
+        "Forged equipment recipes append after existing recipe IDs");
+    test.ExpectEqual(
+        static_cast<int>(RecipeType::BRONZE_SWORD), 12,
+        "Forged equipment recipe range remains stable");
+    test.ExpectEqual(
+        static_cast<int>(RecipeType::OAK_PLANKS), 13,
+        "Oak plank recipe appends after forged equipment IDs");
+    test.ExpectEqual(
+        static_cast<int>(RecipeType::WILLOW_PLANKS), 14,
+        "Willow plank recipe keeps its stable appended ID");
     test.ExpectEqual(
         static_cast<int>(ItemType::WOODEN_PLANKS),
         22,
@@ -45,6 +58,33 @@ int main()
         RecipeDatabase::Get(RecipeType::WOODEN_PLANKS);
     const RecipeDefinition &shield =
         RecipeDatabase::Get(RecipeType::WOODEN_SHIELD);
+    const RecipeDefinition &ironPickaxe =
+        RecipeDatabase::Get(RecipeType::IRON_PICKAXE);
+    const RecipeDefinition &steelAxe =
+        RecipeDatabase::Get(RecipeType::STEEL_AXE);
+    const RecipeDefinition &oakPlanks =
+        RecipeDatabase::Get(RecipeType::OAK_PLANKS);
+    const RecipeDefinition &willowPlanks =
+        RecipeDatabase::Get(RecipeType::WILLOW_PLANKS);
+
+    test.ExpectEqual(
+        RecipeProductionPacing::GetDurationTicks(
+            RecipeDatabase::Get(RecipeType::BRONZE_BAR), 1),
+        3,
+        "A newly learned recipe keeps its authored production time");
+    test.ExpectEqual(
+        RecipeProductionPacing::GetDurationTicks(
+            RecipeDatabase::Get(RecipeType::BRONZE_BAR), 11),
+        2,
+        "Ten skill levels of recipe mastery shorten routine production");
+    test.ExpectEqual(
+        RecipeProductionPacing::GetDurationTicks(steelAxe, 99),
+        3,
+        "Recipe mastery is capped at half of the authored production time");
+    test.ExpectEqual(
+        RecipeProductionPacing::GetDurationTicks(planks, 99),
+        1,
+        "Recipes without a governing skill keep their authored production time");
 
     test.Expect(
         planks.GetRequiredStationType() ==
@@ -66,6 +106,31 @@ int main()
             shield.GetIngredients()[0].amount == 6 &&
             !shield.RepeatsWhileValid(),
         "Wooden shield is a six-plank shaped non-repeating recipe");
+    test.Expect(
+        ironPickaxe.GetRequiredStationType() == StationType::FURNACE &&
+            ironPickaxe.GetRequiredSkill() == SkillType::SMITHING &&
+            ironPickaxe.GetRequiredLevel() == 10 &&
+            ironPickaxe.GetIngredients().size() == 2 &&
+            ironPickaxe.GetIngredients()[0].itemType == ItemType::IRON_BAR &&
+            ironPickaxe.GetIngredients()[0].amount == 3 &&
+            ironPickaxe.GetIngredients()[1].itemType == ItemType::WOODEN_PLANKS &&
+            ironPickaxe.GetIngredients()[1].amount == 2 &&
+            ironPickaxe.GetOutputItem() == ItemType::IRON_PICKAXE,
+        "Iron pickaxe has a deterministic mid-tier forging path");
+    test.Expect(
+        steelAxe.GetRequiredLevel() == 20 &&
+            steelAxe.GetIngredients()[0].itemType == ItemType::STEEL_BAR &&
+            steelAxe.GetOutputItem() == ItemType::STEEL_AXE,
+        "Steel axe has a deterministic high-tier alternative to its rare drop");
+    test.Expect(
+        oakPlanks.GetRequiredLevel() == 5 &&
+            oakPlanks.GetOutputItem() == ItemType::WOODEN_PLANKS &&
+            oakPlanks.GetOutputAmount() == 6 &&
+            !oakPlanks.RepeatsWhileValid() &&
+            willowPlanks.GetRequiredLevel() == 10 &&
+            willowPlanks.GetOutputAmount() == 8 &&
+            !willowPlanks.RepeatsWhileValid(),
+        "Higher timber tiers convert to progressively more planks");
 
     CraftingRecipeMatcher::Grid grid{};
     grid[8] = ItemType::LOG;
@@ -76,6 +141,17 @@ int main()
     test.Expect(
         CraftingRecipeMatcher::FindMatch(grid) == nullptr,
         "Shapeless recipe rejects extra materials");
+
+    grid = {};
+    grid[3] = ItemType::OAK_LOG;
+    test.Expect(
+        CraftingRecipeMatcher::FindMatch(grid) == &oakPlanks,
+        "A single Oak log discovers the improved Oak plank recipe");
+    grid = {};
+    grid[5] = ItemType::WILLOW_LOG;
+    test.Expect(
+        CraftingRecipeMatcher::FindMatch(grid) == &willowPlanks,
+        "A single Willow log discovers the best plank-yield recipe");
 
     grid = {
         ItemType::WOODEN_PLANKS, ItemType::NONE, ItemType::WOODEN_PLANKS,
@@ -225,6 +301,31 @@ int main()
             player.GetInventory().GetItemAmount(
                 ItemType::WOODEN_SHIELD) == 1,
         "Shield transaction consumes exactly six planks and adds one shield");
+
+    Player smith(3, PlayerInitializationMode::EMPTY);
+    smith.GetInventory().AddItem(ItemType::BRONZE_BAR, 3);
+    smith.GetInventory().AddItem(ItemType::WOODEN_PLANKS, 1);
+    test.Expect(
+        RecipeSystem::TryCreateRecipe(smith, RecipeType::BRONZE_SWORD),
+        "A level-one smith can forge the first combat upgrade");
+    test.Expect(
+        smith.GetInventory().GetItemAmount(ItemType::BRONZE_BAR) == 0 &&
+            smith.GetInventory().GetItemAmount(ItemType::WOODEN_PLANKS) == 0 &&
+            smith.GetInventory().GetItemAmount(ItemType::BRONZE_SWORD) == 1,
+        "Forging consumes metal and timber atomically and creates the equipment");
+
+    Player lumberer(4);
+    lumberer.GetInventory().AddItem(ItemType::OAK_LOG, 1);
+    lumberer.GetInventory().AddItem(ItemType::WILLOW_LOG, 1);
+    test.Expect(
+        RecipeSystem::TryCreateRecipe(lumberer, RecipeType::OAK_PLANKS) &&
+            RecipeSystem::TryCreateRecipe(lumberer, RecipeType::WILLOW_PLANKS),
+        "A skilled woodcutter can process both higher timber tiers");
+    test.Expect(
+        lumberer.GetInventory().GetItemAmount(ItemType::OAK_LOG) == 0 &&
+            lumberer.GetInventory().GetItemAmount(ItemType::WILLOW_LOG) == 0 &&
+            lumberer.GetInventory().GetItemAmount(ItemType::WOODEN_PLANKS) == 14,
+        "Oak and Willow yields combine into fourteen useful planks");
 
     Player fullPlayer(2, PlayerInitializationMode::EMPTY);
     fullPlayer.GetInventory().AddItem(ItemType::WOODEN_PLANKS, 7);

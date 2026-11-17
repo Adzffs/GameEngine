@@ -93,8 +93,10 @@ set(GAMEENGINE_CORE_SOURCES
     src/World/Object/Resource/ResourceDatabase.cpp
     src/Recipe/RecipeDefinition.cpp
     src/Recipe/RecipeDatabase.cpp
+    src/Recipe/RecipeBook.cpp
     src/Recipe/CraftingRecipeMatcher.cpp
     src/Recipe/CraftingSessionSystem.cpp
+    src/Recipe/CraftingInteractionModel.cpp
     src/Recipe/RecipeActionSystem.cpp
     src/Recipe/RecipeSystem.cpp
     src/Requirement/RequirementEvaluator.cpp
@@ -219,8 +221,12 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(QuestDialogueIntegrationTests tests/QuestDialogueIntegrationTests.cpp)
     add_gameengine_headless_test(QuestPersistenceTests tests/QuestPersistenceTests.cpp)
     add_gameengine_headless_test(QuestPresentationStateTests tests/QuestPresentationStateTests.cpp)
+    add_gameengine_headless_test(ProgressionPresentationStateTests tests/ProgressionPresentationStateTests.cpp)
+    add_gameengine_headless_test(StarterRegionTests tests/StarterRegionTests.cpp)
     add_gameengine_headless_test(MiningBasicsQuestTests tests/MiningBasicsQuestTests.cpp)
     add_gameengine_headless_test(RecipeActionSystemTests tests/RecipeActionSystemTests.cpp)
+    add_gameengine_headless_test(RecipeBookTests tests/RecipeBookTests.cpp)
+    add_gameengine_headless_test(RecipeDiscoveryIntegrationTests tests/RecipeDiscoveryIntegrationTests.cpp)
     add_gameengine_headless_test(CraftingRecipeTests tests/CraftingRecipeTests.cpp)
     add_gameengine_headless_test(CraftingTableWorldTests tests/CraftingTableWorldTests.cpp)
     add_gameengine_headless_test(CraftingSessionTests tests/CraftingSessionTests.cpp)
@@ -248,6 +254,7 @@ if(BUILD_TESTING)
         add_gameengine_graphics_test(MonsterGraphicsTests tests/MonsterGraphicsTests.cpp)
         add_gameengine_graphics_test(MeleeClickIntegrationTests tests/MeleeClickIntegrationTests.cpp)
         add_gameengine_graphics_test(CombatFeedbackTests tests/CombatFeedbackTests.cpp)
+        add_gameengine_graphics_test(CameraPresentationTests tests/CameraPresentationTests.cpp)
         add_gameengine_graphics_test(MonsterRetaliationTests tests/MonsterRetaliationTests.cpp)
         add_gameengine_graphics_test(QuestGraphicsTests tests/QuestGraphicsTests.cpp)
         add_gameengine_graphics_test(CraftingTableGraphicsTests tests/CraftingTableGraphicsTests.cpp)

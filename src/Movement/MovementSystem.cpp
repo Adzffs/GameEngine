@@ -3,6 +3,7 @@
 #include "Movement.h"
 #include "../Entity/Manager/EntityManager.h"
 #include "../Pathfinding/Pathfinder.h"
+#include "../Player/Player.h"
 #include "../World/Map.h"
 
 #include <algorithm>
@@ -158,6 +159,21 @@ std::vector<MovementOutcome> MovementSystem::Process(
         if (Movement::Move(entity, map, changeX, changeY))
         {
             activePath.remainingSteps.pop_front();
+
+            Player *player = dynamic_cast<Player *>(&entity);
+            const bool runningThisUpdate =
+                player != nullptr && player->TryConsumeRunStamina();
+            if (runningThisUpdate && !activePath.remainingSteps.empty())
+            {
+                const Position runStep = activePath.remainingSteps.front();
+                const int runChangeX = runStep.GetX() - entity.GetPosition().GetX();
+                const int runChangeY = runStep.GetY() - entity.GetPosition().GetY();
+                if (Movement::Move(entity, map, runChangeX, runChangeY))
+                {
+                    activePath.remainingSteps.pop_front();
+                }
+            }
+
             const bool arrived = activePath.remainingSteps.empty();
             outcomes.push_back(MovementOutcome{
                 entityID,
@@ -187,9 +203,15 @@ std::vector<MovementOutcome> MovementSystem::Process(
             const int firstChangeX = firstStep.x - entity.GetPosition().GetX();
             const int firstChangeY = firstStep.y - entity.GetPosition().GetY();
             validReplacement =
-                (((firstChangeX == -1 || firstChangeX == 1) && firstChangeY == 0) ||
-                 (firstChangeX == 0 && (firstChangeY == -1 || firstChangeY == 1))) &&
-                map.IsValidPosition(firstStep.x, firstStep.y);
+                firstChangeX >= -1 && firstChangeX <= 1 &&
+                firstChangeY >= -1 && firstChangeY <= 1 &&
+                (firstChangeX != 0 || firstChangeY != 0) &&
+                map.IsValidPosition(firstStep.x, firstStep.y) &&
+                (firstChangeX == 0 || firstChangeY == 0 ||
+                 (map.IsValidPosition(entity.GetPosition().GetX() + firstChangeX,
+                                      entity.GetPosition().GetY()) &&
+                  map.IsValidPosition(entity.GetPosition().GetX(),
+                                      entity.GetPosition().GetY() + firstChangeY)));
         }
 
         if (!validReplacement)

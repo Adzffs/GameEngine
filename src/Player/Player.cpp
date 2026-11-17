@@ -66,14 +66,6 @@ Player::Player(
             ItemType::BRONZE_PICKAXE,
             1);
 
-        inventory.AddItem(
-            ItemType::IRON_PICKAXE,
-            1);
-
-        inventory.AddItem(
-            ItemType::STEEL_PICKAXE,
-            1);
-
         if (DevelopmentConfig::ENABLE_TEST_PLAYER)
         {
             skills.AddXP(
@@ -97,6 +89,25 @@ Player::Player(
 void Player::Update(World &world)
 {
     (void)world;
+    if (spentRunStaminaThisTick)
+    {
+        spentRunStaminaThisTick = false;
+    }
+    else if (runStamina < MaximumRunStamina)
+    {
+        runStamina++;
+    }
+}
+
+bool Player::TryConsumeRunStamina()
+{
+    if (!runningEnabled || runStamina <= 0)
+    {
+        return false;
+    }
+    runStamina--;
+    spentRunStaminaThisTick = true;
+    return true;
 }
 Inventory &Player::GetInventory()
 {
@@ -277,11 +288,25 @@ void Player::RestoreHealthToFull()
 
 CombatRatings Player::GetCombatRatings() const
 {
-    return CombatRatings{
+    CombatRatings ratings{
         GetTotalStat(StatType::ATTACK_ACCURACY),
         GetTotalStat(StatType::MELEE_STRENGTH),
         GetTotalStat(StatType::DEFENCE),
         GetTotalStat(StatType::MAX_HEALTH)};
+    if (combatStyle == CombatStyle::ACCURATE)
+        ratings.attackAccuracy += 3;
+    else if (combatStyle == CombatStyle::AGGRESSIVE)
+        ratings.meleeStrength += 10;
+    else if (combatStyle == CombatStyle::DEFENSIVE)
+        ratings.defence += 3;
+    return ratings;
+}
+
+bool Player::TrySetCombatStyle(CombatStyle style)
+{
+    if (!IsValidCombatStyle(style)) return false;
+    combatStyle = style;
+    return true;
 }
 
 CombatFormulas::MeleeCombatProfile Player::GetMeleeCombatProfile() const

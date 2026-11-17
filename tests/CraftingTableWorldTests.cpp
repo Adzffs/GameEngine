@@ -2,9 +2,11 @@
 
 #include "../src/Action/Action.h"
 #include "../src/Command/CommandProcessingResult.h"
+#include "../src/NPC/NPC.h"
 #include "../src/Player/Player.h"
 #include "../src/Recipe/CraftingRecipeMatcher.h"
 #include "../src/Recipe/RecipeDatabase.h"
+#include "../src/Quest/QuestSystem.h"
 #include "../src/World/World.h"
 
 namespace
@@ -29,6 +31,16 @@ namespace
     {
         return dynamic_cast<Player *>(
             world.GetEntityByID(world.CreatePlayer()));
+    }
+
+    NPC *FindNpc(World &world, NpcType type)
+    {
+        for (const auto &entity : world.GetEntities())
+        {
+            auto *npc = dynamic_cast<NPC *>(entity.get());
+            if (npc != nullptr && npc->GetNpcType() == type) return npc;
+        }
+        return nullptr;
     }
 
     bool OpenStation(
@@ -84,8 +96,36 @@ int main()
     {
         World world;
         Player *player = CreatePlayer(world);
+        QuestSystem::TryRestore(player->GetQuestJournal(), {
+            {QuestId::GATHERING_BASICS, QuestState::AVAILABLE, 0},
+            {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0},
+            {QuestId::TRACKS_IN_THE_ASH, QuestState::COMPLETED, 1},
+            {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0},
+            {QuestId::FANGS_AT_THE_GATE, QuestState::UNAVAILABLE, 0},
+            {QuestId::HEART_OF_THE_ASH, QuestState::UNAVAILABLE, 0}});
+        NPC *torren = FindNpc(world, NpcType::TORREN_ASH);
+        if (player != nullptr && torren != nullptr)
+        {
+            player->GetPosition().SetPosition(
+                torren->GetPosition().GetX() - 1,
+                torren->GetPosition().GetY());
+            world.EnqueueCommand(NpcInteractionCommand{
+                player->GetID(), torren->GetID(), NpcInteractionType::TALK});
+            world.Update();
+            const ActiveDialogueSession *session =
+                world.GetActiveDialogueSession(player->GetID());
+            if (session != nullptr)
+            {
+                world.EnqueueCommand(QuestAcceptCommand{
+                    player->GetID(), torren->GetID(), session->sessionId,
+                    QuestId::SHIELD_OR_SHELTER});
+                world.Update();
+            }
+        }
         test.Expect(
-            player != nullptr &&
+            player != nullptr && torren != nullptr &&
+                player->GetQuestJournal().TryGet(
+                    QuestId::SHIELD_OR_SHELTER)->state == QuestState::ACTIVE &&
                 OpenStation(
                     world,
                     *player,
@@ -133,8 +173,11 @@ int main()
                 ItemType::WOODEN_PLANKS) == 0 &&
                 player->GetInventory().GetItemAmount(
                     ItemType::WOODEN_SHIELD) == 1 &&
-                world.GetActionForEntity(player->GetID()) == nullptr,
-            "Shield completes once with an exact six-plank transaction");
+                world.GetActionForEntity(player->GetID()) == nullptr &&
+                player->GetQuestJournal().TryGet(
+                    QuestId::SHIELD_OR_SHELTER)->state ==
+                    QuestState::READY_TO_COMPLETE,
+            "Shield completes once and advances the real crafting dilemma");
     }
 
     {

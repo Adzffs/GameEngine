@@ -3,6 +3,7 @@
 #include "../src/Inventory/ItemType.h"
 #include "../src/Core/RandomSource.h"
 #include "../src/Movement/MovementDestinationRequest.h"
+#include "../src/NPC/NPC.h"
 #include "../src/Persistence/PlayerSaveFileStore.h"
 #include "../src/Persistence/PlayerSaveState.h"
 #include "../src/Persistence/WorldPlayerPersistenceLifecycle.h"
@@ -167,7 +168,8 @@ int main()
                         secondStart.Contains(
                             WorldPlayerPersistenceLifecycleIssueCode::ALREADY_STARTED),
                     "Start twice fails deterministically");
-        test.Expect(world.GetEntityByID(5) == nullptr && world.CreatePlayer() == 5,
+        test.Expect(dynamic_cast<NPC *>(world.GetEntityByID(7)) != nullptr &&
+                        world.CreatePlayer() == 12,
                     "Second Start creates no Player and consumes no runtime ID");
     }
 

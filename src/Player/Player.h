@@ -3,6 +3,7 @@
 #include "../Entity/Entity.h"
 #include "../Combat/Combatant.h"
 #include "../Combat/CombatFormulas.h"
+#include "../Combat/CombatStyle.h"
 #include "../Inventory/Inventory.h"
 #include "../Skills/SkillSet.h"
 #include "../Equipment/Equipment.h"
@@ -12,6 +13,9 @@
 #include "../StatusEffect/StatusEffectManager.h"
 #include "PlayerInitializationMode.h"
 #include "../Quest/QuestJournal.h"
+#include "../Bank/Bank.h"
+#include "../Tutorial/TutorialState.h"
+#include "../Recipe/RecipeBook.h"
 
 class World;
 
@@ -27,6 +31,12 @@ public:
 
     Inventory &GetInventory();
     const Inventory &GetInventory() const;
+    Bank &GetBank() { return bank; }
+    const Bank &GetBank() const { return bank; }
+    TutorialState &GetTutorialState() { return tutorialState; }
+    const TutorialState &GetTutorialState() const { return tutorialState; }
+    RecipeBook &GetRecipeBook() { return recipeBook; }
+    const RecipeBook &GetRecipeBook() const { return recipeBook; }
 
     SkillSet &GetSkills();
     const SkillSet &GetSkills() const;
@@ -52,7 +62,15 @@ public:
     void Heal(int amount);
     void RestoreHealthToFull();
 
+    static constexpr int MaximumRunStamina = 100;
+    int GetRunStamina() const { return runStamina; }
+    bool IsRunningEnabled() const { return runningEnabled; }
+    void ToggleRunning() { runningEnabled = !runningEnabled; }
+    bool TryConsumeRunStamina();
+
     CombatRatings GetCombatRatings() const override;
+    CombatStyle GetCombatStyle() const { return combatStyle; }
+    bool TrySetCombatStyle(CombatStyle style);
     CombatFormulas::MeleeCombatProfile GetMeleeCombatProfile() const;
 
     // Call after changes that can affect derived stats such as maximum health.
@@ -60,6 +78,9 @@ public:
 
 private:
     Inventory inventory;
+    Bank bank;
+    TutorialState tutorialState;
+    RecipeBook recipeBook;
 
     SkillSet skills;
 
@@ -69,4 +90,8 @@ private:
 
     HealthPool healthPool;
     QuestJournal questJournal;
+    CombatStyle combatStyle = CombatStyle::ACCURATE;
+    int runStamina = MaximumRunStamina;
+    bool runningEnabled = false;
+    bool spentRunStaminaThisTick = false;
 };
