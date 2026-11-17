@@ -70,7 +70,8 @@ bool QuestDefinitionDatabase::IsValidDefinition(
         definition.initialState == QuestState::AVAILABLE ||
         definition.initialState == QuestState::UNAVAILABLE;
     const bool validObjective =
-        definition.objectiveType == QuestObjectiveType::GATHER_ITEM
+        (definition.objectiveType == QuestObjectiveType::GATHER_ITEM ||
+         definition.objectiveType == QuestObjectiveType::CRAFT_ITEM)
             ? IsKnownItem(definition.objectiveItem)
             : definition.objectiveType == QuestObjectiveType::TALK_TO_CHARACTER &&
                 definition.objectiveItem == ItemType::NONE &&

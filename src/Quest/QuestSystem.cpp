@@ -100,6 +100,37 @@ std::vector<QuestId> QuestSystem::RecordTalkedToAgainstDefinitions(
     return changed;
 }
 
+std::vector<QuestId> QuestSystem::RecordCrafted(
+    QuestJournal &journal, ItemType itemType, int quantity)
+{
+    return RecordCraftedAgainstDefinitions(journal, itemType, quantity,
+        QuestDefinitionDatabase::GetAll());
+}
+
+std::vector<QuestId> QuestSystem::RecordCraftedAgainstDefinitions(
+    QuestJournal &journal, ItemType itemType, int quantity,
+    const std::vector<QuestDefinition> &definitions)
+{
+    std::vector<QuestId> changed;
+    if (itemType == ItemType::NONE || quantity <= 0) return changed;
+    for (const QuestDefinition &definition : definitions)
+    {
+        auto found = journal.records.find(definition.id);
+        if (found == journal.records.end() ||
+            found->second.state != QuestState::ACTIVE ||
+            definition.objectiveType != QuestObjectiveType::CRAFT_ITEM ||
+            definition.objectiveItem != itemType)
+            continue;
+        QuestRecord &record = found->second;
+        record.progress = std::min(definition.requiredAmount,
+            record.progress + quantity);
+        if (record.progress == definition.requiredAmount)
+            record.state = QuestState::READY_TO_COMPLETE;
+        changed.push_back(definition.id);
+    }
+    return changed;
+}
+
 bool QuestSystem::Complete(
     QuestJournal &journal, QuestId questId, Inventory &inventory)
 {

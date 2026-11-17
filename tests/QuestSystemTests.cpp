@@ -51,6 +51,13 @@ struct QuestSystemTestAccess
         return QuestSystem::RecordTalkedToAgainstDefinitions(
             journal, npcType, definitions);
     }
+    static std::vector<QuestId> RecordCrafted(
+        QuestJournal &journal, ItemType itemType, int quantity,
+        const std::vector<QuestDefinition> &definitions)
+    {
+        return QuestSystem::RecordCraftedAgainstDefinitions(
+            journal, itemType, quantity, definitions);
+    }
 };
 
 int main()
@@ -167,5 +174,28 @@ int main()
                     investigationJournal.TryGet(investigation.id)->state ==
                         QuestState::READY_TO_COMPLETE,
                 "Talking to the authored character completes an investigation objective");
+
+    QuestDefinition crafting = first;
+    crafting.objectiveType = QuestObjectiveType::CRAFT_ITEM;
+    crafting.objectiveItem = ItemType::WOODEN_PLANKS;
+    crafting.requiredAmount = 4;
+    std::vector<QuestDefinition> craftingDefinitions{crafting};
+    QuestJournal craftingJournal =
+        QuestJournalTestAccess::FromDefinitions(craftingDefinitions);
+    QuestJournalTestAccess::ActivateAll(craftingJournal);
+    test.Expect(QuestSystemTestAccess::RecordCrafted(craftingJournal,
+                    ItemType::LOG, 4, craftingDefinitions).empty() &&
+                    QuestSystemTestAccess::RecordCrafted(craftingJournal,
+                    ItemType::WOODEN_PLANKS, 0, craftingDefinitions).empty(),
+                "Wrong outputs and failed crafts do not advance crafting objectives");
+    QuestSystemTestAccess::RecordCrafted(craftingJournal,
+        ItemType::WOODEN_PLANKS, 2, craftingDefinitions);
+    const auto crafted = QuestSystemTestAccess::RecordCrafted(craftingJournal,
+        ItemType::WOODEN_PLANKS, 5, craftingDefinitions);
+    test.Expect(crafted == std::vector<QuestId>{crafting.id} &&
+                    craftingJournal.TryGet(crafting.id)->progress == 4 &&
+                    craftingJournal.TryGet(crafting.id)->state ==
+                        QuestState::READY_TO_COMPLETE,
+                "Successful crafted output advances and caps a crafting objective");
     return test.Finish();
 }

@@ -3957,6 +3957,10 @@ void World::ProcessCompletedActions(
 
             RecordActionCompletedEvent(action);
 
+            QuestSystem::RecordCrafted(
+                player->GetQuestJournal(), recipeOutcome.outputItem,
+                recipeOutcome.outputAmount);
+
             Logger::Game(
                 "Created: " +
                 recipeOutcome.recipeName);

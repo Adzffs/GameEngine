@@ -106,6 +106,14 @@ int main()
     investigation.objectiveText = "";
     test.Expect(!QuestDefinitionDatabase::IsValidDefinition(investigation),
                 "Investigation objectives require player-facing journal text");
+    QuestDefinition crafting = *definition;
+    crafting.objectiveType = QuestObjectiveType::CRAFT_ITEM;
+    crafting.objectiveItem = ItemType::WOODEN_PLANKS;
+    test.Expect(QuestDefinitionDatabase::IsValidDefinition(crafting),
+                "Crafting objectives accept a known output item");
+    crafting.objectiveItem = ItemType::NONE;
+    test.Expect(!QuestDefinitionDatabase::IsValidDefinition(crafting),
+                "Crafting objectives reject an unknown output item");
     invalid = *definition; invalid.requiredAmount = 0;
     test.Expect(!QuestDefinitionDatabase::IsValidDefinition(invalid),
                 "Non-positive requirement rejects");
