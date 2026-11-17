@@ -145,9 +145,11 @@ int main()
 
         const Action *action = world.GetActionForEntity(playerID);
         test.Expect(action != nullptr,
-                    "Adjacent attack starts existing melee action");
-        test.Expect(action != nullptr && action->GetStartTick() == 0,
-                    "Command action starts at pre-increment tick");
+                    "Adjacent attack enters its repeating cooldown");
+        test.Expect(world.GetLastMeleeAttackResult().has_value(),
+                    "Command opening attack resolves on its first update");
+        test.Expect(action != nullptr && action->GetStartTick() == 1,
+                    "Cooldown begins when the instant opening attack resolves");
         test.ExpectEqual(
             world.GetCommandProcessingResults()[0].commandID,
             attackID,

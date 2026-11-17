@@ -77,6 +77,23 @@ int main()
         80.0f + GraphicsTestAccess::CameraY(graphics), 0.001f,
         "Screen-to-world conversion includes vertical camera movement");
 
+    for (int index = 0; index < 10; ++index)
+        graphics.AdjustCameraZoom(1);
+    test.ExpectNear(graphics.GetCameraZoom(), 1.5f, 0.001f,
+        "Zoom-in input clamps at a readable maximum");
+    const SDL_FPoint zoomedWorld = GraphicsTestAccess::ScreenToWorldPoint(
+        graphics, 150.0f, 90.0f);
+    test.ExpectNear(zoomedWorld.x,
+        100.0f + GraphicsTestAccess::CameraX(graphics), 0.001f,
+        "Zoomed screen coordinates preserve exact world targeting");
+    test.ExpectNear(zoomedWorld.y,
+        60.0f + GraphicsTestAccess::CameraY(graphics), 0.001f,
+        "Zoomed vertical coordinates preserve exact world targeting");
+    for (int index = 0; index < 20; ++index)
+        graphics.AdjustCameraZoom(-1);
+    test.ExpectNear(graphics.GetCameraZoom(), 0.75f, 0.001f,
+        "Zoom-out input clamps before world details become unreadable");
+
     GraphicsTestAccess::SetMinimapOrigin(graphics, 20, 30);
     test.Expect(GraphicsTestAccess::HandleMinimapClick(
         graphics, 1040.0f + 5.0f * 7.0f + 1.0f,

@@ -272,6 +272,19 @@ namespace
 
         map.SetTileType(31, 30, TileType::WALL);
         expectRejectedMove(30, 30, 1, 0, "Blocked-tile movement");
+
+        CraftingStation *station = world.GetStationAt(14, 9);
+        test.Expect(station != nullptr,
+                    "Starter workstation exists for collision coverage");
+        if (station != nullptr)
+        {
+            expectRejectedMove(
+                station->GetX() - 1,
+                station->GetY(),
+                1,
+                0,
+                "Workstation-tile movement");
+        }
     }
 
     void TestActivePathProgress(TestContext &test)

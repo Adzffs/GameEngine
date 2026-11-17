@@ -15,7 +15,8 @@ public:
         int duration,
         int entityID,
         int targetID,
-        bool repeats = false);
+        bool repeats = false,
+        bool completesOnNextUpdate = false);
 
     void Start(int currentWorldTick);
     void Update(int currentWorldTick);
@@ -63,4 +64,5 @@ private:
     int targetID;
 
     bool repeats;
+    bool completesOnNextUpdate;
 };

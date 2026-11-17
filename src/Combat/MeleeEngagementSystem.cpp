@@ -23,7 +23,8 @@ bool MeleeEngagementSystem::RequestEngagement(
     int attackerEntityID,
     int targetEntityID,
     int durationTicks,
-    const EntityManager &entityManager)
+    const EntityManager &entityManager,
+    bool instantOpeningAttack)
 {
     if (attackerEntityID == targetEntityID || durationTicks < 1)
     {
@@ -43,7 +44,7 @@ bool MeleeEngagementSystem::RequestEngagement(
 
     engagementByAttackerID.insert_or_assign(
         attackerEntityID,
-        Engagement{targetEntityID, durationTicks});
+        Engagement{targetEntityID, durationTicks, instantOpeningAttack});
     return true;
 }
 
@@ -138,7 +139,8 @@ std::vector<MeleeEngagementIntent> MeleeEngagementSystem::Evaluate(
                 engagement.targetEntityID,
                 engagement.durationTicks,
                 MeleeEngagementIntentType::CLEAR_ENGAGEMENT,
-                clearReason});
+                clearReason,
+                engagement.instantOpeningAttack});
             engagementByAttackerID.erase(engagementIterator);
             continue;
         }
@@ -157,7 +159,8 @@ std::vector<MeleeEngagementIntent> MeleeEngagementSystem::Evaluate(
             engagement.durationTicks,
             isAdjacent ? MeleeEngagementIntentType::ATTACK_TARGET
                        : MeleeEngagementIntentType::APPROACH_TARGET,
-            MeleeEngagementClearReason::NONE});
+            MeleeEngagementClearReason::NONE,
+            engagement.instantOpeningAttack});
     }
 
     for (auto iterator = engagementByAttackerID.begin();

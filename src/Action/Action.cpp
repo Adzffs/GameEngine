@@ -6,7 +6,8 @@ Action::Action(
     int duration,
     int entityID,
     int targetID,
-    bool repeats)
+    bool repeats,
+    bool completesOnNextUpdate)
     : type(type),
       state(ActionState::PENDING),
       cancelReason(ActionCancelReason::NONE),
@@ -17,7 +18,8 @@ Action::Action(
       completionTick(0),
       ownerID(entityID),
       targetID(targetID),
-      repeats(repeats)
+      repeats(repeats),
+      completesOnNextUpdate(completesOnNextUpdate)
 {
 }
 
@@ -53,6 +55,13 @@ void Action::Update(int currentWorldTick)
 
     currentTick = currentWorldTick - startTick;
 
+    if (completesOnNextUpdate && currentWorldTick > startTick)
+    {
+        currentTick = duration;
+        state = ActionState::COMPLETED;
+        return;
+    }
+
     if (currentTick >= duration)
     {
         currentTick = duration;
@@ -62,6 +71,7 @@ void Action::Update(int currentWorldTick)
 
 void Action::Restart(int currentWorldTick)
 {
+    completesOnNextUpdate = false;
     Start(currentWorldTick);
 }
 

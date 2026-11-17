@@ -116,6 +116,8 @@ public:
     float CalculateHealthRatio(
         int currentHealth,
         int maximumHealth) const;
+    void AdjustCameraZoom(int wheelDirection);
+    float GetCameraZoom() const { return cameraZoom; }
     static std::string GetCombatFeedbackLabel(
         const MeleeCombatFeedback &feedback);
 
@@ -520,6 +522,7 @@ private:
     bool visualPlayerInitialized = false;
     float cameraPixelX = 0.0f;
     float cameraPixelY = 0.0f;
+    float cameraZoom = 1.0f;
     bool cameraInitialized = false;
     int minimapOriginX = 0;
     int minimapOriginY = 0;

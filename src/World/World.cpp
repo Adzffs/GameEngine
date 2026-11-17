@@ -764,7 +764,8 @@ void World::QueueStationInteraction(
 bool World::QueueMeleeEngagementRequest(
     int attackerEntityID,
     int defenderEntityID,
-    int durationTicks)
+    int durationTicks,
+    bool instantOpeningAttack)
 {
     if (durationTicks < 1)
     {
@@ -862,7 +863,8 @@ bool World::QueueMeleeEngagementRequest(
             attackerEntityID,
             defenderEntityID,
             durationTicks,
-            entityManager))
+            entityManager,
+            instantOpeningAttack))
     {
         return false;
     }
@@ -877,7 +879,8 @@ bool World::QueueMeleeEngagementRequest(
         bool started = TryStartMeleeEngagement(
             attackerEntityID,
             defenderEntityID,
-            durationTicks);
+            durationTicks,
+            instantOpeningAttack);
 
         meleeEngagementSystem.ClearEngagement(
             attackerEntityID);
@@ -993,7 +996,8 @@ void World::ProcessMeleeEngagementSystem()
             const bool started = TryStartMeleeEngagement(
                 intent.attackerEntityID,
                 intent.targetEntityID,
-                intent.durationTicks);
+                intent.durationTicks,
+                intent.instantOpeningAttack);
             meleeEngagementSystem.ClearEngagement(
                 intent.attackerEntityID);
             (void)started;
@@ -1456,13 +1460,15 @@ bool World::TryStartMeleeAttack(
 bool World::TryStartMeleeEngagement(
     int attackerEntityID,
     int defenderEntityID,
-    int durationTicks)
+    int durationTicks,
+    bool instantOpeningAttack)
 {
     if (!meleeEngagementSystem.RequestEngagement(
             attackerEntityID,
             defenderEntityID,
             durationTicks,
-            entityManager))
+            entityManager,
+            instantOpeningAttack))
     {
         return false;
     }
@@ -1471,7 +1477,8 @@ bool World::TryStartMeleeEngagement(
         attackerEntityID,
         defenderEntityID,
         durationTicks,
-        true);
+        true,
+        instantOpeningAttack);
 
     if (!started)
     {
@@ -1537,7 +1544,8 @@ bool World::TryStartMeleeAction(
     int attackerEntityID,
     int defenderEntityID,
     int durationTicks,
-    bool repeating)
+    bool repeating,
+    bool instantOpeningAttack)
 {
     ActionValidationResult validation =
         ValidateMeleeStartAction(
@@ -1565,10 +1573,14 @@ bool World::TryStartMeleeAction(
             durationTicks,
             attackerEntityID,
             defenderEntityID,
-            repeating));
+            repeating,
+            instantOpeningAttack));
 
-    meleeAttackPresentations[attackerEntityID] = MeleeAttackPresentation{
-        attackerEntityID, defenderEntityID, durationTicks, durationTicks};
+    if (!instantOpeningAttack)
+    {
+        meleeAttackPresentations[attackerEntityID] = MeleeAttackPresentation{
+            attackerEntityID, defenderEntityID, durationTicks, durationTicks};
+    }
 
     return true;
 }
@@ -2114,7 +2126,8 @@ void World::ProcessQueuedCommands()
                     else if (QueueMeleeEngagementRequest(
                                  data.actorEntityID,
                                  data.targetEntityID,
-                                 4))
+                                 4,
+                                 true))
                     {
                         resultCode =
                             CommandResultCode::ACCEPTED;

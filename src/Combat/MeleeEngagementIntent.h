@@ -25,4 +25,5 @@ struct MeleeEngagementIntent
     int durationTicks;
     MeleeEngagementIntentType type;
     MeleeEngagementClearReason clearReason;
+    bool instantOpeningAttack = false;
 };

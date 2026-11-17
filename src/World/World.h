@@ -147,7 +147,8 @@ public:
     bool QueueMeleeEngagementRequest(
         int attackerEntityID,
         int defenderEntityID,
-        int durationTicks);
+        int durationTicks,
+        bool instantOpeningAttack = false);
     void CancelActionsForEntity(
         int entityID,
         ActionCancelReason reason =
@@ -197,7 +198,8 @@ public:
     bool TryStartMeleeEngagement(
         int attackerEntityID,
         int defenderEntityID,
-        int durationTicks);
+        int durationTicks,
+        bool instantOpeningAttack = false);
 
     bool TryApplyStatusEffect(
         int playerEntityID,
@@ -375,7 +377,8 @@ private:
         int attackerEntityID,
         int defenderEntityID,
         int durationTicks,
-        bool repeating);
+        bool repeating,
+        bool instantOpeningAttack = false);
     bool IsValidMonsterAggressionTarget(
         const Monster &monster,
         int targetEntityID);

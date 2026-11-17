@@ -1242,7 +1242,8 @@ void Graphics::DrawCraftingItemIcon(
 void Graphics::DrawActionProgress(
     const Action *activeAction)
 {
-    if (activeAction == nullptr)
+    if (activeAction == nullptr ||
+        activeAction->GetType() == ActionType::MELEE_ATTACK)
     {
         return;
     }
@@ -1642,6 +1643,20 @@ void Graphics::ProcessEvents(bool &running)
             running = false;
         }
 
+        if (event.type == SDL_EVENT_MOUSE_WHEEL &&
+            !stationMenuOpen && !shopPresentationState.IsOpen() &&
+            !dialoguePresentationState.IsOpen() && !gameGuideVisible)
+        {
+            bool overSideUi = sidePanelOpen &&
+                IsPointInsideRectangle(mouseX, mouseY, GetSidePanelRectangle());
+            for (const SDL_FRect &tab : GetSidePanelLayout().tabBounds)
+                overSideUi = overSideUi ||
+                    IsPointInsideRectangle(mouseX, mouseY, tab);
+            if (!overSideUi)
+                AdjustCameraZoom(event.wheel.y > 0.0f ? 1 : -1);
+            continue;
+        }
+
         if (event.type == SDL_EVENT_KEY_DOWN &&
             !event.key.repeat)
         {
@@ -1770,17 +1785,14 @@ void Graphics::ProcessEvents(bool &running)
                 continue;
             }
 
-            clickedTileX =
-                static_cast<int>(mouseX + cameraPixelX) / TileSize;
+            const SDL_FPoint worldPoint = ScreenToWorldPoint(mouseX, mouseY);
+            clickedTileX = static_cast<int>(worldPoint.x) / TileSize;
 
-            clickedTileY =
-                static_cast<int>(mouseY + cameraPixelY) / TileSize;
+            clickedTileY = static_cast<int>(worldPoint.y) / TileSize;
 
-            clickedMouseX =
-                static_cast<int>(mouseX + cameraPixelX);
+            clickedMouseX = static_cast<int>(worldPoint.x);
 
-            clickedMouseY =
-                static_cast<int>(mouseY + cameraPixelY);
+            clickedMouseY = static_cast<int>(worldPoint.y);
 
             hasClickedTile = true;
             clickPending = true;
@@ -2333,15 +2345,20 @@ void Graphics::UpdateCamera(
     int playerY,
     const Map &map)
 {
-    constexpr float usefulWorldWidth = 930.0f;
-    constexpr float preferredPlayerScreenX = 450.0f;
-    constexpr float preferredPlayerScreenY = 350.0f;
+    const float screenWorldWidth =
+        (sidePanelOpen ? 930.0f : static_cast<float>(WindowWidth)) /
+        cameraZoom;
+    const float screenWorldHeight = static_cast<float>(WindowHeight) /
+        cameraZoom;
+    const float preferredPlayerScreenX =
+        (sidePanelOpen ? 450.0f : 640.0f) / cameraZoom;
+    const float preferredPlayerScreenY = 350.0f / cameraZoom;
     const float maximumX = std::max(
         0.0f,
-        static_cast<float>(map.GetWidth() * TileSize) - usefulWorldWidth);
+        static_cast<float>(map.GetWidth() * TileSize) - screenWorldWidth);
     const float maximumY = std::max(
         0.0f,
-        static_cast<float>(map.GetHeight() * TileSize - WindowHeight));
+        static_cast<float>(map.GetHeight() * TileSize) - screenWorldHeight);
     const float targetX = std::clamp(
         static_cast<float>(playerX * TileSize) + TileSize * 0.5f -
             preferredPlayerScreenX,
@@ -2374,8 +2391,15 @@ SDL_FPoint Graphics::ScreenToWorldPoint(
     float screenY) const
 {
     return SDL_FPoint{
-        screenX + cameraPixelX,
-        screenY + cameraPixelY};
+        screenX / cameraZoom + cameraPixelX,
+        screenY / cameraZoom + cameraPixelY};
+}
+
+void Graphics::AdjustCameraZoom(int wheelDirection)
+{
+    if (wheelDirection == 0) return;
+    cameraZoom = std::clamp(cameraZoom +
+        (wheelDirection > 0 ? 0.1f : -0.1f), 0.75f, 1.50f);
 }
 
 bool Graphics::HandleMinimapClick(float screenX, float screenY)
@@ -4519,15 +4543,14 @@ void Graphics::DrawWorldHud(const Player &player)
 {
     const float healthRatio = CalculateHealthRatio(
         player.GetCurrentHealth(), player.GetMaximumHealth());
-    const SDL_FRect panel{18.0f, 18.0f, 245.0f, 60.0f};
+    const SDL_FRect panel{18.0f, 18.0f, 190.0f, 34.0f};
     SDL_SetRenderDrawColor(renderer, 20, 24, 28, 225);
     SDL_RenderFillRect(renderer, &panel);
     SDL_SetRenderDrawColor(renderer, 164, 139, 87, 255);
     SDL_RenderRect(renderer, &panel);
 
     SDL_SetRenderDrawColor(renderer, 235, 225, 202, 255);
-    SDL_RenderDebugText(renderer, 32.0f, 29.0f, "ADVENTURER");
-    const SDL_FRect barBackground{32.0f, 50.0f, 180.0f, 12.0f};
+    const SDL_FRect barBackground{30.0f, 31.0f, 105.0f, 8.0f};
     SDL_SetRenderDrawColor(renderer, 45, 31, 34, 255);
     SDL_RenderFillRect(renderer, &barBackground);
     SDL_FRect barFill = barBackground;
@@ -4538,9 +4561,9 @@ void Graphics::DrawWorldHud(const Player &player)
         healthRatio < 0.30f ? 45 : 63, 255);
     SDL_RenderFillRect(renderer, &barFill);
     SDL_SetRenderDrawColor(renderer, 235, 225, 202, 255);
-    const std::string hp = std::to_string(player.GetCurrentHealth()) + " / " +
-        std::to_string(player.GetMaximumHealth()) + " HP";
-    SDL_RenderDebugText(renderer, 217.0f, 52.0f, hp.c_str());
+    const std::string hp = "HP " + std::to_string(player.GetCurrentHealth()) +
+        "/" + std::to_string(player.GetMaximumHealth());
+    SDL_RenderDebugText(renderer, 143.0f, 30.0f, hp.c_str());
 
     if (!player.GetTutorialState().IsCompleted())
     {
@@ -4556,16 +4579,16 @@ void Graphics::DrawWorldHud(const Player &player)
             "Take loot and deposit an item in the bank",
             "Return to the guide and finish Gathering Basics"};
         const int step = static_cast<int>(player.GetTutorialState().GetStep());
-        const SDL_FRect objectivePanel{18.0f, 86.0f, 430.0f, 48.0f};
+        const SDL_FRect objectivePanel{18.0f, 60.0f, 430.0f, 48.0f};
         SDL_SetRenderDrawColor(renderer, 20, 24, 28, 220);
         SDL_RenderFillRect(renderer, &objectivePanel);
         SDL_SetRenderDrawColor(renderer, 190, 151, 78, 255);
         SDL_RenderRect(renderer, &objectivePanel);
         SDL_SetRenderDrawColor(renderer, 250, 226, 170, 255);
         const std::string heading = "NEXT STEP " + std::to_string(step + 1) + "/10";
-        SDL_RenderDebugText(renderer, 30.0f, 98.0f, heading.c_str());
+        SDL_RenderDebugText(renderer, 30.0f, 72.0f, heading.c_str());
         SDL_SetRenderDrawColor(renderer, 235, 225, 202, 255);
-        SDL_RenderDebugText(renderer, 30.0f, 118.0f, objectives[step]);
+        SDL_RenderDebugText(renderer, 30.0f, 92.0f, objectives[step]);
     }
 
     SDL_SetRenderDrawColor(renderer, 235, 225, 202, 220);
@@ -6005,8 +6028,8 @@ void Graphics::Render(
     worldHoverTarget = worldHoverBlocked
         ? WorldHoverTarget{}
         : ResolveWorldHoverTarget(
-            mouseX + cameraPixelX,
-            mouseY + cameraPixelY,
+            mouseX / cameraZoom + cameraPixelX,
+            mouseY / cameraZoom + cameraPixelY,
             entities,
             resources,
             stations,
@@ -6020,11 +6043,12 @@ void Graphics::Render(
 
     SDL_RenderClear(renderer);
 
+    SDL_SetRenderScale(renderer, cameraZoom, cameraZoom);
     const SDL_Rect worldViewport{
-        -static_cast<int>(std::round(cameraPixelX)),
-        -static_cast<int>(std::round(cameraPixelY)),
-        map.GetWidth() * TileSize,
-        map.GetHeight() * TileSize};
+        -static_cast<int>(std::round(cameraPixelX * cameraZoom)),
+        -static_cast<int>(std::round(cameraPixelY * cameraZoom)),
+        static_cast<int>(std::round(map.GetWidth() * TileSize * cameraZoom)),
+        static_cast<int>(std::round(map.GetHeight() * TileSize * cameraZoom))};
     SDL_SetRenderViewport(renderer, &worldViewport);
 
     DrawMap(map);
@@ -6038,7 +6062,6 @@ void Graphics::Render(
     DrawPlayer(playerX, playerY);
     if (attackPresentations != nullptr)
         DrawMeleeAttackPresentations(entities, *attackPresentations);
-    DrawPlayerHealthBar(player);
     DrawMonsterHealthBars(entities);
     DrawMonsterCombatFeedback(entities, combatFeedbacks);
     DrawWorldHoverFeedback();
