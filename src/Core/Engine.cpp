@@ -314,6 +314,8 @@ bool Engine::Run()
         {
             const World::PlayerDeathRecovery *deathRecovery =
                 world.GetPlayerDeathRecovery(playerID);
+            const PlayerRecoveryPile *recoveryPile =
+                world.GetPlayerRecoveryPile(playerID);
             const Skill &woodcutting =
                 player->GetSkills().GetSkill(
                     SkillType::WOODCUTTING);
@@ -345,7 +347,13 @@ bool Engine::Run()
                     ? -1
                     : deathRecovery->killerEntityID,
                 deathRecovery == nullptr ? 0 : deathRecovery->deathX,
-                deathRecovery == nullptr ? 0 : deathRecovery->deathY);
+                deathRecovery == nullptr ? 0 : deathRecovery->deathY,
+                recoveryPile == nullptr
+                    ? -1
+                    : recoveryPile->position.GetX(),
+                recoveryPile == nullptr
+                    ? -1
+                    : recoveryPile->position.GetY());
         }
     }
 

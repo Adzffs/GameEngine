@@ -634,6 +634,13 @@ const GroundItem *World::GetGroundItemAt(int x, int y) const
     return found == groundItems.end() ? nullptr : &*found;
 }
 
+const PlayerRecoveryPile *World::GetPlayerRecoveryPile(
+    int playerEntityID) const
+{
+    const auto pile = playerRecoveryPiles.find(playerEntityID);
+    return pile == playerRecoveryPiles.end() ? nullptr : &pile->second;
+}
+
 CraftingStation *World::GetStationAt(
     int x,
     int y)
@@ -1678,6 +1685,7 @@ void World::Update()
 
     ProcessMovementSystem();
     ProcessGroundItemPickups();
+    ProcessPlayerRecoveryPiles();
     ProcessInteractionSystem();
     RevalidateCraftingSessions();
 
@@ -1808,6 +1816,52 @@ void World::ProcessGroundItemPickups()
             continue;
         }
         ++pending;
+    }
+}
+
+void World::ProcessPlayerRecoveryPiles()
+{
+    for (auto pile = playerRecoveryPiles.begin();
+         pile != playerRecoveryPiles.end();)
+    {
+        Player *owner = dynamic_cast<Player *>(
+            entityManager.GetEntityByID(pile->first));
+        if (owner == nullptr)
+        {
+            pile = playerRecoveryPiles.erase(pile);
+            continue;
+        }
+
+        if (currentTick >= pile->second.expiryTick)
+        {
+            Logger::Game(
+                "[RECOVERY] Protected pile for player " +
+                std::to_string(owner->GetID()) + " expired");
+            pile = playerRecoveryPiles.erase(pile);
+            continue;
+        }
+
+        const int dx = std::abs(owner->GetPosition().GetX() -
+            pile->second.position.GetX());
+        const int dy = std::abs(owner->GetPosition().GetY() -
+            pile->second.position.GetY());
+        if (!owner->IsAlive() || dx > 1 || dy > 1)
+        {
+            ++pile;
+            continue;
+        }
+
+        if (!owner->GetInventory().TryAddItemsAtomically(
+                pile->second.items))
+        {
+            ++pile;
+            continue;
+        }
+
+        Logger::Game(
+            "[RECOVERY] Player " + std::to_string(owner->GetID()) +
+            " recovered their protected inventory pile");
+        pile = playerRecoveryPiles.erase(pile);
     }
 }
 
@@ -4695,6 +4749,30 @@ void World::HandleCombatantDeath(
 
     if (firstProcessedDeath)
     {
+        std::vector<ItemAmount> recoveredItems;
+        std::array<InventorySlot, Inventory::SlotCount> emptySlots{};
+        for (const InventorySlot &slot : player->GetInventory().GetSlots())
+        {
+            if (!slot.IsEmpty())
+            {
+                recoveredItems.push_back(
+                    ItemAmount{slot.GetItemType(), slot.GetAmount()});
+            }
+        }
+
+        if (!recoveredItems.empty() &&
+            player->GetInventory().TryReplaceSlotsAtomically(emptySlots))
+        {
+            PlayerRecoveryPile &pile = playerRecoveryPiles[deadEntityID];
+            pile.ownerPlayerEntityID = deadEntityID;
+            pile.position.SetPosition(
+                player->GetPosition().GetX(),
+                player->GetPosition().GetY());
+            pile.items.insert(
+                pile.items.end(), recoveredItems.begin(), recoveredItems.end());
+            pile.expiryTick = currentTick + PlayerRecoveryPileLifetimeTicks;
+        }
+
         playerDeathRecoveries[deadEntityID] = PlayerDeathRecovery{
             deadEntityID,
             killerEntityID,

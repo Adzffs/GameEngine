@@ -483,6 +483,8 @@ int main()
         Player *defender = GetPlayer(world, defenderID);
         Monster *attacker = GetMonster(world, attackerID);
 
+        defender->GetInventory().AddItem(ItemType::COAL, 3);
+
         attacker->GetPosition().SetPosition(11, 10);
         defender->GetPosition().SetPosition(10, 10);
         defender->ApplyDamage(defender->GetCurrentHealth() - 1);
@@ -528,17 +530,12 @@ int main()
                 "Recovery state records the death location Y");
         }
 
-        const auto countOccupiedSlots = [](const Inventory &inventory)
-        {
-            int count = 0;
-            for (const InventorySlot &slot : inventory.GetSlots())
-            {
-                if (!slot.IsEmpty()) ++count;
-            }
-            return count;
-        };
-        const int inventorySlotsBeforeRespawn =
-            countOccupiedSlots(defender->GetInventory());
+        const PlayerRecoveryPile *pile =
+            world.GetPlayerRecoveryPile(defenderID);
+        test.Expect(pile != nullptr,
+            "Player death protects ordinary inventory in a recovery pile");
+        test.ExpectEqual(defender->GetInventory().GetItemAmount(ItemType::COAL),
+            0, "Recovered items leave the respawn inventory");
         for (int tick = 0; tick < 3; ++tick)
         {
             world.Update();
@@ -558,11 +555,18 @@ int main()
         test.ExpectEqual(defender->GetPosition().GetY(),
             DevelopmentWorldContent::PlayerSpawnY,
             "Respawn returns the player to the village safe point Y");
-        test.ExpectEqual(countOccupiedSlots(defender->GetInventory()),
-            inventorySlotsBeforeRespawn,
-            "Recovery foundation does not lose or duplicate inventory");
         test.Expect(world.GetPlayerDeathRecovery(defenderID) == nullptr,
             "Completed recovery no longer remains pending");
+
+        defender->GetPosition().SetPosition(10, 10);
+        world.Update();
+        test.ExpectEqual(defender->GetInventory().GetItemAmount(ItemType::COAL),
+            3, "Returning to the death location restores pile items");
+        test.Expect(world.GetPlayerRecoveryPile(defenderID) == nullptr,
+            "Claimed recovery pile cannot be collected twice");
+        world.Update();
+        test.ExpectEqual(defender->GetInventory().GetItemAmount(ItemType::COAL),
+            3, "Repeated updates cannot duplicate recovered items");
     }
 
     {

@@ -48,6 +48,7 @@
 #include "../Persistence/WorldPlayerPersistenceResult.h"
 #include <filesystem>
 #include "GroundItem.h"
+#include "PlayerRecoveryPile.h"
 #include "../Bank/BankSession.h"
 
 class RandomSource;
@@ -122,6 +123,8 @@ public:
     const std::vector<GroundItem> &GetGroundItems() const;
     const GroundItem *GetGroundItemByID(int id) const;
     const GroundItem *GetGroundItemAt(int x, int y) const;
+    const PlayerRecoveryPile *GetPlayerRecoveryPile(
+        int playerEntityID) const;
 
     CraftingStation *GetStationAt(
         int x,
@@ -310,6 +313,7 @@ private:
     void ProcessQueuedCommands();
     void ProcessMovementSystem();
     void ProcessGroundItemPickups();
+    void ProcessPlayerRecoveryPiles();
     void ProcessTutorialProgress();
     void ProcessInteractionSystem();
     bool PublishDialogueNode(const ActiveDialogueSession &session,
@@ -408,6 +412,8 @@ private:
     std::vector<GroundItem> groundItems;
     int nextGroundItemID = 1;
     std::map<int, int> pendingGroundItemPickups;
+    std::map<int, PlayerRecoveryPile> playerRecoveryPiles;
+    static constexpr int PlayerRecoveryPileLifetimeTicks = 600;
 
     std::vector<CommandProcessingResult>
         pendingCommandProcessingResults;

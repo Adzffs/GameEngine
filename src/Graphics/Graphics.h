@@ -173,7 +173,9 @@ public:
         int deathRecoveryTicksRemaining = -1,
         int deathKillerEntityID = -1,
         int deathX = 0,
-        int deathY = 0);
+        int deathY = 0,
+        int recoveryPileX = -1,
+        int recoveryPileY = -1);
 
     enum class WorldHoverTargetType
     {
@@ -552,7 +554,9 @@ private:
         const std::vector<ResourceNode> &resources,
         const std::vector<CraftingStation> &stations,
         int playerX,
-        int playerY);
+        int playerY,
+        int recoveryPileX = -1,
+        int recoveryPileY = -1);
     void UpdateProgressionFeedback(
         const Player &player,
         const Inventory &inventory);

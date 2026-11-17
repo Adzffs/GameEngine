@@ -2191,7 +2191,9 @@ void Graphics::DrawMinimap(
     const std::vector<ResourceNode> &resources,
     const std::vector<CraftingStation> &stations,
     int playerX,
-    int playerY)
+    int playerY,
+    int recoveryPileX,
+    int recoveryPileY)
 {
     constexpr int columns = 30;
     constexpr int rows = 22;
@@ -2300,6 +2302,10 @@ void Graphics::DrawMinimap(
             drawMarker(entity->GetPosition().GetX(),
                 entity->GetPosition().GetY(), 240, 150, 55, 4.0f);
         }
+    }
+    if (recoveryPileX >= 0 && recoveryPileY >= 0)
+    {
+        drawMarker(recoveryPileX, recoveryPileY, 238, 120, 255, 6.0f);
     }
     drawMarker(playerX, playerY, 110, 215, 255, 6.0f);
 }
@@ -5303,7 +5309,9 @@ void Graphics::Render(
     int deathRecoveryTicksRemaining,
     int deathKillerEntityID,
     int deathX,
-    int deathY)
+    int deathY,
+    int recoveryPileX,
+    int recoveryPileY)
 {
     const Uint64 presentationTick = SDL_GetTicks();
     if (lastPresentationTick != 0)
@@ -5374,7 +5382,8 @@ void Graphics::Render(
     DrawCombatTargetPanel(
         entities, selectedCombatTargetID, player.GetID());
     DrawProgressionFeedback();
-    DrawMinimap(map, entities, resources, stations, playerX, playerY);
+    DrawMinimap(map, entities, resources, stations, playerX, playerY,
+        recoveryPileX, recoveryPileY);
     DrawSidePanelTabs();
 
     switch (selectedTab)
@@ -5460,9 +5469,9 @@ void Graphics::DrawDeathRecoveryOverlay(
         std::to_string(deathY) + ")";
     SDL_RenderDebugText(renderer, 405.0f, 329.0f, location.c_str());
     SDL_RenderDebugText(renderer, 405.0f, 356.0f,
-        "Your equipment and inventory are safe.");
+        "Your equipped gear stayed with you.");
     SDL_RenderDebugText(renderer, 405.0f, 383.0f,
-        "You will recover at the village safe point.");
+        "Your inventory is protected at the marked death location.");
 
     const std::string countdown = ticksRemaining > 0
         ? "Recovering in " + std::to_string(ticksRemaining) + "..."
