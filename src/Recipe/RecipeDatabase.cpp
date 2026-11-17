@@ -17,7 +17,9 @@ RecipeDatabase::GetAllRecipeTypes()
         RecipeType::BRONZE_PICKAXE,
         RecipeType::IRON_PICKAXE,
         RecipeType::STEEL_PICKAXE,
-        RecipeType::BRONZE_SWORD};
+        RecipeType::BRONZE_SWORD,
+        RecipeType::OAK_PLANKS,
+        RecipeType::WILLOW_PLANKS};
 
     return recipeTypes;
 }
@@ -145,6 +147,18 @@ RecipeDatabase::Get(
         SkillType::SMITHING, 1, 18, 4,
         {{ItemType::BRONZE_BAR, 3}, {ItemType::WOODEN_PLANKS, 1}},
         ItemType::BRONZE_SWORD, 1};
+    static const RecipeDefinition oakPlanksRecipe{
+        RecipeType::OAK_PLANKS, "Cut Oak planks", StationType::CRAFTING_TABLE,
+        SkillType::WOODCUTTING, 5, 8, 1,
+        {{ItemType::OAK_LOG, 1}}, ItemType::WOODEN_PLANKS, 6,
+        CraftingPattern{CraftingPatternType::SHAPELESS, {ItemType::OAK_LOG}},
+        false};
+    static const RecipeDefinition willowPlanksRecipe{
+        RecipeType::WILLOW_PLANKS, "Cut Willow planks", StationType::CRAFTING_TABLE,
+        SkillType::WOODCUTTING, 10, 14, 1,
+        {{ItemType::WILLOW_LOG, 1}}, ItemType::WOODEN_PLANKS, 8,
+        CraftingPattern{CraftingPatternType::SHAPELESS, {ItemType::WILLOW_LOG}},
+        false};
 
     switch (recipeType)
     {
@@ -170,6 +184,8 @@ RecipeDatabase::Get(
     case RecipeType::IRON_PICKAXE: return ironPickaxeRecipe;
     case RecipeType::STEEL_PICKAXE: return steelPickaxeRecipe;
     case RecipeType::BRONZE_SWORD: return bronzeSwordRecipe;
+    case RecipeType::OAK_PLANKS: return oakPlanksRecipe;
+    case RecipeType::WILLOW_PLANKS: return willowPlanksRecipe;
 
     case RecipeType::NONE:
     default:
@@ -195,6 +211,8 @@ const RecipeDefinition *RecipeDatabase::TryGet(
     case RecipeType::IRON_PICKAXE:
     case RecipeType::STEEL_PICKAXE:
     case RecipeType::BRONZE_SWORD:
+    case RecipeType::OAK_PLANKS:
+    case RecipeType::WILLOW_PLANKS:
         return &Get(recipeType);
 
     case RecipeType::NONE:

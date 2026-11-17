@@ -376,11 +376,13 @@ Graphics::CraftingTableLayout Graphics::GetCraftingTableLayout() const
     }
 
     layout.ingredientButtons = {{
-        {menuX + 490.0f, menuY + 92.0f, 280.0f, 48.0f},
-        {menuX + 490.0f, menuY + 150.0f, 280.0f, 48.0f},
+        {menuX + 490.0f, menuY + 70.0f, 280.0f, 44.0f},
+        {menuX + 490.0f, menuY + 122.0f, 280.0f, 44.0f},
+        {menuX + 490.0f, menuY + 174.0f, 280.0f, 44.0f},
+        {menuX + 490.0f, menuY + 226.0f, 280.0f, 44.0f},
     }};
     layout.previewBounds = {
-        menuX + 490.0f, menuY + 218.0f, 280.0f, 88.0f};
+        menuX + 490.0f, menuY + 282.0f, 280.0f, 56.0f};
     layout.clearButton = {
         menuX + 40.0f, menuY + 338.0f, 150.0f, 42.0f};
     layout.craftButton = {
@@ -399,6 +401,16 @@ int Graphics::GetDisplayedCraftingItemCount(
     if (itemType == ItemType::LOG)
     {
         return displayedLogCount;
+    }
+
+    if (itemType == ItemType::OAK_LOG)
+    {
+        return displayedOakLogCount;
+    }
+
+    if (itemType == ItemType::WILLOW_LOG)
+    {
+        return displayedWillowLogCount;
     }
 
     if (itemType == ItemType::WOODEN_PLANKS)
@@ -530,8 +542,10 @@ void Graphics::HandleStationMenuClick(
         return;
     }
 
-    const std::array<ItemType, 2> ingredients{
+    const std::array<ItemType, 4> ingredients{
         ItemType::LOG,
+        ItemType::OAK_LOG,
+        ItemType::WILLOW_LOG,
         ItemType::WOODEN_PLANKS};
 
     for (std::size_t index = 0;
@@ -782,8 +796,10 @@ void Graphics::DrawStationMenu()
         }
     }
 
-    const std::array<ItemType, 2> ingredientTypes{
+    const std::array<ItemType, 4> ingredientTypes{
         ItemType::LOG,
+        ItemType::OAK_LOG,
+        ItemType::WILLOW_LOG,
         ItemType::WOODEN_PLANKS};
     for (std::size_t index = 0;
          index < ingredientTypes.size();
@@ -810,21 +826,15 @@ void Graphics::DrawStationMenu()
         DrawCraftingItemIcon(
             ingredientTypes[index],
             layout.ingredientButtons[index]);
+        const std::string text =
+            ItemDatabase::Get(ingredientTypes[index]).GetName() + " x" +
+            std::to_string(GetDisplayedCraftingItemCount(ingredientTypes[index]));
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderDebugText(renderer,
+            layout.ingredientButtons[index].x + 58.0f,
+            layout.ingredientButtons[index].y + 15.0f,
+            text.c_str());
     }
-
-    const std::string logText =
-        "Log x" + std::to_string(displayedLogCount);
-    const std::string plankText =
-        "Wooden planks x" + std::to_string(displayedPlankCount);
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderDebugText(renderer,
-        layout.ingredientButtons[0].x + 58.0f,
-        layout.ingredientButtons[0].y + 17.0f,
-        logText.c_str());
-    SDL_RenderDebugText(renderer,
-        layout.ingredientButtons[1].x + 58.0f,
-        layout.ingredientButtons[1].y + 17.0f,
-        plankText.c_str());
 
     SDL_SetRenderDrawColor(renderer, 45, 45, 48, 255);
     SDL_RenderFillRect(renderer, &layout.previewBounds);
@@ -5485,6 +5495,8 @@ void Graphics::Render(
     UpdateProgressionFeedback(player, inventory);
     displayedCurrency = inventory.GetItemAmount(ItemType::COINS);
     displayedLogCount = inventory.GetItemAmount(ItemType::LOG);
+    displayedOakLogCount = inventory.GetItemAmount(ItemType::OAK_LOG);
+    displayedWillowLogCount = inventory.GetItemAmount(ItemType::WILLOW_LOG);
     displayedPlankCount = inventory.GetItemAmount(ItemType::WOODEN_PLANKS);
     displayedInventorySlots = inventory.GetSlots();
     recipeActionActive =

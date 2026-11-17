@@ -202,6 +202,8 @@ namespace
         case RecipeType::IRON_PICKAXE: return "IRON_PICKAXE";
         case RecipeType::STEEL_PICKAXE: return "STEEL_PICKAXE";
         case RecipeType::BRONZE_SWORD: return "BRONZE_SWORD";
+        case RecipeType::OAK_PLANKS: return "OAK_PLANKS";
+        case RecipeType::WILLOW_PLANKS: return "WILLOW_PLANKS";
         }
 
         return "UNKNOWN_RECIPE";

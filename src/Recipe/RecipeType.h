@@ -14,5 +14,7 @@ enum class RecipeType
     BRONZE_PICKAXE,
     IRON_PICKAXE,
     STEEL_PICKAXE,
-    BRONZE_SWORD
+    BRONZE_SWORD,
+    OAK_PLANKS,
+    WILLOW_PLANKS
 };

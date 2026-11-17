@@ -293,7 +293,7 @@ public:
         SDL_FRect closeButton;
         std::array<SDL_FRect, 9> gridSlots;
         std::array<SDL_FRect, Inventory::SlotCount> inventorySlots;
-        std::array<SDL_FRect, 2> ingredientButtons;
+        std::array<SDL_FRect, 4> ingredientButtons;
         SDL_FRect clearButton;
         SDL_FRect craftButton;
         SDL_FRect previewBounds;
@@ -494,6 +494,8 @@ private:
     bool craftingDragRightClick = false;
     std::vector<int> craftingDragSlotIndices;
     int displayedLogCount = 0;
+    int displayedOakLogCount = 0;
+    int displayedWillowLogCount = 0;
     int displayedPlankCount = 0;
     std::array<InventorySlot, Inventory::SlotCount> displayedInventorySlots{};
     std::string stationFeedback;

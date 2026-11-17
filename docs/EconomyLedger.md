@@ -17,8 +17,8 @@ This ledger is the balancing contract for the starter region. It records what ev
 | Item | Tier | Sources | Current sinks | Processing / acquisition | Shop value | Pressure and progression role | Required follow-up |
 |---|---:|---|---|---|---|---|---|
 | Log | 1 | Normal tree; shop; starting-area gathering | 1 -> 4 Wooden planks | 70% gather roll, 1 use, 10-tick respawn | Buy 1 / sell 1 | Stackable only after processing, so it teaches inventory pressure and the workshop loop | Keep as the universal basic timber input |
-| Oak log | 2 | Oak tree at Woodcutting 5 | **None** | 55% roll, 3 uses, 15-tick respawn | Not traded | A higher-level resource with no reason to gather after XP | Add a tier-2 timber recipe or service sink |
-| Willow log | 3 | Willow tree at Woodcutting 10 | **None** | 45% roll, 5 uses, 20-tick respawn | Not traded | Highest timber tier, currently XP-only | Add a tier-3 consumable or equipment component |
+| Oak log | 2 | Oak tree at Woodcutting 5 | 1 -> 6 Wooden planks | 55% roll, 3 uses, 15-tick respawn | Not traded | More efficient plank production for shields and forged handles | Add a distinct long-term sink only when it serves a new decision |
+| Willow log | 3 | Willow tree at Woodcutting 10 | 1 -> 8 Wooden planks | 45% roll, 5 uses, 20-tick respawn | Not traded | Best plank efficiency and inventory compression | Add a distinct long-term sink only when it serves a new decision |
 | Copper ore | 1 | Copper rock; Mossling; shop | Bronze bar, 1 per bar | 70% gather roll; paired 1:1 with Tin | Buy 2 | Early mining half-input; unstacked travel cost | Add sensible sell value only after anti-arbitrage checks |
 | Tin ore | 1 | Tin rock; Mossling; shop | Bronze bar, 1 per bar | 65% gather roll; paired 1:1 with Copper | Buy 2 | Completes the first metal loop | Same as Copper |
 | Iron ore | 2 | Iron rock; Mossling; Ashfang; Stoneback | Iron bar 1:1; Steel bar 1:1 | 50% gather roll; competes between Iron and Steel | Not traded | Useful branch point, but bars currently have no equipment sink | Add smithing recipes and later a modest sell value |
@@ -41,9 +41,8 @@ This ledger is the balancing contract for the starter region. It records what ev
 
 ## Confirmed imbalances
 
-1. **Woodcutting tiers are XP-only.** Oak and Willow logs have no sink.
-2. **The shop is mostly a recovery shop, not a repeat-visit economy.** Cooked meat is its only recurring purchase.
-3. **Combat and crafting need more ongoing interdependence.** Ore and bar drops now accelerate equipment, but permanent gear is only a one-time sink.
+1. **The shop is mostly a recovery shop, not a repeat-visit economy.** Cooked meat is its only recurring purchase.
+2. **Combat and crafting need more ongoing interdependence.** Ore and bar drops now accelerate equipment, but permanent gear is only a one-time sink.
 
 ## Implementation order
 

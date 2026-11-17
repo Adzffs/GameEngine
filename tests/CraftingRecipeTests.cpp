@@ -30,6 +30,12 @@ int main()
         static_cast<int>(RecipeType::BRONZE_SWORD), 12,
         "Forged equipment recipe range remains stable");
     test.ExpectEqual(
+        static_cast<int>(RecipeType::OAK_PLANKS), 13,
+        "Oak plank recipe appends after forged equipment IDs");
+    test.ExpectEqual(
+        static_cast<int>(RecipeType::WILLOW_PLANKS), 14,
+        "Willow plank recipe keeps its stable appended ID");
+    test.ExpectEqual(
         static_cast<int>(ItemType::WOODEN_PLANKS),
         22,
         "Wooden planks keep a stable appended numeric item ID");
@@ -55,6 +61,10 @@ int main()
         RecipeDatabase::Get(RecipeType::IRON_PICKAXE);
     const RecipeDefinition &steelAxe =
         RecipeDatabase::Get(RecipeType::STEEL_AXE);
+    const RecipeDefinition &oakPlanks =
+        RecipeDatabase::Get(RecipeType::OAK_PLANKS);
+    const RecipeDefinition &willowPlanks =
+        RecipeDatabase::Get(RecipeType::WILLOW_PLANKS);
 
     test.Expect(
         planks.GetRequiredStationType() ==
@@ -92,6 +102,15 @@ int main()
             steelAxe.GetIngredients()[0].itemType == ItemType::STEEL_BAR &&
             steelAxe.GetOutputItem() == ItemType::STEEL_AXE,
         "Steel axe has a deterministic high-tier alternative to its rare drop");
+    test.Expect(
+        oakPlanks.GetRequiredLevel() == 5 &&
+            oakPlanks.GetOutputItem() == ItemType::WOODEN_PLANKS &&
+            oakPlanks.GetOutputAmount() == 6 &&
+            !oakPlanks.RepeatsWhileValid() &&
+            willowPlanks.GetRequiredLevel() == 10 &&
+            willowPlanks.GetOutputAmount() == 8 &&
+            !willowPlanks.RepeatsWhileValid(),
+        "Higher timber tiers convert to progressively more planks");
 
     CraftingRecipeMatcher::Grid grid{};
     grid[8] = ItemType::LOG;
@@ -102,6 +121,17 @@ int main()
     test.Expect(
         CraftingRecipeMatcher::FindMatch(grid) == nullptr,
         "Shapeless recipe rejects extra materials");
+
+    grid = {};
+    grid[3] = ItemType::OAK_LOG;
+    test.Expect(
+        CraftingRecipeMatcher::FindMatch(grid) == &oakPlanks,
+        "A single Oak log discovers the improved Oak plank recipe");
+    grid = {};
+    grid[5] = ItemType::WILLOW_LOG;
+    test.Expect(
+        CraftingRecipeMatcher::FindMatch(grid) == &willowPlanks,
+        "A single Willow log discovers the best plank-yield recipe");
 
     grid = {
         ItemType::WOODEN_PLANKS, ItemType::NONE, ItemType::WOODEN_PLANKS,
@@ -263,6 +293,19 @@ int main()
             smith.GetInventory().GetItemAmount(ItemType::WOODEN_PLANKS) == 0 &&
             smith.GetInventory().GetItemAmount(ItemType::BRONZE_SWORD) == 1,
         "Forging consumes metal and timber atomically and creates the equipment");
+
+    Player lumberer(4);
+    lumberer.GetInventory().AddItem(ItemType::OAK_LOG, 1);
+    lumberer.GetInventory().AddItem(ItemType::WILLOW_LOG, 1);
+    test.Expect(
+        RecipeSystem::TryCreateRecipe(lumberer, RecipeType::OAK_PLANKS) &&
+            RecipeSystem::TryCreateRecipe(lumberer, RecipeType::WILLOW_PLANKS),
+        "A skilled woodcutter can process both higher timber tiers");
+    test.Expect(
+        lumberer.GetInventory().GetItemAmount(ItemType::OAK_LOG) == 0 &&
+            lumberer.GetInventory().GetItemAmount(ItemType::WILLOW_LOG) == 0 &&
+            lumberer.GetInventory().GetItemAmount(ItemType::WOODEN_PLANKS) == 14,
+        "Oak and Willow yields combine into fourteen useful planks");
 
     Player fullPlayer(2, PlayerInitializationMode::EMPTY);
     fullPlayer.GetInventory().AddItem(ItemType::WOODEN_PLANKS, 7);

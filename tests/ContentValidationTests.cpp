@@ -149,7 +149,7 @@ int main()
             "Every registered resource type is enumerated");
         test.ExpectEqual(
             static_cast<int>(recipeTypes.size()),
-            12,
+            14,
             "Every registered recipe type is enumerated");
         test.ExpectEqual(
             static_cast<int>(rewardTableTypes.size()),
