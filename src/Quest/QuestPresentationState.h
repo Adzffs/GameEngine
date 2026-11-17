@@ -31,7 +31,8 @@ public:
                 QuestDefinitionDatabase::TryGet(questId);
             if (definition == nullptr) continue;
             std::string objective;
-            if (definition->objectiveType == QuestObjectiveType::TALK_TO_CHARACTER)
+            if (definition->objectiveType == QuestObjectiveType::TALK_TO_CHARACTER ||
+                definition->objectiveType == QuestObjectiveType::DEFEAT_CHARACTER)
                 objective = definition->objectiveText == nullptr
                     ? "Speak with the character" : definition->objectiveText;
             else

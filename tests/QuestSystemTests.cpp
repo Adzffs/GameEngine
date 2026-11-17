@@ -65,6 +65,13 @@ struct QuestSystemTestAccess
         return QuestSystem::CompleteWithReward(
             journal, questId, inventory, rewardItem, rewardAmount);
     }
+    static std::vector<QuestId> RecordDefeated(
+        QuestJournal &journal, NpcType npcType, int quantity,
+        const std::vector<QuestDefinition> &definitions)
+    {
+        return QuestSystem::RecordDefeatedAgainstDefinitions(
+            journal, npcType, quantity, definitions);
+    }
 };
 
 int main()
@@ -218,5 +225,32 @@ int main()
                     !QuestSystem::Complete(choiceJournal,
                         QuestId::GATHERING_BASICS, choiceInventory),
                 "A chosen alternate reward completes once and blocks the other outcome");
+
+    QuestDefinition combat = first;
+    combat.objectiveType = QuestObjectiveType::DEFEAT_CHARACTER;
+    combat.objectiveItem = ItemType::NONE;
+    combat.objectiveNpc = NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER;
+    combat.objectiveText = "Defeat three Ashfangs on the east road";
+    combat.requiredAmount = 3;
+    std::vector<QuestDefinition> combatDefinitions{combat};
+    QuestJournal combatJournal =
+        QuestJournalTestAccess::FromDefinitions(combatDefinitions);
+    QuestJournalTestAccess::ActivateAll(combatJournal);
+    test.Expect(QuestSystemTestAccess::RecordDefeated(combatJournal,
+                    NpcType::PASSIVE_DEVELOPMENT_MONSTER, 3,
+                    combatDefinitions).empty() &&
+                    QuestSystemTestAccess::RecordDefeated(combatJournal,
+                    NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER, 0,
+                    combatDefinitions).empty(),
+                "Wrong enemies and invalid kill counts do not advance combat objectives");
+    QuestSystemTestAccess::RecordDefeated(combatJournal,
+        NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER, 1, combatDefinitions);
+    const auto defeated = QuestSystemTestAccess::RecordDefeated(combatJournal,
+        NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER, 5, combatDefinitions);
+    test.Expect(defeated == std::vector<QuestId>{combat.id} &&
+                    combatJournal.TryGet(combat.id)->progress == 3 &&
+                    combatJournal.TryGet(combat.id)->state ==
+                        QuestState::READY_TO_COMPLETE,
+                "Authored enemy defeats advance and cap combat objectives");
     return test.Finish();
 }

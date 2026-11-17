@@ -129,6 +129,16 @@ int main()
         definition->giver.interactionNodeId, ItemType::COOKED_MEAT, 3};
     test.Expect(!QuestDefinitionDatabase::IsValidDefinition(choice),
                 "Alternate completion must represent a real choice of recipient");
+    QuestDefinition combat = *definition;
+    combat.objectiveType = QuestObjectiveType::DEFEAT_CHARACTER;
+    combat.objectiveItem = ItemType::NONE;
+    combat.objectiveNpc = NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER;
+    combat.objectiveText = "Defeat the Ashfangs";
+    test.Expect(QuestDefinitionDatabase::IsValidDefinition(combat),
+                "Combat objectives accept a known monster type");
+    combat.objectiveNpc = NpcType::SERA_FLINT;
+    test.Expect(!QuestDefinitionDatabase::IsValidDefinition(combat),
+                "Combat objectives reject friendly characters as targets");
     invalid = *definition; invalid.requiredAmount = 0;
     test.Expect(!QuestDefinitionDatabase::IsValidDefinition(invalid),
                 "Non-positive requirement rejects");

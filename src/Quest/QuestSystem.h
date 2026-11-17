@@ -14,6 +14,8 @@ public:
         QuestJournal &, NpcType);
     static std::vector<QuestId> RecordCrafted(
         QuestJournal &, ItemType, int quantity);
+    static std::vector<QuestId> RecordDefeated(
+        QuestJournal &, NpcType, int quantity = 1);
     static bool Complete(QuestJournal &, QuestId, Inventory &);
     static bool TryRestore(
         QuestJournal &, const std::vector<QuestRecord> &records);
@@ -29,6 +31,9 @@ private:
         const std::vector<QuestDefinition> &definitions);
     static std::vector<QuestId> RecordCraftedAgainstDefinitions(
         QuestJournal &, ItemType, int quantity,
+        const std::vector<QuestDefinition> &definitions);
+    static std::vector<QuestId> RecordDefeatedAgainstDefinitions(
+        QuestJournal &, NpcType, int quantity,
         const std::vector<QuestDefinition> &definitions);
     static bool CompleteWithReward(
         QuestJournal &, QuestId, Inventory &, ItemType, int);

@@ -91,9 +91,13 @@ bool QuestDefinitionDatabase::IsValidDefinition(
         (definition.objectiveType == QuestObjectiveType::GATHER_ITEM ||
          definition.objectiveType == QuestObjectiveType::CRAFT_ITEM)
             ? IsKnownItem(definition.objectiveItem)
-            : definition.objectiveType == QuestObjectiveType::TALK_TO_CHARACTER &&
+            : (definition.objectiveType == QuestObjectiveType::TALK_TO_CHARACTER ||
+               definition.objectiveType == QuestObjectiveType::DEFEAT_CHARACTER) &&
                 definition.objectiveItem == ItemType::NONE &&
                 NpcDefinitionDatabase::TryGet(definition.objectiveNpc) != nullptr &&
+                (definition.objectiveType != QuestObjectiveType::DEFEAT_CHARACTER ||
+                 NpcDefinitionDatabase::TryGet(definition.objectiveNpc)->kind ==
+                    NpcKind::MONSTER) &&
                 definition.objectiveText != nullptr &&
                 definition.objectiveText[0] != '\0';
     const bool noAlternateCompletion =

@@ -4927,6 +4927,12 @@ void World::HandleCombatantDeath(
         RecordEntityDiedEvent(
             deadEntityID,
             killerEntityID);
+        Player *killer = dynamic_cast<Player *>(
+            entityManager.GetEntityByID(killerEntityID));
+        NPC *defeatedNpc = dynamic_cast<NPC *>(entity);
+        if (killer != nullptr && defeatedNpc != nullptr)
+            QuestSystem::RecordDefeated(
+                killer->GetQuestJournal(), defeatedNpc->GetNpcType());
     }
 
     CancelActionsForEntity(
