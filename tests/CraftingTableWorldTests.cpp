@@ -6,6 +6,7 @@
 #include "../src/Player/Player.h"
 #include "../src/Recipe/CraftingRecipeMatcher.h"
 #include "../src/Recipe/RecipeDatabase.h"
+#include "../src/Quest/QuestSystem.h"
 #include "../src/World/World.h"
 
 namespace
@@ -95,6 +96,13 @@ int main()
     {
         World world;
         Player *player = CreatePlayer(world);
+        QuestSystem::TryRestore(player->GetQuestJournal(), {
+            {QuestId::GATHERING_BASICS, QuestState::AVAILABLE, 0},
+            {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0},
+            {QuestId::TRACKS_IN_THE_ASH, QuestState::COMPLETED, 1},
+            {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0},
+            {QuestId::FANGS_AT_THE_GATE, QuestState::UNAVAILABLE, 0},
+            {QuestId::HEART_OF_THE_ASH, QuestState::UNAVAILABLE, 0}});
         NPC *torren = FindNpc(world, NpcType::TORREN_ASH);
         if (player != nullptr && torren != nullptr)
         {

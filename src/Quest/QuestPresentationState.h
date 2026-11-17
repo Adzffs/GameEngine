@@ -54,7 +54,17 @@ public:
             switch (record.state)
             {
             case QuestState::UNAVAILABLE:
-                guidance = "Locked";
+                if (definition->prerequisiteQuest != QuestId::NONE)
+                {
+                    const QuestDefinition *prerequisite =
+                        QuestDefinitionDatabase::TryGet(
+                            definition->prerequisiteQuest);
+                    guidance = "Requires: " + std::string(
+                        prerequisite == nullptr ? "Earlier quest" :
+                            prerequisite->name);
+                }
+                else
+                    guidance = "Locked";
                 break;
             case QuestState::AVAILABLE:
                 guidance = "Start: Speak to " + giverName;

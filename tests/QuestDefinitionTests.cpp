@@ -153,6 +153,19 @@ int main()
                     conclusion->alternateCompletion.rewardItem ==
                         ItemType::STEEL_BAR,
                 "Starter conclusion combines the elite fight with a reward choice");
+    QuestDefinition gated = *definition;
+    gated.id = QuestId::FANGS_AT_THE_GATE;
+    gated.initialState = QuestState::UNAVAILABLE;
+    gated.prerequisiteQuest = QuestId::SHIELD_OR_SHELTER;
+    test.Expect(QuestDefinitionDatabase::IsValidDefinition(gated),
+                "A locked quest may reference an earlier valid prerequisite");
+    gated.initialState = QuestState::AVAILABLE;
+    test.Expect(!QuestDefinitionDatabase::IsValidDefinition(gated),
+                "A prerequisite quest cannot start available");
+    gated.initialState = QuestState::UNAVAILABLE;
+    gated.prerequisiteQuest = gated.id;
+    test.Expect(!QuestDefinitionDatabase::IsValidDefinition(gated),
+                "A quest cannot require itself");
     invalid = *definition; invalid.requiredAmount = 0;
     test.Expect(!QuestDefinitionDatabase::IsValidDefinition(invalid),
                 "Non-positive requirement rejects");

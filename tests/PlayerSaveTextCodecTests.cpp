@@ -136,7 +136,7 @@ int main()
     golden += "inventory.0=BRONZE_AXE,1\ninventory.1=COINS,150\n";
     for (int i = 2; i < 28; ++i) golden += "inventory." + std::to_string(i) + "=NONE,0\n";
     golden += "bank_count=0\nskill_count=5\nskill.ATTACK=0\nskill.DEFENCE=0\nskill.WOODCUTTING=1200\nskill.MINING=500\nskill.SMITHING=300\n";
-    golden += "equipment_count=5\nequipment.HEAD=NONE\nequipment.BODY=NONE\nequipment.LEGS=NONE\nequipment.WEAPON=BRONZE_SWORD\nequipment.SHIELD=WOODEN_SHIELD\nquest_count=6\nquest.GATHERING_BASICS=AVAILABLE,0\nquest.MINING_BASICS=AVAILABLE,0\nquest.TRACKS_IN_THE_ASH=AVAILABLE,0\nquest.SHIELD_OR_SHELTER=AVAILABLE,0\nquest.FANGS_AT_THE_GATE=AVAILABLE,0\nquest.HEART_OF_THE_ASH=AVAILABLE,0\nEND_GAMEENGINE_PLAYER_SAVE\n";
+    golden += "equipment_count=5\nequipment.HEAD=NONE\nequipment.BODY=NONE\nequipment.LEGS=NONE\nequipment.WEAPON=BRONZE_SWORD\nequipment.SHIELD=WOODEN_SHIELD\nquest_count=6\nquest.GATHERING_BASICS=AVAILABLE,0\nquest.MINING_BASICS=AVAILABLE,0\nquest.TRACKS_IN_THE_ASH=AVAILABLE,0\nquest.SHIELD_OR_SHELTER=UNAVAILABLE,0\nquest.FANGS_AT_THE_GATE=UNAVAILABLE,0\nquest.HEART_OF_THE_ASH=UNAVAILABLE,0\nEND_GAMEENGINE_PLAYER_SAVE\n";
     test.ExpectEqual(canonical, golden, "complete canonical golden output");
     test.Expect(!canonical.empty() && canonical.back() == '\n', "canonical output has final LF");
     test.Expect(canonical.find('\r') == std::string::npos, "canonical output uses LF only");
@@ -223,9 +223,9 @@ int main()
     legacy = Replace(legacy, "quest.GATHERING_BASICS=AVAILABLE,0\n", "");
     legacy = Replace(legacy, "quest.MINING_BASICS=AVAILABLE,0\n", "");
     legacy = Replace(legacy, "quest.TRACKS_IN_THE_ASH=AVAILABLE,0\n", "");
-    legacy = Replace(legacy, "quest.SHIELD_OR_SHELTER=AVAILABLE,0\n", "");
-    legacy = Replace(legacy, "quest.FANGS_AT_THE_GATE=AVAILABLE,0\n", "");
-    legacy = Replace(legacy, "quest.HEART_OF_THE_ASH=AVAILABLE,0\n", "");
+    legacy = Replace(legacy, "quest.SHIELD_OR_SHELTER=UNAVAILABLE,0\n", "");
+    legacy = Replace(legacy, "quest.FANGS_AT_THE_GATE=UNAVAILABLE,0\n", "");
+    legacy = Replace(legacy, "quest.HEART_OF_THE_ASH=UNAVAILABLE,0\n", "");
     const auto migratedLegacy = PlayerSaveTextCodec::Decode(legacy);
     test.Expect(migratedLegacy.IsSuccess() && migratedLegacy.GetSaveData() &&
                     migratedLegacy.GetSaveData()->version == CURRENT_PLAYER_SAVE_VERSION &&
@@ -237,11 +237,11 @@ int main()
     historicalTwoQuest = Replace(historicalTwoQuest,
         "quest.TRACKS_IN_THE_ASH=AVAILABLE,0\n", "");
     historicalTwoQuest = Replace(historicalTwoQuest,
-        "quest.SHIELD_OR_SHELTER=AVAILABLE,0\n", "");
+        "quest.SHIELD_OR_SHELTER=UNAVAILABLE,0\n", "");
     historicalTwoQuest = Replace(historicalTwoQuest,
-        "quest.FANGS_AT_THE_GATE=AVAILABLE,0\n", "");
+        "quest.FANGS_AT_THE_GATE=UNAVAILABLE,0\n", "");
     historicalTwoQuest = Replace(historicalTwoQuest,
-        "quest.HEART_OF_THE_ASH=AVAILABLE,0\n", "");
+        "quest.HEART_OF_THE_ASH=UNAVAILABLE,0\n", "");
     std::string versionFive = Replace(historicalTwoQuest, "version=13", "version=5");
     versionFive = Replace(versionFive, "recipe_mask=4722\n", "");
     versionFive = Replace(versionFive, "tutorial_step=0\n", "");
@@ -288,11 +288,11 @@ int main()
     std::string historicalThreeQuest = Replace(
         canonical, "quest_count=6", "quest_count=3");
     historicalThreeQuest = Replace(historicalThreeQuest,
-        "quest.SHIELD_OR_SHELTER=AVAILABLE,0\n", "");
+        "quest.SHIELD_OR_SHELTER=UNAVAILABLE,0\n", "");
     historicalThreeQuest = Replace(historicalThreeQuest,
-        "quest.FANGS_AT_THE_GATE=AVAILABLE,0\n", "");
+        "quest.FANGS_AT_THE_GATE=UNAVAILABLE,0\n", "");
     historicalThreeQuest = Replace(historicalThreeQuest,
-        "quest.HEART_OF_THE_ASH=AVAILABLE,0\n", "");
+        "quest.HEART_OF_THE_ASH=UNAVAILABLE,0\n", "");
     historicalThreeQuest = Replace(
         historicalThreeQuest, "version=13", "version=10");
     const auto migratedVersionTen =
@@ -305,9 +305,9 @@ int main()
     std::string historicalFourQuest = Replace(
         canonical, "quest_count=6", "quest_count=4");
     historicalFourQuest = Replace(historicalFourQuest,
-        "quest.FANGS_AT_THE_GATE=AVAILABLE,0\n", "");
+        "quest.FANGS_AT_THE_GATE=UNAVAILABLE,0\n", "");
     historicalFourQuest = Replace(historicalFourQuest,
-        "quest.HEART_OF_THE_ASH=AVAILABLE,0\n", "");
+        "quest.HEART_OF_THE_ASH=UNAVAILABLE,0\n", "");
     historicalFourQuest = Replace(
         historicalFourQuest, "version=13", "version=11");
     const auto migratedVersionEleven =
@@ -320,7 +320,7 @@ int main()
     std::string historicalFiveQuest = Replace(
         canonical, "quest_count=6", "quest_count=5");
     historicalFiveQuest = Replace(historicalFiveQuest,
-        "quest.HEART_OF_THE_ASH=AVAILABLE,0\n", "");
+        "quest.HEART_OF_THE_ASH=UNAVAILABLE,0\n", "");
     historicalFiveQuest = Replace(
         historicalFiveQuest, "version=13", "version=12");
     const auto migratedVersionTwelve =
@@ -330,7 +330,7 @@ int main()
             migratedVersionTwelve.GetSaveData()->quests[5].id ==
                 QuestId::HEART_OF_THE_ASH &&
             migratedVersionTwelve.GetSaveData()->quests[5].state ==
-                QuestState::AVAILABLE,
+                QuestState::UNAVAILABLE,
         "version 12 saves gain the starter-region conclusion");
     Rejects(test, Replace(canonical, "combat_style=0", "combat_style=99"),
         PlayerSaveTextIssueCode::SAVE_DATA_VALIDATION_FAILED,

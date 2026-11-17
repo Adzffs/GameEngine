@@ -66,7 +66,7 @@ int main()
         world.GetActiveDialogueSession(player->GetID());
     test.Expect(available != nullptr &&
                     available->nodeId == DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME &&
-                    available->questActions.size() == 4 &&
+                    available->questActions.size() == 3 &&
                     available->questActions.front().kind == QuestDialogueActionKind::ACCEPT &&
                     available->questActions.front().questId == QuestId::GATHERING_BASICS,
                 "Real World opening publishes Accept for AVAILABLE");
@@ -92,7 +92,7 @@ int main()
     Reopen(world, *player);
     const NpcTalkEvent* active = LocalEvent(world, player->GetID());
     test.Expect(active != nullptr &&
-                    active->questActions.size() == 3 &&
+                    active->questActions.size() == 2 &&
                     active->questActions.front().questId == QuestId::MINING_BASICS,
                 "Real World opening retains independent Mining acceptance");
 
@@ -224,6 +224,13 @@ int main()
     {
         World choiceWorld(21U, 22U, 23U);
         Player* crafter = CreatePlayer(choiceWorld);
+        QuestSystem::TryRestore(crafter->GetQuestJournal(), {
+            {QuestId::GATHERING_BASICS, QuestState::AVAILABLE, 0},
+            {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0},
+            {QuestId::TRACKS_IN_THE_ASH, QuestState::COMPLETED, 1},
+            {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0},
+            {QuestId::FANGS_AT_THE_GATE, QuestState::UNAVAILABLE, 0},
+            {QuestId::HEART_OF_THE_ASH, QuestState::UNAVAILABLE, 0}});
         NPC* torren = FindNpc(choiceWorld, NpcType::TORREN_ASH);
         NPC* recipient = FindNpc(choiceWorld, recipientType);
         if (torren == nullptr || recipient == nullptr) return false;
@@ -275,6 +282,13 @@ int main()
 
     World combatWorld(31U, 32U, 33U);
     Player* defender = CreatePlayer(combatWorld);
+    QuestSystem::TryRestore(defender->GetQuestJournal(), {
+        {QuestId::GATHERING_BASICS, QuestState::AVAILABLE, 0},
+        {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0},
+        {QuestId::TRACKS_IN_THE_ASH, QuestState::COMPLETED, 1},
+        {QuestId::SHIELD_OR_SHELTER, QuestState::COMPLETED, 1},
+        {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0},
+        {QuestId::HEART_OF_THE_ASH, QuestState::UNAVAILABLE, 0}});
     NPC* seraCombat = FindNpc(combatWorld, NpcType::SERA_FLINT);
     if (seraCombat != nullptr)
     {
@@ -316,6 +330,13 @@ int main()
 
     World conclusionWorld(41U, 42U, 43U);
     Player* champion = CreatePlayer(conclusionWorld);
+    QuestSystem::TryRestore(champion->GetQuestJournal(), {
+        {QuestId::GATHERING_BASICS, QuestState::AVAILABLE, 0},
+        {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0},
+        {QuestId::TRACKS_IN_THE_ASH, QuestState::COMPLETED, 1},
+        {QuestId::SHIELD_OR_SHELTER, QuestState::COMPLETED, 1},
+        {QuestId::FANGS_AT_THE_GATE, QuestState::COMPLETED, 3},
+        {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}});
     NPC* maraConclusion = FindNpc(
         conclusionWorld, NpcType::DEVELOPMENT_GUIDE);
     NPC* brannConclusion = FindNpc(

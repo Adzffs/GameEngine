@@ -185,6 +185,14 @@ bool QuestSystem::CompleteWithReward(
         !inventory.AddItem(rewardItem, rewardAmount))
         return false;
     found->second.state = QuestState::COMPLETED;
+    for (const QuestDefinition &candidate : QuestDefinitionDatabase::GetAll())
+    {
+        auto locked = journal.records.find(candidate.id);
+        if (candidate.prerequisiteQuest == questId &&
+            locked != journal.records.end() &&
+            locked->second.state == QuestState::UNAVAILABLE)
+            locked->second.state = QuestState::AVAILABLE;
+    }
     return true;
 }
 

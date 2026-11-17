@@ -39,4 +39,5 @@ struct QuestDefinition
     const char *objectiveText = nullptr;
     QuestCompletionDefinition alternateCompletion{};
     QuestCategory category = QuestCategory::SIDE;
+    QuestId prerequisiteQuest = QuestId::NONE;
 };

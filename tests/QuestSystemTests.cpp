@@ -86,8 +86,44 @@ int main()
     const QuestRecord *initial = Gathering(journal);
     test.Expect(initial != nullptr && initial->state == QuestState::AVAILABLE &&
                     initial->progress == 0 && journal.GetRecords().size() == 6 &&
-                    journal.TryGet(QuestId::MINING_BASICS)->state == QuestState::AVAILABLE,
+                    journal.TryGet(QuestId::MINING_BASICS)->state == QuestState::AVAILABLE &&
+                    journal.TryGet(QuestId::SHIELD_OR_SHELTER)->state ==
+                        QuestState::UNAVAILABLE &&
+                    journal.TryGet(QuestId::FANGS_AT_THE_GATE)->state ==
+                        QuestState::UNAVAILABLE &&
+                    journal.TryGet(QuestId::HEART_OF_THE_ASH)->state ==
+                        QuestState::UNAVAILABLE,
                 "Default journal derives canonical initial records");
+    QuestJournal storyArc;
+    test.Expect(QuestSystem::TryRestore(storyArc, {
+                    {QuestId::GATHERING_BASICS, QuestState::AVAILABLE, 0},
+                    {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0},
+                    {QuestId::TRACKS_IN_THE_ASH,
+                        QuestState::READY_TO_COMPLETE, 1},
+                    {QuestId::SHIELD_OR_SHELTER, QuestState::UNAVAILABLE, 0},
+                    {QuestId::FANGS_AT_THE_GATE, QuestState::UNAVAILABLE, 0},
+                    {QuestId::HEART_OF_THE_ASH, QuestState::UNAVAILABLE, 0}}),
+                "Story unlock fixture restores");
+    Inventory storyRewards;
+    test.Expect(QuestSystem::Complete(storyArc, QuestId::TRACKS_IN_THE_ASH,
+                    storyRewards) &&
+                    storyArc.TryGet(QuestId::SHIELD_OR_SHELTER)->state ==
+                        QuestState::AVAILABLE &&
+                    QuestSystem::Accept(storyArc, QuestId::SHIELD_OR_SHELTER) &&
+                    !QuestSystem::RecordCrafted(storyArc,
+                        ItemType::WOODEN_SHIELD, 1).empty() &&
+                    QuestSystem::Complete(storyArc, QuestId::SHIELD_OR_SHELTER,
+                        storyRewards) &&
+                    storyArc.TryGet(QuestId::FANGS_AT_THE_GATE)->state ==
+                        QuestState::AVAILABLE &&
+                    QuestSystem::Accept(storyArc, QuestId::FANGS_AT_THE_GATE) &&
+                    !QuestSystem::RecordDefeated(storyArc,
+                        NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER, 3).empty() &&
+                    QuestSystem::Complete(storyArc, QuestId::FANGS_AT_THE_GATE,
+                        storyRewards) &&
+                    storyArc.TryGet(QuestId::HEART_OF_THE_ASH)->state ==
+                        QuestState::AVAILABLE,
+                "Completing each story chapter unlocks the next authored quest");
     test.Expect(QuestSystem::Accept(journal, QuestId::GATHERING_BASICS) &&
                     !QuestSystem::Accept(journal, QuestId::GATHERING_BASICS) &&
                     !QuestSystem::Accept(journal, static_cast<QuestId>(999)),

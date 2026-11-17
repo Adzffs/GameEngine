@@ -3,6 +3,7 @@
 #include "../Item/ItemDatabase.h"
 #include "../NPC/NpcDefinitionDatabase.h"
 
+#include <algorithm>
 #include <set>
 
 namespace
@@ -19,7 +20,7 @@ namespace
           DialogueId::DEVELOPMENT_GUIDE_INTRO,
           DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME},
          QuestObjectiveType::GATHER_ITEM, NpcType::NONE, nullptr, {},
-         QuestCategory::TUTORIAL},
+         QuestCategory::TUTORIAL, QuestId::NONE},
         {QuestId::MINING_BASICS,
          "Mining Basics",
          QuestState::AVAILABLE,
@@ -31,7 +32,7 @@ namespace
           DialogueId::DEVELOPMENT_GUIDE_INTRO,
           DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME},
          QuestObjectiveType::GATHER_ITEM, NpcType::NONE, nullptr, {},
-         QuestCategory::TUTORIAL},
+         QuestCategory::TUTORIAL, QuestId::NONE},
         {QuestId::TRACKS_IN_THE_ASH,
          "Tracks in the Ash",
          QuestState::AVAILABLE,
@@ -45,10 +46,10 @@ namespace
          QuestObjectiveType::TALK_TO_CHARACTER,
          NpcType::SERA_FLINT,
          "Find Sera Flint at the east road and ask about the Ashfang tracks",
-         {}, QuestCategory::SIDE},
+         {}, QuestCategory::SIDE, QuestId::NONE},
         {QuestId::SHIELD_OR_SHELTER,
          "Shield or Shelter",
-         QuestState::AVAILABLE,
+         QuestState::UNAVAILABLE,
          ItemType::WOODEN_SHIELD,
          1,
          ItemType::COINS,
@@ -63,10 +64,10 @@ namespace
           DialogueId::NESSA_THORNE_INTRO,
           DialogueNodeId::NESSA_THORNE_WELCOME,
           ItemType::COOKED_MEAT,
-          3}, QuestCategory::SIDE},
+          3}, QuestCategory::SIDE, QuestId::TRACKS_IN_THE_ASH},
         {QuestId::FANGS_AT_THE_GATE,
          "Fangs at the Gate",
-         QuestState::AVAILABLE,
+         QuestState::UNAVAILABLE,
          ItemType::NONE,
          3,
          ItemType::COOKED_MEAT,
@@ -77,10 +78,10 @@ namespace
          QuestObjectiveType::DEFEAT_CHARACTER,
          NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER,
          "Defeat three Ashfangs threatening the east road",
-         {}, QuestCategory::MAIN},
+         {}, QuestCategory::MAIN, QuestId::SHIELD_OR_SHELTER},
         {QuestId::HEART_OF_THE_ASH,
          "Heart of the Ash",
-         QuestState::AVAILABLE,
+         QuestState::UNAVAILABLE,
          ItemType::NONE,
          1,
          ItemType::COINS,
@@ -95,7 +96,7 @@ namespace
           DialogueId::BRANN_DEEPWELL_INTRO,
           DialogueNodeId::BRANN_DEEPWELL_WELCOME,
           ItemType::STEEL_BAR,
-          2}, QuestCategory::MAIN}};
+          2}, QuestCategory::MAIN, QuestId::FANGS_AT_THE_GATE}};
 
     bool IsKnownItem(ItemType itemType)
     {
@@ -155,6 +156,10 @@ bool QuestDefinitionDatabase::IsValidDefinition(
     return IsValidQuestId(definition.id) && definition.name != nullptr &&
         definition.name[0] != '\0' && validInitialState &&
         IsValidQuestCategory(definition.category) &&
+        (definition.prerequisiteQuest == QuestId::NONE ||
+         (IsValidQuestId(definition.prerequisiteQuest) &&
+          definition.prerequisiteQuest != definition.id &&
+          definition.initialState == QuestState::UNAVAILABLE)) &&
         IsValidQuestObjectiveType(definition.objectiveType) && validObjective &&
         definition.requiredAmount > 0 &&
         IsKnownItem(definition.rewardItem) && definition.rewardAmount > 0 &&
@@ -176,6 +181,18 @@ bool QuestDefinitionDatabase::IsValidCatalogue(
              static_cast<int>(definition.id) <= static_cast<int>(previous)))
             return false;
         previous = definition.id;
+    }
+    for (const QuestDefinition &definition : definitions)
+    {
+        if (definition.prerequisiteQuest == QuestId::NONE) continue;
+        const auto prerequisite = std::find_if(definitions.begin(),
+            definitions.end(), [&](const QuestDefinition &candidate)
+            {
+                return candidate.id == definition.prerequisiteQuest;
+            });
+        if (prerequisite == definitions.end() ||
+            static_cast<int>(prerequisite->id) >= static_cast<int>(definition.id))
+            return false;
     }
     return !definitions.empty();
 }
