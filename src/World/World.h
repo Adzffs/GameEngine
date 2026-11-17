@@ -17,6 +17,7 @@
 #include <map>
 #include "../Combat/CombatService.h"
 #include "../Combat/MeleeCombatFeedback.h"
+#include "../Combat/MeleeAttackPresentation.h"
 #include "../Combat/MeleeEngagementSystem.h"
 #include "../Reward/ItemReward.h"
 #include "../Reward/RewardTableRoller.h"
@@ -221,6 +222,8 @@ public:
 
     const std::map<int, MeleeCombatFeedback> &
     GetMeleeCombatFeedbacks() const;
+    const std::map<int, MeleeAttackPresentation> &
+    GetMeleeAttackPresentations() const;
 
     const std::vector<EntityDiedEvent> &
     GetEntityDiedEvents() const;
@@ -432,10 +435,12 @@ private:
 
     std::map<int, MeleeCombatFeedback>
         meleeCombatFeedbacks;
+    std::map<int, MeleeAttackPresentation> meleeAttackPresentations;
 
     static constexpr int MeleeCombatFeedbackLifetimeTicks = 3;
 
     void UpdateMeleeCombatFeedback();
+    void UpdateMeleeAttackPresentations();
     void RecordMeleeCombatFeedback(
         int attackerEntityID,
         int defenderEntityID,

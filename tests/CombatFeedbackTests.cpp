@@ -150,16 +150,32 @@ int main()
         test.Expect(
             world.GetMeleeCombatFeedbacks().empty(),
             "Starting a melee attack does not immediately create feedback");
+        test.Expect(world.GetMeleeAttackPresentations().count(playerID) == 1,
+            "Starting a melee attack creates a wind-up presentation");
+        if (world.GetMeleeAttackPresentations().count(playerID) == 1)
+        {
+            const MeleeAttackPresentation &presentation =
+                world.GetMeleeAttackPresentations().at(playerID);
+            test.ExpectEqual(presentation.defenderEntityID, monsterID,
+                "Wind-up identifies the intended defender");
+            test.ExpectEqual(presentation.totalTicks, 2,
+                "Wind-up uses authoritative attack duration");
+        }
 
         world.Update();
 
         test.Expect(
             world.GetMeleeCombatFeedbacks().empty(),
             "Feedback is not created before the attack completes");
+        test.Expect(world.GetMeleeAttackPresentations().count(playerID) == 1 &&
+                world.GetMeleeAttackPresentations().at(playerID).remainingTicks == 1,
+            "Wind-up advances toward contact on the world tick");
 
         world.Update();
 
         const auto &feedbacks = world.GetMeleeCombatFeedbacks();
+        test.Expect(world.GetMeleeAttackPresentations().empty(),
+            "Contact replaces the wind-up presentation with result feedback");
 
         test.Expect(
             feedbacks.count(monsterID) == 1,
@@ -268,6 +284,9 @@ int main()
                 feedback.actualDamageApplied,
                 0,
                 "Miss feedback shows zero actual damage");
+            test.ExpectEqual(Graphics::GetCombatFeedbackLabel(feedback),
+                std::string("MISS"),
+                "Miss presentation is explicitly labelled");
         }
     }
 
@@ -309,6 +328,9 @@ int main()
                 feedback.actualDamageApplied,
                 0,
                 "Zero-damage hit remains distinguishable from a miss");
+            test.ExpectEqual(Graphics::GetCombatFeedbackLabel(feedback),
+                std::string("BLOCK"),
+                "Zero-damage hit is presented as a block");
         }
     }
 

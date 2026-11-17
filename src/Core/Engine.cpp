@@ -353,7 +353,8 @@ bool Engine::Run()
                     : recoveryPile->position.GetX(),
                 recoveryPile == nullptr
                     ? -1
-                    : recoveryPile->position.GetY());
+                    : recoveryPile->position.GetY(),
+                &world.GetMeleeAttackPresentations());
         }
     }
 

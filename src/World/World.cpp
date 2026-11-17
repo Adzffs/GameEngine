@@ -1514,6 +1514,9 @@ bool World::TryStartMeleeAction(
             defenderEntityID,
             repeating));
 
+    meleeAttackPresentations[attackerEntityID] = MeleeAttackPresentation{
+        attackerEntityID, defenderEntityID, durationTicks, durationTicks};
+
     return true;
 }
 
@@ -1587,6 +1590,12 @@ const std::map<int, MeleeCombatFeedback> &
 World::GetMeleeCombatFeedbacks() const
 {
     return meleeCombatFeedbacks;
+}
+
+const std::map<int, MeleeAttackPresentation> &
+World::GetMeleeAttackPresentations() const
+{
+    return meleeAttackPresentations;
 }
 
 const std::vector<EntityDiedEvent> &
@@ -1673,11 +1682,25 @@ void World::UpdateMeleeCombatFeedback()
     }
 }
 
+void World::UpdateMeleeAttackPresentations()
+{
+    for (auto presentation = meleeAttackPresentations.begin();
+         presentation != meleeAttackPresentations.end();)
+    {
+        presentation->second.remainingTicks--;
+        if (presentation->second.remainingTicks <= 0)
+            presentation = meleeAttackPresentations.erase(presentation);
+        else
+            ++presentation;
+    }
+}
+
 void World::RecordMeleeCombatFeedback(
     int attackerEntityID,
     int defenderEntityID,
     const MeleeAttackResult &result)
 {
+    meleeAttackPresentations.erase(attackerEntityID);
     meleeCombatFeedbacks[defenderEntityID] = MeleeCombatFeedback{
         attackerEntityID,
         defenderEntityID,
@@ -1708,6 +1731,7 @@ void World::Update()
     ProcessPlayerRespawns();
 
     UpdateMeleeCombatFeedback();
+    UpdateMeleeAttackPresentations();
     ProcessDeadCombatantCleanup();
 
     ProcessMovementSystem();
@@ -4754,6 +4778,16 @@ void World::HandleCombatantDeath(
 
     ClearPendingMeleeInteractionsInvolvingEntity(
         deadEntityID);
+
+    for (auto presentation = meleeAttackPresentations.begin();
+         presentation != meleeAttackPresentations.end();)
+    {
+        if (presentation->second.attackerEntityID == deadEntityID ||
+            presentation->second.defenderEntityID == deadEntityID)
+            presentation = meleeAttackPresentations.erase(presentation);
+        else
+            ++presentation;
+    }
 
     Monster *monster =
         dynamic_cast<Monster *>(entity);

@@ -11,6 +11,7 @@
 #include "../Action/Action.h"
 #include "../Entity/Entity.h"
 #include "../Combat/MeleeCombatFeedback.h"
+#include "../Combat/MeleeAttackPresentation.h"
 #include "../World/Object/Resource/ResourceNode.h"
 #include "../World/Object/Station/CraftingStation.h"
 #include "../World/Object/Station/StationType.h"
@@ -115,6 +116,8 @@ public:
     float CalculateHealthRatio(
         int currentHealth,
         int maximumHealth) const;
+    static std::string GetCombatFeedbackLabel(
+        const MeleeCombatFeedback &feedback);
 
     SDL_FRect GetMonsterHealthBarBackgroundRectangle(
         const Monster &monster,
@@ -175,7 +178,8 @@ public:
         int deathX = 0,
         int deathY = 0,
         int recoveryPileX = -1,
-        int recoveryPileY = -1);
+        int recoveryPileY = -1,
+        const std::map<int, MeleeAttackPresentation> *attackPresentations = nullptr);
 
     enum class WorldHoverTargetType
     {
@@ -392,6 +396,9 @@ public:
     void DrawMonsterCombatFeedback(
         const std::vector<std::unique_ptr<Entity>> &entities,
         const std::map<int, MeleeCombatFeedback> &combatFeedbacks);
+    void DrawMeleeAttackPresentations(
+        const std::vector<std::unique_ptr<Entity>> &entities,
+        const std::map<int, MeleeAttackPresentation> &presentations);
     void DrawResources(
         const std::vector<ResourceNode> &resources);
     void DrawStations(

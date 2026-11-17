@@ -3183,16 +3183,19 @@ void Graphics::DrawMonsterCombatFeedback(
         }
 
         SDL_FPoint textPosition{};
+        SDL_FRect bodyRectangle{};
 
         if (Monster *monster = dynamic_cast<Monster *>(entity))
         {
             textPosition = GetMonsterCombatFeedbackPosition(
                 *monster);
+            bodyRectangle = GetMonsterScreenRectangle(*monster);
         }
         else if (Player *player = dynamic_cast<Player *>(entity))
         {
             textPosition = GetPlayerCombatFeedbackPosition(
                 *player);
+            bodyRectangle = GetPlayerScreenRectangle(*player);
         }
         else
         {
@@ -3206,9 +3209,7 @@ void Graphics::DrawMonsterCombatFeedback(
             feedback.hit ? 70 : 235,
             255);
 
-        std::string feedbackText = feedback.hit
-                                       ? std::to_string(feedback.actualDamageApplied)
-                                       : "MISS";
+        const std::string feedbackText = GetCombatFeedbackLabel(feedback);
 
         SDL_RenderDebugText(
             renderer,
@@ -3219,6 +3220,80 @@ void Graphics::DrawMonsterCombatFeedback(
         SDL_FRect impact{textPosition.x - 6.0f, textPosition.y + 4.0f,
                          22.0f, 2.0f};
         SDL_RenderFillRect(renderer, &impact);
+
+        if (feedback.hit)
+        {
+            SDL_SetRenderDrawColor(renderer,
+                feedback.remainingTicks >= 3 ? 255 : 210,
+                feedback.remainingTicks >= 3 ? 238 : 105,
+                feedback.remainingTicks >= 3 ? 205 : 92,
+                255);
+            SDL_RenderRect(renderer, &bodyRectangle);
+            if (feedback.remainingTicks >= 3)
+            {
+                SDL_FRect inner = bodyRectangle;
+                inner.x += 2.0f;
+                inner.y += 2.0f;
+                inner.w -= 4.0f;
+                inner.h -= 4.0f;
+                SDL_RenderRect(renderer, &inner);
+            }
+        }
+        else
+        {
+            const float centreX = bodyRectangle.x + bodyRectangle.w * 0.5f;
+            const float centreY = bodyRectangle.y + bodyRectangle.h * 0.5f;
+            SDL_SetRenderDrawColor(renderer, 190, 225, 245, 255);
+            SDL_RenderLine(renderer, centreX - 6.0f, centreY - 6.0f,
+                centreX + 6.0f, centreY + 6.0f);
+            SDL_RenderLine(renderer, centreX + 6.0f, centreY - 6.0f,
+                centreX - 6.0f, centreY + 6.0f);
+        }
+    }
+}
+
+std::string Graphics::GetCombatFeedbackLabel(
+    const MeleeCombatFeedback &feedback)
+{
+    if (!feedback.hit) return "MISS";
+    if (feedback.actualDamageApplied <= 0) return "BLOCK";
+    return std::to_string(feedback.actualDamageApplied);
+}
+
+void Graphics::DrawMeleeAttackPresentations(
+    const std::vector<std::unique_ptr<Entity>> &entities,
+    const std::map<int, MeleeAttackPresentation> &presentations)
+{
+    for (const auto &[attackerID, presentation] : presentations)
+    {
+        (void)attackerID;
+        Entity *attacker = GetEntityByID(entities, presentation.attackerEntityID);
+        Entity *defender = GetEntityByID(entities, presentation.defenderEntityID);
+        if (attacker == nullptr || defender == nullptr) continue;
+
+        const float progress = presentation.totalTicks <= 0
+            ? 1.0f
+            : 1.0f - static_cast<float>(presentation.remainingTicks) /
+                static_cast<float>(presentation.totalTicks);
+        const float attackerX = attacker->GetPosition().GetX() * TileSize + 16.0f;
+        const float attackerY = attacker->GetPosition().GetY() * TileSize + 16.0f;
+        const float defenderX = defender->GetPosition().GetX() * TileSize + 16.0f;
+        const float defenderY = defender->GetPosition().GetY() * TileSize + 16.0f;
+        const float dx = defenderX - attackerX;
+        const float dy = defenderY - attackerY;
+        const float length = std::max(1.0f, std::sqrt(dx * dx + dy * dy));
+        const float nx = dx / length;
+        const float ny = dy / length;
+        const float reach = 7.0f + progress * 9.0f;
+
+        SDL_SetRenderDrawColor(renderer, 255, 210, 105, 255);
+        SDL_RenderLine(renderer,
+            attackerX - ny * 5.0f, attackerY + nx * 5.0f,
+            attackerX + nx * reach, attackerY + ny * reach);
+        const SDL_FRect tell{
+            defenderX - 3.0f, defenderY - 21.0f, 6.0f, 6.0f};
+        SDL_SetRenderDrawColor(renderer, 255, 174, 64, 220);
+        SDL_RenderFillRect(renderer, &tell);
     }
 }
 void Graphics::DrawStations(
@@ -5311,7 +5386,8 @@ void Graphics::Render(
     int deathX,
     int deathY,
     int recoveryPileX,
-    int recoveryPileY)
+    int recoveryPileY,
+    const std::map<int, MeleeAttackPresentation> *attackPresentations)
 {
     const Uint64 presentationTick = SDL_GetTicks();
     if (lastPresentationTick != 0)
@@ -5370,6 +5446,8 @@ void Graphics::Render(
     DrawMonsters(entities, selectedCombatTargetID, player.GetID());
     DrawNPCs(entities);
     DrawPlayer(playerX, playerY);
+    if (attackPresentations != nullptr)
+        DrawMeleeAttackPresentations(entities, *attackPresentations);
     DrawPlayerHealthBar(player);
     DrawMonsterHealthBars(entities);
     DrawMonsterCombatFeedback(entities, combatFeedbacks);
