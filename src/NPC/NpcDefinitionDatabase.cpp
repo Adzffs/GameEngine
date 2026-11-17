@@ -15,7 +15,7 @@ namespace
         NpcType::PASSIVE_DEVELOPMENT_MONSTER,
         "Mossling",
         NpcKind::MONSTER,
-        NpcCombatDefinition{CombatRatings{5, 4, 3, 30}, 5,
+        NpcCombatDefinition{CombatRatings{3, 2, 2, 20}, 6,
             RewardTableType::DEVELOPMENT_MONSTER, std::nullopt, 8},
         {}, DialogueId::NONE, ShopId::NONE};
 
@@ -23,9 +23,27 @@ namespace
         NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER,
         "Ashfang",
         NpcKind::MONSTER,
-        NpcCombatDefinition{CombatRatings{5, 4, 3, 30}, 5,
-            RewardTableType::DEVELOPMENT_MONSTER,
-            MonsterAggressionDefinition{5, 8}, 8},
+        NpcCombatDefinition{CombatRatings{8, 6, 4, 35}, 4,
+            RewardTableType::AGGRESSIVE_MONSTER,
+            MonsterAggressionDefinition{4, 7}, 10},
+        {}, DialogueId::NONE, ShopId::NONE};
+
+    const NpcDefinition DurableDevelopmentMonster{
+        NpcType::DURABLE_DEVELOPMENT_MONSTER,
+        "Stoneback",
+        NpcKind::MONSTER,
+        NpcCombatDefinition{CombatRatings{10, 8, 18, 90}, 6,
+            RewardTableType::DURABLE_MONSTER,
+            MonsterAggressionDefinition{3, 6}, 14},
+        {}, DialogueId::NONE, ShopId::NONE};
+
+    const NpcDefinition EliteDevelopmentMonster{
+        NpcType::ELITE_DEVELOPMENT_MONSTER,
+        "Cinder Warden",
+        NpcKind::MONSTER,
+        NpcCombatDefinition{CombatRatings{18, 16, 14, 140}, 4,
+            RewardTableType::ELITE_MONSTER,
+            MonsterAggressionDefinition{5, 8}, 24},
         {}, DialogueId::NONE, ShopId::NONE};
 }
 
@@ -36,7 +54,9 @@ namespace NpcDefinitionDatabase
         static const std::vector<NpcType> types{
             NpcType::DEVELOPMENT_GUIDE,
             NpcType::PASSIVE_DEVELOPMENT_MONSTER,
-            NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER};
+            NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER,
+            NpcType::DURABLE_DEVELOPMENT_MONSTER,
+            NpcType::ELITE_DEVELOPMENT_MONSTER};
         return types;
     }
 
@@ -50,6 +70,10 @@ namespace NpcDefinitionDatabase
             return &PassiveDevelopmentMonster;
         case NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER:
             return &AggressiveDevelopmentMonster;
+        case NpcType::DURABLE_DEVELOPMENT_MONSTER:
+            return &DurableDevelopmentMonster;
+        case NpcType::ELITE_DEVELOPMENT_MONSTER:
+            return &EliteDevelopmentMonster;
         case NpcType::NONE:
         default:
             return nullptr;

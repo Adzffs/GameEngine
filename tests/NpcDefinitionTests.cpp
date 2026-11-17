@@ -32,9 +32,15 @@ int main()
         NpcType::PASSIVE_DEVELOPMENT_MONSTER);
     const NpcDefinition *aggressive = NpcDefinitionDatabase::TryGet(
         NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER);
+    const NpcDefinition *durable = NpcDefinitionDatabase::TryGet(
+        NpcType::DURABLE_DEVELOPMENT_MONSTER);
+    const NpcDefinition *elite = NpcDefinitionDatabase::TryGet(
+        NpcType::ELITE_DEVELOPMENT_MONSTER);
 
     test.Expect(passive != nullptr, "Passive definition resolves by stable ID");
     test.Expect(aggressive != nullptr, "Aggressive definition resolves by stable ID");
+    test.Expect(durable != nullptr, "Durable definition resolves by stable ID");
+    test.Expect(elite != nullptr, "Elite definition resolves by stable ID");
     test.Expect(
         NpcDefinitionDatabase::TryGet(static_cast<NpcType>(999)) == nullptr,
         "Unknown NPC definition ID fails safely");
@@ -50,26 +56,43 @@ int main()
         NpcDefinitionDatabase::GetAllNpcTypes().size(),
         "NPC definition IDs are unique");
 
-    if (passive != nullptr && aggressive != nullptr)
+    if (passive != nullptr && aggressive != nullptr &&
+        durable != nullptr && elite != nullptr)
     {
-        for (const NpcDefinition *definition : {passive, aggressive})
+        for (const NpcDefinition *definition : {passive, aggressive, durable, elite})
         {
             test.Expect(definition->combat.has_value(), "Monster has combat data");
-            test.ExpectEqual(definition->combat->ratings.attackAccuracy, 5, "Attack accuracy is preserved");
-            test.ExpectEqual(definition->combat->ratings.meleeStrength, 4, "Melee strength is preserved");
-            test.ExpectEqual(definition->combat->ratings.defence, 3, "Defence is preserved");
-            test.ExpectEqual(definition->combat->ratings.maximumHealth, 30, "Maximum health is preserved");
-            test.ExpectEqual(definition->combat->attackDurationTicks, 5, "Attack duration is preserved");
-            test.ExpectEqual(definition->combat->respawnDelayTicks, 8, "Respawn delay is preserved");
-            test.ExpectEqual(
-                static_cast<int>(definition->combat->rewardTableType),
-                static_cast<int>(RewardTableType::DEVELOPMENT_MONSTER),
-                "Reward-table identity is preserved");
+            test.Expect(definition->combat->ratings.maximumHealth > 0,
+                "Monster health is positive");
+            test.Expect(definition->combat->attackDurationTicks > 0,
+                "Monster attack cadence is positive");
+            test.Expect(definition->combat->respawnDelayTicks > 0,
+                "Monster respawn pacing is positive");
         }
+        test.Expect(passive->combat->ratings.maximumHealth <
+                aggressive->combat->ratings.maximumHealth &&
+                aggressive->combat->ratings.maximumHealth <
+                durable->combat->ratings.maximumHealth &&
+                durable->combat->ratings.maximumHealth <
+                elite->combat->ratings.maximumHealth,
+            "Roster health rises through practice, threat, durable and elite tiers");
+        test.Expect(durable->combat->ratings.defence >
+                aggressive->combat->ratings.defence,
+            "Stoneback is defined by substantially higher defence");
+        test.Expect(elite->combat->ratings.attackAccuracy >
+                durable->combat->ratings.attackAccuracy &&
+                elite->combat->ratings.meleeStrength >
+                durable->combat->ratings.meleeStrength,
+            "Cinder Warden tests complete combat preparation");
+        test.Expect(passive->combat->rewardTableType == RewardTableType::DEVELOPMENT_MONSTER &&
+                aggressive->combat->rewardTableType == RewardTableType::AGGRESSIVE_MONSTER &&
+                durable->combat->rewardTableType == RewardTableType::DURABLE_MONSTER &&
+                elite->combat->rewardTableType == RewardTableType::ELITE_MONSTER,
+            "Every roster role has a distinct reward identity");
         test.Expect(!passive->combat->aggression.has_value(), "Passive definition is non-aggressive");
         test.Expect(aggressive->combat->aggression.has_value(), "Aggressive definition is aggressive");
-        test.ExpectEqual(aggressive->combat->aggression->detectionRadius, 5, "Detection radius is preserved");
-        test.ExpectEqual(aggressive->combat->aggression->leashRadius, 8, "Leash radius is preserved");
+        test.ExpectEqual(aggressive->combat->aggression->detectionRadius, 4, "Detection radius is preserved");
+        test.ExpectEqual(aggressive->combat->aggression->leashRadius, 7, "Leash radius is preserved");
 
         NpcDefinition emptyName = *passive;
         emptyName.name.clear();
@@ -212,12 +235,12 @@ int main()
     {
         test.ExpectEqual(spawnedPassive->GetID(), 2, "Passive creation order and ID are preserved");
         test.ExpectEqual(spawnedAggressive->GetID(), 3, "Aggressive creation order and ID are preserved");
-        test.ExpectEqual(spawnedPassive->GetAttackDurationTicks(), 5, "Passive runtime attack duration comes from its definition");
-        test.ExpectEqual(spawnedAggressive->GetAttackDurationTicks(), 5, "Aggressive runtime attack duration comes from its definition");
-        test.ExpectEqual(spawnedPassive->GetMaximumHealth(), 30, "Passive runtime health comes from its definition");
-        test.ExpectEqual(spawnedAggressive->GetMaximumHealth(), 30, "Aggressive runtime health comes from its definition");
+        test.ExpectEqual(spawnedPassive->GetAttackDurationTicks(), 6, "Passive runtime attack duration comes from its definition");
+        test.ExpectEqual(spawnedAggressive->GetAttackDurationTicks(), 4, "Aggressive runtime attack duration comes from its definition");
+        test.ExpectEqual(spawnedPassive->GetMaximumHealth(), 20, "Passive runtime health comes from its definition");
+        test.ExpectEqual(spawnedAggressive->GetMaximumHealth(), 35, "Aggressive runtime health comes from its definition");
         test.ExpectEqual(spawnedPassive->GetRespawnDefinition()->delayTicks, 8, "Passive runtime respawn delay comes from its definition");
-        test.ExpectEqual(spawnedAggressive->GetRespawnDefinition()->delayTicks, 8, "Aggressive runtime respawn delay comes from its definition");
+        test.ExpectEqual(spawnedAggressive->GetRespawnDefinition()->delayTicks, 10, "Aggressive runtime respawn delay comes from its definition");
     }
 
     const std::size_t entityCount = world.GetEntities().size();

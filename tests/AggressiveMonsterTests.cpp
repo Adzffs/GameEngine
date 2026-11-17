@@ -217,11 +217,11 @@ int main()
         {
             test.ExpectEqual(
                 aggressiveDefinition->combat->aggression->detectionRadius,
-                5,
+                4,
                 "Starter aggressive monster uses configured detection radius");
             test.ExpectEqual(
                 aggressiveDefinition->combat->aggression->leashRadius,
-                8,
+                7,
                 "Starter aggressive monster uses configured leash radius");
         }
 

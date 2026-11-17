@@ -208,6 +208,12 @@ namespace
             return "NONE";
         case RewardTableType::DEVELOPMENT_MONSTER:
             return "DEVELOPMENT_MONSTER";
+        case RewardTableType::AGGRESSIVE_MONSTER:
+            return "AGGRESSIVE_MONSTER";
+        case RewardTableType::DURABLE_MONSTER:
+            return "DURABLE_MONSTER";
+        case RewardTableType::ELITE_MONSTER:
+            return "ELITE_MONSTER";
         }
 
         return "UNKNOWN_REWARD_TABLE";
@@ -476,7 +482,7 @@ ContentValidationReport ContentValidator::ValidateRewardTableEntries(
             "stored total weight must match weighted entries");
     }
 
-    if (rewardTableType == RewardTableType::DEVELOPMENT_MONSTER)
+    if (rewardTableType != RewardTableType::NONE)
     {
         if (guaranteedEntries.empty() &&
             weightedEntries.empty())
