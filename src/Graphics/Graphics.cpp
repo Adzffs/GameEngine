@@ -6113,10 +6113,10 @@ void Graphics::Render(
 
     SDL_SetRenderScale(renderer, cameraZoom, cameraZoom);
     const SDL_Rect worldViewport{
-        -static_cast<int>(std::round(cameraPixelX * cameraZoom)),
-        -static_cast<int>(std::round(cameraPixelY * cameraZoom)),
-        static_cast<int>(std::round(map.GetWidth() * TileSize * cameraZoom)),
-        static_cast<int>(std::round(map.GetHeight() * TileSize * cameraZoom))};
+        -static_cast<int>(std::round(cameraPixelX)),
+        -static_cast<int>(std::round(cameraPixelY)),
+        map.GetWidth() * TileSize,
+        map.GetHeight() * TileSize};
     SDL_SetRenderViewport(renderer, &worldViewport);
 
     DrawMap(map);
