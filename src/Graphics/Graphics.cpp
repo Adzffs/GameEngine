@@ -7,6 +7,7 @@
 #include "../NPC/NpcDefinitionDatabase.h"
 #include "../Item/ItemDatabase.h"
 #include "../Recipe/RecipeDatabase.h"
+#include "../Recipe/RecipeProductionPacing.h"
 #include "../Quest/QuestDefinitionDatabase.h"
 #include "../Combat/Combatant.h"
 #include "../World/Object/Resource/ResourceDatabase.h"
@@ -4287,8 +4288,13 @@ void Graphics::DrawRecipeBook()
     const std::string output = "Makes: " +
         std::to_string(selected.GetOutputAmount()) + " " +
         ItemDatabase::Get(selected.GetOutputItem()).GetName();
-    const std::string timing = "Time: " +
-        std::to_string(selected.GetActionDurationTicks()) + " ticks  XP: " +
+    const int baseDuration = selected.GetActionDurationTicks();
+    const int currentDuration = RecipeProductionPacing::GetDurationTicks(
+        selected, GetDisplayedSkillLevel(selected.GetRequiredSkill()));
+    const std::string timing = "Time: " + std::to_string(currentDuration) +
+        (currentDuration < baseDuration
+            ? " ticks (mastered)  XP: "
+            : " ticks  XP: ") +
         std::to_string(selected.GetXPReward());
     SDL_SetRenderDrawColor(renderer, 225, 225, 220, 255);
     SDL_RenderDebugText(renderer, layout.contentBounds.x, detailY,

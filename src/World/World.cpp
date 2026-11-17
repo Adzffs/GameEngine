@@ -31,6 +31,7 @@
 #include "../Core/SeededRandom.h"
 #include "../Recipe/RecipeSystem.h"
 #include "../Recipe/RecipeDatabase.h"
+#include "../Recipe/RecipeProductionPacing.h"
 #include "../Recipe/CraftingRecipeMatcher.h"
 #include "../Reward/RewardTableRegistry.h"
 #include "../Combat/Combatant.h"
@@ -1390,12 +1391,17 @@ bool World::TryStartRecipeAction(
     const RecipeDefinition &recipe =
         RecipeDatabase::Get(
             recipeType);
+    const int skillLevel = recipe.GetRequiredSkill() == SkillType::NONE
+        ? 1
+        : player->GetSkills().GetSkill(recipe.GetRequiredSkill()).GetLevel();
+    const int durationTicks = RecipeProductionPacing::GetDurationTicks(
+        recipe, skillLevel);
 
     StartAction(
         Action(
             ActionType::RECIPE,
             recipe.GetName(),
-            recipe.GetActionDurationTicks(),
+            durationTicks,
             entityID,
             static_cast<int>(
                 recipeType),

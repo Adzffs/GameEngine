@@ -9,6 +9,7 @@
 #include "../src/Player/PlayerInitializationMode.h"
 #include "../src/Recipe/CraftingRecipeMatcher.h"
 #include "../src/Recipe/RecipeDatabase.h"
+#include "../src/Recipe/RecipeProductionPacing.h"
 #include "../src/Recipe/RecipeSystem.h"
 
 int main()
@@ -65,6 +66,25 @@ int main()
         RecipeDatabase::Get(RecipeType::OAK_PLANKS);
     const RecipeDefinition &willowPlanks =
         RecipeDatabase::Get(RecipeType::WILLOW_PLANKS);
+
+    test.ExpectEqual(
+        RecipeProductionPacing::GetDurationTicks(
+            RecipeDatabase::Get(RecipeType::BRONZE_BAR), 1),
+        3,
+        "A newly learned recipe keeps its authored production time");
+    test.ExpectEqual(
+        RecipeProductionPacing::GetDurationTicks(
+            RecipeDatabase::Get(RecipeType::BRONZE_BAR), 11),
+        2,
+        "Ten skill levels of recipe mastery shorten routine production");
+    test.ExpectEqual(
+        RecipeProductionPacing::GetDurationTicks(steelAxe, 99),
+        3,
+        "Recipe mastery is capped at half of the authored production time");
+    test.ExpectEqual(
+        RecipeProductionPacing::GetDurationTicks(planks, 99),
+        1,
+        "Recipes without a governing skill keep their authored production time");
 
     test.Expect(
         planks.GetRequiredStationType() ==

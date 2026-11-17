@@ -13,6 +13,7 @@
 #include "../src/Movement/MovementRequest.h"
 #include "../src/Player/Player.h"
 #include "../src/Recipe/RecipeDatabase.h"
+#include "../src/Recipe/RecipeProductionPacing.h"
 #include "../src/Recipe/RecipeType.h"
 #include "../src/World/Event/ActionCancelledEvent.h"
 #include "../src/World/Event/ActionCompletedEvent.h"
@@ -547,6 +548,34 @@ int main()
                 2,
                 "Start event uses authoritative action completion tick");
         }
+    }
+
+    {
+        World world;
+        int playerID = world.CreatePlayer();
+        Player *player = GetPlayer(world, playerID);
+        player->GetPosition().SetPosition(13, 9);
+        player->GetInventory().AddItem(ItemType::COPPER_ORE, 1);
+        player->GetInventory().AddItem(ItemType::TIN_ORE, 1);
+        player->GetSkills().AddXP(SkillType::SMITHING, 100000);
+
+        test.Expect(
+            OpenFurnace(world, playerID) &&
+                world.TryStartRecipeAction(playerID, RecipeType::BRONZE_BAR),
+            "A mastered recipe starts through the normal authoritative path");
+        const Action *masteredAction = world.GetActionForEntity(playerID);
+        const RecipeDefinition &bronzeBar =
+            RecipeDatabase::Get(RecipeType::BRONZE_BAR);
+        const int smithingLevel = player->GetSkills()
+            .GetSkill(SkillType::SMITHING).GetLevel();
+        test.Expect(
+            masteredAction != nullptr &&
+                masteredAction->GetDuration() ==
+                    RecipeProductionPacing::GetDurationTicks(
+                        bronzeBar, smithingLevel) &&
+                masteredAction->GetDuration() <
+                    bronzeBar.GetActionDurationTicks(),
+            "Authoritative recipe actions use the player's mastery speed");
     }
 
     {
