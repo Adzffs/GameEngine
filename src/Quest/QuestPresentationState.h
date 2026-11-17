@@ -4,6 +4,7 @@
 #include "QuestJournal.h"
 #include "../Item/ItemDatabase.h"
 
+#include <algorithm>
 #include <string>
 #include <utility>
 #include <vector>
@@ -16,6 +17,9 @@ struct QuestPresentation
     int required = 0;
     std::string title;
     std::string objective;
+    QuestCategory category = QuestCategory::SIDE;
+    std::string reward;
+    int rewardAmount = 0;
 };
 
 class QuestPresentationState
@@ -42,8 +46,27 @@ public:
             }
             replacement.push_back({questId, record.state, record.progress,
                 definition->requiredAmount, definition->name,
-                std::move(objective)});
+                std::move(objective), definition->category,
+                ItemDatabase::Get(definition->rewardItem).GetName(),
+                definition->rewardAmount});
         }
+        std::stable_sort(replacement.begin(), replacement.end(),
+            [](const QuestPresentation &left, const QuestPresentation &right)
+            {
+                const auto priority = [](QuestState state)
+                {
+                    switch (state)
+                    {
+                    case QuestState::READY_TO_COMPLETE: return 0;
+                    case QuestState::ACTIVE: return 1;
+                    case QuestState::AVAILABLE: return 2;
+                    case QuestState::COMPLETED: return 3;
+                    case QuestState::UNAVAILABLE: return 4;
+                    }
+                    return 4;
+                };
+                return priority(left.state) < priority(right.state);
+            });
         quests = std::move(replacement);
     }
 

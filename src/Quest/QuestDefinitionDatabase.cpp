@@ -17,7 +17,9 @@ namespace
          10,
          {NpcType::DEVELOPMENT_GUIDE,
           DialogueId::DEVELOPMENT_GUIDE_INTRO,
-          DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME}},
+          DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME},
+         QuestObjectiveType::GATHER_ITEM, NpcType::NONE, nullptr, {},
+         QuestCategory::TUTORIAL},
         {QuestId::MINING_BASICS,
          "Mining Basics",
          QuestState::AVAILABLE,
@@ -27,7 +29,9 @@ namespace
          10,
          {NpcType::DEVELOPMENT_GUIDE,
           DialogueId::DEVELOPMENT_GUIDE_INTRO,
-          DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME}},
+          DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME},
+         QuestObjectiveType::GATHER_ITEM, NpcType::NONE, nullptr, {},
+         QuestCategory::TUTORIAL},
         {QuestId::TRACKS_IN_THE_ASH,
          "Tracks in the Ash",
          QuestState::AVAILABLE,
@@ -40,7 +44,8 @@ namespace
           DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME},
          QuestObjectiveType::TALK_TO_CHARACTER,
          NpcType::SERA_FLINT,
-         "Find Sera Flint at the east road and ask about the Ashfang tracks"},
+         "Find Sera Flint at the east road and ask about the Ashfang tracks",
+         {}, QuestCategory::SIDE},
         {QuestId::SHIELD_OR_SHELTER,
          "Shield or Shelter",
          QuestState::AVAILABLE,
@@ -58,7 +63,7 @@ namespace
           DialogueId::NESSA_THORNE_INTRO,
           DialogueNodeId::NESSA_THORNE_WELCOME,
           ItemType::COOKED_MEAT,
-          3}},
+          3}, QuestCategory::SIDE},
         {QuestId::FANGS_AT_THE_GATE,
          "Fangs at the Gate",
          QuestState::AVAILABLE,
@@ -71,7 +76,8 @@ namespace
           DialogueNodeId::SERA_FLINT_WELCOME},
          QuestObjectiveType::DEFEAT_CHARACTER,
          NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER,
-         "Defeat three Ashfangs threatening the east road"},
+         "Defeat three Ashfangs threatening the east road",
+         {}, QuestCategory::MAIN},
         {QuestId::HEART_OF_THE_ASH,
          "Heart of the Ash",
          QuestState::AVAILABLE,
@@ -89,7 +95,7 @@ namespace
           DialogueId::BRANN_DEEPWELL_INTRO,
           DialogueNodeId::BRANN_DEEPWELL_WELCOME,
           ItemType::STEEL_BAR,
-          2}}};
+          2}, QuestCategory::MAIN}};
 
     bool IsKnownItem(ItemType itemType)
     {
@@ -148,6 +154,7 @@ bool QuestDefinitionDatabase::IsValidDefinition(
         definition.alternateCompletion.rewardAmount > 0;
     return IsValidQuestId(definition.id) && definition.name != nullptr &&
         definition.name[0] != '\0' && validInitialState &&
+        IsValidQuestCategory(definition.category) &&
         IsValidQuestObjectiveType(definition.objectiveType) && validObjective &&
         definition.requiredAmount > 0 &&
         IsKnownItem(definition.rewardItem) && definition.rewardAmount > 0 &&

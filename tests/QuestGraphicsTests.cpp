@@ -159,8 +159,10 @@ int main()
 
     QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::COMPLETED, 10}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}, {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}, {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}, {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}});
     view = graphics.BuildQuestPanelView(player);
-    test.Expect(view.state == "COMPLETED" && view.progress == "Logs: 10 / 10",
-                "Completed quest has a clear label");
+    test.Expect(view.state == "AVAILABLE" &&
+                    view.title == "Mining Basics" &&
+                    view.progress == "Copper ores: 0 / 5",
+                "Completed quest history no longer hides the next available goal");
 
     SelectTab(graphics, 0);
     test.Expect(!graphics.BuildQuestPanelView(player).visible,
@@ -235,7 +237,11 @@ int main()
                         "READY TO COMPLETE" &&
                     Graphics::GetQuestStateLabel(QuestState::COMPLETED) == "COMPLETED" &&
                     Graphics::GetQuestProgressLabel(syntheticQuests[1]) ==
-                        "Logs: 6 / 10",
+                        "Logs: 6 / 10" &&
+                    Graphics::GetQuestCategoryLabel(QuestCategory::MAIN) ==
+                        "MAIN" &&
+                    Graphics::GetQuestCategoryLabel(QuestCategory::TUTORIAL) ==
+                        "TUTORIAL",
                 "Runtime row labels cover every visible quest state");
 
     Graphics nativeGraphics;

@@ -23,19 +23,26 @@ int main()
                     "Fixture restores through controlled QuestSystem API");
         presentation.Synchronize(journal);
         const auto &quests = presentation.GetQuests();
+        const std::size_t gatheringIndex =
+            state == QuestState::COMPLETED ? quests.size() - 1 : 0;
+        const std::size_t miningIndex =
+            state == QuestState::COMPLETED ? 0 : 1;
         test.Expect(quests.size() == 6 &&
-                        quests.front().id == QuestId::GATHERING_BASICS &&
-                        quests.front().state == state &&
-                        quests.front().progress == progress &&
-                        quests.front().required == 10 &&
-                        quests.front().title == "Gathering Basics" &&
-                        quests.front().objective == "Logs",
-                    "Presentation copies ordered authoritative journal values");
-        test.Expect(quests[1].id == QuestId::MINING_BASICS &&
-                        quests[1].required == 5 &&
-                        quests[1].title == "Mining Basics" &&
-                        quests[1].objective == "Copper ores",
-                    "Presentation includes Mining Basics second in catalogue order");
+                        quests[gatheringIndex].id == QuestId::GATHERING_BASICS &&
+                        quests[gatheringIndex].state == state &&
+                        quests[gatheringIndex].progress == progress &&
+                        quests[gatheringIndex].required == 10 &&
+                        quests[gatheringIndex].title == "Gathering Basics" &&
+                        quests[gatheringIndex].objective == "Logs" &&
+                        quests[gatheringIndex].category == QuestCategory::TUTORIAL &&
+                        quests[gatheringIndex].reward == "Coins" &&
+                        quests[gatheringIndex].rewardAmount == 10,
+                    "Presentation copies objective, category and reward values");
+        test.Expect(quests[miningIndex].id == QuestId::MINING_BASICS &&
+                        quests[miningIndex].required == 5 &&
+                        quests[miningIndex].title == "Mining Basics" &&
+                        quests[miningIndex].objective == "Copper ores",
+                    "Active work stays ahead of completed journal history");
     }
     return test.Finish();
 }

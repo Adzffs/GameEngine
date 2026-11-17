@@ -309,6 +309,8 @@ public:
     static std::string GetQuestStateLabel(QuestState state);
     static std::string GetQuestProgressLabel(
         const QuestPresentation &quest);
+    static std::string GetQuestCategoryLabel(QuestCategory category);
+    static std::string GetQuestRewardLabel(const QuestPresentation &quest);
     SDL_FRect GetSidePanelRectangle() const;
     QuestPanelView BuildQuestPanelView(const Player &player) const;
     bool HandleSidePanelClick(

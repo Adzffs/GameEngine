@@ -2,6 +2,7 @@
 #include "QuestId.h"
 #include "QuestState.h"
 #include "QuestObjectiveType.h"
+#include "QuestCategory.h"
 #include "../Dialogue/DialogueId.h"
 #include "../Dialogue/DialogueNodeId.h"
 #include "../Inventory/ItemType.h"
@@ -37,4 +38,5 @@ struct QuestDefinition
     NpcType objectiveNpc = NpcType::NONE;
     const char *objectiveText = nullptr;
     QuestCompletionDefinition alternateCompletion{};
+    QuestCategory category = QuestCategory::SIDE;
 };

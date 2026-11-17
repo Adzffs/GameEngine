@@ -5812,6 +5812,23 @@ std::string Graphics::GetQuestProgressLabel(const QuestPresentation &quest)
         std::to_string(quest.required);
 }
 
+std::string Graphics::GetQuestCategoryLabel(QuestCategory category)
+{
+    switch (category)
+    {
+    case QuestCategory::TUTORIAL: return "TUTORIAL";
+    case QuestCategory::MAIN: return "MAIN";
+    case QuestCategory::SIDE: return "SIDE";
+    }
+    return "SIDE";
+}
+
+std::string Graphics::GetQuestRewardLabel(const QuestPresentation &quest)
+{
+    return "Reward: " + std::to_string(quest.rewardAmount) + " " +
+        quest.reward;
+}
+
 Graphics::QuestPanelView Graphics::BuildQuestPanelView(const Player &player) const
 {
     const SidePanelLayout layout = GetSidePanelLayout();
@@ -5876,7 +5893,9 @@ void Graphics::DrawQuestRows(const std::vector<QuestPresentation> &quests)
         SDL_SetRenderDrawColor(renderer, 255, 215, 100, 255);
         SDL_RenderDebugText(renderer, row.titlePosition.x, row.titlePosition.y,
             quest.title.c_str());
-        const std::string state = GetQuestStateLabel(quest.state);
+        const std::string state = GetQuestStateLabel(quest.state) + " | " +
+            GetQuestCategoryLabel(quest.category) + " | " +
+            GetQuestRewardLabel(quest);
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderDebugText(renderer, row.statePosition.x, row.statePosition.y,
             state.c_str());
