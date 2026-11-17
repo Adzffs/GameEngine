@@ -10,7 +10,11 @@ namespace NpcSpawnDatabase
             {NpcSpawnId::PASSIVE_DEVELOPMENT_SPAWN, NpcType::PASSIVE_DEVELOPMENT_MONSTER,
              Position{6, 1}, 2, 5, 1, true},
             {NpcSpawnId::AGGRESSIVE_DEVELOPMENT_SPAWN, NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER,
-             Position{18, 2}, 0, 0, 1, true}};
+             Position{18, 2}, 0, 0, 1, true},
+            {NpcSpawnId::DURABLE_DEVELOPMENT_SPAWN, NpcType::DURABLE_DEVELOPMENT_MONSTER,
+             Position{16, 11}, 1, 7, 1, true},
+            {NpcSpawnId::ELITE_DEVELOPMENT_SPAWN, NpcType::ELITE_DEVELOPMENT_MONSTER,
+             Position{22, 3}, 0, 0, 1, true}};
         return spawns;
     }
 
@@ -20,7 +24,11 @@ namespace NpcSpawnDatabase
             {NpcSpawnId::PASSIVE_DEVELOPMENT_SPAWN, NpcType::PASSIVE_DEVELOPMENT_MONSTER,
              Position{6, 1}, 2, 5, 1, true},
             {NpcSpawnId::AGGRESSIVE_DEVELOPMENT_SPAWN, NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER,
-             Position{18, 2}, 0, 0, 1, true}};
+             Position{18, 2}, 0, 0, 1, true},
+            {NpcSpawnId::DURABLE_DEVELOPMENT_SPAWN, NpcType::DURABLE_DEVELOPMENT_MONSTER,
+             Position{16, 11}, 1, 7, 1, true},
+            {NpcSpawnId::ELITE_DEVELOPMENT_SPAWN, NpcType::ELITE_DEVELOPMENT_MONSTER,
+             Position{22, 3}, 0, 0, 1, true}};
         return spawns;
     }
 

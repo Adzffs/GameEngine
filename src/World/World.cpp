@@ -198,6 +198,9 @@ World::World(
     for (const NpcSpawnDefinition &spawn :
          NpcSpawnDatabase::GetStarterMonsterSpawns())
     {
+        if (spawn.spawnId == NpcSpawnId::DURABLE_DEVELOPMENT_SPAWN ||
+            spawn.spawnId == NpcSpawnId::ELITE_DEVELOPMENT_SPAWN)
+            continue;
         CreateMonster(spawn.npcType, spawn);
     }
 
@@ -252,7 +255,22 @@ void World::CreateStation(
 }
 int World::CreatePlayer()
 {
-    return entityManager.CreatePlayer();
+    const int playerID = entityManager.CreatePlayer();
+    if (playerID > 0) EnsureAdvancedStarterMonsters();
+    return playerID;
+}
+
+void World::EnsureAdvancedStarterMonsters()
+{
+    if (advancedStarterMonstersCreated) return;
+    const NpcSpawnDefinition *durable =
+        NpcSpawnDatabase::TryGet(NpcSpawnId::DURABLE_DEVELOPMENT_SPAWN);
+    const NpcSpawnDefinition *elite =
+        NpcSpawnDatabase::TryGet(NpcSpawnId::ELITE_DEVELOPMENT_SPAWN);
+    if (durable == nullptr || elite == nullptr) return;
+    const int durableID = CreateMonster(durable->npcType, *durable);
+    const int eliteID = CreateMonster(elite->npcType, *elite);
+    advancedStarterMonstersCreated = durableID > 0 && eliteID > 0;
 }
 
 WorldPlayerLoadResult World::LoadOrCreatePlayerFromFile(
@@ -326,6 +344,7 @@ WorldPlayerLoadResult World::LoadOrCreatePlayerFromFile(
     }
 
     result.SetPlayerEntityID(registeredID);
+    EnsureAdvancedStarterMonsters();
     result.SetStatus(fileStatus == PlayerSaveFileLoadStatus::NOT_FOUND
                          ? WorldPlayerLoadStatus::CREATED_NEW
                          : WorldPlayerLoadStatus::LOADED_EXISTING);
@@ -411,6 +430,7 @@ WorldPlayerLoadResult World::TryRegisterLoadedPlayer(
     }
 
     result.SetPlayerEntityID(registeredID);
+    EnsureAdvancedStarterMonsters();
     result.SetStatus(WorldPlayerLoadStatus::LOADED_EXISTING);
     return result;
 }

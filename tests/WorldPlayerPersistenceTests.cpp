@@ -133,9 +133,9 @@ int main()
                          "Created Player retains development inventory");
 
         WorldPlayerLoadResult second = world.LoadOrCreatePlayerFromFile(missing);
-        test.ExpectEqual(second.GetPlayerEntityID(), 5, "Second manual Player receives ID 5");
+        test.ExpectEqual(second.GetPlayerEntityID(), 7, "Second manual Player follows the advanced encounters");
         WorldPlayerLoadResult third = world.LoadOrCreatePlayerFromFile(missing);
-        test.ExpectEqual(third.GetPlayerEntityID(), 6, "Third manual Player receives ID 6");
+        test.ExpectEqual(third.GetPlayerEntityID(), 8, "Third manual Player receives the next stable ID");
     }
 
     const auto validPath = fixture.path / "valid.save";
@@ -439,7 +439,7 @@ int main()
         std::unique_ptr<Player> playerSnapshot = PlayerSaveState::TryCreatePlayer(
             99, playerBefore, snapshotReport);
         WorldPlayerLoadResult loaded = world.LoadOrCreatePlayerFromFile(validPath);
-        test.Expect(loaded.IsSuccess() && loaded.GetPlayerEntityID() == 5,
+        test.Expect(loaded.IsSuccess() && loaded.GetPlayerEntityID() == 7,
                     "Second Player loads beside active existing Player");
         test.Expect(world.GetActiveDialogueSession(playerID) != nullptr &&
                         world.GetActiveDialogueSession(playerID)->sessionId == sessionID &&

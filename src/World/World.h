@@ -311,6 +311,8 @@ private:
         StationType stationType,
         int x,
         int y);
+    void EnsureAdvancedStarterMonsters();
+    bool advancedStarterMonstersCreated = false;
 
     void ProcessMovementRequests();
     void ProcessQueuedCommands();

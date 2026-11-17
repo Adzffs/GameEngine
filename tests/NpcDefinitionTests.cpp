@@ -130,7 +130,8 @@ int main()
     }
 
     const auto &spawns = NpcSpawnDatabase::GetStarterMonsterSpawns();
-    test.ExpectEqual(spawns.size(), static_cast<std::size_t>(2), "Exactly two starter monster spawns remain");
+    test.ExpectEqual(spawns.size(), static_cast<std::size_t>(4),
+        "Four progression-role monster spawns are authored");
     test.ExpectEqual(spawns[0].spawnPosition.GetX(), 6, "Passive spawn X is preserved");
     test.ExpectEqual(spawns[0].spawnPosition.GetY(), 1, "Passive spawn Y is preserved");
     test.ExpectEqual(spawns[1].spawnPosition.GetX(), 18, "Aggressive spawn X is preserved");
@@ -146,6 +147,14 @@ int main()
     test.ExpectEqual(spawns[0].maximumActiveCount, 1, "Passive capacity is authored");
     test.ExpectEqual(spawns[1].wanderRadius, 0, "Aggressive wandering remains disabled");
     test.Expect(spawns[0].respawns && spawns[1].respawns, "Starter respawn flags are preserved");
+    test.Expect(spawns[2].spawnId == NpcSpawnId::DURABLE_DEVELOPMENT_SPAWN &&
+            spawns[2].spawnPosition.GetX() == 16 &&
+            spawns[2].spawnPosition.GetY() == 11,
+        "Stoneback occupies the workshop-edge durable habitat");
+    test.Expect(spawns[3].spawnId == NpcSpawnId::ELITE_DEVELOPMENT_SPAWN &&
+            spawns[3].spawnPosition.GetX() == 22 &&
+            spawns[3].spawnPosition.GetY() == 3,
+        "Cinder Warden occupies the eastern elite arena");
 
     NpcSpawnDefinition secondPassive = spawns[0];
     secondPassive.spawnId = NpcSpawnId::AGGRESSIVE_DEVELOPMENT_SPAWN;
@@ -269,6 +278,23 @@ int main()
         world.CreatePlayer(),
         4,
         "Invalid definition-driven creation does not consume the next entity ID");
+    Monster *spawnedDurable = FindMonster(
+        world, NpcType::DURABLE_DEVELOPMENT_MONSTER);
+    Monster *spawnedElite = FindMonster(
+        world, NpcType::ELITE_DEVELOPMENT_MONSTER);
+    test.Expect(spawnedDurable != nullptr && spawnedElite != nullptr,
+        "Advanced encounters activate after the first player is registered");
+    if (spawnedDurable != nullptr && spawnedElite != nullptr)
+    {
+        test.ExpectEqual(spawnedDurable->GetID(), 5,
+            "Stoneback activates after stable player ID four");
+        test.ExpectEqual(spawnedElite->GetID(), 6,
+            "Cinder Warden activates after Stoneback");
+        test.ExpectEqual(spawnedDurable->GetMaximumHealth(), 90,
+            "Stoneback runtime uses its durable health profile");
+        test.ExpectEqual(spawnedElite->GetMaximumHealth(), 140,
+            "Cinder Warden runtime uses its elite health profile");
+    }
 
     NpcSpawnDefinition invalidPosition = spawns[0];
     invalidPosition.spawnPosition.SetPosition(-1, 1);
@@ -283,7 +309,7 @@ int main()
         "Invalid position leaves no partial entity");
     test.ExpectEqual(
         world.CreatePlayer(),
-        5,
+        7,
         "Invalid position does not consume the next entity ID");
 
     test.ExpectEqual(
@@ -292,7 +318,7 @@ int main()
         "Authored spawn capacity prevents a duplicate runtime monster");
     test.ExpectEqual(
         world.CreatePlayer(),
-        6,
+        8,
         "Capacity failure does not consume the next entity ID");
 
     World primitiveWorld;

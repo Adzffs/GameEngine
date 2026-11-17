@@ -2948,6 +2948,11 @@ void Graphics::DrawMonsters(
                 GetMonsterScreenRectangle(*monster);
             const bool selected = monster->GetID() == selectedCombatTargetID;
             const bool aggressive = monster->HasAggressionDefinition();
+            const NpcType monsterType = monster->GetNpcType();
+            const bool durable =
+                monsterType == NpcType::DURABLE_DEVELOPMENT_MONSTER;
+            const bool elite =
+                monsterType == NpcType::ELITE_DEVELOPMENT_MONSTER;
             const bool attackingPlayer =
                 monster->GetAggressionTargetEntityID() == localPlayerID;
 
@@ -2969,21 +2974,31 @@ void Graphics::DrawMonsters(
             SDL_SetRenderDrawColor(renderer, 25, 12, 14, 150);
             SDL_RenderFillRect(renderer, &shadow);
 
-            SDL_SetRenderDrawColor(renderer,
-                aggressive ? 164 : 70,
-                aggressive ? 48 : 135,
-                aggressive ? 48 : 78,
-                255);
+            if (elite)
+                SDL_SetRenderDrawColor(renderer, 105, 38, 128, 255);
+            else if (durable)
+                SDL_SetRenderDrawColor(renderer, 92, 102, 112, 255);
+            else
+                SDL_SetRenderDrawColor(renderer,
+                    aggressive ? 164 : 70,
+                    aggressive ? 48 : 135,
+                    aggressive ? 48 : 78,
+                    255);
 
             SDL_RenderFillRect(
                 renderer,
                 &monsterRectangle);
 
-            SDL_SetRenderDrawColor(renderer,
-                aggressive ? 235 : 135,
-                aggressive ? 105 : 205,
-                aggressive ? 95 : 145,
-                255);
+            if (elite)
+                SDL_SetRenderDrawColor(renderer, 244, 106, 65, 255);
+            else if (durable)
+                SDL_SetRenderDrawColor(renderer, 188, 198, 205, 255);
+            else
+                SDL_SetRenderDrawColor(renderer,
+                    aggressive ? 235 : 135,
+                    aggressive ? 105 : 205,
+                    aggressive ? 95 : 145,
+                    255);
 
             SDL_RenderRect(
                 renderer,
@@ -2996,6 +3011,35 @@ void Graphics::DrawMonsters(
             SDL_SetRenderDrawColor(renderer, 255, 210, 115, 255);
             SDL_RenderFillRect(renderer, &eyeLeft);
             SDL_RenderFillRect(renderer, &eyeRight);
+            if (durable)
+            {
+                const SDL_FRect shell{
+                    monsterRectangle.x + 3.0f,
+                    monsterRectangle.y + 13.0f,
+                    monsterRectangle.w - 6.0f,
+                    monsterRectangle.h - 16.0f};
+                SDL_SetRenderDrawColor(renderer, 55, 66, 72, 255);
+                SDL_RenderRect(renderer, &shell);
+                SDL_RenderLine(renderer, shell.x, shell.y + shell.h * 0.5f,
+                    shell.x + shell.w, shell.y + shell.h * 0.5f);
+            }
+            if (elite)
+            {
+                SDL_SetRenderDrawColor(renderer, 255, 142, 55, 255);
+                SDL_RenderLine(renderer,
+                    monsterRectangle.x + 4.0f, monsterRectangle.y + 2.0f,
+                    monsterRectangle.x, monsterRectangle.y - 6.0f);
+                SDL_RenderLine(renderer,
+                    monsterRectangle.x + monsterRectangle.w - 4.0f,
+                    monsterRectangle.y + 2.0f,
+                    monsterRectangle.x + monsterRectangle.w,
+                    monsterRectangle.y - 6.0f);
+                const SDL_FRect core{
+                    monsterRectangle.x + monsterRectangle.w * 0.35f,
+                    monsterRectangle.y + monsterRectangle.h * 0.55f,
+                    monsterRectangle.w * 0.30f, 5.0f};
+                SDL_RenderFillRect(renderer, &core);
+            }
             if (attackingPlayer)
             {
                 SDL_SetRenderDrawColor(renderer, 255, 95, 75, 255);

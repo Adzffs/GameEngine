@@ -80,7 +80,7 @@ int main()
                      "Invalid guide creation fails without an entity");
     test.ExpectEqual(world.CreateNpc(NpcType::DEVELOPMENT_GUIDE, spawns.front()), 0,
                      "Guide spawn capacity rejects duplicate creation");
-    test.ExpectEqual(world.CreatePlayer(), 5,
+    test.ExpectEqual(world.CreatePlayer(), 7,
                      "Invalid guide creation consumes no entity ID");
 
     if (guide != nullptr)

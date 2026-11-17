@@ -199,8 +199,8 @@ int main()
 
         test.ExpectEqual(
             static_cast<int>(starterSpawns.size()),
-            2,
-            "Starter content defines exactly one passive and one aggressive monster");
+            4,
+            "Starter content defines the complete four-role enemy roster");
 
         test.Expect(
             !NpcDefinitionDatabase::TryGet(starterSpawns[0].npcType)->combat->aggression.has_value(),
