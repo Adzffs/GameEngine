@@ -58,7 +58,20 @@ namespace
           DialogueId::NESSA_THORNE_INTRO,
           DialogueNodeId::NESSA_THORNE_WELCOME,
           ItemType::COOKED_MEAT,
-          3}}};
+          3}},
+        {QuestId::FANGS_AT_THE_GATE,
+         "Fangs at the Gate",
+         QuestState::AVAILABLE,
+         ItemType::NONE,
+         3,
+         ItemType::COOKED_MEAT,
+         5,
+         {NpcType::SERA_FLINT,
+          DialogueId::SERA_FLINT_INTRO,
+          DialogueNodeId::SERA_FLINT_WELCOME},
+         QuestObjectiveType::DEFEAT_CHARACTER,
+         NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER,
+         "Defeat three Ashfangs threatening the east road"}};
 
     bool IsKnownItem(ItemType itemType)
     {

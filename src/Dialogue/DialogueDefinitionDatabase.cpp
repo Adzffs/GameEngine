@@ -80,6 +80,10 @@ namespace
         DialogueId::SERA_FLINT_INTRO, DialogueNodeId::SERA_FLINT_WELCOME,
         {{DialogueNodeId::SERA_FLINT_WELCOME,
           "Ashfang tracks on the village road. Fresh ones. Prepare before you follow.",
+          DialogueNodeKind::CONTINUE,
+          DialogueNodeId::SERA_FLINT_FAREWELL, {}},
+         {DialogueNodeId::SERA_FLINT_FAREWELL,
+          "Three roam close to the road. Break the pack, then report back.",
           DialogueNodeKind::TERMINAL, std::nullopt, {}}}};
 }
 

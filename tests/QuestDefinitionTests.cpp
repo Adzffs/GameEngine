@@ -16,11 +16,12 @@ int main()
 {
     TestContext test;
     const auto &definitions = QuestDefinitionDatabase::GetAll();
-    test.Expect(definitions.size() == 4 &&
+    test.Expect(definitions.size() == 5 &&
                     definitions[0].id == QuestId::GATHERING_BASICS &&
                     definitions[1].id == QuestId::MINING_BASICS &&
                     definitions[2].id == QuestId::TRACKS_IN_THE_ASH &&
-                    definitions[3].id == QuestId::SHIELD_OR_SHELTER,
+                    definitions[3].id == QuestId::SHIELD_OR_SHELTER &&
+                    definitions[4].id == QuestId::FANGS_AT_THE_GATE,
                 "Canonical catalogue contains all quests in stable ID order");
     const QuestDefinition *definition =
         QuestDefinitionDatabase::TryGet(QuestId::GATHERING_BASICS);

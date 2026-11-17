@@ -100,7 +100,7 @@ int main()
         {QuestId::GATHERING_BASICS, QuestState::READY_TO_COMPLETE, 10},
         {QuestId::MINING_BASICS, QuestState::ACTIVE, 0},
         {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0},
-        {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}});
+        {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}, {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}});
     Reopen(world, *player);
     const NpcTalkEvent* ready = LocalEvent(world, player->GetID());
     session = world.GetActiveDialogueSession(player->GetID());
@@ -123,7 +123,7 @@ int main()
         {QuestId::GATHERING_BASICS, QuestState::COMPLETED, 10},
         {QuestId::MINING_BASICS, QuestState::ACTIVE, 0},
         {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0},
-        {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}});
+        {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}, {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}});
     Reopen(world, *player);
     const NpcTalkEvent* completed = LocalEvent(world, player->GetID());
     test.Expect(completed != nullptr &&
@@ -272,6 +272,47 @@ int main()
     test.Expect(resolveCraftingDilemma(
                     NpcType::NESSA_THORNE, ItemType::COOKED_MEAT, 3),
                 "Taking the shield plan to Nessa chooses the supply outcome");
+
+    World combatWorld(31U, 32U, 33U);
+    Player* defender = CreatePlayer(combatWorld);
+    NPC* seraCombat = FindNpc(combatWorld, NpcType::SERA_FLINT);
+    if (seraCombat != nullptr)
+    {
+        defender->GetPosition().SetPosition(
+            seraCombat->GetPosition().GetX() - 1,
+            seraCombat->GetPosition().GetY());
+        combatWorld.EnqueueCommand(NpcInteractionCommand{
+            defender->GetID(), seraCombat->GetID(), NpcInteractionType::TALK});
+        combatWorld.Update();
+    }
+    const ActiveDialogueSession* combatSession =
+        combatWorld.GetActiveDialogueSession(defender->GetID());
+    if (combatSession != nullptr && seraCombat != nullptr)
+    {
+        combatWorld.EnqueueCommand(QuestAcceptCommand{
+            defender->GetID(), seraCombat->GetID(), combatSession->sessionId,
+            QuestId::FANGS_AT_THE_GATE});
+        combatWorld.Update();
+    }
+    QuestSystem::RecordDefeated(defender->GetQuestJournal(),
+        NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER, 3);
+    const QuestRecord* combatReady = defender->GetQuestJournal().TryGet(
+        QuestId::FANGS_AT_THE_GATE);
+    test.Expect(combatReady != nullptr &&
+                    combatReady->state == QuestState::READY_TO_COMPLETE,
+                "Three authored Ashfang defeats make the combat quest ready");
+    if (combatSession != nullptr && seraCombat != nullptr)
+    {
+        combatWorld.EnqueueCommand(QuestCompleteCommand{
+            defender->GetID(), seraCombat->GetID(), combatSession->sessionId,
+            QuestId::FANGS_AT_THE_GATE});
+        combatWorld.Update();
+    }
+    test.Expect(defender->GetQuestJournal().TryGet(
+                    QuestId::FANGS_AT_THE_GATE)->state == QuestState::COMPLETED &&
+                    defender->GetInventory().GetItemAmount(
+                        ItemType::COOKED_MEAT) == 5,
+                "Reporting to Sera completes the escalation and grants supplies");
 
     return test.Finish();
 }

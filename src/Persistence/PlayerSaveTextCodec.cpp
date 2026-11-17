@@ -117,6 +117,7 @@ namespace
         if (id == QuestId::MINING_BASICS) return "MINING_BASICS";
         if (id == QuestId::TRACKS_IN_THE_ASH) return "TRACKS_IN_THE_ASH";
         if (id == QuestId::SHIELD_OR_SHELTER) return "SHIELD_OR_SHELTER";
+        if (id == QuestId::FANGS_AT_THE_GATE) return "FANGS_AT_THE_GATE";
         return "NONE";
     }
     std::optional<QuestId> ParseQuestId(std::string_view token)
@@ -125,6 +126,7 @@ namespace
         if (token == "MINING_BASICS") return QuestId::MINING_BASICS;
         if (token == "TRACKS_IN_THE_ASH") return QuestId::TRACKS_IN_THE_ASH;
         if (token == "SHIELD_OR_SHELTER") return QuestId::SHIELD_OR_SHELTER;
+        if (token == "FANGS_AT_THE_GATE") return QuestId::FANGS_AT_THE_GATE;
         return std::nullopt;
     }
 
@@ -312,7 +314,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
     { result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD, -1, "Missing version"); return result; }
     if (version != 1 && version != 2 && version != 3 && version != 4 &&
         version != 5 && version != 6 && version != 7 && version != 8 &&
-        version != 9 && version != 10 &&
+        version != 9 && version != 10 && version != 11 &&
         version != CURRENT_PLAYER_SAVE_VERSION)
     { result.AddIssue(PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, versionLine, "Unsupported player save version"); return result; }
 
@@ -380,7 +382,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         {
             bool &seen = key == "tutorial_step" ? tutorialStepSeen : tutorialSkippedSeen;
             int &target = key == "tutorial_step" ? tutorialStepValue : tutorialSkippedValue;
-            if ((version != 6 && version != 7 && version != 8 && version != 9 && version != 10 && version != 11) || seen)
+            if ((version != 6 && version != 7 && version != 8 && version != 9 && version != 10 && version != 11 && version != 12) || seen)
             {
                 result.AddIssue(PlayerSaveTextIssueCode::DUPLICATE_FIELD,
                     lineNumber, "Unexpected or duplicate tutorial field");
@@ -392,7 +394,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         }
         if (key == "combat_style")
         {
-            if ((version != 7 && version != 8 && version != 9 && version != 10 && version != 11) || combatStyleSeen)
+            if ((version != 7 && version != 8 && version != 9 && version != 10 && version != 11 && version != 12) || combatStyleSeen)
             {
                 result.AddIssue(PlayerSaveTextIssueCode::DUPLICATE_FIELD,
                     lineNumber, "Unexpected or duplicate combat_style");
@@ -404,7 +406,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         }
         if (key == "recipe_mask")
         {
-            if ((version != 9 && version != 10 && version != 11) || recipeMaskSeen)
+            if ((version != 9 && version != 10 && version != 11 && version != 12) || recipeMaskSeen)
             {
                 result.AddIssue(PlayerSaveTextIssueCode::DUPLICATE_FIELD,
                     lineNumber, "Unexpected or duplicate recipe_mask");
@@ -422,7 +424,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
             key == "recovery_y" || key == "recovery_ticks" ||
             key == "recovery_count")
         {
-            if (version != 8 && version != 9 && version != 10 && version != 11)
+            if (version != 8 && version != 9 && version != 10 && version != 11 && version != 12)
             {
                 result.AddIssue(PlayerSaveTextIssueCode::UNKNOWN_FIELD,
                     lineNumber, "Legacy saves cannot contain recovery fields");
@@ -450,7 +452,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         }
         if (key.starts_with("recovery."))
         {
-            if (version != 8 && version != 9 && version != 10 && version != 11)
+            if (version != 8 && version != 9 && version != 10 && version != 11 && version != 12)
             {
                 result.AddIssue(PlayerSaveTextIssueCode::UNKNOWN_FIELD,
                     lineNumber, "Legacy saves cannot contain recovery items");
@@ -499,7 +501,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         if (key == "quest_count")
         {
             if ((version != 3 && version != 4 && version != 5 &&
-                 version != 6 && version != 7 && version != 8 && version != 9 && version != 10 && version != 11) || questCountSeen)
+                 version != 6 && version != 7 && version != 8 && version != 9 && version != 10 && version != 11 && version != 12) || questCountSeen)
             {
                 result.AddIssue(PlayerSaveTextIssueCode::DUPLICATE_FIELD,
                     lineNumber, "Unexpected or duplicate quest_count");
@@ -514,7 +516,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         }
         if (key == "bank_count")
         {
-            if ((version != 5 && version != 6 && version != 7 && version != 8 && version != 9 && version != 10 && version != 11) || bankCountSeen)
+            if ((version != 5 && version != 6 && version != 7 && version != 8 && version != 9 && version != 10 && version != 11 && version != 12) || bankCountSeen)
             {
                 result.AddIssue(PlayerSaveTextIssueCode::DUPLICATE_FIELD,
                     lineNumber, "Unexpected or duplicate bank_count");
@@ -530,7 +532,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         }
         if (key.starts_with("bank."))
         {
-            if (version != 5 && version != 6 && version != 7 && version != 8 && version != 9 && version != 10 && version != 11)
+            if (version != 5 && version != 6 && version != 7 && version != 8 && version != 9 && version != 10 && version != 11 && version != 12)
             {
                 result.AddIssue(PlayerSaveTextIssueCode::UNKNOWN_FIELD,
                     lineNumber, "Legacy saves cannot contain bank records");
@@ -755,12 +757,12 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
             result.AddIssue(PlayerSaveTextIssueCode::INVALID_COUNT, -1,
                 "Version 7 collections are not canonical");
     }
-    if (version == 8 || version == 9 || version == 10 || version == 11)
+    if (version == 8 || version == 9 || version == 10 || version == 11 || version == 12)
     {
         if (!tutorialStepSeen || !tutorialSkippedSeen || !combatStyleSeen ||
             !recoveryActiveSeen || !recoveryXSeen || !recoveryYSeen ||
             !recoveryTicksSeen || !recoveryCountSeen ||
-            ((version == 9 || version == 10 || version == 11) && !recipeMaskSeen))
+            ((version == 9 || version == 10 || version == 11 || version == 12) && !recipeMaskSeen))
             result.AddIssue(PlayerSaveTextIssueCode::MISSING_FIELD, -1,
                 "Missing current player, recipe, or recovery state");
         if ((recoveryActiveValue != 0 && recoveryActiveValue != 1) ||
@@ -768,16 +770,18 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
             declaredRecoveryCount != static_cast<int>(parsedRecoveryItems.size()))
             result.AddIssue(PlayerSaveTextIssueCode::INVALID_COUNT, -1,
                 "Recovery state is not canonical");
-        const int expectedQuestCount = version == 11 ? 4 : version == 10 ? 3 : 2;
+        const int expectedQuestCount = version == 12 ? 5 : version == 11 ? 4 : version == 10 ? 3 : 2;
         if (!questCountSeen || declaredQuestCount != expectedQuestCount ||
             declaredQuestCount != static_cast<int>(parsedQuests.size()) ||
             parsedQuests.size() != static_cast<std::size_t>(expectedQuestCount) ||
             parsedQuests[0].id != QuestId::GATHERING_BASICS ||
             parsedQuests[1].id != QuestId::MINING_BASICS ||
-            ((version == 10 || version == 11) &&
+            ((version == 10 || version == 11 || version == 12) &&
              parsedQuests[2].id != QuestId::TRACKS_IN_THE_ASH) ||
-            (version == 11 &&
+            ((version == 11 || version == 12) &&
              parsedQuests[3].id != QuestId::SHIELD_OR_SHELTER) ||
+            (version == 12 &&
+             parsedQuests[4].id != QuestId::FANGS_AT_THE_GATE) ||
             !bankCountSeen ||
             declaredBankCount != static_cast<int>(parsedBank.size()))
             result.AddIssue(PlayerSaveTextIssueCode::INVALID_COUNT, -1,
@@ -814,7 +818,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         }
         *destination = legacy;
     }
-    else if (save.version >= 4 && save.version <= 10)
+    else if (save.version >= 4 && save.version <= 11)
     {
         std::vector<SavedQuestRecord> migrated;
         for (const QuestDefinition &definition : QuestDefinitionDatabase::GetAll())
@@ -835,9 +839,9 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
     }
     else
         save.quests = std::move(parsedQuests);
-    save.bank = (version == 5 || version == 6 || version == 7 || version == 8 || version == 9 || version == 10 || version == 11)
+    save.bank = (version == 5 || version == 6 || version == 7 || version == 8 || version == 9 || version == 10 || version == 11 || version == 12)
         ? std::move(parsedBank) : std::vector<SavedBankEntry>{};
-    if (version == 6 || version == 7 || version == 8 || version == 9 || version == 10 || version == 11)
+    if (version == 6 || version == 7 || version == 8 || version == 9 || version == 10 || version == 11 || version == 12)
     {
         save.tutorialStep = static_cast<TutorialStep>(tutorialStepValue);
         save.tutorialSkipped = tutorialSkippedValue == 1;
@@ -847,10 +851,10 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         save.tutorialStep = TutorialStep::COMPLETE;
         save.tutorialSkipped = true;
     }
-    save.combatStyle = (version == 7 || version == 8 || version == 9 || version == 10 || version == 11)
+    save.combatStyle = (version == 7 || version == 8 || version == 9 || version == 10 || version == 11 || version == 12)
         ? static_cast<CombatStyle>(combatStyleValue)
         : CombatStyle::ACCURATE;
-    if (version == 8 || version == 9 || version == 10 || version == 11)
+    if (version == 8 || version == 9 || version == 10 || version == 11 || version == 12)
     {
         save.recoveryPile.active = recoveryActiveValue == 1;
         save.recoveryPile.positionX = recoveryXValue;
@@ -858,7 +862,7 @@ PlayerSaveTextDecodeResult PlayerSaveTextCodec::Decode(std::string_view text)
         save.recoveryPile.remainingTicks = recoveryTicksValue;
         save.recoveryPile.items = std::move(parsedRecoveryItems);
     }
-    save.knownRecipes = (version == 9 || version == 10 || version == 11)
+    save.knownRecipes = (version == 9 || version == 10 || version == 11 || version == 12)
         ? DecodeRecipeMask(recipeMaskValue)
         : RecipeBook::GetStarterRecipes();
     save.version = CURRENT_PLAYER_SAVE_VERSION;
