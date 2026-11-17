@@ -2,10 +2,10 @@
 #include "../World/Map.h"
 
 #include <algorithm>
-#include <limits>
 #include <map>
 #include <queue>
 #include <set>
+#include <tuple>
 #include <utility>
 
 std::vector<PathStep> Pathfinder::FindPath(
@@ -33,23 +33,25 @@ std::vector<PathStep> Pathfinder::FindPath(
         destinationX,
         destinationY};
 
-    std::queue<Coordinate> frontier;
+    using SearchNode = std::tuple<int, int, int, int>;
+    std::priority_queue<SearchNode, std::vector<SearchNode>,
+                        std::greater<SearchNode>> frontier;
     std::set<Coordinate> visited;
 
     std::map<Coordinate, Coordinate> cameFrom;
     std::map<Coordinate, int> distanceFromStart;
 
-    frontier.push(start);
-    visited.insert(start);
+    int insertionOrder = 0;
+    const auto heuristic = [destinationX, destinationY](int x, int y)
+    {
+        return std::abs(x - destinationX) + std::abs(y - destinationY);
+    };
+    frontier.emplace(heuristic(startX, startY), insertionOrder++, startX, startY);
     distanceFromStart[start] = 0;
 
     Coordinate bestDestination = start;
-
-    int bestDistanceSquared =
-        std::numeric_limits<int>::max();
-
-    int bestPathLength =
-        std::numeric_limits<int>::max();
+    int bestDistance = heuristic(startX, startY);
+    int bestPathLength = 0;
 
     const int directions[4][2]{
         {0, -1},
@@ -61,28 +63,25 @@ std::vector<PathStep> Pathfinder::FindPath(
 
     while (!frontier.empty())
     {
-        Coordinate current = frontier.front();
+        const auto [priority, order, currentX, currentY] = frontier.top();
         frontier.pop();
+        (void)priority;
+        (void)order;
+        const Coordinate current{currentX, currentY};
+        if (visited.contains(current)) continue;
+        visited.insert(current);
 
-        int differenceX =
-            current.first - destinationX;
-
-        int differenceY =
-            current.second - destinationY;
-
-        int distanceSquared =
-            differenceX * differenceX +
-            differenceY * differenceY;
+        const int distance = heuristic(current.first, current.second);
 
         int currentPathLength =
             distanceFromStart[current];
 
-        if (distanceSquared < bestDistanceSquared ||
-            (distanceSquared == bestDistanceSquared &&
+        if (distance < bestDistance ||
+            (distance == bestDistance &&
              currentPathLength < bestPathLength))
         {
             bestDestination = current;
-            bestDistanceSquared = distanceSquared;
+            bestDistance = distance;
             bestPathLength = currentPathLength;
         }
 
@@ -118,13 +117,19 @@ std::vector<PathStep> Pathfinder::FindPath(
                 continue;
             }
 
-            visited.insert(next);
+            const int tentativeDistance = currentPathLength + 1;
+            auto knownDistance = distanceFromStart.find(next);
+            if (knownDistance != distanceFromStart.end() &&
+                tentativeDistance >= knownDistance->second)
+            {
+                continue;
+            }
+
             cameFrom[next] = current;
-
-            distanceFromStart[next] =
-                currentPathLength + 1;
-
-            frontier.push(next);
+            distanceFromStart[next] = tentativeDistance;
+            frontier.emplace(
+                tentativeDistance + heuristic(nextX, nextY),
+                insertionOrder++, nextX, nextY);
         }
     }
 

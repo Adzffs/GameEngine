@@ -89,6 +89,25 @@ Player::Player(
 void Player::Update(World &world)
 {
     (void)world;
+    if (spentRunStaminaThisTick)
+    {
+        spentRunStaminaThisTick = false;
+    }
+    else if (runStamina < MaximumRunStamina)
+    {
+        runStamina++;
+    }
+}
+
+bool Player::TryConsumeRunStamina()
+{
+    if (!runningEnabled || runStamina <= 0)
+    {
+        return false;
+    }
+    runStamina--;
+    spentRunStaminaThisTick = true;
+    return true;
 }
 Inventory &Player::GetInventory()
 {

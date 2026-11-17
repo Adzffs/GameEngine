@@ -62,6 +62,12 @@ public:
     void Heal(int amount);
     void RestoreHealthToFull();
 
+    static constexpr int MaximumRunStamina = 100;
+    int GetRunStamina() const { return runStamina; }
+    bool IsRunningEnabled() const { return runningEnabled; }
+    void ToggleRunning() { runningEnabled = !runningEnabled; }
+    bool TryConsumeRunStamina();
+
     CombatRatings GetCombatRatings() const override;
     CombatStyle GetCombatStyle() const { return combatStyle; }
     bool TrySetCombatStyle(CombatStyle style);
@@ -85,4 +91,7 @@ private:
     HealthPool healthPool;
     QuestJournal questJournal;
     CombatStyle combatStyle = CombatStyle::ACCURATE;
+    int runStamina = MaximumRunStamina;
+    bool runningEnabled = false;
+    bool spentRunStaminaThisTick = false;
 };

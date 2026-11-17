@@ -196,6 +196,36 @@ namespace
                     "New movement works after cancellation");
     }
 
+    void TestPlayerRunning(TestContext &test)
+    {
+        EntityManager entities;
+        Map map(20, 20);
+        MovementSystem system;
+        const int playerID = entities.CreatePlayer();
+        Player *player = dynamic_cast<Player *>(entities.GetEntityByID(playerID));
+        player->GetPosition().SetPosition(2, 2);
+        player->ToggleRunning();
+
+        test.Expect(system.QueueDestination(
+                        playerID, Position(6, 2), entities, map),
+                    "Running destination is accepted");
+        const auto outcomes = system.Process(entities, map);
+
+        test.ExpectEqual(player->GetPosition().GetX(), 4,
+                         "Running advances two path tiles per movement update");
+        test.ExpectEqual(player->GetRunStamina(), 99,
+                         "A two-tile running update consumes stamina");
+        test.Expect(outcomes.size() == 1 &&
+                        outcomes[0].type == MovementOutcomeType::STEP_SUCCEEDED,
+                    "Running keeps the normal movement outcome contract");
+
+        system.Process(entities, map);
+        test.ExpectEqual(player->GetPosition().GetX(), 6,
+                         "Running reaches the target using the shortest path");
+        test.ExpectEqual(player->GetRunStamina(), 98,
+                         "Continued running consumes stamina once per update");
+    }
+
     void TestDeterminismAndStaleState(TestContext &test)
     {
         EntityManager entities;
@@ -238,6 +268,7 @@ int main()
     TestContext test;
     TestOwnershipAndQueue(test);
     TestStepProgression(test);
+    TestPlayerRunning(test);
     TestRecalculation(test);
     TestDeterminismAndStaleState(test);
     return test.Finish();

@@ -58,6 +58,7 @@ public:
         int &slotIndex);
     bool ConsumeInventoryDropRequest(int &slotIndex, int &amount);
     bool ConsumeTutorialSkipRequest();
+    bool ConsumeRunToggle();
     std::optional<CombatStyle> ConsumeCombatStyleRequest();
 
     bool ConsumeWeaponSlotClick();
@@ -524,6 +525,7 @@ private:
     float cameraPixelY = 0.0f;
     float cameraZoom = 1.0f;
     bool cameraInitialized = false;
+    bool runTogglePending = false;
     int minimapOriginX = 0;
     int minimapOriginY = 0;
     Uint64 lastPresentationTick = 0;

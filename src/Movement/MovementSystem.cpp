@@ -3,6 +3,7 @@
 #include "Movement.h"
 #include "../Entity/Manager/EntityManager.h"
 #include "../Pathfinding/Pathfinder.h"
+#include "../Player/Player.h"
 #include "../World/Map.h"
 
 #include <algorithm>
@@ -158,6 +159,21 @@ std::vector<MovementOutcome> MovementSystem::Process(
         if (Movement::Move(entity, map, changeX, changeY))
         {
             activePath.remainingSteps.pop_front();
+
+            Player *player = dynamic_cast<Player *>(&entity);
+            if (player != nullptr &&
+                !activePath.remainingSteps.empty() &&
+                player->TryConsumeRunStamina())
+            {
+                const Position runStep = activePath.remainingSteps.front();
+                const int runChangeX = runStep.GetX() - entity.GetPosition().GetX();
+                const int runChangeY = runStep.GetY() - entity.GetPosition().GetY();
+                if (Movement::Move(entity, map, runChangeX, runChangeY))
+                {
+                    activePath.remainingSteps.pop_front();
+                }
+            }
+
             const bool arrived = activePath.remainingSteps.empty();
             outcomes.push_back(MovementOutcome{
                 entityID,

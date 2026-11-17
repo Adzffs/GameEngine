@@ -147,6 +147,12 @@ bool Engine::Run()
         EnqueuePendingRecipeCommand();
         EnqueuePendingCraftingInteraction();
 
+        if (graphics.ConsumeRunToggle())
+        {
+            Player *player = dynamic_cast<Player *>(world.GetEntityByID(playerID));
+            if (player != nullptr) player->ToggleRunning();
+        }
+
         int clickedInventorySlot = -1;
 
         if (graphics.ConsumeInventorySlotClick(

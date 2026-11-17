@@ -1660,6 +1660,13 @@ void Graphics::ProcessEvents(bool &running)
         if (event.type == SDL_EVENT_KEY_DOWN &&
             !event.key.repeat)
         {
+            if (event.key.scancode == SDL_SCANCODE_R && !stationMenuOpen &&
+                !shopPresentationState.IsOpen() &&
+                !dialoguePresentationState.IsOpen())
+            {
+                runTogglePending = true;
+                continue;
+            }
             if (stationMenuOpen && openStationType == StationType::BANK &&
                 event.key.scancode == SDL_SCANCODE_BACKSPACE &&
                 !bankSearch.empty())
@@ -4543,7 +4550,7 @@ void Graphics::DrawWorldHud(const Player &player)
 {
     const float healthRatio = CalculateHealthRatio(
         player.GetCurrentHealth(), player.GetMaximumHealth());
-    const SDL_FRect panel{18.0f, 18.0f, 190.0f, 34.0f};
+    const SDL_FRect panel{18.0f, 18.0f, 190.0f, 52.0f};
     SDL_SetRenderDrawColor(renderer, 20, 24, 28, 225);
     SDL_RenderFillRect(renderer, &panel);
     SDL_SetRenderDrawColor(renderer, 164, 139, 87, 255);
@@ -4565,6 +4572,15 @@ void Graphics::DrawWorldHud(const Player &player)
         "/" + std::to_string(player.GetMaximumHealth());
     SDL_RenderDebugText(renderer, 143.0f, 30.0f, hp.c_str());
 
+    const std::string run = std::string(player.IsRunningEnabled() ? "RUN " : "WALK ") +
+        std::to_string(player.GetRunStamina()) + "%  [R]";
+    SDL_SetRenderDrawColor(renderer,
+        player.IsRunningEnabled() ? 126 : 180,
+        player.IsRunningEnabled() ? 210 : 180,
+        player.IsRunningEnabled() ? 120 : 180,
+        255);
+    SDL_RenderDebugText(renderer, 30.0f, 48.0f, run.c_str());
+
     if (!player.GetTutorialState().IsCompleted())
     {
         const std::array<const char *, 10> objectives{
@@ -4579,16 +4595,16 @@ void Graphics::DrawWorldHud(const Player &player)
             "Take loot and deposit an item in the bank",
             "Return to the guide and finish Gathering Basics"};
         const int step = static_cast<int>(player.GetTutorialState().GetStep());
-        const SDL_FRect objectivePanel{18.0f, 60.0f, 430.0f, 48.0f};
+        const SDL_FRect objectivePanel{18.0f, 78.0f, 430.0f, 48.0f};
         SDL_SetRenderDrawColor(renderer, 20, 24, 28, 220);
         SDL_RenderFillRect(renderer, &objectivePanel);
         SDL_SetRenderDrawColor(renderer, 190, 151, 78, 255);
         SDL_RenderRect(renderer, &objectivePanel);
         SDL_SetRenderDrawColor(renderer, 250, 226, 170, 255);
         const std::string heading = "NEXT STEP " + std::to_string(step + 1) + "/10";
-        SDL_RenderDebugText(renderer, 30.0f, 72.0f, heading.c_str());
+        SDL_RenderDebugText(renderer, 30.0f, 90.0f, heading.c_str());
         SDL_SetRenderDrawColor(renderer, 235, 225, 202, 255);
-        SDL_RenderDebugText(renderer, 30.0f, 92.0f, objectives[step]);
+        SDL_RenderDebugText(renderer, 30.0f, 110.0f, objectives[step]);
     }
 
     SDL_SetRenderDrawColor(renderer, 235, 225, 202, 220);
@@ -5642,6 +5658,13 @@ bool Graphics::ConsumeTutorialSkipRequest()
 {
     const bool pending = tutorialSkipPending;
     tutorialSkipPending = false;
+    return pending;
+}
+
+bool Graphics::ConsumeRunToggle()
+{
+    const bool pending = runTogglePending;
+    runTogglePending = false;
     return pending;
 }
 
