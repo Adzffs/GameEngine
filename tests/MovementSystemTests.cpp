@@ -225,6 +225,15 @@ namespace
                          "Running reaches the target using the shortest path");
         test.ExpectEqual(player->GetRunStamina(), 98,
                          "Continued running consumes stamina once per update");
+
+        player->GetPosition().SetPosition(2, 2);
+        system.QueueDestination(playerID, Position(4, 3), entities, map);
+        system.Process(entities, map);
+        test.Expect(player->GetPosition().GetX() == 3 &&
+                        player->GetPosition().GetY() == 2,
+                    "Running takes a direction-changing corner as one visible step");
+        test.ExpectEqual(player->GetRunStamina(), 98,
+                         "A corner step does not spend stamina on a hidden shortcut");
     }
 
     void TestDeterminismAndStaleState(TestContext &test)

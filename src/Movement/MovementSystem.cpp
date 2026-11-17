@@ -162,13 +162,16 @@ std::vector<MovementOutcome> MovementSystem::Process(
 
             Player *player = dynamic_cast<Player *>(&entity);
             if (player != nullptr &&
-                !activePath.remainingSteps.empty() &&
-                player->TryConsumeRunStamina())
+                !activePath.remainingSteps.empty())
             {
                 const Position runStep = activePath.remainingSteps.front();
                 const int runChangeX = runStep.GetX() - entity.GetPosition().GetX();
                 const int runChangeY = runStep.GetY() - entity.GetPosition().GetY();
-                if (Movement::Move(entity, map, runChangeX, runChangeY))
+                const bool continuesSameDirection =
+                    runChangeX == changeX && runChangeY == changeY;
+                if (continuesSameDirection &&
+                    player->TryConsumeRunStamina() &&
+                    Movement::Move(entity, map, runChangeX, runChangeY))
                 {
                     activePath.remainingSteps.pop_front();
                 }
