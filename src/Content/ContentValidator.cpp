@@ -195,6 +195,13 @@ namespace
             return "WOODEN_PLANKS";
         case RecipeType::WOODEN_SHIELD:
             return "WOODEN_SHIELD";
+        case RecipeType::BRONZE_AXE: return "BRONZE_AXE";
+        case RecipeType::IRON_AXE: return "IRON_AXE";
+        case RecipeType::STEEL_AXE: return "STEEL_AXE";
+        case RecipeType::BRONZE_PICKAXE: return "BRONZE_PICKAXE";
+        case RecipeType::IRON_PICKAXE: return "IRON_PICKAXE";
+        case RecipeType::STEEL_PICKAXE: return "STEEL_PICKAXE";
+        case RecipeType::BRONZE_SWORD: return "BRONZE_SWORD";
         }
 
         return "UNKNOWN_RECIPE";

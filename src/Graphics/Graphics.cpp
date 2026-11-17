@@ -296,8 +296,8 @@ void Graphics::DismissStationMenu(
 
 Graphics::FurnaceMenuLayout Graphics::GetFurnaceMenuLayout() const
 {
-    constexpr float menuWidth = 360.0f;
-    constexpr float menuHeight = 280.0f;
+    constexpr float menuWidth = 820.0f;
+    constexpr float menuHeight = 470.0f;
     const float menuX =
         (WindowWidth - menuWidth) / 2.0f;
     const float menuY =
@@ -311,11 +311,18 @@ Graphics::FurnaceMenuLayout Graphics::GetFurnaceMenuLayout() const
         menuY + 12.0f,
         68.0f,
         28.0f};
-    layout.recipeButtons = {{
-        {menuX + 18.0f, menuY + 52.0f, menuWidth - 36.0f, 42.0f},
-        {menuX + 18.0f, menuY + 104.0f, menuWidth - 36.0f, 42.0f},
-        {menuX + 18.0f, menuY + 156.0f, menuWidth - 36.0f, 42.0f},
-    }};
+    constexpr float buttonWidth = 380.0f;
+    constexpr float buttonHeight = 64.0f;
+    for (std::size_t index = 0; index < layout.recipeButtons.size(); ++index)
+    {
+        const float column = static_cast<float>(index % 2);
+        const float row = static_cast<float>(index / 2);
+        layout.recipeButtons[index] = {
+            menuX + 18.0f + column * 404.0f,
+            menuY + 58.0f + row * 72.0f,
+            buttonWidth,
+            buttonHeight};
+    }
     return layout;
 }
 
@@ -457,10 +464,17 @@ void Graphics::HandleStationMenuClick(
             return;
         }
 
-        const std::array<RecipeType, 3> recipes{
+        const std::array<RecipeType, 10> recipes{
             RecipeType::BRONZE_BAR,
             RecipeType::IRON_BAR,
-            RecipeType::STEEL_BAR};
+            RecipeType::STEEL_BAR,
+            RecipeType::BRONZE_AXE,
+            RecipeType::IRON_AXE,
+            RecipeType::STEEL_AXE,
+            RecipeType::BRONZE_PICKAXE,
+            RecipeType::IRON_PICKAXE,
+            RecipeType::STEEL_PICKAXE,
+            RecipeType::BRONZE_SWORD};
 
         for (std::size_t index = 0;
              index < recipes.size();
@@ -658,28 +672,45 @@ void Graphics::DrawStationMenu()
             renderer,
             layout.panelBounds.x + 18.0f,
             layout.panelBounds.y + 18.0f,
-            "FURNACE");
+            "FORGE & FURNACE");
         SDL_RenderDebugText(renderer,
             layout.closeButton.x + 12.0f,
             layout.closeButton.y + 10.0f,
             "CLOSE");
-        SDL_RenderDebugText(renderer,
-            layout.recipeButtons[0].x + 12.0f,
-            layout.recipeButtons[0].y + 14.0f,
-            "BRONZE BAR - 1 COPPER + 1 TIN");
-        SDL_RenderDebugText(renderer,
-            layout.recipeButtons[1].x + 12.0f,
-            layout.recipeButtons[1].y + 14.0f,
-            "IRON BAR - 1 IRON ORE");
-        SDL_RenderDebugText(renderer,
-            layout.recipeButtons[2].x + 12.0f,
-            layout.recipeButtons[2].y + 14.0f,
-            "STEEL BAR - 1 IRON + 2 COAL");
+        const std::array<RecipeType, 10> recipes{
+            RecipeType::BRONZE_BAR, RecipeType::IRON_BAR,
+            RecipeType::STEEL_BAR, RecipeType::BRONZE_AXE,
+            RecipeType::IRON_AXE, RecipeType::STEEL_AXE,
+            RecipeType::BRONZE_PICKAXE, RecipeType::IRON_PICKAXE,
+            RecipeType::STEEL_PICKAXE, RecipeType::BRONZE_SWORD};
+        for (std::size_t index = 0; index < recipes.size(); ++index)
+        {
+            const RecipeDefinition &recipe = RecipeDatabase::Get(recipes[index]);
+            SDL_RenderDebugText(renderer,
+                layout.recipeButtons[index].x + 12.0f,
+                layout.recipeButtons[index].y + 12.0f,
+                recipe.GetName().c_str());
+            std::string details = "Lv " +
+                std::to_string(recipe.GetRequiredLevel()) + "  ";
+            for (std::size_t ingredientIndex = 0;
+                 ingredientIndex < recipe.GetIngredients().size(); ++ingredientIndex)
+            {
+                if (ingredientIndex > 0) details += " + ";
+                const RecipeIngredient &ingredient =
+                    recipe.GetIngredients()[ingredientIndex];
+                details += std::to_string(ingredient.amount) + " " +
+                    ItemDatabase::Get(ingredient.itemType).GetName();
+            }
+            SDL_RenderDebugText(renderer,
+                layout.recipeButtons[index].x + 12.0f,
+                layout.recipeButtons[index].y + 38.0f,
+                details.c_str());
+        }
         if (!stationFeedback.empty())
         {
             SDL_RenderDebugText(renderer,
                 layout.panelBounds.x + 18.0f,
-                layout.panelBounds.y + 224.0f,
+                layout.panelBounds.y + 438.0f,
                 stationFeedback.c_str());
         }
         return;

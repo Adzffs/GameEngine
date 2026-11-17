@@ -24,6 +24,12 @@ int main()
         5,
         "Wooden-shield recipe keeps a stable appended numeric ID");
     test.ExpectEqual(
+        static_cast<int>(RecipeType::BRONZE_AXE), 6,
+        "Forged equipment recipes append after existing recipe IDs");
+    test.ExpectEqual(
+        static_cast<int>(RecipeType::BRONZE_SWORD), 12,
+        "Forged equipment recipe range remains stable");
+    test.ExpectEqual(
         static_cast<int>(ItemType::WOODEN_PLANKS),
         22,
         "Wooden planks keep a stable appended numeric item ID");
@@ -45,6 +51,10 @@ int main()
         RecipeDatabase::Get(RecipeType::WOODEN_PLANKS);
     const RecipeDefinition &shield =
         RecipeDatabase::Get(RecipeType::WOODEN_SHIELD);
+    const RecipeDefinition &ironPickaxe =
+        RecipeDatabase::Get(RecipeType::IRON_PICKAXE);
+    const RecipeDefinition &steelAxe =
+        RecipeDatabase::Get(RecipeType::STEEL_AXE);
 
     test.Expect(
         planks.GetRequiredStationType() ==
@@ -66,6 +76,22 @@ int main()
             shield.GetIngredients()[0].amount == 6 &&
             !shield.RepeatsWhileValid(),
         "Wooden shield is a six-plank shaped non-repeating recipe");
+    test.Expect(
+        ironPickaxe.GetRequiredStationType() == StationType::FURNACE &&
+            ironPickaxe.GetRequiredSkill() == SkillType::SMITHING &&
+            ironPickaxe.GetRequiredLevel() == 10 &&
+            ironPickaxe.GetIngredients().size() == 2 &&
+            ironPickaxe.GetIngredients()[0].itemType == ItemType::IRON_BAR &&
+            ironPickaxe.GetIngredients()[0].amount == 3 &&
+            ironPickaxe.GetIngredients()[1].itemType == ItemType::WOODEN_PLANKS &&
+            ironPickaxe.GetIngredients()[1].amount == 2 &&
+            ironPickaxe.GetOutputItem() == ItemType::IRON_PICKAXE,
+        "Iron pickaxe has a deterministic mid-tier forging path");
+    test.Expect(
+        steelAxe.GetRequiredLevel() == 20 &&
+            steelAxe.GetIngredients()[0].itemType == ItemType::STEEL_BAR &&
+            steelAxe.GetOutputItem() == ItemType::STEEL_AXE,
+        "Steel axe has a deterministic high-tier alternative to its rare drop");
 
     CraftingRecipeMatcher::Grid grid{};
     grid[8] = ItemType::LOG;
@@ -225,6 +251,18 @@ int main()
             player.GetInventory().GetItemAmount(
                 ItemType::WOODEN_SHIELD) == 1,
         "Shield transaction consumes exactly six planks and adds one shield");
+
+    Player smith(3, PlayerInitializationMode::EMPTY);
+    smith.GetInventory().AddItem(ItemType::BRONZE_BAR, 3);
+    smith.GetInventory().AddItem(ItemType::WOODEN_PLANKS, 1);
+    test.Expect(
+        RecipeSystem::TryCreateRecipe(smith, RecipeType::BRONZE_SWORD),
+        "A level-one smith can forge the first combat upgrade");
+    test.Expect(
+        smith.GetInventory().GetItemAmount(ItemType::BRONZE_BAR) == 0 &&
+            smith.GetInventory().GetItemAmount(ItemType::WOODEN_PLANKS) == 0 &&
+            smith.GetInventory().GetItemAmount(ItemType::BRONZE_SWORD) == 1,
+        "Forging consumes metal and timber atomically and creates the equipment");
 
     Player fullPlayer(2, PlayerInitializationMode::EMPTY);
     fullPlayer.GetInventory().AddItem(ItemType::WOODEN_PLANKS, 7);

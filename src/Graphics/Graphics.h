@@ -285,7 +285,7 @@ public:
     {
         SDL_FRect panelBounds;
         SDL_FRect closeButton;
-        std::array<SDL_FRect, 3> recipeButtons;
+        std::array<SDL_FRect, 10> recipeButtons;
     };
     struct CraftingTableLayout
     {

@@ -10,7 +10,14 @@ RecipeDatabase::GetAllRecipeTypes()
         RecipeType::IRON_BAR,
         RecipeType::STEEL_BAR,
         RecipeType::WOODEN_PLANKS,
-        RecipeType::WOODEN_SHIELD};
+        RecipeType::WOODEN_SHIELD,
+        RecipeType::BRONZE_AXE,
+        RecipeType::IRON_AXE,
+        RecipeType::STEEL_AXE,
+        RecipeType::BRONZE_PICKAXE,
+        RecipeType::IRON_PICKAXE,
+        RecipeType::STEEL_PICKAXE,
+        RecipeType::BRONZE_SWORD};
 
     return recipeTypes;
 }
@@ -103,6 +110,42 @@ RecipeDatabase::Get(
             }},
         false};
 
+    static const RecipeDefinition bronzeAxeRecipe{
+        RecipeType::BRONZE_AXE, "Forge Bronze axe", StationType::FURNACE,
+        SkillType::SMITHING, 1, 12, 4,
+        {{ItemType::BRONZE_BAR, 2}, {ItemType::WOODEN_PLANKS, 1}},
+        ItemType::BRONZE_AXE, 1};
+    static const RecipeDefinition ironAxeRecipe{
+        RecipeType::IRON_AXE, "Forge Iron axe", StationType::FURNACE,
+        SkillType::SMITHING, 10, 24, 5,
+        {{ItemType::IRON_BAR, 2}, {ItemType::WOODEN_PLANKS, 1}},
+        ItemType::IRON_AXE, 1};
+    static const RecipeDefinition steelAxeRecipe{
+        RecipeType::STEEL_AXE, "Forge Steel axe", StationType::FURNACE,
+        SkillType::SMITHING, 20, 40, 6,
+        {{ItemType::STEEL_BAR, 2}, {ItemType::WOODEN_PLANKS, 1}},
+        ItemType::STEEL_AXE, 1};
+    static const RecipeDefinition bronzePickaxeRecipe{
+        RecipeType::BRONZE_PICKAXE, "Forge Bronze pickaxe", StationType::FURNACE,
+        SkillType::SMITHING, 1, 16, 4,
+        {{ItemType::BRONZE_BAR, 3}, {ItemType::WOODEN_PLANKS, 2}},
+        ItemType::BRONZE_PICKAXE, 1};
+    static const RecipeDefinition ironPickaxeRecipe{
+        RecipeType::IRON_PICKAXE, "Forge Iron pickaxe", StationType::FURNACE,
+        SkillType::SMITHING, 10, 32, 5,
+        {{ItemType::IRON_BAR, 3}, {ItemType::WOODEN_PLANKS, 2}},
+        ItemType::IRON_PICKAXE, 1};
+    static const RecipeDefinition steelPickaxeRecipe{
+        RecipeType::STEEL_PICKAXE, "Forge Steel pickaxe", StationType::FURNACE,
+        SkillType::SMITHING, 20, 52, 6,
+        {{ItemType::STEEL_BAR, 3}, {ItemType::WOODEN_PLANKS, 2}},
+        ItemType::STEEL_PICKAXE, 1};
+    static const RecipeDefinition bronzeSwordRecipe{
+        RecipeType::BRONZE_SWORD, "Forge Bronze sword", StationType::FURNACE,
+        SkillType::SMITHING, 1, 18, 4,
+        {{ItemType::BRONZE_BAR, 3}, {ItemType::WOODEN_PLANKS, 1}},
+        ItemType::BRONZE_SWORD, 1};
+
     switch (recipeType)
     {
     case RecipeType::BRONZE_BAR:
@@ -119,6 +162,14 @@ RecipeDatabase::Get(
 
     case RecipeType::WOODEN_SHIELD:
         return woodenShieldRecipe;
+
+    case RecipeType::BRONZE_AXE: return bronzeAxeRecipe;
+    case RecipeType::IRON_AXE: return ironAxeRecipe;
+    case RecipeType::STEEL_AXE: return steelAxeRecipe;
+    case RecipeType::BRONZE_PICKAXE: return bronzePickaxeRecipe;
+    case RecipeType::IRON_PICKAXE: return ironPickaxeRecipe;
+    case RecipeType::STEEL_PICKAXE: return steelPickaxeRecipe;
+    case RecipeType::BRONZE_SWORD: return bronzeSwordRecipe;
 
     case RecipeType::NONE:
     default:
@@ -137,6 +188,13 @@ const RecipeDefinition *RecipeDatabase::TryGet(
     case RecipeType::STEEL_BAR:
     case RecipeType::WOODEN_PLANKS:
     case RecipeType::WOODEN_SHIELD:
+    case RecipeType::BRONZE_AXE:
+    case RecipeType::IRON_AXE:
+    case RecipeType::STEEL_AXE:
+    case RecipeType::BRONZE_PICKAXE:
+    case RecipeType::IRON_PICKAXE:
+    case RecipeType::STEEL_PICKAXE:
+    case RecipeType::BRONZE_SWORD:
         return &Get(recipeType);
 
     case RecipeType::NONE:

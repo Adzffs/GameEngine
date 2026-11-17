@@ -23,30 +23,28 @@ This ledger is the balancing contract for the starter region. It records what ev
 | Tin ore | 1 | Tin rock; Mossling; shop | Bronze bar, 1 per bar | 65% gather roll; paired 1:1 with Copper | Buy 2 | Completes the first metal loop | Same as Copper |
 | Iron ore | 2 | Iron rock; Mossling; Ashfang; Stoneback | Iron bar 1:1; Steel bar 1:1 | 50% gather roll; competes between Iron and Steel | Not traded | Useful branch point, but bars currently have no equipment sink | Add smithing recipes and later a modest sell value |
 | Coal | 3 | Coal rock; Mossling; Stoneback; shop | Steel bar, 2 per bar | 40% gather roll; 2 needed per Steel bar | Buy 4 | Controls Steel pace and connects combat drops to crafting | Retain as the main Steel bottleneck |
-| Bronze bar | 1 | Furnace: 1 Copper + 1 Tin | **None** | 3 ticks, 6 Smithing XP | Not traded | Processing output with no use beyond XP | First priority: Bronze equipment recipes |
-| Iron bar | 2 | Furnace: 1 Iron ore | **None** | 3 ticks, Smithing 10, 13 XP | Not traded | Upgrade material without an upgrade path | Add Iron tool recipes |
-| Steel bar | 3 | Furnace: 1 Iron ore + 2 Coal; Stoneback/Cinder Warden drop | **None** | 4 ticks, Smithing 20, 20 XP | Not traded | Supposed prestige material; elite drops currently bypass no meaningful grind | Add Steel tool recipes and retain high input cost |
+| Bronze bar | 1 | Furnace: 1 Copper + 1 Tin | Bronze axe, pickaxe, and sword | 3 ticks, 6 Smithing XP; gear costs 2–3 bars | Not traded | First metal equipment tier and a deterministic combat upgrade | Playtest whether the 4–6 ore cost reaches the 10–15 minute target |
+| Iron bar | 2 | Furnace: 1 Iron ore | Iron axe and pickaxe | 3 ticks, Smithing 10, 13 XP; gear costs 2–3 bars | Not traded | Deterministic mid-tier gathering upgrades | Add another long-term sink only after upgrade pacing is measured |
+| Steel bar | 3 | Furnace: 1 Iron ore + 2 Coal; Stoneback/Cinder Warden drop | Steel axe and pickaxe | 4 ticks, Smithing 20, 20 XP; gear costs 2–3 bars | Not traded | Prestige gathering tier with both crafted and combat-assisted routes | Retain high input cost and compare both acquisition routes |
 | Coins | 1 | Ashfang and Cinder Warden drops | Food and starter equipment purchases | Combat-paced; no gathering conversion | Currency | Gives combat an economic identity | Add useful repeat purchases before adding more coin sources |
 | Cooked meat | 1 | Ashfang guaranteed drop; shop | Consumed for 5 health | Immediate consumable | Buy 8 / sell 3 | Repeatable combat sink and recovery tool | Tune healing against encounter damage after playtest telemetry |
 | Bronze axe | 1 | Development starting inventory; shop | Equipped tool | Permanent | Buy 25 / sell 10 | Baseline Woodcutting access | Remove from shop only if a safe replacement path exists |
-| Iron axe | 2 | **No source** | Equipped tool | Permanent; Woodcutting 5 requirement | Not traded | Implemented upgrade that players cannot obtain | Add Iron bar + timber recipe |
-| Steel axe | 3 | Cinder Warden rare drop | Equipped tool | Permanent; Woodcutting 10 requirement | Not traded | Exciting drop, but crafting needs a deterministic route too | Add Steel recipe; rare drop remains an accelerator |
+| Iron axe | 2 | Forge: 2 Iron bars + 1 Wooden plank | Equipped tool | Permanent; Woodcutting 5 requirement | Not traded | Deterministic mid-tier Woodcutting upgrade | Measure upgrade time |
+| Steel axe | 3 | Forge: 2 Steel bars + 1 Wooden plank; Cinder Warden rare drop | Equipped tool | Permanent; Woodcutting 10 requirement | Not traded | Deterministic route plus an exciting accelerating drop | Compare crafted and combat acquisition times |
 | Bronze pickaxe | 1 | Development starting inventory; shop | Equipped tool | Permanent | Buy 25 / sell 10 | Baseline Mining access | Keep as recovery purchase |
-| Iron pickaxe | 2 | Development starting inventory only | Equipped tool | Permanent; Mining 5 requirement | Not traded | Starting possession removes the first mining upgrade reward | Add recipe, then remove from normal starting inventory |
-| Steel pickaxe | 3 | Development starting inventory only | Equipped tool | Permanent; Mining 10 requirement | Not traded | Starting possession invalidates the mining progression arc | Add recipe, then remove from normal starting inventory |
-| Bronze sword | 1 | Shop | Equipped weapon; Gathering Basics quest requirement | Permanent | Buy 40 / sell 15 | First visible combat upgrade and a coin goal | Add a crafted route so mining and smithing can support combat |
+| Iron pickaxe | 2 | Forge: 3 Iron bars + 2 Wooden planks; development starting inventory | Equipped tool | Permanent; Mining 5 requirement | Not traded | Crafting path exists, but starting possession still removes the reward | Remove from normal starting inventory |
+| Steel pickaxe | 3 | Forge: 3 Steel bars + 2 Wooden planks; development starting inventory | Equipped tool | Permanent; Mining 10 requirement | Not traded | Crafting path exists, but starting possession still invalidates the arc | Remove from normal starting inventory |
+| Bronze sword | 1 | Forge: 3 Bronze bars + 1 Wooden plank; shop | Equipped weapon; Gathering Basics quest requirement | Permanent | Buy 40 / sell 15 | First visible combat upgrade with coin and crafting routes | Compare the two routes in playtesting |
 | Developer Godsword | Debug | Development/debug grant only | Equipped weapon | Permanent | Not traded | Test-only power item | Never place in the live economy |
 | Wooden shield | 1 | 6 Wooden planks at Crafting Table; shop | Equipped shield | 1.5 Logs after plank conversion | Buy 30 / sell 12 | Healthy early cross-skill craft with a shop fallback | Preserve; use as the reference for future crafted gear |
 | Wooden planks | 1 | 1 Log -> 4 at Crafting Table | Wooden shield, 6 | 1 tick; stackable | Not traded | Compresses inventory and feeds construction-style recipes | Add tiered timber variants only when they have at least two sinks |
 
 ## Confirmed imbalances
 
-1. **Metal processing is a dead end.** Bronze, Iron, and Steel bars have no current sink.
-2. **Mining upgrades are front-loaded.** Development defaults give players Iron and Steel pickaxes before they earn them.
-3. **Woodcutting tiers are XP-only.** Oak and Willow logs have no sink.
-4. **Iron axe is unobtainable.** Steel axe is obtainable only as a rare elite reward.
-5. **The shop is mostly a recovery shop, not a repeat-visit economy.** Cooked meat is its only recurring purchase.
-6. **Combat and crafting barely depend on each other.** Ore drops exist, but the resulting bars cannot become useful gear.
+1. **Mining upgrades are front-loaded.** Development defaults give players Iron and Steel pickaxes before they earn them.
+2. **Woodcutting tiers are XP-only.** Oak and Willow logs have no sink.
+3. **The shop is mostly a recovery shop, not a repeat-visit economy.** Cooked meat is its only recurring purchase.
+4. **Combat and crafting need more ongoing interdependence.** Ore and bar drops now accelerate equipment, but permanent gear is only a one-time sink.
 
 ## Implementation order
 

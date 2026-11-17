@@ -7,5 +7,12 @@ enum class RecipeType
     IRON_BAR,
     STEEL_BAR,
     WOODEN_PLANKS,
-    WOODEN_SHIELD
+    WOODEN_SHIELD,
+    BRONZE_AXE,
+    IRON_AXE,
+    STEEL_AXE,
+    BRONZE_PICKAXE,
+    IRON_PICKAXE,
+    STEEL_PICKAXE,
+    BRONZE_SWORD
 };
