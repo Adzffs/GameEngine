@@ -229,11 +229,11 @@ namespace
         player->GetPosition().SetPosition(2, 2);
         system.QueueDestination(playerID, Position(4, 3), entities, map);
         system.Process(entities, map);
-        test.Expect(player->GetPosition().GetX() == 3 &&
-                        player->GetPosition().GetY() == 2,
-                    "Running takes a direction-changing corner as one visible step");
+        test.Expect(player->GetPosition().GetX() == 4 &&
+                        player->GetPosition().GetY() == 3,
+                    "Running combines two safe path steps into OSRS-style L movement");
         test.ExpectEqual(player->GetRunStamina(), 97,
-                         "A visible running corner step still consumes stamina");
+                         "An L-shaped running update consumes stamina once");
 
         system.CancelMovement(playerID);
         player->GetPosition().SetPosition(10, 10);

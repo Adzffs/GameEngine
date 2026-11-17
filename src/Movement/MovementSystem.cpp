@@ -168,10 +168,7 @@ std::vector<MovementOutcome> MovementSystem::Process(
                 const Position runStep = activePath.remainingSteps.front();
                 const int runChangeX = runStep.GetX() - entity.GetPosition().GetX();
                 const int runChangeY = runStep.GetY() - entity.GetPosition().GetY();
-                const bool continuesSameDirection =
-                    runChangeX == changeX && runChangeY == changeY;
-                if (continuesSameDirection &&
-                    Movement::Move(entity, map, runChangeX, runChangeY))
+                if (Movement::Move(entity, map, runChangeX, runChangeY))
                 {
                     activePath.remainingSteps.pop_front();
                 }
