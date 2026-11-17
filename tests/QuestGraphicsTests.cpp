@@ -191,8 +191,9 @@ int main()
                     productionRows[1].quest.progress == 3 &&
                     Graphics::GetQuestProgressLabel(productionRows[1].quest) ==
                         "Copper ores: 3 / 5" &&
-                    !Overlaps(productionRows[0].bounds, productionRows[1].bounds),
-                "Production Quest panel shows two independent rows in catalogue order");
+                    !Overlaps(productionRows[0].bounds, productionRows[1].bounds) &&
+                    !productionRows.back().clipped,
+                "Production Quest panel keeps the full starter arc visible");
 
     const std::vector<QuestPresentation> syntheticQuests{
         {static_cast<QuestId>(10), QuestState::AVAILABLE, 0, 10,
@@ -204,6 +205,10 @@ int main()
         {static_cast<QuestId>(13), QuestState::COMPLETED, 10, 10,
             "Completed Quest", "Logs"},
         {static_cast<QuestId>(14), QuestState::ACTIVE, 2, 10,
+            "Fifth Quest", "Logs"},
+        {static_cast<QuestId>(15), QuestState::ACTIVE, 3, 10,
+            "Sixth Quest", "Logs"},
+        {static_cast<QuestId>(16), QuestState::ACTIVE, 4, 10,
             "Overflow Quest", "Logs"}};
     const auto syntheticRows = graphics.BuildQuestRowLayout(syntheticQuests);
     bool retainedOrder = syntheticRows.size() == syntheticQuests.size();
@@ -222,7 +227,7 @@ int main()
                 syntheticRows[index - 1].bounds, syntheticRows[index].bounds);
             consistentSpacing = consistentSpacing &&
                 syntheticRows[index].originY -
-                    syntheticRows[index - 1].originY == 88.0f;
+                    syntheticRows[index - 1].originY == 48.0f;
         }
     }
     test.Expect(retainedOrder,
@@ -230,8 +235,9 @@ int main()
     test.Expect(disjoint && consistentSpacing,
                 "Synthetic quest rows are distinct with consistent spacing");
     test.Expect(insideContent && !syntheticRows[0].clipped &&
-                    syntheticRows[3].clipped && syntheticRows[4].clipped,
-                "Rows remain bounded and overflow rows are marked clipped");
+                    !syntheticRows[4].clipped && !syntheticRows[5].clipped &&
+                    syntheticRows[6].clipped,
+                "Six compact rows fit while later overflow remains clipped");
     test.Expect(Graphics::GetQuestStateLabel(QuestState::AVAILABLE) == "AVAILABLE" &&
                     Graphics::GetQuestStateLabel(QuestState::ACTIVE) == "ACTIVE" &&
                     Graphics::GetQuestStateLabel(QuestState::READY_TO_COMPLETE) ==
@@ -277,13 +283,13 @@ int main()
         SDL_Surface* syntheticPixels = SDL_RenderReadPixels(renderer, nullptr);
         const Pixel background{5, 7, 9, 255};
         const SDL_FRect insideGlyphRegion{
-            syntheticRows[3].titlePosition.x,
-            syntheticRows[3].titlePosition.y,
+            syntheticRows[6].titlePosition.x,
+            syntheticRows[6].titlePosition.y,
             145.0f,
             9.0f};
         const SDL_FRect belowContentGlyphRegion{
-            syntheticRows[3].progressPosition.x,
-            syntheticRows[3].progressPosition.y,
+            syntheticRows[6].progressPosition.x,
+            syntheticRows[6].progressPosition.y,
             145.0f,
             9.0f};
         test.Expect(syntheticPixels != nullptr &&

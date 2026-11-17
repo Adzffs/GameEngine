@@ -5769,8 +5769,8 @@ std::vector<Graphics::QuestRowLayout> Graphics::BuildQuestRowLayout(
 {
     const SDL_FRect content = GetSidePanelLayout().contentBounds;
     constexpr float headingSpace = 32.0f;
-    constexpr float rowHeight = 80.0f;
-    constexpr float rowGap = 8.0f;
+    constexpr float rowHeight = 44.0f;
+    constexpr float rowGap = 4.0f;
     std::vector<QuestRowLayout> rows;
     rows.reserve(quests.size());
     for (std::size_t index = 0; index < quests.size(); ++index)
@@ -5785,8 +5785,8 @@ std::vector<Graphics::QuestRowLayout> Graphics::BuildQuestRowLayout(
         rows.push_back({quests[index],
             {content.x, clippedTop, content.w, clippedHeight},
             {content.x, originY},
+            {content.x, originY + 14.0f},
             {content.x, originY + 28.0f},
-            {content.x, originY + 52.0f},
             originY,
             clippedHeight < rowHeight});
     }
