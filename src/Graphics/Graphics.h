@@ -497,6 +497,9 @@ private:
     int displayedOakLogCount = 0;
     int displayedWillowLogCount = 0;
     int displayedPlankCount = 0;
+    int displayedWoodcuttingLevel = 1;
+    int displayedMiningLevel = 1;
+    int displayedSmithingLevel = 1;
     std::array<InventorySlot, Inventory::SlotCount> displayedInventorySlots{};
     std::string stationFeedback;
 
@@ -549,6 +552,14 @@ private:
     bool HandleShopClick(float mouseX, float mouseY);
     void DismissStationMenu(bool queueCloseCommand);
     int GetDisplayedCraftingItemCount(ItemType itemType) const;
+    int GetDisplayedInventoryItemCount(ItemType itemType) const;
+    int GetDisplayedSkillLevel(SkillType skillType) const;
+    bool HasDisplayedRecipeRequirements(
+        const RecipeDefinition &recipe,
+        bool ingredientsAreInCraftingGrid = false) const;
+    std::string GetDisplayedRecipeStatus(
+        const RecipeDefinition &recipe,
+        bool ingredientsAreInCraftingGrid = false) const;
     int GetCraftingGridItemCount(ItemType itemType) const;
     void DrawCraftingItemIcon(
         ItemType itemType,

@@ -1,6 +1,7 @@
 #include "TestSupport.h"
 
 #include "../src/Graphics/Graphics.h"
+#include "../src/Recipe/RecipeDatabase.h"
 
 struct GraphicsTestAccess
 {
@@ -21,6 +22,22 @@ struct GraphicsTestAccess
     static void SetInventory(Graphics &graphics, const Inventory &inventory)
     {
         graphics.displayedInventorySlots = inventory.GetSlots();
+    }
+
+    static void SetSkillLevels(
+        Graphics &graphics, int woodcutting, int mining, int smithing)
+    {
+        graphics.displayedWoodcuttingLevel = woodcutting;
+        graphics.displayedMiningLevel = mining;
+        graphics.displayedSmithingLevel = smithing;
+    }
+
+    static std::string RecipeStatus(
+        const Graphics &graphics, RecipeType recipeType,
+        bool ingredientsAreInGrid = false)
+    {
+        return graphics.GetDisplayedRecipeStatus(
+            RecipeDatabase::Get(recipeType), ingredientsAreInGrid);
     }
 };
 
@@ -67,6 +84,30 @@ int main()
 {
     TestContext test;
     Graphics graphics;
+
+    Inventory requirementsInventory;
+    requirementsInventory.AddItem(ItemType::COPPER_ORE, 1);
+    requirementsInventory.AddItem(ItemType::TIN_ORE, 1);
+    requirementsInventory.AddItem(ItemType::OAK_LOG, 1);
+    GraphicsTestAccess::SetInventory(graphics, requirementsInventory);
+    GraphicsTestAccess::SetSkillLevels(graphics, 1, 1, 1);
+    test.Expect(
+        GraphicsTestAccess::RecipeStatus(
+            graphics, RecipeType::BRONZE_BAR) == "READY",
+        "Recipe feedback recognizes sufficient level-one forge materials");
+    test.Expect(
+        GraphicsTestAccess::RecipeStatus(
+            graphics, RecipeType::OAK_PLANKS, true) == "NEED LEVEL 5",
+        "Recipe feedback explains a missing skill requirement");
+    GraphicsTestAccess::SetSkillLevels(graphics, 5, 1, 1);
+    test.Expect(
+        GraphicsTestAccess::RecipeStatus(
+            graphics, RecipeType::OAK_PLANKS, true) == "READY",
+        "Recipe feedback changes to ready when the level requirement is met");
+    test.Expect(
+        GraphicsTestAccess::RecipeStatus(
+            graphics, RecipeType::BRONZE_SWORD) == "NEED MATERIALS",
+        "Recipe feedback distinguishes missing materials from missing levels");
 
     if (!graphics.Initialize())
     {

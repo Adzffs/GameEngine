@@ -421,6 +421,59 @@ int Graphics::GetDisplayedCraftingItemCount(
     return 0;
 }
 
+int Graphics::GetDisplayedInventoryItemCount(ItemType itemType) const
+{
+    int amount = 0;
+    for (const InventorySlot &slot : displayedInventorySlots)
+    {
+        if (slot.GetItemType() == itemType)
+            amount += slot.GetAmount();
+    }
+    return amount;
+}
+
+int Graphics::GetDisplayedSkillLevel(SkillType skillType) const
+{
+    switch (skillType)
+    {
+    case SkillType::WOODCUTTING: return displayedWoodcuttingLevel;
+    case SkillType::MINING: return displayedMiningLevel;
+    case SkillType::SMITHING: return displayedSmithingLevel;
+    case SkillType::NONE: return 1;
+    default: return 1;
+    }
+}
+
+bool Graphics::HasDisplayedRecipeRequirements(
+    const RecipeDefinition &recipe,
+    bool ingredientsAreInCraftingGrid) const
+{
+    if (recipe.GetRequiredSkill() != SkillType::NONE &&
+        GetDisplayedSkillLevel(recipe.GetRequiredSkill()) <
+            recipe.GetRequiredLevel())
+        return false;
+    if (ingredientsAreInCraftingGrid) return true;
+    for (const RecipeIngredient &ingredient : recipe.GetIngredients())
+        if (GetDisplayedInventoryItemCount(ingredient.itemType) < ingredient.amount)
+            return false;
+    return true;
+}
+
+std::string Graphics::GetDisplayedRecipeStatus(
+    const RecipeDefinition &recipe,
+    bool ingredientsAreInCraftingGrid) const
+{
+    if (recipe.GetRequiredSkill() != SkillType::NONE &&
+        GetDisplayedSkillLevel(recipe.GetRequiredSkill()) <
+            recipe.GetRequiredLevel())
+        return "NEED LEVEL " + std::to_string(recipe.GetRequiredLevel());
+    if (!ingredientsAreInCraftingGrid)
+        for (const RecipeIngredient &ingredient : recipe.GetIngredients())
+            if (GetDisplayedInventoryItemCount(ingredient.itemType) < ingredient.amount)
+                return "NEED MATERIALS";
+    return "READY";
+}
+
 int Graphics::GetCraftingGridItemCount(
     ItemType itemType) const
 {
@@ -667,11 +720,20 @@ void Graphics::DrawStationMenu()
     {
         const FurnaceMenuLayout layout =
             GetFurnaceMenuLayout();
-        SDL_SetRenderDrawColor(
-            renderer, 60, 60, 65, 255);
-        for (const SDL_FRect &button : layout.recipeButtons)
+        const std::array<RecipeType, 10> recipes{
+            RecipeType::BRONZE_BAR, RecipeType::IRON_BAR,
+            RecipeType::STEEL_BAR, RecipeType::BRONZE_AXE,
+            RecipeType::IRON_AXE, RecipeType::STEEL_AXE,
+            RecipeType::BRONZE_PICKAXE, RecipeType::IRON_PICKAXE,
+            RecipeType::STEEL_PICKAXE, RecipeType::BRONZE_SWORD};
+        for (std::size_t index = 0; index < recipes.size(); ++index)
         {
-            SDL_RenderFillRect(renderer, &button);
+            const bool ready = HasDisplayedRecipeRequirements(
+                RecipeDatabase::Get(recipes[index]));
+            SDL_SetRenderDrawColor(renderer,
+                ready ? 52 : 45, ready ? 78 : 45,
+                ready ? 55 : 48, 255);
+            SDL_RenderFillRect(renderer, &layout.recipeButtons[index]);
         }
         SDL_SetRenderDrawColor(
             renderer, 175, 175, 180, 255);
@@ -691,19 +753,15 @@ void Graphics::DrawStationMenu()
             layout.closeButton.x + 12.0f,
             layout.closeButton.y + 10.0f,
             "CLOSE");
-        const std::array<RecipeType, 10> recipes{
-            RecipeType::BRONZE_BAR, RecipeType::IRON_BAR,
-            RecipeType::STEEL_BAR, RecipeType::BRONZE_AXE,
-            RecipeType::IRON_AXE, RecipeType::STEEL_AXE,
-            RecipeType::BRONZE_PICKAXE, RecipeType::IRON_PICKAXE,
-            RecipeType::STEEL_PICKAXE, RecipeType::BRONZE_SWORD};
         for (std::size_t index = 0; index < recipes.size(); ++index)
         {
             const RecipeDefinition &recipe = RecipeDatabase::Get(recipes[index]);
+            const std::string title = recipe.GetName() + " - " +
+                GetDisplayedRecipeStatus(recipe);
             SDL_RenderDebugText(renderer,
                 layout.recipeButtons[index].x + 12.0f,
                 layout.recipeButtons[index].y + 12.0f,
-                recipe.GetName().c_str());
+                title.c_str());
             std::string details = "Lv " +
                 std::to_string(recipe.GetRequiredLevel()) + "  ";
             for (std::size_t ingredientIndex = 0;
@@ -862,14 +920,20 @@ void Graphics::DrawStationMenu()
             ItemDatabase::Get(match->GetOutputItem()).GetName();
         SDL_RenderDebugText(renderer,
             layout.previewBounds.x + 14.0f,
-            layout.previewBounds.y + 46.0f,
+            layout.previewBounds.y + 30.0f,
             output.c_str());
+        const std::string status = GetDisplayedRecipeStatus(*match, true);
+        SDL_RenderDebugText(renderer,
+            layout.previewBounds.x + 14.0f,
+            layout.previewBounds.y + 44.0f,
+            status.c_str());
     }
 
     SDL_SetRenderDrawColor(renderer, 70, 62, 52, 255);
     SDL_RenderFillRect(renderer, &layout.clearButton);
     const bool canCraft =
         match != nullptr &&
+        HasDisplayedRecipeRequirements(*match, true) &&
         !recipeCommandInFlight &&
         !recipeActionActive;
     SDL_SetRenderDrawColor(
@@ -5498,6 +5562,12 @@ void Graphics::Render(
     displayedOakLogCount = inventory.GetItemAmount(ItemType::OAK_LOG);
     displayedWillowLogCount = inventory.GetItemAmount(ItemType::WILLOW_LOG);
     displayedPlankCount = inventory.GetItemAmount(ItemType::WOODEN_PLANKS);
+    displayedWoodcuttingLevel = player.GetSkills()
+        .GetSkill(SkillType::WOODCUTTING).GetLevel();
+    displayedMiningLevel = player.GetSkills()
+        .GetSkill(SkillType::MINING).GetLevel();
+    displayedSmithingLevel = player.GetSkills()
+        .GetSkill(SkillType::SMITHING).GetLevel();
     displayedInventorySlots = inventory.GetSlots();
     recipeActionActive =
         activeAction != nullptr &&
