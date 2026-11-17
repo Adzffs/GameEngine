@@ -500,6 +500,8 @@ private:
     int displayedWoodcuttingLevel = 1;
     int displayedMiningLevel = 1;
     int displayedSmithingLevel = 1;
+    std::vector<RecipeType> displayedKnownRecipes;
+    bool recipeKnowledgeInitialized = false;
     std::array<InventorySlot, Inventory::SlotCount> displayedInventorySlots{};
     std::string stationFeedback;
 
@@ -557,6 +559,7 @@ private:
     bool HasDisplayedRecipeRequirements(
         const RecipeDefinition &recipe,
         bool ingredientsAreInCraftingGrid = false) const;
+    bool IsDisplayedRecipeKnown(RecipeType recipeType) const;
     std::string GetDisplayedRecipeStatus(
         const RecipeDefinition &recipe,
         bool ingredientsAreInCraftingGrid = false) const;

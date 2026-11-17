@@ -805,6 +805,7 @@ int main()
         {
             const RecipeDefinition &recipe =
                 RecipeDatabase::Get(expectation.recipeType);
+            player->GetRecipeBook().Discover(expectation.recipeType);
 
             test.Expect(
                 OpenFurnace(world, playerID),

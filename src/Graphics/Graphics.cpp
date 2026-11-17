@@ -174,6 +174,7 @@ Graphics::Graphics()
       pendingDialogueCommand(std::nullopt),
       pendingShopCommand(std::nullopt)
 {
+    displayedKnownRecipes = RecipeBook::GetStarterRecipes();
 }
 
 Graphics::~Graphics()
@@ -474,6 +475,12 @@ std::string Graphics::GetDisplayedRecipeStatus(
     return "READY";
 }
 
+bool Graphics::IsDisplayedRecipeKnown(RecipeType recipeType) const
+{
+    return std::find(displayedKnownRecipes.begin(),
+        displayedKnownRecipes.end(), recipeType) != displayedKnownRecipes.end();
+}
+
 int Graphics::GetCraftingGridItemCount(
     ItemType itemType) const
 {
@@ -550,6 +557,11 @@ void Graphics::HandleStationMenuClick(
                     mouseY,
                     layout.recipeButtons[index]))
             {
+                if (!IsDisplayedRecipeKnown(recipes[index]))
+                {
+                    stationFeedback = "Unknown recipe - gather new materials";
+                    return;
+                }
                 requestedRecipeType = recipes[index];
                 recipeRequestPending = true;
                 stationFeedback.clear();
@@ -728,11 +740,12 @@ void Graphics::DrawStationMenu()
             RecipeType::STEEL_PICKAXE, RecipeType::BRONZE_SWORD};
         for (std::size_t index = 0; index < recipes.size(); ++index)
         {
+            const bool known = IsDisplayedRecipeKnown(recipes[index]);
             const bool ready = HasDisplayedRecipeRequirements(
                 RecipeDatabase::Get(recipes[index]));
             SDL_SetRenderDrawColor(renderer,
-                ready ? 52 : 45, ready ? 78 : 45,
-                ready ? 55 : 48, 255);
+                known && ready ? 52 : 45, known && ready ? 78 : 45,
+                known && ready ? 55 : 48, 255);
             SDL_RenderFillRect(renderer, &layout.recipeButtons[index]);
         }
         SDL_SetRenderDrawColor(
@@ -756,15 +769,18 @@ void Graphics::DrawStationMenu()
         for (std::size_t index = 0; index < recipes.size(); ++index)
         {
             const RecipeDefinition &recipe = RecipeDatabase::Get(recipes[index]);
-            const std::string title = recipe.GetName() + " - " +
-                GetDisplayedRecipeStatus(recipe);
+            const bool known = IsDisplayedRecipeKnown(recipes[index]);
+            const std::string title = known
+                ? recipe.GetName() + " - " + GetDisplayedRecipeStatus(recipe)
+                : "???? - UNKNOWN";
             SDL_RenderDebugText(renderer,
                 layout.recipeButtons[index].x + 12.0f,
                 layout.recipeButtons[index].y + 12.0f,
                 title.c_str());
-            std::string details = "Lv " +
-                std::to_string(recipe.GetRequiredLevel()) + "  ";
-            for (std::size_t ingredientIndex = 0;
+            std::string details = known
+                ? "Lv " + std::to_string(recipe.GetRequiredLevel()) + "  "
+                : "Gather new materials to discover";
+            for (std::size_t ingredientIndex = 0; known &&
                  ingredientIndex < recipe.GetIngredients().size(); ++ingredientIndex)
             {
                 if (ingredientIndex > 0) details += " + ";
@@ -909,10 +925,14 @@ void Graphics::DrawStationMenu()
     }
     else
     {
+        const bool known = IsDisplayedRecipeKnown(match->GetRecipeType());
+        const std::string recipeTitle = known
+            ? match->GetName()
+            : "DISCOVER: " + match->GetName();
         SDL_RenderDebugText(renderer,
             layout.previewBounds.x + 14.0f,
             layout.previewBounds.y + 14.0f,
-            match->GetName().c_str());
+            recipeTitle.c_str());
         const std::string output =
             "OUTPUT: " +
             std::to_string(match->GetOutputAmount()) +
@@ -5568,6 +5588,28 @@ void Graphics::Render(
         .GetSkill(SkillType::MINING).GetLevel();
     displayedSmithingLevel = player.GetSkills()
         .GetSkill(SkillType::SMITHING).GetLevel();
+    const std::vector<RecipeType> &knownRecipes =
+        player.GetRecipeBook().GetKnownRecipes();
+    if (recipeKnowledgeInitialized)
+    {
+        for (RecipeType recipeType : knownRecipes)
+        {
+            if (std::find(displayedKnownRecipes.begin(),
+                    displayedKnownRecipes.end(), recipeType) !=
+                displayedKnownRecipes.end())
+                continue;
+            progressionNotices.push_back({
+                ProgressionEventType::ITEM_ACQUIRED,
+                "New recipe: " + RecipeDatabase::Get(recipeType).GetName(),
+                4.0f});
+        }
+        constexpr std::size_t MaximumNotices = 6;
+        if (progressionNotices.size() > MaximumNotices)
+            progressionNotices.erase(progressionNotices.begin(),
+                progressionNotices.end() - MaximumNotices);
+    }
+    displayedKnownRecipes = knownRecipes;
+    recipeKnowledgeInitialized = true;
     displayedInventorySlots = inventory.GetSlots();
     recipeActionActive =
         activeAction != nullptr &&

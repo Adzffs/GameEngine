@@ -2340,13 +2340,19 @@ void World::ProcessQueuedCommands()
                                  CraftingRecipeMatcher::FindMatch(data.grid);
                              recipe != nullptr &&
                              recipe->GetRequiredStationType() ==
-                                 StationType::CRAFTING_TABLE &&
-                             TryStartRecipeAction(
-                                 data.actorEntityID,
-                                 recipe->GetRecipeType()))
+                                 StationType::CRAFTING_TABLE)
                     {
-                        resultCode =
-                            CommandResultCode::ACCEPTED;
+                        Player *player = dynamic_cast<Player *>(
+                            entityManager.GetEntityByID(data.actorEntityID));
+                        if (player != nullptr && IsStationUsable(
+                                data.actorEntityID, StationType::CRAFTING_TABLE))
+                        {
+                            player->GetRecipeBook().Discover(
+                                recipe->GetRecipeType());
+                            if (TryStartRecipeAction(data.actorEntityID,
+                                    recipe->GetRecipeType()))
+                                resultCode = CommandResultCode::ACCEPTED;
+                        }
                     }
                 }
                 else if constexpr (
@@ -3492,6 +3498,14 @@ ActionValidationResult World::ValidateRecipeActionReadOnly(
             "The selected recipe is invalid"};
     }
 
+    if (!player->GetRecipeBook().IsKnown(recipeType))
+    {
+        return {
+            false,
+            ActionCancelReason::REQUIREMENTS_FAILED,
+            "You have not discovered this recipe"};
+    }
+
     if (!IsStationUsable(
             entityID,
             recipe->GetRequiredStationType()))
@@ -3909,6 +3923,17 @@ void World::ProcessCompletedActions(
                 "Created: " +
                 recipeOutcome.recipeName);
 
+            if (recipeOutcome.outputItem == ItemType::IRON_BAR)
+            {
+                player->GetRecipeBook().Discover(RecipeType::IRON_AXE);
+                player->GetRecipeBook().Discover(RecipeType::IRON_PICKAXE);
+            }
+            else if (recipeOutcome.outputItem == ItemType::STEEL_BAR)
+            {
+                player->GetRecipeBook().Discover(RecipeType::STEEL_AXE);
+                player->GetRecipeBook().Discover(RecipeType::STEEL_PICKAXE);
+            }
+
             const RecipeDefinition *completedRecipe =
                 RecipeDatabase::TryGet(
                     recipeOutcome.recipeType);
@@ -4038,6 +4063,24 @@ void World::ProcessCompletedActions(
             QuestSystem::RecordGathered(
                 player->GetQuestJournal(), gatheringOutcome.rewardItem,
                 gatheringOutcome.rewardAmount);
+
+            switch (gatheringOutcome.rewardItem)
+            {
+            case ItemType::OAK_LOG:
+                player->GetRecipeBook().Discover(RecipeType::OAK_PLANKS);
+                break;
+            case ItemType::WILLOW_LOG:
+                player->GetRecipeBook().Discover(RecipeType::WILLOW_PLANKS);
+                break;
+            case ItemType::IRON_ORE:
+                player->GetRecipeBook().Discover(RecipeType::IRON_BAR);
+                break;
+            case ItemType::COAL:
+                player->GetRecipeBook().Discover(RecipeType::STEEL_BAR);
+                break;
+            default:
+                break;
+            }
 
             int previousLevel =
                 player->GetSkills()
