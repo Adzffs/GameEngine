@@ -8,11 +8,12 @@
 #include "../Quest/QuestId.h"
 #include "../Tutorial/TutorialState.h"
 #include "../Combat/CombatStyle.h"
+#include "../Recipe/RecipeType.h"
 
 #include <array>
 #include <vector>
 
-inline constexpr int CURRENT_PLAYER_SAVE_VERSION = 8;
+inline constexpr int CURRENT_PLAYER_SAVE_VERSION = 9;
 
 struct SavedInventorySlot
 {
@@ -68,5 +69,6 @@ struct PlayerSaveData
     TutorialStep tutorialStep = TutorialStep::MEET_GUIDE;
     bool tutorialSkipped = false;
     CombatStyle combatStyle = CombatStyle::ACCURATE;
+    std::vector<RecipeType> knownRecipes;
     SavedRecoveryPile recoveryPile;
 };

@@ -78,6 +78,7 @@ PlayerSaveData PlayerSaveState::Capture(const Player &player)
     saveData.tutorialStep = player.GetTutorialState().GetStep();
     saveData.tutorialSkipped = player.GetTutorialState().IsSkipped();
     saveData.combatStyle = player.GetCombatStyle();
+    saveData.knownRecipes = player.GetRecipeBook().GetKnownRecipes();
     for (const auto &[questId, record] :
          player.GetQuestJournal().GetRecords())
     {
@@ -122,7 +123,7 @@ PlayerSaveValidationReport PlayerSaveState::ValidateInternal(
         report.AddIssue(
             PlayerSaveValidationCode::UNSUPPORTED_VERSION,
             -1,
-            "Only canonical player save version 3 is supported");
+            "Only the current canonical player save version is supported");
     }
     if (saveData.currentHealth <= 0)
     {
@@ -141,6 +142,10 @@ PlayerSaveValidationReport PlayerSaveState::ValidateInternal(
     if (!IsValidCombatStyle(saveData.combatStyle))
         report.AddIssue(PlayerSaveValidationCode::INVALID_COMBAT_STYLE, -1,
             "Combat style is not canonical");
+    RecipeBook recipeBookValidation;
+    if (!recipeBookValidation.TryRestore(saveData.knownRecipes))
+        report.AddIssue(PlayerSaveValidationCode::INVALID_RECIPE_BOOK, -1,
+            "Known recipes contain an invalid or duplicate recipe ID");
     if (saveData.recoveryPile.active)
     {
         if (saveData.recoveryPile.remainingTicks <= 0 ||
@@ -422,6 +427,13 @@ std::unique_ptr<Player> PlayerSaveState::TryCreatePlayer(
         validationReport.AddIssue(
             PlayerSaveValidationCode::INTERNAL_RESTORE_FAILURE, -1,
             "Validated combat style could not be restored");
+        return nullptr;
+    }
+    if (!player->GetRecipeBook().TryRestore(saveData.knownRecipes))
+    {
+        validationReport.AddIssue(
+            PlayerSaveValidationCode::INTERNAL_RESTORE_FAILURE, -1,
+            "Validated recipe knowledge could not be restored");
         return nullptr;
     }
     if (!player->GetTutorialState().TryRestore(

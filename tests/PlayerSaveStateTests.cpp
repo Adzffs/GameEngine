@@ -361,12 +361,31 @@ int main()
         }
     }
 
-    for (int version : {0, -1, 9})
+    for (int version : {0, -1, 10})
     {
         PlayerSaveData malformed = valid;
         malformed.version = version;
         ExpectRejected(test, malformed, PlayerSaveValidationCode::UNSUPPORTED_VERSION,
                        "Unsupported version rejects");
+    }
+    {
+        Player recipePlayer(72, PlayerInitializationMode::EMPTY);
+        recipePlayer.GetRecipeBook().Discover(RecipeType::IRON_BAR);
+        recipePlayer.GetRecipeBook().Discover(RecipeType::OAK_PLANKS);
+        PlayerSaveData recipeSave = PlayerSaveState::Capture(recipePlayer);
+        PlayerSaveValidationReport recipeReport;
+        std::unique_ptr<Player> restored = PlayerSaveState::TryCreatePlayer(
+            73, recipeSave, recipeReport);
+        test.Expect(restored != nullptr && recipeReport.IsValid() &&
+                restored->GetRecipeBook().IsKnown(RecipeType::IRON_BAR) &&
+                restored->GetRecipeBook().IsKnown(RecipeType::OAK_PLANKS) &&
+                restored->GetRecipeBook().ConsumeNewDiscoveries().empty(),
+            "Recipe discoveries restore without replaying notifications");
+
+        recipeSave.knownRecipes.push_back(recipeSave.knownRecipes.front());
+        ExpectRejected(test, recipeSave,
+            PlayerSaveValidationCode::INVALID_RECIPE_BOOK,
+            "Duplicate persisted recipe rejects");
     }
     {
         PlayerSaveData malformed = valid;

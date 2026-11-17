@@ -131,7 +131,7 @@ int main()
 
     PlayerSaveData save = ValidSave();
     const std::string canonical = Encode(save);
-    std::string golden = "GAMEENGINE_PLAYER_SAVE\nversion=8\nposition_x=3\nposition_y=2\ncurrent_health=87\ntutorial_step=0\ntutorial_skipped=0\ncombat_style=0\nrecovery_active=0\nrecovery_x=0\nrecovery_y=0\nrecovery_ticks=0\nrecovery_count=0\ninventory_count=28\n";
+    std::string golden = "GAMEENGINE_PLAYER_SAVE\nversion=9\nposition_x=3\nposition_y=2\ncurrent_health=87\ntutorial_step=0\ntutorial_skipped=0\ncombat_style=0\nrecipe_mask=4722\nrecovery_active=0\nrecovery_x=0\nrecovery_y=0\nrecovery_ticks=0\nrecovery_count=0\ninventory_count=28\n";
     golden += "inventory.0=BRONZE_AXE,1\ninventory.1=COINS,150\n";
     for (int i = 2; i < 28; ++i) golden += "inventory." + std::to_string(i) + "=NONE,0\n";
     golden += "bank_count=0\nskill_count=5\nskill.ATTACK=0\nskill.DEFENCE=0\nskill.WOODCUTTING=1200\nskill.MINING=500\nskill.SMITHING=300\n";
@@ -147,7 +147,7 @@ int main()
     test.Expect(!PlayerSaveTextCodec::TryEncode(save, unchanged, invalidReport), "invalid save fails encoding");
     test.ExpectEqual(unchanged, std::string("sentinel"), "failed encoding leaves output unchanged");
     PlayerSaveData invalid = ValidSave(); invalid.version = 1; EncodeRejectsUnchanged(test, invalid, "legacy version encoding");
-    invalid = ValidSave(); invalid.version = 9; EncodeRejectsUnchanged(test, invalid, "future version encoding");
+    invalid = ValidSave(); invalid.version = 10; EncodeRejectsUnchanged(test, invalid, "future version encoding");
     invalid = ValidSave(); invalid.inventorySlots[0] = {ItemType::NONE, 1}; EncodeRejectsUnchanged(test, invalid, "invalid inventory");
     invalid = ValidSave(); invalid.skills.pop_back(); EncodeRejectsUnchanged(test, invalid, "missing skill");
     invalid = ValidSave(); invalid.skills[1].skillType = SkillType::ATTACK; EncodeRejectsUnchanged(test, invalid, "duplicate skill");
@@ -166,6 +166,23 @@ int main()
     }
     test.Expect(exactInventory, "all 28 decoded inventory indexes remain exact");
     test.ExpectEqual(Encode(*decoded.GetSaveData()), canonical, "encode decode encode byte-identical");
+    Player discoveredPlayer(91, PlayerInitializationMode::EMPTY);
+    discoveredPlayer.GetRecipeBook().Discover(RecipeType::IRON_BAR);
+    discoveredPlayer.GetRecipeBook().Discover(RecipeType::WILLOW_PLANKS);
+    const std::string discoveredText = Encode(
+        PlayerSaveState::Capture(discoveredPlayer));
+    const auto decodedDiscoveries = PlayerSaveTextCodec::Decode(discoveredText);
+    test.Expect(decodedDiscoveries.IsSuccess() &&
+            decodedDiscoveries.GetSaveData()->knownRecipes.size() == 8 &&
+            std::find(decodedDiscoveries.GetSaveData()->knownRecipes.begin(),
+                decodedDiscoveries.GetSaveData()->knownRecipes.end(),
+                RecipeType::IRON_BAR) !=
+                decodedDiscoveries.GetSaveData()->knownRecipes.end() &&
+            std::find(decodedDiscoveries.GetSaveData()->knownRecipes.begin(),
+                decodedDiscoveries.GetSaveData()->knownRecipes.end(),
+                RecipeType::WILLOW_PLANKS) !=
+                decodedDiscoveries.GetSaveData()->knownRecipes.end(),
+        "Version 9 recipe discoveries survive text round-trip");
     PlayerSaveData plankSave = ValidSave();
     plankSave.inventorySlots[1] = {ItemType::WOODEN_PLANKS, 4};
     const std::string plankText = Encode(plankSave);
@@ -194,7 +211,8 @@ int main()
                 ItemType::COAL &&
             decodedRecovery.GetSaveData()->recoveryPile.items[0].quantity == 7,
         "protected recovery pile survives canonical save round-trip");
-    std::string legacy = Replace(canonical, "version=8", "version=1");
+    std::string legacy = Replace(canonical, "version=9", "version=1");
+    legacy = Replace(legacy, "recipe_mask=4722\n", "");
     legacy = Replace(legacy, "tutorial_step=0\n", "");
     legacy = Replace(legacy, "tutorial_skipped=0\n", "");
     legacy = Replace(legacy, "combat_style=0\n", "");
@@ -210,7 +228,8 @@ int main()
                     migratedLegacy.GetSaveData()->quests.front().state == QuestState::AVAILABLE &&
                     migratedLegacy.GetSaveData()->quests.front().progress == 0,
                 "genuine version-1 text migrates to canonical in-memory quest defaults");
-    std::string versionFive = Replace(canonical, "version=8", "version=5");
+    std::string versionFive = Replace(canonical, "version=9", "version=5");
+    versionFive = Replace(versionFive, "recipe_mask=4722\n", "");
     versionFive = Replace(versionFive, "tutorial_step=0\n", "");
     versionFive = Replace(versionFive, "tutorial_skipped=0\n", "");
     versionFive = Replace(versionFive, "combat_style=0\n", "");
@@ -220,22 +239,37 @@ int main()
             migratedVersionFive.GetSaveData()->tutorialStep == TutorialStep::COMPLETE &&
             migratedVersionFive.GetSaveData()->tutorialSkipped,
         "version 5 saves migrate without forcing existing players through onboarding");
-    std::string versionSix = Replace(canonical, "version=8", "version=6");
+    std::string versionSix = Replace(canonical, "version=9", "version=6");
+    versionSix = Replace(versionSix, "recipe_mask=4722\n", "");
     versionSix = Replace(versionSix, "combat_style=0\n", "");
     versionSix = Replace(versionSix, "recovery_active=0\nrecovery_x=0\nrecovery_y=0\nrecovery_ticks=0\nrecovery_count=0\n", "");
     const auto migratedVersionSix = PlayerSaveTextCodec::Decode(versionSix);
     test.Expect(migratedVersionSix.IsSuccess() &&
             migratedVersionSix.GetSaveData()->combatStyle == CombatStyle::ACCURATE,
         "version 6 saves migrate to the safe Accurate combat style");
-    std::string versionSeven = Replace(canonical, "version=8", "version=7");
+    std::string versionSeven = Replace(canonical, "version=9", "version=7");
+    versionSeven = Replace(versionSeven, "recipe_mask=4722\n", "");
     versionSeven = Replace(versionSeven, "recovery_active=0\nrecovery_x=0\nrecovery_y=0\nrecovery_ticks=0\nrecovery_count=0\n", "");
     const auto migratedVersionSeven = PlayerSaveTextCodec::Decode(versionSeven);
     test.Expect(migratedVersionSeven.IsSuccess() &&
             !migratedVersionSeven.GetSaveData()->recoveryPile.active,
         "version 7 saves migrate with no recovery pile");
+    std::string versionEight = Replace(canonical, "version=9", "version=8");
+    versionEight = Replace(versionEight, "recipe_mask=4722\n", "");
+    const auto migratedVersionEight = PlayerSaveTextCodec::Decode(versionEight);
+    test.Expect(migratedVersionEight.IsSuccess() &&
+            migratedVersionEight.GetSaveData()->knownRecipes ==
+                RecipeBook::GetStarterRecipes(),
+        "version 8 saves migrate with canonical starter recipe knowledge");
     Rejects(test, Replace(canonical, "combat_style=0", "combat_style=99"),
         PlayerSaveTextIssueCode::SAVE_DATA_VALIDATION_FAILED,
         "unknown combat style rejects");
+    Rejects(test, Replace(canonical, "recipe_mask=4722", "recipe_mask=1"),
+        PlayerSaveTextIssueCode::SAVE_DATA_VALIDATION_FAILED,
+        "recipe mask rejects the reserved NONE bit");
+    Rejects(test, Replace(canonical, "recipe_mask=4722\n", ""),
+        PlayerSaveTextIssueCode::MISSING_FIELD,
+        "version 9 requires recipe knowledge");
     std::string crlf; for (char c : canonical) { if (c == '\n') crlf.push_back('\r'); crlf.push_back(c); }
     test.Expect(PlayerSaveTextCodec::Decode(crlf).IsSuccess(), "CRLF decodes");
     test.Expect(PlayerSaveTextCodec::Decode(canonical.substr(0, canonical.size()-1)).IsSuccess(), "missing final newline decodes");
@@ -304,10 +338,10 @@ int main()
 
     Rejects(test, Replace(canonical,"position_x=3","position_x"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "missing equals");
     Rejects(test, Replace(canonical,"position_x=3","position_x==3"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "extra equals");
-    Rejects(test, Replace(canonical,"version=8","version==8"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "malformed version extra equals");
-    Rejects(test, Replace(canonical,"version=8","version=8=9"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "malformed version value separator");
-    Rejects(test, Replace(canonical,"version=8","version="), PlayerSaveTextIssueCode::MALFORMED_RECORD, "empty version value");
-    Rejects(test, Replace(canonical,"version=8","=8"), PlayerSaveTextIssueCode::MISSING_FIELD, "empty version key");
+    Rejects(test, Replace(canonical,"version=9","version==9"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "malformed version extra equals");
+    Rejects(test, Replace(canonical,"version=9","version=9=10"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "malformed version value separator");
+    Rejects(test, Replace(canonical,"version=9","version="), PlayerSaveTextIssueCode::MALFORMED_RECORD, "empty version value");
+    Rejects(test, Replace(canonical,"version=9","=9"), PlayerSaveTextIssueCode::MISSING_FIELD, "empty version key");
     Rejects(test, Replace(canonical,"position_x=3"," position_x=3"), PlayerSaveTextIssueCode::MALFORMED_RECORD, "leading space");
     Rejects(test, Replace(canonical,"position_x=3","position_x=3 "), PlayerSaveTextIssueCode::MALFORMED_RECORD, "trailing space");
     Rejects(test, Replace(canonical,"position_x=3","mystery=3"), PlayerSaveTextIssueCode::UNKNOWN_FIELD, "unknown field");
@@ -326,10 +360,10 @@ int main()
     Rejects(test, Replace(canonical,"position_x=3","position_x=2147483648"), PlayerSaveTextIssueCode::INTEGER_OUT_OF_RANGE, "integer overflow");
     test.Expect(PlayerSaveTextCodec::Decode(Replace(canonical,"position_x=3","position_x=-2147483648")).IsSuccess(), "INT_MIN position decodes");
     test.Expect(PlayerSaveTextCodec::Decode(Replace(canonical,"position_x=3","position_x=2147483647")).IsSuccess(), "INT_MAX position decodes");
-    Rejects(test, Replace(canonical,"version=8","version=9"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "unsupported version");
-    Rejects(test, Replace(canonical,"version=8","version=0"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "zero version");
-    Rejects(test, Replace(canonical,"version=8","version=-1"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "negative version");
-    Rejects(test, Replace(canonical,"version=8","version=2147483647"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "future INT_MAX version");
+    Rejects(test, Replace(canonical,"version=9","version=10"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "unsupported version");
+    Rejects(test, Replace(canonical,"version=9","version=0"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "zero version");
+    Rejects(test, Replace(canonical,"version=9","version=-1"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "negative version");
+    Rejects(test, Replace(canonical,"version=9","version=2147483647"), PlayerSaveTextIssueCode::UNSUPPORTED_VERSION, "future INT_MAX version");
     Rejects(test, Replace(canonical,"inventory_count=28","inventory_count=999999999"), PlayerSaveTextIssueCode::INVALID_COUNT, "attacker count");
     Rejects(test, Replace(canonical,"skill_count=5","skill_count=05"), PlayerSaveTextIssueCode::NON_CANONICAL_INTEGER, "noncanonical count");
     Rejects(test, Replace(canonical,"equipment_count=5\n",""), PlayerSaveTextIssueCode::MISSING_FIELD, "missing count");
