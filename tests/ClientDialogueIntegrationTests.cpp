@@ -24,6 +24,22 @@ struct GraphicsTestAccess
         graphics.ProcessEvents(running);
         return running;
     }
+    static bool PushRunPresses(Graphics &graphics, int count)
+    {
+        if ((SDL_WasInit(SDL_INIT_EVENTS) & SDL_INIT_EVENTS) == 0 &&
+            !SDL_InitSubSystem(SDL_INIT_EVENTS))
+            return false;
+        for (int index = 0; index < count; ++index)
+        {
+            SDL_Event event{};
+            event.type = SDL_EVENT_KEY_DOWN;
+            event.key.scancode = SDL_SCANCODE_R;
+            if (!SDL_PushEvent(&event)) return false;
+        }
+        bool running = true;
+        graphics.ProcessEvents(running);
+        return running;
+    }
     static bool Click(Graphics &graphics, float x, float y)
     {
         return graphics.HandleDialogueClick(x, y);
@@ -91,6 +107,17 @@ namespace
 int main()
 {
     TestContext test;
+
+    {
+        Graphics graphics;
+        test.Expect(GraphicsTestAccess::PushRunPresses(graphics, 2) &&
+                        !graphics.ConsumeRunToggle(),
+                    "Two rapid run presses cancel rather than becoming one late toggle");
+        test.Expect(GraphicsTestAccess::PushRunPresses(graphics, 3) &&
+                        graphics.ConsumeRunToggle() &&
+                        !graphics.ConsumeRunToggle(),
+                    "An odd rapid run-press burst produces exactly one toggle");
+    }
 
     {
         Graphics graphics;

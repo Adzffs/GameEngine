@@ -1667,7 +1667,7 @@ void Graphics::ProcessEvents(bool &running)
                 !shopPresentationState.IsOpen() &&
                 !dialoguePresentationState.IsOpen())
             {
-                runTogglePending = true;
+                runTogglePending = !runTogglePending;
                 continue;
             }
             if (stationMenuOpen && openStationType == StationType::BANK &&
