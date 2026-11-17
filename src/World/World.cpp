@@ -3097,8 +3097,13 @@ void World::ProcessInteractionSystem()
                     {
                         if (!PublishDialogueNode(*session, *startNode))
                             dialogueSystem.Close(intent.actorEntityID, sessionId);
-                        else if (startNode->kind == DialogueNodeKind::TERMINAL)
-                            dialogueSystem.Close(intent.actorEntityID, sessionId);
+                        else
+                        {
+                            QuestSystem::RecordTalkedTo(
+                                actor->GetQuestJournal(), npc->GetNpcType());
+                            if (startNode->kind == DialogueNodeKind::TERMINAL)
+                                dialogueSystem.Close(intent.actorEntityID, sessionId);
+                        }
                     }
                     catch (...)
                     {

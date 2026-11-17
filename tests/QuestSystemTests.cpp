@@ -16,7 +16,8 @@ namespace
         QuestState miningState = QuestState::AVAILABLE, int miningProgress = 0)
     {
         return {{QuestId::GATHERING_BASICS, gatheringState, gatheringProgress},
-                {QuestId::MINING_BASICS, miningState, miningProgress}};
+                {QuestId::MINING_BASICS, miningState, miningProgress},
+                {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}};
     }
 }
 
@@ -61,7 +62,7 @@ int main()
     QuestJournal journal;
     const QuestRecord *initial = Gathering(journal);
     test.Expect(initial != nullptr && initial->state == QuestState::AVAILABLE &&
-                    initial->progress == 0 && journal.GetRecords().size() == 2 &&
+                    initial->progress == 0 && journal.GetRecords().size() == 3 &&
                     journal.TryGet(QuestId::MINING_BASICS)->state == QuestState::AVAILABLE,
                 "Default journal derives canonical initial records");
     test.Expect(QuestSystem::Accept(journal, QuestId::GATHERING_BASICS) &&
@@ -103,7 +104,8 @@ int main()
         {{QuestId::NONE, QuestState::AVAILABLE, 0}},
         {{static_cast<QuestId>(999), QuestState::AVAILABLE, 0}},
         {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 10},
-         {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}},
+         {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0},
+         {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}},
         {},
         {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 4},
          {QuestId::GATHERING_BASICS, QuestState::ACTIVE, 4}}};

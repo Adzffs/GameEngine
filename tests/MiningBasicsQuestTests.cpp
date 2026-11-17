@@ -101,12 +101,13 @@ int main()
     TestContext test;
 
     const auto& definitions = QuestDefinitionDatabase::GetAll();
-    test.Expect(definitions.size() == 2 &&
+    test.Expect(definitions.size() == 3 &&
                     definitions[0].id == QuestId::GATHERING_BASICS &&
-                    definitions[1].id == QuestId::MINING_BASICS,
-                "Two-quest catalogue order is stable");
+                    definitions[1].id == QuestId::MINING_BASICS &&
+                    definitions[2].id == QuestId::TRACKS_IN_THE_ASH,
+                "Quest catalogue order is stable");
     QuestJournal defaults;
-    test.Expect(defaults.GetRecords().size() == 2 &&
+    test.Expect(defaults.GetRecords().size() == 3 &&
                     defaults.TryGet(QuestId::GATHERING_BASICS)->state == QuestState::AVAILABLE &&
                     defaults.TryGet(QuestId::MINING_BASICS)->state == QuestState::AVAILABLE,
                 "Both quests initialize independently available");
@@ -237,7 +238,8 @@ int main()
         QuestJournal journal;
         test.Expect(QuestSystem::TryRestore(journal, {
                         {QuestId::GATHERING_BASICS, QuestState::READY_TO_COMPLETE, 10},
-                        {QuestId::MINING_BASICS, QuestState::READY_TO_COMPLETE, 5}}),
+                        {QuestId::MINING_BASICS, QuestState::READY_TO_COMPLETE, 5},
+                        {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}}),
                     "Both quests restore ready for reward test");
         Inventory inventory;
         test.Expect(QuestSystem::Complete(journal, QuestId::GATHERING_BASICS, inventory) &&
@@ -248,7 +250,8 @@ int main()
         QuestJournal fullJournal;
         QuestSystem::TryRestore(fullJournal, {
             {QuestId::GATHERING_BASICS, QuestState::AVAILABLE, 0},
-            {QuestId::MINING_BASICS, QuestState::READY_TO_COMPLETE, 5}});
+            {QuestId::MINING_BASICS, QuestState::READY_TO_COMPLETE, 5},
+            {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}});
         Inventory full;
         for (int slot = 0; slot < Inventory::SlotCount; ++slot)
             full.AddItem(ItemType::LOG, 1);

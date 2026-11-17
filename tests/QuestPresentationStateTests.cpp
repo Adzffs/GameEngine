@@ -15,11 +15,12 @@ int main()
     {
         test.Expect(QuestSystem::TryRestore(journal, {
                         {QuestId::GATHERING_BASICS, state, progress},
-                        {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}}),
+                        {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0},
+                        {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}}),
                     "Fixture restores through controlled QuestSystem API");
         presentation.Synchronize(journal);
         const auto &quests = presentation.GetQuests();
-        test.Expect(quests.size() == 2 &&
+        test.Expect(quests.size() == 3 &&
                         quests.front().id == QuestId::GATHERING_BASICS &&
                         quests.front().state == state &&
                         quests.front().progress == progress &&

@@ -16,10 +16,11 @@ int main()
 {
     TestContext test;
     const auto &definitions = QuestDefinitionDatabase::GetAll();
-    test.Expect(definitions.size() == 2 &&
+    test.Expect(definitions.size() == 3 &&
                     definitions[0].id == QuestId::GATHERING_BASICS &&
-                    definitions[1].id == QuestId::MINING_BASICS,
-                "Canonical catalogue contains both quests in stable ID order");
+                    definitions[1].id == QuestId::MINING_BASICS &&
+                    definitions[2].id == QuestId::TRACKS_IN_THE_ASH,
+                "Canonical catalogue contains all quests in stable ID order");
     const QuestDefinition *definition =
         QuestDefinitionDatabase::TryGet(QuestId::GATHERING_BASICS);
     test.Expect(definition != nullptr &&

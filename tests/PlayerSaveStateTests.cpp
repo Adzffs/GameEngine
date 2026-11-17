@@ -361,7 +361,7 @@ int main()
         }
     }
 
-    for (int version : {0, -1, 10})
+    for (int version : {0, -1, CURRENT_PLAYER_SAVE_VERSION + 1})
     {
         PlayerSaveData malformed = valid;
         malformed.version = version;

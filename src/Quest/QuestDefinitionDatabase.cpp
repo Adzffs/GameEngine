@@ -27,7 +27,20 @@ namespace
          10,
          {NpcType::DEVELOPMENT_GUIDE,
           DialogueId::DEVELOPMENT_GUIDE_INTRO,
-          DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME}}};
+          DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME}},
+        {QuestId::TRACKS_IN_THE_ASH,
+         "Tracks in the Ash",
+         QuestState::AVAILABLE,
+         ItemType::NONE,
+         1,
+         ItemType::COINS,
+         15,
+         {NpcType::DEVELOPMENT_GUIDE,
+          DialogueId::DEVELOPMENT_GUIDE_INTRO,
+          DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME},
+         QuestObjectiveType::TALK_TO_CHARACTER,
+         NpcType::SERA_FLINT,
+         "Find Sera Flint at the east road and ask about the Ashfang tracks"}};
 
     bool IsKnownItem(ItemType itemType)
     {
