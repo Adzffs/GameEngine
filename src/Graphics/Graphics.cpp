@@ -1339,7 +1339,7 @@ bool Graphics::HandleSidePanelClick(
         SidePanelTab::INVENTORY,
         SidePanelTab::EQUIPMENT,
         SidePanelTab::PRAYER,
-        SidePanelTab::MAGIC,
+        SidePanelTab::RECIPES,
         SidePanelTab::SETTINGS};
 
     // Check tab buttons first.
@@ -1460,6 +1460,20 @@ bool Graphics::HandleSidePanelClick(
         if (IsPointInsideRectangle(mouseX, mouseY, skipTutorialButton))
         {
             tutorialSkipPending = true;
+            return true;
+        }
+    }
+
+    if (selectedTab == SidePanelTab::RECIPES)
+    {
+        const SDL_FRect filterButton{
+            layout.contentBounds.x,
+            layout.contentBounds.y + 28.0f,
+            layout.contentBounds.w,
+            28.0f};
+        if (IsPointInsideRectangle(mouseX, mouseY, filterButton))
+        {
+            recipeCanCraftOnly = !recipeCanCraftOnly;
             return true;
         }
     }
@@ -4100,6 +4114,71 @@ void Graphics::DrawPlaceholderPanel(
         "COMING SOON");
 }
 
+void Graphics::DrawRecipeBook()
+{
+    const SidePanelLayout layout = GetSidePanelLayout();
+    DrawSidePanelFrame("RECIPE BOOK");
+
+    const SDL_FRect filterButton{
+        layout.contentBounds.x,
+        layout.contentBounds.y + 28.0f,
+        layout.contentBounds.w,
+        28.0f};
+    SDL_SetRenderDrawColor(renderer,
+        recipeCanCraftOnly ? 64 : 40,
+        recipeCanCraftOnly ? 92 : 44,
+        recipeCanCraftOnly ? 60 : 48, 255);
+    SDL_RenderFillRect(renderer, &filterButton);
+    SDL_SetRenderDrawColor(renderer, 164, 139, 87, 255);
+    SDL_RenderRect(renderer, &filterButton);
+    const std::string filterLabel = recipeCanCraftOnly
+        ? "CAN CRAFT: ON"
+        : "CAN CRAFT: OFF";
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderDebugText(renderer, filterButton.x + 10.0f,
+        filterButton.y + 10.0f, filterLabel.c_str());
+
+    float rowY = layout.contentBounds.y + 66.0f;
+    int shown = 0;
+    for (RecipeType recipeType : RecipeDatabase::GetAllRecipeTypes())
+    {
+        const RecipeDefinition &recipe = RecipeDatabase::Get(recipeType);
+        const bool known = IsDisplayedRecipeKnown(recipeType);
+        const bool craftable = known && HasDisplayedRecipeRequirements(recipe);
+        if (recipeCanCraftOnly && !craftable) continue;
+
+        SDL_SetRenderDrawColor(renderer,
+            craftable ? 80 : (known ? 55 : 38),
+            craftable ? 120 : (known ? 58 : 40),
+            craftable ? 82 : (known ? 62 : 44), 255);
+        const SDL_FRect row{
+            layout.contentBounds.x, rowY,
+            layout.contentBounds.w, 17.0f};
+        SDL_RenderFillRect(renderer, &row);
+        SDL_SetRenderDrawColor(renderer,
+            known ? 235 : 135, known ? 235 : 135, known ? 235 : 140, 255);
+        std::string compactStatus = GetDisplayedRecipeStatus(recipe);
+        if (compactStatus == "NEED MATERIALS") compactStatus = "ITEMS";
+        else if (compactStatus.starts_with("NEED LEVEL "))
+            compactStatus = "LV " + compactStatus.substr(11);
+        const std::string text = known
+            ? recipe.GetName() + " | " + compactStatus
+            : "???? | Explore to discover";
+        SDL_RenderDebugText(renderer, row.x + 5.0f, row.y + 5.0f,
+            text.c_str());
+        rowY += 18.0f;
+        ++shown;
+    }
+
+    if (shown == 0)
+    {
+        SDL_SetRenderDrawColor(renderer, 175, 180, 180, 255);
+        SDL_RenderDebugText(renderer, layout.contentBounds.x,
+            layout.contentBounds.y + 82.0f,
+            "No known recipes are craftable");
+    }
+}
+
 void Graphics::DrawSettings()
 {
     const SidePanelLayout layout = GetSidePanelLayout();
@@ -4164,7 +4243,7 @@ void Graphics::DrawSidePanelTabs()
         SidePanelTab::INVENTORY,
         SidePanelTab::EQUIPMENT,
         SidePanelTab::PRAYER,
-        SidePanelTab::MAGIC,
+        SidePanelTab::RECIPES,
         SidePanelTab::SETTINGS};
 
     const std::array<const char *, 7> labels{
@@ -4173,7 +4252,7 @@ void Graphics::DrawSidePanelTabs()
         "BAG",
         "GEAR",
         "FAITH",
-        "MAGIC",
+        "BOOK",
         "SET"};
 
     for (std::size_t tabIndex = 0;
@@ -5692,8 +5771,8 @@ void Graphics::Render(
         DrawPlaceholderPanel("PRAYER");
         break;
 
-    case SidePanelTab::MAGIC:
-        DrawPlaceholderPanel("MAGIC");
+    case SidePanelTab::RECIPES:
+        DrawRecipeBook();
         break;
 
     case SidePanelTab::SETTINGS:

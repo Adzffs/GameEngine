@@ -39,6 +39,16 @@ struct GraphicsTestAccess
         return graphics.GetDisplayedRecipeStatus(
             RecipeDatabase::Get(recipeType), ingredientsAreInGrid);
     }
+
+    static Graphics::SidePanelTab SelectedTab(const Graphics &graphics)
+    {
+        return graphics.selectedTab;
+    }
+
+    static bool RecipeFilterEnabled(const Graphics &graphics)
+    {
+        return graphics.recipeCanCraftOnly;
+    }
 };
 
 namespace
@@ -114,6 +124,22 @@ int main()
         test.Expect(false, "Native SDL renderer initializes");
         return test.Finish();
     }
+
+    const Graphics::SidePanelLayout sidePanel =
+        graphics.GetSidePanelLayout();
+    test.Expect(
+        graphics.HandleSidePanelClick(
+            sidePanel.tabBounds[5].x + 5.0f,
+            sidePanel.tabBounds[5].y + 5.0f) &&
+            GraphicsTestAccess::SelectedTab(graphics) ==
+                Graphics::SidePanelTab::RECIPES,
+        "Book tab replaces the unused Magic placeholder");
+    test.Expect(
+        graphics.HandleSidePanelClick(
+            sidePanel.contentBounds.x + 5.0f,
+            sidePanel.contentBounds.y + 33.0f) &&
+            GraphicsTestAccess::RecipeFilterEnabled(graphics),
+        "Recipe book can toggle the can-craft-only filter");
 
     SDL_Renderer *renderer =
         GraphicsTestAccess::Renderer(graphics);

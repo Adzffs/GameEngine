@@ -229,7 +229,7 @@ public:
         INVENTORY,
         EQUIPMENT,
         PRAYER,
-        MAGIC,
+        RECIPES,
         SETTINGS
     };
     struct QuestPanelView
@@ -335,6 +335,7 @@ public:
 
     void DrawPlaceholderPanel(
         const char *title);
+    void DrawRecipeBook();
 
     void DrawMap(Map &map);
     void DrawGrid(const Map &map);
@@ -502,6 +503,7 @@ private:
     int displayedSmithingLevel = 1;
     std::vector<RecipeType> displayedKnownRecipes;
     bool recipeKnowledgeInitialized = false;
+    bool recipeCanCraftOnly = false;
     std::array<InventorySlot, Inventory::SlotCount> displayedInventorySlots{};
     std::string stationFeedback;
 
