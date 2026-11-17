@@ -689,7 +689,9 @@ int main()
             player->GetInventory();
 
         inventory.AddItem(ItemType::COAL, 1);
-        inventory.AddItem(ItemType::LOG, 23);
+        while (inventory.AddItem(ItemType::LOG, 1))
+        {
+        }
 
         int coalBefore =
             inventory.GetItemAmount(ItemType::COAL);

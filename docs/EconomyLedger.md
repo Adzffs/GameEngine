@@ -32,8 +32,8 @@ This ledger is the balancing contract for the starter region. It records what ev
 | Iron axe | 2 | Forge: 2 Iron bars + 1 Wooden plank | Equipped tool | Permanent; Woodcutting 5 requirement | Not traded | Deterministic mid-tier Woodcutting upgrade | Measure upgrade time |
 | Steel axe | 3 | Forge: 2 Steel bars + 1 Wooden plank; Cinder Warden rare drop | Equipped tool | Permanent; Woodcutting 10 requirement | Not traded | Deterministic route plus an exciting accelerating drop | Compare crafted and combat acquisition times |
 | Bronze pickaxe | 1 | Development starting inventory; shop | Equipped tool | Permanent | Buy 25 / sell 10 | Baseline Mining access | Keep as recovery purchase |
-| Iron pickaxe | 2 | Forge: 3 Iron bars + 2 Wooden planks; development starting inventory | Equipped tool | Permanent; Mining 5 requirement | Not traded | Crafting path exists, but starting possession still removes the reward | Remove from normal starting inventory |
-| Steel pickaxe | 3 | Forge: 3 Steel bars + 2 Wooden planks; development starting inventory | Equipped tool | Permanent; Mining 10 requirement | Not traded | Crafting path exists, but starting possession still invalidates the arc | Remove from normal starting inventory |
+| Iron pickaxe | 2 | Forge: 3 Iron bars + 2 Wooden planks | Equipped tool | Permanent; Mining 5 requirement | Not traded | Earned mid-tier Mining upgrade | Measure time-to-upgrade in a fresh playthrough |
+| Steel pickaxe | 3 | Forge: 3 Steel bars + 2 Wooden planks | Equipped tool | Permanent; Mining 10 requirement | Not traded | Earned high-tier Mining upgrade | Measure time-to-upgrade in a fresh playthrough |
 | Bronze sword | 1 | Forge: 3 Bronze bars + 1 Wooden plank; shop | Equipped weapon; Gathering Basics quest requirement | Permanent | Buy 40 / sell 15 | First visible combat upgrade with coin and crafting routes | Compare the two routes in playtesting |
 | Developer Godsword | Debug | Development/debug grant only | Equipped weapon | Permanent | Not traded | Test-only power item | Never place in the live economy |
 | Wooden shield | 1 | 6 Wooden planks at Crafting Table; shop | Equipped shield | 1.5 Logs after plank conversion | Buy 30 / sell 12 | Healthy early cross-skill craft with a shop fallback | Preserve; use as the reference for future crafted gear |
@@ -41,10 +41,9 @@ This ledger is the balancing contract for the starter region. It records what ev
 
 ## Confirmed imbalances
 
-1. **Mining upgrades are front-loaded.** Development defaults give players Iron and Steel pickaxes before they earn them.
-2. **Woodcutting tiers are XP-only.** Oak and Willow logs have no sink.
-3. **The shop is mostly a recovery shop, not a repeat-visit economy.** Cooked meat is its only recurring purchase.
-4. **Combat and crafting need more ongoing interdependence.** Ore and bar drops now accelerate equipment, but permanent gear is only a one-time sink.
+1. **Woodcutting tiers are XP-only.** Oak and Willow logs have no sink.
+2. **The shop is mostly a recovery shop, not a repeat-visit economy.** Cooked meat is its only recurring purchase.
+3. **Combat and crafting need more ongoing interdependence.** Ore and bar drops now accelerate equipment, but permanent gear is only a one-time sink.
 
 ## Implementation order
 

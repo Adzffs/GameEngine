@@ -103,10 +103,10 @@ int main()
                          "Default Player retains bronze axe");
         test.ExpectEqual(defaults.GetInventory().GetItemAmount(ItemType::BRONZE_PICKAXE), 1,
                          "Default Player retains bronze pickaxe");
-        test.ExpectEqual(defaults.GetInventory().GetItemAmount(ItemType::IRON_PICKAXE), 1,
-                         "Default Player retains iron pickaxe");
-        test.ExpectEqual(defaults.GetInventory().GetItemAmount(ItemType::STEEL_PICKAXE), 1,
-                         "Default Player retains steel pickaxe");
+        test.ExpectEqual(defaults.GetInventory().GetItemAmount(ItemType::IRON_PICKAXE), 0,
+                         "Default Player must earn the iron pickaxe upgrade");
+        test.ExpectEqual(defaults.GetInventory().GetItemAmount(ItemType::STEEL_PICKAXE), 0,
+                         "Default Player must earn the steel pickaxe upgrade");
         test.ExpectEqual(
             defaults.GetSkills().GetSkill(SkillType::WOODCUTTING).GetXP(),
             DevelopmentConfig::TEST_WOODCUTTING_XP,
@@ -120,11 +120,9 @@ int main()
             DevelopmentConfig::TEST_SMITHING_XP,
             "Default Player retains development Smithing XP");
 
-        const std::array<ItemType, 4> expectedStarterItems{
+        const std::array<ItemType, 2> expectedStarterItems{
             ItemType::BRONZE_AXE,
-            ItemType::BRONZE_PICKAXE,
-            ItemType::IRON_PICKAXE,
-            ItemType::STEEL_PICKAXE};
+            ItemType::BRONZE_PICKAXE};
         const auto &defaultSlots = defaults.GetInventory().GetSlots();
         for (std::size_t index = 0; index < expectedStarterItems.size(); ++index)
         {

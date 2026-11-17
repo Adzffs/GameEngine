@@ -66,14 +66,6 @@ Player::Player(
             ItemType::BRONZE_PICKAXE,
             1);
 
-        inventory.AddItem(
-            ItemType::IRON_PICKAXE,
-            1);
-
-        inventory.AddItem(
-            ItemType::STEEL_PICKAXE,
-            1);
-
         if (DevelopmentConfig::ENABLE_TEST_PLAYER)
         {
             skills.AddXP(
