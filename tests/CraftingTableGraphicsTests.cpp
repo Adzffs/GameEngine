@@ -139,8 +139,8 @@ int main()
         graphics.GetSidePanelLayout();
     test.Expect(
         graphics.HandleSidePanelClick(
-            sidePanel.tabBounds[5].x + 5.0f,
-            sidePanel.tabBounds[5].y + 5.0f) &&
+            sidePanel.tabBounds[4].x + 5.0f,
+            sidePanel.tabBounds[4].y + 5.0f) &&
             GraphicsTestAccess::SelectedTab(graphics) ==
                 Graphics::SidePanelTab::RECIPES,
         "Book tab replaces the unused Magic placeholder");

@@ -229,7 +229,6 @@ public:
         QUESTS,
         INVENTORY,
         EQUIPMENT,
-        PRAYER,
         RECIPES,
         SETTINGS
     };
@@ -251,7 +250,7 @@ public:
     {
         SDL_FRect panelBounds;
         SDL_FRect contentBounds;
-        std::array<SDL_FRect, 7> tabBounds;
+        std::array<SDL_FRect, 6> tabBounds;
     };
     enum class DialogueControlType
     {
@@ -317,6 +316,7 @@ public:
         float mouseX,
         float mouseY,
         bool rightClick = false);
+    bool IsSidePanelOpen() const { return sidePanelOpen; }
 
     void DrawSidePanelTabs();
     void DrawGameGuide(const Player &player);
@@ -472,6 +472,7 @@ public:
     static constexpr int WindowHeight = 720;
     static constexpr int TileSize = 32;
     SidePanelTab selectedTab;
+    bool sidePanelOpen;
 
 private:
     friend struct GraphicsTestAccess;

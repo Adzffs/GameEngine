@@ -174,6 +174,7 @@ Graphics::Graphics()
       clickedMouseX(0),
       clickedMouseY(0),
       selectedTab(SidePanelTab::INVENTORY),
+      sidePanelOpen(false),
       inventorySlotClickPending(false),
       clickedInventorySlotIndex(-1),
       weaponSlotClickPending(false),
@@ -1344,12 +1345,11 @@ bool Graphics::HandleSidePanelClick(
     const float panelX = layout.panelBounds.x;
     const float panelY = layout.panelBounds.y;
 
-    const std::array<SidePanelTab, 7> tabs{
+    const std::array<SidePanelTab, 6> tabs{
         SidePanelTab::SKILLS,
         SidePanelTab::QUESTS,
         SidePanelTab::INVENTORY,
         SidePanelTab::EQUIPMENT,
-        SidePanelTab::PRAYER,
         SidePanelTab::RECIPES,
         SidePanelTab::SETTINGS};
 
@@ -1365,7 +1365,13 @@ bool Graphics::HandleSidePanelClick(
 
         if (insideTab)
         {
-            selectedTab = tabs[tabIndex];
+            if (sidePanelOpen && selectedTab == tabs[tabIndex])
+                sidePanelOpen = false;
+            else
+            {
+                selectedTab = tabs[tabIndex];
+                sidePanelOpen = true;
+            }
             return true;
         }
     }
@@ -1376,7 +1382,7 @@ bool Graphics::HandleSidePanelClick(
         mouseY >= layout.panelBounds.y &&
         mouseY < layout.panelBounds.y + layout.panelBounds.h;
 
-    if (!insidePanel)
+    if (!sidePanelOpen || !insidePanel)
     {
         return false;
     }
@@ -4438,21 +4444,19 @@ void Graphics::DrawSidePanelTabs()
 {
     const SidePanelLayout layout = GetSidePanelLayout();
 
-    const std::array<SidePanelTab, 7> tabs{
+    const std::array<SidePanelTab, 6> tabs{
         SidePanelTab::SKILLS,
         SidePanelTab::QUESTS,
         SidePanelTab::INVENTORY,
         SidePanelTab::EQUIPMENT,
-        SidePanelTab::PRAYER,
         SidePanelTab::RECIPES,
         SidePanelTab::SETTINGS};
 
-    const std::array<const char *, 7> labels{
+    const std::array<const char *, 6> labels{
         "SKILL",
         "QUEST",
         "BAG",
         "GEAR",
-        "FAITH",
         "BOOK",
         "SET"};
 
@@ -4462,7 +4466,7 @@ void Graphics::DrawSidePanelTabs()
     {
         const SDL_FRect &tabRectangle = layout.tabBounds[tabIndex];
 
-        if (selectedTab == tabs[tabIndex])
+        if (sidePanelOpen && selectedTab == tabs[tabIndex])
         {
             SDL_SetRenderDrawColor(
                 renderer,
@@ -5872,7 +5876,7 @@ Graphics::QuestPanelView Graphics::BuildQuestPanelView(const Player &player) con
         record.title.empty() ? "Unknown quest" : record.title,
         "UNAVAILABLE",
         "",
-        selectedTab == SidePanelTab::QUESTS};
+        sidePanelOpen && selectedTab == SidePanelTab::QUESTS};
 
     view.state = GetQuestStateLabel(record.state);
     view.progress = GetQuestProgressLabel(record);
@@ -5989,10 +5993,15 @@ void Graphics::Render(
     recipeActionActive =
         activeAction != nullptr &&
         activeAction->GetType() == ActionType::RECIPE;
+    bool pointerOverSideUi = sidePanelOpen &&
+        IsPointInsideRectangle(mouseX, mouseY, GetSidePanelRectangle());
+    for (const SDL_FRect &tab : GetSidePanelLayout().tabBounds)
+        pointerOverSideUi = pointerOverSideUi ||
+            IsPointInsideRectangle(mouseX, mouseY, tab);
     const bool worldHoverBlocked = stationMenuOpen || worldContextMenu.open ||
         shopPresentationState.IsOpen() ||
         dialoguePresentationState.IsOpen() || gameGuideVisible ||
-        IsPointInsideRectangle(mouseX, mouseY, GetSidePanelRectangle());
+        pointerOverSideUi;
     worldHoverTarget = worldHoverBlocked
         ? WorldHoverTarget{}
         : ResolveWorldHoverTarget(
@@ -6045,7 +6054,7 @@ void Graphics::Render(
         recoveryPileX, recoveryPileY);
     DrawSidePanelTabs();
 
-    switch (selectedTab)
+    if (sidePanelOpen) switch (selectedTab)
     {
     case SidePanelTab::INVENTORY:
         DrawInventory(inventory, &equipment, &player);
@@ -6061,10 +6070,6 @@ void Graphics::Render(
 
     case SidePanelTab::QUESTS:
         DrawQuestPanel(player);
-        break;
-
-    case SidePanelTab::PRAYER:
-        DrawPlaceholderPanel("PRAYER");
         break;
 
     case SidePanelTab::RECIPES:

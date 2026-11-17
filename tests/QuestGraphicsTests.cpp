@@ -141,6 +141,14 @@ int main()
     test.Expect(view.state == "AVAILABLE" &&
                     view.progress == "Start: Speak to Mara Vale",
                 "Available quest has a clear label");
+    SelectTab(graphics, 1);
+    test.Expect(!graphics.IsSidePanelOpen() &&
+                    !graphics.BuildQuestPanelView(player).visible,
+                "Clicking the active tab collapses the side panel");
+    SelectTab(graphics, 1);
+    test.Expect(graphics.IsSidePanelOpen() &&
+                    graphics.BuildQuestPanelView(player).visible,
+                "Clicking a collapsed tab restores only that panel");
 
     QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 0}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}, {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}, {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}, {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}});
     view = graphics.BuildQuestPanelView(player);
