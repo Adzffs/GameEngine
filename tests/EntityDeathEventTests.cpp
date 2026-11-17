@@ -15,6 +15,7 @@
 #include "../src/World/World.h"
 
 #include <memory>
+#include <filesystem>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -557,6 +558,38 @@ int main()
             "Respawn returns the player to the village safe point Y");
         test.Expect(world.GetPlayerDeathRecovery(defenderID) == nullptr,
             "Completed recovery no longer remains pending");
+
+        const std::filesystem::path recoverySavePath =
+            std::filesystem::temp_directory_path() /
+            "gameengine_recovery_pile_roundtrip.save";
+        std::filesystem::remove(recoverySavePath);
+        test.Expect(world.SavePlayerToFile(defenderID, recoverySavePath).IsSuccess(),
+            "Outstanding recovery pile saves with the living player");
+        World loadedWorld(71U, 72U, 73U);
+        const WorldPlayerLoadResult loaded =
+            loadedWorld.LoadOrCreatePlayerFromFile(recoverySavePath);
+        Player *loadedPlayer = dynamic_cast<Player *>(
+            loadedWorld.GetEntityByID(loaded.GetPlayerEntityID()));
+        const PlayerRecoveryPile *loadedPile = loadedPlayer == nullptr
+            ? nullptr
+            : loadedWorld.GetPlayerRecoveryPile(loadedPlayer->GetID());
+        test.Expect(loaded.IsSuccess() && loadedPlayer != nullptr &&
+                loadedPile != nullptr &&
+                loadedPlayer->GetInventory().GetItemAmount(ItemType::COAL) == 0,
+            "Load restores protected items only in the recovery pile");
+        if (loadedPlayer != nullptr && loadedPile != nullptr)
+        {
+            loadedPlayer->GetPosition().SetPosition(
+                loadedPile->position.GetX(), loadedPile->position.GetY());
+            loadedWorld.Update();
+            test.ExpectEqual(
+                loadedPlayer->GetInventory().GetItemAmount(ItemType::COAL), 3,
+                "Loaded recovery pile can be reclaimed exactly once");
+            test.Expect(loadedWorld.GetPlayerRecoveryPile(
+                    loadedPlayer->GetID()) == nullptr,
+                "Loaded recovery claim removes persisted pile state");
+        }
+        std::filesystem::remove(recoverySavePath);
 
         defender->GetPosition().SetPosition(10, 10);
         world.Update();

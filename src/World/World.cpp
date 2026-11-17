@@ -398,6 +398,18 @@ WorldPlayerLoadResult World::TryRegisterLoadedPlayer(
         return result;
     }
 
+    if (saveData.recoveryPile.active)
+    {
+        PlayerRecoveryPile pile;
+        pile.ownerPlayerEntityID = registeredID;
+        pile.position.SetPosition(saveData.recoveryPile.positionX,
+                                  saveData.recoveryPile.positionY);
+        pile.expiryTick = currentTick + saveData.recoveryPile.remainingTicks;
+        for (const SavedBankEntry &entry : saveData.recoveryPile.items)
+            pile.items.push_back({entry.itemType, entry.quantity});
+        playerRecoveryPiles[registeredID] = std::move(pile);
+    }
+
     result.SetPlayerEntityID(registeredID);
     result.SetStatus(WorldPlayerLoadStatus::LOADED_EXISTING);
     return result;
@@ -440,8 +452,23 @@ WorldPlayerSaveResult World::SavePlayerToFile(
         return result;
     }
 
+    PlayerSaveData saveData = PlayerSaveState::Capture(*player);
+    const auto pile = playerRecoveryPiles.find(playerEntityID);
+    if (pile != playerRecoveryPiles.end())
+    {
+        saveData.recoveryPile.active = true;
+        saveData.recoveryPile.positionX = pile->second.position.GetX();
+        saveData.recoveryPile.positionY = pile->second.position.GetY();
+        saveData.recoveryPile.remainingTicks =
+            std::max(1, pile->second.expiryTick - currentTick);
+        std::map<ItemType, int> totals;
+        for (const ItemAmount &item : pile->second.items)
+            totals[item.itemType] += item.quantity;
+        for (const auto &[itemType, quantity] : totals)
+            saveData.recoveryPile.items.push_back({itemType, quantity});
+    }
     PlayerSaveFileSaveResult fileResult =
-        PlayerSaveFileStore::Save(savePath, PlayerSaveState::Capture(*player));
+        PlayerSaveFileStore::Save(savePath, saveData);
     const bool saved = fileResult.IsSuccess();
     result.SetFileSaveResult(std::move(fileResult));
     if (!saved)

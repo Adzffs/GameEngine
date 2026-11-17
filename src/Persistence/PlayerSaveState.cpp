@@ -141,6 +141,35 @@ PlayerSaveValidationReport PlayerSaveState::ValidateInternal(
     if (!IsValidCombatStyle(saveData.combatStyle))
         report.AddIssue(PlayerSaveValidationCode::INVALID_COMBAT_STYLE, -1,
             "Combat style is not canonical");
+    if (saveData.recoveryPile.active)
+    {
+        if (saveData.recoveryPile.remainingTicks <= 0 ||
+            saveData.recoveryPile.items.empty())
+            report.AddIssue(PlayerSaveValidationCode::INVALID_RECOVERY_PILE,
+                -1, "Active recovery pile requires items and remaining time");
+    }
+    else if (saveData.recoveryPile.remainingTicks != 0 ||
+             !saveData.recoveryPile.items.empty())
+        report.AddIssue(PlayerSaveValidationCode::INVALID_RECOVERY_PILE,
+            -1, "Inactive recovery pile must be empty");
+    std::vector<ItemType> recoveryItems;
+    for (std::size_t index = 0;
+         index < saveData.recoveryPile.items.size(); ++index)
+    {
+        const SavedBankEntry &entry = saveData.recoveryPile.items[index];
+        if (!IsKnownItem(entry.itemType) || entry.itemType == ItemType::NONE)
+            report.AddIssue(PlayerSaveValidationCode::UNKNOWN_RECOVERY_ITEM,
+                static_cast<int>(index), "Recovery item type is unknown");
+        if (entry.quantity <= 0)
+            report.AddIssue(PlayerSaveValidationCode::INVALID_RECOVERY_QUANTITY,
+                static_cast<int>(index), "Recovery quantities must be positive");
+        if (std::find(recoveryItems.begin(), recoveryItems.end(), entry.itemType) !=
+            recoveryItems.end())
+            report.AddIssue(PlayerSaveValidationCode::DUPLICATE_RECOVERY_ITEM,
+                static_cast<int>(index), "Recovery item types must be unique");
+        else
+            recoveryItems.push_back(entry.itemType);
+    }
     QuestJournal questValidationJournal;
     std::vector<QuestRecord> questRecords;
     questRecords.reserve(saveData.quests.size());

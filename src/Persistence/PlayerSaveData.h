@@ -12,7 +12,7 @@
 #include <array>
 #include <vector>
 
-inline constexpr int CURRENT_PLAYER_SAVE_VERSION = 7;
+inline constexpr int CURRENT_PLAYER_SAVE_VERSION = 8;
 
 struct SavedInventorySlot
 {
@@ -45,6 +45,15 @@ struct SavedBankEntry
     int quantity = 0;
 };
 
+struct SavedRecoveryPile
+{
+    bool active = false;
+    int positionX = 0;
+    int positionY = 0;
+    int remainingTicks = 0;
+    std::vector<SavedBankEntry> items;
+};
+
 struct PlayerSaveData
 {
     int version = CURRENT_PLAYER_SAVE_VERSION;
@@ -59,4 +68,5 @@ struct PlayerSaveData
     TutorialStep tutorialStep = TutorialStep::MEET_GUIDE;
     bool tutorialSkipped = false;
     CombatStyle combatStyle = CombatStyle::ACCURATE;
+    SavedRecoveryPile recoveryPile;
 };
