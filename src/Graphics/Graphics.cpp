@@ -3115,11 +3115,21 @@ void Graphics::DrawNPCs(
             npc->GetNpcType() == NpcType::DEVELOPMENT_GUIDE;
         const bool isTorren = npc != nullptr &&
             npc->GetNpcType() == NpcType::TORREN_ASH;
-        SDL_SetRenderDrawColor(renderer,
-            isMara ? 48 : (isTorren ? 135 : 255),
-            isMara ? 96 : (isTorren ? 58 : 150),
-            isMara ? 150 : (isTorren ? 38 : 50),
-            255);
+        Uint8 red = 255, green = 150, blue = 50;
+        if (npc != nullptr)
+        {
+            switch (npc->GetNpcType())
+            {
+            case NpcType::DEVELOPMENT_GUIDE: red = 48; green = 96; blue = 150; break;
+            case NpcType::TORREN_ASH: red = 135; green = 58; blue = 38; break;
+            case NpcType::ELIA_REED: red = 48; green = 112; blue = 72; break;
+            case NpcType::NESSA_THORNE: red = 74; green = 130; blue = 58; break;
+            case NpcType::BRANN_DEEPWELL: red = 105; green = 108; blue = 112; break;
+            case NpcType::SERA_FLINT: red = 142; green = 58; blue = 45; break;
+            default: break;
+            }
+        }
+        SDL_SetRenderDrawColor(renderer, red, green, blue, 255);
 
         SDL_RenderFillRect(
             renderer,
@@ -3142,6 +3152,16 @@ void Graphics::DrawNPCs(
                 npcRectangle.w - 12.0f, npcRectangle.h * 0.50f};
             SDL_SetRenderDrawColor(renderer, 72, 48, 36, 255);
             SDL_RenderFillRect(renderer, &apron);
+        }
+        else if (npc != nullptr)
+        {
+            SDL_SetRenderDrawColor(renderer, 220, 205, 150, 255);
+            SDL_RenderRect(renderer, &npcRectangle);
+            const SDL_FRect roleMark{
+                npcRectangle.x + npcRectangle.w * 0.35f,
+                npcRectangle.y + 3.0f,
+                npcRectangle.w * 0.30f, 4.0f};
+            SDL_RenderFillRect(renderer, &roleMark);
         }
     }
 }

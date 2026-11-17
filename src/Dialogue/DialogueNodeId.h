@@ -9,7 +9,11 @@ enum class DialogueNodeId
     DEVELOPMENT_GUIDE_TOPIC_PROMPT = 4,
     DEVELOPMENT_GUIDE_GATHERING_RESPONSE = 5,
     DEVELOPMENT_GUIDE_COMBAT_RESPONSE = 6,
-    TORREN_ASH_WELCOME = 7
+    TORREN_ASH_WELCOME = 7,
+    ELIA_REED_WELCOME = 8,
+    NESSA_THORNE_WELCOME = 9,
+    BRANN_DEEPWELL_WELCOME = 10,
+    SERA_FLINT_WELCOME = 11
 };
 
 constexpr bool IsValidDialogueNodeId(DialogueNodeId id)
@@ -20,5 +24,9 @@ constexpr bool IsValidDialogueNodeId(DialogueNodeId id)
            id == DialogueNodeId::DEVELOPMENT_GUIDE_TOPIC_PROMPT ||
            id == DialogueNodeId::DEVELOPMENT_GUIDE_GATHERING_RESPONSE ||
            id == DialogueNodeId::DEVELOPMENT_GUIDE_COMBAT_RESPONSE ||
-           id == DialogueNodeId::TORREN_ASH_WELCOME;
+           id == DialogueNodeId::TORREN_ASH_WELCOME ||
+           id == DialogueNodeId::ELIA_REED_WELCOME ||
+           id == DialogueNodeId::NESSA_THORNE_WELCOME ||
+           id == DialogueNodeId::BRANN_DEEPWELL_WELCOME ||
+           id == DialogueNodeId::SERA_FLINT_WELCOME;
 }

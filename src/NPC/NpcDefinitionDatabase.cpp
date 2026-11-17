@@ -64,6 +64,42 @@ namespace
         "Blunt, competitive, and fond of craft metaphors",
         "Respects Mara, but thinks she is too cautious",
         "Every tool in Torren's reach has been repaired twice and praised three times."};
+
+    const NpcDefinition EliaReed{
+        NpcType::ELIA_REED, "Elia Reed", NpcKind::FRIENDLY, std::nullopt,
+        {NpcInteractionType::TALK}, DialogueId::ELIA_REED_INTRO, ShopId::NONE,
+        "Banker and record keeper",
+        "Recover a missing village ledger without causing panic",
+        "Precise, dryly funny, and impossible to surprise",
+        "Quietly funds Nessa's woodland restoration",
+        "Elia's key ring is organised more carefully than most people's lives."};
+
+    const NpcDefinition NessaThorne{
+        NpcType::NESSA_THORNE, "Nessa Thorne", NpcKind::FRIENDLY, std::nullopt,
+        {NpcInteractionType::TALK}, DialogueId::NESSA_THORNE_INTRO, ShopId::NONE,
+        "Forester and herbalist",
+        "Calm the hostile woodland without stripping it bare",
+        "Patient, observant, and more likely to ask than order",
+        "Relies on Elia and distrusts Torren's appetite for timber",
+        "Leaves and tiny labelled bottles fill every pocket of Nessa's coat."};
+
+    const NpcDefinition BrannDeepwell{
+        NpcType::BRANN_DEEPWELL, "Brann Deepwell", NpcKind::FRIENDLY, std::nullopt,
+        {NpcInteractionType::TALK}, DialogueId::BRANN_DEEPWELL_INTRO, ShopId::NONE,
+        "Miner and surveyor",
+        "Reopen the old route while hiding his fear of Stonebacks",
+        "Boastful stories that eventually collapse into honest detail",
+        "Competes with Torren and treats Sera like family",
+        "Brann's lamp is polished; his boots suggest the mine was less cooperative."};
+
+    const NpcDefinition SeraFlint{
+        NpcType::SERA_FLINT, "Sera Flint", NpcKind::FRIENDLY, std::nullopt,
+        {NpcInteractionType::TALK}, DialogueId::SERA_FLINT_INTRO, ShopId::NONE,
+        "Hunter and road scout",
+        "Discover why Ashfangs are leaving their normal territory",
+        "Sparse, direct, and attentive to details others miss",
+        "Reports to Mara; Brann treats her like family",
+        "Sera studies the treeline as if it has just said something important."};
 }
 
 namespace NpcDefinitionDatabase
@@ -76,7 +112,11 @@ namespace NpcDefinitionDatabase
             NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER,
             NpcType::DURABLE_DEVELOPMENT_MONSTER,
             NpcType::ELITE_DEVELOPMENT_MONSTER,
-            NpcType::TORREN_ASH};
+            NpcType::TORREN_ASH,
+            NpcType::ELIA_REED,
+            NpcType::NESSA_THORNE,
+            NpcType::BRANN_DEEPWELL,
+            NpcType::SERA_FLINT};
         return types;
     }
 
@@ -96,6 +136,10 @@ namespace NpcDefinitionDatabase
             return &EliteDevelopmentMonster;
         case NpcType::TORREN_ASH:
             return &TorrenAsh;
+        case NpcType::ELIA_REED: return &EliaReed;
+        case NpcType::NESSA_THORNE: return &NessaThorne;
+        case NpcType::BRANN_DEEPWELL: return &BrannDeepwell;
+        case NpcType::SERA_FLINT: return &SeraFlint;
         case NpcType::NONE:
         default:
             return nullptr;

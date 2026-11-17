@@ -7,6 +7,10 @@
 #include "../src/NPC/NpcSpawnDatabase.h"
 #include "../src/World/World.h"
 
+#include <string>
+#include <utility>
+#include <vector>
+
 int main()
 {
     TestContext test;
@@ -60,8 +64,28 @@ int main()
                     torren->interactions[0] == NpcInteractionType::TALK &&
                     !torren->role.empty() && !torren->relationship.empty(),
                 "Torren has a complete workshop character definition");
+    const std::vector<std::pair<NpcType, std::string>> supportingCast{
+        {NpcType::TORREN_ASH, "Torren Ash"},
+        {NpcType::ELIA_REED, "Elia Reed"},
+        {NpcType::NESSA_THORNE, "Nessa Thorne"},
+        {NpcType::BRANN_DEEPWELL, "Brann Deepwell"},
+        {NpcType::SERA_FLINT, "Sera Flint"}};
+    for (const auto &[type, name] : supportingCast)
+    {
+        const NpcDefinition *character = NpcDefinitionDatabase::TryGet(type);
+        test.Expect(character != nullptr && character->name == name &&
+                        character->kind == NpcKind::FRIENDLY &&
+                        !character->role.empty() &&
+                        !character->motivation.empty() &&
+                        !character->speechStyle.empty() &&
+                        !character->relationship.empty() &&
+                        !character->examineText.empty(),
+                    "Every supporting villager has a complete character identity");
+    }
 
     const auto &spawns = NpcSpawnDatabase::GetStarterSpawns();
+    test.ExpectEqual(spawns.size(), std::size_t{10},
+                    "Starter world defines six villagers and four monsters");
     test.Expect(spawns.front().spawnId == NpcSpawnId::DEVELOPMENT_GUIDE_SPAWN,
                 "Guide spawn is first in authored order");
     test.ExpectEqual(spawns.front().spawnPosition.GetX(), 3, "Guide X is preserved");
@@ -69,9 +93,11 @@ int main()
     test.ExpectEqual(spawns.front().maximumActiveCount, 1, "Guide capacity is one");
     test.ExpectEqual(spawns.front().wanderRadius, 0, "Guide wandering is disabled");
     test.Expect(!spawns.front().respawns, "Guide respawning is disabled");
-    test.Expect(spawns.back().spawnId == NpcSpawnId::TORREN_ASH_SPAWN &&
-                    spawns.back().spawnPosition.GetX() == 16 &&
-                    spawns.back().spawnPosition.GetY() == 10,
+    const NpcSpawnDefinition *torrenSpawn =
+        NpcSpawnDatabase::TryGet(NpcSpawnId::TORREN_ASH_SPAWN);
+    test.Expect(torrenSpawn != nullptr &&
+                    torrenSpawn->spawnPosition.GetX() == 16 &&
+                    torrenSpawn->spawnPosition.GetY() == 10,
                 "Torren has a stable workshop spawn");
 
     World world;
@@ -96,6 +122,17 @@ int main()
                     runtimeTorren->GetNpcType() == NpcType::TORREN_ASH &&
                     runtimeTorren->GetNpcSpawnId() == NpcSpawnId::TORREN_ASH_SPAWN,
                 "Torren enters the live world after the player and advanced encounters");
+    const std::vector<NpcType> runtimeCast{
+        NpcType::TORREN_ASH, NpcType::ELIA_REED, NpcType::NESSA_THORNE,
+        NpcType::BRANN_DEEPWELL, NpcType::SERA_FLINT};
+    for (std::size_t index = 0; index < runtimeCast.size(); ++index)
+    {
+        NPC *character = dynamic_cast<NPC *>(
+            world.GetEntityByID(7 + static_cast<int>(index)));
+        test.Expect(character != nullptr &&
+                        character->GetNpcType() == runtimeCast[index],
+                    "Every supporting villager enters the live starter world");
+    }
     test.ExpectEqual(world.GetNpcSpawnManager().GetActiveCount(
                          NpcSpawnId::DEVELOPMENT_GUIDE_SPAWN), 1,
                      "Guide consumes authored spawn capacity");
@@ -107,7 +144,7 @@ int main()
                      "Invalid guide creation fails without an entity");
     test.ExpectEqual(world.CreateNpc(NpcType::DEVELOPMENT_GUIDE, spawns.front()), 0,
                      "Guide spawn capacity rejects duplicate creation");
-    test.ExpectEqual(world.CreatePlayer(), 8,
+    test.ExpectEqual(world.CreatePlayer(), 12,
                      "Invalid guide creation consumes no entity ID");
 
     if (guide != nullptr)

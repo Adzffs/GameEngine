@@ -309,7 +309,7 @@ int main()
         "Invalid position leaves no partial entity");
     test.ExpectEqual(
         world.CreatePlayer(),
-        8,
+        12,
         "Invalid position does not consume the next entity ID");
 
     test.ExpectEqual(
@@ -318,7 +318,7 @@ int main()
         "Authored spawn capacity prevents a duplicate runtime monster");
     test.ExpectEqual(
         world.CreatePlayer(),
-        9,
+        13,
         "Capacity failure does not consume the next entity ID");
 
     World primitiveWorld;

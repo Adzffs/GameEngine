@@ -51,6 +51,27 @@ namespace
           DialogueNodeKind::TERMINAL,
           std::nullopt,
           {}}}};
+
+    const DialogueDefinition EliaReedIntro{
+        DialogueId::ELIA_REED_INTRO, DialogueNodeId::ELIA_REED_WELCOME,
+        {{DialogueNodeId::ELIA_REED_WELCOME,
+          "Your bank space is safe. The village ledger, regrettably, is not.",
+          DialogueNodeKind::TERMINAL, std::nullopt, {}}}};
+    const DialogueDefinition NessaThorneIntro{
+        DialogueId::NESSA_THORNE_INTRO, DialogueNodeId::NESSA_THORNE_WELCOME,
+        {{DialogueNodeId::NESSA_THORNE_WELCOME,
+          "Take what the woodland can spare, and notice what it refuses to give.",
+          DialogueNodeKind::TERMINAL, std::nullopt, {}}}};
+    const DialogueDefinition BrannDeepwellIntro{
+        DialogueId::BRANN_DEEPWELL_INTRO, DialogueNodeId::BRANN_DEEPWELL_WELCOME,
+        {{DialogueNodeId::BRANN_DEEPWELL_WELCOME,
+          "Old route's perfectly safe. Mostly safe. Safer if you walk ahead.",
+          DialogueNodeKind::TERMINAL, std::nullopt, {}}}};
+    const DialogueDefinition SeraFlintIntro{
+        DialogueId::SERA_FLINT_INTRO, DialogueNodeId::SERA_FLINT_WELCOME,
+        {{DialogueNodeId::SERA_FLINT_WELCOME,
+          "Ashfang tracks on the village road. Fresh ones. Prepare before you follow.",
+          DialogueNodeKind::TERMINAL, std::nullopt, {}}}};
 }
 
 namespace DialogueDefinitionDatabase
@@ -59,7 +80,11 @@ namespace DialogueDefinitionDatabase
     {
         static const std::vector<DialogueId> ids{
             DialogueId::DEVELOPMENT_GUIDE_INTRO,
-            DialogueId::TORREN_ASH_INTRO};
+            DialogueId::TORREN_ASH_INTRO,
+            DialogueId::ELIA_REED_INTRO,
+            DialogueId::NESSA_THORNE_INTRO,
+            DialogueId::BRANN_DEEPWELL_INTRO,
+            DialogueId::SERA_FLINT_INTRO};
         return ids;
     }
 
@@ -69,6 +94,10 @@ namespace DialogueDefinitionDatabase
         {
         case DialogueId::DEVELOPMENT_GUIDE_INTRO: return &DevelopmentGuideIntro;
         case DialogueId::TORREN_ASH_INTRO: return &TorrenAshIntro;
+        case DialogueId::ELIA_REED_INTRO: return &EliaReedIntro;
+        case DialogueId::NESSA_THORNE_INTRO: return &NessaThorneIntro;
+        case DialogueId::BRANN_DEEPWELL_INTRO: return &BrannDeepwellIntro;
+        case DialogueId::SERA_FLINT_INTRO: return &SeraFlintIntro;
         case DialogueId::NONE: default: return nullptr;
         }
     }

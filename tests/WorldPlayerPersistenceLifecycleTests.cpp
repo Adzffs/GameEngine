@@ -169,7 +169,7 @@ int main()
                             WorldPlayerPersistenceLifecycleIssueCode::ALREADY_STARTED),
                     "Start twice fails deterministically");
         test.Expect(dynamic_cast<NPC *>(world.GetEntityByID(7)) != nullptr &&
-                        world.CreatePlayer() == 8,
+                        world.CreatePlayer() == 12,
                     "Second Start creates no Player and consumes no runtime ID");
     }
 

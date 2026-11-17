@@ -281,11 +281,22 @@ void World::EnsureAdvancedStarterMonsters()
 void World::EnsureStarterSupportingCharacters()
 {
     if (starterSupportingCharactersCreated) return;
-    const NpcSpawnDefinition *torren =
-        NpcSpawnDatabase::TryGet(NpcSpawnId::TORREN_ASH_SPAWN);
-    if (torren == nullptr) return;
-    starterSupportingCharactersCreated =
-        CreateNpc(torren->npcType, *torren) > 0;
+    const std::array<NpcSpawnId, 5> supportingSpawns{
+        NpcSpawnId::TORREN_ASH_SPAWN,
+        NpcSpawnId::ELIA_REED_SPAWN,
+        NpcSpawnId::NESSA_THORNE_SPAWN,
+        NpcSpawnId::BRANN_DEEPWELL_SPAWN,
+        NpcSpawnId::SERA_FLINT_SPAWN};
+    bool createdAll = true;
+    for (NpcSpawnId spawnId : supportingSpawns)
+    {
+        const NpcSpawnDefinition *spawn = NpcSpawnDatabase::TryGet(spawnId);
+        if (spawn == nullptr ||
+            (npcSpawnManager.GetActiveCount(spawnId) == 0 &&
+             CreateNpc(spawn->npcType, *spawn) == 0))
+            createdAll = false;
+    }
+    starterSupportingCharactersCreated = createdAll;
 }
 
 WorldPlayerLoadResult World::LoadOrCreatePlayerFromFile(
