@@ -3113,10 +3113,12 @@ void Graphics::DrawNPCs(
         const NPC *npc = dynamic_cast<const NPC *>(entity.get());
         const bool isMara = npc != nullptr &&
             npc->GetNpcType() == NpcType::DEVELOPMENT_GUIDE;
+        const bool isTorren = npc != nullptr &&
+            npc->GetNpcType() == NpcType::TORREN_ASH;
         SDL_SetRenderDrawColor(renderer,
-            isMara ? 48 : 255,
-            isMara ? 96 : 150,
-            isMara ? 150 : 50,
+            isMara ? 48 : (isTorren ? 135 : 255),
+            isMara ? 96 : (isTorren ? 58 : 150),
+            isMara ? 150 : (isTorren ? 38 : 50),
             255);
 
         SDL_RenderFillRect(
@@ -3130,6 +3132,16 @@ void Graphics::DrawNPCs(
                 npcRectangle.x + 5.0f, npcRectangle.y + 2.0f,
                 4.0f, npcRectangle.h - 4.0f};
             SDL_RenderFillRect(renderer, &wardenSash);
+        }
+        else if (isTorren)
+        {
+            SDL_SetRenderDrawColor(renderer, 232, 122, 54, 255);
+            SDL_RenderRect(renderer, &npcRectangle);
+            const SDL_FRect apron{
+                npcRectangle.x + 6.0f, npcRectangle.y + npcRectangle.h * 0.42f,
+                npcRectangle.w - 12.0f, npcRectangle.h * 0.50f};
+            SDL_SetRenderDrawColor(renderer, 72, 48, 36, 255);
+            SDL_RenderFillRect(renderer, &apron);
         }
     }
 }

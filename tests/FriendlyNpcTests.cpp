@@ -11,6 +11,7 @@ int main()
 {
     TestContext test;
     const NpcDefinition *guide = NpcDefinitionDatabase::TryGet(NpcType::DEVELOPMENT_GUIDE);
+    const NpcDefinition *torren = NpcDefinitionDatabase::TryGet(NpcType::TORREN_ASH);
     test.Expect(guide != nullptr, "Development guide definition resolves");
     if (guide != nullptr)
     {
@@ -53,6 +54,12 @@ int main()
                         missingCharacterIdentity).IsValid(),
                     "Friendly characters require a motivation");
     }
+    test.Expect(torren != nullptr && torren->name == "Torren Ash" &&
+                    torren->dialogueId == DialogueId::TORREN_ASH_INTRO &&
+                    torren->interactions.size() == 1 &&
+                    torren->interactions[0] == NpcInteractionType::TALK &&
+                    !torren->role.empty() && !torren->relationship.empty(),
+                "Torren has a complete workshop character definition");
 
     const auto &spawns = NpcSpawnDatabase::GetStarterSpawns();
     test.Expect(spawns.front().spawnId == NpcSpawnId::DEVELOPMENT_GUIDE_SPAWN,
@@ -62,6 +69,10 @@ int main()
     test.ExpectEqual(spawns.front().maximumActiveCount, 1, "Guide capacity is one");
     test.ExpectEqual(spawns.front().wanderRadius, 0, "Guide wandering is disabled");
     test.Expect(!spawns.front().respawns, "Guide respawning is disabled");
+    test.Expect(spawns.back().spawnId == NpcSpawnId::TORREN_ASH_SPAWN &&
+                    spawns.back().spawnPosition.GetX() == 16 &&
+                    spawns.back().spawnPosition.GetY() == 10,
+                "Torren has a stable workshop spawn");
 
     World world;
     NPC *runtimeGuide = dynamic_cast<NPC *>(world.GetEntityByID(1));
@@ -80,6 +91,11 @@ int main()
     test.Expect(dynamic_cast<Monster *>(world.GetEntityByID(3)) != nullptr,
                 "Aggressive monster remains entity three");
     test.ExpectEqual(world.CreatePlayer(), 4, "Player remains entity four");
+    NPC *runtimeTorren = dynamic_cast<NPC *>(world.GetEntityByID(7));
+    test.Expect(runtimeTorren != nullptr &&
+                    runtimeTorren->GetNpcType() == NpcType::TORREN_ASH &&
+                    runtimeTorren->GetNpcSpawnId() == NpcSpawnId::TORREN_ASH_SPAWN,
+                "Torren enters the live world after the player and advanced encounters");
     test.ExpectEqual(world.GetNpcSpawnManager().GetActiveCount(
                          NpcSpawnId::DEVELOPMENT_GUIDE_SPAWN), 1,
                      "Guide consumes authored spawn capacity");
@@ -91,7 +107,7 @@ int main()
                      "Invalid guide creation fails without an entity");
     test.ExpectEqual(world.CreateNpc(NpcType::DEVELOPMENT_GUIDE, spawns.front()), 0,
                      "Guide spawn capacity rejects duplicate creation");
-    test.ExpectEqual(world.CreatePlayer(), 7,
+    test.ExpectEqual(world.CreatePlayer(), 8,
                      "Invalid guide creation consumes no entity ID");
 
     if (guide != nullptr)

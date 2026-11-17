@@ -79,7 +79,7 @@ int main()
         test.ExpectEqual(EngineTestAccess::GetPlayerID(engine), 4,
                          "Default Engine creates development Player ID 4");
         test.Expect(dynamic_cast<Player *>(world.GetEntityByID(4)) != nullptr &&
-                        world.GetEntityByID(7) == nullptr,
+                        dynamic_cast<Player *>(world.GetEntityByID(7)) == nullptr,
                     "Default Engine creates exactly one Player");
         test.Expect(EngineTestAccess::FinalizeWorldAfterRun(engine),
                     "Default Engine finalization is a successful no-op");
@@ -96,7 +96,7 @@ int main()
         test.ExpectEqual(EngineTestAccess::GetPlayerID(engine), 4,
                          "Persistent missing-file startup tracks ID 4");
         test.Expect(dynamic_cast<Player *>(world.GetEntityByID(4)) != nullptr &&
-                        world.GetEntityByID(7) == nullptr,
+                        dynamic_cast<Player *>(world.GetEntityByID(7)) == nullptr,
                     "Persistent startup bypasses duplicate default creation");
         test.Expect(!std::filesystem::exists(path),
                     "Engine startup does not immediately save a new Player");
@@ -122,7 +122,8 @@ int main()
         World &world = EngineTestAccess::GetWorld(engine);
         auto *player = dynamic_cast<Player *>(world.GetEntityByID(4));
         test.Expect(player != nullptr && player->GetPosition().GetX() == 2 &&
-                        player->GetPosition().GetY() == 3 && world.GetEntityByID(7) == nullptr,
+                        player->GetPosition().GetY() == 3 &&
+                        dynamic_cast<Player *>(world.GetEntityByID(7)) == nullptr,
                     "Existing-file Engine startup restores exactly one Player");
         test.Expect(ReadBytes(path) == original, "Engine startup does not rewrite existing save");
         player->GetPosition().SetPosition(4, 4);

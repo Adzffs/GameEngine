@@ -50,6 +50,20 @@ namespace
             RewardTableType::ELITE_MONSTER,
             MonsterAggressionDefinition{5, 8}, 24},
         {}, DialogueId::NONE, ShopId::NONE};
+
+    const NpcDefinition TorrenAsh{
+        NpcType::TORREN_ASH,
+        "Torren Ash",
+        NpcKind::FRIENDLY,
+        std::nullopt,
+        {NpcInteractionType::TALK},
+        DialogueId::TORREN_ASH_INTRO,
+        ShopId::NONE,
+        "Smith and workshop keeper",
+        "Prove his steelwork can protect Embervale",
+        "Blunt, competitive, and fond of craft metaphors",
+        "Respects Mara, but thinks she is too cautious",
+        "Every tool in Torren's reach has been repaired twice and praised three times."};
 }
 
 namespace NpcDefinitionDatabase
@@ -61,7 +75,8 @@ namespace NpcDefinitionDatabase
             NpcType::PASSIVE_DEVELOPMENT_MONSTER,
             NpcType::AGGRESSIVE_DEVELOPMENT_MONSTER,
             NpcType::DURABLE_DEVELOPMENT_MONSTER,
-            NpcType::ELITE_DEVELOPMENT_MONSTER};
+            NpcType::ELITE_DEVELOPMENT_MONSTER,
+            NpcType::TORREN_ASH};
         return types;
     }
 
@@ -79,6 +94,8 @@ namespace NpcDefinitionDatabase
             return &DurableDevelopmentMonster;
         case NpcType::ELITE_DEVELOPMENT_MONSTER:
             return &EliteDevelopmentMonster;
+        case NpcType::TORREN_ASH:
+            return &TorrenAsh;
         case NpcType::NONE:
         default:
             return nullptr;

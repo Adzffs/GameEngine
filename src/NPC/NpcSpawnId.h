@@ -7,7 +7,8 @@ enum class NpcSpawnId
     PASSIVE_DEVELOPMENT_SPAWN,
     AGGRESSIVE_DEVELOPMENT_SPAWN,
     DURABLE_DEVELOPMENT_SPAWN,
-    ELITE_DEVELOPMENT_SPAWN
+    ELITE_DEVELOPMENT_SPAWN,
+    TORREN_ASH_SPAWN
 };
 
 constexpr bool IsValidNpcSpawnId(NpcSpawnId spawnId)
@@ -19,6 +20,7 @@ constexpr bool IsValidNpcSpawnId(NpcSpawnId spawnId)
     case NpcSpawnId::AGGRESSIVE_DEVELOPMENT_SPAWN:
     case NpcSpawnId::DURABLE_DEVELOPMENT_SPAWN:
     case NpcSpawnId::ELITE_DEVELOPMENT_SPAWN:
+    case NpcSpawnId::TORREN_ASH_SPAWN:
         return true;
     case NpcSpawnId::NONE:
         return false;

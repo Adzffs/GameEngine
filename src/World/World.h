@@ -312,7 +312,9 @@ private:
         int x,
         int y);
     void EnsureAdvancedStarterMonsters();
+    void EnsureStarterSupportingCharacters();
     bool advancedStarterMonstersCreated = false;
+    bool starterSupportingCharactersCreated = false;
 
     void ProcessMovementRequests();
     void ProcessQueuedCommands();

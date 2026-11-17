@@ -13,6 +13,15 @@ int main()
                 "NONE dialogue fails safely");
     test.Expect(DialogueDefinitionDatabase::TryGet(static_cast<DialogueId>(999)) == nullptr,
                 "Unknown dialogue fails safely");
+    const DialogueDefinition *torrenDialogue =
+        DialogueDefinitionDatabase::TryGet(DialogueId::TORREN_ASH_INTRO);
+    test.Expect(torrenDialogue != nullptr &&
+                    torrenDialogue->startNodeId == DialogueNodeId::TORREN_ASH_WELCOME &&
+                    torrenDialogue->nodes.size() == 1 &&
+                    torrenDialogue->nodes[0].kind == DialogueNodeKind::TERMINAL &&
+                    ContentValidator::ValidateDialogueDefinition(
+                        *torrenDialogue).IsValid(),
+                "Torren has valid authored workshop dialogue");
     if (dialogue != nullptr)
     {
         test.Expect(dialogue->startNodeId == DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME,

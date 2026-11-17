@@ -42,6 +42,15 @@ namespace
              std::nullopt,
              {}}
         }};
+
+    const DialogueDefinition TorrenAshIntro{
+        DialogueId::TORREN_ASH_INTRO,
+        DialogueNodeId::TORREN_ASH_WELCOME,
+        {{DialogueNodeId::TORREN_ASH_WELCOME,
+          "Mara sent you? Good. Bring me honest metal and I'll make it earn its weight.",
+          DialogueNodeKind::TERMINAL,
+          std::nullopt,
+          {}}}};
 }
 
 namespace DialogueDefinitionDatabase
@@ -49,15 +58,19 @@ namespace DialogueDefinitionDatabase
     const std::vector<DialogueId> &GetAllDialogueIds()
     {
         static const std::vector<DialogueId> ids{
-            DialogueId::DEVELOPMENT_GUIDE_INTRO};
+            DialogueId::DEVELOPMENT_GUIDE_INTRO,
+            DialogueId::TORREN_ASH_INTRO};
         return ids;
     }
 
     const DialogueDefinition *TryGet(DialogueId id)
     {
-        return id == DialogueId::DEVELOPMENT_GUIDE_INTRO
-                   ? &DevelopmentGuideIntro
-                   : nullptr;
+        switch (id)
+        {
+        case DialogueId::DEVELOPMENT_GUIDE_INTRO: return &DevelopmentGuideIntro;
+        case DialogueId::TORREN_ASH_INTRO: return &TorrenAshIntro;
+        case DialogueId::NONE: default: return nullptr;
+        }
     }
 
     const DialogueNodeDefinition *TryGetNode(DialogueId dialogueId,

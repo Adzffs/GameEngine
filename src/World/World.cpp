@@ -257,7 +257,11 @@ void World::CreateStation(
 int World::CreatePlayer()
 {
     const int playerID = entityManager.CreatePlayer();
-    if (playerID > 0) EnsureAdvancedStarterMonsters();
+    if (playerID > 0)
+    {
+        EnsureAdvancedStarterMonsters();
+        EnsureStarterSupportingCharacters();
+    }
     return playerID;
 }
 
@@ -272,6 +276,16 @@ void World::EnsureAdvancedStarterMonsters()
     const int durableID = CreateMonster(durable->npcType, *durable);
     const int eliteID = CreateMonster(elite->npcType, *elite);
     advancedStarterMonstersCreated = durableID > 0 && eliteID > 0;
+}
+
+void World::EnsureStarterSupportingCharacters()
+{
+    if (starterSupportingCharactersCreated) return;
+    const NpcSpawnDefinition *torren =
+        NpcSpawnDatabase::TryGet(NpcSpawnId::TORREN_ASH_SPAWN);
+    if (torren == nullptr) return;
+    starterSupportingCharactersCreated =
+        CreateNpc(torren->npcType, *torren) > 0;
 }
 
 WorldPlayerLoadResult World::LoadOrCreatePlayerFromFile(
@@ -346,6 +360,7 @@ WorldPlayerLoadResult World::LoadOrCreatePlayerFromFile(
 
     result.SetPlayerEntityID(registeredID);
     EnsureAdvancedStarterMonsters();
+    EnsureStarterSupportingCharacters();
     result.SetStatus(fileStatus == PlayerSaveFileLoadStatus::NOT_FOUND
                          ? WorldPlayerLoadStatus::CREATED_NEW
                          : WorldPlayerLoadStatus::LOADED_EXISTING);
@@ -432,6 +447,7 @@ WorldPlayerLoadResult World::TryRegisterLoadedPlayer(
 
     result.SetPlayerEntityID(registeredID);
     EnsureAdvancedStarterMonsters();
+    EnsureStarterSupportingCharacters();
     result.SetStatus(WorldPlayerLoadStatus::LOADED_EXISTING);
     return result;
 }
