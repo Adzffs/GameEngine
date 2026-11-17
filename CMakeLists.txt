@@ -93,6 +93,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/World/Object/Resource/ResourceDatabase.cpp
     src/Recipe/RecipeDefinition.cpp
     src/Recipe/RecipeDatabase.cpp
+    src/Recipe/RecipeBook.cpp
     src/Recipe/CraftingRecipeMatcher.cpp
     src/Recipe/CraftingSessionSystem.cpp
     src/Recipe/CraftingInteractionModel.cpp
@@ -224,6 +225,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(StarterRegionTests tests/StarterRegionTests.cpp)
     add_gameengine_headless_test(MiningBasicsQuestTests tests/MiningBasicsQuestTests.cpp)
     add_gameengine_headless_test(RecipeActionSystemTests tests/RecipeActionSystemTests.cpp)
+    add_gameengine_headless_test(RecipeBookTests tests/RecipeBookTests.cpp)
     add_gameengine_headless_test(CraftingRecipeTests tests/CraftingRecipeTests.cpp)
     add_gameengine_headless_test(CraftingTableWorldTests tests/CraftingTableWorldTests.cpp)
     add_gameengine_headless_test(CraftingSessionTests tests/CraftingSessionTests.cpp)

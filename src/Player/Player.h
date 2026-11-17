@@ -15,6 +15,7 @@
 #include "../Quest/QuestJournal.h"
 #include "../Bank/Bank.h"
 #include "../Tutorial/TutorialState.h"
+#include "../Recipe/RecipeBook.h"
 
 class World;
 
@@ -34,6 +35,8 @@ public:
     const Bank &GetBank() const { return bank; }
     TutorialState &GetTutorialState() { return tutorialState; }
     const TutorialState &GetTutorialState() const { return tutorialState; }
+    RecipeBook &GetRecipeBook() { return recipeBook; }
+    const RecipeBook &GetRecipeBook() const { return recipeBook; }
 
     SkillSet &GetSkills();
     const SkillSet &GetSkills() const;
@@ -71,6 +74,7 @@ private:
     Inventory inventory;
     Bank bank;
     TutorialState tutorialState;
+    RecipeBook recipeBook;
 
     SkillSet skills;
 
