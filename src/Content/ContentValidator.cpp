@@ -1746,6 +1746,12 @@ void ContentValidator::AppendNpcDefinitionValidation(
         report.AddError("NpcDefinition", contentID, "NPC kind is unknown");
     if (definition.kind == NpcKind::FRIENDLY && definition.combat.has_value())
         report.AddError("NpcDefinition", contentID, "friendly definition must not contain combat data");
+    if (definition.kind == NpcKind::FRIENDLY &&
+        (definition.role.empty() || definition.motivation.empty() ||
+         definition.speechStyle.empty() || definition.relationship.empty() ||
+         definition.examineText.empty()))
+        report.AddError("NpcDefinition", contentID,
+            "friendly characters require role, motivation, voice, relationship and examine text");
     if (definition.kind == NpcKind::MONSTER && !definition.combat.has_value())
         report.AddError("NpcDefinition", contentID, "monster definition must contain combat data");
     if (definition.kind == NpcKind::MONSTER && !definition.interactions.empty())

@@ -23,6 +23,12 @@ int main()
                     "Guide references development supplies");
         test.Expect(guide->dialogueId == DialogueId::DEVELOPMENT_GUIDE_INTRO,
                     "Guide references the authored dialogue");
+        test.Expect(guide->name == "Mara Vale" &&
+                        !guide->role.empty() && !guide->motivation.empty() &&
+                        !guide->speechStyle.empty() &&
+                        !guide->relationship.empty() &&
+                        !guide->examineText.empty(),
+                    "Mara has a complete authored character identity");
 
         NpcDefinition invalidFriendly = *guide;
         invalidFriendly.combat = NpcCombatDefinition{CombatRatings{1,1,1,1}, 1,
@@ -41,6 +47,11 @@ int main()
         missingDialogue.dialogueId = DialogueId::NONE;
         test.Expect(!ContentValidator::ValidateNpcDefinition(missingDialogue).IsValid(),
                     "TALK without a dialogue is rejected");
+        NpcDefinition missingCharacterIdentity = *guide;
+        missingCharacterIdentity.motivation.clear();
+        test.Expect(!ContentValidator::ValidateNpcDefinition(
+                        missingCharacterIdentity).IsValid(),
+                    "Friendly characters require a motivation");
     }
 
     const auto &spawns = NpcSpawnDatabase::GetStarterSpawns();

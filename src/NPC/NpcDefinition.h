@@ -31,4 +31,9 @@ struct NpcDefinition
     std::vector<NpcInteractionType> interactions;
     DialogueId dialogueId = DialogueId::NONE;
     ShopId shopId = ShopId::NONE;
+    std::string role;
+    std::string motivation;
+    std::string speechStyle;
+    std::string relationship;
+    std::string examineText;
 };

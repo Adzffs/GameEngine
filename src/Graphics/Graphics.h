@@ -197,6 +197,7 @@ public:
         SDL_FRect bounds{};
         std::string name;
         std::string primaryAction;
+        std::string examineText;
 
         bool HasTarget() const
         {

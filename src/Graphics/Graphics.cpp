@@ -2917,7 +2917,7 @@ Graphics::WorldHoverTarget Graphics::ResolveWorldHoverTarget(
         if (IsPointInsideRectangle(screenX, screenY, bounds))
         {
             return {WorldHoverTargetType::FRIENDLY_NPC, npc->GetID(),
-                bounds, definition->name, "Talk-to"};
+                bounds, definition->name, "Talk-to", definition->examineText};
         }
     }
 
@@ -3018,9 +3018,11 @@ bool Graphics::HandleWorldContextMenuClick(float screenX, float screenY)
     }
     else if (hasTarget && selectedRow == 2)
     {
-        examineMessage = worldContextMenu.target.name +
-            " — " + worldContextMenu.target.primaryAction +
-            " is its main interaction.";
+        examineMessage = worldContextMenu.target.examineText.empty()
+            ? worldContextMenu.target.name + " — " +
+                worldContextMenu.target.primaryAction +
+                " is its main interaction."
+            : worldContextMenu.target.examineText;
         examineMessageUntil = SDL_GetTicks() + 4500;
     }
 
@@ -3108,16 +3110,27 @@ void Graphics::DrawNPCs(
             static_cast<float>(TileSize - 10),
             static_cast<float>(TileSize - 10)};
 
-        SDL_SetRenderDrawColor(
-            renderer,
-            255,
-            150,
-            50,
+        const NPC *npc = dynamic_cast<const NPC *>(entity.get());
+        const bool isMara = npc != nullptr &&
+            npc->GetNpcType() == NpcType::DEVELOPMENT_GUIDE;
+        SDL_SetRenderDrawColor(renderer,
+            isMara ? 48 : 255,
+            isMara ? 96 : 150,
+            isMara ? 150 : 50,
             255);
 
         SDL_RenderFillRect(
             renderer,
             &npcRectangle);
+        if (isMara)
+        {
+            SDL_SetRenderDrawColor(renderer, 225, 184, 82, 255);
+            SDL_RenderRect(renderer, &npcRectangle);
+            const SDL_FRect wardenSash{
+                npcRectangle.x + 5.0f, npcRectangle.y + 2.0f,
+                4.0f, npcRectangle.h - 4.0f};
+            SDL_RenderFillRect(renderer, &wardenSash);
+        }
     }
 }
 

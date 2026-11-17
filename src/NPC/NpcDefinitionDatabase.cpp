@@ -4,12 +4,17 @@ namespace
 {
     const NpcDefinition DevelopmentGuide{
         NpcType::DEVELOPMENT_GUIDE,
-        "Development guide",
+        "Mara Vale",
         NpcKind::FRIENDLY,
         std::nullopt,
         {NpcInteractionType::TALK, NpcInteractionType::TRADE},
         DialogueId::DEVELOPMENT_GUIDE_INTRO,
-        ShopId::DEVELOPMENT_GUIDE_SUPPLIES};
+        ShopId::DEVELOPMENT_GUIDE_SUPPLIES,
+        "Village warden and quartermaster",
+        "Prepare newcomers before the Cinder Warden reaches Embervale",
+        "Practical, warm, and fond of short field lessons",
+        "Trusts Torren the smith, but worries his pride outruns his caution",
+        "Mara watches the road and quietly counts every traveller who returns."};
 
     const NpcDefinition PassiveDevelopmentMonster{
         NpcType::PASSIVE_DEVELOPMENT_MONSTER,

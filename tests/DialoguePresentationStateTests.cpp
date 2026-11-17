@@ -54,7 +54,7 @@ int main()
 
     state.Synchronize(4, {MakeEvent(4, 42, DialogueNodeKind::CONTINUE)}, &session);
     test.Expect(state.IsOpen() && state.GetEvent()->sessionId == 42 &&
-                    state.GetNpcName() == "Development guide",
+                    state.GetNpcName() == "Mara Vale",
                 "Local event opens the presentation with NPC identity");
     test.Expect(state.CanTrade(), "Opening service node exposes Trade");
     state.Synchronize(4, {}, &session);

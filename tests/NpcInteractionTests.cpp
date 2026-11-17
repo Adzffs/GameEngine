@@ -95,7 +95,7 @@ int main()
                 "Event exposes stable dialogue ID");
     test.Expect(event.nodeId == DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME,
                 "Tick one publishes welcome node");
-    test.Expect(event.text == "Welcome to the development world.", "Event copies server-owned text");
+    test.Expect(event.text == "Welcome to Embervale. I'm Mara, the village warden.", "Event copies server-owned text");
     test.Expect(!event.isTerminal, "Welcome node is nonterminal");
     test.Expect(!WorldTestAccess::Pending(nearby, nearbyPlayer->GetID()).has_value(),
                 "Completion clears pending TALK");
@@ -109,7 +109,7 @@ int main()
                     DialogueNodeId::DEVELOPMENT_GUIDE_EXPLANATION,
                 "Tick two publishes explanation node");
     test.Expect(nearby.GetNpcTalkEvents()[0].text ==
-                    "This area is used to test gathering, combat, and NPC systems.",
+                    "The wilds provide what we need, but lately they have been pushing back.",
                 "Explanation text is authoritative");
     nearby.EnqueueCommand(DialogueContinueCommand{nearbyPlayer->GetID(), nearbySessionId});
     nearby.Update();
@@ -312,7 +312,7 @@ int main()
     test.Expect(activeTargetRemoval.GetActiveDialogueSession(targetRemovalA->GetID()) == nullptr &&
                 activeTargetRemoval.GetActiveDialogueSession(targetRemovalB->GetID()) == nullptr,
                 "NPC removal cancels every targeting session");
-    test.Expect(copiedBeforeRemoval.text == "Welcome to the development world.",
+    test.Expect(copiedBeforeRemoval.text == "Welcome to Embervale. I'm Mara, the village warden.",
                 "NPC removal cannot invalidate an already copied event");
 
     World invalidIntentions;

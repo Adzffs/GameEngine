@@ -32,13 +32,13 @@ int main()
         test.Expect(welcome != nullptr && explanation != nullptr && prompt != nullptr &&
                         gathering != nullptr && combat != nullptr && future != nullptr,
                     "All stable nodes resolve");
-        test.Expect(welcome->text == "Welcome to the development world.",
+        test.Expect(welcome->text == "Welcome to Embervale. I'm Mara, the village warden.",
                     "Welcome text is exact");
         test.Expect(explanation->text ==
-            "This area is used to test gathering, combat, and NPC systems.",
+            "The wilds provide what we need, but lately they have been pushing back.",
             "Explanation text is exact");
         test.Expect(future->text ==
-            "More adventures will be added as the world grows.",
+            "Return when you're ready. Embervale has work for capable hands.",
             "Terminal text is exact");
         test.Expect(welcome->nextNodeId == DialogueNodeId::DEVELOPMENT_GUIDE_EXPLANATION,
                     "Welcome points to explanation");
