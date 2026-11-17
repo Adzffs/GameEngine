@@ -203,9 +203,15 @@ std::vector<MovementOutcome> MovementSystem::Process(
             const int firstChangeX = firstStep.x - entity.GetPosition().GetX();
             const int firstChangeY = firstStep.y - entity.GetPosition().GetY();
             validReplacement =
-                (((firstChangeX == -1 || firstChangeX == 1) && firstChangeY == 0) ||
-                 (firstChangeX == 0 && (firstChangeY == -1 || firstChangeY == 1))) &&
-                map.IsValidPosition(firstStep.x, firstStep.y);
+                firstChangeX >= -1 && firstChangeX <= 1 &&
+                firstChangeY >= -1 && firstChangeY <= 1 &&
+                (firstChangeX != 0 || firstChangeY != 0) &&
+                map.IsValidPosition(firstStep.x, firstStep.y) &&
+                (firstChangeX == 0 || firstChangeY == 0 ||
+                 (map.IsValidPosition(entity.GetPosition().GetX() + firstChangeX,
+                                      entity.GetPosition().GetY()) &&
+                  map.IsValidPosition(entity.GetPosition().GetX(),
+                                      entity.GetPosition().GetY() + firstChangeY)));
         }
 
         if (!validReplacement)

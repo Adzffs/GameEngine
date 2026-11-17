@@ -7,13 +7,11 @@ bool Movement::Move(Entity &entity, Map &map, int x, int y)
 {
     Position &position = entity.GetPosition();
 
-    const bool isHorizontalStep =
-        (x == -1 || x == 1) && y == 0;
+    const bool isSingleTileStep =
+        x >= -1 && x <= 1 && y >= -1 && y <= 1 &&
+        (x != 0 || y != 0);
 
-    const bool isVerticalStep =
-        x == 0 && (y == -1 || y == 1);
-
-    if (!isHorizontalStep && !isVerticalStep)
+    if (!isSingleTileStep)
     {
         return false;
     }
@@ -36,6 +34,13 @@ bool Movement::Move(Entity &entity, Map &map, int x, int y)
     const int newY = static_cast<int>(candidateY);
 
     if (!map.IsValidPosition(newX, newY))
+    {
+        return false;
+    }
+
+    if (x != 0 && y != 0 &&
+        (!map.IsValidPosition(position.GetX() + x, position.GetY()) ||
+         !map.IsValidPosition(position.GetX(), position.GetY() + y)))
     {
         return false;
     }

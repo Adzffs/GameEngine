@@ -117,7 +117,10 @@ public:
     float CalculateHealthRatio(
         int currentHealth,
         int maximumHealth) const;
-    void AdjustCameraZoom(int wheelDirection);
+    void AdjustCameraZoom(
+        int wheelDirection,
+        float anchorScreenX = -1.0f,
+        float anchorScreenY = -1.0f);
     float GetCameraZoom() const { return cameraZoom; }
     static std::string GetCombatFeedbackLabel(
         const MeleeCombatFeedback &feedback);

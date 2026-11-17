@@ -33,7 +33,7 @@ std::vector<PathStep> Pathfinder::FindPath(
         destinationX,
         destinationY};
 
-    using SearchNode = std::tuple<int, int, int, int>;
+    using SearchNode = std::tuple<int, int, int, int, int>;
     std::priority_queue<SearchNode, std::vector<SearchNode>,
                         std::greater<SearchNode>> frontier;
     std::set<Coordinate> visited;
@@ -44,28 +44,44 @@ std::vector<PathStep> Pathfinder::FindPath(
     int insertionOrder = 0;
     const auto heuristic = [destinationX, destinationY](int x, int y)
     {
-        return std::abs(x - destinationX) + std::abs(y - destinationY);
+        return std::max(
+            std::abs(x - destinationX),
+            std::abs(y - destinationY));
     };
-    frontier.emplace(heuristic(startX, startY), insertionOrder++, startX, startY);
+    const auto lineDeviation = [startX, startY, destinationX, destinationY](int x, int y)
+    {
+        const long long routeX = destinationX - startX;
+        const long long routeY = destinationY - startY;
+        const long long stepX = x - startX;
+        const long long stepY = y - startY;
+        return static_cast<int>(std::abs(stepX * routeY - stepY * routeX));
+    };
+    frontier.emplace(
+        heuristic(startX, startY), 0, insertionOrder++, startX, startY);
     distanceFromStart[start] = 0;
 
     Coordinate bestDestination = start;
     int bestDistance = heuristic(startX, startY);
     int bestPathLength = 0;
 
-    const int directions[4][2]{
+    const int directions[8][2]{
         {0, -1},
+        {1, -1},
         {1, 0},
+        {1, 1},
         {0, 1},
-        {-1, 0}};
+        {-1, 1},
+        {-1, 0},
+        {-1, -1}};
 
     bool exactPathFound = false;
 
     while (!frontier.empty())
     {
-        const auto [priority, order, currentX, currentY] = frontier.top();
+        const auto [priority, deviation, order, currentX, currentY] = frontier.top();
         frontier.pop();
         (void)priority;
+        (void)deviation;
         (void)order;
         const Coordinate current{currentX, currentY};
         if (visited.contains(current)) continue;
@@ -108,6 +124,13 @@ std::vector<PathStep> Pathfinder::FindPath(
                 continue;
             }
 
+            if (changeX != 0 && changeY != 0 &&
+                (!map.IsValidPosition(current.first + changeX, current.second) ||
+                 !map.IsValidPosition(current.first, current.second + changeY)))
+            {
+                continue;
+            }
+
             Coordinate next{
                 nextX,
                 nextY};
@@ -129,6 +152,7 @@ std::vector<PathStep> Pathfinder::FindPath(
             distanceFromStart[next] = tentativeDistance;
             frontier.emplace(
                 tentativeDistance + heuristic(nextX, nextY),
+                lineDeviation(nextX, nextY),
                 insertionOrder++, nextX, nextY);
         }
     }

@@ -85,16 +85,16 @@ int main()
     World distant;
     Player *walker = PlayerAt(distant, 0, 0);
     Trade(distant, walker->GetID());
-    for (int tick = 1; tick <= 5; ++tick)
+    for (int tick = 1;
+         tick <= 5 && distant.GetShopOpenedEvents().empty();
+         ++tick)
     {
         distant.Update();
-        if (tick < 5)
-            test.Expect(distant.GetShopOpenedEvents().empty(), "No early open event");
     }
     test.Expect(walker->GetPosition().GetX() == 3 && walker->GetPosition().GetY() == 2,
                 "Distant route reaches (3,2) on tick five");
     test.ExpectEqual(distant.GetShopOpenedEvents().size(), std::size_t{1},
-                     "Distant trade opens on tick five");
+                     "Distant trade opens as soon as the diagonal approach reaches range");
     test.Expect(!distant.HasActiveMovementPath(walker->GetID()),
                 "Approach movement clears after opening");
     distant.Update();

@@ -94,6 +94,17 @@ int main()
     test.ExpectNear(graphics.GetCameraZoom(), 0.75f, 0.001f,
         "Zoom-out input clamps before world details become unreadable");
 
+    Graphics anchoredZoomGraphics;
+    const SDL_FPoint beforeAnchoredZoom = GraphicsTestAccess::ScreenToWorldPoint(
+        anchoredZoomGraphics, 420.0f, 260.0f);
+    anchoredZoomGraphics.AdjustCameraZoom(1, 420.0f, 260.0f);
+    const SDL_FPoint afterAnchoredZoom = GraphicsTestAccess::ScreenToWorldPoint(
+        anchoredZoomGraphics, 420.0f, 260.0f);
+    test.ExpectNear(afterAnchoredZoom.x, beforeAnchoredZoom.x, 0.001f,
+        "Zoom keeps the horizontal world point beneath the cursor fixed");
+    test.ExpectNear(afterAnchoredZoom.y, beforeAnchoredZoom.y, 0.001f,
+        "Zoom keeps the vertical world point beneath the cursor fixed");
+
     GraphicsTestAccess::SetMinimapOrigin(graphics, 20, 30);
     test.Expect(GraphicsTestAccess::HandleMinimapClick(
         graphics, 1040.0f + 5.0f * 7.0f + 1.0f,

@@ -131,13 +131,14 @@ namespace
                     "Intermediate success emits STEP_SUCCEEDED");
         test.ExpectEqual(
             MovementSystemTestAccess::RemainingSteps(system, entityID),
-            std::size_t{5},
+            std::size_t{3},
             "Successful movement removes exactly one stored step");
         test.ExpectEqual(
-            std::abs(entities.GetEntityByID(entityID)->GetPosition().GetX() - 2) +
-                std::abs(entities.GetEntityByID(entityID)->GetPosition().GetY() - 2),
+            std::max(
+                std::abs(entities.GetEntityByID(entityID)->GetPosition().GetX() - 2),
+                std::abs(entities.GetEntityByID(entityID)->GetPosition().GetY() - 2)),
             1,
-            "A process call never performs diagonal or multi-tile movement");
+            "A process call permits one diagonal tile without skipping tiles");
     }
 
     void TestRecalculation(TestContext &test)

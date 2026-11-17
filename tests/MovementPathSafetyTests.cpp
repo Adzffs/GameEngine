@@ -130,6 +130,17 @@ namespace
                std::abs(firstY - secondY);
     }
 
+    int GridStepDistance(
+        int firstX,
+        int firstY,
+        int secondX,
+        int secondY)
+    {
+        return std::max(
+            std::abs(firstX - secondX),
+            std::abs(firstY - secondY));
+    }
+
     void AdvanceTicks(
         World &world,
         int ticks)
@@ -267,11 +278,17 @@ namespace
         expectRejectedMove(30, 30, 0, 0, "Same-tile movement");
         expectRejectedMove(30, 30, 2, 0, "Two-tile horizontal movement");
         expectRejectedMove(30, 30, 0, -2, "Two-tile vertical movement");
-        expectRejectedMove(30, 30, 1, 1, "Diagonal movement");
         expectRejectedMove(0, 0, -1, 0, "Out-of-bounds movement");
+
+        player->GetPosition().SetPosition(30, 30);
+        test.Expect(Movement::Move(*player, map, 1, 1) &&
+                        player->GetPosition().GetX() == 31 &&
+                        player->GetPosition().GetY() == 31,
+                    "Clear diagonal movement advances one tile on both axes");
 
         map.SetTileType(31, 30, TileType::WALL);
         expectRejectedMove(30, 30, 1, 0, "Blocked-tile movement");
+        expectRejectedMove(30, 30, 1, 1, "Diagonal corner-cut movement");
 
         CraftingStation *station = world.GetStationAt(14, 9);
         test.Expect(station != nullptr,
@@ -417,17 +434,17 @@ namespace
             "Recalculation retains the original final destination");
         test.Expect(
             replacementStep.has_value() &&
-                ManhattanDistance(
+                GridStepDistance(
                     positionBeforeFailureX,
                     positionBeforeFailureY,
                     replacementStep->GetX(),
                     replacementStep->GetY()) == 1,
-            "The replacement path begins with an orthogonally adjacent step");
+            "The replacement path begins with an adjacent cardinal or diagonal step");
 
         world.Update();
 
         test.ExpectEqual(
-            ManhattanDistance(
+            GridStepDistance(
                 positionBeforeFailureX,
                 positionBeforeFailureY,
                 player->GetPosition().GetX(),
@@ -452,7 +469,7 @@ namespace
             world.Update();
 
             test.ExpectEqual(
-                ManhattanDistance(
+                GridStepDistance(
                     priorX,
                     priorY,
                     player->GetPosition().GetX(),
@@ -570,20 +587,22 @@ namespace
                     63,
                     13));
 
-            for (int tick = 0; tick < 6; ++tick)
+            for (int tick = 0;
+                 tick < 6 && world.HasActiveMovementPath(playerID);
+                 ++tick)
             {
                 int priorX = player->GetPosition().GetX();
                 int priorY = player->GetPosition().GetY();
                 world.Update();
 
                 test.ExpectEqual(
-                    ManhattanDistance(
+                    GridStepDistance(
                         priorX,
                         priorY,
                         player->GetPosition().GetX(),
                         player->GetPosition().GetY()),
                     1,
-                    "Destination walking executes only orthogonal click-to-walk steps");
+                    "Destination walking executes one cardinal or diagonal path step");
             }
 
             test.ExpectEqual(

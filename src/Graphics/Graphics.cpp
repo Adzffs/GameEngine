@@ -1653,7 +1653,10 @@ void Graphics::ProcessEvents(bool &running)
                 overSideUi = overSideUi ||
                     IsPointInsideRectangle(mouseX, mouseY, tab);
             if (!overSideUi)
-                AdjustCameraZoom(event.wheel.y > 0.0f ? 1 : -1);
+                AdjustCameraZoom(
+                    event.wheel.y > 0.0f ? 1 : -1,
+                    mouseX,
+                    mouseY);
             continue;
         }
 
@@ -2402,11 +2405,25 @@ SDL_FPoint Graphics::ScreenToWorldPoint(
         screenY / cameraZoom + cameraPixelY};
 }
 
-void Graphics::AdjustCameraZoom(int wheelDirection)
+void Graphics::AdjustCameraZoom(
+    int wheelDirection,
+    float anchorScreenX,
+    float anchorScreenY)
 {
     if (wheelDirection == 0) return;
-    cameraZoom = std::clamp(cameraZoom +
+    const float oldZoom = cameraZoom;
+    const float newZoom = std::clamp(oldZoom +
         (wheelDirection > 0 ? 0.1f : -0.1f), 0.75f, 1.50f);
+    if (newZoom == oldZoom) return;
+
+    if (anchorScreenX >= 0.0f && anchorScreenY >= 0.0f)
+    {
+        const float anchoredWorldX = anchorScreenX / oldZoom + cameraPixelX;
+        const float anchoredWorldY = anchorScreenY / oldZoom + cameraPixelY;
+        cameraPixelX = anchoredWorldX - anchorScreenX / newZoom;
+        cameraPixelY = anchoredWorldY - anchorScreenY / newZoom;
+    }
+    cameraZoom = newZoom;
 }
 
 bool Graphics::HandleMinimapClick(float screenX, float screenY)
