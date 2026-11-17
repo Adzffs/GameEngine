@@ -61,3 +61,16 @@ For every shop-traded crafted item:
 `output sell value < total ingredient buy value`
 
 Travel time and action time may justify a better return than selling raw gathered materials, but buying ingredients, crafting them, and immediately selling the output must never generate coins.
+
+## Executable balance snapshot
+
+The balance model uses the authoritative 600 ms world tick: 100 ticks per minute. Production figures below are station-only ceilings before gathering, travel, banking, inventory pressure, or failed gathering rolls.
+
+| Activity | Entry-level ceiling | Mastered ceiling | XP ceiling | Interpretation |
+|---|---:|---:|---:|---|
+| Bronze bars | 33.3 items/min at Smithing 1 | 50 items/min from Smithing 11 | 200–300 XP/min | Mastery rewards routine production without exceeding the 50% action-time cap |
+| Steel bars | 25 items/min at Smithing 20 | 50 items/min at maximum mastery | 500–1000 XP/min | Coal and Iron acquisition remain the real throughput limits |
+| Cooked meat | 0.625 health/coin | — | — | Best shop healing value; costs inventory slots |
+| Healing tonic | 0.6 health/coin | — | — | Slight value premium buys stackability and longer trips |
+
+`EconomyBalanceModel` calculates these ceilings from live recipe and shop data and can calculate buy-craft-sell margin whenever every input and output is traded.

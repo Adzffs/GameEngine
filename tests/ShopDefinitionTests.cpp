@@ -1,5 +1,7 @@
 #include "TestSupport.h"
 #include "../src/Content/ContentValidator.h"
+#include "../src/Economy/EconomyBalanceModel.h"
+#include "../src/Recipe/RecipeDatabase.h"
 #include "../src/Shop/ShopDefinitionDatabase.h"
 
 int main()
@@ -31,6 +33,37 @@ int main()
     }
     test.Expect(ContentValidator::ValidateShopDefinition(shop->id, *shop).IsValid(),
                 "Authored shop validates");
+
+    const std::optional<double> meatHealing =
+        EconomyBalanceModel::GetHealingPerCoin(ItemType::COOKED_MEAT, *shop);
+    const std::optional<double> tonicHealing =
+        EconomyBalanceModel::GetHealingPerCoin(ItemType::HEALING_TONIC, *shop);
+    test.Expect(
+        meatHealing.has_value() && tonicHealing.has_value() &&
+            *meatHealing > *tonicHealing,
+        "Cooked meat remains the efficient option and tonic pays for convenience");
+
+    const RecipeDefinition &bronzeBar =
+        RecipeDatabase::Get(RecipeType::BRONZE_BAR);
+    test.Expect(
+        EconomyBalanceModel::GetRecipeItemsPerMinute(bronzeBar, 1) > 33.3 &&
+            EconomyBalanceModel::GetRecipeItemsPerMinute(bronzeBar, 1) < 33.4 &&
+            EconomyBalanceModel::GetRecipeXPPerMinute(bronzeBar, 1) == 200.0,
+        "Balance model records the station-only Bronze production ceiling");
+
+    ShopDefinition arbitrageFixture = *shop;
+    arbitrageFixture.entries[1].buyPrice = 2;
+    arbitrageFixture.entries[2].buyPrice = 2;
+    arbitrageFixture.entries.push_back({ItemType::BRONZE_BAR, std::nullopt, 5});
+    const std::optional<int> safeMargin =
+        EconomyBalanceModel::GetCraftingMargin(bronzeBar, arbitrageFixture);
+    test.Expect(safeMargin.has_value() && *safeMargin == 1,
+        "Balance model exposes a profitable buy-craft-sell loop");
+    arbitrageFixture.entries.back().sellPrice = 3;
+    const std::optional<int> safeLoss =
+        EconomyBalanceModel::GetCraftingMargin(bronzeBar, arbitrageFixture);
+    test.Expect(safeLoss.has_value() && *safeLoss == -1,
+        "Balance model exposes a safely lossy crafting trade");
 
     ShopDefinition invalid = *shop;
     invalid.entries.push_back(invalid.entries.front());
