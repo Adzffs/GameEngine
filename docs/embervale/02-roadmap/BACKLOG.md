@@ -31,7 +31,7 @@ The export foundation is followed by bounded parsing, geographic validation and 
 | Runtime compatibility adapter | STUDIO-013 | in_progress | Opt-in snapshot loading preserves ground, occupancy and staged creation; explicit compiled mode, temporary playtests and save-path guards are implemented |
 | Headless command surface | STUDIO-022 | in_progress | Export, validation and resource/station move dry-run commands exist; guarded writes and structured machine diagnostics remain planned |
 | Create-only guarded draft writer | STUDIO-021 | in_progress | Source-byte SHA-256, exclusive source lock, read/recheck, same-directory new-file publication; limited isolated verification only, not in-place replacement or full platform acceptance |
-| Shared placement move | STUDIO-020 | in_progress | A typed resource/station move returns a validated copy, with a dry-run CLI and regression tests; writes, diff, history and wider editing remain open |
+| Shared placement move and terrain paint | STUDIO-020 | in_progress | Existing resources/stations can move by stable ID; a new single-tile G/D/S/W terrain paint command validates the entire candidate and supports guarded draft output. Full stacked build, GUI brush, history and broader content edits remain open |
 | Bounded command undo/redo | STUDIO-023 | in_progress | In-memory resource/station move batches have inverse replay and semantic conflict detection; full project verification, persistence and UI remain open |
 | Interactive map-preview/session | STUDIO-022, STUDIO-024 | in_progress | Stacked terminal view shows occupancy and all stable IDs, supports shared history and create-only guarded saves; isolated syntax/mock checks only; full repo and graphical UI unverified |
 

@@ -256,6 +256,15 @@ if(BUILD_TESTING)
         )
         set_tests_properties(StarterWorldMoveCliTests PROPERTIES LABELS "headless;content")
         add_test(
+            NAME StarterWorldPaintCliTests
+            COMMAND ${CMAKE_COMMAND}
+                "-DMOVER=$<TARGET_FILE:EmbervaleWorldMove>"
+                "-DFIXTURE=${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/content/development-starter.snapshot.json"
+                "-DWORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/starter-world-paint-cli-test"
+                -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/StarterWorldPaintCliTests.cmake"
+        )
+        set_tests_properties(StarterWorldPaintCliTests PROPERTIES LABELS "headless;content")
+        add_test(
             NAME StarterWorldInteractiveSessionTests
             COMMAND ${CMAKE_COMMAND}
                 "-DMOVER=$<TARGET_FILE:EmbervaleWorldMove>"

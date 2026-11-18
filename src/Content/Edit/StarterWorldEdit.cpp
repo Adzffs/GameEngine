@@ -3,12 +3,41 @@
 #include "../Import/StarterWorldRuntimeInput.h"
 
 #include <algorithm>
+#include <cstddef>
 #include <stdexcept>
 #include <string>
 #include <utility>
 
 namespace StarterWorldEdit
 {
+    PaintResult PaintTerrain(const StarterWorldExport::Snapshot &source,
+        const Position &tile, char ground)
+    {
+        using namespace StarterWorldExport;
+        // Check the original content first: an edit may not make a broken map
+        // appear valid by incidentally repairing an unrelated defect.
+        Snapshot candidate = StarterWorldImport::ValidateForRuntime(source);
+        const int x = tile.GetX();
+        const int y = tile.GetY();
+        if (x < 0 || y < 0 || x >= candidate.width || y >= candidate.height)
+            throw std::runtime_error("starter world edit: paint tile is outside the starter region");
+        if (ground != 'G' && ground != 'D' && ground != 'S' && ground != 'W')
+            throw std::runtime_error("starter world edit: unsupported terrain glyph (use G, D, S or W)");
+
+        char &existing = candidate.terrainRows[static_cast<std::size_t>(y)]
+            [static_cast<std::size_t>(x)];
+        const char previous = existing;
+        const bool changed = previous != ground;
+        if (changed)
+        {
+            existing = ground;
+            // Revalidates everything, not just the target tile: water may
+            // destroy connectivity to distant actors or their approaches.
+            candidate = StarterWorldImport::ValidateForRuntime(candidate);
+        }
+        return PaintResult{std::move(candidate), tile, previous, ground, changed};
+    }
+
     MoveResult MovePlacement(const StarterWorldExport::Snapshot &source,
         std::string_view placementId, const Position &destination)
     {

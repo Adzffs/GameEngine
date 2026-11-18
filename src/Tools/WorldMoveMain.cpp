@@ -25,6 +25,9 @@ namespace
         output << "Usage:\n"
             "  EmbervaleWorldMove --hash <snapshot.json>\n"
             "  EmbervaleWorldMove <snapshot.json> <placement-id> <x> <y>\n"
+            "  EmbervaleWorldMove --paint <snapshot.json> <x> <y> <G|D|S|W>\n"
+            "  EmbervaleWorldMove --paint <snapshot.json> <x> <y> <G|D|S|W>"
+            " --expected-hash <sha256> --write-draft <new-sibling.json>\n"
             "  EmbervaleWorldMove <snapshot.json> <placement-id> <x> <y>"
             " --expected-hash <sha256> --write-draft <new-sibling.json>\n"
             "  EmbervaleWorldMove --session <snapshot.json>"
@@ -80,6 +83,63 @@ int main(int argc, char **argv)
             const std::string bytes = StarterWorldDraftFile::Read(argv[2]);
             (void)StarterWorldImport::ValidateForRuntime(StarterWorldExport::ParseSnapshot(bytes));
             std::cout << StarterWorldDraftFile::Digest(bytes) << '\n';
+            return 0;
+        }
+        catch (const std::exception &error)
+        {
+            std::cerr << error.what() << '\n';
+            return FailureCode(error.what());
+        }
+    }
+
+    // Bounded single-tile terrain edits share the runtime's map, actor
+    // connectivity, player-spawn and placement validation. Dry-run by
+    // default; publication only through the same guarded sibling writer.
+    if ((argc == 6 || argc == 10) && std::string_view(argv[1]) == "--paint")
+    {
+        const bool writePaint = argc == 10;
+        int x = 0, y = 0;
+        const std::string_view glyph(argv[5]);
+        if (!ParseCoordinate(argv[3], x) || !ParseCoordinate(argv[4], y) ||
+            glyph.size() != 1 ||
+            (writePaint && (std::string_view(argv[6]) != "--expected-hash" ||
+                !StarterWorldDraftFile::ValidDigest(argv[7]) ||
+                std::string_view(argv[8]) != "--write-draft" ||
+                std::string_view(argv[9]).empty())))
+        {
+            Usage(std::cerr);
+            return 2;
+        }
+        try
+        {
+            const std::string bytes = StarterWorldDraftFile::Read(argv[2]);
+            const std::string sourceHash = StarterWorldDraftFile::Digest(bytes);
+            if (writePaint && sourceHash != argv[7])
+            {
+                std::cerr << "CONTENT_CONFLICT: source SHA-256 differs from expected-hash\n";
+                return 4;
+            }
+            const auto source = StarterWorldImport::ValidateForRuntime(
+                StarterWorldExport::ParseSnapshot(bytes));
+            const auto result = StarterWorldEdit::PaintTerrain(
+                source, Position{x, y}, glyph[0]);
+            if (writePaint)
+            {
+                const std::string content =
+                    StarterWorldExport::SerializeCanonical(result.candidate);
+                StarterWorldDraftFile::PublishNew(argv[2], argv[7], content, argv[9]);
+                std::cout << "Saved new draft: " << argv[9] << "\n"
+                    << "source-sha256: " << sourceHash << "\n"
+                    << "draft-sha256: " << StarterWorldDraftFile::Digest(content) << '\n';
+            }
+            else
+            {
+                std::cout << (result.changed ? "Valid paint: " : "Valid unchanged terrain: ")
+                    << "(" << x << ", " << y << ") "
+                    << result.previousTerrain << " -> " << result.newTerrain
+                    << "; dry run, no files written.\n"
+                    << "source-sha256: " << sourceHash << '\n';
+            }
             return 0;
         }
         catch (const std::exception &error)

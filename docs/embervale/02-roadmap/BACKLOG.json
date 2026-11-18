@@ -352,9 +352,11 @@
         "src/Tools/WorldMoveMain.cpp",
         "tests/StarterWorldEditTests.cpp",
         "tests/StarterWorldMoveCliTests.cmake",
+        "tests/StarterWorldPaintCliTests.cmake",
+        "docs/embervale/06-development/STUDIO_TERRAIN_PAINT_EXPERIMENT_2026-11-18.md",
         "docs/embervale/06-development/STUDIO_MOVE_PREVIEW_2026-11-18.md"
       ],
-      "notes": "Pure move of an existing resource or station by stable ID produces a runtime-valid candidate and rejects bad source/destination; CLI is dry-run only. Tests registered; executable build and full integration verification pending. No save, hash, undo or actor-spawn editing yet."
+      "notes": "Pure stable-ID resource/station moves and one-tile G/D/S/W ground paints return runtime-validated copies. The terrain-paint CLI supports a read-only dry run or guarded create-only sibling draft with exact input hash. Undo/redo for painting, GUI brush, wider content authoring and full stacked build/runtime verification remain open."
     },
     {
       "id": "STUDIO-021",

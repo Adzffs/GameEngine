@@ -73,6 +73,53 @@ int main()
     test.ExpectEqual(SerializeCanonical(baseline), original,
         "station move leaves original untouched");
 
+    // A terrain paint is a pure candidate edit, never an occupancy mutation.
+    // (30,30) is grass in the captured starter world and has no placement.
+    const auto painted = StarterWorldEdit::PaintTerrain(baseline, Position{30, 30}, 'D');
+    test.Expect(painted.changed, "painting new ground reports a change");
+    test.ExpectEqual(painted.previousTerrain, 'G', "paint reports previous ground");
+    test.ExpectEqual(painted.newTerrain, 'D', "paint reports requested ground");
+    test.ExpectEqual(painted.candidate.terrainRows[30][30], 'D',
+        "paint changes only candidate base terrain");
+    test.ExpectEqual(SerializeCanonical(StarterWorldImport::ValidateForRuntime(painted.candidate)),
+        SerializeCanonical(painted.candidate), "painted terrain remains runtime-valid");
+    test.ExpectEqual(SerializeCanonical(ParseSnapshot(SerializeCanonical(painted.candidate))),
+        SerializeCanonical(painted.candidate), "painted terrain round-trips");
+    test.ExpectEqual(SerializeCanonical(baseline), original,
+        "painting never mutates source");
+    const auto restoredTerrain = StarterWorldEdit::PaintTerrain(
+        painted.candidate, Position{30, 30}, 'G');
+    test.ExpectEqual(SerializeCanonical(restoredTerrain.candidate), original,
+        "inverse paint restores full canonical world");
+    const auto unchangedTerrain = StarterWorldEdit::PaintTerrain(
+        baseline, Position{30, 30}, 'G');
+    test.Expect(!unchangedTerrain.changed, "painting existing ground is a no-op");
+
+    const auto stone = StarterWorldEdit::PaintTerrain(baseline, Position{30, 30}, 'S');
+    test.ExpectEqual(stone.candidate.terrainRows[30][30], 'S',
+        "stone terrain is a supported walkable paint");
+
+    const auto RejectPaint = [&](const Snapshot &source, Position tile,
+        char ground, const std::string &message) {
+        bool rejected = false;
+        try { (void)StarterWorldEdit::PaintTerrain(source, tile, ground); }
+        catch (const std::runtime_error &) { rejected = true; }
+        test.Expect(rejected, message);
+    };
+    RejectPaint(baseline, Position{-1, 30}, 'D', "negative paint x rejected");
+    RejectPaint(baseline, Position{100, 30}, 'D', "out-of-bounds paint x rejected");
+    RejectPaint(baseline, Position{30, 30}, 'X', "unsupported terrain symbol rejected");
+    RejectPaint(baseline, Get(baseline, TreeId).position, 'W',
+        "water cannot consume an existing tree");
+    RejectPaint(baseline, baseline.playerSpawn, 'W',
+        "water cannot consume the player spawn");
+    Snapshot broken = baseline;
+    broken.terrainRows[0][0] = 'W';
+    RejectPaint(broken, Position{30, 30}, 'D',
+        "painting cannot silently repair an invalid source");
+    test.ExpectEqual(SerializeCanonical(baseline), original,
+        "failed paints cannot mutate caller's world");
+
     Reject(test, baseline, "", Position{30, 30}, "empty ID is rejected");
     Reject(test, baseline, "resource.normal_tree.missing", Position{30, 30},
         "unknown durable ID is rejected");
