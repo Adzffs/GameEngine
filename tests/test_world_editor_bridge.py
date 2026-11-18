@@ -263,6 +263,19 @@ class BridgeTests(unittest.TestCase):
         self.assertEqual(self.bridge.terrain, self.world['terrain']['rows'])
         self.assertEqual(self.bridge.placements['npc.guide.001'][1:], (2, 2))
 
+    def test_edit_rejects_backend_kind_drift(self):
+        original = "print(f'{kind_char[kind]}  {name}  ({x}, {y})')"
+        altered = (
+            """print(f'{"S" if history and kind == "resource" else kind_char[kind]}  """
+            """{name}  ({x}, {y})')"""
+        )
+        self.assertIn(original, FAKE_TOOL)
+        self.tool.write_text(FAKE_TOOL.replace(original, altered), encoding='utf-8')
+        with self.assertRaisesRegex(StudioError, 'placement kind'):
+            self.bridge.paint(1, 0, 'D')
+        self.assertEqual(self.bridge.commands, [])
+        self.assertEqual(self.bridge.placements['resource.tree.001'][0], 'R')
+
     def test_edit_rejects_out_of_bounds_backend_position(self):
         original = "print(f'{kind_char[kind]}  {name}  ({x}, {y})')"
         altered = (
