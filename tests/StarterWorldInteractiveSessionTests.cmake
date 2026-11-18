@@ -53,3 +53,19 @@ file(SHA256 "${SAVED}" STILL_SAVED_HASH)
 if(NOT VERIFIED_HASH STREQUAL STILL_SAVED_HASH)
     message(FATAL_ERROR "existing draft changed after a rejected publication")
 endif()
+
+# An editor pinned to a specific source revision must reject a newer source
+# before accepting any move or save command, without leaving an output draft.
+set(STALE_DRAFT "${WORK_DIR}/stale-revision-draft.json")
+file(REMOVE "${STALE_DRAFT}")
+file(APPEND "${SOURCE}" "\n")
+file(WRITE "${SCRIPT}" "move resource.normal_tree.001 30 30\nsave ${STALE_DRAFT}\nquit\n")
+execute_process(COMMAND "${MOVER}" --session "${SOURCE}" --expected-hash "${ORIGINAL_HASH}"
+    INPUT_FILE "${SCRIPT}" RESULT_VARIABLE STALE_RESULT
+    OUTPUT_VARIABLE STALE_OUTPUT ERROR_VARIABLE STALE_ERRORS)
+if(NOT STALE_RESULT EQUAL 4 OR NOT STALE_ERRORS MATCHES "CONTENT_CONFLICT")
+    message(FATAL_ERROR "stale source revision not rejected before commands: ${STALE_RESULT} ${STALE_OUTPUT} ${STALE_ERRORS}")
+endif()
+if(EXISTS "${STALE_DRAFT}")
+    message(FATAL_ERROR "stale source unexpectedly published a draft")
+endif()
