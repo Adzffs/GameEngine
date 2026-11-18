@@ -345,6 +345,47 @@ class BridgeTests(unittest.TestCase):
         self.assertEqual(self.bridge.commands, [])
         self.assertEqual(self.bridge.placements['resource.tree.001'][1:], (1, 1))
 
+    def test_undo_rejects_wrong_earlier_world_revision(self):
+        self.bridge.move('resource.tree.001', 3, 1)
+        saved_commands = list(self.bridge.commands)
+        original = "placements[target] = (placements[target][0], *old)"
+        self.assertIn(original, FAKE_TOOL)
+        self.tool.write_text(
+            FAKE_TOOL.replace(original, "placements[target] = (placements[target][0], 0, 2)"),
+            encoding='utf-8')
+        # Counts and identities remain legal; only exact observed-state parity catches this.
+        with self.assertRaisesRegex(StudioError, 'verified history checkpoint'):
+            self.bridge.undo()
+        self.assertEqual(self.bridge.commands, saved_commands)
+        self.assertEqual(self.bridge.placements['resource.tree.001'][1:], (3, 1))
+        self.assertEqual(len(self.bridge._checkpoints), 2)
+
+    def test_redo_rejects_wrong_later_world_revision(self):
+        self.bridge.move('resource.tree.001', 3, 1)
+        self.bridge.undo()
+        saved_commands = list(self.bridge.commands)
+        original = "placements[target] = (placements[target][0], *new)"
+        self.assertIn(original, FAKE_TOOL)
+        self.tool.write_text(
+            FAKE_TOOL.replace(original, "placements[target] = (placements[target][0], 0, 2)"),
+            encoding='utf-8')
+        with self.assertRaisesRegex(StudioError, 'verified history checkpoint'):
+            self.bridge.redo()
+        self.assertEqual(self.bridge.commands, saved_commands)
+        self.assertEqual(self.bridge.placements['resource.tree.001'][1:], (1, 1))
+        self.assertEqual(len(self.bridge._checkpoints), 2)
+
+    def test_new_paint_after_undo_replaces_observed_redo_branch(self):
+        self.bridge.move('resource.tree.001', 3, 1)
+        self.bridge.undo()
+        self.bridge.paint(1, 0, 'D')
+        self.assertEqual(len(self.bridge._checkpoints), 2)
+        self.assertEqual(self.bridge._checkpoints[1][1], ('GDGG', 'GGWG', 'GGGG'))
+        self.assertEqual(self.bridge.placements['resource.tree.001'][1:], (1, 1))
+        with self.assertRaisesRegex(StudioError, 'no redo available'):
+            self.bridge.redo()
+
+
 class ViewportMathTests(unittest.TestCase):
     def test_boundary_grid_after_zoom(self):
         self.assertEqual(tile_at(0, 0, 22, 100, 100), (0, 0))
