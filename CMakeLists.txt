@@ -115,6 +115,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/Content/Import/StarterWorldRuntimeInput.cpp
     src/Content/Edit/StarterWorldEdit.cpp
     src/Content/Edit/StarterWorldDraftFile.cpp
+    src/Content/Edit/StarterWorldHistory.cpp
     src/Reward/RewardTable.cpp
     src/Reward/RewardTableRoller.cpp
     src/Reward/DevelopmentRewardTables.cpp
@@ -213,6 +214,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(StarterWorldRuntimeInputTests tests/StarterWorldRuntimeInputTests.cpp)
     add_gameengine_headless_test(StarterWorldEditTests tests/StarterWorldEditTests.cpp)
     add_gameengine_headless_test(StarterWorldDraftFileTests tests/StarterWorldDraftFileTests.cpp)
+    add_gameengine_headless_test(StarterWorldHistoryTests tests/StarterWorldHistoryTests.cpp)
     add_gameengine_headless_test(StarterWorldRuntimeTests tests/StarterWorldRuntimeTests.cpp)
     if(GAMEENGINE_BUILD_CONTENT_TOOLS)
         add_gameengine_headless_test(StarterWorldSnapshotTests tests/StarterWorldSnapshotTests.cpp)
