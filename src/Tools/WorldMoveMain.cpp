@@ -27,7 +27,7 @@ namespace
             "  EmbervaleWorldMove <snapshot.json> <placement-id> <x> <y>\n"
             "  EmbervaleWorldMove <snapshot.json> <placement-id> <x> <y>"
             " --expected-hash <sha256> --write-draft <new-sibling.json>\n"
-            "  EmbervaleWorldMove --session <snapshot.json>\\n"
+            "  EmbervaleWorldMove --session <snapshot.json>\n"
             "The default is a dry run. Draft writes require a fresh sibling"
             " filename and the exact input-file SHA-256. Source and player saves"
             " are never overwritten.\n";
@@ -60,7 +60,7 @@ int main(int argc, char **argv)
         }
         catch (const std::exception &error)
         {
-            std::cerr << error.what() << '\\n';
+            std::cerr << error.what() << '\n';
             return FailureCode(error.what());
         }
     }
