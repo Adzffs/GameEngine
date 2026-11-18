@@ -125,10 +125,14 @@ namespace
 namespace EmbervaleStudioSession
 {
     int Run(const std::filesystem::path &sourcePath,
-        std::istream &input, std::ostream &output, std::ostream &errors)
+        std::istream &input, std::ostream &output, std::ostream &errors,
+        std::string_view requiredHash)
     {
         const std::string bytes = StarterWorldDraftFile::Read(sourcePath);
         const std::string expectedHash = StarterWorldDraftFile::Digest(bytes);
+        if (!requiredHash.empty() && expectedHash != requiredHash)
+            throw std::runtime_error(
+                "CONTENT_CONFLICT: source SHA-256 differs from expected-hash");
         auto current = StarterWorldImport::ValidateForRuntime(
             StarterWorldExport::ParseSnapshot(bytes));
         const std::string baselineCanonical =
@@ -221,10 +225,10 @@ namespace EmbervaleStudioSession
                 else if (command == "save")
                 {
                     std::string destination;
-                    if (!(args >> destination))
+                    if (!std::getline(args >> std::ws, destination) ||
+                        destination.empty())
                         throw std::runtime_error(
                             "usage: save <fresh-sibling.json>");
-                    RequireEnd(args);
                     // Revalidate against actual runtime rules before any file
                     // publication. PublishNew rereads exact input under its
                     // cooperative lock and refuses stale or occupied targets.
