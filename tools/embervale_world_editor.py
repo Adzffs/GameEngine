@@ -8,6 +8,7 @@ bounded user commands; it never serializes gameplay content to disk.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import subprocess
@@ -42,7 +43,9 @@ class StudioBridge:
         if self.source.stat().st_size > 2 * 1024 * 1024:
             raise StudioError("Snapshot exceeds the 2 MiB editor input limit")
         try:
-            self.snapshot = json.loads(self.source.read_text(encoding="utf-8"))
+            source_bytes = self.source.read_bytes()
+            display_hash = hashlib.sha256(source_bytes).hexdigest()
+            self.snapshot = json.loads(source_bytes.decode("utf-8"))
             terrain = self.snapshot["terrain"]["rows"]
             width, height = (self.snapshot["size"][k] for k in ("width", "height"))
             if not isinstance(width, int) or not isinstance(height, int) or not (0 < width <= 256 and 0 < height <= 256):
@@ -60,6 +63,8 @@ class StudioBridge:
         self.placements: dict[str, tuple[str, int, int]] = {}
         self.status = ""
         self._accept(self._invoke([]))
+        if self.hash != display_hash:
+            raise StudioError("CONTENT_CONFLICT: source changed while opening; reopen the editor")
         if set(self.definitions) != set(self.placements):
             raise StudioError("The authoritative placement list differs from the snapshot")
 
