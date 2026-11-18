@@ -356,7 +356,7 @@
         "docs/embervale/06-development/STUDIO_TERRAIN_PAINT_EXPERIMENT_2026-11-18.md",
         "docs/embervale/06-development/STUDIO_MOVE_PREVIEW_2026-11-18.md"
       ],
-      "notes": "Pure stable-ID resource/station moves and one-tile G/D/S/W ground paints return runtime-validated copies. The terrain-paint CLI supports a read-only dry run or guarded create-only sibling draft with exact input hash. Undo/redo for painting, GUI brush, wider content authoring and full stacked build/runtime verification remain open."
+      "notes": "The stacked edit operations now include pure runtime-validated stable-ID resource/station moves and one-tile G/D/S/W ground painting; the terminal history supports undo and redo across both kinds, and the Tk bridge can issue mouse paint. The C++ validation authority is shared. Broader placement creation/removal, structured diagnostics, full project compilation and real editor/game verification remain open."
     },
     {
       "id": "STUDIO-021",
@@ -400,7 +400,7 @@
         "docs/embervale/04-studio/STARTER_WORLD_IMPORT.md",
         "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
       ],
-      "notes": "EmbervaleWorldExport and EmbervaleWorldValidate run headlessly; the client has explicit --world/--save selection. Shared edits, guarded writes and structured machine diagnostics remain planned."
+      "notes": "Headless export, snapshot validation, dry-run moves and terrain paint, guarded draft publication and an interactive terminal map/list/move/paint/undo/redo/save session are staged. Structured machine diagnostics, full project compilation and real command execution have not been verified on the stacked editor branch."
     },
     {
       "id": "STUDIO-023",
@@ -420,7 +420,7 @@
         "docs/embervale/04-studio/BOUNDED_UNDO_REDO.md",
         "docs/embervale/06-development/STUDIO_HISTORY_VERIFICATION_2026-11-18.md"
       ],
-      "notes": "Bounded in-memory undo/redo for runtime-validated, stable-ID resource/station move batches. Full semantic revision comparison rejects incompatible external edits; all-or-nothing batches and cursor/redo rules are covered by limited local mocked checks. Not yet a persistent history journal, full editing or UI. Full repository build and gameplay tests remain unverified."
+      "notes": "C++ history stages bounded stable-ID move batches and one-tile terrain paint with a shared cursor, semantic conflict check and reversible undo/redo. Both text and Tk editing sessions use the shared engine history. Unit/regression sources are committed, but a complete C++ build, real runtime tests and persisted history acceptance remain open."
     },
     {
       "id": "STUDIO-024",
@@ -503,9 +503,10 @@
         "tools/embervale_world_editor.py",
         "tests/test_world_editor_bridge.py",
         "docs/embervale/04-studio/VISUAL_WORLD_EDITOR.md",
-        "docs/embervale/06-development/STUDIO_VIEWPORT_NAVIGATION_VERIFICATION_2026-11-18.md"
+        "docs/embervale/06-development/STUDIO_VIEWPORT_NAVIGATION_VERIFICATION_2026-11-18.md",
+        "docs/embervale/06-development/STUDIO_AUTHORITATIVE_TERRAIN_VIEW_2026-11-18.md"
       ],
-      "notes": "First mouse-driven Python/Tk shell is stacked after the terminal editor: scrollable starter grid, selectable stable IDs, C++ validated moves/undo/redo and create-only guarded draft save. Six local mock-backend tests and an xvfb startup smoke passed; full repository and real runtime integration remain unverified. Map navigation now includes bounded zoom, fit-to-view, cursor tile coordinates and world-coordinate selection, with three isolated viewport math checks. No terrain painting or full graphical playtest yet."
+      "notes": "First mouse-driven Python/Tk editor now stages zoom, selection, stable-ID resource/station moves, G/D/S/W painting, shared C++ undo/redo and guarded create-only draft saving. C++ returns authoritative terrain rows; the bridge checks initial stable-ID placement kind/coordinate parity with the source and rejects invalid post-edit kinds, bounds or actor-spawn movement before changing the view. Mock bridge regressions were added; 9 isolated parity checks and 4 fake-line execution checks passed, but the full checked-in Python suite and C++/Tk/game integration remain unexecuted because this host cannot check out the repository."
     },
     {
       "id": "STUDIO-032",
