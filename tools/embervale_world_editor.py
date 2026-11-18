@@ -82,7 +82,9 @@ class StudioBridge:
                 raise ValueError("invalid dimensions")
             if len(terrain) != height or any(not isinstance(row, str) or len(row) != width for row in terrain):
                 raise ValueError("invalid terrain shape")
-            self.terrain = terrain
+            self.terrain = list(terrain)
+        self._terrain_states = [list(terrain)]
+        self._terrain_cursor = 0
             self.width, self.height = width, height
             self.spawn = (self.snapshot["player_spawn"]["x"], self.snapshot["player_spawn"]["y"])
             self.definitions = {p["id"]: p["definition_id"] for p in self.snapshot["placements"]}
@@ -144,6 +146,22 @@ class StudioBridge:
         result = self._invoke([*self.commands, command])
         if set(result[1]) != set(self.definitions):
             raise StudioError("Editing changed the authoritative placement identities")
+        old_undo = int(self.status.split("/")[1])
+        new_undo = int(result[2].split("/")[1])
+        if command == "undo" and new_undo < old_undo:
+            self._terrain_cursor -= 1
+        elif command == "redo" and new_undo > old_undo:
+            self._terrain_cursor += 1
+        elif new_undo > old_undo:
+            rows = list(self._terrain_states[self._terrain_cursor])
+            if command.startswith("paint "):
+                _, sx, sy, glyph = command.split()
+                x, y = int(sx), int(sy)
+                rows[y] = rows[y][:x] + glyph + rows[y][x + 1:]
+            self._terrain_states = self._terrain_states[:self._terrain_cursor + 1]
+            self._terrain_states.append(rows)
+            self._terrain_cursor += 1
+        self.terrain = list(self._terrain_states[self._terrain_cursor])
         self.commands.append(command)
         self._accept(result)
 
@@ -157,6 +175,14 @@ class StudioBridge:
             raise StudioError("Destination is outside the starter world")
         if (x, y) != (entry[1], entry[2]):
             self.perform(f"move {placement_id} {x} {y}")
+
+    def paint(self, x: int, y: int, glyph: str) -> None:
+        if glyph not in ("G", "D", "S", "W"):
+            raise StudioError("Invalid terrain brush")
+        if not (0 <= x < self.width and 0 <= y < self.height):
+            raise StudioError("Paint tile is outside the map")
+        if self.terrain[y][x] != glyph:
+            self.perform(f"paint {x} {y} {glyph}")
 
     def undo(self) -> None:
         self.perform("undo")
@@ -185,6 +211,7 @@ def launch(bridge: StudioBridge) -> None:
     root.geometry("1120x760")
     tile = 22
     selected: str | None = None
+    brush = tk.StringVar(value="Select / move")
     saved: str | None = None
     caption = tk.StringVar()
     cursor_label = tk.StringVar(value="Tile: —")
@@ -300,6 +327,14 @@ def launch(bridge: StudioBridge) -> None:
         if position is None:
             return
         x, y = position
+        if brush.get() != "Select / move":
+            try:
+                bridge.paint(x, y, {"Grass": "G", "Dirt": "D",
+                                    "Stone": "S", "Water": "W"}[brush.get()])
+                display()
+            except StudioError as error:
+                messagebox.showerror("Paint rejected", str(error), parent=root)
+            return
         occupant = next((name for name, (_, px, py) in bridge.placements.items()
                          if (x, y) == (px, py)), None)
         if occupant:
@@ -340,6 +375,9 @@ def launch(bridge: StudioBridge) -> None:
         except StudioError as error:
             messagebox.showerror("Save rejected", str(error), parent=root)
 
+    ttk.Label(toolbar, text="Tool:").pack(side="left", padx=(4, 2))
+    ttk.Combobox(toolbar, textvariable=brush, state="readonly", width=15,
+                 values=("Select / move", "Grass", "Dirt", "Stone", "Water")).pack(side="left", padx=(0, 8))
     ttk.Button(toolbar, text="−", command=lambda: zoom_to(tile - 2)).pack(side="left", padx=2)
     ttk.Button(toolbar, text="+", command=lambda: zoom_to(tile + 2)).pack(side="left", padx=2)
     ttk.Button(toolbar, text="Fit", command=fit_view).pack(side="left", padx=(2, 8))
