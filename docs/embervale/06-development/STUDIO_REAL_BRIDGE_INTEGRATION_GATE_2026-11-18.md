@@ -106,3 +106,32 @@ Windows, or a gameplay playtest. Local `curl` to both github.com and
 api.github.com failed with DNS resolution errors; direct HTTPS IP connections
 were also unavailable. The repository was inspected and edited through its
 connected GitHub repository interface. Keep PR #18 draft and stacked.
+
+## Follow-up: verify actual draft bytes after publication (18 November 2026)
+
+A review found that `StudioBridge.save` accepted any `Saved new draft:`
+substring, without confirming the requested path or comparing the C++
+`draft-sha256` receipt to the on-disk artifact. The C++ writer is already
+guarded, but the UI could still report success for an unexpected/missing or
+mismatched file when the tool response was wrong or the file was changed
+immediately after publication.
+
+- The bridge now requires one exact requested-path acknowledgement and one
+  valid SHA-256 receipt; it rejects missing/nonregular/symlink/oversized
+  outputs and reads back the saved bytes before reporting success.
+- The fake executable test writer now emits a valid authored JSON draft with
+  placements/terrain and the corresponding content digest (rather than
+  placeholder text).
+- Three committed fake-backend tests cover mismatched digests, wrong paths
+  and missing files. Failures leave the displayed world and command history
+  unchanged; questionable files are intentionally **not** removed.
+- Locally executed **8/8** Python 3.13.5 standalone unit checks against the
+  exact new receipt helper body: valid draft, wrong path/hash, missing file,
+  duplicate/malformed receipt, symlink and oversized file. This is an
+  **isolated helper execution**, not the complete committed bridge tests.
+
+**Remaining verification:** Full committed Python bridge tests, complete
+GameEngine build, real executable-backed integration, GUI click-through,
+Windows validation and saved-world gameplay were not run because the local
+compiler environment cannot resolve GitHub to clone the repository. The PR
+must remain draft and stacked until complete tests can run.

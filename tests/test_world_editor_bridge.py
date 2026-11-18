@@ -93,8 +93,17 @@ for line in sys.stdin:
         if target.exists():
             print('Error: output already exists', file=sys.stderr)
         else:
-            target.write_text('mock output', encoding='utf-8')
+            authored = dict(world)
+            authored['placements'] = [
+                {**p, 'position': {'x': placements[p['id']][1],
+                                    'y': placements[p['id']][2]}}
+                for p in world['placements']
+            ]
+            authored['terrain'] = {'rows': terrain}
+            content = json.dumps(authored, sort_keys=True).encode('utf-8')
+            target.write_bytes(content)
             print('Saved new draft:', target)
+            print('draft-sha256:', hashlib.sha256(content).hexdigest())
     elif op == 'list':
         print('Existing placements (only R and S can be moved):')
         for name, (kind, x, y) in sorted(placements.items()):
@@ -176,6 +185,40 @@ class BridgeTests(unittest.TestCase):
         with self.assertRaisesRegex(StudioError, 'already exists'):
             self.bridge.save(draft)
         self.assertEqual(json.loads(self.source.read_text()), self.world)
+
+
+    def test_save_rejects_wrong_backend_hash_without_accepting_draft(self):
+        original = "print('draft-sha256:', hashlib.sha256(content).hexdigest())"
+        self.assertIn(original, FAKE_TOOL)
+        self.tool.write_text(FAKE_TOOL.replace(
+            original, "print('draft-sha256:', '0' * 64)"), encoding='utf-8')
+        draft = self.source.with_name('bad receipt.json')
+        with self.assertRaisesRegex(StudioError, 'SHA-256 differs'):
+            self.bridge.save(draft)
+        self.assertTrue(draft.exists())  # Do not delete/rewrite an uncertain file.
+        self.assertEqual(self.bridge.commands, [])
+
+    def test_save_rejects_wrong_backend_destination(self):
+        original = "print('Saved new draft:', target)"
+        self.assertIn(original, FAKE_TOOL)
+        self.tool.write_text(FAKE_TOOL.replace(
+            original, "print('Saved new draft:', target.with_name('unexpected.json'))"),
+            encoding='utf-8')
+        draft = self.source.with_name('requested.json')
+        with self.assertRaisesRegex(StudioError, 'did not confirm the requested'):
+            self.bridge.save(draft)
+        self.assertTrue(draft.exists())
+        self.assertEqual(self.bridge.commands, [])
+
+    def test_save_rejects_missing_backend_file(self):
+        original = "target.write_bytes(content)"
+        self.assertIn(original, FAKE_TOOL)
+        self.tool.write_text(FAKE_TOOL.replace(original, "pass"), encoding='utf-8')
+        draft = self.source.with_name('not written.json')
+        with self.assertRaisesRegex(StudioError, 'regular draft file'):
+            self.bridge.save(draft)
+        self.assertFalse(draft.exists())
+        self.assertEqual(self.bridge.commands, [])
 
     def test_protects_invalid_action_and_history_limit(self):
         with self.assertRaisesRegex(StudioError, 'Invalid placement ID'):

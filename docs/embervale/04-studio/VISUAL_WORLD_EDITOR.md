@@ -99,3 +99,20 @@ before the visual editor commits the new view or command. This is a protocol
 consistency check on top of C++ runtime validation, not a Python validator.
 Four new mocked backend regressions are checked in, with an isolated extracted
 checker test passed; full integrated Python/C++/GUI verification is still open.
+
+## Protected draft receipt verification — 18 November 2026
+
+After the C++ editing session reports a successful create-only sibling save, the
+Python bridge now requires exactly one acknowledgement for the **requested**
+absolute target path and exactly one valid `draft-sha256` receipt. It checks
+that the target is a regular file, is not a symlink, remains within the 2 MiB
+editor input limit, and that its actual bytes match the C++ SHA-256 receipt.
+A missing, malformed, unexpected or mismatched saved artifact is reported as
+a failed save, not displayed as success. The bridge does **not** delete or
+rewrite a suspect draft; inspect that file before retrying with a fresh name.
+
+Mock-backed regressions cover mismatched hashes, wrong acknowledgement paths,
+and files the backend claims to save but does not create. No player or live
+world persistence path is changed. The complete checked-in Python tests,
+real C++ executable integration and desktop GUI validation still need to run
+before merging this stacked feature.

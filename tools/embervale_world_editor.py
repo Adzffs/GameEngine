@@ -112,6 +112,25 @@ def verify_editor_checkpoint(action: str, checkpoints: list[tuple[dict, tuple[st
     return [*checkpoints[:cursor], state]
 
 
+
+def verify_saved_draft_receipt(transcript: str, destination: Path) -> None:
+    """Accept only the requested new draft when the saved bytes match C++."""
+    target = str(destination)
+    acknowledgements = re.findall(r"^Saved new draft: (.+)$", transcript, re.MULTILINE)
+    digests = re.findall(r"^draft-sha256: ([0-9a-f]{64})$", transcript, re.MULTILINE)
+    if acknowledgements != [target] or len(digests) != 1:
+        raise StudioError("Editor did not confirm the requested saved draft and hash")
+    try:
+        if destination.is_symlink() or not destination.is_file():
+            raise StudioError("Editor did not publish a regular draft file")
+        if destination.stat().st_size > 2 * 1024 * 1024:
+            raise StudioError("Saved draft exceeds the 2 MiB input limit")
+        saved_bytes = destination.read_bytes()
+    except OSError as error:
+        raise StudioError(f"Cannot verify saved draft: {error}") from error
+    if hashlib.sha256(saved_bytes).hexdigest() != digests[0]:
+        raise StudioError("Saved draft SHA-256 differs from the authoritative receipt")
+
 class StudioBridge:
     """Revision-bound replay bridge to the *real* C++ editing session.
 
@@ -276,8 +295,7 @@ class StudioBridge:
             raise StudioError("Invalid draft filename")
         # The C++ writer validates source SHA and publishes only a new sibling.
         result = self._invoke([*self.commands, "save " + target])
-        if "Saved new draft: " not in result[4]:
-            raise StudioError("Editor did not confirm publication")
+        verify_saved_draft_receipt(result[4], Path(target))
         return target
 
 
