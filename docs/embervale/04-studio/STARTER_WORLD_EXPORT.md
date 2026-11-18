@@ -95,3 +95,11 @@ See the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18
 The next bounded task is the input contract: choose a bounded parser, validate a candidate without unsafe map access, and connect one canonical definition provider to the runtime adapter. Loading the unchanged baseline must preserve terrain, occupancy, lifecycle and saved-location behaviour. After that, add one shared move operation, guarded persistence, preview and undo.
 
 The [broader CLI contract](CLI_AND_AI_CONTRACT.md) and [content model](../03-engine/CONTENT_MODEL.md) remain proposals for those capabilities. This exporter does not complete their parser, import, validation, publication, migration or editor requirements. [ADR-016](../07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md) records why this first step is deliberately bounded.
+
+## Experimental bounded input parser (review branch)
+
+`StarterWorldSnapshotInput.h` now provides `ParseSnapshot(std::string_view)`, an **in-memory, non-mutating** parser for the current snapshot schema. It is deliberately not a runtime importer or a general map editor. The parser accepts the current compiled identity registry and lifecycle ordering, including coordinate edits, but rejects unknown/missing placements, modified spawn settings, unsupported surfaces/exits, extra fields, duplicate keys, malformed JSON and unsupported schema revisions.
+
+Limits: 2 MiB input, 12 JSON nesting levels, 16,384 array elements, 32 keys per object, ASCII strings, 1–1024 dimensions and at most 4096 placements. The existing canonical writer performs additional structural validation after parsing. JSON Unicode escapes and non-ASCII strings are not supported by this first bounded parser.
+
+`StarterWorldSnapshotInputTests` exercises canonical round-trip, coordinate edits and representative rejection cases. **Build/test execution for this review branch has not yet been independently verified**; do not treat it as ready for runtime loading. Next work: verify compiler/test results, add property/negative cases, integrate authoritative placement and route validators, and only then design transactional loading and save-position migration.
