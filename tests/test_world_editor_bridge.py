@@ -29,6 +29,7 @@ placements = {p['id']: (p['kind'], p['position']['x'], p['position']['y']) for p
 kind_char = {'resource': 'R', 'station': 'S', 'npc_spawn': 'N', 'monster_spawn': 'M'}
 history = []
 redone = []
+terrain = world['terrain']['rows']
 print('Embervale Studio — starter-world editing session')
 print('Source SHA-256:', digest)
 for line in sys.stdin:
@@ -40,24 +41,53 @@ for line in sys.stdin:
             print('Error: walkable ground required', file=sys.stderr)
             continue
         kind, x, y = placements[name]
-        history.append((name, (x, y), (int(sx), int(sy))))
+        if (int(sx), int(sy)) == (x, y):
+            print('Unchanged', name)
+            continue
+        history.append(('move', name, (x, y), (int(sx), int(sy))))
         redone.clear()
         placements[name] = (kind, int(sx), int(sy))
         print('Moved', name)
+    elif op == 'paint':
+        _, sx, sy, glyph = parts
+        x, y = int(sx), int(sy)
+        if (not (0 <= y < len(terrain) and 0 <= x < len(terrain[y]))
+                or glyph not in 'GDSW' or (x, y) == (0, 0)
+                or any((x, y) == (px, py) for _, px, py in placements.values())):
+            print('Error: paint rejected: occupied or invalid tile', file=sys.stderr)
+            continue
+        previous = terrain[y][x]
+        if previous == glyph:
+            print('Unchanged terrain at', (x, y))
+            continue
+        history.append(('paint', (x, y), previous, glyph))
+        redone.clear()
+        terrain[y] = terrain[y][:x] + glyph + terrain[y][x + 1:]
+        print('Painted', (x, y), glyph)
     elif op == 'undo':
         if not history:
             print('Error: no undo available', file=sys.stderr)
             continue
-        name, old, new = history.pop()
-        redone.append((name, old, new))
-        placements[name] = (placements[name][0], *old)
+        change = history.pop()
+        redone.append(change)
+        kind, target, old, new = change
+        if kind == 'move':
+            placements[target] = (placements[target][0], *old)
+        else:
+            x, y = target
+            terrain[y] = terrain[y][:x] + old + terrain[y][x + 1:]
     elif op == 'redo':
         if not redone:
             print('Error: no redo available', file=sys.stderr)
             continue
-        name, old, new = redone.pop()
-        history.append((name, old, new))
-        placements[name] = (placements[name][0], *new)
+        change = redone.pop()
+        history.append(change)
+        kind, target, old, new = change
+        if kind == 'move':
+            placements[target] = (placements[target][0], *new)
+        else:
+            x, y = target
+            terrain[y] = terrain[y][:x] + new + terrain[y][x + 1:]
     elif op == 'save':
         target = pathlib.Path(line.rstrip('\n')[5:])
         if target.exists():
@@ -148,6 +178,52 @@ class BridgeTests(unittest.TestCase):
         self.bridge.commands = ['status'] * 256
         with self.assertRaisesRegex(StudioError, '256-command'):
             self.bridge.undo()
+
+    def test_paint_updates_display_only_after_authoritative_history(self):
+        self.bridge.paint(1, 0, 'D')
+        self.assertEqual(self.bridge.terrain[0], 'GDGG')
+        self.assertEqual(self.bridge.status.split('/')[1:], ['1', '0'])
+        # Repainting an identical tile is not an edit and must not add a command.
+        self.bridge.paint(1, 0, 'D')
+        self.assertEqual(len(self.bridge.commands), 1)
+        self.bridge.undo()
+        self.assertEqual(self.bridge.terrain[0], 'GGGG')
+        self.bridge.redo()
+        self.assertEqual(self.bridge.terrain[0], 'GDGG')
+        self.assertEqual(json.loads(self.source.read_text()), self.world)
+
+    def test_move_and_paint_share_undo_redo_and_branch_correctly(self):
+        self.bridge.move('resource.tree.001', 3, 1)
+        self.bridge.paint(1, 0, 'D')
+        self.bridge.undo()
+        self.assertEqual(self.bridge.terrain[0], 'GGGG')
+        self.assertEqual(self.bridge.placements['resource.tree.001'][1:], (3, 1))
+        self.bridge.undo()
+        self.assertEqual(self.bridge.placements['resource.tree.001'][1:], (1, 1))
+        self.bridge.redo()
+        self.assertEqual(self.bridge.placements['resource.tree.001'][1:], (3, 1))
+        self.bridge.paint(0, 1, 'S')
+        self.assertEqual(self.bridge.terrain[1], 'SGWG')
+        self.assertEqual(self.bridge.status.split('/')[1:], ['2', '0'])
+        # A new paint after undo discards the redo branch in both histories.
+        with self.assertRaisesRegex(StudioError, 'no redo available'):
+            self.bridge.redo()
+        self.assertEqual(self.bridge.commands[-1], 'paint 0 1 S')
+        self.bridge.undo()
+        self.assertEqual(self.bridge.terrain[1], 'GGWG')
+        self.assertEqual(self.bridge.placements['resource.tree.001'][1:], (3, 1))
+
+    def test_rejected_paint_preserves_source_and_history(self):
+        with self.assertRaisesRegex(StudioError, 'occupied or invalid tile'):
+            self.bridge.paint(1, 1, 'W')
+        self.assertEqual(self.bridge.commands, [])
+        self.assertEqual(self.bridge.terrain, self.world['terrain']['rows'])
+        with self.assertRaisesRegex(StudioError, 'Invalid terrain brush'):
+            self.bridge.paint(1, 0, 'X')
+        with self.assertRaisesRegex(StudioError, 'outside the map'):
+            self.bridge.paint(50, 0, 'W')
+        self.assertEqual(self.bridge.commands, [])
+        self.assertEqual(json.loads(self.source.read_text()), self.world)
 
 
 class ViewportMathTests(unittest.TestCase):

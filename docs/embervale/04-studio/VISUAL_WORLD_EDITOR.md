@@ -22,7 +22,7 @@ This is a deliberately thin standard-library Python/Tk shell. It reads the sourc
 
 A new optional `--expected-hash <sha256>` flag on `EmbervaleWorldMove --session` compares the **exact source bytes** with the initial snapshot revision before *any* replayed command can execute. On a conflict the session returns exit code 4; the user must reopen the source rather than silently editing a different revision. The C++ draft writer independently rechecks the same exact source hash under its cooperative lock, and continues to reject existing files. This does not make the filesystem lock mandatory for outside writers or guarantee power-loss durability.
 
-The UI does not currently paint terrain, edit actor spawns, auto-save, preserve undo across process restarts, handle multiple regions or launch an isolated game playtest. It uses a simple logical grid, not game sprites. This initial desktop client is intended to exercise STUDIO-030's selection/inspection/move path and reuse of shared command authority; the broader acceptance criteria remain open.
+The UI now has a click-to-paint Grass/Dirt/Stone/Water brush. Accepted brush actions use the C++ session's paint command and share history with placement moves; rejected brush actions never modify the displayed map. The UI does not currently edit actor spawns, auto-save, preserve undo across process restarts, handle multiple regions or launch an isolated game playtest. It uses a simple logical grid, not game sprites. This initial desktop client is intended to exercise STUDIO-030's selection/inspection/move path and reuse of shared command authority; the broader acceptance criteria remain open.
 
 ## Navigation and coordinate safety
 
@@ -42,3 +42,9 @@ A subsequent navigation slice adds 3 pure viewport-math regression tests. The pi
 Before merging: compile the complete stacked branch, run `ctest --test-dir build-headless --output-on-failure -R StarterWorld`, run the six Python bridge checks from repository root, and manually open the real fixture with the built mover. Move a tree, undo/redo, reject a blocked tile, save a sibling path containing spaces, validate and playtest the exact saved content with an isolated player save. Keep draft status until all gates are satisfied.
 
 See [the history design](BOUNDED_UNDO_REDO.md), [guarded drafts](GUARDED_DRAFT_REVISIONS.md) and [editor workflow acceptance](EDITOR_WORKFLOWS.md).
+
+## Terrain brush stabilization (18 November 2026)
+
+The first brush push contained a Python indentation defect in the initial terrain-history setup, which prevented importing the graphical editor module. This follow-up restores that initialization inside the snapshot parsing block. The mocked command-session fixture now models real terrain paints, undo, redo and branch truncation, with three focused bridge tests for accepted/no-op paints, interleaved moves and paints, and transactional rejection. The source snapshot remains read-only, and the C++ editing session remains authoritative.
+
+**Evidence limitation:** The updates were reviewed against the checked-in Python and C++ session source, but the full Python test suite, actual desktop interactions and combined C++ executable were not executed from this environment because repository checkout is unavailable. These checks remain required before merging PR #16.

@@ -83,8 +83,9 @@ class StudioBridge:
             if len(terrain) != height or any(not isinstance(row, str) or len(row) != width for row in terrain):
                 raise ValueError("invalid terrain shape")
             self.terrain = list(terrain)
-        self._terrain_states = [list(terrain)]
-        self._terrain_cursor = 0
+            # The displayed terrain follows the authoritative history cursor.
+            self._terrain_states = [list(terrain)]
+            self._terrain_cursor = 0
             self.width, self.height = width, height
             self.spawn = (self.snapshot["player_spawn"]["x"], self.snapshot["player_spawn"]["y"])
             self.definitions = {p["id"]: p["definition_id"] for p in self.snapshot["placements"]}
