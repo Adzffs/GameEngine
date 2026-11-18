@@ -1,6 +1,8 @@
 # Embervale starter cast
 
-This is the character contract for roadmap milestone J1. Every friendly character needs a recognizable silhouette, a village role, a personal want or problem, a distinct speaking style, a relationship to another character, a mechanical purpose, and optional examine text.
+**Design contract:** Character roles, voices, wants, relationships and examine lines are design intent; individual dialogue implementation is tracked separately. See the [content catalogue](embervale/05-game/CONTENT_CATALOGUE.md) and [game design](embervale/05-game/GAME_DESIGN.md). The earlier J1 label is historical; the current [master roadmap](embervale/02-roadmap/MASTER_ROADMAP.md) uses R0–R10.
+
+This is the starter character design contract. Every friendly character needs a recognizable silhouette, a village role, a personal want or problem, a distinct speaking style, a relationship to another character, a mechanical purpose, and optional examine text.
 
 | Character | Silhouette / colour | Village role | Want or problem | Voice | Relationship | Mechanical purpose |
 |---|---|---|---|---|---|---|
@@ -25,3 +27,4 @@ This is the character contract for roadmap milestone J1. Every friendly characte
 Mara needs Torren’s equipment; Torren needs Brann’s ore and Nessa’s timber; Brann relies on Sera to scout dangerous routes; Sera reports changing threats to Mara; Nessa relies on Elia to protect restoration supplies; Elia needs the player to recover evidence that connects the whole village mystery.
 
 This loop should surface through optional dialogue and quest choices, not only quest exposition.
+
