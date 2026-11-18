@@ -113,6 +113,19 @@ class RealWorldBridgeTests(unittest.TestCase):
             self.bridge.save(draft)
         self.assertEqual(draft.read_bytes(), data)
 
+    def test_raw_terminal_commands_cannot_bypass_guarded_draft_save(self) -> None:
+        draft = self.source.with_name('unverified writer bypass.json')
+        for command in (f'save {draft}', 'status', 'list', 'terrain', 'quit'):
+            with self.subTest(command=command):
+                with self.assertRaisesRegex(StudioError, 'Only move, paint, undo and redo'):
+                    self.bridge.perform(command)
+        self.assertFalse(draft.exists())
+        self.assertEqual(self.bridge.commands, [])
+        self.assertEqual(self.source.read_bytes(), self.original)
+        # The separate verified save API continues to work as intended.
+        self.bridge.save(draft)
+        self.assertTrue(draft.is_file())
+
     def test_source_revision_conflict_prevents_edits_and_save(self) -> None:
         self.source.write_bytes(self.original + b"\n")
         with self.assertRaisesRegex(StudioError, "CONTENT_CONFLICT"):

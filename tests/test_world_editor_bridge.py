@@ -269,6 +269,23 @@ class BridgeTests(unittest.TestCase):
         self.assertTrue(draft.exists())
         self.assertEqual(self.bridge.commands, [])
 
+    def test_replay_rejects_untracked_terminal_commands_before_any_side_effect(self):
+        draft = self.source.with_name('untracked save.json')
+        for command in (f'save {draft}', 'status', 'list', 'terrain',
+                        'help', 'map 0 0', 'quit', 'exit',
+                        'move resource.tree.001 3 1 extra', 'paint 1 0 X'):
+            with self.subTest(command=command):
+                with self.assertRaisesRegex(StudioError, 'Only move, paint, undo and redo'):
+                    self.bridge.perform(command)
+        self.assertFalse(draft.exists())
+        self.assertEqual(self.bridge.commands, [])
+        self.assertEqual(self.bridge.placements['resource.tree.001'][1:], (1, 1))
+        self.assertEqual(self.bridge.terrain, self.world['terrain']['rows'])
+        # The rejected requests have not poisoned later legitimate history.
+        self.bridge.paint(1, 0, 'D')
+        self.bridge.undo()
+        self.assertEqual(self.bridge.terrain, self.world['terrain']['rows'])
+
     def test_protects_invalid_action_and_history_limit(self):
         with self.assertRaisesRegex(StudioError, 'Invalid placement ID'):
             self.bridge.move('resource.tree.001\nquit', 1, 0)

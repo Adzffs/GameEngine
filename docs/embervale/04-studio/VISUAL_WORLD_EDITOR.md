@@ -136,3 +136,15 @@ spawn. The targeted eight-case standalone pure-helper exercise passed under
 local Python, but the checked-in regressions and real-executable/GUI paths
 remain unrun pending a complete checkout. See the dated integration evidence.
 
+
+## Replay-command boundary (18 November 2026)
+
+The Python Studio bridge has two deliberately separate backend entry points:
+`perform` accepts only canonical resource/station `move`, terrain `paint`,
+`undo` and `redo` commands, while `save` alone is allowed to issue a
+`save <new-sibling.json>` command. This prevents untracked terminal commands
+from being stored in the replay history or bypassing draft receipt/readback
+verification. Raw status, list, map, help and quit commands cannot be used as
+history edits. Two new regressions exercise the boundary with fake and real
+backends; only the isolated four-method guard check has actually run locally.
+The complete Studio integration gate remains open.

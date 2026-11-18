@@ -191,3 +191,29 @@ the uncertain output or changing its editor history.
 new and existing Python mock contracts plus the real `StarterWorld` C++/CLI
 tests. Fix any actual failures and consolidate the validated PR stack.
 
+
+## Follow-up: prevent untracked C++ commands entering the replay history (18 November 2026)
+
+**Reviewed input:** PR #18 head `f093cf29115fad434ee9da6386bbd4efdf827622`. The Python `StudioBridge.perform`
+entry point previously accepted any single-line backend command, including
+`save <path>`, which could write a file during ordinary history replay without
+using `StudioBridge.save`'s receipt, exact-bytes or semantic-readback checks.
+Read-only terminal commands could likewise be appended as if they were edits,
+poisoning the replay ledger or exhausting its bound.
+
+The bridge now permits only canonical `move <id> <x> <y>`,
+`paint <x> <y> <G|D|S|W>`, `undo` and `redo` in the replay channel.
+All draft writes still go through the separately verified `save` path.
+Rejected raw terminal commands do not invoke the C++ tool, write a draft, or
+alter displayed state, checkpoints or replay history. Mock-backed and
+real-binary-backed regressions now explicitly check attempted save bypasses.
+
+**Actually executed locally:** an isolated Python 3 test file containing the
+same replay-command guard implementation passed `py_compile` and **4/4
+unittest methods** (valid edits, unsupported backend commands, multiline
+injection and noncanonical syntax). This is not the complete checked-in Python
+module or a real C++ tool invocation. GitHub remains inaccessible from the
+local execution container for full checkout/build; the connected repository
+interface was used for source inspection and publishing. **Not run:** the new
+committed regression methods, full Python suite, C++ build, executable bridge
+integration, actual graphical click-through or gameplay. Keep PR #18 draft.
