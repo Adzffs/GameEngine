@@ -135,3 +135,19 @@ GameEngine build, real executable-backed integration, GUI click-through,
 Windows validation and saved-world gameplay were not run because the local
 compiler environment cannot resolve GitHub to clone the repository. The PR
 must remain draft and stacked until complete tests can run.
+
+### Source identity and review boundary
+
+- Reviewed input head: `dae2b56e69c49dd42ac54de5a41d283b2288de93`.
+- Receipt-verification implementation and checked-in regression source:
+  [`1a1a4531249ed12e016193b2119a9eaf96a851a8`](https://github.com/Adzffs/GameEngine/commit/1a1a4531249ed12e016193b2119a9eaf96a851a8)
+  (`tools/embervale_world_editor.py` and `tests/test_world_editor_bridge.py`).
+- Locally executed on 18 November 2026: Python 3.13.5
+  `python -m py_compile /tmp/test_draft_receipt.py`, then
+  `python /tmp/test_draft_receipt.py` — 8 tests passed. The isolated
+  fixture embeds the new helper body; the committed full module and fake
+  executable regressions were **not** run. The GitHub commit and six-file
+  diff were read back after pushing, and the PR head was checked.
+- These tests exercise only draft-receipt fail-closed behaviour; they do
+  not establish full C++ importer parity, successful game playtest, or
+  successful integrated Studio publication.
