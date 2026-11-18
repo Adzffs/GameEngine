@@ -22,6 +22,12 @@ This new work remains stacked and unmerged.
   existing evidence, C++ edit/session/history and the actual content fixture.
 - The exact new test file (`763da5ef9cd066b03441018267e2b3cccf71e490`
   Git blob SHA) passed Python 3.13.5 `py_compile` and `ast.parse` locally.
+- An isolated CMake 3.31.6 + Ninja registration scaffold containing the
+  exact new Python test-registration block configured and built a dummy
+  executable; `ctest -N -R StarterWorldVisualBridgeIntegration` listed
+  **one test** with the intended executable/fixture arguments.
+  This is a CMake syntax/registration smoke, **not** the production
+  GameEngine configuration or a test execution.
 - The local host has no complete GameEngine checkout; `git ls-remote`
   failed with `Could not resolve host: github.com`.
 - **Not run:** new executable integration tests, full real-core build,
