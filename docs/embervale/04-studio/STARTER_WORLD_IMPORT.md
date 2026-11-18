@@ -1,6 +1,6 @@
 # Validate and play a starter-world snapshot
 
-**Status:** Implemented starter-content runtime bridge; shared editing, guarded publication, undo and the visual editor remain planned.\
+**Status:** Implemented runtime bridge and bounded dry-run placement move; guarded draft saving, undo, publication and visual editing remain planned.\
 **Updated:** 18 November 2026\
 **Format:** `embervale.starter-world-snapshot`, schema version `1`, region `embervale.development_starter`.\
 **Related:** [Export guide](STARTER_WORLD_EXPORT.md), [runtime import decision](../07-decisions/ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md), [save compatibility](../03-engine/SAVE_COMPATIBILITY.md).
@@ -11,7 +11,7 @@ The game can load an explicitly selected JSON snapshot of its existing 100×100 
 
 `EmbervaleWorldValidate` reads a candidate and applies the same parser and runtime validation used by game startup. `GameEngine --world <path>` then constructs the world from the validated snapshot. A missing, malformed or unsafe file stops startup with a diagnostic; it does not silently select a different world.
 
-The game and validator do not write the selected world file. There is no implemented map-move command, draft-save command, undo history, publication manifest or graphical editor. Coordinate edits can be supplied in a candidate JSON document, but the complete safe authoring workflow remains the next milestone.
+The game and validator do not write the selected world file. A shared typed move operation now produces an independently validated in-memory candidate for an existing resource or station, exposed through a dry-run CLI. There is no draft-save command, undo history, publication manifest or graphical editor. The CLI does not persist the candidate; the safe authoring workflow remains unfinished.
 
 ## 2. Build and validate without SDL
 
@@ -34,6 +34,16 @@ To create a separate baseline file for inspection, choose a new destination name
 Shell redirection creates or replaces its destination. The exporter always captures compiled initial content; it does not re-export a running imported world. Keep the reviewed fixture intact when creating a candidate.
 
 `GAMEENGINE_BUILD_CONTENT_TOOLS=OFF` omits the standalone export/validation executables and their optional checks. The parser, runtime validator and compatibility adapter remain in the SDL-free core so the game can still use `--world`.
+
+### Resource/station move preview (STUDIO-020 subset)
+
+`EmbervaleWorldMove` uses the same bounded input parser and full runtime geography validation as game startup. The shared `StarterWorldEdit::MovePlacement` function works on a copy and returns the runtime-valid candidate and before/after coordinates. Existing resource/station IDs are supported; NPC and monster spawn moves are deliberately excluded until their editing rules are implemented.
+
+```bash
+./build-headless/EmbervaleWorldMove tests/fixtures/content/development-starter.snapshot.json resource.normal_tree.001 30 30
+```
+
+Exit `0` means the move is valid (including an unchanged-coordinate no-op), exit `1` means the source or candidate was rejected, and exit `2` means invalid command syntax. **This is a dry run: no file, player save, or live world is modified.** It reports the stable ID and old/new coordinates. It does not generate a saved draft, hash, diff, undo history, or preview image yet. Use it to check a move, not to claim that content has been published. Unit and CLI regression tests are registered but must be executed on the exact commit before this slice is considered verified.
 
 ### Validator command results
 
@@ -141,4 +151,4 @@ On 18 November 2026, this slice passed **77/77 headless tests**, **89/89 tests**
 
 Implementation and tests: [parser](../../../src/Content/Export/StarterWorldSnapshotInput.cpp), [runtime input](../../../src/Content/Import/StarterWorldRuntimeInput.cpp), [World](../../../src/World/World.cpp), [launch options](../../../src/Core/GameLaunchOptions.cpp), [parser tests](../../../tests/StarterWorldSnapshotInputTests.cpp), [input tests](../../../tests/StarterWorldRuntimeInputTests.cpp), [runtime tests](../../../tests/StarterWorldRuntimeTests.cpp), [launch tests](../../../tests/GameLaunchOptionsTests.cpp), [validator CLI tests](../../../tests/StarterWorldValidateCliTests.cmake), [real application startup tests](../../../tests/GameEngineStartupCliTests.cmake).
 
-The next bounded step is a shared operation that moves an existing placement by stable ID, produces a reviewable candidate, and uses this same validator. Guarded saving with conflict detection, undo/redo, preview and a minimal visual editor then complete the authoring path. This importer alone does not complete R1, R2 or Studio Alpha 0.1.
+The next bounded step is guarded draft saving with expected-hash conflict detection and atomic replacement, followed by undo/redo, previews and a minimal visual editor. The bounded move preview provides the underlying shared command and is not yet a complete editing workflow. This importer alone does not complete R1, R2 or Studio Alpha 0.1.

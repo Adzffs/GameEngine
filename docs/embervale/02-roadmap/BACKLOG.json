@@ -339,15 +339,22 @@
       "milestone": "R2",
       "priority": "P1",
       "title": "Implement shared edit operations",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-010",
         "STUDIO-050"
       ],
       "acceptance": "Typed inspect/paint/place/move/remove/validate/diff/save operations produce a candidate and affected references; first release exposes bounded scope.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "src/Content/Edit/StarterWorldEdit.h",
+        "src/Content/Edit/StarterWorldEdit.cpp",
+        "src/Tools/WorldMoveMain.cpp",
+        "tests/StarterWorldEditTests.cpp",
+        "tests/StarterWorldMoveCliTests.cmake",
+        "docs/embervale/06-development/STUDIO_MOVE_PREVIEW_2026-11-18.md"
+      ],
+      "notes": "Pure move of an existing resource or station by stable ID produces a runtime-valid candidate and rejects bad source/destination; CLI is dry-run only. Tests registered; executable build and full integration verification pending. No save, hash, undo or actor-spawn editing yet."
     },
     {
       "id": "STUDIO-021",

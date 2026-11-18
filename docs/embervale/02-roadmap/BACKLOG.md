@@ -29,9 +29,10 @@ The export foundation is followed by bounded parsing, geographic validation and 
 | Static geography and access | STUDIO-050, STUDIO-051 | in_progress | Bounds, overlaps, water, clear player spawn, reachable actors and cardinal approaches validated; general regions/exits remain unsupported |
 | Position compatibility | STUDIO-053 | in_progress | Selected safe spawn and saved-player/recovery handling are integrated for this region; broader content/save migration remains open |
 | Runtime compatibility adapter | STUDIO-013 | in_progress | Opt-in snapshot loading preserves ground, occupancy and staged creation; explicit compiled mode, temporary playtests and save-path guards are implemented |
-| Headless command surface | STUDIO-022 | in_progress | Export and read-only validation commands exist; shared editing, guarded writes and structured machine diagnostics remain planned |
+| Headless command surface | STUDIO-022 | in_progress | Export, validation and resource/station move dry-run commands exist; guarded writes and structured machine diagnostics remain planned |
+| Shared placement move | STUDIO-020 | in_progress | A typed resource/station move returns a validated copy, with a dry-run CLI and regression tests; writes, diff, history and wider editing remain open |
 
-Next implement the shared move operation (STUDIO-020), guarded saving (STUDIO-021) and undo/redo (STUDIO-023), then preview and the minimal visual editor. Fresh-player and economy work also remain open. A parser or a successful load alone does not demonstrate a complete authoring product.
+The next bounded slice adds expected-hash guarded draft saving (STUDIO-021), followed by undo/redo (STUDIO-023), preview and the minimal visual editor. The new STUDIO-020 resource/station move preview is an in-memory candidate with full runtime validation and a no-write CLI; broader editing operations remain open. Fresh-player and economy work also remain open. A parser or a successful load alone does not demonstrate a complete authoring product.
 
 ## Complete work inventory
 

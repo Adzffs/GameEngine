@@ -113,6 +113,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/Content/Export/StarterWorldSnapshot.cpp
     src/Content/Export/StarterWorldSnapshotInput.cpp
     src/Content/Import/StarterWorldRuntimeInput.cpp
+    src/Content/Edit/StarterWorldEdit.cpp
     src/Reward/RewardTable.cpp
     src/Reward/RewardTableRoller.cpp
     src/Reward/DevelopmentRewardTables.cpp
@@ -140,6 +141,9 @@ if(GAMEENGINE_BUILD_CONTENT_TOOLS)
 
     add_executable(EmbervaleWorldValidate src/Tools/WorldValidateMain.cpp)
     target_link_libraries(EmbervaleWorldValidate PRIVATE GameEngineCore)
+
+    add_executable(EmbervaleWorldMove src/Tools/WorldMoveMain.cpp)
+    target_link_libraries(EmbervaleWorldMove PRIVATE GameEngineCore)
 endif()
 
 if(GAMEENGINE_BUILD_CLIENT)
@@ -206,6 +210,7 @@ if(BUILD_TESTING)
     endif()
     add_gameengine_headless_test(GameLaunchOptionsTests tests/GameLaunchOptionsTests.cpp)
     add_gameengine_headless_test(StarterWorldRuntimeInputTests tests/StarterWorldRuntimeInputTests.cpp)
+    add_gameengine_headless_test(StarterWorldEditTests tests/StarterWorldEditTests.cpp)
     add_gameengine_headless_test(StarterWorldRuntimeTests tests/StarterWorldRuntimeTests.cpp)
     if(GAMEENGINE_BUILD_CONTENT_TOOLS)
         add_gameengine_headless_test(StarterWorldSnapshotTests tests/StarterWorldSnapshotTests.cpp)
@@ -233,6 +238,15 @@ if(BUILD_TESTING)
                 -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/StarterWorldValidateCliTests.cmake"
         )
         set_tests_properties(StarterWorldValidateCliTests PROPERTIES LABELS "headless;content")
+
+        add_test(
+            NAME StarterWorldMoveCliTests
+            COMMAND ${CMAKE_COMMAND}
+                "-DMOVER=$<TARGET_FILE:EmbervaleWorldMove>"
+                "-DFIXTURE=${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/content/development-starter.snapshot.json"
+                -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/StarterWorldMoveCliTests.cmake"
+        )
+        set_tests_properties(StarterWorldMoveCliTests PROPERTIES LABELS "headless;content")
     endif()
 
     add_gameengine_headless_test(ActionFrameworkTests tests/ActionFrameworkTests.cpp)

@@ -77,7 +77,7 @@ The history appendix selects gameplay and project commits from the reviewed `mas
 - Local builds and automated tests are now recorded above. No visible manual playthrough, performance profile, coverage measurement, accessibility assessment or production security audit was performed.
 - Existing save codec, file-store, world and engine persistence tests passed in the local suites. This does not prove every legacy edge case or a future edited-map saved-location migration matrix.
 - Branch/ruleset observations do not establish all account, organisation, or external enforcement settings.
-- The original baseline had no Studio files. Later work adds export, bounded validation and starter runtime import. Shared editing, guarded publication, undo and preview remain future work.
+- The original baseline had no Studio files. Later work adds export, bounded validation and starter runtime import. A narrow resource/station move-preview command is now on a development branch; full editing, guarded publication, undo and graphical preview remain future work.
 - Existing economy and character documents contain design intentions as well as factual claims. Code and explicit current decisions take precedence where the documents are stale.
 - The old PR #1 quest-verification gaps are historical review notes. Recheck them against current code and tests before marking them unresolved defects or closing them.
 
