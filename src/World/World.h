@@ -51,6 +51,7 @@
 #include "GroundItem.h"
 #include "PlayerRecoveryPile.h"
 #include "../Bank/BankSession.h"
+#include "../Content/Export/StarterWorldSnapshot.h"
 
 class RandomSource;
 class Monster;
@@ -63,6 +64,13 @@ class World
 {
 public:
     World();
+    explicit World(const StarterWorldExport::Snapshot &snapshot);
+    explicit World(const std::optional<StarterWorldExport::Snapshot> &snapshot);
+    World(
+        const StarterWorldExport::Snapshot &snapshot,
+        unsigned int combatSeed,
+        unsigned int rewardSeed = 7331U,
+        unsigned int gatheringSeed = 9001U);
     explicit World(
         unsigned int combatSeed,
         unsigned int rewardSeed = 7331U,
@@ -259,6 +267,21 @@ public:
 
 private:
     friend struct WorldTestAccess;
+
+    World(
+        const std::optional<StarterWorldExport::Snapshot> &snapshot,
+        std::unique_ptr<RandomSource> combatRandomSource,
+        std::unique_ptr<RandomSource> rewardRandomSource,
+        std::unique_ptr<RandomSource> gatheringRandomSource);
+
+    // Validation happens before Map or any runtime population is constructed.
+    const std::optional<StarterWorldExport::Snapshot> importedStarterSnapshot;
+    std::map<NpcSpawnId, NpcSpawnDefinition> importedStarterSpawns;
+    const NpcSpawnDefinition *TryGetStarterSpawn(NpcSpawnId spawnId) const;
+    Position GetStarterPlayerSpawn() const;
+    bool IsStarterSpawnReachableFrom(int x, int y);
+    void CreateImportedPlacements(StarterWorldExport::InitializationStage stage);
+    bool importedDelayedPlacementsCreated = false;
 
     using PlayerReconstructionFunction = std::unique_ptr<Player> (*)(
         int,

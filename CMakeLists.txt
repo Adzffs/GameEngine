@@ -10,7 +10,7 @@ option(
 
 option(
     GAMEENGINE_BUILD_CONTENT_TOOLS
-    "Build the read-only starter-world exporter"
+    "Build the starter-world export and validation tools"
     ON
 )
 
@@ -109,6 +109,10 @@ set(GAMEENGINE_CORE_SOURCES
     src/Content/ContentValidationReport.cpp
     src/Content/ContentValidator.cpp
     src/Core/ContentStartupValidation.cpp
+    src/Core/GameLaunchOptions.cpp
+    src/Content/Export/StarterWorldSnapshot.cpp
+    src/Content/Export/StarterWorldSnapshotInput.cpp
+    src/Content/Import/StarterWorldRuntimeInput.cpp
     src/Reward/RewardTable.cpp
     src/Reward/RewardTableRoller.cpp
     src/Reward/DevelopmentRewardTables.cpp
@@ -122,16 +126,20 @@ add_library(GameEngineCore
 
 target_include_directories(GameEngineCore PUBLIC src)
 
+# Compatibility target: runtime input is SDL-free core functionality, so it is
+# available even when the standalone content tools are omitted.
+add_library(EmbervaleWorldSnapshot INTERFACE)
+target_link_libraries(EmbervaleWorldSnapshot INTERFACE GameEngineCore)
+
 if(GAMEENGINE_BUILD_CONTENT_TOOLS)
-    add_library(EmbervaleWorldSnapshot
-        src/Content/Export/StarterWorldSnapshot.cpp
-    )
-    target_link_libraries(EmbervaleWorldSnapshot PUBLIC GameEngineCore)
 
     add_executable(EmbervaleWorldExport
         src/Tools/WorldExportMain.cpp
     )
     target_link_libraries(EmbervaleWorldExport PRIVATE EmbervaleWorldSnapshot)
+
+    add_executable(EmbervaleWorldValidate src/Tools/WorldValidateMain.cpp)
+    target_link_libraries(EmbervaleWorldValidate PRIVATE GameEngineCore)
 endif()
 
 if(GAMEENGINE_BUILD_CLIENT)
@@ -185,9 +193,26 @@ function(add_gameengine_graphics_test target source)
 endfunction()
 
 if(BUILD_TESTING)
+    if(GAMEENGINE_BUILD_CLIENT)
+        add_test(
+            NAME GameEngineStartupCliTests
+            COMMAND ${CMAKE_COMMAND}
+                "-DCLIENT=$<TARGET_FILE:GameEngine>"
+                "-DFIXTURE=${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/content/development-starter.snapshot.json"
+                "-DWORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/game-startup-cli-test"
+                -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/GameEngineStartupCliTests.cmake"
+        )
+        set_tests_properties(GameEngineStartupCliTests PROPERTIES LABELS "client;content")
+    endif()
+    add_gameengine_headless_test(GameLaunchOptionsTests tests/GameLaunchOptionsTests.cpp)
+    add_gameengine_headless_test(StarterWorldRuntimeInputTests tests/StarterWorldRuntimeInputTests.cpp)
+    add_gameengine_headless_test(StarterWorldRuntimeTests tests/StarterWorldRuntimeTests.cpp)
     if(GAMEENGINE_BUILD_CONTENT_TOOLS)
         add_gameengine_headless_test(StarterWorldSnapshotTests tests/StarterWorldSnapshotTests.cpp)
         target_link_libraries(StarterWorldSnapshotTests PRIVATE EmbervaleWorldSnapshot)
+
+        add_gameengine_headless_test(StarterWorldSnapshotInputTests tests/StarterWorldSnapshotInputTests.cpp)
+        target_link_libraries(StarterWorldSnapshotInputTests PRIVATE EmbervaleWorldSnapshot)
 
         add_test(
             NAME StarterWorldExportCliTests
@@ -198,6 +223,16 @@ if(BUILD_TESTING)
                 -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/StarterWorldExportCliTests.cmake"
         )
         set_tests_properties(StarterWorldExportCliTests PROPERTIES LABELS "headless;content")
+
+        add_test(
+            NAME StarterWorldValidateCliTests
+            COMMAND ${CMAKE_COMMAND}
+                "-DVALIDATOR=$<TARGET_FILE:EmbervaleWorldValidate>"
+                "-DFIXTURE=${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/content/development-starter.snapshot.json"
+                "-DWORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/starter-world-validate-cli-test"
+                -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/StarterWorldValidateCliTests.cmake"
+        )
+        set_tests_properties(StarterWorldValidateCliTests PROPERTIES LABELS "headless;content")
     endif()
 
     add_gameengine_headless_test(ActionFrameworkTests tests/ActionFrameworkTests.cpp)
