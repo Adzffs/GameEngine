@@ -506,7 +506,7 @@
         "docs/embervale/06-development/STUDIO_VIEWPORT_NAVIGATION_VERIFICATION_2026-11-18.md",
         "docs/embervale/06-development/STUDIO_AUTHORITATIVE_TERRAIN_VIEW_2026-11-18.md"
       ],
-      "notes": "First mouse-driven Python/Tk editor now stages zoom, selection, stable-ID resource/station moves, G/D/S/W painting, shared C++ undo/redo and guarded create-only draft saving. C++ returns authoritative terrain rows; the bridge checks initial stable-ID placement kind/coordinate parity with the source and rejects invalid post-edit kinds, bounds or actor-spawn movement before changing the view. Mock bridge regressions were added; 9 isolated parity checks and 4 fake-line execution checks passed, but the full checked-in Python suite and C++/Tk/game integration remain unexecuted because this host cannot check out the repository."
+      "notes": "First mouse-driven Python/Tk editor now stages zoom, selection, stable-ID resource/station moves, G/D/S/W painting, shared C++ undo/redo and guarded create-only draft saving. C++ returns authoritative terrain rows; the bridge checks initial stable-ID placement kind/coordinate parity with the source and rejects invalid post-edit kinds, bounds or actor-spawn movement before changing the view. Mock bridge regressions were added; 9 isolated parity checks and 5 fake-line execution checks passed, but the full checked-in Python suite and C++/Tk/game integration remain unexecuted because this host cannot check out the repository."
     },
     {
       "id": "STUDIO-032",
