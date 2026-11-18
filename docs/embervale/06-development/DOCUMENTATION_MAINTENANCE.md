@@ -25,7 +25,7 @@ For a documentation-only PR, check factual claims, relative links, code fences, 
 
 ## 3. Status vocabulary
 
-Use SOURCE VERIFIED for inspected implementation, REMOTE RESULT VERIFIED for a specific GitHub outcome, HISTORICAL REPORT for an old unrerun claim, PLANNED for intended work, PROPOSED for candidate design and UNVERIFIED for missing evidence. COMPLETE requires the stated acceptance criteria and evidence. REMOTE CI VERIFIED, where retained in historical evidence, is a specific remote-result subtype.
+Use SOURCE VERIFIED for inspected implementation, REMOTE RESULT VERIFIED for a specific GitHub outcome, HISTORICAL REPORT for an old unrerun claim, PLANNED for intended work, PROPOSED for candidate design and UNVERIFIED for missing evidence. COMPLETE requires the stated acceptance criteria and evidence.
 
 Always date a source snapshot and pin its commit. Recount catalogue/test registrations when they change rather than assuming old totals are permanent. Registered tests, passing tests and manually exercised workflows are different facts.
 
@@ -61,9 +61,9 @@ The optional tree lets unchanged baseline paths satisfy file references and chec
 
 ## 6. Freshness review
 
-At a milestone boundary, inspect the current default-branch commit, workflow results, releases, open PRs and changed subsystems. Refresh the evidence ledger and update any stale “current” statements. Compare the game catalogue with definitions, especially objective labels, recipe inputs/outputs, shop direction and development defaults.
+At a milestone boundary, inspect the current default-branch commit, local test results, releases, open PRs and changed subsystems. Refresh the evidence ledger and update any stale “current” statements. Compare the game catalogue with definitions, especially objective labels, recipe inputs/outputs, shop direction and development defaults.
 
-Review previous unresolved findings explicitly: failed CI, fresh-profile setup, multi-step economy checks, saved-location migration and source-versus-design naming. A later date in a document header is not a substitute for rechecking the claim.
+Review previous unresolved findings explicitly: fresh-profile setup, multi-step economy checks, saved-location migration and source-versus-design naming. A later date in a document header is not a substitute for rechecking the claim.
 
 ## 7. Archiving and cleanup
 
@@ -77,4 +77,4 @@ Before starting work, read the current overview, the relevant work package, its 
 
 ## 9. When something is uncertain
 
-Label the uncertainty and state the next observation that would resolve it. Use “source-derived, not runtime-reproduced” for the documented economy calculation. The original CI uncertainty was resolved by the public run annotation: an account billing lock prevented jobs from starting. Preserve that evidence and the separate local results in the [verification record](BASELINE_VERIFICATION_2026-11-18.md). Clear uncertainty is more useful than confident but unsupported completion language.
+Label the uncertainty and state the next observation that would resolve it. Use “source-derived, not runtime-reproduced” for the documented economy calculation. Preserve exact local results and platform limitations in the [verification record](BASELINE_VERIFICATION_2026-11-18.md). Clear uncertainty is more useful than confident but unsupported completion language.

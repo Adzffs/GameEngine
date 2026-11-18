@@ -88,7 +88,7 @@ ctest --test-dir build-headless --output-on-failure -R StarterWorld
 
 When intentional starter content changes make the fixture fail, inspect the semantic differences first. Review terrain, identities, spawn definitions and lifecycle keys; then regenerate the fixture and explain the intended changes in the same PR. Do not update it merely to hide an unexpected regression.
 
-See the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) for exact tested environments and the GitHub CI blocker. A passing export test does not establish that an edited world is safe to load.
+See the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) for exact tested environments and remaining platform limits. A passing export test does not establish that an edited world is safe to load.
 
 ## What comes next
 

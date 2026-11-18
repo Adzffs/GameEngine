@@ -19,7 +19,7 @@ A C++20 and SDL3 tile-based RPG project, with an existing playable development w
 
 The source includes authoritative world updates, movement and running, gathering, crafting, melee combat, NPCs, quests, dialogue, shops, banking, progression, development-player persistence and an SDL3 client. The current development map is flat and uses placeholder visuals. The first Studio foundation is a read-only [starter-world exporter](docs/embervale/04-studio/STARTER_WORLD_EXPORT.md). Map editing, external region loading and elevation remain planned; their design documents describe future capabilities.
 
-On **18 November 2026**, the unchanged baseline at `c697386382845f17ce02027e6bade24591a9eb36` built locally and all **81 existing tests passed** on Linux with SDL’s dummy display driver. The exporter adds two CTest checks. GitHub Actions is separately blocked: the inspected run reports an account billing lock before any job steps start. See the [verification record](docs/embervale/06-development/BASELINE_VERIFICATION_2026-11-18.md) for changed-source results, exact environments and remaining Windows/visual-playtest limits.
+On **18 November 2026**, the unchanged baseline at `c697386382845f17ce02027e6bade24591a9eb36` built locally and all **81 existing tests passed** on Linux with SDL’s dummy display driver. The exporter adds two CTest checks. See the [verification record](docs/embervale/06-development/BASELINE_VERIFICATION_2026-11-18.md) for changed-source results, exact environments and remaining Windows/visual-playtest limits.
 
 ## Quick headless build
 

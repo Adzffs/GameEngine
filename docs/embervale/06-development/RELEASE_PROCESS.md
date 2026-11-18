@@ -33,7 +33,7 @@ Choose a focused scope from the roadmap and freeze the candidate's source/conten
 
 Build from a clean, reproducible checkout/environment using the documented configuration. Record dependency versions rather than assuming a package manager's latest packages are the same as a previous run. For authored content, normalise and validate the selected package and record the validator version/profile.
 
-The existing CI defines Linux headless and Windows UCRT64 SDL3 configurations, but configuration alone does not prove a release passed them. The inspected baseline's failed run must be resolved before presenting it as a successful release baseline. [Sources: CI workflow](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/.github/workflows/ci.yml), [baseline workflow run](https://github.com/Adzffs/GameEngine/actions/runs/44018694678).
+Run the relevant headless and SDL3 client configurations locally for the intended release platforms. Record the exact commit, commands and outcomes, and explicitly identify platforms not exercised. See [Getting started](GETTING_STARTED.md) and [Testing](TESTING.md).
 
 ## 4. Verification and acceptance
 

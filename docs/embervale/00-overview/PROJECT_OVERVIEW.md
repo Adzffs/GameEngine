@@ -45,7 +45,7 @@ The current baseline contains seven resource placements, three workstations and 
 
 The original documentation review used engine commit `e9d32932e8f9b27e96283313cca320058792a81f`. The documentation pack was subsequently merged through [PR #3](https://github.com/Adzffs/GameEngine/pull/3) at `c697386382845f17ce02027e6bade24591a9eb36`, without changing the runtime. The superseded documentation PR #1 was closed.
 
-A fresh local build of that unchanged baseline passed all **81 existing tests** on Linux with SDL’s dummy display driver. The failed GitHub run was independently diagnosed: its jobs did not start because of an account billing lock. Local test success does not resolve that remote blocker or establish a Windows result. See the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md).
+A fresh local build of that unchanged baseline passed all **81 existing tests** on Linux with SDL’s dummy display driver. This result does not establish a Windows result. See the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md).
 
 The first implemented Studio step is [read-only export](../04-studio/STARTER_WORLD_EXPORT.md): a complete starter-world JSON snapshot, stable placement identities, ground beneath objects and explicit actor lifecycle metadata. Two new CTest checks compare it with the actual world and verify executable output. A runtime importer, map editing, preview and undo remain future work.
 
@@ -62,7 +62,7 @@ The first release does not require all content editors, a networking rewrite, fi
 | Label | Meaning |
 |---|---|
 | **SOURCE VERIFIED** | The stated implementation or configuration is present in inspected source at the cited commit |
-| **REMOTE RESULT VERIFIED** | A particular returned GitHub result was inspected, such as a merged PR or failed workflow |
+| **REMOTE RESULT VERIFIED** | A particular returned GitHub result was inspected, such as a merged PR |
 | **HISTORICAL REPORT** | A previous PR or conversation reports an outcome that has not been rerun here |
 | **PLANNED** | Included in the roadmap; implementation and acceptance evidence are still required |
 | **PROPOSED** | A candidate design or technical choice requiring validation or an architecture decision |

@@ -17,8 +17,7 @@ The first export slice is implemented and locally verified for review. `ready_fo
 
 | Work | Planning IDs | Status | Evidence and remaining work |
 |---|---|---|---|
-| CI recovery | ENG-001 | blocked | Cause established: account billing lock; owner resolution and rerun remain required |
-| Reproducible baseline | ENG-002 | in_progress | Linux baseline 81/81; changed headless 72/72 and client 83/83; Windows/remote execution outstanding |
+| Reproducible baseline | ENG-002 | in_progress | Linux baseline 81/81; changed headless 72/72 and client 83/83; Windows execution unverified |
 | Ownership and saved-location inventory | STUDIO-001, STUDIO-002 | ready_for_review | Source ownership, all placements/lifecycle, labels, quests and save versions/position paths documented; no edited-map migration claimed |
 | Minimal architecture | STUDIO-003 | in_progress | Export target/model/writer decisions recorded; input parser and preview decisions remain open |
 | Semantic baseline fixtures | STUDIO-004 | ready_for_review | Full terrain/occupancy, actor stages, pathfinder approaches, furnace action and deterministic snapshot tests pass |
@@ -35,8 +34,7 @@ This scoped export proof does not mark R0/R1 complete. The parser, provider vali
 
 | Planning ID | Priority | Work package | Depends on | Acceptance result |
 |---|---|---|---|---|
-| ENG-001 | P0 | Investigate current CI failure | None | Identify an evidenced cause or precise external blocker; obtain useful logs and rerun existing jobs; record exact commit and outcomes. |
-| ENG-002 | P0 | Reproduce baseline builds | ENG-001 | Record compiler/CMake/SDL/platform versions, configure/build commands, test discovery and actual headless/client/graphics outcomes. |
+| ENG-002 | P0 | Reproduce baseline builds | None | Record compiler/CMake/SDL/platform versions, configure/build commands, test discovery and actual headless/client/graphics outcomes. |
 | DOC-001 | P1 | Publish documentation and focused cleanup | None | Add the indexed pack on a dedicated branch/PR, reconcile older docs, list exact removals, validate links and preserve useful existing material. |
 | DOC-002 | P1 | Resolve source and documentation drift | DOC-001 | Correct the ledger; decide the final quest target wording; separate old PR findings from current verified issues; record remaining decisions. |
 | STUDIO-001 | P0 | Inventory all placement ownership | ENG-002 | Trace ground, object, station, NPC, monster, label, quest and initialization ownership with source links. |
@@ -127,7 +125,7 @@ This scoped export proof does not mark R0/R1 complete. The parser, provider vali
 | STUDIO-092 | P2 | Improve Git-aware review and conflict workflow | STUDIO-021; STUDIO-027; DOC-003 | Show changed identities and dependencies; resolve Git conflicts through revalidation rather than coordinate-only auto-merging. |
 | STUDIO-093 | P1 | Version content packages and migrations | STUDIO-026; STUDIO-015 | Publish engine/schema/asset/save compatibility matrix, migration tests and reversible package selection. |
 | STUDIO-094 | P2 | Profile representative scale and contention | STUDIO-054; GAME-006 | Measure tick/route/validation/render/memory workloads before selecting chunking; document local simulation limits. |
-| QA-001 | P1 | Maintain regression and content CI gates | STUDIO-052; STUDIO-093 | Require meaningful tests and content checks at release commit; preserve failure artifacts and prevent misleading skipped groups. |
+| QA-001 | P1 | Maintain local regression and content checks | STUDIO-052; STUDIO-093 | Run meaningful local tests and content checks at the release commit; preserve failure logs and report skipped groups. |
 | QA-002 | P2 | Exercise malformed content and failure recovery | STUDIO-011; STUDIO-021; STUDIO-093 | Bounded negative/fuzz/fault scenarios demonstrate safe failure and preserved previous content/player data. |
 | QA-003 | P2 | Verify accessibility and usability | ART-003; STUDIO-033; GAME-006 | Record keyboard, focus, colour-independent state, readable scale and error recovery results with fixes. |
 | REL-001 | P1 | Define versioned release metadata | STUDIO-093 | Tie engine/content/schema/assets/save compatibility and known issues to a reproducible release commit. |
@@ -182,7 +180,7 @@ The first release retains a bounded GUI and the actual-tree demonstration. Broad
 
 ## Handling partial work and new findings
 
-A task with code written but no acceptance evidence stays in progress or ready for review. If an implementation reveals a new risk, link a new issue or dependency rather than quietly weakening the gate. A bug discovered in this documentation review is not automatically fixed by describing it. ENG-001 now has a diagnosed external blocker but still needs account resolution and a rerun; GAME-008 still needs runtime reproduction.
+A task with code written but no acceptance evidence stays in progress or ready for review. If an implementation reveals a new risk, link a new issue or dependency rather than quietly weakening the gate. A bug discovered in this documentation review is not automatically fixed by describing it. GAME-008 still needs runtime reproduction.
 
 For FUT-003, WORLD-002 and WORLD-003 become required dependencies when the selected expansion adds connected regions.
 

@@ -18,9 +18,8 @@ An internet-facing account service, production server and multiplayer threat mod
 | Player-save input | File store performs bounded reads and structured validation/error handling | Does not prove immunity to every filesystem/power-failure condition |
 | World authority | Typed NPC/monster creation validates catalogue and spawn conditions | Not proof of a completed network-server boundary |
 | Build separation | Headless core can build without SDL when both dependent options are OFF | Does not prove every target currently builds in this environment |
-| CI permissions | Workflow requests read access to repository contents | Branch/ruleset enforcement is a separate setting |
 
-Sources: [main.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/main.cpp), [PlayerSaveFileStore.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Persistence/PlayerSaveFileStore.cpp), [World.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/World/World.cpp), [CMakeLists.txt](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/CMakeLists.txt), [CI workflow](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/.github/workflows/ci.yml).
+Sources: [main.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/main.cpp), [PlayerSaveFileStore.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Persistence/PlayerSaveFileStore.cpp), [World.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/World/World.cpp), [CMakeLists.txt](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/CMakeLists.txt).
 
 ## 3. External content must be bounded data
 
@@ -71,8 +70,6 @@ Do not commit credentials, private tokens, personal saves or generated caches. R
 For an ordinary defect, report the source/content revision, environment, exact steps, expected/observed result and sanitised logs. If a finding could expose private data or enable abuse in a future deployed service, use the project's chosen private reporting route once established. This document does not invent a security email address or claim private vulnerability reporting is configured.
 
 Triage a failure into input/content error, code defect, write conflict, persistence incompatibility, dependency/environment failure or unavailable evidence. Preserve the relevant prior state before attempting repair. Record the actual cause only after evidence supports it.
-
-The inspected baseline's failed workflow has no usable execution/log evidence in this review; it is a reliability investigation item, not a proven vulnerability or proven test assertion failure. [Source: workflow run](https://github.com/Adzffs/GameEngine/actions/runs/44018694678).
 
 ## 9. Readiness checks by feature
 

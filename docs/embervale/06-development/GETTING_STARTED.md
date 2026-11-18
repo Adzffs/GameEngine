@@ -33,7 +33,7 @@ The [Repository guide](../01-current-state/REPOSITORY_GUIDE.md) explains where t
 
 ## 3. Linux headless development
 
-The current Linux CI job uses a C++ compiler, CMake and Ninja. On an Ubuntu-like environment, its package installation is `build-essential`, `cmake` and `ninja-build`; install equivalent tools through your environment's normal package manager. [Source: CI workflow](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/.github/workflows/ci.yml).
+Use a C++20 compiler, CMake and Ninja. On an Ubuntu-like environment, install `build-essential`, `cmake` and `ninja-build`; install equivalent tools through your environment’s normal package manager.
 
 From the repository root:
 
@@ -51,7 +51,7 @@ This configuration intentionally does not produce the SDL game window. To list d
 
 ## 4. Windows client with MSYS2 UCRT64
 
-The existing Windows CI uses the **UCRT64** MSYS2 environment and its matching compiler, CMake, Ninja and SDL3 packages. Use that environment consistently rather than mixing tools from unrelated MSYS2 subsystems or an old absolute compiler path. The package names in the inspected workflow are: [Source: CI workflow](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/.github/workflows/ci.yml).
+Use the **UCRT64** MSYS2 environment and its matching compiler, CMake, Ninja and SDL3 packages. Keep this environment consistent rather than mixing tools from unrelated MSYS2 subsystems or an old absolute compiler path. Install the following packages in an MSYS2 UCRT64 shell:
 
 ```bash
 pacman -S --needed mingw-w64-ucrt-x86_64-gcc \
@@ -98,6 +98,6 @@ Machine-specific `.vscode` files containing paths such as `c:/GameEngine` are no
 
 ## 7. When something fails
 
-Record the exact commit, command, tool versions, build directory and error output. Separate configure failures, compilation failures, test failures and runtime failures. A workflow failure with no usable steps does not establish that the game tests failed.
+Record the exact commit, command, tool versions, build directory and error output. Separate configure failures, compilation failures, test failures and runtime failures.
 
-The unchanged baseline’s 81 tests now have a fresh local Linux pass. With content tools enabled, the new exporter adds two headless CTest entries. GitHub’s inspected run was blocked before execution by an account billing lock. See [Testing](TESTING.md) and the [verification record](BASELINE_VERIFICATION_2026-11-18.md) for exact outcomes and limits. Export usage is documented in [Starter-world export](../04-studio/STARTER_WORLD_EXPORT.md).
+The unchanged baseline’s 81 tests now have a fresh local Linux pass. With content tools enabled, the new exporter adds two headless CTest entries. See [Testing](TESTING.md) and the [verification record](BASELINE_VERIFICATION_2026-11-18.md) for exact outcomes and limits. Export usage is documented in [Starter-world export](../04-studio/STARTER_WORLD_EXPORT.md).

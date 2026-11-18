@@ -17,7 +17,7 @@ Inspect the working tree and current branch. Preserve unrelated local work. Crea
 
 Record the baseline commit and keep the change scope clear. Avoid combining a map redesign, save-format migration, renderer rewrite and editor GUI in one pull request. A narrowly scoped documentation cleanup can proceed independently of runtime changes when its evidence is clear.
 
-Branch protection and required checks are repository settings, not properties created by this document. Configure them deliberately when adopting the release process. Do not claim a rule is enforced merely because it appears here.
+Use local verification for the affected code and record the results with the change. A task can proceed once its relevant local evidence is sufficient; distinguish untested platforms from observed failures.
 
 ## 3. Work with the existing architecture
 

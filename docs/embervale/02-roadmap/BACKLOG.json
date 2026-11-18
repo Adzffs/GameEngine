@@ -6,36 +6,19 @@
   "status_policy": "Implementation tasks require acceptance evidence and merge before complete; ready_for_review records verified branch work; in_progress and blocked preserve outstanding scope. Planning IDs are not issue numbers.",
   "tasks": [
     {
-      "id": "ENG-001",
-      "milestone": "R0",
-      "priority": "P0",
-      "title": "Investigate current CI failure",
-      "status": "blocked",
-      "dependencies": [],
-      "acceptance": "Identify an evidenced cause or precise external blocker; obtain useful logs and rerun existing jobs; record exact commit and outcomes.",
-      "github_issue": null,
-      "evidence": [
-        "docs/embervale/06-development/BASELINE_VERIFICATION_2026-11-18.md",
-        "https://github.com/Adzffs/GameEngine/actions/runs/44018694678"
-      ],
-      "notes": "Public annotation confirms account billing lock before job execution. Owner must resolve it and rerun intended commit; no workflow source fix or CI pass claimed."
-    },
-    {
       "id": "ENG-002",
       "milestone": "R0",
       "priority": "P0",
       "title": "Reproduce baseline builds",
       "status": "in_progress",
-      "dependencies": [
-        "ENG-001"
-      ],
+      "dependencies": [],
       "acceptance": "Record compiler/CMake/SDL/platform versions, configure/build commands, test discovery and actual headless/client/graphics outcomes.",
       "github_issue": null,
       "evidence": [
         "docs/embervale/06-development/BASELINE_VERIFICATION_2026-11-18.md",
         "docs/embervale/06-development/verification/2026-11-18/results.json"
       ],
-      "notes": "Linux clean baseline passes 81; exporter headless 72/client 83 all pass with SDL dummy. Windows/UCRT64 and remote CI remain outstanding."
+      "notes": "Linux clean baseline passes 81; exporter headless 72/client 83 all pass with SDL dummy. Windows/UCRT64 remains unverified."
     },
     {
       "id": "DOC-001",
@@ -968,13 +951,13 @@
       "id": "QA-001",
       "milestone": "R6",
       "priority": "P1",
-      "title": "Maintain regression and content CI gates",
+      "title": "Maintain local regression and content checks",
       "status": "planned",
       "dependencies": [
         "STUDIO-052",
         "STUDIO-093"
       ],
-      "acceptance": "Require meaningful tests and content checks at release commit; preserve failure artifacts and prevent misleading skipped groups.",
+      "acceptance": "Run meaningful local tests and content checks at the release commit; preserve failure logs and report skipped groups.",
       "github_issue": null,
       "evidence": [],
       "notes": "Planning ID; not a GitHub issue number."

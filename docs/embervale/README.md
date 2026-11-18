@@ -17,7 +17,7 @@
 | Where should the settlement go? | [River Crossing proposal](05-game/RIVER_CROSSING.md) |
 | What still needs resolving? | [Risk register](07-decisions/RISKS_AND_QUESTIONS.md) |
 
-The source contains substantial RPG systems and a first read-only starter-world exporter. Editing and the proposed geographic redesign remain planned. The unchanged baseline now has a fresh local 81-test pass; GitHub’s inspected run was blocked before execution by an account billing lock. See the [verification record](06-development/BASELINE_VERIFICATION_2026-11-18.md) for baseline and changed-source results, and the remaining platform limits.
+The source contains substantial RPG systems and a first read-only starter-world exporter. Editing and the proposed geographic redesign remain planned. The unchanged baseline now has a fresh local 81-test pass. See the [verification record](06-development/BASELINE_VERIFICATION_2026-11-18.md) for baseline and changed-source results, and the remaining platform limits.
 
 ## Suggested reading paths
 
@@ -50,7 +50,7 @@ The source contains substantial RPG systems and a first read-only starter-world 
 | Document | What it contains |
 |---|---|
 | [MASTER_ROADMAP.md](02-roadmap/MASTER_ROADMAP.md) | R0–R10 milestones, dependencies, outcomes and implementation order |
-| [BACKLOG.md](02-roadmap/BACKLOG.md) | 88 work packages with priorities, dependencies and acceptance results |
+| [BACKLOG.md](02-roadmap/BACKLOG.md) | 87 work packages with priorities, dependencies and acceptance results |
 | [BACKLOG.json](02-roadmap/BACKLOG.json) | The same work-package records in a machine-readable form |
 | [RELEASE_GATES.md](02-roadmap/RELEASE_GATES.md) | Observable acceptance criteria for foundations, Alpha releases, beta and experiments |
 
@@ -85,10 +85,10 @@ The source contains substantial RPG systems and a first read-only starter-world 
 
 | Document | What it contains |
 |---|---|
-| [GETTING_STARTED.md](06-development/GETTING_STARTED.md) | Actual CMake/CI setup, Windows client, saves and editor guidance |
+| [GETTING_STARTED.md](06-development/GETTING_STARTED.md) | Local CMake setup, Windows client, saves and editor guidance |
 | [CONTRIBUTING.md](06-development/CONTRIBUTING.md) | Focused work, evidence, review, compatibility and parallel-agent handoff |
-| [TESTING.md](06-development/TESTING.md) | Current registrations, meaningful future tests, CI interpretation and result records |
-| [BASELINE_VERIFICATION_2026-11-18.md](06-development/BASELINE_VERIFICATION_2026-11-18.md) | Fresh baseline/export build results, environment, reproducible commands and exact CI blocker |
+| [TESTING.md](06-development/TESTING.md) | Current registrations, meaningful future tests and result records |
+| [BASELINE_VERIFICATION_2026-11-18.md](06-development/BASELINE_VERIFICATION_2026-11-18.md) | Fresh baseline/export build results, environment, reproducible commands and platform limits |
 | [RELEASE_PROCESS.md](06-development/RELEASE_PROCESS.md) | Versioned candidates, packaging, verification, rollback and maintenance |
 | [SECURITY_AND_RELIABILITY.md](06-development/SECURITY_AND_RELIABILITY.md) | Bounded content, scoped writes, recovery and future trust boundaries |
 | [DOCUMENTATION_MAINTENANCE.md](06-development/DOCUMENTATION_MAINTENANCE.md) | Source-of-truth rules, freshness, updates and archiving |
