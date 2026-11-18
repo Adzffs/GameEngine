@@ -88,6 +88,14 @@ class StudioBridge:
             self.width, self.height = width, height
             self.spawn = (self.snapshot["player_spawn"]["x"], self.snapshot["player_spawn"]["y"])
             self.definitions = {p["id"]: p["definition_id"] for p in self.snapshot["placements"]}
+            kinds = {"resource": "R", "station": "S", "npc_spawn": "N",
+                     "monster_spawn": "M"}
+            self.source_placements = {
+                p["id"]: (kinds[p["kind"]], p["position"]["x"], p["position"]["y"])
+                for p in self.snapshot["placements"]
+            }
+            if len(self.source_placements) != len(self.snapshot["placements"]):
+                raise ValueError("duplicate source placement IDs")
         except (OSError, UnicodeError, ValueError, TypeError, KeyError) as error:
             raise StudioError(f"Cannot display snapshot: {error}") from error
         self.hash: str | None = None
@@ -97,8 +105,8 @@ class StudioBridge:
         self._accept(self._invoke([]))
         if self.hash != display_hash:
             raise StudioError("CONTENT_CONFLICT: source changed while opening; reopen the editor")
-        if set(self.definitions) != set(self.placements):
-            raise StudioError("The authoritative placement list differs from the snapshot")
+        if self.placements != self.source_placements:
+            raise StudioError("The authoritative placements differ from the source snapshot")
         if self.terrain != display_terrain:
             raise StudioError("The authoritative terrain differs from the source snapshot")
 
@@ -157,8 +165,16 @@ class StudioBridge:
         if len(self.commands) >= MAX_COMMANDS:
             raise StudioError("This session reached its 256-command limit; save a draft and reopen it")
         result = self._invoke([*self.commands, command])
-        if set(result[1]) != set(self.definitions):
+        if set(result[1]) != set(self.source_placements):
             raise StudioError("Editing changed the authoritative placement identities")
+        for name, (kind, x, y) in result[1].items():
+            original_kind, original_x, original_y = self.source_placements[name]
+            if kind != original_kind:
+                raise StudioError("Editing changed an authoritative placement kind")
+            if not (0 <= x < self.width and 0 <= y < self.height):
+                raise StudioError("Editor returned an out-of-bounds placement")
+            if kind in ("N", "M") and (x, y) != (original_x, original_y):
+                raise StudioError("Editor moved a read-only actor spawn")
         # Both displayed placements and painted ground come from the same
         # successful backend replay. Rejections preserve all local state.
         self._accept(result)
