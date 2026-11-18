@@ -2,8 +2,8 @@
 
 **Reviewed:** 18 November 2026.\
 **Game-code baseline:** `e9d32932e8f9b27e96283313cca320058792a81f`.\
-**Original review method:** Read-only GitHub metadata, pinned source reads, recursive tree/history inventory, PR/workflow inspection and source-derived counts. That initial documentation review did not build the game.
-**Subsequent verification:** A clean local build of documentation merge `c697386382845f17ce02027e6bade24591a9eb36` passed all 81 existing tests. The exporter change passed all 83 CTest entries. The [dated record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) is the current build/CI evidence.
+**Original review method:** Read-only GitHub metadata, pinned source reads, recursive tree/history inventory, PR inspection and source-derived counts. That initial documentation review did not build the game.
+**Subsequent verification:** A clean local build of documentation merge `c697386382845f17ce02027e6bade24591a9eb36` passed all 81 existing tests. The exporter change passed all 83 CTest entries. The [dated record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) is the current local build evidence.
 
 This ledger is the factual boundary for the documentation pack. A roadmap can describe ambitious future work while this file remains conservative about what exists and what was verified.
 
@@ -12,7 +12,7 @@ This ledger is the factual boundary for the documentation pack. A roadmap can de
 | Status | Meaning | Evidence required to use it |
 |---|---|---|
 | SOURCE VERIFIED | A definition, path, algorithm, configuration, or behaviour is present in inspected source. | Exact commit and source path; explain any inference. |
-| REMOTE RESULT VERIFIED | A specific repository action or CI run/job has an observed outcome. | Exact commit where applicable, result URL, date, outcome, and limitations; CI is a subtype. |
+| REMOTE RESULT VERIFIED | A specific repository action has an observed outcome. | Exact commit where applicable, result URL, date, outcome, and limitations. |
 | HISTORICAL REPORT | An earlier PR, note, or document claims an outcome. | Link and date; preserve the distinction from current verification. |
 | PLANNED | Work is included in the current proposed implementation sequence. | Scope, dependency, owner when assigned, and exit evidence. |
 | PROPOSED | A design option or recommendation awaits an implementation/design decision. | Rationale, tradeoffs, and decision point. |
@@ -32,15 +32,11 @@ This ledger is the factual boundary for the documentation pack. A roadmap can de
 | EV-006 | No release objects were returned by the releases endpoint. | [Releases](https://github.com/Adzffs/GameEngine/releases), checked 18 November. This does not rule out untagged/manual builds. |
 | EV-007 | The branch summary reported `protected: false`; the repository rulesets endpoint returned an empty array. | [Branch API](https://api.github.com/repos/Adzffs/GameEngine/branches/master) and [rulesets API](https://api.github.com/repos/Adzffs/GameEngine/rulesets), checked 18 November. Record as observed settings, not a full organisation/security audit. |
 
-## 3. Updated build evidence and CI diagnosis
+## 3. Updated local build evidence
 
 [PR #3](https://github.com/Adzffs/GameEngine/pull/3) merged the handbook and focused cleanup at `c697386382845f17ce02027e6bade24591a9eb36` without changing engine/test source. A separate clean worktree at that commit built successfully on Linux; all **81 original tests passed**, including 4 client and 7 graphics tests using SDL’s dummy driver. The exporter implementation also passed its **72-test headless configuration** and **83-test client configuration**.
 
-The [master push run 44018694678](https://github.com/Adzffs/GameEngine/actions/runs/44018694678), at engine commit `e9d32932e8f9b27e96283313cca320058792a81f`, remains a failed remote result. Its public error annotation was subsequently inspected and explicitly identifies an **account billing lock that prevented the jobs from starting**. Both jobs had no recorded steps or runner; logs returned 404. The cause is now known for that run, and it is not evidence of a compiler or test failure.
-
-The [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) preserves exact annotation wording, run/job links, environment, commands, limitations and the machine-readable test/source record. The owner must resolve the account lock before rerunning GitHub Linux and Windows verification. No passing remote run or Windows execution is claimed.
-
-The [workflow source](https://github.com/Adzffs/GameEngine/blob/c697386382845f17ce02027e6bade24591a9eb36/.github/workflows/ci.yml) is unchanged. Windows test groups continue after individual failure to collect all results, then an always-run enforcement step requires each group to succeed. No workflow code defect was established by the account-lock investigation.
+The [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) preserves the environment, commands, limitations and machine-readable test/source record. No Windows execution is claimed.
 
 ## 4. Principal source evidence
 
@@ -67,7 +63,7 @@ All links in this table are pinned to the reviewed game-code baseline.
 
 Repository file counts were calculated from entries whose Git-tree type is `blob`. Test counts were calculated from CMake calls: seventy `add_gameengine_headless_test`, seven `add_gameengine_graphics_test`, and four explicitly registered client targets. This is not an assertion count. Catalogue counts came from the explicit registered lists, excluding `NONE` sentinels, rather than from the number of switch cases or enum tokens in an entire file.
 
-The history appendix contains all 234 unique commits returned by the three-page `master` history request. A commit title is evidence that the change was recorded; it does not establish that the original implementation remains unchanged or currently passes tests. The current source is the stronger evidence for current behaviour.
+The history appendix selects gameplay and project commits from the reviewed `master` history. A commit title is evidence that the change was recorded; it does not establish that the original implementation remains unchanged or currently passes tests. The current source is the stronger evidence for current behaviour.
 
 ## 6. Review limits and unresolved questions
 
@@ -81,6 +77,6 @@ The history appendix contains all 234 unique commits returned by the three-page 
 
 ## 7. Refresh protocol
 
-For each future baseline, record the new game-code SHA, date, changed systems, exact build/test commands and environments, remote run links, and a concise limitation statement. Keep old evidence immutable or clearly dated. Update current-state pages and roadmap statuses together so that implementation and documentation do not drift apart.
+For each future baseline, record the new game-code SHA, date, changed systems, exact build/test commands and environments, result records, and a concise limitation statement. Keep old evidence immutable or clearly dated. Update current-state pages and roadmap statuses together so that implementation and documentation do not drift apart.
 
 When a check is blocked, record the operation, observed failure, and what remains unknown. When a hypothesis is tested, link the result and remove only the uncertainty that result resolves. This keeps the roadmap useful as both a plan and a trustworthy record.

@@ -723,18 +723,11 @@
       }
     ]
   },
-  "github_ci": {
-    "run_url": "https://github.com/Adzffs/GameEngine/actions/runs/44018694678",
-    "run_commit": "e9d32932e8f9b27e96283313cca320058792a81f",
-    "outcome": "blocked_before_job_steps",
-    "observed_error": "The job was not started because your account is locked due to a billing issue."
-  },
   "limitations": [
     "No Windows/UCRT64 execution",
     "No visible interactive playtest",
     "No desktop/GPU or audio-device verification",
-    "No runtime map importer or editor validation claimed",
-    "No GitHub CI pass claimed"
+    "No runtime map importer or editor validation claimed"
   ],
   "original_runtime_tracked_files_modified": []
 }

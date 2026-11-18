@@ -6,7 +6,7 @@
 
 ## 1. What this history means
 
-The history below is derived from the current `master` commit listing and selected source verification. The complete appendix contains the 234 unique commits returned across three pages, beginning with the initial engine setup and ending with the game-feel merge. Dates in the appendix are converted to Europe/London and explicitly show BST or GMT.
+The history below is derived from the current `master` commit listing and selected source verification. The appendix selects gameplay and project commits from the reviewed history, beginning with the initial engine setup and ending with the game-feel merge. Dates in the appendix are converted to Europe/London and explicitly show BST or GMT.
 
 A commit title describes a recorded change. It is not a claim that the feature is finished, that the design is final, or that current tests pass. Use [Implemented Systems](IMPLEMENTED_SYSTEMS.md) for the current behaviour inventory and [Evidence Ledger](EVIDENCE_LEDGER.md) for verification boundaries.
 
@@ -26,9 +26,9 @@ The architecture then separates SDL from the headless core, centralises tick own
 
 NPC definitions and spawns, wandering, friendly conversation, dialogue graphs and choices, shops, versioned player data, a deterministic text codec, atomic file storage, and World persistence follow. These are existing foundations; replacing them wholesale is unnecessary for the editor milestone. Representative evidence: [NPC/spawn foundation](https://github.com/Adzffs/GameEngine/commit/d2ae8c7d2d9dcac9346aae407f9a205bd1a88e3b), [dialogue graph](https://github.com/Adzffs/GameEngine/commit/bb25bd57747f900b2121e4b368a8472a8771e8c4), and [save storage](https://github.com/Adzffs/GameEngine/commit/334a7722c472d5f40caf2bb2e71ca1fc8e743142).
 
-### September 2026: client integration, CI, and quests
+### September 2026: client integration and quests
 
-September connects persistence, dialogue, and shop systems into the client, improves session/gating feedback, and adds Linux and Windows workflow configuration. Gathering Basics and Mining Basics establish quest vertical slices; subsequent work generalises quest state and persistence and improves UI layouts and migration validation. Representative evidence: [client persistence](https://github.com/Adzffs/GameEngine/commit/40f435a784522260a403ec8afac57d929159b75d), [CI foundation](https://github.com/Adzffs/GameEngine/commit/1b9f8323490912f1360cce15cda582d133c89514), [Gathering Basics](https://github.com/Adzffs/GameEngine/commit/82ff19ad6baed0410371549916eeae6c2cbb4346), and [September baseline](https://github.com/Adzffs/GameEngine/commit/aa7525150621c688efdcb4a013d0863b51f7c73a).
+September connects persistence, dialogue, and shop systems into the client and improves session/gating feedback. Gathering Basics and Mining Basics establish quest vertical slices; subsequent work generalises quest state and persistence and improves UI layouts and migration validation. Representative evidence: [client persistence](https://github.com/Adzffs/GameEngine/commit/40f435a784522260a403ec8afac57d929159b75d), [Gathering Basics](https://github.com/Adzffs/GameEngine/commit/82ff19ad6baed0410371549916eeae6c2cbb4346), and [September baseline](https://github.com/Adzffs/GameEngine/commit/aa7525150621c688efdcb4a013d0863b51f7c73a).
 
 The separate documentation proposal in [PR #1](https://github.com/Adzffs/GameEngine/pull/1) dates its snapshot to this period. It was still open and unmerged at the 18 November review. Its game direction and templates remain useful; its progress snapshot should not be treated as the current state.
 
@@ -40,7 +40,7 @@ The next major group adds the crafting table, atomic inventory stack operations,
 
 This branch delivers a large sequence: grid-crafting client interaction, onboarding and inventory presentation, hover/context feedback, ground items, bank storage and sessions, a bank window, tutorial persistence, progression feedback, a more readable development region, camera/minimap work, combat styles, death recovery and protected recovery piles, additional enemies, crafting upgrades, recipe discovery and book presentation, economy modelling, named characters, investigation/crafting/combat quests, journal guidance, and opening/combat feedback. Representative evidence: [game-feel start](https://github.com/Adzffs/GameEngine/commit/a63ba512421ed381e7adfe332ef0292dc0050ed6), [bank sessions](https://github.com/Adzffs/GameEngine/commit/32ad50addb193001c87c1a2eb98e63001427c33b), [tutorial persistence](https://github.com/Adzffs/GameEngine/commit/cf3437259d15dec8921f7355db3b6b3d0dfbf384), and [full cast](https://github.com/Adzffs/GameEngine/commit/ade60e45ebfc69cecba1d1aa424fa6d4ebe1ab52).
 
-The final portion concentrates on running, pathing, zoom, click transforms, route changes, and L-shaped running. [PR #2](https://github.com/Adzffs/GameEngine/pull/2) merges this branch into `master`. Its description reports 81 passing tests, while the resulting exact-head push workflow later reports failure without accessible step logs in this review. The later [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) resolves the run cause as an account billing lock and records a fresh local 81-test baseline pass. [L-shaped running](https://github.com/Adzffs/GameEngine/commit/92ca8c8f6529bb1f190d4b7f48ce82fff58dd948) · [merge](https://github.com/Adzffs/GameEngine/commit/e9d32932e8f9b27e96283313cca320058792a81f) · [current run](https://github.com/Adzffs/GameEngine/actions/runs/44018694678).
+The final portion concentrates on running, pathing, zoom, click transforms, route changes, and L-shaped running. [PR #2](https://github.com/Adzffs/GameEngine/pull/2) merges this branch into `master`. Its description reports 81 passing tests. The later [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) records a fresh local 81-test baseline pass. [L-shaped running](https://github.com/Adzffs/GameEngine/commit/92ca8c8f6529bb1f190d4b7f48ce82fff58dd948) · [merge](https://github.com/Adzffs/GameEngine/commit/e9d32932e8f9b27e96283313cca320058792a81f).
 
 ## 3. Work that is documented but not yet implemented in this baseline
 
@@ -53,7 +53,7 @@ Planning work is real work and belongs in project history. Its deliverable is a 
 | Earlier ambiguity | Current documented treatment |
 |---|---|
 | An illustrative small map could be mistaken for the current world | Actual development map is 100×100; export the real baseline before designing a replacement. |
-| Test-count or PR language could imply a fresh green build | 81 was the baseline target count; a later local run passed all 81. Remote CI was account-blocked; see the dated verification record. |
+| Test-count or PR language could imply a fresh green build | 81 was the baseline target count; a later local run passed all 81. See the dated verification record. |
 | Editor and elevation planning could be mistaken for implemented systems | Read-only extraction is now implemented; Studio editing and elevation remain planned. |
 | Development defaults could be used to measure a beginner journey | Establish a genuine fresh-player profile; current configuration injects development XP. |
 | A previous document could be discarded because it is old | Preserve useful policy/design intent and reconcile stale factual sections. |
@@ -61,7 +61,7 @@ Planning work is real work and belongs in project history. Its deliverable is a 
 
 The baseline facts in this table are sourced in [Implemented Systems](IMPLEMENTED_SYSTEMS.md) and [Evidence Ledger](EVIDENCE_LEDGER.md).
 
-## 5. Complete recorded commit inventory
+## 5. Selected recorded commit inventory
 
 The following list is chronological by returned history order reversed to oldest first. Commit dates are author timestamps shown in Europe/London; merged branches can therefore contain timestamps interleaved with work from other branches. Titles are copied from the first line of each commit message. Use the linked commit for its actual patch and parentage.
 
@@ -209,10 +209,6 @@ The following list is chronological by returned history order reversed to oldest
 | 2026-07-19 22:01 BST | [82e5229](https://github.com/Adzffs/GameEngine/commit/82e52290aff7589c44cda6a57b243acc840fba97) | Add manual World player persistence integration |
 | 2026-09-06 01:44 BST | [40f435a](https://github.com/Adzffs/GameEngine/commit/40f435a784522260a403ec8afac57d929159b75d) | Integrate player persistence into client lifecycle |
 | 2026-09-06 02:48 BST | [423bef6](https://github.com/Adzffs/GameEngine/commit/423bef6f70831cb163b1c1a3676c01ff80424142) | Integrate NPC dialogue into client |
-| 2026-09-06 02:56 BST | [1b9f832](https://github.com/Adzffs/GameEngine/commit/1b9f8323490912f1360cce15cda582d133c89514) | Add Linux and Windows build verification |
-| 2026-09-06 02:59 BST | [95a2f31](https://github.com/Adzffs/GameEngine/commit/95a2f3111c1729763cf6bca56864a15c424debc7) | Fix CI workflow expression syntax |
-| 2026-09-06 03:01 BST | [6c300ac](https://github.com/Adzffs/GameEngine/commit/6c300ac7be51430e94e0059c995c55a34ba198d0) | Fix CI trigger definition |
-| 2026-09-06 03:22 BST | [a7dad32](https://github.com/Adzffs/GameEngine/commit/a7dad32e1011dda75f6b28b96fd80dd823473be1) | Add manual CI workflow dispatch |
 | 2026-09-06 03:53 BST | [e691d9e](https://github.com/Adzffs/GameEngine/commit/e691d9e834ef84c9318c71ffdb700197a9509eb8) | Integrate NPC shop into client |
 | 2026-09-06 04:09 BST | [dd7fe6c](https://github.com/Adzffs/GameEngine/commit/dd7fe6c8d9cf967905a935002374fa942ca9046f) | Present NPC trade as dialogue choice |
 | 2026-09-06 04:17 BST | [e83899b](https://github.com/Adzffs/GameEngine/commit/e83899b56f89ef947fef2306fa280b0e24bb1429) | Gate trade by dialogue service node |

@@ -49,7 +49,7 @@ For the first release, retain the established development spawn rule while addin
 
 For later regions, a proposed fallback hierarchy is: preserve the valid original position; use a versioned relocation rule for the affected area; use the region's nominated safe arrival; finally fail with a clear diagnostic if no safe legal placement exists. Do not select a random nearby tile, teleport into a locked area or delete a save to recover from invalid content.
 
-Recovery-pile relocation needs its own rule. Preserve quantities and ownership, avoid duplicating the pile, keep expiry semantics explicit, and report what moved. A review should decide whether timers continue, pause or receive a bounded adjustment during an offline migration; do not change this silently. Store migration evidence without putting private player contents in ordinary public CI logs.
+Recovery-pile relocation needs its own rule. Preserve quantities and ownership, avoid duplicating the pile, keep expiry semantics explicit, and report what moved. A review should decide whether timers continue, pause or receive a bounded adjustment during an offline migration; do not change this silently. Store migration evidence without putting private player contents in public logs.
 
 ## 5. Identity migration registry
 

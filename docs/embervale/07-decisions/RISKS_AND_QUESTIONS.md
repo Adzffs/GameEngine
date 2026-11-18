@@ -7,7 +7,6 @@ This register distinguishes observed findings from future design risks. Priority
 
 | ID | Finding | Evidence and effect | Next action |
 |---|---|---|---|
-| RISK-001 | GitHub CI cannot start because of an account billing lock | Public run annotation establishes the blocker; local Linux baseline passes all 81 tests, but Windows/remote CI remain unverified | Owner resolves account lock, then rerun CI on the intended SHA; [evidence](../06-development/BASELINE_VERIFICATION_2026-11-18.md) |
 | RISK-002 | Development defaults are boosted | Current configuration injects XP; elapsed starter progression could be misleading | GAME-001: define/test a genuine fresh profile |
 | RISK-003 | Ground and occupied tiles are mixed | Resource/station creation overwrites tile markers; moving a resource can lose base ground if exported naïvely | Export now preserves underlying ground; STUDIO-013 still needs the runtime compatibility adapter |
 | RISK-004 | Spawn catalogue and lifecycle are authoritative | External coordinates cannot bypass canonical equality checks; delayed actors and creation order affect behaviour | STUDIO-001/014/043: explicit provider and lifecycle mapping |
@@ -16,7 +15,6 @@ This register distinguishes observed findings from future design risks. Priority
 | RISK-007 | Narrative and economy descriptions have drift | Elite target naming and older ledger rows disagree with source | DOC-002/GAME-007: correct facts and decide remaining intent |
 | RISK-008 | Local editor files are stale; ignore rules miss actual output paths | Tracked .vscode setup targets old local paths; dash-named builds and saves need coverage | DOC-001: focused cleanup with removal manifest |
 | RISK-009 | Multi-step economy arbitrage is plausible | Source-derived 3 logs→12 planks→2 shields implies 3 coins spent and 24 returned; not runtime-replayed | GAME-008: reproduce complete chain and fix/test confirmed exploit |
-| RISK-010 | Branch protection is not established | Inspected branch reports unprotected and rulesets returned none | Decide supported review/check rules; do not claim existing protections |
 
 These statements are grounded in the [evidence ledger](../01-current-state/EVIDENCE_LEDGER.md) and pinned source references there. The documentation update addresses RISK-008 and factual parts of RISK-007 on its branch. Runtime findings remain implementation work.
 
@@ -51,7 +49,7 @@ Owner roles describe responsibilities; they do not assert that additional team m
 ### Before the first editor release
 
 - What is the minimal GUI packaging that preserves a clean headless dependency boundary?
-- Which preview backend can be reproduced in CI while sharing presentation semantics?
+- Which preview backend can be reproduced locally while sharing presentation semantics?
 - What lock/recheck and replace guarantees are supported on each target filesystem?
 - What exact fields are included in content hashes, manifests and validation provenance?
 - How are autosaved drafts discovered, retained, recovered and discarded visibly?

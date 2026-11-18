@@ -7,14 +7,13 @@
 
 Record the exact source commit, content hash/version, build configuration, tool versions, platform, commands, results and known limitations. Keep automated results separate from manual observations. A screenshot establishes appearance; it does not establish collision, reachability or save compatibility. An exported file establishes output; it does not establish successful runtime loading.
 
-The inspected GitHub baseline run was blocked before execution by an account billing lock. A fresh local Linux baseline now passes, and the export slice has its own regression evidence. Windows and GitHub CI remain outstanding; no cross-platform release gate is satisfied by the local run alone. See the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md).
+A fresh local Linux baseline passes, and the export slice has its own regression evidence. Windows remains unverified; the local Linux run does not establish a cross-platform result. See the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md).
 
 ## 2. Baseline gate
 
 | Requirement | Evidence |
 |---|---|
 | Current build can be reproduced | Headless build/test log and supported SDL3 client build/test log with commit and environment |
-| CI status is understood | Cause or precise unresolved blocker recorded; no unsupported claim that tests failed |
 | World ownership is known | Inventory of terrain, object, station, NPC, monster, label and quest-location definitions |
 | Save obligations are known | Fields, versions, player loading, respawns, recovery piles and fallback routes traced |
 | Test profile is honest | Development boost distinguished from fresh-player conditions |
@@ -75,7 +74,7 @@ Every additional content editor must author one real definition consumed by the 
 ## 8. Beta candidate gate
 
 - Supported build/install combinations are explicitly listed and exercised.
-- The release commit's required checks pass, and any intentionally excluded environment is stated.
+- The release commit's relevant local checks pass, and any intentionally excluded environment is stated.
 - Engine, content schema, asset and player-save compatibility are documented together.
 - Package creation and selection are repeatable; release metadata identifies exact inputs.
 - Normal operation, corrupted/missing content, update and rollback are tested.

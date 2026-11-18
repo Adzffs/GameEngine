@@ -9,9 +9,9 @@
 
 Embervale already has a substantial local game prototype: an authoritative world simulation, gathering and crafting, melee combat, six named friendly characters, a six-quest starter arc, banking, shops, and versioned player saves. The next development stage should preserve those systems while making their content editable. It should not assume the game is a blank engine.
 
-Throughout this document, **SOURCE VERIFIED** means the behaviour or definition was found in the pinned source. It does not mean a new build, playthrough, or test suite passed during this documentation task. **REMOTE RESULT VERIFIED** describes an observed repository result; a CI outcome is one subtype. **HISTORICAL REPORT** identifies a claim in an earlier PR or document. **PLANNED**, **PROPOSED**, and **UNVERIFIED** keep future work and uncertainty visible.
+Throughout this document, **SOURCE VERIFIED** means the behaviour or definition was found in the pinned source. It does not mean a new build, playthrough, or test suite passed during this documentation task. **REMOTE RESULT VERIFIED** describes an observed repository result. **HISTORICAL REPORT** identifies a claim in an earlier PR or document. **PLANNED**, **PROPOSED**, and **UNVERIFIED** keep future work and uncertainty visible.
 
-The original source inventory below is pinned to the engine baseline. Subsequent verification on 18 November reproduced all **81 existing tests passing** locally on Linux with SDL’s dummy driver at documentation merge `c697386`. GitHub’s failed run was blocked before steps started by an account billing lock; it was not a source-test failure. The [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) contains the new exporter checks and remaining platform limits.
+The original source inventory below is pinned to the engine baseline. Subsequent verification on 18 November reproduced all **81 existing tests passing** locally on Linux with SDL’s dummy driver at documentation merge `c697386`. The [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) contains the new exporter checks and remaining platform limits.
 
 ## 1. Baseline at a glance
 
@@ -147,15 +147,15 @@ The application uses `saves/development-player.save` relative to its working dir
 
 These safeguards do not make saves crash-proof. Periodic autosave, forced-termination guarantees, and physical-media durability beyond the existing implementation are not part of the documented lifecycle. Invalid saved player coordinates fall back to the development spawn if that fallback is valid. Recovery-pile coordinates and respawn destinations need explicit treatment when maps become editable; player-position fallback alone does not define the whole content migration policy. [Persistence policy][IS-PERSISTENCE-DOC] · [World][IS-WORLD]
 
-## 8. Validation, tests, and CI
+## 8. Validation and tests
 
 Startup content validation and catalogue validators already cover a broad group of items, resources, recipes, rewards, NPCs, spawns, shops, dialogue, and quests. Reuse their semantics through a content-provider boundary where needed. Creating a separate editor validator that disagrees with runtime validation would be a regression. [Validator][IS-VALIDATOR] · [Entry point][IS-MAIN]
 
 CMake defines 81 test executables when all relevant options are enabled: 70 headless, seven graphics, and four client tests. These cover many gameplay and persistence concerns, but an executable count says nothing about assertion count, code coverage, untested branches, or current pass rate. [CMake][IS-CMAKE]
 
-The workflow is configured for Linux headless and Windows UCRT64 client builds. Windows runs headless, client, and graphics groups with the dummy SDL video driver, collects failures, then explicitly enforces all test outcomes. Its `continue-on-error` settings therefore do not mean failures are silently accepted. [CI configuration][IS-CI]
+Local CMake builds support headless and SDL3 client configurations. CTest labels separate headless, client and graphics coverage; use SDL’s dummy display driver for the recorded noninteractive client and graphics tests. See [Testing](../06-development/TESTING.md).
 
-**Current result:** the latest `master` push run at the pinned commit is `failure`. **Historical report:** PR #2 says all 81 tests passed. Both statements belong in the record; the second does not override the first. The initial roadmap milestone should restore diagnosable CI execution and establish a fresh baseline before content migration. [Run][IS-CI-RUN] · [PR #2][IS-PR2]
+**Executed result:** all 81 baseline tests passed in a fresh local Linux run at documentation merge `c697386`. The exporter change passed 83 CTest entries. Windows execution and visible playtesting remain unverified; see the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md).
 
 ## 9. What should remain marked as future work
 
@@ -208,6 +208,5 @@ The first implementation goal is narrow: faithfully export the existing world, v
 [IS-FILESTORE]: https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Persistence/PlayerSaveFileStore.cpp
 [IS-MAIN]: https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/main.cpp
 [IS-VALIDATOR]: https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Content/ContentValidator.cpp
-[IS-CI]: https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/.github/workflows/ci.yml
-[IS-CI-RUN]: https://github.com/Adzffs/GameEngine/actions/runs/44018694678
+
 [IS-PR2]: https://github.com/Adzffs/GameEngine/pull/2

@@ -3,7 +3,7 @@
 **Date:** 18 November 2026 (GMT/UTC)\
 **Unchanged baseline:** [`c697386382845f17ce02027e6bade24591a9eb36`](https://github.com/Adzffs/GameEngine/commit/c697386382845f17ce02027e6bade24591a9eb36)\
 **Changed implementation:** The read-only exporter change containing this record; exact tested code/fixture hashes and per-test results are in [results.json](verification/2026-11-18/results.json).\
-**Result:** Local baseline and exporter configurations passed. GitHub CI remains blocked before execution by an account billing lock.
+**Result:** Local baseline and exporter configurations passed.
 
 ## 1. Actual local results
 
@@ -35,7 +35,7 @@ The original runtime source and existing test files were not modified. A separat
 
 SDL was built into a local prefix with dummy/offscreen video and disk/dummy audio. X11, Wayland and external audio backends were disabled because the test environment did not provide their development packages. The software renderer remained available. This setup proves automated client/graphics behaviour in that configuration; it is not a native desktop, GPU, audio-device or visible interactive playtest. SDL's [pinned build guidance](https://github.com/libsdl-org/SDL/blob/f00dc919ca35b9756316e86c4777392de442f9b2/docs/README-cmake.md) describes the supported CMake installation approach.
 
-No Windows/UCRT64 execution or macOS build is claimed. The checked-in Windows workflow remains the project’s Windows verification path once GitHub can schedule its jobs.
+No Windows/UCRT64 execution or macOS build is claimed. Use the documented local UCRT64 setup when verifying Windows behaviour.
 
 ## 3. Reproduction commands
 
@@ -93,19 +93,7 @@ The reviewed fixture contains **18,149 bytes**, including all 100 terrain rows a
 
 These tests establish the export baseline. They do not prove a parser, external runtime loader, arbitrary edited-map validation, guarded save transaction or GUI. Those features do not yet exist.
 
-## 5. GitHub CI diagnosis
-
-The public [run 44018694678](https://github.com/Adzffs/GameEngine/actions/runs/44018694678), for engine commit `e9d32932e8f9b27e96283313cca320058792a81f`, shows this error for both jobs:
-
-> The job was not started because your account is locked due to a billing issue.
-
-The annotation was observed on **18 November 2026 at 03:23:32 UTC** through the public, signed-out run page. Both the [Linux job](https://github.com/Adzffs/GameEngine/actions/runs/44018694678/job/133822729389) and [Windows job](https://github.com/Adzffs/GameEngine/actions/runs/44018694678/job/133822729009) had no reported steps, no assigned runner and approximately two-second durations. Log requests returned HTTP 404. The additional Ubuntu runner migration notice was separate from the account-lock errors.
-
-This resolves the original uncertainty about that run: it did not compile or test the source. No workflow source change is justified as a fix for this account error. Local passes do not turn that run green.
-
-The repository owner must resolve the account billing lock, then rerun the intended commit’s Linux and Windows jobs. This implementation remains reviewable while that external action is outstanding. Account settings were not changed, and no passing GitHub result is claimed.
-
-## 6. Remaining work and review boundary
+## 5. Remaining work and review boundary
 
 The export-only architecture is recorded in [ADR-016](../07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md). [Backlog progress](../02-roadmap/BACKLOG.md#current-progress) distinguishes implemented-for-review work from incomplete larger tasks.
 

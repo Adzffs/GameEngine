@@ -31,7 +31,7 @@
 | ADR-007 | Safe edits and concurrent writes | Proposed: typed transactions, content hash, lock/recheck, atomic replacement | Before persistent editor changes |
 | ADR-008 | Drafts, validation and publication | Proposed: separate recoverable drafts and immutable validated packages | Before save/recovery UI |
 | ADR-009 | Editor packaging | Open: separate executable or embedded mode, based on dependency and UX evidence | Before GUI target implementation |
-| ADR-010 | Preview renderer | Open: share interpretation/palette; choose backend with CI evidence | Before preview acceptance |
+| ADR-010 | Preview renderer | Open: share interpretation/palette; choose backend with reproducible local evidence | Before preview acceptance |
 | ADR-011 | Assets and provenance | Proposed: stable manifest IDs, source assets separate from derived atlas | Before first import |
 | ADR-012 | Surface and region identity | Proposed: reserve ground identity; implement transitions separately | Before schema freezes/elevation |
 | ADR-013 | Save migration | Proposed: preserve current format when possible; explicit registry for changes | Before content affects persisted references |

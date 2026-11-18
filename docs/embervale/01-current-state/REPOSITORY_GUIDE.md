@@ -48,13 +48,13 @@ These paths are present at the pinned commit. [Build][RG-CMAKE] · [entry point]
 | `src/Content/` | Catalogue validation and structured reports | Definition correctness and cross-reference checks. |
 | `src/Graphics/`, `src/Input/` | SDL presentation, input-facing client state | Camera, hitboxes, panels, procedural visuals. |
 | `tests/` | Behaviour and integration test executables | Existing regression coverage and new focused evidence. |
-| `.github/workflows/` | Linux and Windows CI | Reproduction of configured verification gates. |
+| `.github/` | Contribution templates | Bug reports, feature requests and pull request context. |
 
 The map is based on the complete source tree and the CMake source list. Some folders hold headers while orchestration still lives in `World.cpp`; folder names should not be interpreted as perfectly isolated services. [Tree][RG-TREE] · [CMake][RG-CMAKE]
 
 ## 3. Build and run reference
 
-These configurations have subsequently been reproduced on Linux, including all 81 original tests with SDL’s dummy driver. The exporter adds optional content-tool targets and two CTest checks; see the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md). GitHub remains blocked before execution by the observed account billing lock. Compiler, CMake, Ninja and SDL remain environment prerequisites.
+These configurations have subsequently been reproduced on Linux, including all 81 original tests with SDL’s dummy driver. The exporter adds optional content-tool targets and two CTest checks; see the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md). Compiler, CMake, Ninja and SDL remain environment prerequisites.
 
 ### Headless build
 
@@ -74,7 +74,7 @@ This deliberately disables both SDL-dependent targets. It is the useful baseline
 
 ### SDL client and complete configured test groups
 
-The current Windows workflow uses an MSYS2 **UCRT64** shell and the UCRT64 GCC, CMake, Ninja, and SDL3 packages. Keep the compiler, libraries, and build directory in the same toolchain family. [CI][RG-CI]
+For a Windows build, use an MSYS2 **UCRT64** shell and matching UCRT64 GCC, CMake, Ninja, and SDL3 packages. Keep the compiler, libraries, and build directory in the same toolchain family. See [Getting started](../06-development/GETTING_STARTED.md).
 
 ```bash
 cmake -S . -B build-client -G Ninja \
@@ -127,7 +127,7 @@ At the 18 November baseline review, an earlier documentation foundation was open
 
 The reviewed `.gitignore` already excludes `.vscode/`, but three editor configuration files are tracked. Their launch settings contain an absolute `c:/GameEngine` path and an `outDebug` executable path that differs from the current CMake target. These are machine-specific development settings rather than a portable project contract. A clean integration can remove those tracked copies after the CMake build/debug guidance is supplied; the ignore rule then allows individual local settings. [Editor launch settings][RG-LAUNCH] · [Ignore rules][RG-IGNORE]
 
-The ignore rules also use `build_client/` and `build_headless/`, while CI uses `build-client/` and `build-headless/`. A narrow update should cover the documented build folders and local saves. Do not add blanket patterns that could hide intended fixture files. There is no basis in the reviewed tree for deleting source, tests, or the three useful existing documents as generated clutter. [Ignore rules][RG-IGNORE] · [CI][RG-CI] · [Tree][RG-TREE]
+The ignore rules cover `build_client/`, `build_headless/`, `build-client/`, `build-headless/` and local saves. Keep intended fixture files visible. There is no basis in the reviewed tree for deleting source, tests, or the three useful existing documents as generated clutter. [Ignore rules][RG-IGNORE] · [Tree][RG-TREE]
 
 ## 6. When returning after a break
 
@@ -138,7 +138,6 @@ First read the current roadmap and evidence ledger, then inspect the actual bran
 [RG-MAIN]: https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/main.cpp
 [RG-WORLD]: https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/World/World.cpp
 [RG-COMMAND]: https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Command/ServerCommand.h
-[RG-CI]: https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/.github/workflows/ci.yml
 [RG-PERSISTENCE]: https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/docs/DevelopmentPlayerPersistence.md
 [RG-GRAPHICS]: https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Graphics/Graphics.cpp
 [RG-ECONOMY]: https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/docs/EconomyLedger.md

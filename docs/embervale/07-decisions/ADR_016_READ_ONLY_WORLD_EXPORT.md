@@ -2,7 +2,7 @@
 
 **Date:** 18 November 2026\
 **Status:** Implemented by this change; broader authoring/import decisions remain open.\
-**Related work:** ENG-001/002, STUDIO-001–004, STUDIO-010–012 and STUDIO-015.\
+**Related work:** ENG-002, STUDIO-001–004, STUDIO-010–012 and STUDIO-015.\
 **Sources:** [baseline inventory](../03-engine/STARTER_WORLD_BASELINE.md), [snapshot implementation](../../../src/Content/Export/StarterWorldSnapshot.cpp), [runtime parity tests](../../../tests/StarterWorldSnapshotTests.cpp).
 
 ## Context
@@ -45,6 +45,6 @@ Preview backend and GUI packaging remain open decisions. Their absence does not 
 
 ## Validation and follow-up
 
-Acceptance for this slice is deterministic valid JSON, a reviewed complete fixture, all-cell terrain/occupancy parity, lifecycle and object-binding parity, and passing existing relevant regressions. The [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) separates local outcomes from GitHub CI and platform limitations.
+Acceptance for this slice is deterministic valid JSON, a reviewed complete fixture, all-cell terrain/occupancy parity, lifecycle and object-binding parity, and passing existing relevant regressions. The [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) records local outcomes and platform limitations.
 
 Next implement bounded input and baseline loading equivalence, then one shared move operation. Keep this snapshot and its historical baseline assertions available while that integration is developed. If the runtime input format differs, introduce an explicit versioned conversion rather than silently treating the export marker as permission to load arbitrary documents.

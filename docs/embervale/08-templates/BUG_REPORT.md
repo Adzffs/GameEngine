@@ -23,7 +23,7 @@ Attach sanitised diagnostics, logs, screenshot/preview or fixture where useful. 
 
 ## Evidence and impact
 
-Distinguish observed behaviour from a source-derived hypothesis. Record affected saves/content, reproducible test result and any regression range. Do not label an unknown CI job failure as a particular unit-test failure.
+Distinguish observed behaviour from a source-derived hypothesis. Record affected saves/content, reproducible test result and any regression range. Distinguish setup, compilation and runtime failures from a particular test assertion failure.
 
 ## Resolution
 

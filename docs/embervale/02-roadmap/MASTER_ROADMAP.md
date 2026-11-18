@@ -14,17 +14,16 @@ Longer-term work includes richer assets and content, multiple regions, elevation
 
 The baseline is commit [e9d32932e8f9b27e96283313cca320058792a81f](https://github.com/Adzffs/GameEngine/commit/e9d32932e8f9b27e96283313cca320058792a81f). Source inspection confirms substantial RPG systems, a flat 100×100 development world, placeholder rendering and hardcoded content placement. A read-only starter-world export now establishes the first Studio foundation; importing and editing remain planned. See [Implemented systems](../01-current-state/IMPLEMENTED_SYSTEMS.md).
 
-Four findings change the implementation order:
+Three findings change the implementation order:
 
-1. The inspected [push workflow](https://github.com/Adzffs/GameEngine/actions/runs/44018694678) was blocked before execution by an account billing lock. Fresh local Linux baseline tests now pass; resolve the account blocker and rerun GitHub checks, including Windows, before claiming cross-platform CI success.
-2. The development player receives boosted XP under the current configuration. Starter pacing must be measured using a deliberately defined fresh-player profile. See [DevelopmentConfig](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Core/DevelopmentConfig.h).
-3. Some existing economy and objective descriptions disagree with implementation. Correct documentation facts, then resolve any remaining gameplay or narrative disagreements explicitly.
+1. The development player receives boosted XP under the current configuration. Starter pacing must be measured using a deliberately defined fresh-player profile. See [DevelopmentConfig](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Core/DevelopmentConfig.h).
+2. Some existing economy and objective descriptions disagree with implementation. Correct documentation facts, then resolve any remaining gameplay or narrative disagreements explicitly.
 
-4. Source-derived shop/recipe arithmetic suggests a repeatable 3-coin to 24-coin log/plank/shield chain. This needs runtime reproduction and a separate correction if confirmed before starter balance can be signed off. See GAME-008 and the [economy ledger](../../EconomyLedger.md).
+3. Source-derived shop/recipe arithmetic suggests a repeatable 3-coin to 24-coin log/plank/shield chain. This needs runtime reproduction and a separate correction if confirmed before starter balance can be signed off. See GAME-008 and the [economy ledger](../../EconomyLedger.md).
 
 ## 3. Roadmap at a glance
 
-R0 and R1 are **in progress**: the local baseline, placement/save inventory, export-only architecture and deterministic snapshot are implemented for review. CI recovery, full codec/provider validation, runtime import and the remaining R0 game tasks are outstanding. R2–R10 remain **planned**. See [current task progress](BACKLOG.md#current-progress) and the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md); no complete Studio release is claimed.
+R0 and R1 are **in progress**: the local baseline, placement/save inventory, export-only architecture and deterministic snapshot are implemented for review. Full codec/provider validation, runtime import and the remaining R0 game tasks are outstanding. R2–R10 remain **planned**. See [current task progress](BACKLOG.md#current-progress) and the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md); no complete Studio release is claimed.
 
 | Milestone | Outcome | Primary dependencies | Release or proof |
 |---|---|---|---|
@@ -58,7 +57,6 @@ The milestone numbers organise the work; they are not a rule that every optional
 
 ### Deliverables
 
-- Investigate the failed workflow using available run details and account/runner configuration. Record the cause only when supported by evidence. Re-run the existing jobs after resolving it; do not infer a code failure from an empty job trace.
 - Build the current headless configuration and the supported Windows SDL3 client configuration. Record commit, operating system, compiler, CMake, SDL version, configuration, discovered tests and results.
 - Trace all terrain, resources, workstations, NPCs, monster spawns, labels, quests and saved-position dependencies. Inventory source ownership and delayed creation stages.
 - Record baseline world state before player creation, after player registration and after representative gameplay actions. Identify invariants rather than blindly freezing every incidental runtime value.
@@ -70,7 +68,7 @@ The milestone numbers organise the work; they are not a rule that every optional
 
 A contributor can reproduce the selected baseline and distinguish any outstanding failure from an untested assumption. Placement sources and save dependencies are accounted for, and the evidence record gives a trustworthy starting point. If one platform is blocked, record the blocker and constrain subsequent claims; do not label a cross-platform release complete.
 
-**Work packages:** ENG-001, ENG-002, GAME-001, GAME-008, DOC-001, DOC-002, STUDIO-001–004.
+**Work packages:** ENG-002, GAME-001, GAME-008, DOC-001, DOC-002, STUDIO-001–004.
 
 ## 6. R1 — Safe authored-content foundation
 
@@ -180,7 +178,7 @@ Measure larger-map and heavy-content workloads before choosing chunking or cachi
 
 Finish Git conflict handling, documentation checks and scoped automation. An optional MCP wrapper may expose the existing command surface; it should not introduce a second implementation or unrestricted filesystem access. Version capabilities so an AI can identify supported commands.
 
-**Exit gate:** The chosen beta scope has reproducible builds, release evidence, compatibility tests, user workflows and rollback. Required CI checks are enabled and passing at the release commit; branch rules are deliberately configured rather than assumed.
+**Exit gate:** The chosen beta scope has reproducible builds, release evidence, compatibility tests, user workflows and rollback. The release commit has recorded local build and regression results for the chosen platforms.
 
 **Work packages:** STUDIO-091–094; REL-001–003; QA-001–003.
 
@@ -230,19 +228,18 @@ Choose protocol, transport, persistence backend and identity/security requiremen
 
 These are aspirations, not promised release dates. Keep features that reinforce the proven game loop; reconsider those that only enlarge maintenance cost.
 
-## 16. First eleven executable work packages
+## 16. First ten executable work packages
 
-1. ENG-001: diagnose and document the current CI failure.
-2. ENG-002: reproduce baseline builds and record environment/results.
-3. DOC-001: integrate this pack and narrowly scoped cleanup. **Documentation delivered through [PR #3](https://github.com/Adzffs/GameEngine/pull/3).**
-4. DOC-002: reconcile old documentation and objective/ledger drift.
-5. STUDIO-001: complete placement ownership inventory.
-6. STUDIO-002: trace save, respawn and position compatibility.
-7. GAME-001: define a genuine fresh-player profile.
-8. GAME-008: reproduce the source-derived multi-step economy cycle.
-9. STUDIO-003: record model/parser/target-boundary decisions.
-10. STUDIO-004: capture baseline world observations and meaningful parity fixtures.
-11. STUDIO-010: implement the minimal authored model after the preceding inputs are clear.
+1. ENG-002: reproduce baseline builds and record environment/results.
+2. DOC-001: integrate this pack and narrowly scoped cleanup. **Documentation delivered through [PR #3](https://github.com/Adzffs/GameEngine/pull/3).**
+3. DOC-002: reconcile old documentation and objective/ledger drift.
+4. STUDIO-001: complete placement ownership inventory.
+5. STUDIO-002: trace save, respawn and position compatibility.
+6. GAME-001: define a genuine fresh-player profile.
+7. GAME-008: reproduce the source-derived multi-step economy cycle.
+8. STUDIO-003: record model/parser/target-boundary decisions.
+9. STUDIO-004: capture baseline world observations and meaningful parity fixtures.
+10. STUDIO-010: implement the minimal authored model after the preceding inputs are clear.
 
 Documentation integration can proceed alongside the read-only baseline investigation. Runtime changes wait for relevant evidence. Do not begin every editor workspace in parallel.
 

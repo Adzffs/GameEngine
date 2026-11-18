@@ -22,7 +22,7 @@ Removing these tracked files does not change the CMake targets or source files. 
 
 ## 3. Ignore-rule corrections
 
-Retain existing underscore-named build entries for compatibility. Add the dash-named build-client/ and build-headless/ directories used by the current CI and onboarding, and ignore the application's local saves/ directory. Keep authored fixtures under explicit test fixture paths so ignoring local player saves does not hide future committed compatibility fixtures.
+Retain existing underscore-named build entries for compatibility. Add the dash-named build-client/ and build-headless/ directories used by the documented local build commands, and ignore the application's local saves/ directory. Keep authored fixtures under explicit test fixture paths so ignoring local player saves does not hide future committed compatibility fixtures.
 
 Do not use a broad rule that hides all JSON, all images, all data files or the future content directory. Authored content and asset manifests are project source and must remain reviewable.
 
@@ -46,7 +46,7 @@ The new root README and docs/embervale/README.md supply navigation. The detailed
 
 Create a dedicated documentation branch from the freshly checked default-branch head. Add this pack, correct the existing ledger/header links, apply the exact three removals and update ignore rules. Review the complete changed-file list. Validate internal links, source path references, backlog identifiers/dependencies and example syntax. Open a focused PR with the baseline limitations and cleanup manifest in its description.
 
-The documentation PR is not evidence that ENG-001, GAME-008, Studio or the starter redesign have been implemented. Report the new PR's actual check results separately from the historical code-baseline run. Merge and release status must reflect what GitHub actually reports.
+The documentation PR is not evidence that GAME-008, Studio or the starter redesign have been implemented. Record local verification for the actual change separately from historical test results. Merge and release status must reflect what GitHub actually reports.
 
 ## 7. Future cleanup policy
 
