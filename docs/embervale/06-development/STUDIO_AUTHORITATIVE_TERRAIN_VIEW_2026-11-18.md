@@ -11,3 +11,7 @@ Added fake-backed Python regression cases for missing terrain, malformed dimensi
 ## Verification and next gate
 
 Static source inspection and exact-match source edits were performed on GitHub's fetched branch content. The local container could not resolve github.com or raw.githubusercontent.com (network restriction), so it could not obtain a complete checkout. **No complete project build, committed Python suite, C++ interactive test, Windows test or real game/editor playtest ran in this session.** Do not merge based on this record. Next, run the full project build and targeted StarterWorld tests on a complete checkout, then run `python -m unittest discover -s tests -p test_world_editor_bridge.py -v` and inspect the actual Tk editor. Resolve defects before integrating stacked branches in dependency order.
+
+## Additional isolated protocol checks
+
+A self-contained GCC C++20 smoke executable reproduced the new `PrintTerrain` serializer and passed under `-Wall -Wextra -Werror`, confirming the expected delimiters and rows. A separate Python `unittest` harness exercised the new delimiter/dimension/glyph parsing logic: **6/6 passed** (valid rows, missing response, truncated height, invalid glyph, invalid width and latest response selection). These checks ran locally after the push, but **they were not the checked-in GameEngine test files and did not link against the actual engine**. The full integration/build status stated above remains unchanged.
