@@ -5,7 +5,7 @@ set(SCRIPT "${WORK_DIR}/commands.txt")
 configure_file("${FIXTURE}" "${SOURCE}" COPYONLY)
 file(REMOVE "${SAVED}")
 file(SHA256 "${SOURCE}" ORIGINAL_HASH)
-file(WRITE "${SCRIPT}" "list\nmap 30 30\nmove resource.normal_tree.001 30 30\nstatus\nundo\nstatus\nredo\nmove station.furnace.001 10 10\nsave ${SAVED}\nquit\n")
+file(WRITE "${SCRIPT}" "list\nmap 30 30\nmove resource.normal_tree.001 30 30\nstatus\nundo\nstatus\nredo\npaint 30 30 D\nundo\nredo\npaint 30 30 W\nmove station.furnace.001 10 10\nsave ${SAVED}\nquit\n")
 execute_process(COMMAND "${MOVER}" --session "${SOURCE}"
     INPUT_FILE "${SCRIPT}"
     RESULT_VARIABLE RESULT
@@ -14,7 +14,7 @@ execute_process(COMMAND "${MOVER}" --session "${SOURCE}"
 if(NOT RESULT EQUAL 0)
     message(FATAL_ERROR "interactive session failed: ${RESULT}: ${OUTPUT} ${ERRORS}")
 endif()
-foreach(EXPECTED "Existing placements" "Map x=" "Moved resource.normal_tree.001" "Undone." "Redone." "Changed: no" "Saved new draft:" "Session closed.")
+foreach(EXPECTED "Existing placements" "Map x=" "Moved resource.normal_tree.001" "Painted (30, 30) D" "Undone." "Redone." "Changed: no" "Saved new draft:" "Session closed.")
     string(FIND "${OUTPUT}" "${EXPECTED}" FOUND)
     if(FOUND EQUAL -1)
         message(FATAL_ERROR "session missing ${EXPECTED}: ${OUTPUT}")

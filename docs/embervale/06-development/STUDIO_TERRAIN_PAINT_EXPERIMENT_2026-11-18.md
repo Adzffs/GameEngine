@@ -20,4 +20,4 @@ The branch adds direct C++ paint candidate regression assertions to `StarterWorl
 
 ## Next
 
-Extend shared history and terminal editing with reversible terrain paint batches, return authoritative painted rows for the graphical viewport, then add the GUI brush. Keep current move/undo/save support, stable IDs, spawn lifecycle, and imported-player recovery unchanged.
+The stacked follow-up adds reversible one-tile terrain paint entries to the existing stable-ID move history, and exposes `paint x y G|D|S|W` in the interactive session. Move and paint edits now share undo/redo and the same guarded save path. **Verification of the follow-up is pending:** source and test changes were committed via GitHub, but this execution host cannot clone the complete repository for actual C++ builds or runtime runs. Next, run the full stacked build and registered tests, return authoritative painted rows for the graphical viewport, then add the GUI brush. Keep current move/undo/save support, stable IDs, spawn lifecycle, and imported-player recovery unchanged.

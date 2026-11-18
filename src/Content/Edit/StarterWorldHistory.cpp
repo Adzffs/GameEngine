@@ -71,6 +71,35 @@ namespace StarterWorldHistory
         return candidate;
     }
 
+    StarterWorldExport::Snapshot History::ApplyPaint(
+        const StarterWorldExport::Snapshot &current,
+        const Position &tile, char ground)
+    {
+        CheckRevision(current);
+        auto result = StarterWorldEdit::PaintTerrain(current, tile, ground);
+        if (!result.changed)
+            return std::move(result.candidate); // A no-op must retain redo history.
+
+        if (cursor_ >= MaximumEntries)
+            throw std::runtime_error("starter world history: maximum undo depth reached");
+
+        Entry entry;
+        entry.beforeCanonical = expectedCanonical_;
+        entry.paints.push_back(InversePaint{
+            result.position, result.previousTerrain, result.newTerrain});
+        entry.afterCanonical = StarterWorldExport::SerializeCanonical(result.candidate);
+
+        // Allocate the new history branch before committing. A failure must
+        // not change the cursor, expected revision or previous redo entries.
+        std::vector<Entry> updated(entries_.begin(), entries_.begin() + cursor_);
+        updated.push_back(std::move(entry));
+        std::string newExpected = updated.back().afterCanonical;
+        entries_.swap(updated);
+        expectedCanonical_.swap(newExpected);
+        ++cursor_;
+        return std::move(result.candidate);
+    }
+
     StarterWorldExport::Snapshot History::Undo(
         const StarterWorldExport::Snapshot &current)
     {
@@ -82,6 +111,9 @@ namespace StarterWorldHistory
             Conflict();
 
         auto candidate = StarterWorldImport::ValidateForRuntime(current);
+        for (auto it = entry.paints.rbegin(); it != entry.paints.rend(); ++it)
+            candidate = StarterWorldEdit::PaintTerrain(
+                candidate, it->tile, it->before).candidate;
         for (auto it = entry.moves.rbegin(); it != entry.moves.rend(); ++it)
             candidate = StarterWorldEdit::MovePlacement(
                 candidate, it->placementId, it->before).candidate;
@@ -108,6 +140,9 @@ namespace StarterWorldHistory
         for (const InverseMove &move : entry.moves)
             candidate = StarterWorldEdit::MovePlacement(
                 candidate, move.placementId, move.after).candidate;
+        for (const InversePaint &paint : entry.paints)
+            candidate = StarterWorldEdit::PaintTerrain(
+                candidate, paint.tile, paint.after).candidate;
         if (StarterWorldExport::SerializeCanonical(candidate) != entry.afterCanonical)
             Conflict();
 

@@ -109,5 +109,71 @@ int main()
     Reject(test, [&] { (void)repeated.Redo(externallyChanged); },
         "redo also rejects a valid external semantic revision");
     test.Expect(repeated.CanRedo(), "redo conflict preserves history cursor");
+    // Terrain edits share the SAME revision cursor as placement moves.
+    // Every accepted paint is validated by the authoritative runtime importer.
+    StarterWorldHistory::History terrainHistory(baseline);
+    const Position paintTile{30, 30};
+    const auto painted = terrainHistory.ApplyPaint(baseline, paintTile, 'D');
+    const std::string paintedCanonical = SerializeCanonical(painted);
+    test.Expect(paintedCanonical != original, "terrain paint changes canonical content");
+    test.ExpectEqual(terrainHistory.EntryCount(), std::size_t{1},
+        "single terrain edit creates one undo entry");
+    const auto noopPaint = terrainHistory.ApplyPaint(painted, paintTile, 'D');
+    test.ExpectEqual(SerializeCanonical(noopPaint), paintedCanonical,
+        "painting the current glyph is a no-op");
+    test.ExpectEqual(terrainHistory.EntryCount(), std::size_t{1},
+        "no-op paint never creates an entry");
+
+    Reject(test, [&] {
+        (void)terrainHistory.ApplyPaint(painted, Position{5, 5}, 'W');
+    }, "blocked player-spawn paint rejected by runtime validation");
+    test.ExpectEqual(terrainHistory.AppliedCount(), std::size_t{1},
+        "rejected paint preserves cursor");
+
+    const auto terrainUndone = terrainHistory.Undo(painted);
+    test.ExpectEqual(SerializeCanonical(terrainUndone), original,
+        "terrain undo restores the exact starting world");
+    const auto noOpAfterUndo = terrainHistory.ApplyPaint(terrainUndone, paintTile, 'G');
+    test.Expect(terrainHistory.CanRedo() && terrainHistory.EntryCount() == 1,
+        "no-op terrain paint does not erase the redo branch");
+    test.ExpectEqual(SerializeCanonical(noOpAfterUndo), original,
+        "no-op on baseline preserves original revision");
+    const auto terrainRedone = terrainHistory.Redo(noOpAfterUndo);
+    test.ExpectEqual(SerializeCanonical(terrainRedone), paintedCanonical,
+        "terrain redo restores exactly the edited world");
+
+    const auto externalTerrain = StarterWorldEdit::MovePlacement(
+        terrainRedone, Furnace, Position{35, 30}).candidate;
+    Reject(test, [&] { (void)terrainHistory.Undo(externalTerrain); },
+        "terrain undo rejects external valid semantic edits");
+    test.ExpectEqual(terrainHistory.AppliedCount(), std::size_t{1},
+        "terrain history conflict does not move its cursor");
+
+    const auto terrainBack = terrainHistory.Undo(terrainRedone);
+    const auto branchedPaint = terrainHistory.ApplyPaint(terrainBack, paintTile, 'S');
+    test.Expect(!terrainHistory.CanRedo() && terrainHistory.EntryCount() == 1,
+        "new paint after undo discards prior redo");
+    test.ExpectEqual(SerializeCanonical(terrainHistory.Undo(branchedPaint)), original,
+        "branched paint remains reversible");
+
+    StarterWorldHistory::History mixed(baseline);
+    const auto movedBeforePaint = mixed.ApplyMoves(
+        baseline, {{Tree, Position{30, 30}}});
+    const auto paintedAfterMove = mixed.ApplyPaint(movedBeforePaint, paintTile, 'D');
+    const auto mixedCanonical = SerializeCanonical(paintedAfterMove);
+    const auto undoOnlyPaint = mixed.Undo(paintedAfterMove);
+    test.ExpectEqual(SerializeCanonical(undoOnlyPaint),
+        SerializeCanonical(movedBeforePaint),
+        "undo paint retains earlier object move");
+    const auto undoBoth = mixed.Undo(undoOnlyPaint);
+    test.ExpectEqual(SerializeCanonical(undoBoth), original,
+        "second undo reverses object move as well");
+    const auto redoOnlyMove = mixed.Redo(undoBoth);
+    test.ExpectEqual(SerializeCanonical(redoOnlyMove),
+        SerializeCanonical(movedBeforePaint),
+        "redo first replays object movement");
+    test.ExpectEqual(SerializeCanonical(mixed.Redo(redoOnlyMove)), mixedCanonical,
+        "redo next replays painted ground");
+
     return test.Finish();
 }

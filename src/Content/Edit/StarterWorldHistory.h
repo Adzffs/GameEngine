@@ -33,6 +33,12 @@ namespace StarterWorldHistory
             const StarterWorldExport::Snapshot &current,
             const std::vector<MoveCommand> &commands);
 
+        // One accepted, validated base-ground tile change becomes one history
+        // entry. No-op paint keeps any pending redo branch intact.
+        StarterWorldExport::Snapshot ApplyPaint(
+            const StarterWorldExport::Snapshot &current,
+            const Position &tile, char ground);
+
         // Both require the exact current semantic revision previously returned
         // by this history. On conflict or invalid inverse, state is unchanged.
         StarterWorldExport::Snapshot Undo(const StarterWorldExport::Snapshot &current);
@@ -50,9 +56,16 @@ namespace StarterWorldHistory
             Position before;
             Position after;
         };
+        struct InversePaint
+        {
+            Position tile;
+            char before;
+            char after;
+        };
         struct Entry
         {
             std::vector<InverseMove> moves;
+            std::vector<InversePaint> paints;
             std::string beforeCanonical;
             std::string afterCanonical;
         };

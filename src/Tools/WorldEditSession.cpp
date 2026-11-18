@@ -115,7 +115,8 @@ namespace
     void Help(std::ostream &out)
     {
         out << "Commands: help, list, map [x y], move <id> <x> <y>,"
-            << " undo, redo, status, save <fresh-sibling.json>, quit\n"
+            << " paint <x> <y> <G|D|S|W>, undo, redo, status,"
+            << " save <fresh-sibling.json>, quit\n"
             << "All changes are private until save. A save creates a NEW sibling"
             << " draft only; it cannot overwrite source, existing drafts or"
             << " player saves. No actions affect the running game.\n";
@@ -198,6 +199,23 @@ namespace EmbervaleStudioSession
                     current = std::move(next);
                     output << (changed ? "Moved " : "Unchanged ") << id
                         << " to (" << x << ", " << y << ")\n";
+                }
+                else if (command == "paint")
+                {
+                    std::string sx, sy, symbol;
+                    int x = 0, y = 0;
+                    if (!(args >> sx >> sy >> symbol) ||
+                        !Coordinate(sx, x) || !Coordinate(sy, y) ||
+                        symbol.size() != 1)
+                        throw std::runtime_error("usage: paint <x> <y> <G|D|S|W>");
+                    RequireEnd(args);
+                    auto next = history.ApplyPaint(current, Position{x, y}, symbol[0]);
+                    const bool changed =
+                        StarterWorldExport::SerializeCanonical(next) !=
+                            StarterWorldExport::SerializeCanonical(current);
+                    current = std::move(next);
+                    output << (changed ? "Painted " : "Unchanged terrain at ")
+                        << "(" << x << ", " << y << ") " << symbol << '\n';
                 }
                 else if (command == "undo")
                 {
