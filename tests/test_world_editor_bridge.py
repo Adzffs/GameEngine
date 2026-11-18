@@ -220,6 +220,55 @@ class BridgeTests(unittest.TestCase):
         self.assertFalse(draft.exists())
         self.assertEqual(self.bridge.commands, [])
 
+
+    def test_save_readback_matches_moved_and_painted_world(self):
+        self.bridge.move('resource.tree.001', 3, 1)
+        self.bridge.paint(1, 0, 'D')
+        draft = self.source.with_name('edited draft.json')
+        self.bridge.save(draft)
+        authored = json.loads(draft.read_text(encoding='utf-8'))
+        self.assertEqual(authored['placements'][0]['position'], {'x': 3, 'y': 1})
+        self.assertEqual(authored['terrain']['rows'][0], 'GDGG')
+        self.assertEqual(self.bridge.commands, ['move resource.tree.001 3 1', 'paint 1 0 D'])
+
+    def test_save_rejects_correctly_hashed_wrong_terrain(self):
+        original = "authored['terrain'] = {'rows': terrain}"
+        self.assertIn(original, FAKE_TOOL)
+        self.tool.write_text(FAKE_TOOL.replace(
+            original, "authored['terrain'] = {'rows': ['DDDD', *terrain[1:]]}"),
+            encoding='utf-8')
+        draft = self.source.with_name('unexpected terrain.json')
+        with self.assertRaisesRegex(StudioError, 'Saved draft differs'):
+            self.bridge.save(draft)
+        self.assertTrue(draft.exists())
+        self.assertEqual(self.bridge.commands, [])
+
+    def test_save_rejects_correctly_hashed_wrong_placement(self):
+        original = "authored['terrain'] = {'rows': terrain}"
+        self.assertIn(original, FAKE_TOOL)
+        self.tool.write_text(FAKE_TOOL.replace(
+            original,
+            "authored['placements'][0]['position']['x'] = 0\\n            authored['terrain'] = {'rows': terrain}".replace('\\n', '\n')),
+            encoding='utf-8')
+        draft = self.source.with_name('unexpected placement.json')
+        with self.assertRaisesRegex(StudioError, 'Saved draft differs'):
+            self.bridge.save(draft)
+        self.assertTrue(draft.exists())
+        self.assertEqual(self.bridge.commands, [])
+
+    def test_save_rejects_correctly_hashed_changed_spawn(self):
+        original = "authored = dict(world)"
+        self.assertIn(original, FAKE_TOOL)
+        self.tool.write_text(FAKE_TOOL.replace(
+            original,
+            "authored = dict(world)\\n            authored['player_spawn'] = {'x': 2, 'y': 0}".replace('\\n', '\n')),
+            encoding='utf-8')
+        draft = self.source.with_name('unexpected spawn.json')
+        with self.assertRaisesRegex(StudioError, 'Saved draft differs'):
+            self.bridge.save(draft)
+        self.assertTrue(draft.exists())
+        self.assertEqual(self.bridge.commands, [])
+
     def test_protects_invalid_action_and_history_limit(self):
         with self.assertRaisesRegex(StudioError, 'Invalid placement ID'):
             self.bridge.move('resource.tree.001\nquit', 1, 0)

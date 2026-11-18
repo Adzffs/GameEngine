@@ -8,6 +8,7 @@ bounded user commands; it never serializes gameplay content to disk.
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import re
@@ -113,7 +114,7 @@ def verify_editor_checkpoint(action: str, checkpoints: list[tuple[dict, tuple[st
 
 
 
-def verify_saved_draft_receipt(transcript: str, destination: Path) -> None:
+def verify_saved_draft_receipt(transcript: str, destination: Path) -> bytes:
     """Accept only the requested new draft when the saved bytes match C++."""
     target = str(destination)
     acknowledgements = re.findall(r"^Saved new draft: (.+)$", transcript, re.MULTILINE)
@@ -130,6 +131,31 @@ def verify_saved_draft_receipt(transcript: str, destination: Path) -> None:
         raise StudioError(f"Cannot verify saved draft: {error}") from error
     if hashlib.sha256(saved_bytes).hexdigest() != digests[0]:
         raise StudioError("Saved draft SHA-256 differs from the authoritative receipt")
+    return saved_bytes
+
+
+def verify_saved_world_parity(original: dict, saved_bytes: bytes,
+                              placements: dict, terrain: list[str]) -> None:
+    """Ensure the published draft is precisely the edited world, not just hashed bytes."""
+    try:
+        saved = json.loads(saved_bytes.decode("utf-8"))
+        expected = copy.deepcopy(original)
+        expected["terrain"]["rows"] = list(terrain)
+        kinds = {"resource": "R", "station": "S", "npc_spawn": "N",
+                 "monster_spawn": "M"}
+        for entry in expected["placements"]:
+            kind, x, y = placements[entry["id"]]
+            if kinds[entry["kind"]] != kind:
+                raise StudioError("Saved draft changed a placement kind")
+            entry["position"]["x"] = x
+            entry["position"]["y"] = y
+        # Canonical C++ output sorts placements by ID, not source order.
+        expected["placements"].sort(key=lambda entry: entry["id"])
+        saved["placements"].sort(key=lambda entry: entry["id"])
+    except (KeyError, IndexError, TypeError, ValueError, UnicodeError, AttributeError) as error:
+        raise StudioError("Saved draft has malformed world content") from error
+    if saved != expected:
+        raise StudioError("Saved draft differs from edited terrain, placements or preserved world metadata")
 
 class StudioBridge:
     """Revision-bound replay bridge to the *real* C++ editing session.
@@ -295,7 +321,8 @@ class StudioBridge:
             raise StudioError("Invalid draft filename")
         # The C++ writer validates source SHA and publishes only a new sibling.
         result = self._invoke([*self.commands, "save " + target])
-        verify_saved_draft_receipt(result[4], Path(target))
+        saved_bytes = verify_saved_draft_receipt(result[4], Path(target))
+        verify_saved_world_parity(self.snapshot, saved_bytes, self.placements, self.terrain)
         return target
 
 
