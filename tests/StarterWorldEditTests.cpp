@@ -113,6 +113,12 @@ int main()
         "water cannot consume an existing tree");
     RejectPaint(baseline, baseline.playerSpawn, 'W',
         "water cannot consume the player spawn");
+    // Both neighbours of the corner spawn can become water individually,
+    // but cutting the last reachable exit must fail the full-world gate.
+    const auto firstBarrier = StarterWorldEdit::PaintTerrain(
+        baseline, Position{1, 0}, 'W');
+    RejectPaint(firstBarrier.candidate, Position{0, 1}, 'W',
+        "paint cannot isolate the player from every authored service");
     Snapshot broken = baseline;
     broken.terrainRows[0][0] = 'W';
     RejectPaint(broken, Position{30, 30}, 'D',
