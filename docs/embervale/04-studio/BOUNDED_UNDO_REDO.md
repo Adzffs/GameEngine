@@ -44,3 +44,9 @@ history disappears on exit. See the dedicated session tests and evidence record.
 This class does not persist history across process restarts, support arbitrary object creation/removal, make undo available in the CLI, or implement UI shortcuts. A general command journal, batch file transaction and editor controls belong to later slices. When building the visual editor, connect its selection and hotkeys to this shared service rather than creating a second interpretation of world movement. Always confirm the generated candidate with the real runtime validator and use separately guarded draft publication.
 
 See [editor workflows](EDITOR_WORKFLOWS.md), [guarded draft revisions](GUARDED_DRAFT_REVISIONS.md) and the [verification boundary](../06-development/STUDIO_HISTORY_VERIFICATION_2026-11-18.md).
+
+## First visual shell (STUDIO-030)
+
+An experimental desktop map viewport in [`tools/embervale_world_editor.py`](../../../tools/embervale_world_editor.py) wraps the actual `EmbervaleWorldMove --session` command. It shows the complete terrain grid, authored placements and a stable-ID inspector; clicks propose existing resource/station moves. Undo, redo and saving use the same in-memory C++ history and guarded draft publication on every replay. The editor does not write JSON itself.
+
+`--session` additionally accepts `--expected-hash <sha256>` so the GUI can pin every replay to the exact source revision it opened and reject external source changes before executing commands. The session `save` command accepts the remainder of its line as a destination, supporting ordinary file paths containing spaces. See [visual editor scope and verification](VISUAL_WORLD_EDITOR.md). This is an experimental shell, not full editor acceptance or a completed graphical playtest.
