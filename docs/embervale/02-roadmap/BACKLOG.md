@@ -33,6 +33,9 @@ The export foundation is followed by bounded parsing, geographic validation and 
 | Create-only guarded draft writer | STUDIO-021 | in_progress | Source-byte SHA-256, exclusive source lock, read/recheck, same-directory new-file publication; limited isolated verification only, not in-place replacement or full platform acceptance |
 | Shared placement move | STUDIO-020 | in_progress | A typed resource/station move returns a validated copy, with a dry-run CLI and regression tests; writes, diff, history and wider editing remain open |
 | Bounded command undo/redo | STUDIO-023 | in_progress | In-memory resource/station move batches have inverse replay and semantic conflict detection; full project verification, persistence and UI remain open |
+| Interactive map-preview/session | STUDIO-022, STUDIO-024 | in_progress | Stacked terminal view shows occupancy and all stable IDs, supports shared history and create-only guarded saves; isolated syntax/mock checks only; full repo and graphical UI unverified |
+
+The next stacked slice provides a map/list terminal editor using shared movement history and guarded saving; it remains an interim text-based surface, pending full-project build and runtime validation.
 
 A bounded experimental expected-hash, create-only sibling draft writer (STUDIO-021) is now staged on a separate development branch. It protects the source and refuses stale or pre-existing targets, but has not met the full replacement, platform and integration acceptance gates. Next: verify the stacked changes against the full game, complete guarded revision support, then expanded undo/redo (STUDIO-023), preview and the minimal visual editor. The new STUDIO-020 resource/station move preview is an in-memory candidate with full runtime validation and a no-write CLI; broader editing operations remain open. Fresh-player and economy work also remain open. A parser or a successful load alone does not demonstrate a complete authoring product.
 
