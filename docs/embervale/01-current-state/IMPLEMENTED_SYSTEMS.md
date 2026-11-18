@@ -1,8 +1,8 @@
 # Implemented systems and current project state
 
-**Review date:** 18 November 2026  
-**Repository:** Adzffs/GameEngine  
-**Reviewed baseline:** `e9d32932e8f9b27e96283313cca320058792a81f` on `master`  
+**Review date:** 18 November 2026\
+**Repository:** Adzffs/GameEngine\
+**Reviewed baseline:** `e9d32932e8f9b27e96283313cca320058792a81f` on `master`\
 **Purpose:** Explain what is already present, what it does, and what still needs evidence or development.
 
 ## How to read this inventory
@@ -11,7 +11,7 @@ Embervale already has a substantial local game prototype: an authoritative world
 
 Throughout this document, **SOURCE VERIFIED** means the behaviour or definition was found in the pinned source. It does not mean a new build, playthrough, or test suite passed during this documentation task. **REMOTE RESULT VERIFIED** describes an observed repository result; a CI outcome is one subtype. **HISTORICAL REPORT** identifies a claim in an earlier PR or document. **PLANNED**, **PROPOSED**, and **UNVERIFIED** keep future work and uncertainty visible.
 
-The important current limitation is verification: the exact reviewed commit has a failed GitHub Actions run. Both recorded jobs ended without recorded steps, and their logs were unavailable. The cause is unresolved; the evidence does not establish that a particular test failed. No local compilation or gameplay testing was performed for this documentation review. [CI run][IS-CI-RUN]
+The original source inventory below is pinned to the engine baseline. Subsequent verification on 18 November reproduced all **81 existing tests passing** locally on Linux with SDL’s dummy driver at documentation merge `c697386`. GitHub’s failed run was blocked before steps started by an account billing lock; it was not a source-test failure. The [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) contains the new exporter checks and remaining platform limits.
 
 ## 1. Baseline at a glance
 
@@ -29,7 +29,8 @@ The important current limitation is verification: the exact reviewed commit has 
 | Recipe catalogue | 14 entries | Smelting, forging, planks, and a wooden shield. |
 | Skill types | 5 non-`NONE` entries | Attack, Defence, Woodcutting, Mining, Smithing. |
 | Player save format | Version 13 | Existing migrations and compatibility behaviour must be preserved. |
-| Test targets | 70 headless + 7 graphics + 4 client = 81 | CMake registration count, not a new passing-test result. |
+| Baseline test targets | 70 headless + 7 graphics + 4 client = 81 | Fresh local baseline pass recorded separately. |
+| Read-only world export | Complete 100×100 ground plus 20 placements and lifecycle metadata | Implemented as a separate SDL-free tool; two additional CTest entries. |
 
 Sources: [build definition][IS-CMAKE], [clock][IS-CLOCK], [world dimensions][IS-WORLD-CONTENT-H], [terrain and placements][IS-WORLD-CONTENT], [NPC definitions][IS-NPC], [quest definitions][IS-QUEST], [items][IS-ITEM], [recipes][IS-RECIPE], [skills][IS-SKILLS], [save data][IS-SAVE]. Counts refer to the pinned catalogue lists, excluding sentinel values where stated.
 
@@ -158,7 +159,7 @@ The workflow is configured for Linux headless and Windows UCRT64 client builds. 
 
 ## 9. What should remain marked as future work
 
-The reviewed default-branch tree does not contain Embervale Studio, an external region loader/exporter, a map-editing GUI, a shared editor command API, an editor CLI, content publication states, an asset import/atlas editor, an AI/MCP authoring interface, layered elevation, or a production online service. They remain planned capabilities, even when this documentation describes their intended design in detail. [Reviewed tree][IS-TREE]
+The initial reviewed tree had no Studio implementation. This change adds a separate [read-only starter-world exporter](../04-studio/STARTER_WORLD_EXPORT.md), typed snapshot, canonical writer, explicit identity mappings and runtime/CLI regression checks. The current game still loads compiled content. An external region loader, map-editing GUI, shared edit API, content publication, asset editor, AI/MCP editing interface, elevation and production online service remain planned.
 
 The first implementation goal is narrow: faithfully export the existing world, validate and reload it with parity, then move one authored tree through a shared command path and prove that save/reopen, collision, interactions, preview, and runtime agree. That proves the editing foundation on the existing game before the content library expands.
 

@@ -1,7 +1,7 @@
 # Embervale master roadmap
 
-**Version:** 1.0 · **Status date:** 18 November 2026  
-**Scope:** GameEngine, Embervale, Embervale Studio and project delivery.  
+**Version:** 1.0 · **Status date:** 18 November 2026\
+**Scope:** GameEngine, Embervale, Embervale Studio and project delivery.\
 **Canonical roadmap:** This document replaces the competing phase sequences in the earlier Studio plans. The original STUDIO task IDs remain traceable in the [backlog](BACKLOG.md).
 
 ## 1. The destination
@@ -12,11 +12,11 @@ Longer-term work includes richer assets and content, multiple regions, elevation
 
 ## 2. Starting point and immediate priorities
 
-The baseline is commit [e9d32932e8f9b27e96283313cca320058792a81f](https://github.com/Adzffs/GameEngine/commit/e9d32932e8f9b27e96283313cca320058792a81f). Source inspection confirms substantial RPG systems, a flat 100×100 development world, placeholder rendering and hardcoded content placement. Studio and an external region pipeline are planned. See [Implemented systems](../01-current-state/IMPLEMENTED_SYSTEMS.md).
+The baseline is commit [e9d32932e8f9b27e96283313cca320058792a81f](https://github.com/Adzffs/GameEngine/commit/e9d32932e8f9b27e96283313cca320058792a81f). Source inspection confirms substantial RPG systems, a flat 100×100 development world, placeholder rendering and hardcoded content placement. A read-only starter-world export now establishes the first Studio foundation; importing and editing remain planned. See [Implemented systems](../01-current-state/IMPLEMENTED_SYSTEMS.md).
 
 Four findings change the implementation order:
 
-1. The latest inspected [push workflow](https://github.com/Adzffs/GameEngine/actions/runs/44018694678) failed, with no usable step execution/log evidence returned. Establish why and obtain a reproducible baseline before treating earlier test reports as current assurance.
+1. The inspected [push workflow](https://github.com/Adzffs/GameEngine/actions/runs/44018694678) was blocked before execution by an account billing lock. Fresh local Linux baseline tests now pass; resolve the account blocker and rerun GitHub checks, including Windows, before claiming cross-platform CI success.
 2. The development player receives boosted XP under the current configuration. Starter pacing must be measured using a deliberately defined fresh-player profile. See [DevelopmentConfig](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Core/DevelopmentConfig.h).
 3. Some existing economy and objective descriptions disagree with implementation. Correct documentation facts, then resolve any remaining gameplay or narrative disagreements explicitly.
 
@@ -24,7 +24,7 @@ Four findings change the implementation order:
 
 ## 3. Roadmap at a glance
 
-All R0–R10 milestones below are **planned**. This documentation pack completes a planning deliverable; it does not complete the implementation milestones.
+R0 and R1 are **in progress**: the local baseline, placement/save inventory, export-only architecture and deterministic snapshot are implemented for review. CI recovery, full codec/provider validation, runtime import and the remaining R0 game tasks are outstanding. R2–R10 remain **planned**. See [current task progress](BACKLOG.md#current-progress) and the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md); no complete Studio release is claimed.
 
 | Milestone | Outcome | Primary dependencies | Release or proof |
 |---|---|---|---|

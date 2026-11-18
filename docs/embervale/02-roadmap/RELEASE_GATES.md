@@ -1,13 +1,13 @@
 # Release gates and acceptance demonstrations
 
-**Status:** Proposed acceptance contract. No Studio release is marked complete by this document.  
+**Status:** Proposed acceptance contract. No Studio release is marked complete by this document.\
 **Purpose:** Make completion observable and prevent unfinished foundations from being hidden behind a large feature list.
 
 ## 1. Evidence required for every gate
 
 Record the exact source commit, content hash/version, build configuration, tool versions, platform, commands, results and known limitations. Keep automated results separate from manual observations. A screenshot establishes appearance; it does not establish collision, reachability or save compatibility. An exported file establishes output; it does not establish successful runtime loading.
 
-The latest inspected baseline CI run is failed with an unknown cause. Gate evidence must come from a subsequent reproducible run, not a reference to PR #2's historical result. See the [evidence ledger](../01-current-state/EVIDENCE_LEDGER.md).
+The inspected GitHub baseline run was blocked before execution by an account billing lock. A fresh local Linux baseline now passes, and the export slice has its own regression evidence. Windows and GitHub CI remain outstanding; no cross-platform release gate is satisfied by the local run alone. See the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md).
 
 ## 2. Baseline gate
 

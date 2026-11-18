@@ -77,4 +77,4 @@ Before starting work, read the current overview, the relevant work package, its 
 
 ## 9. When something is uncertain
 
-Label the uncertainty and state the next observation that would resolve it. Use “source-derived, not runtime-reproduced” for the documented economy calculation. Use “unknown cause” for the inspected CI failure until evidence identifies it. Clear uncertainty is more useful than confident but unsupported completion language.
+Label the uncertainty and state the next observation that would resolve it. Use “source-derived, not runtime-reproduced” for the documented economy calculation. The original CI uncertainty was resolved by the public run annotation: an account billing lock prevented jobs from starting. Preserve that evidence and the separate local results in the [verification record](BASELINE_VERIFICATION_2026-11-18.md). Clear uncertainty is more useful than confident but unsupported completion language.

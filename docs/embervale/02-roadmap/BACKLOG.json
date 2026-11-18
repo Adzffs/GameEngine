@@ -3,33 +3,39 @@
   "reviewed_date": "2026-11-18",
   "repository": "Adzffs/GameEngine",
   "baseline_commit": "e9d32932e8f9b27e96283313cca320058792a81f",
-  "status_policy": "Implementation tasks are planned until evidence proves acceptance; planning IDs are not issue numbers.",
+  "status_policy": "Implementation tasks require acceptance evidence and merge before complete; ready_for_review records verified branch work; in_progress and blocked preserve outstanding scope. Planning IDs are not issue numbers.",
   "tasks": [
     {
       "id": "ENG-001",
       "milestone": "R0",
       "priority": "P0",
       "title": "Investigate current CI failure",
-      "status": "planned",
+      "status": "blocked",
       "dependencies": [],
       "acceptance": "Identify an evidenced cause or precise external blocker; obtain useful logs and rerun existing jobs; record exact commit and outcomes.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/BASELINE_VERIFICATION_2026-11-18.md",
+        "https://github.com/Adzffs/GameEngine/actions/runs/44018694678"
+      ],
+      "notes": "Public annotation confirms account billing lock before job execution. Owner must resolve it and rerun intended commit; no workflow source fix or CI pass claimed."
     },
     {
       "id": "ENG-002",
       "milestone": "R0",
       "priority": "P0",
       "title": "Reproduce baseline builds",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "ENG-001"
       ],
       "acceptance": "Record compiler/CMake/SDL/platform versions, configure/build commands, test discovery and actual headless/client/graphics outcomes.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/BASELINE_VERIFICATION_2026-11-18.md",
+        "docs/embervale/06-development/verification/2026-11-18/results.json"
+      ],
+      "notes": "Linux clean baseline passes 81; exporter headless 72/client 83 all pass with SDL dummy. Windows/UCRT64 and remote CI remain outstanding."
     },
     {
       "id": "DOC-001",
@@ -65,58 +71,70 @@
       "milestone": "R0",
       "priority": "P0",
       "title": "Inventory all placement ownership",
-      "status": "planned",
+      "status": "ready_for_review",
       "dependencies": [
         "ENG-002"
       ],
       "acceptance": "Trace ground, object, station, NPC, monster, label, quest and initialization ownership with source links.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/03-engine/STARTER_WORLD_BASELINE.md"
+      ],
+      "notes": "All source placement owners, ordered terrain, objects, labels, quests and actor initialization traced. Inventory delivered for review; baseline platform work remains open."
     },
     {
       "id": "STUDIO-002",
       "milestone": "R0",
       "priority": "P0",
       "title": "Audit position and save compatibility",
-      "status": "planned",
+      "status": "ready_for_review",
       "dependencies": [
         "STUDIO-001"
       ],
       "acceptance": "Cover player creation/loading/death/respawn, recovery piles, spawn catalogue checks, interaction approach tiles and historical saves.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/03-engine/STARTER_WORLD_BASELINE.md",
+        "docs/embervale/03-engine/SAVE_COMPATIBILITY.md"
+      ],
+      "notes": "Inventory covers direct/loaded player positions, respawn, recovery piles, spawn equality, approaches and wire versions 1–13. No edited-world migration acceptance claimed."
     },
     {
       "id": "STUDIO-003",
       "milestone": "R0",
       "priority": "P1",
       "title": "Decide minimal content architecture",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-001",
         "STUDIO-002"
       ],
       "acceptance": "Record parser, schema representation, target dependencies, coordinates and preview design ADRs with consequences.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md"
+      ],
+      "notes": "Export-only model, canonical rows/JSON, explicit identity/lifecycle and separate SDL-free targets decided. General parser and preview/backend decisions remain open."
     },
     {
       "id": "STUDIO-004",
       "milestone": "R0",
       "priority": "P0",
       "title": "Capture semantic baseline fixtures",
-      "status": "planned",
+      "status": "ready_for_review",
       "dependencies": [
         "STUDIO-001",
         "STUDIO-002"
       ],
       "acceptance": "Snapshot terrain/occupancy and lifecycle stages; define deterministic behavioural checks without overfitting transient IDs.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "tests/StarterWorldSnapshotTests.cpp",
+        "tests/StarterWorldExportCliTests.cmake",
+        "tests/fixtures/content/development-starter.snapshot.json",
+        "docs/embervale/06-development/verification/2026-11-18/results.json"
+      ],
+      "notes": "Full-grid and actor-stage runtime parity, true pathfinder endpoints, actual furnace interaction and canonical fixture checks pass. Saved-content importer scenarios remain later gates."
     },
     {
       "id": "GAME-001",
@@ -151,44 +169,55 @@
       "milestone": "R1",
       "priority": "P1",
       "title": "Define authored region model",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-003",
         "STUDIO-004"
       ],
       "acceptance": "Represent region identity, dimensions, ground, placements, definition references and ground surface without changing current gameplay.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "src/Content/Export/StarterWorldSnapshot.h",
+        "docs/embervale/04-studio/STARTER_WORLD_EXPORT.md"
+      ],
+      "notes": "A typed snapshot represents the complete current ground/placements/default spawn/lifecycle. General authored input/edit model is not yet finalized."
     },
     {
       "id": "STUDIO-011",
       "milestone": "R1",
       "priority": "P1",
       "title": "Implement bounded codec and canonical writer",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-010"
       ],
       "acceptance": "Round-trip valid fixtures deterministically; reject malformed/oversized/unsupported/duplicate content before allocation or map writes.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "src/Content/Export/StarterWorldSnapshot.cpp",
+        "tests/StarterWorldSnapshotTests.cpp"
+      ],
+      "notes": "Canonical writer and bounded in-memory structural checks implemented. No parser, hostile-file rejection or parse/write round trip exists yet."
     },
     {
       "id": "STUDIO-012",
       "milestone": "R1",
       "priority": "P1",
       "title": "Export current world read-only",
-      "status": "planned",
+      "status": "ready_for_review",
       "dependencies": [
         "STUDIO-011",
         "STUDIO-004"
       ],
       "acceptance": "Export actual 100×100 definitions, pond, overlays, placements and lifecycle metadata; compare complete semantic baseline.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "src/Tools/WorldExportMain.cpp",
+        "tests/fixtures/content/development-starter.snapshot.json",
+        "docs/embervale/04-studio/STARTER_WORLD_EXPORT.md",
+        "docs/embervale/06-development/verification/2026-11-18/results.json"
+      ],
+      "notes": "Read-only export acceptance implemented and locally verified. This bounded writer-only proof does not close full codec dependency STUDIO-011 or broader R1 gates."
     },
     {
       "id": "STUDIO-014",
@@ -210,14 +239,17 @@
       "milestone": "R1",
       "priority": "P1",
       "title": "Maintain stable ID and migration registry",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-010"
       ],
       "acceptance": "Map authored IDs to current enums, forbid silent reuse/renumbering, document aliases/removals and test references.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "src/Content/Export/StarterWorldSnapshot.cpp",
+        "docs/embervale/07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md"
+      ],
+      "notes": "Explicit baseline placement/definition/spawn mappings avoid ordinals/coordinates/runtime IDs and reject missing/repeated legacy mappings. General new placement identity allocation, aliases, deletions and migrations remain future work."
     },
     {
       "id": "STUDIO-050",

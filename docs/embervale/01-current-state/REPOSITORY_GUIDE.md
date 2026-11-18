@@ -1,6 +1,6 @@
 # Repository guide and developer orientation
 
-**Status:** SOURCE VERIFIED orientation to `e9d32932e8f9b27e96283313cca320058792a81f`; proposed integration notes are labelled separately.  
+**Status:** SOURCE VERIFIED orientation to `e9d32932e8f9b27e96283313cca320058792a81f`; proposed integration notes are labelled separately.\
 **Reviewed:** 18 November 2026.
 
 ## 1. Start here
@@ -54,7 +54,7 @@ The map is based on the complete source tree and the CMake source list. Some fol
 
 ## 3. Build and run reference
 
-These commands reproduce the configured CMake options. They were **not executed during this documentation task**, and the remote baseline is not green. Compiler, CMake, Ninja, and SDL installation remain environment prerequisites. [CMake][RG-CMAKE] · [CI][RG-CI]
+These configurations have subsequently been reproduced on Linux, including all 81 original tests with SDL’s dummy driver. The exporter adds optional content-tool targets and two CTest checks; see the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md). GitHub remains blocked before execution by the observed account billing lock. Compiler, CMake, Ninja and SDL remain environment prerequisites.
 
 ### Headless build
 

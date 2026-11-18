@@ -1,0 +1,740 @@
+{
+  "recorded_date": "2026-11-18",
+  "baseline_commit": "c697386382845f17ce02027e6bade24591a9eb36",
+  "environment": {
+    "os": "Debian GNU/Linux 13 x86_64",
+    "compiler": "GCC/G++ 14.2.0",
+    "cmake": "4.4.5",
+    "ninja": "1.13.2.git.kitware.jobserver-pipe-1",
+    "build_type": "Debug",
+    "sdl_version": "3.4.20",
+    "sdl_commit": "f00dc919ca35b9756316e86c4777392de442f9b2",
+    "client_video_driver": "dummy"
+  },
+  "implementation_source_sha256": {
+    "CMakeLists.txt": "a78cdd0365a16edf86be4a272bf6dc2cea49548c2aae7393b10edde75b1a7b0b",
+    "src/Content/Export/StarterWorldSnapshot.h": "803ef661df9b2db4dd2929e0f918ccf657bd678253755355d86edfcea49c28d4",
+    "src/Content/Export/StarterWorldSnapshot.cpp": "739930862dcc4e6ddc6dd7fc9f5d92d9fd5a27a321a689567b0b08ecedea6a45",
+    "src/Tools/WorldExportMain.cpp": "3927442546e4e15ff08cf2df73d74367561b29d31b37f7a50c0f019ad1cab9fd",
+    "tests/StarterWorldSnapshotTests.cpp": "91fb45ef3ee5fe276962198d7101221ec1b95f5a6915279783ca595f813e8032",
+    "tests/StarterWorldExportCliTests.cmake": "0555264101807479eb9c775bddc641b02a696680274af47e762244542e061752",
+    "tests/fixtures/content/development-starter.snapshot.json": "33477349aceb2899fcdc8a4715a42833dc3e35f7cc44d37045dd9466b8fd7957",
+    "tests/fixtures/content/.gitattributes": "a80a87585f6d9b0da5c4dcb15feb7a95d82e5b4a4ca66ebaac1e02cba69ae8a8"
+  },
+  "baseline_client": {
+    "total": 81,
+    "passed": 81,
+    "failed": 0,
+    "skipped": 0,
+    "label_counts": {
+      "headless": 70,
+      "client": 4,
+      "graphics": 7
+    },
+    "test_names_sha256": "513fa680b30e597217e94634308cc1d0419202c181563d7b45c48d511a05b0bb"
+  },
+  "export_headless": {
+    "total": 72,
+    "passed": 72,
+    "failed": 0,
+    "skipped": 0,
+    "label_counts": {
+      "headless": 72,
+      "client": 0,
+      "graphics": 0
+    },
+    "test_names_sha256": "36cc2ccd944cffd1f9898c0a79db99e0941b4c707133e558dea1d86853d86d26"
+  },
+  "export_client": {
+    "total": 83,
+    "passed": 83,
+    "failed": 0,
+    "skipped": 0,
+    "label_counts": {
+      "headless": 72,
+      "client": 4,
+      "graphics": 7
+    },
+    "tests": [
+      {
+        "name": "StarterWorldSnapshotTests",
+        "status": "passed",
+        "seconds": 0.140497,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "StarterWorldExportCliTests",
+        "status": "passed",
+        "seconds": 0.0668106,
+        "labels": [
+          "content",
+          "headless"
+        ]
+      },
+      {
+        "name": "ActionFrameworkTests",
+        "status": "passed",
+        "seconds": 0.0072329,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "GameplayActionIntegrationTests",
+        "status": "passed",
+        "seconds": 0.00992334,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "EquipmentStatsTests",
+        "status": "passed",
+        "seconds": 0.00529546,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "PlayerHealthTests",
+        "status": "passed",
+        "seconds": 0.0077007,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "CombatFormulaTests",
+        "status": "passed",
+        "seconds": 0.00354075,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "MeleeAttackResolverTests",
+        "status": "passed",
+        "seconds": 0.00543725,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "CombatServiceTests",
+        "status": "passed",
+        "seconds": 0.0031866,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "MeleeCombatActionTests",
+        "status": "passed",
+        "seconds": 0.00990076,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "PendingMeleeInteractionTests",
+        "status": "passed",
+        "seconds": 0.00694224,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "MeleeEngagementTests",
+        "status": "passed",
+        "seconds": 0.0119609,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "MeleeEngagementSystemTests",
+        "status": "passed",
+        "seconds": 0.00330239,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "InteractionSystemTests",
+        "status": "passed",
+        "seconds": 0.0036367,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "CombatantMonsterTests",
+        "status": "passed",
+        "seconds": 0.00645843,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "EntityDeathEventTests",
+        "status": "passed",
+        "seconds": 0.00890384,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "RewardTableTests",
+        "status": "passed",
+        "seconds": 0.00308019,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "InventoryTransactionTests",
+        "status": "passed",
+        "seconds": 0.00297831,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "InventoryStackOperationsTests",
+        "status": "passed",
+        "seconds": 0.00586045,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "PlayerSaveStateTests",
+        "status": "passed",
+        "seconds": 0.00661814,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "PlayerSaveTextCodecTests",
+        "status": "passed",
+        "seconds": 0.0113813,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "PlayerSaveFileStoreTests",
+        "status": "passed",
+        "seconds": 0.00970221,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "WorldPlayerPersistenceTests",
+        "status": "passed",
+        "seconds": 0.018297,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "WorldPlayerPersistenceLifecycleTests",
+        "status": "passed",
+        "seconds": 0.00910571,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "EnginePlayerPersistenceLifecycleTests",
+        "status": "passed",
+        "seconds": 0.0113828,
+        "labels": [
+          "client"
+        ]
+      },
+      {
+        "name": "MonsterLootIntegrationTests",
+        "status": "passed",
+        "seconds": 0.0142983,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "MonsterRespawnTests",
+        "status": "passed",
+        "seconds": 0.0121307,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "EquipmentUnequipTests",
+        "status": "passed",
+        "seconds": 0.00545469,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "RequirementSystemTests",
+        "status": "passed",
+        "seconds": 0.00590739,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "ActionLifecycleEventTests",
+        "status": "passed",
+        "seconds": 0.0162421,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "ContentValidationTests",
+        "status": "passed",
+        "seconds": 0.007128,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "StatusEffectTests",
+        "status": "passed",
+        "seconds": 0.00790736,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "FoodHealingTests",
+        "status": "passed",
+        "seconds": 0.00771693,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "AggressiveMonsterTests",
+        "status": "passed",
+        "seconds": 0.00998205,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "MonsterAISystemTests",
+        "status": "passed",
+        "seconds": 0.00593181,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "WorldTickAuthorityTests",
+        "status": "passed",
+        "seconds": 0.00739417,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "ClockPacingTests",
+        "status": "passed",
+        "seconds": 0.00293225,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "GatheringRandomTests",
+        "status": "passed",
+        "seconds": 0.0116381,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "GatheringSystemTests",
+        "status": "passed",
+        "seconds": 0.00325818,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "QuestSystemTests",
+        "status": "passed",
+        "seconds": 0.00283473,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "QuestDefinitionTests",
+        "status": "passed",
+        "seconds": 0.00280795,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "QuestWorldIntegrationTests",
+        "status": "passed",
+        "seconds": 0.0147511,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "QuestDialogueIntegrationTests",
+        "status": "passed",
+        "seconds": 0.00587623,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "QuestPersistenceTests",
+        "status": "passed",
+        "seconds": 0.0108818,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "QuestPresentationStateTests",
+        "status": "passed",
+        "seconds": 0.00274998,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "ProgressionPresentationStateTests",
+        "status": "passed",
+        "seconds": 0.00411964,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "StarterRegionTests",
+        "status": "passed",
+        "seconds": 0.00694345,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "MiningBasicsQuestTests",
+        "status": "passed",
+        "seconds": 0.00771357,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "RecipeActionSystemTests",
+        "status": "passed",
+        "seconds": 0.00322678,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "RecipeBookTests",
+        "status": "passed",
+        "seconds": 0.00283316,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "RecipeDiscoveryIntegrationTests",
+        "status": "passed",
+        "seconds": 0.00596794,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "CraftingRecipeTests",
+        "status": "passed",
+        "seconds": 0.00571337,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "CraftingTableWorldTests",
+        "status": "passed",
+        "seconds": 0.00888248,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "CraftingSessionTests",
+        "status": "passed",
+        "seconds": 0.00710367,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "MovementPathSafetyTests",
+        "status": "passed",
+        "seconds": 0.211128,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "MovementSystemTests",
+        "status": "passed",
+        "seconds": 0.00739717,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "EntityManagerLookupTests",
+        "status": "passed",
+        "seconds": 0.0122256,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "ServerCommandQueueTests",
+        "status": "passed",
+        "seconds": 0.120439,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "TickSchedulerTests",
+        "status": "passed",
+        "seconds": 0.00504618,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "NpcDefinitionTests",
+        "status": "passed",
+        "seconds": 0.0050329,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "NpcSpawnManagerTests",
+        "status": "passed",
+        "seconds": 0.00415213,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "MonsterWanderingTests",
+        "status": "passed",
+        "seconds": 0.00589352,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "FriendlyNpcTests",
+        "status": "passed",
+        "seconds": 0.00392188,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "NpcInteractionTests",
+        "status": "passed",
+        "seconds": 0.522235,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "DialogueDefinitionTests",
+        "status": "passed",
+        "seconds": 0.0208656,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "DialogueSystemTests",
+        "status": "passed",
+        "seconds": 0.00570168,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "DialogueChoiceTests",
+        "status": "passed",
+        "seconds": 0.0200719,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "DialoguePresentationStateTests",
+        "status": "passed",
+        "seconds": 0.00346151,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "EngineWorldClickDecisionTests",
+        "status": "passed",
+        "seconds": 0.258256,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "ShopPresentationStateTests",
+        "status": "passed",
+        "seconds": 0.00466808,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "ShopDefinitionTests",
+        "status": "passed",
+        "seconds": 0.00424608,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "ShopSystemTests",
+        "status": "passed",
+        "seconds": 0.00338918,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "ShopInteractionTests",
+        "status": "passed",
+        "seconds": 0.0109617,
+        "labels": [
+          "headless"
+        ]
+      },
+      {
+        "name": "MonsterGraphicsTests",
+        "status": "passed",
+        "seconds": 0.0140283,
+        "labels": [
+          "graphics"
+        ]
+      },
+      {
+        "name": "MeleeClickIntegrationTests",
+        "status": "passed",
+        "seconds": 0.129624,
+        "labels": [
+          "graphics"
+        ]
+      },
+      {
+        "name": "CombatFeedbackTests",
+        "status": "passed",
+        "seconds": 0.00929453,
+        "labels": [
+          "graphics"
+        ]
+      },
+      {
+        "name": "CameraPresentationTests",
+        "status": "passed",
+        "seconds": 0.00429825,
+        "labels": [
+          "graphics"
+        ]
+      },
+      {
+        "name": "MonsterRetaliationTests",
+        "status": "passed",
+        "seconds": 0.0113009,
+        "labels": [
+          "graphics"
+        ]
+      },
+      {
+        "name": "QuestGraphicsTests",
+        "status": "passed",
+        "seconds": 0.0622425,
+        "labels": [
+          "graphics"
+        ]
+      },
+      {
+        "name": "CraftingTableGraphicsTests",
+        "status": "passed",
+        "seconds": 0.0360692,
+        "labels": [
+          "graphics"
+        ]
+      },
+      {
+        "name": "ClientDialogueIntegrationTests",
+        "status": "passed",
+        "seconds": 0.00525934,
+        "labels": [
+          "client"
+        ]
+      },
+      {
+        "name": "ClientShopIntegrationTests",
+        "status": "passed",
+        "seconds": 0.00638743,
+        "labels": [
+          "client"
+        ]
+      },
+      {
+        "name": "ClientCraftingIntegrationTests",
+        "status": "passed",
+        "seconds": 0.00655571,
+        "labels": [
+          "client"
+        ]
+      }
+    ]
+  },
+  "github_ci": {
+    "run_url": "https://github.com/Adzffs/GameEngine/actions/runs/44018694678",
+    "run_commit": "e9d32932e8f9b27e96283313cca320058792a81f",
+    "outcome": "blocked_before_job_steps",
+    "observed_error": "The job was not started because your account is locked due to a billing issue."
+  },
+  "limitations": [
+    "No Windows/UCRT64 execution",
+    "No visible interactive playtest",
+    "No desktop/GPU or audio-device verification",
+    "No runtime map importer or editor validation claimed",
+    "No GitHub CI pass claimed"
+  ],
+  "original_runtime_tracked_files_modified": []
+}

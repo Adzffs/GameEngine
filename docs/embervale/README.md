@@ -1,6 +1,6 @@
 # Embervale documentation
 
-**Documentation version:** 1.0 · **Review date:** 18 November 2026  
+**Documentation version:** 1.1 · **Review date:** 18 November 2026\
 **Code baseline:** [e9d32932e8f9b27e96283313cca320058792a81f](https://github.com/Adzffs/GameEngine/commit/e9d32932e8f9b27e96283313cca320058792a81f)
 
 ## Start with the question you have
@@ -12,17 +12,18 @@
 | What should we do next? | [Master roadmap](02-roadmap/MASTER_ROADMAP.md) |
 | What task can I pick up? | [Backlog](02-roadmap/BACKLOG.md) |
 | How do I run the game? | [Getting started](06-development/GETTING_STARTED.md) |
+| Export the actual starter world? | [Starter-world export](04-studio/STARTER_WORLD_EXPORT.md) |
 | How will the editor work? | [Studio design](04-studio/STUDIO_DESIGN.md) |
 | Where should the settlement go? | [River Crossing proposal](05-game/RIVER_CROSSING.md) |
 | What still needs resolving? | [Risk register](07-decisions/RISKS_AND_QUESTIONS.md) |
 
-The source contains substantial RPG systems; Studio and the proposed geographic redesign remain planned. The latest inspected baseline workflow failed with unknown cause. Registered tests and earlier reports are not presented as a current passing build. See the evidence ledger for exact limits.
+The source contains substantial RPG systems and a first read-only starter-world exporter. Editing and the proposed geographic redesign remain planned. The unchanged baseline now has a fresh local 81-test pass; GitHub’s inspected run was blocked before execution by an account billing lock. See the [verification record](06-development/BASELINE_VERIFICATION_2026-11-18.md) for baseline and changed-source results, and the remaining platform limits.
 
 ## Suggested reading paths
 
-**Project owner:** Overview → implemented systems → roadmap → release gates → risks.  
-**Engine contributor:** Getting started → repository guide → architecture → content model → save compatibility → relevant backlog task.  
-**World/content designer:** Game design → catalogue → River Crossing → editor workflows → playtest template.  
+**Project owner:** Overview → implemented systems → roadmap → release gates → risks.\
+**Engine contributor:** Getting started → repository guide → architecture → content model → save compatibility → relevant backlog task.\
+**World/content designer:** Game design → catalogue → River Crossing → editor workflows → playtest template.\
 **AI contributor:** Overview → source baseline → task and dependencies → CLI contract → contribution rules → evidence/hand-off template.
 
 ## Complete document catalogue
@@ -60,11 +61,13 @@ The source contains substantial RPG systems; Studio and the proposed geographic 
 | [ARCHITECTURE.md](03-engine/ARCHITECTURE.md) | Current and proposed dependencies, authority and content integration |
 | [CONTENT_MODEL.md](03-engine/CONTENT_MODEL.md) | Proposed schema, coordinates, layers, IDs, canonicalisation and publication |
 | [SAVE_COMPATIBILITY.md](03-engine/SAVE_COMPATIBILITY.md) | Current save boundaries, migration contracts and all saved-location risks |
+| [STARTER_WORLD_BASELINE.md](03-engine/STARTER_WORLD_BASELINE.md) | Exact terrain, occupancy, placement/lifecycle ownership and saved-location inventory |
 
 ### Tools for people and AI
 
 | Document | What it contains |
 |---|---|
+| [STARTER_WORLD_EXPORT.md](04-studio/STARTER_WORLD_EXPORT.md) | Implemented read-only command, snapshot contract, fixture and remaining input/edit work |
 | [STUDIO_DESIGN.md](04-studio/STUDIO_DESIGN.md) | Workspace scope, minimal editor, shared commands and accessibility |
 | [CLI_AND_AI_CONTRACT.md](04-studio/CLI_AND_AI_CONTRACT.md) | Proposed command interface, transactions, diagnostics and automation safeguards |
 | [EDITOR_WORKFLOWS.md](04-studio/EDITOR_WORKFLOWS.md) | Practical authoring, recovery, conflict and playtest journeys |
@@ -85,6 +88,7 @@ The source contains substantial RPG systems; Studio and the proposed geographic 
 | [GETTING_STARTED.md](06-development/GETTING_STARTED.md) | Actual CMake/CI setup, Windows client, saves and editor guidance |
 | [CONTRIBUTING.md](06-development/CONTRIBUTING.md) | Focused work, evidence, review, compatibility and parallel-agent handoff |
 | [TESTING.md](06-development/TESTING.md) | Current registrations, meaningful future tests, CI interpretation and result records |
+| [BASELINE_VERIFICATION_2026-11-18.md](06-development/BASELINE_VERIFICATION_2026-11-18.md) | Fresh baseline/export build results, environment, reproducible commands and exact CI blocker |
 | [RELEASE_PROCESS.md](06-development/RELEASE_PROCESS.md) | Versioned candidates, packaging, verification, rollback and maintenance |
 | [SECURITY_AND_RELIABILITY.md](06-development/SECURITY_AND_RELIABILITY.md) | Bounded content, scoped writes, recovery and future trust boundaries |
 | [DOCUMENTATION_MAINTENANCE.md](06-development/DOCUMENTATION_MAINTENANCE.md) | Source-of-truth rules, freshness, updates and archiving |
@@ -95,6 +99,7 @@ The source contains substantial RPG systems; Studio and the proposed geographic 
 | Document | What it contains |
 |---|---|
 | [DECISIONS.md](07-decisions/DECISIONS.md) | User direction, proposed architecture choices and open ADRs |
+| [ADR_016_READ_ONLY_WORLD_EXPORT.md](07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md) | Implemented export-only boundaries, deterministic format and deferred parser/import decisions |
 | [RISKS_AND_QUESTIONS.md](07-decisions/RISKS_AND_QUESTIONS.md) | Observed findings, design risks, decision triggers and closure rules |
 
 ### Reusable work records

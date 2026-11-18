@@ -17,9 +17,9 @@ A C++20 and SDL3 tile-based RPG project, with an existing playable development w
 
 ## Project status
 
-The source includes authoritative world updates, movement and running, gathering, crafting, melee combat, NPCs, quests, dialogue, shops, banking, progression, development-player persistence and an SDL3 client. The current development map is flat and uses placeholder visuals. Studio, external authored region loading and elevation are planned work; their design documents are specifications rather than instructions for tools that already exist.
+The source includes authoritative world updates, movement and running, gathering, crafting, melee combat, NPCs, quests, dialogue, shops, banking, progression, development-player persistence and an SDL3 client. The current development map is flat and uses placeholder visuals. The first Studio foundation is a read-only [starter-world exporter](docs/embervale/04-studio/STARTER_WORLD_EXPORT.md). Map editing, external region loading and elevation remain planned; their design documents describe future capabilities.
 
-The documentation baseline is commit [e9d32932e8f9b27e96283313cca320058792a81f](https://github.com/Adzffs/GameEngine/commit/e9d32932e8f9b27e96283313cca320058792a81f), checked on **18 November 2026**. The latest inspected push workflow at that commit is [marked failed](https://github.com/Adzffs/GameEngine/actions/runs/44018694678). Its available job metadata does not establish the cause. PR #2's earlier report of 81 passing tests is historical evidence; this documentation update did not execute a fresh game build. See the [evidence ledger](docs/embervale/01-current-state/EVIDENCE_LEDGER.md).
+On **18 November 2026**, the unchanged baseline at `c697386382845f17ce02027e6bade24591a9eb36` built locally and all **81 existing tests passed** on Linux with SDL’s dummy display driver. The exporter adds two CTest checks. GitHub Actions is separately blocked: the inspected run reports an account billing lock before any job steps start. See the [verification record](docs/embervale/06-development/BASELINE_VERIFICATION_2026-11-18.md) for changed-source results, exact environments and remaining Windows/visual-playtest limits.
 
 ## Quick headless build
 
@@ -31,11 +31,11 @@ cmake --build build-headless --parallel
 ctest --test-dir build-headless --output-on-failure -L headless
 ```
 
-These commands match the checked-in build configuration. They are reproduction instructions, not a claim that the current CI failure has been resolved. SDL3 is needed for the client configuration; see [Getting started](docs/embervale/06-development/GETTING_STARTED.md).
+Export the current compiled starter area with `./build-headless/EmbervaleWorldExport > development-starter.snapshot.json`. The output is a complete baseline snapshot; editing it does not yet alter the game. SDL3 is needed for the client configuration; see [Getting started](docs/embervale/06-development/GETTING_STARTED.md).
 
 ## Development direction
 
-First establish a reproducible baseline. Then extract the current world into validated, versioned content; prove equivalent behaviour; and deliver one complete editor workflow: **move a real tree, validate it, preview it, undo it, save it and play the edited map**. Expand into a flat River Crossing starter area, coherent artwork and additional content editors after that foundation works.
+The local baseline and read-only export are the first implemented foundation. Next add bounded input validation and prove equivalent runtime loading, then deliver one complete editor workflow: **move a real tree, validate it, preview it, undo it, save it and play the edited map**. Expand into a flat River Crossing starter area, coherent artwork and additional content editors after that foundation works.
 
 The longer-term direction includes richer regions, elevation, encounters, companions and multiplayer investigation. These are separately gated milestones, not claims of implemented MMO infrastructure.
 

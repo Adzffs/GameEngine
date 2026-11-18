@@ -1,7 +1,7 @@
 # Project overview
 
-**Document version:** 1.0 · **Reviewed:** 18 November 2026  
-**Purpose:** Explain the whole project, preserve the user's decisions and show where to begin.  
+**Document version:** 1.0 · **Reviewed:** 18 November 2026\
+**Purpose:** Explain the whole project, preserve the user's decisions and show where to begin.\
 **Status:** Current project summary plus explicitly labelled future direction.
 
 ## 1. What we are building
@@ -14,7 +14,7 @@ The project has three connected parts:
 |---|---|---|
 | **Embervale, the game** | Places, characters, activities, progression, art, sound and the player experience | A coherent starter adventure that people can learn, explore and enjoy |
 | **GameEngine, the runtime** | Simulation, movement, interactions, persistence, rendering and platform support | Predictable behaviour, trustworthy saves and reproducible builds |
-| **Embervale Studio, the planned tools** | World editing, content definitions, validation, previews and authoring workflows | A human or AI can make the same reviewable content change through shared operations |
+| **Embervale Studio, the authoring tools** | World editing, content definitions, validation, previews and authoring workflows | A human or AI can make the same reviewable content change through shared operations |
 
 The engine is the delivery mechanism for the game. The editor is valuable when it shortens the route from a design idea to a playable, tested change. A large number of editor panels is not, on its own, evidence of useful progress.
 
@@ -41,13 +41,13 @@ This is a **development RPG foundation**. It is not yet a completed starter regi
 
 The current baseline contains seven resource placements, three workstations and ten NPC/monster spawn definitions. These counts describe authored records; delayed creation rules mean the number of live entities varies by lifecycle stage. The [current content catalogue](../05-game/CONTENT_CATALOGUE.md) records the differences.
 
-## 4. What this documentation review established
+## 4. Current verification and first tooling step
 
-The default branch was freshly checked on 18 November 2026 and remained [e9d32932e8f9b27e96283313cca320058792a81f](https://github.com/Adzffs/GameEngine/commit/e9d32932e8f9b27e96283313cca320058792a81f). The review covered the repository tree, history, pull requests, CI metadata and selected important implementation files. It did not execute a fresh build or constitute a complete security audit.
+The original documentation review used engine commit `e9d32932e8f9b27e96283313cca320058792a81f`. The documentation pack was subsequently merged through [PR #3](https://github.com/Adzffs/GameEngine/pull/3) at `c697386382845f17ce02027e6bade24591a9eb36`, without changing the runtime. The superseded documentation PR #1 was closed.
 
-The existing CMake configuration registers **81 test executables: 70 headless, 7 graphics and 4 client**. That is a source inventory, not a pass count. The latest inspected push run is failed and has no useful execution steps or logs in the returned evidence. Its failure must be investigated before claiming a clean current baseline. [Build definition](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/CMakeLists.txt) · [Workflow run](https://github.com/Adzffs/GameEngine/actions/runs/44018694678).
+A fresh local build of that unchanged baseline passed all **81 existing tests** on Linux with SDL’s dummy display driver. The failed GitHub run was independently diagnosed: its jobs did not start because of an account billing lock. Local test success does not resolve that remote blocker or establish a Windows result. See the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md).
 
-At the baseline review, the older documentation pull request was open. Its ideas can inform this pack, but its age and branch state mean it cannot establish current behaviour. The integration notes record how it relates to this documentation update.
+The first implemented Studio step is [read-only export](../04-studio/STARTER_WORLD_EXPORT.md): a complete starter-world JSON snapshot, stable placement identities, ground beneath objects and explicit actor lifecycle metadata. Two new CTest checks compare it with the actual world and verify executable output. A runtime importer, map editing, preview and undo remain future work.
 
 ## 5. The first valuable release
 
