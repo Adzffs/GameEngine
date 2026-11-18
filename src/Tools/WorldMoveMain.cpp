@@ -1,3 +1,4 @@
+#include "WorldEditSession.h"
 #include "../Content/Edit/StarterWorldDraftFile.h"
 #include "../Content/Edit/StarterWorldEdit.h"
 #include "../Content/Export/StarterWorldSnapshotInput.h"
@@ -26,6 +27,7 @@ namespace
             "  EmbervaleWorldMove <snapshot.json> <placement-id> <x> <y>\n"
             "  EmbervaleWorldMove <snapshot.json> <placement-id> <x> <y>"
             " --expected-hash <sha256> --write-draft <new-sibling.json>\n"
+            "  EmbervaleWorldMove --session <snapshot.json>\\n"
             "The default is a dry run. Draft writes require a fresh sibling"
             " filename and the exact input-file SHA-256. Source and player saves"
             " are never overwritten.\n";
@@ -48,6 +50,19 @@ int main(int argc, char **argv)
     {
         Usage(std::cout);
         return 0;
+    }
+    if (argc == 3 && std::string_view(argv[1]) == "--session")
+    {
+        try
+        {
+            return EmbervaleStudioSession::Run(
+                argv[2], std::cin, std::cout, std::cerr);
+        }
+        catch (const std::exception &error)
+        {
+            std::cerr << error.what() << '\\n';
+            return FailureCode(error.what());
+        }
     }
     if (argc == 3 && std::string_view(argv[1]) == "--hash")
     {

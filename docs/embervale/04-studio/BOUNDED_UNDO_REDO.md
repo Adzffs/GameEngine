@@ -22,6 +22,23 @@ These examples require the source world to be valid and the target tiles to be f
 
 The caller supplies the most recent snapshot to each action. History is deliberately not rebased automatically after an outside edit; the caller must inspect the changed content and begin a new session or apply a deliberate new edit. Canonical comparison detects semantic changes, not whitespace-only edits: disk publication must independently use the exact-byte expected SHA-256 and guarded new-file API.
 
+## Terminal editing session (STUDIO-024 first surface)
+
+The stacked `EmbervaleWorldMove --session <snapshot.json>` command opens a bounded terminal workspace.
+`list` identifies all current placements; `map` or `map x y` displays a 21-by-21
+terrain/occupancy view centered on the player spawn or chosen tile. `move <id> <x> <y>`,
+`undo`, `redo`, and `status` operate only on an in-memory candidate using the shared
+`History` implementation, not a separate command interpreter for validation.
+`save <fresh-sibling.json>` revalidates and calls the existing expected-hash
+create-only writer. Its source SHA-256 is captured when the session opens, so
+editing the source externally before saving reports a conflict rather than
+silently using the new bytes. Multiple saves require distinct sibling filenames.
+
+The terminal view is an **interim interactive editor**, not a GUI. It does not
+permit terrain painting, actor-spawn edits, in-place overwrites or publication.
+The source file and player saves remain untouched, and the session's undo
+history disappears on exit. See the dedicated session tests and evidence record.
+
 ## Remaining integration work
 
 This class does not persist history across process restarts, support arbitrary object creation/removal, make undo available in the CLI, or implement UI shortcuts. A general command journal, batch file transaction and editor controls belong to later slices. When building the visual editor, connect its selection and hotkeys to this shared service rather than creating a second interpretation of world movement. Always confirm the generated candidate with the real runtime validator and use separately guarded draft publication.

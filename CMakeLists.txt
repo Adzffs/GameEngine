@@ -144,7 +144,10 @@ if(GAMEENGINE_BUILD_CONTENT_TOOLS)
     add_executable(EmbervaleWorldValidate src/Tools/WorldValidateMain.cpp)
     target_link_libraries(EmbervaleWorldValidate PRIVATE GameEngineCore)
 
-    add_executable(EmbervaleWorldMove src/Tools/WorldMoveMain.cpp)
+    add_executable(EmbervaleWorldMove
+        src/Tools/WorldMoveMain.cpp
+        src/Tools/WorldEditSession.cpp
+    )
     target_link_libraries(EmbervaleWorldMove PRIVATE GameEngineCore)
 endif()
 
@@ -252,6 +255,15 @@ if(BUILD_TESTING)
                 -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/StarterWorldMoveCliTests.cmake"
         )
         set_tests_properties(StarterWorldMoveCliTests PROPERTIES LABELS "headless;content")
+        add_test(
+            NAME StarterWorldInteractiveSessionTests
+            COMMAND ${CMAKE_COMMAND}
+                "-DMOVER=$<TARGET_FILE:EmbervaleWorldMove>"
+                "-DFIXTURE=${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/content/development-starter.snapshot.json"
+                "-DWORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/starter-world-session-test"
+                -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/StarterWorldInteractiveSessionTests.cmake"
+        )
+        set_tests_properties(StarterWorldInteractiveSessionTests PROPERTIES LABELS "headless;content")
     endif()
 
     add_gameengine_headless_test(ActionFrameworkTests tests/ActionFrameworkTests.cpp)
