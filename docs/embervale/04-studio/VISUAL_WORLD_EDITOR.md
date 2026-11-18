@@ -116,3 +116,23 @@ and files the backend claims to save but does not create. No player or live
 world persistence path is changed. The complete checked-in Python tests,
 real C++ executable integration and desktop GUI validation still need to run
 before merging this stacked feature.
+
+
+## Saved draft semantic readback — 18 November 2026
+
+A matching receipt hash proves which bytes were written, **not** that the bytes
+represent the world currently visible in the editor. On a successful guarded
+save, StudioBridge now compares the **same bytes** used for receipt verification
+against the original snapshot plus the current authoritative C++ terrain rows
+and stable-ID placement coordinates. It preserves the original player spawn,
+definition bindings, initialization/spawn properties, region and other metadata.
+Canonical placement ordering is ignored; unexpected metadata or map changes
+cause a failed save. Suspicious drafts are left on disk for inspection rather
+than silently deleted.
+
+Four new fake-backend regressions cover correct move+paint readback and
+self-consistently hashed drafts containing wrong terrain, placement or player
+spawn. The targeted eight-case standalone pure-helper exercise passed under
+local Python, but the checked-in regressions and real-executable/GUI paths
+remain unrun pending a complete checkout. See the dated integration evidence.
+

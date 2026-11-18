@@ -151,3 +151,43 @@ must remain draft and stacked until complete tests can run.
 - These tests exercise only draft-receipt fail-closed behaviour; they do
   not establish full C++ importer parity, successful game playtest, or
   successful integrated Studio publication.
+
+
+## Follow-up: exact authored draft parity after hash verification (18 November 2026)
+
+**Reviewed input:** PR #18 head `0f2b348bb301f76870346b6f37b4fa2f8e9c059f`.
+**Implementation/tests:** [`a9eda09c1ee24aec721c59eced99b48654db4079`](https://github.com/Adzffs/GameEngine/commit/a9eda09c1ee24aec721c59eced99b48654db4079),
+editor blob `3764b994ae900126c8984f52bef70999a4dbe14d`,
+test blob `515b512d191599cfea70a6172b1e448745a73875`.
+
+The existing digest check accepted correctly hashed files even if a faulty
+backend wrote a *different* world than the one validated and displayed. The
+bridge now uses the identical bytes read for SHA-256 verification to compare
+against the original snapshot with **only** current authoritative terrain
+rows and stable-ID placement coordinates substituted. Unchanged player spawn,
+kind/definition bindings, spawn/lifecycle metadata, dimensions and other
+schema fields must be preserved; canonical placement ordering may differ.
+The bridge reports a save failure if parity is violated, without deleting
+the uncertain output or changing its editor history.
+
+- **Actually executed locally:** `python -m py_compile /tmp/embervale_saved_parity_test.py`
+  and `python /tmp/embervale_saved_parity_test.py`: **8/8 passed**
+  (correct save, reordered IDs, wrong ground, wrong position, altered spawn,
+  missing metadata, malformed JSON, kind mismatch). This standalone
+  file contained the **same pure parity helper body** as the committed
+  change, with a minimal isolated fixture. It is not the checked-in suite.
+- **Committed but not executed:** four new mocked-backend regression cases
+  in `tests/test_world_editor_bridge.py`, including move/paint and
+  correctly hashed wrong-world outputs.
+- **Not executed:** full committed Python test module, complete C++ build,
+  actual executable bridge integration, graphical click-through, Windows
+  or game playtest. On this run, `git ls-remote` again failed with
+  `Could not resolve host: github.com` in the local execution container.
+  GitHub repository access was available through the connected repository
+  interface; the exact commit and both changed files were read back
+  after the push. Keep PR #18 draft and stacked until end-to-end testing.
+
+**Next:** obtain a full checkout in a build-capable environment; execute the
+new and existing Python mock contracts plus the real `StarterWorld` C++/CLI
+tests. Fix any actual failures and consolidate the validated PR stack.
+
