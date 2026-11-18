@@ -19,7 +19,7 @@ SOURCE_HASH = re.compile(r"^Source SHA-256: ([0-9a-f]{64})$", re.MULTILINE)
 PLACEMENT = re.compile(r"^([RSMN])  ([A-Za-z0-9._-]+)  \((\d+), (\d+)\)", re.MULTILINE)
 KINDS = {"R": "Resource", "S": "Station", "N": "NPC spawn", "M": "Monster spawn"}
 MAX_COMMANDS = 256
-REPLAYABLE_EDIT = re.compile(r"(?:move [A-Za-z0-9._-]+ [0-9]+ [0-9]+|paint [0-9]+ [0-9]+ [GDSW]|undo|redo)\\Z")
+REPLAYABLE_EDIT = re.compile(r"(?:move [A-Za-z0-9._-]+ [0-9]+ [0-9]+|paint [0-9]+ [0-9]+ [GDSW]|undo|redo)\Z")
 MIN_TILE = 4
 MAX_TILE = 64
 
@@ -58,7 +58,7 @@ class StudioError(RuntimeError):
 
 def validate_replayable_editor_command(command: str) -> None:
     """Only validated history edits may be replayed; saves use their own path."""
-    if any(c in command for c in "\\r\\n"):
+    if any(c in command for c in "\r\n"):
         raise StudioError("Newlines are not valid editor commands")
     if not REPLAYABLE_EDIT.fullmatch(command):
         raise StudioError("Only move, paint, undo and redo can enter replay history")
