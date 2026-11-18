@@ -185,6 +185,16 @@ function(add_gameengine_graphics_test target source)
 endfunction()
 
 if(BUILD_TESTING)
+    find_package(Python3 QUIET COMPONENTS Interpreter)
+    if(Python3_Interpreter_FOUND AND GAMEENGINE_BUILD_CONTENT_TOOLS)
+        add_test(
+            NAME StarterWorldSnapshotInputValidationTests
+            COMMAND ${Python3_EXECUTABLE}
+                ${CMAKE_CURRENT_SOURCE_DIR}/tools/test_validate_world_snapshot.py
+        )
+        set_tests_properties(StarterWorldSnapshotInputValidationTests
+            PROPERTIES LABELS "headless;content")
+    endif()
     if(GAMEENGINE_BUILD_CONTENT_TOOLS)
         add_gameengine_headless_test(StarterWorldSnapshotTests tests/StarterWorldSnapshotTests.cpp)
         target_link_libraries(StarterWorldSnapshotTests PRIVATE EmbervaleWorldSnapshot)
