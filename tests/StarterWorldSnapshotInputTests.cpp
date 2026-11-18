@@ -35,10 +35,17 @@ int main()
     assert(SerializeCanonical(ParseSnapshot(" \n" + canonical + "\t")) == canonical);
 
     // A bounded coordinate edit preserves stable identity and lifecycle.
-    const std::string moved = ReplaceOnce(canonical,
-        "\"id\": \"resource.normal_tree.001\",\n      \"kind\"",
-        "\"id\": \"resource.normal_tree.001\",\n      \"kind\"");
-    assert(SerializeCanonical(ParseSnapshot(moved)) == canonical);
+    std::string moved = canonical;
+    const auto resource = moved.find("\"id\": \"resource.normal_tree.001\"");
+    assert(resource != std::string::npos);
+    const auto coordinate = moved.find("\"x\": ", resource);
+    assert(coordinate != std::string::npos);
+    const auto numberStart = coordinate + std::string("\"x\": ").size();
+    const auto numberEnd = moved.find(',', numberStart);
+    assert(numberEnd != std::string::npos);
+    const int originalX = std::stoi(moved.substr(numberStart, numberEnd - numberStart));
+    moved.replace(numberStart, numberEnd - numberStart, std::to_string(originalX + 1));
+    assert(SerializeCanonical(ParseSnapshot(moved)) != canonical);
 
     assert(Rejects(""));
     assert(Rejects("{}"));
