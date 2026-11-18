@@ -425,14 +425,18 @@
       "milestone": "R2",
       "priority": "P1",
       "title": "Produce reproducible previews",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-013"
       ],
       "acceptance": "Preview true content, occupancy and selected overlays; share interpretation and version rendering inputs.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "src/Tools/WorldEditSession.cpp",
+        "tests/StarterWorldInteractiveSessionTests.cmake",
+        "docs/embervale/06-development/STUDIO_SESSION_VERIFICATION_2026-11-18.md"
+      ],
+      "notes": "A bounded terminal 21x21 terrain-and-occupancy preview now accompanies in-memory shared-history move/undo/redo and guarded new-draft saving. This is not a graphical editor, complete renderer, preview-artifact format or verified publication. New code passed isolated GCC C++20 syntax and mock-backed session smoke checks; full project tests remain unrun."
     },
     {
       "id": "STUDIO-025",
