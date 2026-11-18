@@ -54,6 +54,45 @@ class StudioError(RuntimeError):
     """A user-visible validation or tool error."""
 
 
+
+def verify_editor_transition(command: str, old_placements: dict, old_terrain: list[str],
+                             old_status: str, new_placements: dict,
+                             new_terrain: list[str], new_status: str) -> None:
+    """Fail closed when the C++ response contradicts a requested editor action."""
+    parts = command.split()
+    action = parts[0] if parts else ""
+    if action not in ("move", "paint", "undo", "redo"):
+        return
+    try:
+        _, old_undo, old_redo = old_status.split("/")
+        _, new_undo, new_redo = new_status.split("/")
+        before, pending = int(old_undo), int(old_redo)
+        after, remaining = int(new_undo), int(new_redo)
+        if action in ("move", "paint"):
+            history_ok = after == before + 1 and remaining == 0
+        elif action == "undo":
+            history_ok = after == before - 1 and remaining == pending + 1
+        else:
+            history_ok = after == before + 1 and remaining == pending - 1
+        if not history_ok:
+            raise StudioError("Editor returned inconsistent undo/redo history")
+        if action == "move":
+            name, x, y = parts[1], int(parts[2]), int(parts[3])
+            expected = dict(old_placements)
+            expected[name] = (expected[name][0], x, y)
+            if new_placements != expected or new_terrain != old_terrain:
+                raise StudioError("Editor returned an unexpected move or ground change")
+        elif action == "paint":
+            x, y, glyph = int(parts[1]), int(parts[2]), parts[3]
+            expected = list(old_terrain)
+            expected[y] = expected[y][:x] + glyph + expected[y][x + 1:]
+            if new_placements != old_placements or new_terrain != expected:
+                raise StudioError("Editor returned an unexpected paint or placement change")
+        elif new_placements == old_placements and new_terrain == old_terrain:
+            raise StudioError("Editor reported undo/redo without changing the world")
+    except (IndexError, KeyError, TypeError, ValueError) as error:
+        raise StudioError("Editor returned malformed command/history data") from error
+
 class StudioBridge:
     """Revision-bound replay bridge to the *real* C++ editing session.
 
@@ -177,6 +216,8 @@ class StudioBridge:
                 raise StudioError("Editor moved a read-only actor spawn")
         # Both displayed placements and painted ground come from the same
         # successful backend replay. Rejections preserve all local state.
+        verify_editor_transition(command, self.placements, self.terrain, self.status,
+                                 result[1], result[3], result[2])
         self._accept(result)
         self.commands.append(command)
 

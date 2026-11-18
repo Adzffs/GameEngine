@@ -302,6 +302,49 @@ class BridgeTests(unittest.TestCase):
         self.assertEqual(json.loads(self.source.read_text()), self.world)
 
 
+    def test_move_rejects_backend_that_ignores_destination(self):
+        original = "placements[name] = (kind, int(sx), int(sy))"
+        self.assertIn(original, FAKE_TOOL)
+        self.tool.write_text(FAKE_TOOL.replace(original, "placements[name] = (kind, x, y)"),
+                             encoding='utf-8')
+        with self.assertRaisesRegex(StudioError, 'unexpected move or ground'):
+            self.bridge.move('resource.tree.001', 3, 1)
+        self.assertEqual(self.bridge.commands, [])
+        self.assertEqual(self.bridge.placements['resource.tree.001'][1:], (1, 1))
+
+    def test_move_rejects_accidental_ground_mutation(self):
+        original = "print('Moved', name)"
+        self.assertIn(original, FAKE_TOOL)
+        self.tool.write_text(FAKE_TOOL.replace(
+            original, "terrain[0] = 'D' + terrain[0][1:]\\n        print('Moved', name)".replace('\\n', '\n')),
+            encoding='utf-8')
+        with self.assertRaisesRegex(StudioError, 'ground change'):
+            self.bridge.move('resource.tree.001', 3, 1)
+        self.assertEqual(self.bridge.commands, [])
+        self.assertEqual(self.bridge.terrain, self.world['terrain']['rows'])
+
+    def test_paint_rejects_unexpected_placement_move(self):
+        original = "print('Painted', (x, y), glyph)"
+        self.assertIn(original, FAKE_TOOL)
+        self.tool.write_text(FAKE_TOOL.replace(
+            original,
+            "placements['resource.tree.001'] = ('resource', 3, 1)\\n        print('Painted', (x, y), glyph)".replace('\\n', '\n')),
+            encoding='utf-8')
+        with self.assertRaisesRegex(StudioError, 'placement change'):
+            self.bridge.paint(1, 0, 'D')
+        self.assertEqual(self.bridge.commands, [])
+        self.assertEqual(self.bridge.placements['resource.tree.001'][1:], (1, 1))
+
+    def test_rejects_inconsistent_backend_undo_count(self):
+        original = "undo: {len(history)}; redo: {len(redone)};"
+        self.assertIn(original, FAKE_TOOL)
+        self.tool.write_text(FAKE_TOOL.replace(
+            original, "undo: 0; redo: {len(redone)};"), encoding='utf-8')
+        with self.assertRaisesRegex(StudioError, 'inconsistent undo/redo'):
+            self.bridge.move('resource.tree.001', 3, 1)
+        self.assertEqual(self.bridge.commands, [])
+        self.assertEqual(self.bridge.placements['resource.tree.001'][1:], (1, 1))
+
 class ViewportMathTests(unittest.TestCase):
     def test_boundary_grid_after_zoom(self):
         self.assertEqual(tile_at(0, 0, 22, 100, 100), (0, 0))

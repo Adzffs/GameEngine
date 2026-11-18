@@ -47,3 +47,29 @@ python3 -m unittest discover -s tests -p test_world_editor_bridge.py -v
 
 Record exact tested commit, run the graphical editor against a built real
 executable, and fix any integration regressions before merging stacked PRs.
+
+## Follow-up: fail-closed bridge transition checks (18 November 2026)
+
+At the PR #18 integration gate, review found the Python bridge checked placement
+IDs/kinds and actor bounds but did not require a successful C++ response to
+actually perform the requested move/paint or advance the expected undo cursor.
+This could silently accept divergent tool output while displaying the wrong
+world state.
+
+- The bridge now checks applied/redo history count transitions for move,
+  paint, undo, and redo; a new edit after undo must clear redo.
+- Moving a resource/station must change exactly that placement and preserve
+  ground rows. Painting must change only the requested ground tile and
+  preserve placements. Undo/redo must visibly change placement or terrain.
+- The response is checked **before** the UI mutates its map or replay list;
+  failed checks leave the source, current GUI view and undo commands alone.
+- Four new fake-tool regression cases cover ignored moves, incidental ground
+  changes, incidental placement moves, and inconsistent backend history counts.
+- Local Python 3 isolated extraction of the exact pure transition checker:
+  `py_compile` passed and **4 unittest methods passed**, covering valid moves,
+  paints, undo/redo, branching, stale cursor and malformed replies. This was
+  deliberately an extracted helper test, **not** the committed Python module,
+  full bridge suite or actual C++ executable. The exact source baseline
+  inspected was `3e1ddf8b6c993182feacf689cac31a32c9e648a2`; no full-repository build or live editing
+  test was possible because the host still cannot resolve `github.com`.
+  Keep the PR draft and avoid integration until full tests pass.

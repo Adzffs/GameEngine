@@ -88,3 +88,14 @@ passed. This is not a GUI interaction test or an actual game playtest.
 The test source passed local Python syntax checks, but the combined
 executable test remains unrun until a full repository checkout is
 available. See the dated evidence record in 06-development.
+
+## Response-state contract hardening (18 November 2026)
+
+Successful move/paint responses must agree with the requested stable ID,
+coordinate and ground glyph, without changing unrelated placements or terrain.
+Undo/redo must advance or rewind the backend history cursor by exactly one
+entry and must change world state. Unexpected backend replies are rejected
+before the visual editor commits the new view or command. This is a protocol
+consistency check on top of C++ runtime validation, not a Python validator.
+Four new mocked backend regressions are checked in, with an isolated extracted
+checker test passed; full integrated Python/C++/GUI verification is still open.
