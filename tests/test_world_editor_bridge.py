@@ -4,10 +4,11 @@ import hashlib
 import json
 import os
 import tempfile
-import textwrap
 import unittest
+import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 from embervale_world_editor import StudioBridge, StudioError
 
 FAKE_TOOL = r'''#!/usr/bin/env python3
