@@ -93,6 +93,25 @@ def verify_editor_transition(command: str, old_placements: dict, old_terrain: li
     except (IndexError, KeyError, TypeError, ValueError) as error:
         raise StudioError("Editor returned malformed command/history data") from error
 
+def verify_editor_checkpoint(action: str, checkpoints: list[tuple[dict, tuple[str, ...]]],
+                             placements: dict, terrain: list[str], status: str) -> list[tuple[dict, tuple[str, ...]]]:
+    """Compare undo/redo with previously observed authoritative world revisions."""
+    if action not in ("move", "paint", "undo", "redo"):
+        return checkpoints
+    try:
+        cursor = int(status.split("/")[1])
+    except (IndexError, ValueError, AttributeError) as error:
+        raise StudioError("Editor returned a malformed history checkpoint") from error
+    state = (dict(placements), tuple(terrain))
+    if action in ("undo", "redo"):
+        if cursor >= len(checkpoints) or cursor < 0 or state != checkpoints[cursor]:
+            raise StudioError("Editor undo/redo disagrees with a verified history checkpoint")
+        return checkpoints
+    if cursor < 1 or cursor > len(checkpoints):
+        raise StudioError("Editor returned an impossible edit history checkpoint")
+    return [*checkpoints[:cursor], state]
+
+
 class StudioBridge:
     """Revision-bound replay bridge to the *real* C++ editing session.
 
@@ -148,6 +167,8 @@ class StudioBridge:
             raise StudioError("The authoritative placements differ from the source snapshot")
         if self.terrain != display_terrain:
             raise StudioError("The authoritative terrain differs from the source snapshot")
+        # Keep only responses already observed from C++; never infer undo inverses.
+        self._checkpoints = [(dict(self.placements), tuple(self.terrain))]
 
     def _invoke(self, commands: list[str]) -> tuple[str, dict[str, tuple[str, int, int]], str, list[str], str]:
         arguments = [self.executable, "--session", str(self.source)]
@@ -218,7 +239,10 @@ class StudioBridge:
         # successful backend replay. Rejections preserve all local state.
         verify_editor_transition(command, self.placements, self.terrain, self.status,
                                  result[1], result[3], result[2])
+        checkpoints = verify_editor_checkpoint(command.split()[0], self._checkpoints,
+                                               result[1], result[3], result[2])
         self._accept(result)
+        self._checkpoints = checkpoints
         self.commands.append(command)
 
     def move(self, placement_id: str, x: int, y: int) -> None:
