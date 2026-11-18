@@ -82,10 +82,9 @@ class StudioBridge:
                 raise ValueError("invalid dimensions")
             if len(terrain) != height or any(not isinstance(row, str) or len(row) != width for row in terrain):
                 raise ValueError("invalid terrain shape")
+            # Startup rows only cross-check the authoritative C++ session.
+            display_terrain = list(terrain)
             self.terrain = list(terrain)
-            # The displayed terrain follows the authoritative history cursor.
-            self._terrain_states = [list(terrain)]
-            self._terrain_cursor = 0
             self.width, self.height = width, height
             self.spawn = (self.snapshot["player_spawn"]["x"], self.snapshot["player_spawn"]["y"])
             self.definitions = {p["id"]: p["definition_id"] for p in self.snapshot["placements"]}
@@ -100,12 +99,14 @@ class StudioBridge:
             raise StudioError("CONTENT_CONFLICT: source changed while opening; reopen the editor")
         if set(self.definitions) != set(self.placements):
             raise StudioError("The authoritative placement list differs from the snapshot")
+        if self.terrain != display_terrain:
+            raise StudioError("The authoritative terrain differs from the source snapshot")
 
-    def _invoke(self, commands: list[str]) -> tuple[str, dict[str, tuple[str, int, int]], str, str]:
+    def _invoke(self, commands: list[str]) -> tuple[str, dict[str, tuple[str, int, int]], str, list[str], str]:
         arguments = [self.executable, "--session", str(self.source)]
         if self.hash:
             arguments += ["--expected-hash", self.hash]
-        script = "\n".join([*commands, "list", "status", "quit", ""])
+        script = "\n".join([*commands, "list", "terrain", "status", "quit", ""])
         try:
             result = subprocess.run(arguments, input=script, text=True,
                                     encoding="utf-8", errors="replace",
@@ -130,14 +131,25 @@ class StudioBridge:
             placements[name] = (kind, int(x), int(y))
         if not placements:
             raise StudioError("Editor returned no placements")
+        # This is the only terrain used by the viewport. Never locally guess
+        # a painted tile or inverse from the command string: the authoritative
+        # C++ history has already validated and replayed the complete world.
+        pieces = result.stdout.rsplit("Terrain rows (GDSW):\n", 1)
+        if len(pieces) != 2:
+            raise StudioError("Editor did not return authoritative terrain")
+        block, delimiter, _ = pieces[1].partition("End terrain rows\n")
+        rows = block.splitlines()
+        if (not delimiter or len(rows) != self.height or
+                any(len(row) != self.width or not set(row) <= set("GDSW") for row in rows)):
+            raise StudioError("Editor returned malformed authoritative terrain")
         statuses = re.findall(r"^Changed: (yes|no); undo: (\d+); redo: (\d+); original SHA-256: ([0-9a-f]{64})$",
                               result.stdout, re.MULTILINE)
         if not statuses or statuses[-1][-1] != digest:
             raise StudioError("Editor did not return an authoritative status")
-        return digest, placements, "/".join(statuses[-1][:3]), result.stdout
+        return digest, placements, "/".join(statuses[-1][:3]), rows, result.stdout
 
-    def _accept(self, result: tuple[str, dict[str, tuple[str, int, int]], str, str]) -> None:
-        self.hash, self.placements, self.status, _ = result
+    def _accept(self, result: tuple[str, dict[str, tuple[str, int, int]], str, list[str], str]) -> None:
+        self.hash, self.placements, self.status, self.terrain, _ = result
 
     def perform(self, command: str) -> None:
         if any(c in command for c in "\r\n"):
@@ -147,24 +159,10 @@ class StudioBridge:
         result = self._invoke([*self.commands, command])
         if set(result[1]) != set(self.definitions):
             raise StudioError("Editing changed the authoritative placement identities")
-        old_undo = int(self.status.split("/")[1])
-        new_undo = int(result[2].split("/")[1])
-        if command == "undo" and new_undo < old_undo:
-            self._terrain_cursor -= 1
-        elif command == "redo" and new_undo > old_undo:
-            self._terrain_cursor += 1
-        elif new_undo > old_undo:
-            rows = list(self._terrain_states[self._terrain_cursor])
-            if command.startswith("paint "):
-                _, sx, sy, glyph = command.split()
-                x, y = int(sx), int(sy)
-                rows[y] = rows[y][:x] + glyph + rows[y][x + 1:]
-            self._terrain_states = self._terrain_states[:self._terrain_cursor + 1]
-            self._terrain_states.append(rows)
-            self._terrain_cursor += 1
-        self.terrain = list(self._terrain_states[self._terrain_cursor])
-        self.commands.append(command)
+        # Both displayed placements and painted ground come from the same
+        # successful backend replay. Rejections preserve all local state.
         self._accept(result)
+        self.commands.append(command)
 
     def move(self, placement_id: str, x: int, y: int) -> None:
         if not re.fullmatch(r"[A-Za-z0-9._-]+", placement_id):
@@ -197,7 +195,7 @@ class StudioBridge:
             raise StudioError("Invalid draft filename")
         # The C++ writer validates source SHA and publishes only a new sibling.
         result = self._invoke([*self.commands, "save " + target])
-        if "Saved new draft: " not in result[3]:
+        if "Saved new draft: " not in result[4]:
             raise StudioError("Editor did not confirm publication")
         return target
 

@@ -18,7 +18,7 @@ The viewport displays the complete terrain grid with scrollbars and placement ma
 
 ## Authority, revision and boundaries
 
-This is a deliberately thin standard-library Python/Tk shell. It reads the source JSON to draw *base terrain and metadata only*. It neither edits JSON nor determines authoritative validity. Every edit, undo, redo and save is passed as commands to `EmbervaleWorldMove --session`; the entire bounded command history is replayed in a short-lived process and the GUI re-reads the C++ placement list before repainting. A rejected command does not get appended to the history. To avoid a fragile streaming-text subprocess protocol, the first shell uses a bounded history of 256 commands with a 20-second invocation timeout.
+This is a deliberately thin standard-library Python/Tk shell. It reads the source JSON to draw *base terrain and metadata only*. It neither edits JSON nor determines authoritative validity. Every edit, undo, redo and save is passed as commands to `EmbervaleWorldMove --session`; the entire bounded command history is replayed in a short-lived process and the GUI re-reads both the C++ placement list and the **actual terrain rows at its history cursor** before repainting. Python never guesses inverse terrain from recorded commands. A rejected command does not get appended to the history. To avoid a fragile streaming-text subprocess protocol, the first shell uses a bounded history of 256 commands with a 20-second invocation timeout.
 
 A new optional `--expected-hash <sha256>` flag on `EmbervaleWorldMove --session` compares the **exact source bytes** with the initial snapshot revision before *any* replayed command can execute. On a conflict the session returns exit code 4; the user must reopen the source rather than silently editing a different revision. The C++ draft writer independently rechecks the same exact source hash under its cooperative lock, and continues to reject existing files. This does not make the filesystem lock mandatory for outside writers or guarantee power-loss durability.
 
@@ -26,7 +26,7 @@ The UI now has a click-to-paint Grass/Dirt/Stone/Water brush. Accepted brush act
 
 ## Navigation and coordinate safety
 
-The map viewport uses the same pure pixel-to-tile, clamped-scroll and fitted-scale functions for mouse selection and zoom. Scale is bounded to 4–64 pixels per tile. Selecting a placement and moving it still use only stable IDs and the C++ move validator; zoom cannot alter the underlying content or command history. A 100×100 map can be fitted into a typical desktop viewport without changing its JSON dimensions. This is navigational presentation, not terrain painting.
+The map viewport uses the same pure pixel-to-tile, clamped-scroll and fitted-scale functions for mouse selection and zoom. Scale is bounded to 4–64 pixels per tile. Selecting a placement and moving it still use only stable IDs and the C++ move validator; zoom cannot alter the underlying content or command history. A 100×100 map can be fitted into a typical desktop viewport without changing its JSON dimensions. Zoom and navigation do not alter the brush or the validated terrain-editing operations.
 
 ## Verification and remaining gate
 
@@ -48,3 +48,10 @@ See [the history design](BOUNDED_UNDO_REDO.md), [guarded drafts](GUARDED_DRAFT_R
 The first brush push contained a Python indentation defect in the initial terrain-history setup, which prevented importing the graphical editor module. This follow-up restores that initialization inside the snapshot parsing block. The mocked command-session fixture now models real terrain paints, undo, redo and branch truncation, with three focused bridge tests for accepted/no-op paints, interleaved moves and paints, and transactional rejection. The source snapshot remains read-only, and the C++ editing session remains authoritative.
 
 **Evidence limitation:** The updates were reviewed against the checked-in Python and C++ session source, but the full Python test suite, actual desktop interactions and combined C++ executable were not executed from this environment because repository checkout is unavailable. These checks remain required before merging PR #16.
+
+
+## Authoritative terrain viewport follow-up (18 November 2026)
+
+The graphical editor no longer maintains a parallel Python terrain history. The C++ session now exposes a read-only `terrain` command, delimited by `Terrain rows (GDSW):` and `End terrain rows`. After every successful command, the Python bridge requests and validates the complete row grid, updates the viewport from those rows and rejects missing, truncated, invalid-glyph or source-disagreeing data. Undo/redo and a new branch after undo are displayed from the C++ history cursor, not a guessed inverse. The source file, stable IDs, player data and draft protections remain unchanged.
+
+The new Python mock cases cover missing/malformed/mismatching terrain responses, and the C++ interactive-session script now requests and checks terrain output. This stack remains draft until combined C++ and Python tests and a real graphical playtest are completed. No complete checkout/build or actual game execution was available in this run.

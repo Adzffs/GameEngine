@@ -96,6 +96,17 @@ namespace
         }
     }
 
+    // The UI renders the actual C++ history cursor, including painted
+    // terrain changed by undo or redo; delimit complete canonical glyph rows.
+    void PrintTerrain(const StarterWorldExport::Snapshot &snapshot,
+        std::ostream &out)
+    {
+        out << "Terrain rows (GDSW):\n";
+        for (const auto &row : snapshot.terrainRows)
+            out << row << '\n';
+        out << "End terrain rows\n";
+    }
+
     void PrintPlacements(const StarterWorldExport::Snapshot &snapshot,
         std::ostream &out)
     {
@@ -114,7 +125,7 @@ namespace
 
     void Help(std::ostream &out)
     {
-        out << "Commands: help, list, map [x y], move <id> <x> <y>,"
+        out << "Commands: help, list, terrain, map [x y], move <id> <x> <y>,"
             << " paint <x> <y> <G|D|S|W>, undo, redo, status,"
             << " save <fresh-sibling.json>, quit\n"
             << "All changes are private until save. A save creates a NEW sibling"
@@ -167,6 +178,11 @@ namespace EmbervaleStudioSession
                 {
                     RequireEnd(args);
                     PrintPlacements(current, output);
+                }
+                else if (command == "terrain")
+                {
+                    RequireEnd(args);
+                    PrintTerrain(current, output);
                 }
                 else if (command == "map")
                 {

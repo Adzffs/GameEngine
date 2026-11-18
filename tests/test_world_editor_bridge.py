@@ -99,6 +99,11 @@ for line in sys.stdin:
         print('Existing placements (only R and S can be moved):')
         for name, (kind, x, y) in sorted(placements.items()):
             print(f'{kind_char[kind]}  {name}  ({x}, {y})')
+    elif op == 'terrain':
+        print('Terrain rows (GDSW):')
+        for row in terrain:
+            print(row)
+        print('End terrain rows')
     elif op == 'status':
         print(f'Changed: yes; undo: {len(history)}; redo: {len(redone)}; original SHA-256: {digest}')
     elif op == 'quit':
@@ -212,6 +217,21 @@ class BridgeTests(unittest.TestCase):
         self.bridge.undo()
         self.assertEqual(self.bridge.terrain[1], 'GGWG')
         self.assertEqual(self.bridge.placements['resource.tree.001'][1:], (3, 1))
+
+    def test_requires_authoritative_terrain_response(self):
+        self.tool.write_text(FAKE_TOOL.replace("elif op == 'terrain':", "elif op == 'unused':"), encoding='utf-8')
+        with self.assertRaisesRegex(StudioError, 'did not return authoritative terrain'):
+            StudioBridge(self.tool, self.source)
+
+    def test_rejects_incomplete_authoritative_terrain(self):
+        self.tool.write_text(FAKE_TOOL.replace("print(row)", "print(row[:-1])"), encoding='utf-8')
+        with self.assertRaisesRegex(StudioError, 'malformed authoritative terrain'):
+            StudioBridge(self.tool, self.source)
+
+    def test_rejects_disagreement_with_original_source(self):
+        self.tool.write_text(FAKE_TOOL.replace("print(row)", "print(row.replace('G', 'D'))"), encoding='utf-8')
+        with self.assertRaisesRegex(StudioError, 'terrain differs from the source snapshot'):
+            StudioBridge(self.tool, self.source)
 
     def test_rejected_paint_preserves_source_and_history(self):
         with self.assertRaisesRegex(StudioError, 'occupied or invalid tile'):
