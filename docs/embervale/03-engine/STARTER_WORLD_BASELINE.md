@@ -188,7 +188,7 @@ The application chooses `saves/development-player.save` relative to the process 
 | 12 | Adds Fangs at the Gate: five quests |
 | 13 | Adds Heart of the Ash: six quests |
 
-Older quest records are overlaid on current defaults without inventing earned progress. Pre-bank saves receive an empty bank; pre-tutorial saves are marked tutorial complete/skipped; pre-style saves receive ACCURATE; pre-recipe saves receive the starter recipe set. The saved player and recovery-pile positions contain only `(x,y)`, with no region or surface identity. A future loader must define their interpretation explicitly; merely moving a tree does not itself require a new player-save version. See [Save compatibility](SAVE_COMPATIBILITY.md).
+Older quest records are overlaid on current defaults without inventing earned progress. Pre-bank saves receive an empty bank; pre-tutorial saves are marked tutorial complete/skipped; pre-style saves receive ACCURATE; pre-recipe saves receive the starter recipe set. The saved player and recovery-pile positions contain only `(x,y)`, with no region or surface identity. The current starter importer interprets those coordinates in the same selected legacy-compatible region on ground, with explicit player/recovery fallback; moving a tree does not itself require a new player-save version. See [Save compatibility](SAVE_COMPATIBILITY.md).
 
 ## 7. Verification boundary and remaining integration requirements
 

@@ -47,7 +47,7 @@ The original documentation review used engine commit `e9d32932e8f9b27e96283313cc
 
 A fresh local build of that unchanged baseline passed all **81 existing tests** on Linux with SDL’s dummy display driver. This result does not establish a Windows result. See the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md).
 
-The first implemented Studio step is [read-only export](../04-studio/STARTER_WORLD_EXPORT.md): a complete starter-world JSON snapshot, stable placement identities, ground beneath objects and explicit actor lifecycle metadata. Two new CTest checks compare it with the actual world and verify executable output. A runtime importer, map editing, preview and undo remain future work.
+The first implemented Studio step is [read-only export](../04-studio/STARTER_WORLD_EXPORT.md): a complete starter-world JSON snapshot, stable placement identities, ground beneath objects and explicit actor lifecycle metadata. Two new CTest checks compare it with the actual world and verify executable output. The following implementation adds [bounded snapshot validation and explicit runtime loading](../04-studio/STARTER_WORLD_IMPORT.md), including selected spawn authority and isolated playtest saves. Shared map-editing commands, guarded saving, preview, undo and a visual editor remain future work.
 
 ## 5. The first valuable release
 

@@ -1,6 +1,6 @@
 # CLI and AI editing contract
 
-**Status:** Proposed editing interface. The implemented [EmbervaleWorldExport command](STARTER_WORLD_EXPORT.md) is a separate read-only baseline tool; the command families below are not yet available.\
+**Status:** Proposed editing interface. The implemented commands are [EmbervaleWorldExport](STARTER_WORLD_EXPORT.md), [EmbervaleWorldValidate and explicit game input](STARTER_WORLD_IMPORT.md). The shared editing command families below are not yet available.\
 **Updated:** 18 November 2026\
 **Goal:** Let a human and an AI agent inspect or change content through the same predictable operations.
 

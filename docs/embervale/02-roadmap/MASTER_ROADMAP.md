@@ -12,7 +12,7 @@ Longer-term work includes richer assets and content, multiple regions, elevation
 
 ## 2. Starting point and immediate priorities
 
-The baseline is commit [e9d32932e8f9b27e96283313cca320058792a81f](https://github.com/Adzffs/GameEngine/commit/e9d32932e8f9b27e96283313cca320058792a81f). Source inspection confirms substantial RPG systems, a flat 100×100 development world, placeholder rendering and hardcoded content placement. A read-only starter-world export now establishes the first Studio foundation; importing and editing remain planned. See [Implemented systems](../01-current-state/IMPLEMENTED_SYSTEMS.md).
+The baseline is commit [e9d32932e8f9b27e96283313cca320058792a81f](https://github.com/Adzffs/GameEngine/commit/e9d32932e8f9b27e96283313cca320058792a81f). Source inspection confirms substantial RPG systems, a flat 100×100 development world, placeholder rendering and hardcoded content placement. Starter-world export, strict input validation and an explicit runtime adapter establish the current Studio foundation; shared editing and publication remain planned. See [Implemented systems](../01-current-state/IMPLEMENTED_SYSTEMS.md).
 
 Three findings change the implementation order:
 
@@ -23,7 +23,7 @@ Three findings change the implementation order:
 
 ## 3. Roadmap at a glance
 
-R0 and R1 are **in progress**: the local baseline, placement/save inventory, export-only architecture and deterministic snapshot are implemented for review. Full codec/provider validation, runtime import and the remaining R0 game tasks are outstanding. R2–R10 remain **planned**. See [current task progress](BACKLOG.md#current-progress) and the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md); no complete Studio release is claimed.
+R0 and R1 remain **in progress**. The local baseline, ownership inventory, deterministic snapshot, bounded parser, runtime geography validation and selected spawn authority are implemented. R2 is **in progress** through explicit starter-snapshot loading; shared editing, guarded writes, undo, preview and GUI work remain planned. The remaining baseline game tasks and broader identity/migration requirements are still open. R3–R10 remain **planned**. See [current task progress](BACKLOG.md#current-progress) and the [runtime verification record](../06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md); no complete Studio release is claimed.
 
 | Milestone | Outcome | Primary dependencies | Release or proof |
 |---|---|---|---|
@@ -73,6 +73,8 @@ A contributor can reproduce the selected baseline and distinguish any outstandin
 ## 6. R1 — Safe authored-content foundation
 
 **Goal:** Describe the existing world as external content while preserving the current runtime behaviour.
+
+**Current slice:** [Starter-world import](../04-studio/STARTER_WORLD_IMPORT.md) implements the existing 100×100 registry, geography validation and runtime compatibility path. This is a bounded starter-region contract, not arbitrary region/definition authoring.
 
 ### Work order
 

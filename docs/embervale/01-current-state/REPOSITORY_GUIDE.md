@@ -52,6 +52,8 @@ These paths are present at the pinned commit. [Build][RG-CMAKE] · [entry point]
 
 The map is based on the complete source tree and the CMake source list. Some folders hold headers while orchestration still lives in `World.cpp`; folder names should not be interpreted as perfectly isolated services. [Tree][RG-TREE] · [CMake][RG-CMAKE]
 
+The current starter-content bridge adds a bounded parser in `src/Content/Export/`, runtime file/geography validation in `src/Content/Import/`, and launch selection in `src/Core/GameLaunchOptions.*`. Those paths belong to the SDL-free core. `src/Tools/` provides standalone export and validation commands; [runtime import](../04-studio/STARTER_WORLD_IMPORT.md) documents their supported use.
+
 ## 3. Build and run reference
 
 These configurations have subsequently been reproduced on Linux, including all 81 original tests with SDL’s dummy driver. The exporter adds optional content-tool targets and two CTest checks; see the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md). Compiler, CMake, Ninja and SDL remain environment prerequisites.
@@ -100,7 +102,7 @@ Use `ctest --test-dir build-client -N` to inspect configured tests, and `ctest -
 
 | Change | Read before implementation | Preserve |
 |---|---|---|
-| Export or import the starter map | Development world content, Map constructor, World constructor, spawn database | Terrain order, `(10, 10)` water, base ground, object blocking, lifecycle order. |
+| Export or import the starter map | `src/Content/Export/`, `src/Content/Import/`, World, development content and spawn catalogue | Terrain order, `(10, 10)` water, base ground, object blocking, lifecycle order. |
 | Move an NPC or enemy | Spawn definitions, `World::CreateNpc/CreateMonster`, spawn manager | Canonical-definition validation, active counts, wandering/respawn settings. |
 | Add an item or recipe | Enum, database, requirements, rewards, save token codec, UI | Stable meanings of existing IDs, known-recipe state, authoritative transactions. |
 | Change quest logic | Quest definitions/system, dialogue, World events, save versions | Prerequisites, reward-once behaviour, old save interpretation. |

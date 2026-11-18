@@ -1,0 +1,49 @@
+{
+  "date": "2026-11-18",
+  "platform": "Linux",
+  "compiler": "GCC 14.2.0",
+  "cmake": "4.4.5",
+  "sdl": "3.4.20",
+  "configuration": "Debug",
+  "source_tree": "de267dd4d7410689aba1525a2f4e5ab48b1f7403",
+  "headless": {
+    "passed": 77,
+    "total": 77
+  },
+  "client": {
+    "passed": 89,
+    "total": 89,
+    "headless": 77,
+    "client": 5,
+    "graphics": 7,
+    "environment": {
+      "SDL_VIDEODRIVER": "dummy",
+      "SDL_RENDER_DRIVER": "software",
+      "SDL_AUDIODRIVER": "dummy"
+    }
+  },
+  "content_tools_disabled": {
+    "passed": 2,
+    "total": 2
+  },
+  "startup": {
+    "validation": "Valid starter world: 100 x 100, 20 placements, player spawn (0, 0).",
+    "stayed_running_two_seconds": true,
+    "exit_code": 0,
+    "server_started": true,
+    "created_files": [],
+    "stdout": "[INFO] [CONTENT] Validated items, resources, recipes, rewards, dialogues and starter spawns\nWorld playtest: player progress is temporary. Use --save <player.save> to keep it.\n[INFO] Server Started\n[GAME] Developer Godsword equipped\n[INFO] Server stopped\n",
+    "stderr": "",
+    "driver": "SDL dummy video/software renderer",
+    "manual_visual_playtest": false
+  },
+  "windows_executed": false,
+  "manual_visual_playtest": false,
+  "implementation_commit": "a498b240651f64bb673e5fb0c1db8f093e76b77c",
+  "implementation_url": "https://github.com/Adzffs/GameEngine/commit/a498b240651f64bb673e5fb0c1db8f093e76b77c",
+  "notes": [
+    "The full 89-test suite includes the same 77 headless tests; counts are not additive.",
+    "SDL graphics tests used dummy video and the software renderer; no manual visual or Windows playtest was performed.",
+    "Without an available video driver, two rendering tests initially failed initialization; the explicit driver run passed all 89."
+  ]
+}

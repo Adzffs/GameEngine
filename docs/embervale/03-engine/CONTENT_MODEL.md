@@ -1,6 +1,6 @@
 # Authored content model and validation contract
 
-**Status:** Proposed loadable authoring schema and rules. A distinct [read-only snapshot format](../04-studio/STARTER_WORLD_EXPORT.md) is implemented; this proposed loader does not yet exist.\
+**Status:** Broader authoring schema and rules are proposed. The distinct [starter snapshot](../04-studio/STARTER_WORLD_EXPORT.md) now has a [bounded runtime loader](../04-studio/STARTER_WORLD_IMPORT.md) for its existing 100×100 identity registry. The small illustrative schema below remains unsupported.\
 **Updated:** 18 November 2026\
 **Purpose:** Give engine, editor and automation work one precise description of authored content.
 
@@ -79,11 +79,11 @@ The final schema must define required fields, allowed enums, numeric ranges, uns
 
 ## 4. Identity registry and references
 
-Bridge existing enum values to authored strings through an explicit mapping table. The first exporter must not renumber `NpcSpawnId`, `ItemType`, resource or station identities. The initial content model may still refer to compiled gameplay definitions; externalising every definition catalogue is a separate workstream. [Sources: NpcSpawnDatabase.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/NPC/NpcSpawnDatabase.cpp), [DevelopmentWorldContent.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/World/Development/DevelopmentWorldContent.cpp).
+Bridge existing enum values to authored strings through an explicit mapping table. The exporter and importer must not renumber `NpcSpawnId`, `ItemType`, resource or station identities. The initial content model may still refer to compiled gameplay definitions; externalising every definition catalogue is a separate workstream. [Sources: NpcSpawnDatabase.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/NPC/NpcSpawnDatabase.cpp), [DevelopmentWorldContent.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/World/Development/DevelopmentWorldContent.cpp).
 
 Maintain a registry containing stable ID, kind, current definition, introduction revision, deprecated aliases and migration rule where needed. A retired identifier is not reused for a different object. Display-name changes need no identity migration. An ID rename, merge or deletion requires a reference report covering quests, dialogue, shops, spawns, assets, tests and any persisted field that uses it.
 
-Validate references against the selected content package, not whichever global database happens to be available. This is particularly important because current typed NPC/monster creation checks supplied spawns against the canonical compiled spawn database. The runtime adapter needs a coherent catalogue view; simply accepting arbitrary fields is not sufficient. [Source: World.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/World/World.cpp).
+Validate references against the selected content package, not whichever global database happens to be available. This is particularly important because current typed NPC/monster creation checks supplied spawns against the canonical compiled spawn database. The implemented starter adapter owns a validated selected spawn catalogue per World; all other gameplay definitions remain compiled. Future general providers must retain that authority rather than accepting arbitrary fields. [Source: World.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/World/World.cpp).
 
 ## 5. Validation is a sequence of guarantees
 

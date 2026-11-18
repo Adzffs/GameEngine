@@ -8,15 +8,15 @@ This register distinguishes observed findings from future design risks. Priority
 | ID | Finding | Evidence and effect | Next action |
 |---|---|---|---|
 | RISK-002 | Development defaults are boosted | Current configuration injects XP; elapsed starter progression could be misleading | GAME-001: define/test a genuine fresh profile |
-| RISK-003 | Ground and occupied tiles are mixed | Resource/station creation overwrites tile markers; moving a resource can lose base ground if exported naïvely | Export now preserves underlying ground; STUDIO-013 still needs the runtime compatibility adapter |
-| RISK-004 | Spawn catalogue and lifecycle are authoritative | External coordinates cannot bypass canonical equality checks; delayed actors and creation order affect behaviour | STUDIO-001/014/043: explicit provider and lifecycle mapping |
-| RISK-005 | Saved coordinates can become invalid | Player fallback alone does not cover respawns or recovery piles | STUDIO-002/053: trace/test all location-bearing state |
-| RISK-006 | Current map writes require validated bounds | External content expands input surface before unchecked tile access | STUDIO-011/050: reject dimensions/positions before construction/writes |
+| RISK-003 | Ground and occupied tiles are mixed | Resource/station creation overwrites tile markers; moving a resource can lose base ground if exported naïvely | Export and runtime import preserve base ground; retain this contract in shared move/delete operations |
+| RISK-004 | Spawn catalogue and lifecycle are authoritative | External coordinates cannot bypass canonical equality checks; delayed actors and creation order affect behaviour | Selected per-world spawns and staged creation now preserve this boundary; broaden providers only with definition-specific tests |
+| RISK-005 | Saved coordinates can become invalid | The imported starter path now handles player, death-spawn and recovery accessibility; broader region/version migrations remain open | STUDIO-053: retain tested position handling when widening content scope |
+| RISK-006 | Current map writes require validated bounds | External content expands input surface before unchecked tile access | Implemented bounded parser and runtime validator reject unsafe starter input; retain limits for future extensions |
 | RISK-007 | Narrative and economy descriptions have drift | Elite target naming and older ledger rows disagree with source | DOC-002/GAME-007: correct facts and decide remaining intent |
 | RISK-008 | Local editor files are stale; ignore rules miss actual output paths | Tracked .vscode setup targets old local paths; dash-named builds and saves need coverage | DOC-001: focused cleanup with removal manifest |
 | RISK-009 | Multi-step economy arbitrage is plausible | Source-derived 3 logs→12 planks→2 shields implies 3 coins spent and 24 returned; not runtime-replayed | GAME-008: reproduce complete chain and fix/test confirmed exploit |
 
-These statements are grounded in the [evidence ledger](../01-current-state/EVIDENCE_LEDGER.md) and pinned source references there. The documentation update addresses RISK-008 and factual parts of RISK-007 on its branch. Runtime findings remain implementation work.
+These statements are grounded in the [evidence ledger](../01-current-state/EVIDENCE_LEDGER.md) and pinned source references there. Earlier documentation cleanup addresses RISK-008 and factual parts of RISK-007. The runtime-import slice adds bounded handling for RISK-003–006; wider authoring and migration remain scoped work.
 
 ## 2. Design and delivery risks
 
@@ -39,12 +39,12 @@ Owner roles describe responsibilities; they do not assert that additional team m
 
 ## 3. Open questions by decision point
 
-### Before the content model
+### Before extending the current starter contract
 
-- Which bounded input parser should consume the future authoring format? The initial export uses canonical JSON with ASCII terrain rows.
+- Which additional schema or encoding features justify widening the current bounded ASCII JSON contract?
 - How will future edit commands allocate lifecycle/order keys for new placements while preserving the explicit baseline stages and durable IDs?
 - Which references need durable placement identity versus a reusable definition ID?
-- Which additional saved-content observations are needed to extend the existing terrain, lifecycle and interaction baseline to runtime import?
+- Which further save/content compatibility fixtures are needed before supporting new region identities or placement types?
 
 ### Before the first editor release
 

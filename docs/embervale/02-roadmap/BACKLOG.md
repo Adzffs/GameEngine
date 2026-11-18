@@ -13,20 +13,25 @@ Each dependency below is a direct prerequisite, not a suggestion that every earl
 
 ## Current progress
 
-The first export slice is implemented and locally verified for review. `ready_for_review` does not mean merged or released; `in_progress` means the larger acceptance contract still has explicit unfinished work. Dependencies and acceptance text below remain intact. The [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md), [baseline inventory](../03-engine/STARTER_WORLD_BASELINE.md), [export guide](../04-studio/STARTER_WORLD_EXPORT.md) and [ADR-016](../07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md) contain the evidence.
+The export foundation is followed by bounded parsing, geographic validation and explicit runtime import of the existing starter region. `in_progress` retains larger acceptance obligations; implementation below is not a claim that R1, R2 or Studio Alpha 0.1 is complete. [Runtime import](../04-studio/STARTER_WORLD_IMPORT.md) and [ADR-017](../07-decisions/ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md) document the current scope. The [runtime verification record](../06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md) records 77/77 headless tests, 89/89 Linux SDL tests, a content-tools-disabled check and a real dummy-video game launch. The earlier [baseline/export record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) remains separately dated.
 
 | Work | Planning IDs | Status | Evidence and remaining work |
 |---|---|---|---|
-| Reproducible baseline | ENG-002 | in_progress | Linux baseline 81/81; changed headless 72/72 and client 83/83; Windows execution unverified |
-| Ownership and saved-location inventory | STUDIO-001, STUDIO-002 | ready_for_review | Source ownership, all placements/lifecycle, labels, quests and save versions/position paths documented; no edited-map migration claimed |
-| Minimal architecture | STUDIO-003 | in_progress | Export target/model/writer decisions recorded; input parser and preview decisions remain open |
-| Semantic baseline fixtures | STUDIO-004 | ready_for_review | Full terrain/occupancy, actor stages, pathfinder approaches, furnace action and deterministic snapshot tests pass |
-| General authored model | STUDIO-010 | in_progress | Typed export-only model implemented; general input/edit contract remains to be finalized |
-| Bounded codec | STUDIO-011 | in_progress | Canonical writer and in-memory checks implemented; decoder/input rejection and round-trip contract remain outstanding |
-| Read-only current-world export | STUDIO-012 | ready_for_review | Complete 100×100 snapshot, pond, 20 placements and lifecycle metadata pass runtime/CLI parity; full codec dependency remains open for the wider foundation |
-| Identity/migration registry | STUDIO-015 | in_progress | Explicit current placement/enum mappings reject drift; general allocation, aliases and migration support remain future work |
+| Reproducible baseline | ENG-002 | in_progress | Linux runtime slice 77/77 headless and 89/89 SDL; Windows execution and visible playtesting remain unverified |
+| Ownership and saved-location inventory | STUDIO-001, STUDIO-002 | ready_for_review | Full placement/lifecycle and save-position paths documented; general migration remains separate |
+| Minimal architecture | STUDIO-003 | in_progress | Bounded parser, shared core, explicit input and world-local spawn decisions recorded; preview/backend remains open |
+| Semantic baseline fixtures | STUDIO-004 | ready_for_review | Existing full-grid export fixture extended by imported-world construction, stages and interaction tests |
+| Authored starter model | STUDIO-010 | in_progress | Terrain, coordinates and selected player spawn can vary within the exact starter registry; arbitrary identity/region authoring remains unsupported |
+| Bounded codec | STUDIO-011 | in_progress | Strict ASCII schema-1 parser, canonical writer, resource budgets and round-trip/rejection tests implemented; broader schema evolution remains open |
+| Read-only current-world export | STUDIO-012 | ready_for_review | Complete compiled baseline export is retained; input/runtime additions do not change its output contract |
+| Selected content authority | STUDIO-014 | in_progress | Per-world validated spawn catalogue preserves existing type/capacity/lifecycle checks; other definition catalogues remain compiled |
+| Identity/migration registry | STUDIO-015 | in_progress | Exact 20 stable IDs and legacy bindings enforced; allocation, aliases, removals and migrations remain future work |
+| Static geography and access | STUDIO-050, STUDIO-051 | in_progress | Bounds, overlaps, water, clear player spawn, reachable actors and cardinal approaches validated; general regions/exits remain unsupported |
+| Position compatibility | STUDIO-053 | in_progress | Selected safe spawn and saved-player/recovery handling are integrated for this region; broader content/save migration remains open |
+| Runtime compatibility adapter | STUDIO-013 | in_progress | Opt-in snapshot loading preserves ground, occupancy and staged creation; explicit compiled mode, temporary playtests and save-path guards are implemented |
+| Headless command surface | STUDIO-022 | in_progress | Export and read-only validation commands exist; shared editing, guarded writes and structured machine diagnostics remain planned |
 
-This scoped export proof does not mark R0/R1 complete. The parser, provider validation, edited-map safety, saved-location policy, importer, commands and GUI retain their own gates. Fresh-player and economy tasks also remain open.
+Next implement the shared move operation (STUDIO-020), guarded saving (STUDIO-021) and undo/redo (STUDIO-023), then preview and the minimal visual editor. Fresh-player and economy work also remain open. A parser or a successful load alone does not demonstrate a complete authoring product.
 
 ## Complete work inventory
 
@@ -176,7 +181,7 @@ This scoped export proof does not mark R0/R1 complete. The parser, provider vali
 
 All STUDIO IDs present in the earlier reviewed plan are retained. Their order is updated to put safety and compatibility before editable publication. STUDIO-050/051/053 move to the foundation; STUDIO-090 moves to the first CLI release. STUDIO-004/015/025/026/027 make baseline evidence, identity migration, draft recovery, publication and batch conflict handling explicit. STUDIO-044 separates real multi-tile runtime support from ordinary single-tile placement editing. The former M0–M9 sequence is historical; R0–R10 in the master roadmap is canonical.
 
-The first release retains a bounded GUI and the actual-tree demonstration. Broad brushes, full placement categories and gameplay workspaces arrive through subsequent tasks. Renderer choice, parser dependency and embedded-versus-separate Studio packaging remain ADR decisions, not instructions to start all approaches.
+The first release retains a bounded GUI and the actual-tree demonstration. Broad brushes, full placement categories and gameplay workspaces arrive through subsequent tasks. Renderer choice, broader schema evolution and embedded-versus-separate Studio packaging remain ADR decisions, not instructions to start all approaches.
 
 ## Handling partial work and new findings
 

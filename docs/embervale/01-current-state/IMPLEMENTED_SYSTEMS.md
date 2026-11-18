@@ -151,17 +151,17 @@ These safeguards do not make saves crash-proof. Periodic autosave, forced-termin
 
 Startup content validation and catalogue validators already cover a broad group of items, resources, recipes, rewards, NPCs, spawns, shops, dialogue, and quests. Reuse their semantics through a content-provider boundary where needed. Creating a separate editor validator that disagrees with runtime validation would be a regression. [Validator][IS-VALIDATOR] · [Entry point][IS-MAIN]
 
-CMake defines 81 test executables when all relevant options are enabled: 70 headless, seven graphics, and four client tests. These cover many gameplay and persistence concerns, but an executable count says nothing about assertion count, code coverage, untested branches, or current pass rate. [CMake][IS-CMAKE]
+The original pinned baseline defines 81 test executables when all relevant options are enabled: 70 headless, seven graphics, and four client tests. These cover many gameplay and persistence concerns, but an executable count says nothing about assertion count, code coverage, untested branches, or current pass rate. [CMake][IS-CMAKE]
 
 Local CMake builds support headless and SDL3 client configurations. CTest labels separate headless, client and graphics coverage; use SDL’s dummy display driver for the recorded noninteractive client and graphics tests. See [Testing](../06-development/TESTING.md).
 
-**Executed result:** all 81 baseline tests passed in a fresh local Linux run at documentation merge `c697386`. The exporter change passed 83 CTest entries. Windows execution and visible playtesting remain unverified; see the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md).
+**Executed result:** the runtime-import slice passed 77/77 headless and 89/89 Linux SDL tests; see the [runtime verification record](../06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md). Earlier 81-test baseline and 83-entry exporter results remain in the [baseline record](../06-development/BASELINE_VERIFICATION_2026-11-18.md). Windows execution and visible manual playtesting remain unverified.
 
 ## 9. What should remain marked as future work
 
-The initial reviewed tree had no Studio implementation. This change adds a separate [read-only starter-world exporter](../04-studio/STARTER_WORLD_EXPORT.md), typed snapshot, canonical writer, explicit identity mappings and runtime/CLI regression checks. The current game still loads compiled content. An external region loader, map-editing GUI, shared edit API, content publication, asset editor, AI/MCP editing interface, elevation and production online service remain planned.
+The initial reviewed tree had no Studio implementation. Later work adds [read-only starter-world export](../04-studio/STARTER_WORLD_EXPORT.md), a typed snapshot and canonical writer, followed by [bounded validation and runtime loading](../04-studio/STARTER_WORLD_IMPORT.md). The default game still selects compiled content; `--world` explicitly loads the validated 100×100 starter snapshot with its existing identities and lifecycle. General region loading, a map-editing GUI, shared edit API, guarded publication, asset editor, AI/MCP editing interface, elevation and production online service remain planned.
 
-The first implementation goal is narrow: faithfully export the existing world, validate and reload it with parity, then move one authored tree through a shared command path and prove that save/reopen, collision, interactions, preview, and runtime agree. That proves the editing foundation on the existing game before the content library expands.
+The next implementation goal is narrow: move one authored tree through a shared command path and prove that guarded save/reopen, collision, interactions, undo, preview and runtime agree. That proves the editing foundation on the existing game before the content library expands.
 
 ## Related documents
 

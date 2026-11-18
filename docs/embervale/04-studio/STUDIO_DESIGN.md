@@ -14,7 +14,7 @@ The first product is deliberately bounded: open the exported development region,
 
 From a documented clean environment, inspect a specific region revision, move one existing tree to a valid tile, review the resulting collision and route changes, undo and redo it, save, reopen in the GUI and launch a test world from the same content hash. The original terrain is restored at the old location, the tree keeps its authored ID, invalid moves are rejected or retained only as an explicitly invalid draft where supported, and no normal player save is modified.
 
-The current world still uses compiled placements and code-drawn presentation; these are the integration baseline for Studio. [Sources: DevelopmentWorldContent.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/World/Development/DevelopmentWorldContent.cpp), [Graphics.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Graphics/Graphics.cpp).
+The default world uses compiled placements and code-drawn presentation. [Explicit snapshot loading](STARTER_WORLD_IMPORT.md) now accepts supported coordinates and terrain through the real runtime; this is the integration boundary for the planned shared editor operations. [Sources: DevelopmentWorldContent.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/World/Development/DevelopmentWorldContent.cpp), [Graphics.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Graphics/Graphics.cpp).
 
 ## 2. Workspace map
 

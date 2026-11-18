@@ -3,7 +3,7 @@
 **Reviewed:** 18 November 2026.\
 **Game-code baseline:** `e9d32932e8f9b27e96283313cca320058792a81f`.\
 **Original review method:** Read-only GitHub metadata, pinned source reads, recursive tree/history inventory, PR inspection and source-derived counts. That initial documentation review did not build the game.
-**Subsequent verification:** A clean local build of documentation merge `c697386382845f17ce02027e6bade24591a9eb36` passed all 81 existing tests. The exporter change passed all 83 CTest entries. The [dated record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) is the current local build evidence.
+**Subsequent verification:** A clean local build of documentation merge `c697386382845f17ce02027e6bade24591a9eb36` passed all 81 existing tests. The exporter change passed all 83 CTest entries. The [dated record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) preserves those baseline/export results. Later parser/runtime changes require evidence for their own source revision.
 
 This ledger is the factual boundary for the documentation pack. A roadmap can describe ambitious future work while this file remains conservative about what exists and what was verified.
 
@@ -18,7 +18,7 @@ This ledger is the factual boundary for the documentation pack. A roadmap can de
 | PROPOSED | A design option or recommendation awaits an implementation/design decision. | Rationale, tradeoffs, and decision point. |
 | UNVERIFIED | Evidence is missing or does not establish the claimed outcome. | State what would resolve it. |
 
-“Done” in a work tracker should require the relevant acceptance evidence and merged implementation. A source inventory, generated document, passing isolated unit test, or a green job for a different commit is not a substitute.
+“Done” in a work tracker should require the relevant acceptance evidence and merged implementation. A source inventory, generated document, passing isolated unit test, or test result for a different commit is not a substitute.
 
 ## 2. Original source-review observations before PR #3
 
@@ -37,6 +37,12 @@ This ledger is the factual boundary for the documentation pack. A roadmap can de
 [PR #3](https://github.com/Adzffs/GameEngine/pull/3) merged the handbook and focused cleanup at `c697386382845f17ce02027e6bade24591a9eb36` without changing engine/test source. A separate clean worktree at that commit built successfully on Linux; all **81 original tests passed**, including 4 client and 7 graphics tests using SDL’s dummy driver. The exporter implementation also passed its **72-test headless configuration** and **83-test client configuration**.
 
 The [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) preserves the environment, commands, limitations and machine-readable test/source record. No Windows execution is claimed.
+
+### Current runtime-input implementation
+
+The current slice implements a strict schema-1 parser and file reader, 100×100 runtime geography validation, selected spawn authority and an opt-in World construction path. `EmbervaleWorldValidate` and `GameEngine --world` share that interpretation. Imported playtests default to no player save; explicit save selection includes world/save-sidecar alias checks. [Current source and usage](../04-studio/STARTER_WORLD_IMPORT.md) and [ADR-017](../07-decisions/ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md) identify the implementation boundary.
+
+The runtime-import implementation passed **77/77 headless tests** and **89/89 tests** in the Linux SDL configuration (77 headless, 5 client, 7 graphics). A content-tools-disabled build passed its two selected runtime/launch tests. A real game process loaded an edited normal-tree coordinate `(40,20)`, ran for two seconds with temporary progress and stopped gracefully with exit `0`; it created no files. This used dummy video/software rendering, not visible manual gameplay. The [runtime verification record](../06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md) contains exact source, environment and commands. Windows execution is unverified.
 
 ## 4. Principal source evidence
 
@@ -71,7 +77,7 @@ The history appendix selects gameplay and project commits from the reviewed `mas
 - Local builds and automated tests are now recorded above. No visible manual playthrough, performance profile, coverage measurement, accessibility assessment or production security audit was performed.
 - Existing save codec, file-store, world and engine persistence tests passed in the local suites. This does not prove every legacy edge case or a future edited-map saved-location migration matrix.
 - Branch/ruleset observations do not establish all account, organisation, or external enforcement settings.
-- The original baseline had no Studio files. This change adds read-only extraction; importing, editing and preview remain future work.
+- The original baseline had no Studio files. Later work adds export, bounded validation and starter runtime import. Shared editing, guarded publication, undo and preview remain future work.
 - Existing economy and character documents contain design intentions as well as factual claims. Code and explicit current decisions take precedence where the documents are stale.
 - The old PR #1 quest-verification gaps are historical review notes. Recheck them against current code and tests before marking them unresolved defects or closing them.
 

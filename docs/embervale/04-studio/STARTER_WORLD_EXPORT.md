@@ -1,14 +1,14 @@
 # Export the current starter world
 
-**Scope:** First read-only Studio foundation. The executable exports compiled initial content; it is not a map editor or a runtime map loader.\
+**Scope:** Read-only export of compiled initial content. [Runtime validation and loading](STARTER_WORLD_IMPORT.md) are separate implemented entry points; shared map editing remains planned.\
 **Format:** `embervale.starter-world-snapshot`, schema version `1`.\
 **Implementation:** [snapshot model and writer](../../../src/Content/Export/StarterWorldSnapshot.h), [command entry point](../../../src/Tools/WorldExportMain.cpp).
 
 ## What this makes possible
 
-The current starter area's geography can now be inspected as one deterministic JSON document. It includes the ground beneath objects, every resource and workstation, and all ten NPC/monster spawn definitions, including actors created only after the first player is registered. The checked-in [baseline snapshot](../../../tests/fixtures/content/development-starter.snapshot.json) is a reviewable reference for the next importer and editing work.
+The current starter area's geography can now be inspected as one deterministic JSON document. It includes the ground beneath objects, every resource and workstation, and all ten NPC/monster spawn definitions, including actors created only after the first player is registered. The checked-in [baseline snapshot](../../../tests/fixtures/content/development-starter.snapshot.json) is a reviewable reference for runtime parity and editing work.
 
-The game continues to construct its world from the existing compiled definitions. Editing the exported JSON does not change the game. The next integration step must prove that loading a document reproduces the current world before it supports moving a tree.
+Normal startup constructs the compiled world. `GameEngine --world <snapshot.json>` explicitly selects a validated snapshot, including supported terrain and placement-coordinate changes. The exporter always captures the compiled baseline, irrespective of which content a game instance is using. See [Starter-world import](STARTER_WORLD_IMPORT.md) for the exact input contract and isolated playtest behaviour.
 
 ## Build and run
 
@@ -23,7 +23,7 @@ ctest --test-dir build-headless --output-on-failure -L headless
 
 On Windows, use the corresponding executable in your build directory, for example `build-client/EmbervaleWorldExport.exe`. Use an MSYS2 shell or another shell that preserves redirected UTF-8 bytes; avoid text transformations when comparing canonical files. The program itself emits LF on Windows and Linux.
 
-`GAMEENGINE_BUILD_CONTENT_TOOLS` defaults to `ON`. Set it to `OFF` to omit the snapshot library, executable and its two tests. The tool requires no SDL when both client and graphics tests are disabled. It adds no JSON-library or Python requirement to the C++ build.
+`GAMEENGINE_BUILD_CONTENT_TOOLS` defaults to `ON`. Set it to `OFF` to omit the standalone export/validation executables and their optional tests. Snapshot parsing and runtime loading remain available in the core. The tool requires no SDL when both client and graphics tests are disabled. It adds no JSON-library or Python requirement to the C++ build.
 
 | Invocation | Result |
 |---|---|
@@ -40,7 +40,7 @@ The exporter accepts no input filename and has no `--output`, edit or save optio
 
 | Section | Meaning |
 |---|---|
-| `format`, `schema_version` | Identifies this export contract separately from a future loadable authoring format |
+| `format`, `schema_version` | Identifies the supported starter snapshot contract; a broader authoring schema remains planned |
 | `region_id`, `revision` | `embervale.development_starter`, initial snapshot revision `1` |
 | `size` | Actual 100×100 development-map dimensions |
 | `surfaces` | One `ground` surface with elevation `0`; this introduces no elevation capability |
@@ -61,7 +61,7 @@ Live state is excluded: player inventory, current health, wandering positions, r
 
 The in-memory writer accepts dimensions from 1 through 1024, at most 4096 placements, and identity strings of 1–128 characters from lowercase ASCII letters, digits, `.`, `_` and `-`. Rows must exactly match the dimensions and use only `G`, `D`, `S` and `W`. Positions must be within bounds; placement IDs and stage/order pairs must be unique. Typed definition bindings and spawn fields are checked for consistency.
 
-The actual exporter captures only the current compiled 100×100 baseline and its explicit registry. These writer limits do not declare larger-map gameplay support or define a hostile-file parser policy. Overlap rules, blocked-spawn checks, full catalogue compatibility and edited-world validation remain separate requirements.
+The actual exporter captures only the current compiled 100×100 baseline and its explicit registry. These writer limits do not declare larger-map gameplay support or define a hostile-file parser policy. The [runtime validator](STARTER_WORLD_IMPORT.md) additionally enforces the exact 100×100 starter registry, overlap/terrain rules, player-spawn clearance and reachable approaches. Larger or general authoring formats remain separate work.
 
 ## Identity and ordering
 
@@ -72,7 +72,7 @@ The JSON array is sorted by placement ID. A separate initialization stage/order 
 - `world_start`: guide, two early monsters, seven resources and three stations.
 - `first_player_registration`: two advanced monsters and five supporting characters, after the player itself is registered.
 
-All ten spawn definitions are registered before initial actors are created. A future importer must reproduce that distinction. Sorting the document must never reorder runtime creation. Moving a placement later must retain its identity and initialization order.
+All ten spawn definitions are registered before initial actors are created. The runtime importer reproduces that distinction. Sorting the document must never reorder runtime creation. Changing a placement coordinate retains its identity and initialization order.
 
 Canonical output has a fixed field order, deterministic integer formatting, LF and a final newline. It includes no timestamp, machine-specific path or local runtime state. Repeated exports of the same compiled content produce identical bytes.
 
@@ -90,16 +90,12 @@ When intentional starter content changes make the fixture fail, inspect the sema
 
 See the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) for exact tested environments and remaining platform limits. A passing export test does not establish that an edited world is safe to load.
 
+## Input and runtime use
+
+The [bounded parser and runtime importer](STARTER_WORLD_IMPORT.md) accept schema-1 documents containing the complete current identity registry. They validate supported geography before runtime construction and preserve ground, spawn authority and creation stages. Parser round-trip/rejection tests and imported-world tests supplement the original exporter checks.
+
+The current input path has a 2 MiB byte budget and independent limits for nesting, total values, strings and containers. It accepts ASCII schema strings and rejects unknown fields, identities, changed spawn settings and unsupported features. Runtime use remains restricted to the existing 100×100 region. The import guide documents all limits, commands and save isolation.
+
 ## What comes next
 
-The next bounded task is the input contract: choose a bounded parser, validate a candidate without unsafe map access, and connect one canonical definition provider to the runtime adapter. Loading the unchanged baseline must preserve terrain, occupancy, lifecycle and saved-location behaviour. After that, add one shared move operation, guarded persistence, preview and undo.
-
-The [broader CLI contract](CLI_AND_AI_CONTRACT.md) and [content model](../03-engine/CONTENT_MODEL.md) remain proposals for those capabilities. This exporter does not complete their parser, import, validation, publication, migration or editor requirements. [ADR-016](../07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md) records why this first step is deliberately bounded.
-
-## Experimental bounded input parser (review branch)
-
-`StarterWorldSnapshotInput.h` now provides `ParseSnapshot(std::string_view)`, an **in-memory, non-mutating** parser for the current snapshot schema. It is deliberately not a runtime importer or a general map editor. The parser accepts the current compiled identity registry and lifecycle ordering, including coordinate edits, but rejects unknown/missing placements, modified spawn settings, unsupported surfaces/exits, extra fields, duplicate keys, malformed JSON and unsupported schema revisions.
-
-Limits: 2 MiB input, 12 JSON nesting levels, 16,384 array elements, 32 keys per object, ASCII strings, 1–1024 dimensions and at most 4096 placements. The existing canonical writer performs additional structural validation after parsing. JSON Unicode escapes and non-ASCII strings are not supported by this first bounded parser.
-
-`StarterWorldSnapshotInputTests` exercises canonical round-trip, coordinate edits and representative rejection cases. **Build/test execution for this review branch has not yet been independently verified**; do not treat it as ready for runtime loading. Next work: verify compiler/test results, add property/negative cases, integrate authoritative placement and route validators, and only then design transactional loading and save-position migration.
+Implement one shared operation that moves an existing placement by stable ID, then add guarded saving, undo and preview. The [broader CLI contract](CLI_AND_AI_CONTRACT.md) and [content model](../03-engine/CONTENT_MODEL.md) describe the remaining authoring capabilities. Export and runtime import do not complete their publication, general migration or graphical-editor requirements. [ADR-016](../07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md) records the original export boundary; [ADR-017](../07-decisions/ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md) extends it with explicit runtime loading.
