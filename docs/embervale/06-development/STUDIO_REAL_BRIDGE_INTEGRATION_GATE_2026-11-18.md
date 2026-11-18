@@ -217,3 +217,5 @@ local execution container for full checkout/build; the connected repository
 interface was used for source inspection and publishing. **Not run:** the new
 committed regression methods, full Python suite, C++ build, executable bridge
 integration, actual graphical click-through or gameplay. Keep PR #18 draft.
+
+**Final replay-guard implementation:** [`f8b2ade`](https://github.com/Adzffs/GameEngine/commit/f8b2ade2b9d656d0999685f623efd86c10db2954) with editor blob `7aedfff3128ace7137c7ca77519a6a47036526d0`; new mock and executable-backed test blobs are `515640b378cd1f1bfa10783ca26fd1c5fab5db3c` and `956be5be0d811fecb915289b98b190bcffdd7648`. The first implementation commit `2e4f373` had incorrectly escaped Python string literals; they were corrected before this final source review. The same corrected pure replay-command guard was exercised by the four local isolated unittest methods. The complete repository test files, actual C++ executable and GUI were **not run**, so this is no basis for merging the stacked PR.
