@@ -69,8 +69,10 @@ int main()
     test.Expect(Reject([&]{ PublishNew(source, baseline, "x", temp.path / "locked.json"); }),
         "held source lock rejects concurrent writer");
     std::filesystem::remove(source.string() + ".embervale.lock");
-    std::filesystem::create_symlink(source, temp.path / "link.json");
-    test.Expect(Reject([&]{ (void)Read(temp.path / "link.json"); }), "symlink input rejected");
+    std::error_code symlinkError;
+    std::filesystem::create_symlink(source, temp.path / "link.json", symlinkError);
+    if (!symlinkError)
+        test.Expect(Reject([&]{ (void)Read(temp.path / "link.json"); }), "symlink input rejected where supported");
     test.Expect(Reject([&]{ (void)Read(temp.path); }), "directory input rejected");
     Write(source, "changed\n");
     test.Expect(Reject([&]{ PublishNew(source, baseline, "x", temp.path / "stale.json"); }),
