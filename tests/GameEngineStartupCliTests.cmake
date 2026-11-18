@@ -1,0 +1,58 @@
+cmake_minimum_required(VERSION 3.20)
+if(NOT DEFINED CLIENT OR NOT DEFINED FIXTURE OR NOT DEFINED WORK_DIR)
+    message(FATAL_ERROR "Client, fixture and isolated working directory are required")
+endif()
+file(MAKE_DIRECTORY "${WORK_DIR}")
+file(WRITE "${WORK_DIR}/bad-world.json" "{\"format\":")
+file(WRITE "${WORK_DIR}/player.save" "player-save-must-not-be-read-or-modified")
+file(WRITE "${WORK_DIR}/player.save.tmp" "temporary-save-must-survive")
+file(WRITE "${WORK_DIR}/player.save.bak" "backup-save-must-survive")
+configure_file("${FIXTURE}" "${WORK_DIR}/world.json" COPYONLY)
+file(GLOB before "${WORK_DIR}/*")
+foreach(path IN LISTS before)
+    file(SHA256 "${path}" hash)
+    list(APPEND before_hashes "${path}:${hash}")
+endforeach()
+
+execute_process(COMMAND "${CLIENT}" --help WORKING_DIRECTORY "${WORK_DIR}"
+    RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE errors TIMEOUT 5)
+if(NOT result STREQUAL "0" OR NOT output MATCHES "--world" OR NOT errors STREQUAL "")
+    message(FATAL_ERROR "Client help did not work without starting graphics: ${errors}")
+endif()
+execute_process(COMMAND "${CLIENT}" --unknown WORKING_DIRECTORY "${WORK_DIR}"
+    RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE errors TIMEOUT 5)
+if(NOT result STREQUAL "2" OR NOT errors MATCHES "unknown argument")
+    message(FATAL_ERROR "Client invalid arguments did not fail before startup")
+endif()
+foreach(input IN ITEMS missing.json bad-world.json)
+    execute_process(COMMAND "${CLIENT}" --world "${WORK_DIR}/${input}" --save "${WORK_DIR}/player.save"
+        WORKING_DIRECTORY "${WORK_DIR}"
+        RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE errors TIMEOUT 5)
+    if(NOT result STREQUAL "1" OR NOT errors MATCHES "Game startup failed: starter world")
+        message(FATAL_ERROR "Selected bad content did not stop startup explicitly (${result}): ${errors}")
+    endif()
+endforeach()
+execute_process(COMMAND "${CLIENT}" --world "${WORK_DIR}/world.json" --save "${WORK_DIR}/world.json"
+    WORKING_DIRECTORY "${WORK_DIR}"
+    RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE errors TIMEOUT 5)
+if(NOT result STREQUAL "2" OR NOT errors MATCHES "separate from world content")
+    message(FATAL_ERROR "Content/save alias was not rejected before startup")
+endif()
+foreach(suffix IN ITEMS tmp bak)
+    execute_process(COMMAND "${CLIENT}" --world "${WORK_DIR}/player.save.${suffix}" --save "${WORK_DIR}/player.save"
+        WORKING_DIRECTORY "${WORK_DIR}"
+        RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE errors TIMEOUT 5)
+    if(NOT result STREQUAL "2" OR NOT errors MATCHES "separate from world content")
+        message(FATAL_ERROR "Content/save sidecar alias was not rejected")
+    endif()
+endforeach()
+
+file(GLOB after "${WORK_DIR}/*")
+foreach(path IN LISTS after)
+    file(SHA256 "${path}" hash)
+    list(APPEND after_hashes "${path}:${hash}")
+endforeach()
+if(NOT before_hashes STREQUAL after_hashes)
+    message(FATAL_ERROR "Rejected startup modified content or a save/recovery file")
+endif()
+message(STATUS "Client startup rejects bad content before graphics or player-save lifecycle")

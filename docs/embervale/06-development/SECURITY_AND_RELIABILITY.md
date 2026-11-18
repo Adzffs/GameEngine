@@ -14,7 +14,7 @@ An internet-facing account service, production server and multiplayer threat mod
 
 | Boundary | Observed source behaviour | Limit of the evidence |
 |---|---|---|
-| Startup content checks | `main` invokes content validation before running the engine | Does not validate a future external map format that is not implemented |
+| Startup content checks | `main` validates compiled catalogues; selected starter snapshots receive bounded input and geography validation | The exact current starter registry is supported, not arbitrary future map formats |
 | Player-save input | File store performs bounded reads and structured validation/error handling | Does not prove immunity to every filesystem/power-failure condition |
 | World authority | Typed NPC/monster creation validates catalogue and spawn conditions | Not proof of a completed network-server boundary |
 | Build separation | Headless core can build without SDL when both dependent options are OFF | Does not prove every target currently builds in this environment |
@@ -23,7 +23,7 @@ Sources: [main.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96
 
 ## 3. External content must be bounded data
 
-The proposed loader must validate encoding, schema version, file size, nesting depth, dimensions, arithmetic overflow, collection lengths, references and supported enum values before constructing a map or writing tiles. The current `Map::GetTile` directly indexes its vector; an external file must not be allowed to drive unchecked coordinates into it. This is a concrete integration requirement, not a claim that current compiled placements exploit that path. [Source: Map.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/World/Map.cpp).
+The implemented starter loader bounds file size, JSON resource use, schema, references, coordinates and supported values before constructing a map. It additionally validates occupancy, player spawn and required access. [Current contract](../04-studio/STARTER_WORLD_IMPORT.md). Future format extensions must retain these checks, including safe arithmetic for any new dimensions. The current `Map::GetTile` directly indexes its vector; an external file must not be allowed to drive unchecked coordinates into it. This is a concrete integration requirement, not a claim that current compiled placements exploit that path. [Source: Map.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/World/Map.cpp).
 
 Map and patch files should contain typed data, not shell commands, arbitrary scripts or plugin code. Reject unknown behaviour fields rather than executing or silently discarding them. Limit operations and affected cells in an automated batch so accidental requests cannot allocate unreasonable memory or freeze validation indefinitely.
 

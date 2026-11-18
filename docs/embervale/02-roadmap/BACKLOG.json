@@ -16,9 +16,10 @@
       "github_issue": null,
       "evidence": [
         "docs/embervale/06-development/BASELINE_VERIFICATION_2026-11-18.md",
-        "docs/embervale/06-development/verification/2026-11-18/results.json"
+        "docs/embervale/06-development/verification/2026-11-18/results.json",
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
       ],
-      "notes": "Linux clean baseline passes 81; exporter headless 72/client 83 all pass with SDL dummy. Windows/UCRT64 remains unverified."
+      "notes": "Linux baseline/export results preserved; runtime import passes headless 77/77 and full SDL 89/89, with selected tools-disabled tests 2/2 and a dummy-video live process smoke. Windows/UCRT64 and visible playtesting remain unverified."
     },
     {
       "id": "DOC-001",
@@ -95,9 +96,11 @@
       "acceptance": "Record parser, schema representation, target dependencies, coordinates and preview design ADRs with consequences.",
       "github_issue": null,
       "evidence": [
-        "docs/embervale/07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md"
+        "docs/embervale/07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md",
+        "docs/embervale/07-decisions/ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md",
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
       ],
-      "notes": "Export-only model, canonical rows/JSON, explicit identity/lifecycle and separate SDL-free targets decided. General parser and preview/backend decisions remain open."
+      "notes": "Bounded ASCII parser, snapshot representation, shared core ownership and selected runtime input decided in ADR-017. Preview/backend remains open."
     },
     {
       "id": "STUDIO-004",
@@ -115,9 +118,11 @@
         "tests/StarterWorldSnapshotTests.cpp",
         "tests/StarterWorldExportCliTests.cmake",
         "tests/fixtures/content/development-starter.snapshot.json",
-        "docs/embervale/06-development/verification/2026-11-18/results.json"
+        "docs/embervale/06-development/verification/2026-11-18/results.json",
+        "tests/StarterWorldRuntimeTests.cpp",
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
       ],
-      "notes": "Full-grid and actor-stage runtime parity, true pathfinder endpoints, actual furnace interaction and canonical fixture checks pass. Saved-content importer scenarios remain later gates."
+      "notes": "Existing export grid/actor/path fixtures are supplemented by compiled-versus-imported runtime construction and lifecycle tests. Importer execution is recorded separately from the original exporter baseline."
     },
     {
       "id": "GAME-001",
@@ -161,9 +166,11 @@
       "github_issue": null,
       "evidence": [
         "src/Content/Export/StarterWorldSnapshot.h",
-        "docs/embervale/04-studio/STARTER_WORLD_EXPORT.md"
+        "docs/embervale/04-studio/STARTER_WORLD_EXPORT.md",
+        "docs/embervale/04-studio/STARTER_WORLD_IMPORT.md",
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
       ],
-      "notes": "A typed snapshot represents the complete current ground/placements/default spawn/lifecycle. General authored input/edit model is not yet finalized."
+      "notes": "The exact current 100x100 starter model supports terrain, placement coordinates and player spawn as input while retaining definitions/lifecycle. General region/identity authoring remains unsupported."
     },
     {
       "id": "STUDIO-011",
@@ -178,9 +185,12 @@
       "github_issue": null,
       "evidence": [
         "src/Content/Export/StarterWorldSnapshot.cpp",
-        "tests/StarterWorldSnapshotTests.cpp"
+        "tests/StarterWorldSnapshotTests.cpp",
+        "src/Content/Export/StarterWorldSnapshotInput.cpp",
+        "tests/StarterWorldSnapshotInputTests.cpp",
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
       ],
-      "notes": "Canonical writer and bounded in-memory structural checks implemented. No parser, hostile-file rejection or parse/write round trip exists yet."
+      "notes": "Strict schema-1 ASCII parser and canonical writer implement input/depth/value/string/container budgets, complete binding checks and round-trip/rejection coverage. Broader schema evolution remains open."
     },
     {
       "id": "STUDIO-012",
@@ -198,24 +208,30 @@
         "src/Tools/WorldExportMain.cpp",
         "tests/fixtures/content/development-starter.snapshot.json",
         "docs/embervale/04-studio/STARTER_WORLD_EXPORT.md",
-        "docs/embervale/06-development/verification/2026-11-18/results.json"
+        "docs/embervale/06-development/verification/2026-11-18/results.json",
+        "docs/embervale/04-studio/STARTER_WORLD_IMPORT.md",
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
       ],
-      "notes": "Read-only export acceptance implemented and locally verified. This bounded writer-only proof does not close full codec dependency STUDIO-011 or broader R1 gates."
+      "notes": "Compiled baseline export remains deterministic and read-only. Existing local exporter evidence is retained; later input/runtime behaviour has separate verification."
     },
     {
       "id": "STUDIO-014",
       "milestone": "R1",
       "priority": "P1",
       "title": "Integrate content validation providers",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-010",
         "STUDIO-002"
       ],
       "acceptance": "Use existing rule semantics; establish one canonical definition provider and preserve spawn authority checks.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "src/World/World.cpp",
+        "tests/StarterWorldRuntimeTests.cpp",
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
+      ],
+      "notes": "Selected spawn catalogue is owned by each World and retains type, capacity and lifecycle checks. Other gameplay definition catalogues remain compiled."
     },
     {
       "id": "STUDIO-015",
@@ -230,60 +246,76 @@
       "github_issue": null,
       "evidence": [
         "src/Content/Export/StarterWorldSnapshot.cpp",
-        "docs/embervale/07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md"
+        "docs/embervale/07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md",
+        "src/Content/Export/StarterWorldSnapshotInput.cpp",
+        "tests/StarterWorldSnapshotInputTests.cpp",
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
       ],
-      "notes": "Explicit baseline placement/definition/spawn mappings avoid ordinals/coordinates/runtime IDs and reject missing/repeated legacy mappings. General new placement identity allocation, aliases, deletions and migrations remain future work."
+      "notes": "Parser binds the complete 20-placement registry to existing enum/type/config/lifecycle identities. Coordinates may change; ID allocation, aliases/removals and general migrations remain future work."
     },
     {
       "id": "STUDIO-050",
       "milestone": "R1",
       "priority": "P1",
       "title": "Validate static placement safety",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-011",
         "STUDIO-014"
       ],
       "acceptance": "Reject out-of-bounds/overlap/bad-reference/blocked-spawn cases using authoritative occupancy rules and precise diagnostics.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "src/Content/Import/StarterWorldRuntimeInput.cpp",
+        "tests/StarterWorldRuntimeInputTests.cpp",
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
+      ],
+      "notes": "Runtime validator rejects invalid dimensions, references, bounds, overlaps, water placements and occupied player spawn before world construction. Scope is the current 100x100 starter registry."
     },
     {
       "id": "STUDIO-051",
       "milestone": "R1",
       "priority": "P1",
       "title": "Validate mandatory route and approach access",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-050"
       ],
       "acceptance": "Use actual diagonal and interaction semantics to prove required services, spawn and exits reachable; test false-positive traps.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "src/Content/Import/StarterWorldRuntimeInput.cpp",
+        "tests/StarterWorldRuntimeInputTests.cpp",
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
+      ],
+      "notes": "Runtime validation checks actor reachability and a reachable cardinal approach for every placement under current blocking/no-corner-cut semantics. General regions/exits and broader geography diagnostics remain unsupported."
     },
     {
       "id": "STUDIO-053",
       "milestone": "R1",
       "priority": "P1",
       "title": "Define map-update position compatibility",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-002",
         "STUDIO-015"
       ],
       "acceptance": "Specify and test safe player/respawn/recovery-data handling when geometry changes, preserving unrelated progress.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "src/World/World.cpp",
+        "tests/StarterWorldRuntimeTests.cpp",
+        "docs/embervale/03-engine/SAVE_COMPATIBILITY.md",
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
+      ],
+      "notes": "Selected player spawn governs creation, death respawn and unsafe saved-position fallback; recovery accessibility is handled within the single imported starter region. Save version remains 13; broader migration manifests/region identity remain open."
     },
     {
       "id": "STUDIO-013",
       "milestone": "R2",
       "priority": "P1",
       "title": "Load content through compatibility adapter",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-012",
         "STUDIO-014",
@@ -293,8 +325,14 @@
       ],
       "acceptance": "Match baseline terrain/occupancy/lifecycle and save behaviour; make rollback explicit and invalid file failure observable.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "src/World/World.cpp",
+        "src/main.cpp",
+        "tests/StarterWorldRuntimeTests.cpp",
+        "docs/embervale/04-studio/STARTER_WORLD_IMPORT.md",
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
+      ],
+      "notes": "World constructs a validated snapshot with retained terrain/occupancy and staged IDs. CLI explicitly selects input or compiled content; bad input fails and imported playtests default to no save. General publication/rollback packages remain planned."
     },
     {
       "id": "STUDIO-020",
@@ -331,15 +369,21 @@
       "milestone": "R2",
       "priority": "P1",
       "title": "Provide headless CLI",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-020",
         "STUDIO-021"
       ],
       "acceptance": "Document supported syntax, structured diagnostics and exit outcomes; tests operate without SDL.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "src/Tools/WorldValidateMain.cpp",
+        "src/Core/GameLaunchOptions.cpp",
+        "tests/StarterWorldValidateCliTests.cmake",
+        "docs/embervale/04-studio/STARTER_WORLD_IMPORT.md",
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
+      ],
+      "notes": "EmbervaleWorldExport and EmbervaleWorldValidate run headlessly; the client has explicit --world/--save selection. Shared edits, guarded writes and structured machine diagnostics remain planned."
     },
     {
       "id": "STUDIO-023",

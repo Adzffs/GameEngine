@@ -8,8 +8,9 @@
 #include <variant>
 #include <vector>
 
-// Export-only observations of the compiled starter content. This is not a
-// runtime loader, player save, or a supported general-purpose editing model.
+// Typed observations of the compiled starter registry, shared by the exporter
+// and the opt-in runtime bridge. This is not a player save or a general-purpose
+// editor model; runtime input has additional validation and a fixed scope.
 namespace StarterWorldExport
 {
     enum class PlacementKind
@@ -34,7 +35,7 @@ namespace StarterWorldExport
         InitializationStage stage;
         int order;
         Position position;
-        // Typed bindings are retained for parity checks. The JSON contains
+        // Typed bindings support parity checks and runtime spawn authority. The JSON contains
         // explicit string identities, never enum ordinals or runtime IDs.
         std::variant<ResourceType, StationType, NpcSpawnDefinition> legacyDefinition;
     };

@@ -42,7 +42,7 @@ Engine::Engine()
 }
 
 Engine::Engine(EngineConfiguration configuration)
-    : playerID(-1)
+    : world(configuration.starterWorldSnapshot), playerID(-1)
 {
     if (configuration.developmentPlayerSavePath.has_value())
     {

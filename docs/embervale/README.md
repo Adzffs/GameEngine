@@ -17,7 +17,7 @@
 | Where should the settlement go? | [River Crossing proposal](05-game/RIVER_CROSSING.md) |
 | What still needs resolving? | [Risk register](07-decisions/RISKS_AND_QUESTIONS.md) |
 
-The source contains substantial RPG systems and a first read-only starter-world exporter. Editing and the proposed geographic redesign remain planned. The unchanged baseline now has a fresh local 81-test pass. See the [verification record](06-development/BASELINE_VERIFICATION_2026-11-18.md) for baseline and changed-source results, and the remaining platform limits.
+The source contains substantial RPG systems, starter-world export, bounded validation and explicit runtime loading of supported starter snapshots. Shared editing, guarded saving, undo, the visual editor and the proposed geographic redesign remain planned. The runtime-import slice passed 77/77 headless and 89/89 Linux SDL tests; see the [runtime verification record](06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md) for executed source/environment evidence. The [earlier baseline/export results](06-development/BASELINE_VERIFICATION_2026-11-18.md) remain separately recorded.
 
 ## Suggested reading paths
 
@@ -67,8 +67,9 @@ The source contains substantial RPG systems and a first read-only starter-world 
 
 | Document | What it contains |
 |---|---|
-| [STARTER_WORLD_EXPORT.md](04-studio/STARTER_WORLD_EXPORT.md) | Implemented read-only command, snapshot contract, fixture and remaining input/edit work |
+| [STARTER_WORLD_EXPORT.md](04-studio/STARTER_WORLD_EXPORT.md) | Implemented read-only command, snapshot contract and compiled baseline fixture |
 | [STUDIO_DESIGN.md](04-studio/STUDIO_DESIGN.md) | Workspace scope, minimal editor, shared commands and accessibility |
+| [STARTER_WORLD_IMPORT.md](04-studio/STARTER_WORLD_IMPORT.md) | Current runtime input limits, validator, game launch, save isolation and compatibility |
 | [CLI_AND_AI_CONTRACT.md](04-studio/CLI_AND_AI_CONTRACT.md) | Proposed command interface, transactions, diagnostics and automation safeguards |
 | [EDITOR_WORKFLOWS.md](04-studio/EDITOR_WORKFLOWS.md) | Practical authoring, recovery, conflict and playtest journeys |
 
@@ -88,6 +89,7 @@ The source contains substantial RPG systems and a first read-only starter-world 
 | [GETTING_STARTED.md](06-development/GETTING_STARTED.md) | Local CMake setup, Windows client, saves and editor guidance |
 | [CONTRIBUTING.md](06-development/CONTRIBUTING.md) | Focused work, evidence, review, compatibility and parallel-agent handoff |
 | [TESTING.md](06-development/TESTING.md) | Current registrations, meaningful future tests and result records |
+| [RUNTIME_IMPORT_VERIFICATION_2026-11-18.md](06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md) | Runtime-input build/test results, real dummy-video launch and precise platform limits |
 | [BASELINE_VERIFICATION_2026-11-18.md](06-development/BASELINE_VERIFICATION_2026-11-18.md) | Fresh baseline/export build results, environment, reproducible commands and platform limits |
 | [RELEASE_PROCESS.md](06-development/RELEASE_PROCESS.md) | Versioned candidates, packaging, verification, rollback and maintenance |
 | [SECURITY_AND_RELIABILITY.md](06-development/SECURITY_AND_RELIABILITY.md) | Bounded content, scoped writes, recovery and future trust boundaries |
@@ -99,7 +101,8 @@ The source contains substantial RPG systems and a first read-only starter-world 
 | Document | What it contains |
 |---|---|
 | [DECISIONS.md](07-decisions/DECISIONS.md) | User direction, proposed architecture choices and open ADRs |
-| [ADR_016_READ_ONLY_WORLD_EXPORT.md](07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md) | Implemented export-only boundaries, deterministic format and deferred parser/import decisions |
+| [ADR_016_READ_ONLY_WORLD_EXPORT.md](07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md) | Original export decision, deterministic format and historical dependency boundary |
+| [ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md](07-decisions/ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md) | Implemented bounded parser, core/runtime ownership, selected spawn authority and isolated playtests |
 | [RISKS_AND_QUESTIONS.md](07-decisions/RISKS_AND_QUESTIONS.md) | Observed findings, design risks, decision triggers and closure rules |
 
 ### Reusable work records

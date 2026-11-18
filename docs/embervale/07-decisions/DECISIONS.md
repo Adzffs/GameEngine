@@ -24,10 +24,10 @@
 |---|---|---|---|
 | ADR-001 | Authored definitions versus runtime state | Proposed: separate content from depletion, live NPC positions and player state | Before model implementation |
 | ADR-002 | Shared content and command semantics | Proposed: one headless interpretation, avoid dependency cycles | Before choosing CMake targets |
-| ADR-003 | Content representation/parser | Open: choose bounded, deterministic format and parser from actual needs | After baseline/export inventory |
+| ADR-003 | Content representation/parser | Implemented for the current ASCII snapshot in ADR-017; general schema evolution remains open | Before widening input scope |
 | ADR-004 | Stable identity | Proposed: durable authored IDs plus explicit enum/legacy mapping | Before exporting external references |
-| ADR-005 | Ground and occupancy migration | Proposed: separate authored layers with compatibility adapter | Before importer implementation |
-| ADR-006 | Canonical ordering versus lifecycle | Proposed: serialisation order must not determine legacy runtime creation order | Before parity fixtures/importer |
+| ADR-005 | Ground and occupancy migration | Starter adapter implemented: authored ground first, legacy occupancy second | Before broader occupancy changes |
+| ADR-006 | Canonical ordering versus lifecycle | Starter importer preserves explicit stages/order independently of array sorting | Before adding placement lifecycle kinds |
 | ADR-007 | Safe edits and concurrent writes | Proposed: typed transactions, content hash, lock/recheck, atomic replacement | Before persistent editor changes |
 | ADR-008 | Drafts, validation and publication | Proposed: separate recoverable drafts and immutable validated packages | Before save/recovery UI |
 | ADR-009 | Editor packaging | Open: separate executable or embedded mode, based on dependency and UX evidence | Before GUI target implementation |
@@ -37,7 +37,8 @@
 | ADR-013 | Save migration | Proposed: preserve current format when possible; explicit registry for changes | Before content affects persisted references |
 | ADR-014 | Network architecture | Open: use prototype requirements; do not infer MMO readiness | R9 feasibility phase |
 | ADR-015 | Repository and asset licensing | Open owner decision; no licence invented by documentation | Before distribution/contributor intake |
-| [ADR-016](ADR_016_READ_ONLY_WORLD_EXPORT.md) | Read-only snapshot before import | Implemented in this change: SDL-free tool, complete terrain/placements, explicit IDs/lifecycle and canonical JSON | Parser, importer and editor remain separately gated |
+| [ADR-016](ADR_016_READ_ONLY_WORLD_EXPORT.md) | Read-only snapshot before import | Original export decision; runtime boundary subsequently extended by ADR-017 | Retain compiled baseline export |
+| [ADR-017](ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md) | Bounded explicit runtime import | Implemented starter parser/validator, shared core, selected spawn catalogue and isolated playtests | Shared editing/publication remains separate |
 
 ## 4. Rationale for the key proposals
 
@@ -63,7 +64,7 @@ Current map size and workload provide a real baseline. Chunking, streaming, cach
 
 ## 5. Decisions still needing a concrete answer
 
-The parser, terrain encoding, preview backend, GUI packaging and eventual network transport remain open. The proposed River Crossing coordinates are a blockout candidate rather than an approved final map. Character and objective naming drift needs an intentional narrative choice. The confirmed outcome of the suspected economy loop may require price, recipe, stock or progression changes; the design should be chosen after reproduction.
+The starter input uses bounded ASCII JSON with terrain rows. General schema evolution, preview backend, GUI packaging and eventual network transport remain open. The proposed River Crossing coordinates are a blockout candidate rather than an approved final map. Character and objective naming drift needs an intentional narrative choice. The confirmed outcome of the suspected economy loop may require price, recipe, stock or progression changes; the design should be chosen after reproduction.
 
 Open does not mean work must stop for every minor implementation choice. A contributor can make routine reversible decisions within the agreed scope and document them. Escalate a choice when it changes the user experience, compatibility contract or a major investment.
 

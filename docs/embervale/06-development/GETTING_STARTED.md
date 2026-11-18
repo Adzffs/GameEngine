@@ -9,6 +9,8 @@
 |---|---|---|
 | Work on simulation and headless tests | Client OFF, graphics tests OFF | No |
 | Play the development game and run all test groups | Client ON, graphics tests ON | Yes |
+| Validate a starter snapshot | `EmbervaleWorldValidate`, content tools ON | No in headless configuration |
+| Play a selected starter snapshot | Client ON; `GameEngine --world <file>` | Yes |
 | Export compiled starter content | `EmbervaleWorldExport`, content tools ON (default) | No in headless configuration |
 | Edit maps in Embervale Studio | Future roadmap deliverable | GUI/backend still to be selected |
 
@@ -84,7 +86,7 @@ If SDL3 cannot be found, verify the selected toolchain and the package installat
 
 ## 5. Understand saves and development boosts
 
-`main.cpp` selects `saves/development-player.save` relative to the process working directory. Running from the repository root and running from a build directory can therefore use different saves. There is no current command-line save-path option in `main`. The configuration type supports an optional path in code, but that is not a shipped CLI. [Sources: main.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/main.cpp), [EngineConfiguration.h](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Core/EngineConfiguration.h).
+No-argument startup uses the compiled world and `saves/development-player.save`, relative to the process working directory. `--world <snapshot.json>` explicitly validates and loads a supported starter snapshot and defaults to temporary progress with no player save. Add `--save saves/map-playtest.save` to select an isolated persistent playtest, or use `--no-save` for temporary compiled-world play. `--compiled-world` explicitly selects the original content; `--help` lists current options. See [runtime import and launch examples](../04-studio/STARTER_WORLD_IMPORT.md).
 
 Keep ordinary development saves separate from test fixtures. Before a save-related experiment, preserve a copy and record the launch directory. Do not delete your save as a routine troubleshooting step. Normal controlled shutdown is the documented save boundary; a forced termination is not guaranteed to preserve progress. [Source: DevelopmentPlayerPersistence.md](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/docs/DevelopmentPlayerPersistence.md).
 
@@ -100,4 +102,4 @@ Machine-specific `.vscode` files containing paths such as `c:/GameEngine` are no
 
 Record the exact commit, command, tool versions, build directory and error output. Separate configure failures, compilation failures, test failures and runtime failures.
 
-The unchanged baseline’s 81 tests now have a fresh local Linux pass. With content tools enabled, the new exporter adds two headless CTest entries. See [Testing](TESTING.md) and the [verification record](BASELINE_VERIFICATION_2026-11-18.md) for exact outcomes and limits. Export usage is documented in [Starter-world export](../04-studio/STARTER_WORLD_EXPORT.md).
+The unchanged baseline’s 81 tests now have a fresh local Linux pass. The exporter milestone added two headless CTest entries. Later parser, runtime and command tests have their own source and execution evidence. See [Testing](TESTING.md) and the [verification record](BASELINE_VERIFICATION_2026-11-18.md) for exact outcomes and limits. Use [Starter-world export](../04-studio/STARTER_WORLD_EXPORT.md) and [Starter-world import](../04-studio/STARTER_WORLD_IMPORT.md) for the current command surface.

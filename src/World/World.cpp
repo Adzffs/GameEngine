@@ -51,6 +51,7 @@
 #include "../Persistence/PlayerSaveState.h"
 #include "../Quest/QuestSystem.h"
 #include "../Quest/QuestDefinitionDatabase.h"
+#include "../Content/Import/StarterWorldRuntimeInput.h"
 
 namespace
 {
@@ -119,6 +120,31 @@ World::World()
 {
 }
 
+World::World(const StarterWorldExport::Snapshot &snapshot)
+    : World(std::optional<StarterWorldExport::Snapshot>{snapshot})
+{
+}
+
+World::World(const std::optional<StarterWorldExport::Snapshot> &snapshot)
+    : World(snapshot,
+          CreateProductionRandomSource(),
+          CreateProductionRandomSource(),
+          CreateProductionRandomSource())
+{
+}
+
+World::World(
+    const StarterWorldExport::Snapshot &snapshot,
+    unsigned int combatSeed,
+    unsigned int rewardSeed,
+    unsigned int gatheringSeed)
+    : World(std::optional<StarterWorldExport::Snapshot>{snapshot},
+          std::make_unique<SeededRandom>(combatSeed),
+          std::make_unique<SeededRandom>(rewardSeed),
+          std::make_unique<SeededRandom>(gatheringSeed))
+{
+}
+
 World::World(
     unsigned int combatSeed,
     unsigned int rewardSeed,
@@ -152,12 +178,28 @@ World::World(
     std::unique_ptr<RandomSource> combatRandomSource,
     std::unique_ptr<RandomSource> rewardRandomSource,
     std::unique_ptr<RandomSource> gatheringRandomSource)
-    : combatService(std::move(combatRandomSource)),
+    : World(std::nullopt,
+          std::move(combatRandomSource),
+          std::move(rewardRandomSource),
+          std::move(gatheringRandomSource))
+{
+}
+
+World::World(
+    const std::optional<StarterWorldExport::Snapshot> &snapshot,
+    std::unique_ptr<RandomSource> combatRandomSource,
+    std::unique_ptr<RandomSource> rewardRandomSource,
+    std::unique_ptr<RandomSource> gatheringRandomSource)
+    : importedStarterSnapshot(snapshot.has_value()
+          ? std::optional<StarterWorldExport::Snapshot>{
+                StarterWorldImport::ValidateForRuntime(*snapshot)}
+          : std::nullopt),
+      combatService(std::move(combatRandomSource)),
       rewardRandomSource(std::move(rewardRandomSource)),
       gatheringRandomSource(std::move(gatheringRandomSource)),
       map(
-          DevelopmentWorldContent::MapWidth,
-          DevelopmentWorldContent::MapHeight)
+          importedStarterSnapshot ? importedStarterSnapshot->width : DevelopmentWorldContent::MapWidth,
+          importedStarterSnapshot ? importedStarterSnapshot->height : DevelopmentWorldContent::MapHeight)
 {
     if (this->rewardRandomSource == nullptr)
     {
@@ -171,6 +213,34 @@ World::World(
 
     rewardTableRoller = std::make_unique<RewardTableRoller>(
         *this->rewardRandomSource);
+
+    if (importedStarterSnapshot.has_value())
+    {
+        const auto &content = *importedStarterSnapshot;
+        for (int y = 0; y < content.height; ++y)
+            for (int x = 0; x < content.width; ++x)
+            {
+                TileType type;
+                switch (content.terrainRows[y][x])
+                {
+                case 'G': type = TileType::GRASS; break;
+                case 'D': type = TileType::DIRT; break;
+                case 'S': type = TileType::STONE; break;
+                case 'W': type = TileType::WATER; break;
+                default: throw std::logic_error("Validated starter ground is unsupported");
+                }
+                map.SetTileType(x, y, type);
+            }
+        for (const auto &placement : content.placements)
+            if (const auto *spawn = std::get_if<NpcSpawnDefinition>(&placement.legacyDefinition))
+            {
+                if (!importedStarterSpawns.emplace(spawn->spawnId, *spawn).second ||
+                    !npcSpawnManager.AddSpawn(*spawn))
+                    throw std::runtime_error("Could not register starter spawn: " + placement.id);
+            }
+        CreateImportedPlacements(StarterWorldExport::InitializationStage::WorldStart);
+        return;
+    }
 
     for (const DevelopmentTerrainRegionDefinition &region :
          DevelopmentWorldContent::GetStarterTerrainRegions())
@@ -223,6 +293,91 @@ World::World(
             definition.y);
     }
 }
+
+const NpcSpawnDefinition *World::TryGetStarterSpawn(NpcSpawnId spawnId) const
+{
+    if (!importedStarterSnapshot.has_value())
+        return NpcSpawnDatabase::TryGet(spawnId);
+    const auto found = importedStarterSpawns.find(spawnId);
+    return found == importedStarterSpawns.end() ? nullptr : &found->second;
+}
+
+Position World::GetStarterPlayerSpawn() const
+{
+    return importedStarterSnapshot.has_value()
+        ? importedStarterSnapshot->playerSpawn
+        : Position{DevelopmentWorldContent::PlayerSpawnX, DevelopmentWorldContent::PlayerSpawnY};
+}
+
+bool World::IsStarterSpawnReachableFrom(int x, int y)
+{
+    if (!map.IsValidPosition(x, y)) return false;
+    // Preserve the compiled world's historical restore policy. Imported
+    // terrain can isolate otherwise walkable cells from all game services.
+    if (!importedStarterSnapshot.has_value()) return true;
+    const Position spawn = GetStarterPlayerSpawn();
+    if (!map.IsValidPosition(spawn.GetX(), spawn.GetY())) return false;
+
+    const int width = map.GetWidth();
+    const auto index = [width](int tileX, int tileY) {
+        return static_cast<std::size_t>(tileY) * width + tileX;
+    };
+    std::vector<bool> visited(static_cast<std::size_t>(width) * map.GetHeight(), false);
+    std::queue<std::pair<int, int>> pending;
+    visited[index(spawn.GetX(), spawn.GetY())] = true;
+    pending.emplace(spawn.GetX(), spawn.GetY());
+    // Cardinal connectivity also covers all legal diagonal routes, because
+    // runtime movement rejects diagonal corner cutting.
+    constexpr std::array<std::pair<int, int>, 4> neighbors{
+        {{0, -1}, {1, 0}, {0, 1}, {-1, 0}}};
+    while (!pending.empty())
+    {
+        const auto [currentX, currentY] = pending.front();
+        pending.pop();
+        if (currentX == x && currentY == y) return true;
+        for (const auto [dx, dy] : neighbors)
+        {
+            const int nextX = currentX + dx;
+            const int nextY = currentY + dy;
+            if (!map.IsValidPosition(nextX, nextY)) continue;
+            const std::size_t next = index(nextX, nextY);
+            if (visited[next]) continue;
+            visited[next] = true;
+            pending.emplace(nextX, nextY);
+        }
+    }
+    return false;
+}
+
+void World::CreateImportedPlacements(StarterWorldExport::InitializationStage stage)
+{
+    std::vector<const StarterWorldExport::Placement *> ordered;
+    for (const auto &placement : importedStarterSnapshot->placements)
+        if (placement.stage == stage)
+            ordered.push_back(&placement);
+    std::sort(ordered.begin(), ordered.end(), [](const auto *left, const auto *right) {
+        return left->order < right->order;
+    });
+    for (const auto *placement : ordered)
+    {
+        const int x = placement->position.GetX();
+        const int y = placement->position.GetY();
+        if (const auto *type = std::get_if<ResourceType>(&placement->legacyDefinition))
+            CreateResource(*type, x, y);
+        else if (const auto *type = std::get_if<StationType>(&placement->legacyDefinition))
+            CreateStation(*type, x, y);
+        else
+        {
+            const auto &spawn = std::get<NpcSpawnDefinition>(placement->legacyDefinition);
+            const int id = placement->kind == StarterWorldExport::PlacementKind::MonsterSpawn
+                ? CreateMonster(spawn.npcType, spawn)
+                : CreateNpc(spawn.npcType, spawn);
+            if (id <= 0)
+                throw std::runtime_error("Could not create starter actor: " + placement->id);
+        }
+    }
+}
+
 void World::CreateResource(
     ResourceType resourceType,
     int x,
@@ -259,6 +414,8 @@ int World::CreatePlayer()
     const int playerID = entityManager.CreatePlayer();
     if (playerID > 0)
     {
+        const Position spawn = GetStarterPlayerSpawn();
+        entityManager.GetEntityByID(playerID)->GetPosition().SetPosition(spawn.GetX(), spawn.GetY());
         EnsureAdvancedStarterMonsters();
         EnsureStarterSupportingCharacters();
     }
@@ -267,6 +424,15 @@ int World::CreatePlayer()
 
 void World::EnsureAdvancedStarterMonsters()
 {
+    if (importedStarterSnapshot.has_value())
+    {
+        if (!importedDelayedPlacementsCreated)
+        {
+            CreateImportedPlacements(StarterWorldExport::InitializationStage::FirstPlayerRegistration);
+            importedDelayedPlacementsCreated = true;
+        }
+        return;
+    }
     if (advancedStarterMonstersCreated) return;
     const NpcSpawnDefinition *durable =
         NpcSpawnDatabase::TryGet(NpcSpawnId::DURABLE_DEVELOPMENT_SPAWN);
@@ -280,6 +446,7 @@ void World::EnsureAdvancedStarterMonsters()
 
 void World::EnsureStarterSupportingCharacters()
 {
+    if (importedStarterSnapshot.has_value()) return;
     if (starterSupportingCharactersCreated) return;
     const std::array<NpcSpawnId, 5> supportingSpawns{
         NpcSpawnId::TORREN_ASH_SPAWN,
@@ -302,6 +469,7 @@ void World::EnsureStarterSupportingCharacters()
 WorldPlayerLoadResult World::LoadOrCreatePlayerFromFile(
     const std::filesystem::path &savePath)
 {
+    const Position playerSpawn = GetStarterPlayerSpawn();
     WorldPlayerLoadResult result;
     PlayerSaveFileLoadResult fileResult = PlayerSaveFileStore::Load(savePath);
     const PlayerSaveFileLoadStatus fileStatus = fileResult.GetStatus();
@@ -322,8 +490,7 @@ WorldPlayerLoadResult World::LoadOrCreatePlayerFromFile(
     if (fileStatus == PlayerSaveFileLoadStatus::NOT_FOUND)
     {
         result.SetFileLoadResult(std::move(fileResult));
-        if (!map.IsValidPosition(DevelopmentWorldContent::PlayerSpawnX,
-                                 DevelopmentWorldContent::PlayerSpawnY))
+        if (!map.IsValidPosition(playerSpawn.GetX(), playerSpawn.GetY()))
         {
             result.AddIssue(WorldPlayerPersistenceIssueSeverity::ERROR,
                             WorldPlayerPersistenceIssueCode::DEVELOPMENT_SPAWN_INVALID,
@@ -333,8 +500,7 @@ WorldPlayerLoadResult World::LoadOrCreatePlayerFromFile(
         candidateID = entityManager.GetNextEntityIDCandidate();
         player = std::make_unique<Player>(
             candidateID, PlayerInitializationMode::DEVELOPMENT_DEFAULTS);
-        player->GetPosition().SetPosition(DevelopmentWorldContent::PlayerSpawnX,
-                                          DevelopmentWorldContent::PlayerSpawnY);
+        player->GetPosition().SetPosition(playerSpawn.GetX(), playerSpawn.GetY());
     }
     else
     {
@@ -383,6 +549,7 @@ WorldPlayerLoadResult World::TryRegisterLoadedPlayer(
     const PlayerSaveData &saveData,
     PlayerReconstructionFunction reconstructPlayer)
 {
+    const Position playerSpawn = GetStarterPlayerSpawn();
     WorldPlayerLoadResult result;
     result.SetFileLoadResult(std::move(fileLoadResult));
     const int candidateID = entityManager.GetNextEntityIDCandidate();
@@ -401,10 +568,10 @@ WorldPlayerLoadResult World::TryRegisterLoadedPlayer(
 
     const int savedX = player->GetPosition().GetX();
     const int savedY = player->GetPosition().GetY();
-    if (!map.IsValidPosition(savedX, savedY))
+    const bool savedPositionWalkable = map.IsValidPosition(savedX, savedY);
+    if (!savedPositionWalkable || !IsStarterSpawnReachableFrom(savedX, savedY))
     {
-        if (!map.IsValidPosition(DevelopmentWorldContent::PlayerSpawnX,
-                                 DevelopmentWorldContent::PlayerSpawnY))
+        if (!map.IsValidPosition(playerSpawn.GetX(), playerSpawn.GetY()))
         {
             result.AddIssue(WorldPlayerPersistenceIssueSeverity::ERROR,
                             WorldPlayerPersistenceIssueCode::DEVELOPMENT_SPAWN_INVALID,
@@ -416,13 +583,16 @@ WorldPlayerLoadResult World::TryRegisterLoadedPlayer(
         result.AddIssue(WorldPlayerPersistenceIssueSeverity::WARNING,
                         outOfBounds
                             ? WorldPlayerPersistenceIssueCode::SAVED_POSITION_OUT_OF_BOUNDS
-                            : WorldPlayerPersistenceIssueCode::SAVED_POSITION_BLOCKED,
+                            : savedPositionWalkable
+                                ? WorldPlayerPersistenceIssueCode::SAVED_POSITION_UNREACHABLE
+                                : WorldPlayerPersistenceIssueCode::SAVED_POSITION_BLOCKED,
                         candidateID,
-                        outOfBounds ? "Saved position is out of bounds; development spawn used"
-                                    : "Saved position is blocked; development spawn used");
+                        outOfBounds ? "Saved position is out of bounds; selected player spawn used"
+                            : savedPositionWalkable
+                                ? "Saved position cannot reach starter services; selected player spawn used"
+                                : "Saved position is blocked; selected player spawn used");
         result.SetUsedSpawnFallback();
-        player->GetPosition().SetPosition(DevelopmentWorldContent::PlayerSpawnX,
-                                          DevelopmentWorldContent::PlayerSpawnY);
+        player->GetPosition().SetPosition(playerSpawn.GetX(), playerSpawn.GetY());
     }
 
     const int finalX = player->GetPosition().GetX();
@@ -450,6 +620,14 @@ WorldPlayerLoadResult World::TryRegisterLoadedPlayer(
         pile.ownerPlayerEntityID = registeredID;
         pile.position.SetPosition(saveData.recoveryPile.positionX,
                                   saveData.recoveryPile.positionY);
+        if (importedStarterSnapshot.has_value() &&
+            !IsStarterSpawnReachableFrom(pile.position.GetX(), pile.position.GetY()))
+        {
+            pile.position = playerSpawn;
+            result.AddIssue(WorldPlayerPersistenceIssueSeverity::WARNING,
+                WorldPlayerPersistenceIssueCode::RECOVERY_PILE_RELOCATED,
+                registeredID, "Saved recovery pile position is unsafe; selected player spawn used");
+        }
         pile.expiryTick = currentTick + saveData.recoveryPile.remainingTicks;
         for (const SavedBankEntry &entry : saveData.recoveryPile.items)
             pile.items.push_back({entry.itemType, entry.quantity});
@@ -552,7 +730,7 @@ int World::CreateMonster(
     const NpcSpawnDefinition &spawn)
 {
     const NpcSpawnDefinition *authoredSpawn =
-        NpcSpawnDatabase::TryGet(spawn.spawnId);
+        TryGetStarterSpawn(spawn.spawnId);
     const NpcDefinition *definition =
         NpcDefinitionDatabase::TryGet(npcType);
     if (definition == nullptr || authoredSpawn == nullptr ||
@@ -640,7 +818,7 @@ int World::CreateMonster(
 int World::CreateNpc(NpcType npcType, const NpcSpawnDefinition &spawn)
 {
     const NpcDefinition *definition = NpcDefinitionDatabase::TryGet(npcType);
-    const NpcSpawnDefinition *authored = NpcSpawnDatabase::TryGet(spawn.spawnId);
+    const NpcSpawnDefinition *authored = TryGetStarterSpawn(spawn.spawnId);
     if (definition == nullptr || authored == nullptr || definition->kind != NpcKind::FRIENDLY ||
         definition->combat.has_value() || npcType != spawn.npcType ||
         authored->npcType != npcType || authored->spawnId != spawn.spawnId ||
@@ -5053,9 +5231,9 @@ void World::ProcessPlayerRespawns()
 
         if (!player->IsAlive())
         {
+            const Position playerSpawn = GetStarterPlayerSpawn();
             player->GetPosition().SetPosition(
-                DevelopmentWorldContent::PlayerSpawnX,
-                DevelopmentWorldContent::PlayerSpawnY);
+                playerSpawn.GetX(), playerSpawn.GetY());
             player->RestoreHealthToFull();
             processedDeathEntityIDs.erase(player->GetID());
             ClearCombatFeedbackInvolvingEntity(player->GetID());

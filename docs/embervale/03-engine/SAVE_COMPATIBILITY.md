@@ -1,6 +1,6 @@
 # Save compatibility and content migration
 
-**Status:** Existing save behaviour is source verified; migration mechanisms below are proposed.  
+**Status:** Current starter import preserves save version 13 and adds selected-map position handling. Broader versioned content/save migration mechanisms below remain proposed.\
 **Updated:** 18 November 2026  
 **Primary rule:** A geography edit must not silently discard a player's earned state.
 
@@ -24,11 +24,13 @@ A tree moving two tiles does not inherently require player save version 14. Conv
 
 The first flat-world migration should preserve the current save format wherever possible. Because current saved positions have no region or surface fields, the adapter must explicitly interpret them as positions in the selected legacy-compatible development region on `ground`. This is a compatibility rule, not an excuse to assume every future map uses the same coordinate space.
 
-## 3. Existing fallback behaviour and additional review targets
+## 3. Position fallback and remaining migration scope
 
-When reconstructing a saved player, `World::TryRegisterLoadedPlayer` checks the saved position against the active map. A blocked or out-of-bounds position falls back to the development spawn and produces a warning; an invalid fallback spawn prevents registration. Player registration then triggers the delayed starter entities. [Source: World.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/World/World.cpp).
+For the compiled world, the existing blocked/out-of-bounds player fallback remains the development spawn. Imported starter content uses its selected player spawn for new players, saved-position fallback and death respawn. Saved player positions must be traversable and connected to the selected safe starting area. The recovery pile must remain accessible from that area as well; incompatible recovery positions are relocated without changing their item quantities, owner or remaining expiry ticks. Player registration still triggers delayed starter entities only once.
 
-That existing fallback is an important baseline, but it is not the entire compatibility contract. In the inspected function, recovery-pile coordinates are restored separately from the player's position. Player death respawn also uses the development spawn through another path. These observations create concrete audit targets; they are not a claim that every related path has a confirmed bug. Geography migration must review all location-bearing state, not only the player-load happy path. [Source: World.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/World/World.cpp).
+This is a bounded compatibility rule for the same 100×100 starter region and `ground` surface. It does not add region identity to saves, perform an offline migration, or provide general versioned content migration manifests. The [runtime import guide](../04-studio/STARTER_WORLD_IMPORT.md) documents command selection and scope; [World](../../../src/World/World.cpp) and [runtime tests](../../../tests/StarterWorldRuntimeTests.cpp) contain the implementation and regression scenarios.
+
+Imported-world launches use no player save by default. An explicit `--save` opts into the existing persistence lifecycle, while the save target and its temporary/backup paths are checked against world-file aliases. Ordinary no-argument startup keeps the normal development save. Runtime content validation does not write player files.
 
 ### Location migration matrix
 

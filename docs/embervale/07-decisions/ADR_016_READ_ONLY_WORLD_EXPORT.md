@@ -1,7 +1,7 @@
 # ADR-016: Read-only starter-world snapshot before import
 
 **Date:** 18 November 2026\
-**Status:** Implemented by this change; broader authoring/import decisions remain open.\
+**Status:** Historical export decision, implemented first and extended by [ADR-017](ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md) for shared core ownership and explicit runtime input.\
 **Related work:** ENG-002, STUDIO-001–004, STUDIO-010–012 and STUDIO-015.\
 **Sources:** [baseline inventory](../03-engine/STARTER_WORLD_BASELINE.md), [snapshot implementation](../../../src/Content/Export/StarterWorldSnapshot.cpp), [runtime parity tests](../../../tests/StarterWorldSnapshotTests.cpp).
 
@@ -35,7 +35,7 @@ Do not add a JSON parser yet. An output-only tool needs a correct writer and ind
 
 ## Consequences
 
-The snapshot is a concrete baseline that people and automation can inspect, diff and test. The CLI runs in the headless configuration and uses no player-save API. Its output is not a supported runtime input; changing a JSON file cannot yet move anything in the game.
+The snapshot is a concrete baseline that people and automation can inspect, diff and test. The CLI runs in the headless configuration and uses no player-save API. At the original exporter boundary, output was not supported runtime input. ADR-017 adds explicit loading and supported geography changes; the exporter itself remains read-only.
 
 The registry intentionally supports the current unique legacy placements. A second placement of the same resource type requires a new durable identity and an explicit registry change. This is a baseline compatibility bridge, not the final general placement catalogue.
 

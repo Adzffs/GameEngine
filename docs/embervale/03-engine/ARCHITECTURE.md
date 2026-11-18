@@ -1,6 +1,6 @@
 # Engine and authoring architecture
 
-**Document status:** Runtime behaviour is source verified at `e9d32932e8f9b27e96283313cca320058792a81f`. The [export-only boundary](../07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md) is implemented; broader Studio/import architecture remains proposed.\
+**Document status:** Runtime behaviour is source verified at `e9d32932e8f9b27e96283313cca320058792a81f`. The [original export boundary](../07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md) is extended by [bounded runtime import](../07-decisions/ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md). Broader Studio editing/publication architecture remains proposed.\
 **Updated:** 18 November 2026\
 **Audience:** Engine developers, Studio developers, coding agents and technical reviewers.
 
@@ -19,6 +19,12 @@ Keep three meanings separate throughout implementation:
 Studio edits the first two through validated content operations. Gameplay changes the third. A playtest must not accidentally save an NPC's wandering position or a depleted tree as the permanent map design.
 
 For status, source links and the broader system inventory, use [Implemented systems](../01-current-state/IMPLEMENTED_SYSTEMS.md). For work order, use the [Master roadmap](../02-roadmap/MASTER_ROADMAP.md).
+
+### Current starter-content bridge
+
+The snapshot model, canonical writer, bounded parser and runtime validator now belong to `GameEngineCore`. `EmbervaleWorldSnapshot` remains an interface compatibility target linking the core. Optional standalone commands export compiled content and validate selected input; disabling those executables does not remove game import support.
+
+`EngineConfiguration::starterWorldSnapshot` passes an owned validated document into World construction. The world installs underlying terrain, registers its selected spawn definitions and follows explicit lifecycle order before using existing gameplay systems. Default construction retains the compiled path. `GameEngine --world` selects file input and isolates player-save behaviour unless an explicit save is provided. See [ADR-017](../07-decisions/ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md) and [current commands](../04-studio/STARTER_WORLD_IMPORT.md).
 
 ## 2. Architecture already present
 
