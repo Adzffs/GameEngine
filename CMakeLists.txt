@@ -114,6 +114,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/Content/Export/StarterWorldSnapshotInput.cpp
     src/Content/Import/StarterWorldRuntimeInput.cpp
     src/Content/Edit/StarterWorldEdit.cpp
+    src/Content/Edit/StarterWorldDraftFile.cpp
     src/Reward/RewardTable.cpp
     src/Reward/RewardTableRoller.cpp
     src/Reward/DevelopmentRewardTables.cpp
@@ -211,6 +212,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(GameLaunchOptionsTests tests/GameLaunchOptionsTests.cpp)
     add_gameengine_headless_test(StarterWorldRuntimeInputTests tests/StarterWorldRuntimeInputTests.cpp)
     add_gameengine_headless_test(StarterWorldEditTests tests/StarterWorldEditTests.cpp)
+    add_gameengine_headless_test(StarterWorldDraftFileTests tests/StarterWorldDraftFileTests.cpp)
     add_gameengine_headless_test(StarterWorldRuntimeTests tests/StarterWorldRuntimeTests.cpp)
     if(GAMEENGINE_BUILD_CONTENT_TOOLS)
         add_gameengine_headless_test(StarterWorldSnapshotTests tests/StarterWorldSnapshotTests.cpp)
@@ -244,6 +246,7 @@ if(BUILD_TESTING)
             COMMAND ${CMAKE_COMMAND}
                 "-DMOVER=$<TARGET_FILE:EmbervaleWorldMove>"
                 "-DFIXTURE=${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/content/development-starter.snapshot.json"
+                "-DWORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/starter-world-move-cli-test"
                 -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/StarterWorldMoveCliTests.cmake"
         )
         set_tests_properties(StarterWorldMoveCliTests PROPERTIES LABELS "headless;content")

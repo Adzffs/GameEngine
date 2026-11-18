@@ -361,15 +361,23 @@
       "milestone": "R2",
       "priority": "P1",
       "title": "Guard writes and dry runs",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-020",
         "STUDIO-011"
       ],
       "acceptance": "Expected content hash, file locking/recheck and atomic replacement prevent stale writes; dry-run persists nothing.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "src/Content/Edit/StarterWorldDraftFile.h",
+        "src/Content/Edit/StarterWorldDraftFile.cpp",
+        "src/Tools/WorldMoveMain.cpp",
+        "tests/StarterWorldDraftFileTests.cpp",
+        "tests/StarterWorldMoveCliTests.cmake",
+        "docs/embervale/04-studio/GUARDED_DRAFT_REVISIONS.md",
+        "docs/embervale/06-development/GUARDED_DRAFT_VERIFICATION_2026-11-18.md"
+      ],
+      "notes": "Experimental create-only sibling draft publication with raw-byte SHA-256 expected hash, source recheck under cooperating-directory lock, private staging and exclusive hard-link commit. Original source and save files never overwritten. No in-place atomic replacement, crash-durability guarantee or general editor yet. Full repository build/tests and Windows are unverified; isolated C++ storage tests and mock CLI/CMake checks only."
     },
     {
       "id": "STUDIO-022",

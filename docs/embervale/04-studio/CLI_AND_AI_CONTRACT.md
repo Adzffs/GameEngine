@@ -1,6 +1,6 @@
 # CLI and AI editing contract
 
-**Status:** Proposed full editing interface. Export, validation and an initial dry-run resource/station move are implemented; draft writes, hashes, undo and most command families remain planned. See [starter-world import](STARTER_WORLD_IMPORT.md) for current syntax.\
+**Status:** Proposed full editing interface. Export, validation and a bounded dry-run resource/station move are implemented. A separate draft branch introduces raw-file SHA-256 inspection and create-only guarded draft writes; general revisions, undo and most command families remain planned. See [starter-world import](STARTER_WORLD_IMPORT.md) for current syntax.\
 **Updated:** 18 November 2026\
 **Goal:** Let a human and an AI agent inspect or change content through the same predictable operations.
 
@@ -30,7 +30,7 @@ A machine must be able to answer four questions after every operation: what inpu
 | `content publish` | Create a validated immutable package | New package only |
 | `playtest` | Launch an isolated test using an explicit package and save | Test state only |
 
-The experimental `EmbervaleWorldMove <snapshot.json> <placement-id> <x> <y>` is a dry-run preview, not the final command family. Its typed underlying operation returns a validated candidate but the CLI writes nothing. Full command spelling and output contracts remain implementation decisions. Initial work only needs the bounded tree-move workflow. Unsupported operations should return a capability error, not succeed with no effect.
+The experimental `EmbervaleWorldMove <snapshot.json> <placement-id> <x> <y>` remains a dry-run preview by default. Its stacked write extension requires `--expected-hash <sha256> --write-draft <fresh-sibling.json>` and has stricter create-only scope than the eventual replacement-based transaction. Its typed underlying operation returns a validated candidate but the CLI writes nothing. Full command spelling and output contracts remain implementation decisions. Initial work only needs the bounded tree-move workflow. Unsupported operations should return a capability error, not succeed with no effect.
 
 ## 3. Proposed tree-move workflow
 

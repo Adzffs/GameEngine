@@ -1,6 +1,6 @@
 # Validate and play a starter-world snapshot
 
-**Status:** Implemented runtime bridge and bounded dry-run placement move; guarded draft saving, undo, publication and visual editing remain planned.\
+**Status:** Runtime bridge and bounded dry-run move are integrated; an experimental create-only draft-writing extension is staged on a separate development branch, pending full verification. Undo, publication and visual editing remain planned.\
 **Updated:** 18 November 2026\
 **Format:** `embervale.starter-world-snapshot`, schema version `1`, region `embervale.development_starter`.\
 **Related:** [Export guide](STARTER_WORLD_EXPORT.md), [runtime import decision](../07-decisions/ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md), [save compatibility](../03-engine/SAVE_COMPATIBILITY.md).
@@ -11,7 +11,7 @@ The game can load an explicitly selected JSON snapshot of its existing 100×100 
 
 `EmbervaleWorldValidate` reads a candidate and applies the same parser and runtime validation used by game startup. `GameEngine --world <path>` then constructs the world from the validated snapshot. A missing, malformed or unsafe file stops startup with a diagnostic; it does not silently select a different world.
 
-The game and validator do not write the selected world file. A shared typed move operation now produces an independently validated in-memory candidate for an existing resource or station, exposed through a dry-run CLI. There is no draft-save command, undo history, publication manifest or graphical editor. The CLI does not persist the candidate; the safe authoring workflow remains unfinished.
+The game and validator do not write the selected world file. A shared typed move operation now produces an independently validated in-memory candidate for an existing resource or station, exposed through a dry-run CLI. The base CLI does not persist candidates. A stacked development change adds guarded creation of a **new** sibling draft file after validated move; it never replaces its source. Undo history, publication manifest, general-purpose editor and an in-place revision workflow remain unfinished.
 
 ## 2. Build and validate without SDL
 
@@ -43,7 +43,7 @@ Shell redirection creates or replaces its destination. The exporter always captu
 ./build-headless/EmbervaleWorldMove tests/fixtures/content/development-starter.snapshot.json resource.normal_tree.001 30 30
 ```
 
-Exit `0` means the move is valid (including an unchanged-coordinate no-op), exit `1` means the source or candidate was rejected, and exit `2` means invalid command syntax. **This is a dry run: no file, player save, or live world is modified.** It reports the stable ID and old/new coordinates. It does not generate a saved draft, hash, diff, undo history, or preview image yet. Use it to check a move, not to claim that content has been published. Unit and CLI regression tests are registered but must be executed on the exact commit before this slice is considered verified.
+The development extension uses exit `0` for success, `2` for invalid syntax, `3` for rejected content/move, `4` for stale hash or occupied output, and `5` for bounded file/lock/write errors. **This is a dry run: no file, player save, or live world is modified.** It reports the stable ID and old/new coordinates. On the development branch it can inspect the raw-file SHA-256 and create a validated candidate at a **new** filename in the same directory when supplied the expected source hash. It does not generate a semantic diff, undo history, or preview image. Use it to check a move, not to claim that content has been published. Full repository unit and CLI regression tests must still be executed on the exact stacked revision before it is considered verified. See [guarded revisions](GUARDED_DRAFT_REVISIONS.md).
 
 ### Validator command results
 
