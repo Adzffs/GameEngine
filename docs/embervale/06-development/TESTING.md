@@ -1,16 +1,16 @@
 # Testing, validation and evidence
 
-**Status date:** 18 November 2026  
-**Baseline:** `e9d32932e8f9b27e96283313cca320058792a81f`  
-**Evidence limitation:** No fresh local game build/test run was performed for this documentation pack.
+**Status date:** 18 November 2026\
+**Baseline:** `e9d32932e8f9b27e96283313cca320058792a81f`\
+**Fresh evidence:** [18 November verification](BASELINE_VERIFICATION_2026-11-18.md) records a passing local Linux baseline and the exporter change. Windows and GitHub CI remain outstanding.
 
-## 1. What the existing test count means
+## 1. Current test counts and executed results
 
-The inspected CMake file registers **70 headless**, **7 graphics** and **4 client** test targets when the required options are enabled: **81 in total**. This is a source registration count, not a result count from a fresh executed suite. A headless-only configuration does not build all 81. [Source: CMakeLists.txt](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/CMakeLists.txt).
+The original engine baseline registers 70 headless, 7 graphics and 4 client executables: 81 total. All 81 passed in a fresh local Linux run at documentation merge `c697386382845f17ce02027e6bade24591a9eb36`, with SDL’s dummy display driver. This is independent of the older PR report.
 
-The historical game-feel pull request reports that all 81 tests passed. The inspected push workflow for the baseline commit instead has a failed outcome, with no usable step execution/log evidence returned in this review. Its cause is unknown; neither “tests failed” nor “tests currently pass” is established by that workflow observation. [Sources: PR #2](https://github.com/Adzffs/GameEngine/pull/2), [workflow run](https://github.com/Adzffs/GameEngine/actions/runs/44018694678).
+With `GAMEENGINE_BUILD_CONTENT_TOOLS=ON`, the exporter adds one C++ snapshot test and one CMake CLI integration test: **72 headless + 7 graphics + 4 client = 83 CTest entries**. Both changed configurations passed: 72/72 headless and 83/83 in the SDL client build, with no failures or skips. Disabling content tools omits those two checks. See [current CMake](../../../CMakeLists.txt) and the [machine-readable results](verification/2026-11-18/results.json).
 
-Recovering a reproducible baseline is the first engineering milestone. Record the test inventory discovered by the actual configured build, the execution results and any platform limitation.
+The inspected [GitHub run](https://github.com/Adzffs/GameEngine/actions/runs/44018694678) did not execute tests: its public annotation says an account billing lock prevented the jobs from starting. The owner must resolve that blocker and rerun the intended commit’s Linux and Windows jobs. Local Linux success is not a Windows or GitHub CI result.
 
 ## 2. Existing verification layers
 
@@ -47,9 +47,11 @@ The workflow has Linux headless and Windows UCRT64 client jobs. Windows runs the
 
 When diagnosing a failed run, distinguish runner/setup failure, configure failure, compilation failure, test assertion failure, timeout and missing/skipped execution. If logs are unavailable, record that limit rather than assigning a cause. Workflow configuration, branch rules, commit statuses and Actions check results are separate evidence sources.
 
-## 5. Studio foundation coverage to add
+## 5. Studio coverage already present and still required
 
-The following coverage is planned and should be introduced with the corresponding implementation, not claimed as present today.
+The [snapshot test](../../../tests/StarterWorldSnapshotTests.cpp) compares all 10,000 effective cells and collision results with a real World, checks ground under occupied tiles and staged actors, uses actual pathfinder endpoints, performs a furnace interaction, and verifies deterministic output and structural rejection. The [CLI test](../../../tests/StarterWorldExportCliTests.cmake) independently parses executable JSON, compares the reviewed fixture and exercises read-only invocation/argument behaviour.
+
+The following broader input/editing coverage remains planned and should be introduced with its corresponding implementation:
 
 | Contract | Meaningful test |
 |---|---|
@@ -70,7 +72,7 @@ Negative tests should assert unchanged committed content and a useful diagnostic
 
 ## 6. Semantic baseline comparisons
 
-Before enabling the importer, capture the existing world using deterministic seeds and explicit observation stages: immediately after construction, after player registration, after relevant actions/ticks, and after save/reload. Delayed NPC/monster creation makes a single startup snapshot insufficient.
+The exporter now covers initial construction, first and subsequent player registration, and a representative action/tick sequence. Before enabling the importer, extend that evidence to loaded-content construction and saved-player/recovery compatibility. Delayed NPC/monster creation makes a single startup snapshot insufficient.
 
 Compare terrain, effective collision, durable placement identity, definition references, spawn population/lifecycle, important interactions and persistent state. Preserve creation order during initial migration where compatibility requires it. Keep temporary runtime IDs as a separate observation when relevant; do not define the entire golden master as “all integers match forever.”
 

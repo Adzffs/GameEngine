@@ -1,6 +1,6 @@
 # Design decisions and architecture decision register
 
-**Purpose:** Preserve why choices were made and distinguish agreed direction from implementation proposals.  
+**Purpose:** Preserve why choices were made and distinguish agreed direction from implementation proposals.\
 **Status date:** 18 November 2026. Use the [ADR template](../08-templates/ADR_TEMPLATE.md) for decisions that need more detail.
 
 ## 1. Decision status
@@ -37,6 +37,7 @@
 | ADR-013 | Save migration | Proposed: preserve current format when possible; explicit registry for changes | Before content affects persisted references |
 | ADR-014 | Network architecture | Open: use prototype requirements; do not infer MMO readiness | R9 feasibility phase |
 | ADR-015 | Repository and asset licensing | Open owner decision; no licence invented by documentation | Before distribution/contributor intake |
+| [ADR-016](ADR_016_READ_ONLY_WORLD_EXPORT.md) | Read-only snapshot before import | Implemented in this change: SDL-free tool, complete terrain/placements, explicit IDs/lifecycle and canonical JSON | Parser, importer and editor remain separately gated |
 
 ## 4. Rationale for the key proposals
 

@@ -8,6 +8,12 @@ option(
     ON
 )
 
+option(
+    GAMEENGINE_BUILD_CONTENT_TOOLS
+    "Build the read-only starter-world exporter"
+    ON
+)
+
 set(GAMEENGINE_DEFAULT_BUILD_GRAPHICS_TESTS ${GAMEENGINE_BUILD_CLIENT})
 option(
     GAMEENGINE_BUILD_GRAPHICS_TESTS
@@ -116,6 +122,18 @@ add_library(GameEngineCore
 
 target_include_directories(GameEngineCore PUBLIC src)
 
+if(GAMEENGINE_BUILD_CONTENT_TOOLS)
+    add_library(EmbervaleWorldSnapshot
+        src/Content/Export/StarterWorldSnapshot.cpp
+    )
+    target_link_libraries(EmbervaleWorldSnapshot PUBLIC GameEngineCore)
+
+    add_executable(EmbervaleWorldExport
+        src/Tools/WorldExportMain.cpp
+    )
+    target_link_libraries(EmbervaleWorldExport PRIVATE EmbervaleWorldSnapshot)
+endif()
+
 if(GAMEENGINE_BUILD_CLIENT)
     add_executable(GameEngine
         src/main.cpp
@@ -167,6 +185,21 @@ function(add_gameengine_graphics_test target source)
 endfunction()
 
 if(BUILD_TESTING)
+    if(GAMEENGINE_BUILD_CONTENT_TOOLS)
+        add_gameengine_headless_test(StarterWorldSnapshotTests tests/StarterWorldSnapshotTests.cpp)
+        target_link_libraries(StarterWorldSnapshotTests PRIVATE EmbervaleWorldSnapshot)
+
+        add_test(
+            NAME StarterWorldExportCliTests
+            COMMAND ${CMAKE_COMMAND}
+                "-DEXPORTER=$<TARGET_FILE:EmbervaleWorldExport>"
+                "-DFIXTURE=${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/content/development-starter.snapshot.json"
+                "-DWORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/starter-world-export-cli-test"
+                -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/StarterWorldExportCliTests.cmake"
+        )
+        set_tests_properties(StarterWorldExportCliTests PROPERTIES LABELS "headless;content")
+    endif()
+
     add_gameengine_headless_test(ActionFrameworkTests tests/ActionFrameworkTests.cpp)
     add_gameengine_headless_test(GameplayActionIntegrationTests tests/GameplayActionIntegrationTests.cpp)
     add_gameengine_headless_test(EquipmentStatsTests tests/EquipmentStatsTests.cpp)

@@ -4,6 +4,17 @@ This file records reviewable project changes going forward. Historical work is d
 
 ## Unreleased
 
+### Read-only starter-world foundation
+
+- Add an optional SDL-free `EmbervaleWorldExport` executable and typed snapshot library.
+- Export all 100×100 underlying ground cells, seven resources, three stations, ten spawn definitions and explicit initialization stages/order as deterministic JSON.
+- Add a reviewed complete snapshot fixture, real-world terrain/lifecycle/path/interaction checks, and independent CLI JSON verification.
+- Record a fresh local Linux baseline pass (81 tests) and changed-build passes (72 headless; 83 with client/graphics), with exact environments and source hashes.
+- Diagnose the inspected GitHub failure as an account billing lock before job execution; remote rerun and Windows verification remain outstanding.
+- Document placement/save ownership, the export architecture decision, actual command usage and task progress. Runtime construction, player saves, existing gameplay and the CI workflow are unchanged.
+
+See [export usage](docs/embervale/04-studio/STARTER_WORLD_EXPORT.md) and the [verification record](docs/embervale/06-development/BASELINE_VERIFICATION_2026-11-18.md). This is a foundation change; runtime import and editing remain planned.
+
 ### Documentation and repository organisation
 
 - Add a root project entry point and categorised Embervale documentation index.
@@ -15,9 +26,9 @@ This file records reviewable project changes going forward. Historical work is d
 
 ### Known baseline findings
 
-- The inspected source-baseline workflow failed without a confirmed cause; no fresh game build/test result is asserted by this documentation update.
+- The original documentation review had no confirmed CI cause or local build; the later foundation verification above supplies both the account-lock diagnosis and local test results.
 - A source-derived multi-step shop/crafting profit cycle requires runtime reproduction and a separate balance correction if confirmed.
 - Starter pacing requires a genuine fresh-player profile rather than the current boosted development defaults.
 
-This entry describes the documentation/setup update delivered through [PR #3](https://github.com/Adzffs/GameEngine/pull/3). It does not claim a Studio release, geographic implementation or engine fix.
+The documentation and organisation portion was delivered through [PR #3](https://github.com/Adzffs/GameEngine/pull/3). It does not claim a Studio release, geographic implementation or engine fix.
 

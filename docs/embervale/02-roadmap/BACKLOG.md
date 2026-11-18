@@ -1,15 +1,33 @@
 # Implementation backlog
 
-**Version:** 1.0 · **Reviewed:** 18 November 2026  
+**Version:** 1.0 · **Reviewed:** 18 November 2026\
 **Purpose:** Turn the roadmap into clear, expandable work packages. These are planning records, not automatically created GitHub issues.
 
 ## How to use this backlog
 
-P0 means a prerequisite or integrity risk that needs early resolution; P1 is required for the named release; P2 is a valuable subsequent improvement; P3 is optional or longer-term work. These are planning priorities rather than security severity ratings. Runtime implementation tasks remain planned. DOC-001 is complete for delivery of this documentation pack and focused cleanup through [PR #3](https://github.com/Adzffs/GameEngine/pull/3); it does not complete the engine/editor milestones. GitHub records the PR merge state.
+P0 means a prerequisite or integrity risk that needs early resolution; P1 is required for the named release; P2 is a valuable subsequent improvement; P3 is optional or longer-term work. These are planning priorities rather than security severity ratings. Current implementation progress is recorded below; unlisted tasks remain planned. DOC-001 is complete for delivery of this documentation pack and focused cleanup through [PR #3](https://github.com/Adzffs/GameEngine/pull/3); it does not complete the engine/editor milestones. GitHub records the PR merge state.
 
 The acceptance column states what must be demonstrated. When opening a GitHub issue, copy the task into the [feature template](../08-templates/FEATURE_SPEC.md), add exact source and test references, estimate only that bounded task, and record the actual issue URL. Split a task if the acceptance result cannot be reviewed in a focused change. Keep the ID stable even if its milestone moves.
 
 Each dependency below is a direct prerequisite, not a suggestion that every earlier milestone must finish. The machine-readable [BACKLOG.json](BACKLOG.json) contains the same task records for future automation; it does not execute work or create issues.
+
+## Current progress
+
+The first export slice is implemented and locally verified for review. `ready_for_review` does not mean merged or released; `in_progress` means the larger acceptance contract still has explicit unfinished work. Dependencies and acceptance text below remain intact. The [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md), [baseline inventory](../03-engine/STARTER_WORLD_BASELINE.md), [export guide](../04-studio/STARTER_WORLD_EXPORT.md) and [ADR-016](../07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md) contain the evidence.
+
+| Work | Planning IDs | Status | Evidence and remaining work |
+|---|---|---|---|
+| CI recovery | ENG-001 | blocked | Cause established: account billing lock; owner resolution and rerun remain required |
+| Reproducible baseline | ENG-002 | in_progress | Linux baseline 81/81; changed headless 72/72 and client 83/83; Windows/remote execution outstanding |
+| Ownership and saved-location inventory | STUDIO-001, STUDIO-002 | ready_for_review | Source ownership, all placements/lifecycle, labels, quests and save versions/position paths documented; no edited-map migration claimed |
+| Minimal architecture | STUDIO-003 | in_progress | Export target/model/writer decisions recorded; input parser and preview decisions remain open |
+| Semantic baseline fixtures | STUDIO-004 | ready_for_review | Full terrain/occupancy, actor stages, pathfinder approaches, furnace action and deterministic snapshot tests pass |
+| General authored model | STUDIO-010 | in_progress | Typed export-only model implemented; general input/edit contract remains to be finalized |
+| Bounded codec | STUDIO-011 | in_progress | Canonical writer and in-memory checks implemented; decoder/input rejection and round-trip contract remain outstanding |
+| Read-only current-world export | STUDIO-012 | ready_for_review | Complete 100×100 snapshot, pond, 20 placements and lifecycle metadata pass runtime/CLI parity; full codec dependency remains open for the wider foundation |
+| Identity/migration registry | STUDIO-015 | in_progress | Explicit current placement/enum mappings reject drift; general allocation, aliases and migration support remain future work |
+
+This scoped export proof does not mark R0/R1 complete. The parser, provider validation, edited-map safety, saved-location policy, importer, commands and GUI retain their own gates. Fresh-player and economy tasks also remain open.
 
 ## Complete work inventory
 
@@ -164,7 +182,7 @@ The first release retains a bounded GUI and the actual-tree demonstration. Broad
 
 ## Handling partial work and new findings
 
-A task with code written but no acceptance evidence stays in progress or ready for review. If an implementation reveals a new risk, link a new issue or dependency rather than quietly weakening the gate. A bug discovered in this documentation review is not automatically fixed by describing it. In particular, ENG-001 and GAME-008 remain unresolved until their own evidence exists.
+A task with code written but no acceptance evidence stays in progress or ready for review. If an implementation reveals a new risk, link a new issue or dependency rather than quietly weakening the gate. A bug discovered in this documentation review is not automatically fixed by describing it. ENG-001 now has a diagnosed external blocker but still needs account resolution and a rerun; GAME-008 still needs runtime reproduction.
 
 For FUT-003, WORLD-002 and WORLD-003 become required dependencies when the selected expansion adds connected regions.
 

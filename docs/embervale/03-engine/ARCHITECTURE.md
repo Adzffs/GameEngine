@@ -1,7 +1,7 @@
 # Engine and authoring architecture
 
-**Document status:** Current behaviour is source verified at `e9d32932e8f9b27e96283313cca320058792a81f`; the Studio architecture is a proposal.  
-**Updated:** 18 November 2026  
+**Document status:** Runtime behaviour is source verified at `e9d32932e8f9b27e96283313cca320058792a81f`. The [export-only boundary](../07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md) is implemented; broader Studio/import architecture remains proposed.\
+**Updated:** 18 November 2026\
 **Audience:** Engine developers, Studio developers, coding agents and technical reviewers.
 
 ## 1. What this document decides
@@ -41,6 +41,10 @@ Here, **authoritative** means that the world owns decisions such as accepted mov
 | Presentation | `Graphics/Graphics.*`, `Input/*` | Camera, zoom, picking and visible collision agreement |
 
 This table describes responsibilities, not an exhaustive dependency graph. Exact extraction points belong in a reviewed architecture decision before changing build targets.
+
+### Implemented export boundary
+
+`EmbervaleWorldExport` links `EmbervaleWorldSnapshot`, which links existing `GameEngineCore`. These optional content-tool targets require no SDL and add no dependency from the game back to authoring. The game’s construction and persistence paths remain unchanged. See [ADR-016](../07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md) and [current CMake](../../../CMakeLists.txt).
 
 ## 3. Proposed dependency direction
 

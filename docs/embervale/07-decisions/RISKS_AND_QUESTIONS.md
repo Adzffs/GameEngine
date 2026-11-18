@@ -1,15 +1,15 @@
 # Risk register and open questions
 
-**Reviewed:** 18 November 2026. **Status:** Open items unless evidence below says otherwise.  
+**Reviewed:** 18 November 2026. **Status:** Open items unless evidence below says otherwise.\
 This register distinguishes observed findings from future design risks. Priority is a planning judgement, not a measured probability or a security severity score.
 
 ## 1. Immediate findings
 
 | ID | Finding | Evidence and effect | Next action |
 |---|---|---|---|
-| RISK-001 | Latest inspected baseline CI failed; cause unknown | Run 44018694678 has failed jobs without useful step/log evidence; historical test reports cannot establish present health | ENG-001/002: diagnose, reproduce and record results |
+| RISK-001 | GitHub CI cannot start because of an account billing lock | Public run annotation establishes the blocker; local Linux baseline passes all 81 tests, but Windows/remote CI remain unverified | Owner resolves account lock, then rerun CI on the intended SHA; [evidence](../06-development/BASELINE_VERIFICATION_2026-11-18.md) |
 | RISK-002 | Development defaults are boosted | Current configuration injects XP; elapsed starter progression could be misleading | GAME-001: define/test a genuine fresh profile |
-| RISK-003 | Ground and occupied tiles are mixed | Resource/station creation overwrites tile markers; moving a resource can lose base ground if exported naïvely | STUDIO-012/013: separate authored ground and use compatibility adapter |
+| RISK-003 | Ground and occupied tiles are mixed | Resource/station creation overwrites tile markers; moving a resource can lose base ground if exported naïvely | Export now preserves underlying ground; STUDIO-013 still needs the runtime compatibility adapter |
 | RISK-004 | Spawn catalogue and lifecycle are authoritative | External coordinates cannot bypass canonical equality checks; delayed actors and creation order affect behaviour | STUDIO-001/014/043: explicit provider and lifecycle mapping |
 | RISK-005 | Saved coordinates can become invalid | Player fallback alone does not cover respawns or recovery piles | STUDIO-002/053: trace/test all location-bearing state |
 | RISK-006 | Current map writes require validated bounds | External content expands input surface before unchecked tile access | STUDIO-011/050: reject dimensions/positions before construction/writes |
@@ -43,10 +43,10 @@ Owner roles describe responsibilities; they do not assert that additional team m
 
 ### Before the content model
 
-- Which parser and canonical representation fit the existing dependencies and expected content sizes?
-- How should explicit lifecycle/order metadata coexist with stable authored IDs?
+- Which bounded input parser should consume the future authoring format? The initial export uses canonical JSON with ASCII terrain rows.
+- How will future edit commands allocate lifecycle/order keys for new placements while preserving the explicit baseline stages and durable IDs?
 - Which references need durable placement identity versus a reusable definition ID?
-- Which world fields are authoritative baseline observations and which are transient implementation details?
+- Which additional saved-content observations are needed to extend the existing terrain, lifecycle and interaction baseline to runtime import?
 
 ### Before the first editor release
 

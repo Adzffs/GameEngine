@@ -1,7 +1,7 @@
 # Development history
 
-**Recorded:** 18 November 2026.  
-**Default-branch baseline:** `e9d32932e8f9b27e96283313cca320058792a81f`.  
+**Recorded:** 18 November 2026.\
+**Default-branch baseline:** `e9d32932e8f9b27e96283313cca320058792a81f`.\
 **Purpose:** Preserve the project’s delivered sequence and give future contributors a reliable route back to the original changes.
 
 ## 1. What this history means
@@ -40,7 +40,7 @@ The next major group adds the crafting table, atomic inventory stack operations,
 
 This branch delivers a large sequence: grid-crafting client interaction, onboarding and inventory presentation, hover/context feedback, ground items, bank storage and sessions, a bank window, tutorial persistence, progression feedback, a more readable development region, camera/minimap work, combat styles, death recovery and protected recovery piles, additional enemies, crafting upgrades, recipe discovery and book presentation, economy modelling, named characters, investigation/crafting/combat quests, journal guidance, and opening/combat feedback. Representative evidence: [game-feel start](https://github.com/Adzffs/GameEngine/commit/a63ba512421ed381e7adfe332ef0292dc0050ed6), [bank sessions](https://github.com/Adzffs/GameEngine/commit/32ad50addb193001c87c1a2eb98e63001427c33b), [tutorial persistence](https://github.com/Adzffs/GameEngine/commit/cf3437259d15dec8921f7355db3b6b3d0dfbf384), and [full cast](https://github.com/Adzffs/GameEngine/commit/ade60e45ebfc69cecba1d1aa424fa6d4ebe1ab52).
 
-The final portion concentrates on running, pathing, zoom, click transforms, route changes, and L-shaped running. [PR #2](https://github.com/Adzffs/GameEngine/pull/2) merges this branch into `master`. Its description reports 81 passing tests, while the resulting exact-head push workflow later reports failure without accessible step logs in this review. Preserve both records and resolve the current verification gap. [L-shaped running](https://github.com/Adzffs/GameEngine/commit/92ca8c8f6529bb1f190d4b7f48ce82fff58dd948) · [merge](https://github.com/Adzffs/GameEngine/commit/e9d32932e8f9b27e96283313cca320058792a81f) · [current run](https://github.com/Adzffs/GameEngine/actions/runs/44018694678).
+The final portion concentrates on running, pathing, zoom, click transforms, route changes, and L-shaped running. [PR #2](https://github.com/Adzffs/GameEngine/pull/2) merges this branch into `master`. Its description reports 81 passing tests, while the resulting exact-head push workflow later reports failure without accessible step logs in this review. The later [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) resolves the run cause as an account billing lock and records a fresh local 81-test baseline pass. [L-shaped running](https://github.com/Adzffs/GameEngine/commit/92ca8c8f6529bb1f190d4b7f48ce82fff58dd948) · [merge](https://github.com/Adzffs/GameEngine/commit/e9d32932e8f9b27e96283313cca320058792a81f) · [current run](https://github.com/Adzffs/GameEngine/actions/runs/44018694678).
 
 ## 3. Work that is documented but not yet implemented in this baseline
 
@@ -53,8 +53,8 @@ Planning work is real work and belongs in project history. Its deliverable is a 
 | Earlier ambiguity | Current documented treatment |
 |---|---|
 | An illustrative small map could be mistaken for the current world | Actual development map is 100×100; export the real baseline before designing a replacement. |
-| Test-count or PR language could imply a fresh green build | 81 is the CMake target count; current remote run is failed; fresh evidence remains required. |
-| Editor and elevation planning could be mistaken for implemented systems | Explicitly mark Studio and elevation as planned. |
+| Test-count or PR language could imply a fresh green build | 81 was the baseline target count; a later local run passed all 81. Remote CI was account-blocked; see the dated verification record. |
+| Editor and elevation planning could be mistaken for implemented systems | Read-only extraction is now implemented; Studio editing and elevation remain planned. |
 | Development defaults could be used to measure a beginner journey | Establish a genuine fresh-player profile; current configuration injects development XP. |
 | A previous document could be discarded because it is old | Preserve useful policy/design intent and reconcile stale factual sections. |
 | Every requested tool could expand Alpha 0.1 | Keep the first vertical slice bounded; later editors, pets, complex bosses, and online services have separate gates. |

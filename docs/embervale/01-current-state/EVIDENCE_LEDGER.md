@@ -1,8 +1,9 @@
 # Evidence ledger and review limits
 
-**Reviewed:** 18 November 2026.  
-**Game-code baseline:** `e9d32932e8f9b27e96283313cca320058792a81f`.  
-**Review method:** Read-only GitHub metadata and selected pinned source reads, complete recursive file-tree inventory, complete default-branch commit listing returned across three pages, PR inspection, workflow and job metadata, and source-derived counts. No local build or live game run was performed for this documentation review.
+**Reviewed:** 18 November 2026.\
+**Game-code baseline:** `e9d32932e8f9b27e96283313cca320058792a81f`.\
+**Original review method:** Read-only GitHub metadata, pinned source reads, recursive tree/history inventory, PR/workflow inspection and source-derived counts. That initial documentation review did not build the game.
+**Subsequent verification:** A clean local build of documentation merge `c697386382845f17ce02027e6bade24591a9eb36` passed all 81 existing tests. The exporter change passed all 83 CTest entries. The [dated record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) is the current build/CI evidence.
 
 This ledger is the factual boundary for the documentation pack. A roadmap can describe ambitious future work while this file remains conservative about what exists and what was verified.
 
@@ -19,7 +20,7 @@ This ledger is the factual boundary for the documentation pack. A roadmap can de
 
 “Done” in a work tracker should require the relevant acceptance evidence and merged implementation. A source inventory, generated document, passing isolated unit test, or a green job for a different commit is not a substitute.
 
-## 2. Fresh repository observations
+## 2. Original source-review observations before PR #3
 
 | ID | Observation | Evidence and interpretation |
 |---|---|---|
@@ -31,15 +32,15 @@ This ledger is the factual boundary for the documentation pack. A roadmap can de
 | EV-006 | No release objects were returned by the releases endpoint. | [Releases](https://github.com/Adzffs/GameEngine/releases), checked 18 November. This does not rule out untagged/manual builds. |
 | EV-007 | The branch summary reported `protected: false`; the repository rulesets endpoint returned an empty array. | [Branch API](https://api.github.com/repos/Adzffs/GameEngine/branches/master) and [rulesets API](https://api.github.com/repos/Adzffs/GameEngine/rulesets), checked 18 November. Record as observed settings, not a full organisation/security audit. |
 
-## 3. Current build evidence: unresolved failure
+## 3. Updated build evidence and CI diagnosis
 
-The [master push run 44018694678](https://github.com/Adzffs/GameEngine/actions/runs/44018694678) is associated with the exact reviewed SHA and has conclusion **failure**. Both jobs—Linux headless and Windows UCRT64 client—also have conclusion failure. Their returned job records contain no steps, no named runner, and approximately two seconds between start and completion.
+[PR #3](https://github.com/Adzffs/GameEngine/pull/3) merged the handbook and focused cleanup at `c697386382845f17ce02027e6bade24591a9eb36` without changing engine/test source. A separate clean worktree at that commit built successfully on Linux; all **81 original tests passed**, including 4 client and 7 graphics tests using SDL’s dummy driver. The exporter implementation also passed its **72-test headless configuration** and **83-test client configuration**.
 
-The job-log download requests returned 404. The commit check-run records confirmed failure and annotation counts, but their summary/text fields were empty and the available fetch interface did not expose the annotation endpoint. **The failure cause is therefore unverified.** These observations do not establish whether the issue is account/runner startup, configuration, compilation, or a failing test. Do not invent a cause from the short duration.
+The [master push run 44018694678](https://github.com/Adzffs/GameEngine/actions/runs/44018694678), at engine commit `e9d32932e8f9b27e96283313cca320058792a81f`, remains a failed remote result. Its public error annotation was subsequently inspected and explicitly identifies an **account billing lock that prevented the jobs from starting**. Both jobs had no recorded steps or runner; logs returned 404. The cause is now known for that run, and it is not evidence of a compiler or test failure.
 
-[PR #2](https://github.com/Adzffs/GameEngine/pull/2) says “All 81 tests pass.” Preserve that as a **HISTORICAL REPORT**. CMake independently supports the count of 81 registered test executables, but no passing logs for the exact reviewed baseline were obtained here. The first verification milestone must produce a current, diagnosable result.
+The [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) preserves exact annotation wording, run/job links, environment, commands, limitations and the machine-readable test/source record. The owner must resolve the account lock before rerunning GitHub Linux and Windows verification. No passing remote run or Windows execution is claimed.
 
-The [workflow source](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/.github/workflows/ci.yml) defines Linux headless and Windows UCRT64 jobs. Its Windows test groups temporarily continue after failure so all groups can report, then an always-run enforcement step requires every group to succeed. The workflow structure is not itself evidence of an executed test outcome.
+The [workflow source](https://github.com/Adzffs/GameEngine/blob/c697386382845f17ce02027e6bade24591a9eb36/.github/workflows/ci.yml) is unchanged. Windows test groups continue after individual failure to collect all results, then an always-run enforcement step requires each group to succeed. No workflow code defect was established by the account-lock investigation.
 
 ## 4. Principal source evidence
 
@@ -71,10 +72,10 @@ The history appendix contains all 234 unique commits returned by the three-page 
 ## 6. Review limits and unresolved questions
 
 - The recursive tree was fully inventoried; source inspection was selective. This is not a line-by-line audit of every source or test file.
-- No current local build, test run, manual playthrough, performance profile, coverage measurement, accessibility assessment, or production security audit was performed.
-- The full historical save-fixture matrix was not executed. Source recognition of a version is not proof that every legacy edge case passes.
+- Local builds and automated tests are now recorded above. No visible manual playthrough, performance profile, coverage measurement, accessibility assessment or production security audit was performed.
+- Existing save codec, file-store, world and engine persistence tests passed in the local suites. This does not prove every legacy edge case or a future edited-map saved-location migration matrix.
 - Branch/ruleset observations do not establish all account, organisation, or external enforcement settings.
-- Absence of Studio files in this baseline does not rule out private work, local work, or other branches.
+- The original baseline had no Studio files. This change adds read-only extraction; importing, editing and preview remain future work.
 - Existing economy and character documents contain design intentions as well as factual claims. Code and explicit current decisions take precedence where the documents are stale.
 - The old PR #1 quest-verification gaps are historical review notes. Recheck them against current code and tests before marking them unresolved defects or closing them.
 

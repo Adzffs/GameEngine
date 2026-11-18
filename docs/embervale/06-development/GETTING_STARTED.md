@@ -1,6 +1,6 @@
 # Getting started with GameEngine and Embervale
 
-**Status:** Commands match the inspected CMake/CI configuration; they were not executed as a fresh build during this documentation review.  
+**Status:** Linux headless and dummy-driver client/test builds have been reproduced. See the [dated verification record](BASELINE_VERIFICATION_2026-11-18.md); Windows and visible playtesting remain unverified.\
 **Baseline:** `e9d32932e8f9b27e96283313cca320058792a81f` · **Updated:** 18 November 2026
 
 ## 1. Choose what you want to run
@@ -9,7 +9,8 @@
 |---|---|---|
 | Work on simulation and headless tests | Client OFF, graphics tests OFF | No |
 | Play the development game and run all test groups | Client ON, graphics tests ON | Yes |
-| Use Embervale Studio | Future roadmap deliverable | No Studio executable exists yet |
+| Export compiled starter content | `EmbervaleWorldExport`, content tools ON (default) | No in headless configuration |
+| Edit maps in Embervale Studio | Future roadmap deliverable | GUI/backend still to be selected |
 
 The project uses C++20 and CMake 3.20 or newer. It defines `GameEngineCore`, an optional `GameEngine` client and tests controlled by `BUILD_TESTING`. `GAMEENGINE_BUILD_CLIENT` defaults ON; the default for graphics tests follows that option. Set both flags explicitly when creating a headless build. [Source: CMakeLists.txt](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/CMakeLists.txt).
 
@@ -79,7 +80,7 @@ These shell examples target MSYS2 Bash. The dummy video environment is for autom
 ./build-client/GameEngine.exe
 ```
 
-If SDL3 cannot be found, verify the selected toolchain and the package installation before adding arbitrary include/library paths. CMake requests SDL3 through its config package. The inspected repository does not establish a separately tested Linux graphical-client or macOS onboarding procedure; add those after recording a real build on each platform.
+If SDL3 cannot be found, verify the selected toolchain and the package installation before adding arbitrary include/library paths. CMake requests SDL3 through its config package. The [verification record](BASELINE_VERIFICATION_2026-11-18.md) supplies a tested Linux dummy-driver client setup using a local SDL prefix. A visible desktop/GPU playtest and macOS onboarding remain separate work.
 
 ## 5. Understand saves and development boosts
 
@@ -99,4 +100,4 @@ Machine-specific `.vscode` files containing paths such as `c:/GameEngine` are no
 
 Record the exact commit, command, tool versions, build directory and error output. Separate configure failures, compilation failures, test failures and runtime failures. A workflow failure with no usable steps does not establish that the game tests failed.
 
-At the inspected baseline, 81 test targets were registered across configurations, but this documentation work did not run them locally. The inspected push workflow failed without usable execution/log evidence; its cause remains to be established. See [Testing](TESTING.md) and [Evidence ledger](../01-current-state/EVIDENCE_LEDGER.md) before repeating an older “all tests pass” claim.
+The unchanged baseline’s 81 tests now have a fresh local Linux pass. With content tools enabled, the new exporter adds two headless CTest entries. GitHub’s inspected run was blocked before execution by an account billing lock. See [Testing](TESTING.md) and the [verification record](BASELINE_VERIFICATION_2026-11-18.md) for exact outcomes and limits. Export usage is documented in [Starter-world export](../04-studio/STARTER_WORLD_EXPORT.md).

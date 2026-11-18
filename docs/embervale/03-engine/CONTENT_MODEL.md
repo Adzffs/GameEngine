@@ -1,7 +1,7 @@
 # Authored content model and validation contract
 
-**Status:** Proposed schema and rules; no claim that this file format or loader exists.  
-**Updated:** 18 November 2026  
+**Status:** Proposed loadable authoring schema and rules. A distinct [read-only snapshot format](../04-studio/STARTER_WORLD_EXPORT.md) is implemented; this proposed loader does not yet exist.\
+**Updated:** 18 November 2026\
 **Purpose:** Give engine, editor and automation work one precise description of authored content.
 
 ## 1. What is being saved
