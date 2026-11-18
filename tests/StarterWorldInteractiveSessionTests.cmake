@@ -69,3 +69,14 @@ endif()
 if(EXISTS "${STALE_DRAFT}")
     message(FATAL_ERROR "stale source unexpectedly published a draft")
 endif()
+
+# Paths containing spaces must be accepted as one save destination.
+set(SPACED_DRAFT "${WORK_DIR}/draft with spaces.json")
+file(REMOVE "${SPACED_DRAFT}")
+file(WRITE "${SCRIPT}" "save ${SPACED_DRAFT}\nquit\n")
+execute_process(COMMAND "${MOVER}" --session "${SOURCE}"
+    INPUT_FILE "${SCRIPT}" RESULT_VARIABLE SPACED_RESULT
+    OUTPUT_VARIABLE SPACED_OUTPUT ERROR_VARIABLE SPACED_ERRORS)
+if(NOT SPACED_RESULT EQUAL 0 OR NOT EXISTS "${SPACED_DRAFT}")
+    message(FATAL_ERROR "session did not save space-containing draft path: ${SPACED_RESULT} ${SPACED_OUTPUT} ${SPACED_ERRORS}")
+endif()
