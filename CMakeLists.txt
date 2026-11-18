@@ -125,6 +125,7 @@ target_include_directories(GameEngineCore PUBLIC src)
 if(GAMEENGINE_BUILD_CONTENT_TOOLS)
     add_library(EmbervaleWorldSnapshot
         src/Content/Export/StarterWorldSnapshot.cpp
+        src/Content/Export/StarterWorldSnapshotInput.cpp
     )
     target_link_libraries(EmbervaleWorldSnapshot PUBLIC GameEngineCore)
 
@@ -188,6 +189,9 @@ if(BUILD_TESTING)
     if(GAMEENGINE_BUILD_CONTENT_TOOLS)
         add_gameengine_headless_test(StarterWorldSnapshotTests tests/StarterWorldSnapshotTests.cpp)
         target_link_libraries(StarterWorldSnapshotTests PRIVATE EmbervaleWorldSnapshot)
+
+        add_gameengine_headless_test(StarterWorldSnapshotInputTests tests/StarterWorldSnapshotInputTests.cpp)
+        target_link_libraries(StarterWorldSnapshotInputTests PRIVATE EmbervaleWorldSnapshot)
 
         add_test(
             NAME StarterWorldExportCliTests
