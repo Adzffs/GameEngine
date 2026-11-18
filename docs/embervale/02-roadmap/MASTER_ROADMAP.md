@@ -234,7 +234,7 @@ These are aspirations, not promised release dates. Keep features that reinforce 
 
 1. ENG-001: diagnose and document the current CI failure.
 2. ENG-002: reproduce baseline builds and record environment/results.
-3. DOC-001: integrate this pack and narrowly scoped cleanup.
+3. DOC-001: integrate this pack and narrowly scoped cleanup. **Documentation delivered through [PR #3](https://github.com/Adzffs/GameEngine/pull/3).**
 4. DOC-002: reconcile old documentation and objective/ledger drift.
 5. STUDIO-001: complete placement ownership inventory.
 6. STUDIO-002: trace save, respawn and position compatibility.

@@ -19,5 +19,5 @@ This file records reviewable project changes going forward. Historical work is d
 - A source-derived multi-step shop/crafting profit cycle requires runtime reproduction and a separate balance correction if confirmed.
 - Starter pacing requires a genuine fresh-player profile rather than the current boosted development defaults.
 
-This entry describes a documentation change under review. It does not claim a Studio release, geographic implementation or engine fix.
+This entry describes the documentation/setup update delivered through [PR #3](https://github.com/Adzffs/GameEngine/pull/3). It does not claim a Studio release, geographic implementation or engine fix.
 

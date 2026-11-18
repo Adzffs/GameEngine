@@ -5,7 +5,7 @@
 
 ## How to use this backlog
 
-P0 means a prerequisite or integrity risk that needs early resolution; P1 is required for the named release; P2 is a valuable subsequent improvement; P3 is optional or longer-term work. These are planning priorities rather than security severity ratings. All implementation tasks are planned. DOC-001 describes this documentation pull request and is ready for review, not merged.
+P0 means a prerequisite or integrity risk that needs early resolution; P1 is required for the named release; P2 is a valuable subsequent improvement; P3 is optional or longer-term work. These are planning priorities rather than security severity ratings. Runtime implementation tasks remain planned. DOC-001 is complete for delivery of this documentation pack and focused cleanup through [PR #3](https://github.com/Adzffs/GameEngine/pull/3); it does not complete the engine/editor milestones. GitHub records the PR merge state.
 
 The acceptance column states what must be demonstrated. When opening a GitHub issue, copy the task into the [feature template](../08-templates/FEATURE_SPEC.md), add exact source and test references, estimate only that bounded task, and record the actual issue URL. Split a task if the acceptance result cannot be reviewed in a focused change. Keep the ID stable even if its milestone moves.
 

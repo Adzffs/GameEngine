@@ -36,12 +36,15 @@
       "milestone": "R0",
       "priority": "P1",
       "title": "Publish documentation and focused cleanup",
-      "status": "ready_for_review",
+      "status": "complete",
       "dependencies": [],
       "acceptance": "Add the indexed pack on a dedicated branch/PR, reconcile older docs, list exact removals, validate links and preserve useful existing material.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "https://github.com/Adzffs/GameEngine/pull/3",
+        "Documentation checker: all local links/anchors, JSON examples, backlog parity and dependencies passed; remote file blobs verified against local content."
+      ],
+      "notes": "Documentation pack and focused cleanup delivered in PR #3. This does not complete runtime milestones. Planning ID; not a GitHub issue number."
     },
     {
       "id": "DOC-002",

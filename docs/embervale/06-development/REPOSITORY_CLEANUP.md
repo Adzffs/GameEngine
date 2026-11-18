@@ -40,7 +40,7 @@ The new root README and docs/embervale/README.md supply navigation. The detailed
 
 [PR #1](https://github.com/Adzffs/GameEngine/pull/1) proposed a documentation foundation against an older September baseline. The fresh review found it open. Useful vision, templates and authority/persistence principles are incorporated into the new pack. Its old status snapshot and M0–M7 sequence are superseded; features such as crafting and recipe discovery have since appeared in source.
 
-This documentation update is the replacement review vehicle. After the replacement PR exists, the older overlapping PR can be closed as superseded, while its branch and commit history remain available. Its historical findings are not automatically treated as current bugs.
+[PR #3](https://github.com/Adzffs/GameEngine/pull/3) is the replacement documentation change. PR #1 was closed as superseded on 18 November 2026, after the replacement was published. Its branch and commit history remain available. Its historical findings are not automatically treated as current bugs.
 
 ## 6. Publication procedure
 
