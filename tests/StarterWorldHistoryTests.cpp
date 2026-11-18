@@ -91,5 +91,23 @@ int main()
         "oversized command batch is rejected before applying");
     test.ExpectEqual(SerializeCanonical(baseline), original,
         "original input remains untouched after all operations");
+
+    // Repeated commands against one durable ID are undone in reverse order.
+    StarterWorldHistory::History repeated(baseline);
+    const auto doubleMove = repeated.ApplyMoves(baseline, {
+        {Tree, Position{30, 30}}, {Tree, Position{31, 30}}});
+    const auto doubleCanonical = SerializeCanonical(doubleMove);
+    const auto doubleUndone = repeated.Undo(doubleMove);
+    test.ExpectEqual(SerializeCanonical(doubleUndone), original,
+        "undo reverses multiple moves of the same durable ID");
+    test.ExpectEqual(SerializeCanonical(repeated.Redo(doubleUndone)), doubleCanonical,
+        "redo replays multiple moves of the same durable ID");
+
+    const auto externallyChanged = StarterWorldEdit::MovePlacement(
+        doubleUndone, Furnace, Position{35, 30}).candidate;
+    repeated.Undo(doubleMove);
+    Reject(test, [&] { (void)repeated.Redo(externallyChanged); },
+        "redo also rejects a valid external semantic revision");
+    test.Expect(repeated.CanRedo(), "redo conflict preserves history cursor");
     return test.Finish();
 }
