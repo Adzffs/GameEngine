@@ -405,14 +405,20 @@
       "milestone": "R2",
       "priority": "P1",
       "title": "Add undo and redo",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-020"
       ],
       "acceptance": "Reverse complete commands/batches while retaining authored identity; reject incompatible history after external changes.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "src/Content/Edit/StarterWorldHistory.h",
+        "src/Content/Edit/StarterWorldHistory.cpp",
+        "tests/StarterWorldHistoryTests.cpp",
+        "docs/embervale/04-studio/BOUNDED_UNDO_REDO.md",
+        "docs/embervale/06-development/STUDIO_HISTORY_VERIFICATION_2026-11-18.md"
+      ],
+      "notes": "Bounded in-memory undo/redo for runtime-validated, stable-ID resource/station move batches. Full semantic revision comparison rejects incompatible external edits; all-or-nothing batches and cursor/redo rules are covered by limited local mocked checks. Not yet a persistent history journal, full editing or UI. Full repository build and gameplay tests remain unverified."
     },
     {
       "id": "STUDIO-024",
