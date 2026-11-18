@@ -18,6 +18,36 @@ SOURCE_HASH = re.compile(r"^Source SHA-256: ([0-9a-f]{64})$", re.MULTILINE)
 PLACEMENT = re.compile(r"^([RSMN])  ([A-Za-z0-9._-]+)  \((\d+), (\d+)\)", re.MULTILINE)
 KINDS = {"R": "Resource", "S": "Station", "N": "NPC spawn", "M": "Monster spawn"}
 MAX_COMMANDS = 256
+MIN_TILE = 4
+MAX_TILE = 64
+
+
+def tile_at(canvas_x: float, canvas_y: float, tile_size: int,
+            width: int, height: int) -> tuple[int, int] | None:
+    """Convert scroll-adjusted canvas pixels into an authored tile coordinate."""
+    if tile_size <= 0:
+        raise ValueError("tile size must be positive")
+    x, y = int(canvas_x // tile_size), int(canvas_y // tile_size)
+    return (x, y) if 0 <= x < width and 0 <= y < height else None
+
+
+def scroll_fraction(world_pixels: int, viewport_pixels: int,
+                    requested_origin: float) -> float:
+    """Clamp viewport origin before converting it to Tk's fractional scroll."""
+    if world_pixels <= 0:
+        return 0.0
+    origin = max(0.0, min(float(max(0, world_pixels - viewport_pixels)),
+                          requested_origin))
+    return origin / world_pixels
+
+
+def fitted_tile(viewport_width: int, viewport_height: int,
+                world_width: int, world_height: int) -> int:
+    """Choose a pixel scale that exposes as much of the map as possible."""
+    if world_width <= 0 or world_height <= 0:
+        raise ValueError("world dimensions must be positive")
+    return max(MIN_TILE, min(MAX_TILE, viewport_width // world_width,
+                             viewport_height // world_height))
 
 
 class StudioError(RuntimeError):
@@ -157,6 +187,7 @@ def launch(bridge: StudioBridge) -> None:
     selected: str | None = None
     saved: str | None = None
     caption = tk.StringVar()
+    cursor_label = tk.StringVar(value="Tile: —")
     inspector = tk.StringVar(value="Click a resource or station, then click an empty target tile")
     frame = ttk.Frame(root, padding=8)
     frame.pack(fill="both", expand=True)
@@ -195,16 +226,25 @@ def launch(bridge: StudioBridge) -> None:
                                         (y + 1) * tile, fill=terrain_colors.get(symbol, "#222222"),
                                         outline="#354235", width=1)
         spawn_x, spawn_y = bridge.spawn
-        canvas.create_text((spawn_x + .5) * tile, (spawn_y + .5) * tile,
-                           text="@", fill="white", font=("TkDefaultFont", max(9, tile - 6), "bold"))
+        if tile >= 12:
+            canvas.create_text((spawn_x + .5) * tile, (spawn_y + .5) * tile,
+                               text="@", fill="white",
+                               font=("TkDefaultFont", max(9, tile - 6), "bold"))
+        else:
+            canvas.create_rectangle(spawn_x * tile, spawn_y * tile,
+                                    (spawn_x + 1) * tile, (spawn_y + 1) * tile,
+                                    fill="white", outline="#303030")
+        marker_inset = max(1, min(2, tile // 6))
         for name, (kind, x, y) in bridge.placements.items():
-            canvas.create_oval(x * tile + 2, y * tile + 2, (x + 1) * tile - 2,
-                               (y + 1) * tile - 2, fill=object_colors[kind],
+            canvas.create_oval(x * tile + marker_inset, y * tile + marker_inset,
+                               (x + 1) * tile - marker_inset,
+                               (y + 1) * tile - marker_inset,
+                               fill=object_colors[kind],
                                outline="white" if name == selected else "#202020",
                                width=3 if name == selected else 1)
             if name == selected:
                 inspector.set(f"{KINDS[kind]}\n{name}\n{bridge.definitions[name]}\nTile: ({x}, {y})")
-        caption.set(f"{bridge.source.name} | {bridge.hash[:10]} | changed/undo/redo: {bridge.status}")
+        caption.set(f"{bridge.source.name} | {bridge.hash[:10]} | {tile}px/tile | changed/undo/redo: {bridge.status}")
         choices.delete(0, "end")
         names = sorted(bridge.placements)
         for name in names:
@@ -212,6 +252,32 @@ def launch(bridge: StudioBridge) -> None:
             choices.insert("end", f"{kind} {name} ({x},{y})")
         if selected in names:
             choices.selection_set(names.index(selected))
+
+    def zoom_to(requested_tile: int, anchor: tuple[int, int] | None = None) -> None:
+        nonlocal tile
+        next_tile = max(MIN_TILE, min(MAX_TILE, requested_tile))
+        if next_tile == tile:
+            return
+        if anchor is None:
+            anchor = (canvas.winfo_width() // 2, canvas.winfo_height() // 2)
+        # Preserve the same world point beneath the cursor / viewport centre.
+        world_x = canvas.canvasx(anchor[0]) / tile
+        world_y = canvas.canvasy(anchor[1]) / tile
+        tile = next_tile
+        display()
+        canvas.xview_moveto(scroll_fraction(
+            bridge.width * tile, canvas.winfo_width(), world_x * tile - anchor[0]))
+        canvas.yview_moveto(scroll_fraction(
+            bridge.height * tile, canvas.winfo_height(), world_y * tile - anchor[1]))
+
+    def fit_view() -> None:
+        nonlocal tile
+        root.update_idletasks()
+        tile = fitted_tile(canvas.winfo_width(), canvas.winfo_height(),
+                           bridge.width, bridge.height)
+        display()
+        canvas.xview_moveto(0)
+        canvas.yview_moveto(0)
 
     def select(name: str) -> None:
         nonlocal selected
@@ -229,9 +295,11 @@ def launch(bridge: StudioBridge) -> None:
                 select(name)
 
     def on_click(event: tk.Event) -> None:
-        x, y = int(canvas.canvasx(event.x) // tile), int(canvas.canvasy(event.y) // tile)
-        if not (0 <= x < bridge.width and 0 <= y < bridge.height):
+        position = tile_at(canvas.canvasx(event.x), canvas.canvasy(event.y),
+                           tile, bridge.width, bridge.height)
+        if position is None:
             return
+        x, y = position
         occupant = next((name for name, (_, px, py) in bridge.placements.items()
                          if (x, y) == (px, py)), None)
         if occupant:
@@ -242,6 +310,15 @@ def launch(bridge: StudioBridge) -> None:
                 display()
             except StudioError as error:
                 messagebox.showerror("Move rejected", str(error), parent=root)
+
+    def on_hover(event: tk.Event) -> None:
+        position = tile_at(canvas.canvasx(event.x), canvas.canvasy(event.y),
+                           tile, bridge.width, bridge.height)
+        cursor_label.set(f"Tile: {position[0]}, {position[1]}" if position else "Tile: —")
+
+    def zoom_wheel(event: tk.Event, direction: int) -> str:
+        zoom_to(tile + direction * 2, (event.x, event.y))
+        return "break"
 
     def action(name: str) -> None:
         try:
@@ -263,6 +340,10 @@ def launch(bridge: StudioBridge) -> None:
         except StudioError as error:
             messagebox.showerror("Save rejected", str(error), parent=root)
 
+    ttk.Button(toolbar, text="−", command=lambda: zoom_to(tile - 2)).pack(side="left", padx=2)
+    ttk.Button(toolbar, text="+", command=lambda: zoom_to(tile + 2)).pack(side="left", padx=2)
+    ttk.Button(toolbar, text="Fit", command=fit_view).pack(side="left", padx=(2, 8))
+    ttk.Label(toolbar, textvariable=cursor_label).pack(side="right", padx=5)
     ttk.Button(toolbar, text="Undo (Ctrl+Z)", command=lambda: action("undo")).pack(side="left", padx=3)
     ttk.Button(toolbar, text="Redo (Ctrl+Y)", command=lambda: action("redo")).pack(side="left", padx=3)
     ttk.Button(toolbar, text="Save new draft", command=save).pack(side="left", padx=3)
@@ -270,6 +351,14 @@ def launch(bridge: StudioBridge) -> None:
     root.bind_all("<Control-z>", lambda _event: action("undo"))
     root.bind_all("<Control-y>", lambda _event: action("redo"))
     canvas.bind("<Button-1>", on_click)
+    canvas.bind("<Motion>", on_hover)
+    canvas.bind("<Control-MouseWheel>", lambda event: zoom_wheel(event, 1 if event.delta > 0 else -1))
+    canvas.bind("<Control-Button-4>", lambda event: zoom_wheel(event, 1))
+    canvas.bind("<Control-Button-5>", lambda event: zoom_wheel(event, -1))
+    root.bind_all("<Control-equal>", lambda _event: zoom_to(tile + 2))
+    root.bind_all("<Control-plus>", lambda _event: zoom_to(tile + 2))
+    root.bind_all("<Control-minus>", lambda _event: zoom_to(tile - 2))
+    root.bind_all("<Control-0>", lambda _event: fit_view())
     choices.bind("<<ListboxSelect>>", on_choose)
     display()
     root.mainloop()

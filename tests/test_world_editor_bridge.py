@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
-from embervale_world_editor import StudioBridge, StudioError
+from embervale_world_editor import StudioBridge, StudioError, fitted_tile, scroll_fraction, tile_at
 
 FAKE_TOOL = r'''#!/usr/bin/env python3
 import hashlib
@@ -148,6 +148,33 @@ class BridgeTests(unittest.TestCase):
         self.bridge.commands = ['status'] * 256
         with self.assertRaisesRegex(StudioError, '256-command'):
             self.bridge.undo()
+
+
+class ViewportMathTests(unittest.TestCase):
+    def test_boundary_grid_after_zoom(self):
+        self.assertEqual(tile_at(0, 0, 22, 100, 100), (0, 0))
+        self.assertEqual(tile_at(21.9, 21.9, 22, 100, 100), (0, 0))
+        self.assertEqual(tile_at(22, 44, 22, 100, 100), (1, 2))
+        self.assertEqual(tile_at(2199, 2199, 22, 100, 100), (99, 99))
+        for x, y in [(-0.01, 10), (10, -1), (2200, 0), (0, 2200)]:
+            self.assertIsNone(tile_at(x, y, 22, 100, 100))
+        with self.assertRaises(ValueError):
+            tile_at(0, 0, 0, 100, 100)
+
+    def test_scroll_anchor_is_clamped(self):
+        self.assertEqual(scroll_fraction(2200, 800, -1), 0)
+        self.assertAlmostEqual(scroll_fraction(2200, 800, 1100 - 400), 700 / 2200)
+        self.assertAlmostEqual(scroll_fraction(2200, 800, 999999), 1400 / 2200)
+        self.assertEqual(scroll_fraction(200, 800, 90), 0)
+        self.assertEqual(scroll_fraction(0, 800, 90), 0)
+
+    def test_fit_view_respects_extremes(self):
+        self.assertEqual(fitted_tile(800, 600, 100, 100), 6)
+        self.assertEqual(fitted_tile(800, 600, 10, 10), 60)
+        self.assertEqual(fitted_tile(100, 100, 100, 100), 4)
+        self.assertEqual(fitted_tile(10000, 10000, 10, 10), 64)
+        with self.assertRaises(ValueError):
+            fitted_tile(100, 100, 0, 10)
 
 
 if __name__ == '__main__':

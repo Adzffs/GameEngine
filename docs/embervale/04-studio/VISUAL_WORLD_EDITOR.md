@@ -14,7 +14,7 @@ python3 tools/embervale_world_editor.py tests/fixtures/content/development-start
 On Windows, use `python` and the path to the built `EmbervaleWorldMove.exe`.
 Python 3 and its standard-library Tk desktop module are required; no Python packages are installed by the tool. The snapshot must be a valid existing development starter-world JSON file.
 
-The viewport displays the complete terrain grid with scrollbars and placement markers. Click a placement or select it from the sidebar to inspect its stable ID, definition and tile. Click an empty destination tile to propose a move. The shared C++ `MovePlacement`, runtime validator and `History` determine whether it succeeds; invalid destinations leave the source and current editor state unchanged. Use Ctrl+Z / Ctrl+Y or the buttons for undo / redo. **Save new draft** opens a filename chooser and publishes only a fresh sibling JSON file through the existing guarded C++ writer. Filenames containing spaces are supported by the terminal session. The original snapshot and player saves are never changed by the GUI.
+The viewport displays the complete terrain grid with scrollbars and placement markers. Use the **− / + / Fit** toolbar controls or **Ctrl+mouse wheel** to zoom (Ctrl+0 fits the map). The tile coordinate under the pointer is shown in the toolbar. Zoom preserves the authored tile under the mouse cursor, or the viewport centre for toolbar/keyboard zoom; scrollbars and tile selection continue to use world coordinates. Very small tiles display the player spawn as a white square rather than an unreadable @ glyph. Click a placement or select it from the sidebar to inspect its stable ID, definition and tile. Click an empty destination tile to propose a move. The shared C++ `MovePlacement`, runtime validator and `History` determine whether it succeeds; invalid destinations leave the source and current editor state unchanged. Use Ctrl+Z / Ctrl+Y or the buttons for undo / redo. **Save new draft** opens a filename chooser and publishes only a fresh sibling JSON file through the existing guarded C++ writer. Filenames containing spaces are supported by the terminal session. The original snapshot and player saves are never changed by the GUI.
 
 ## Authority, revision and boundaries
 
@@ -24,6 +24,10 @@ A new optional `--expected-hash <sha256>` flag on `EmbervaleWorldMove --session`
 
 The UI does not currently paint terrain, edit actor spawns, auto-save, preserve undo across process restarts, handle multiple regions or launch an isolated game playtest. It uses a simple logical grid, not game sprites. This initial desktop client is intended to exercise STUDIO-030's selection/inspection/move path and reuse of shared command authority; the broader acceptance criteria remain open.
 
+## Navigation and coordinate safety
+
+The map viewport uses the same pure pixel-to-tile, clamped-scroll and fitted-scale functions for mouse selection and zoom. Scale is bounded to 4–64 pixels per tile. Selecting a placement and moving it still use only stable IDs and the C++ move validator; zoom cannot alter the underlying content or command history. A 100×100 map can be fitted into a typical desktop viewport without changing its JSON dimensions. This is navigational presentation, not terrain painting.
+
 ## Verification and remaining gate
 
 On 18 November 2026, source for this branch was developed and checked in a local isolated workspace:
@@ -32,6 +36,8 @@ On 18 November 2026, source for this branch was developed and checked in a local
 - `python -m unittest discover -s tests -p 'test_world_editor_bridge.py' -v` passed **6/6**. These are mocked-backend contract tests, not actual C++ or gameplay tests: they cover move/undo/redo replay, rejected operation rollback, source revision conflict, space-containing output paths, save protection and bounded history.
 - A Tk window was launched under `xvfb-run` against the mock tool without startup errors, then terminated by a 4-second smoke-test timeout. This is not a human interaction or rendering-quality test.
 - The **full repository build, real `EmbervaleWorldMove` integration, client playtest and Windows Tk experience were not executed** because repository cloning is not available in this execution environment (GitHub DNS resolution).
+
+A subsequent navigation slice adds 3 pure viewport-math regression tests. The pixel/tile boundary, scroll clamping and fit-scale cases passed in an isolated Python 3 run; they are not a GUI interaction test. The complete updated bridge module and real game have not been run as a combined build in this environment. See [navigation evidence](../06-development/STUDIO_VIEWPORT_NAVIGATION_VERIFICATION_2026-11-18.md).
 
 Before merging: compile the complete stacked branch, run `ctest --test-dir build-headless --output-on-failure -R StarterWorld`, run the six Python bridge checks from repository root, and manually open the real fixture with the built mover. Move a tree, undo/redo, reject a blocked tile, save a sibling path containing spaces, validate and playtest the exact saved content with an isolated player save. Keep draft status until all gates are satisfied.
 
