@@ -490,15 +490,19 @@
       "milestone": "R2",
       "priority": "P1",
       "title": "Build minimal visual editor shell",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-022",
         "STUDIO-024"
       ],
       "acceptance": "Open/select/inspect/move/paint with shared commands; preserve camera and coordinate transforms.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "tools/embervale_world_editor.py",
+        "tests/test_world_editor_bridge.py",
+        "docs/embervale/04-studio/VISUAL_WORLD_EDITOR.md"
+      ],
+      "notes": "First mouse-driven Python/Tk shell is stacked after the terminal editor: scrollable starter grid, selectable stable IDs, C++ validated moves/undo/redo and create-only guarded draft save. Six local mock-backend tests and an xvfb startup smoke passed; full repository and real runtime integration remain unverified. No terrain painting or graphical playtest yet."
     },
     {
       "id": "STUDIO-032",
