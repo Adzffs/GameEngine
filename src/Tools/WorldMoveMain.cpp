@@ -27,7 +27,8 @@ namespace
             "  EmbervaleWorldMove <snapshot.json> <placement-id> <x> <y>\n"
             "  EmbervaleWorldMove <snapshot.json> <placement-id> <x> <y>"
             " --expected-hash <sha256> --write-draft <new-sibling.json>\n"
-            "  EmbervaleWorldMove --session <snapshot.json>\n"
+            "  EmbervaleWorldMove --session <snapshot.json>"
+            " [--expected-hash <sha256>]\n"
             "The default is a dry run. Draft writes require a fresh sibling"
             " filename and the exact input-file SHA-256. Source and player saves"
             " are never overwritten.\n";
@@ -51,12 +52,20 @@ int main(int argc, char **argv)
         Usage(std::cout);
         return 0;
     }
-    if (argc == 3 && std::string_view(argv[1]) == "--session")
+    if ((argc == 3 || argc == 5) &&
+        std::string_view(argv[1]) == "--session")
     {
+        if (argc == 5 && (std::string_view(argv[3]) != "--expected-hash" ||
+            !StarterWorldDraftFile::ValidDigest(argv[4])))
+        {
+            Usage(std::cerr);
+            return 2;
+        }
         try
         {
             return EmbervaleStudioSession::Run(
-                argv[2], std::cin, std::cout, std::cerr);
+                argv[2], std::cin, std::cout, std::cerr,
+                argc == 5 ? std::string_view(argv[4]) : std::string_view{});
         }
         catch (const std::exception &error)
         {
