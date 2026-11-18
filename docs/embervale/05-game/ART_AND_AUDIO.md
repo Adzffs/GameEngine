@@ -1,0 +1,107 @@
+# Art, animation and audio production guide
+
+**Status:** Proposed production workflow and quality requirements. The current visual baseline is source-reviewed; the asset pipeline described here is planned.  
+**Reviewed:** 18 November 2026.  
+**Purpose:** Replace placeholder presentation in manageable steps while preserving gameplay and making assets easy for humans and AI to work with.
+
+## 1. Current presentation and the recommended transition
+
+The current client uses SDL3 drawing code for the world and entities. `Graphics.h` defines a 32-pixel tile size and a 1280×720 window. The rendering code includes terrain colours, resource shapes, combat feedback and world labels. This does not establish an existing general-purpose sprite import pipeline. Sources: [Graphics.h](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Graphics/Graphics.h), [Graphics.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Graphics/Graphics.cpp).
+
+Keep that presentation as a useful debug mode. Begin custom art with one coherent terrain family, one tree, one station and one character. Validate those assets in the game, Studio and previews before producing hundreds more. The first goal is a reliable asset-to-game workflow, followed by a consistent visual identity.
+
+A large graphics source file and a large sprite atlas are different concerns. The former needs maintainable code boundaries; the latter is an asset packaging decision. Neither requires drawing the entire world as one enormous image. Keep source artwork editable and identifiable, then pack runtime atlases when a measured need or a chosen pipeline justifies them.
+
+## 2. Proposed visual direction
+
+Use the existing tile scale as the first compatibility reference. A restrained pixel-art direction can grow from the current simple silhouettes: readable ground, distinct characters, clear resources and strong contrast between the terrain and important interactions. This is a proposed direction, not a final approved style bible.
+
+| Element | Initial production rule | Review question |
+|---|---|---|
+| Ground | Quiet texture, limited contrast, consistent tile edges | Can the player still locate an item or cursor on it? |
+| Resources | Distinct silhouettes and visible depleted states | Can each tier and state be recognised at normal zoom? |
+| Characters | Consistent scale and ground contact point | Does the sprite appear to stand on the selected tile? |
+| Buildings | Separate roof, walls, doors and collision meaning | Does the image imply an entrance that actually works? |
+| Interactables | A readable shape plus a label or contextual cue | Is usability dependent only on colour? |
+| Threats | Signals distinguish passive, aggressive and elite encounters | Can danger be recognised before contact? |
+| UI | Consistent spacing, text hierarchy and icon language | Does the game remain understandable without memorising icons? |
+
+Create a short style board from approved assets once those first examples work. Record palette swatches, outline treatment, perspective, lighting direction, character proportions and animation cadence. The board should be a production reference, not a substitute for checking assets at actual gameplay scale.
+
+## 3. Start with a small asset list
+
+| Batch | Minimum useful contents | Gate before expanding |
+|---|---|---|
+| Terrain proof | Grass, dirt, stone, water and their required edge variants | Tiling is clean; collision remains independent of pixels |
+| Resource proof | Normal tree, stump, copper rock and depleted rubble | Existing gathering states choose the right visual |
+| Service proof | Bank marker, furnace and crafting table | Interaction approaches remain visible |
+| Character proof | One friendly character and one monster | Pivot, facing, targeting and draw order behave correctly |
+| Settlement proof | One small building kit, door and a few props | Roofs and scenery do not hide mandatory interactions |
+| UI proof | A small consistent set of item and action icons | Inventory and recipe views remain legible |
+
+Do not add a new material, monster rule or station type merely because an appealing image exists. Art should represent an explicit gameplay definition or a declared decorative role. If a sprite suggests a new mechanic, record that as a separate design proposal.
+
+## 4. Asset identity and metadata
+
+Each asset needs a stable identifier independent of its filename and atlas location. Moving a frame within an atlas should not invalidate a map's reference. A manifest should connect the authored ID to the source file, generated runtime file, frame geometry, pivot, intended usage and provenance.
+
+The manifest and importer are planned work. The following field groups are requirements for that work, not a currently supported file schema.
+
+| Field group | Required information | Why it matters |
+|---|---|---|
+| Identity | Stable asset ID, display name, category | References survive renaming and repacking |
+| Source | Editable source path and source checksum | The asset can be reproduced and traced |
+| Runtime image | Path, dimensions, colour/alpha expectations | Invalid imports fail before runtime |
+| Frames | Rectangles, names, timing, directional mapping | Animation is explicit and inspectable |
+| Placement | Pivot and visual offsets | Feet, trunks and objects align with tiles |
+| Bounds | Visual rectangle, selection region, optional occlusion hints | Large artwork is distinguishable from gameplay occupancy |
+| Provenance | Creator/source, licence or permission record, modification notes | Distribution rights can be reviewed |
+| Build relationship | Importer version and generated-output relationship | Stale output can be detected |
+
+A tree may have a canopy larger than one tile while its interaction footprint remains one tile. A building may cover many tiles while only selected doors are passable. Never derive either rule from transparent pixels without an explicit, validated design. The renderer can use visual bounds for culling; the authoritative simulation must use authored gameplay geometry.
+
+## 5. Human and AI asset workflow
+
+1. Write a short brief: intended use, dimensions, style reference, required states and how the asset will be selected in game.
+2. Create or obtain the source artwork. Preserve the editable source and any permission record.
+3. Inspect the actual pixels, including alpha, edge seams and silhouette at normal zoom. A concept image is not automatically a usable sprite sheet.
+4. Assign an asset ID and import metadata. Validate dimensions, frame rectangles, file limits and references.
+5. Preview against representative terrain with the real camera scale and selection overlays.
+6. Play the associated action: gather, deplete, respawn, talk, attack, move or use a station.
+7. Commit the source, metadata and appropriate generated output according to the chosen repository policy, with a small before/after preview.
+
+AI assistance can help with briefs, concept variations, placeholder art, metadata and consistency checks. Generated images still need human review and technical import validation. Check that frames share scale and pivot, that directional views agree, and that the image has not invented fine details that become noise at gameplay size. Do not assume a single generated sheet has correct frame boundaries or consistent animation.
+
+Atlas packing is a build concern. Keep canonical IDs and source metadata stable if packing changes. The importer should report which asset and frame failed, not just that a texture could not load. Missing or invalid art should have a visible diagnostic fallback during development; release validation should fail for required missing assets.
+
+## 6. Render integration and performance
+
+Extract reusable presentation data from the existing renderer as needed for a concrete feature. Avoid creating a second unrelated interpretation of map colours, sprite selection or transforms in Studio. The core validator and CLI should remain usable without an SDL window; the preview backend can be chosen separately as long as its content interpretation is shared and its output is testable. See [architecture](../03-engine/ARCHITECTURE.md).
+
+Record ordering rules for ground, low props, entities, tall props, roofs, effects and UI. Add a deliberately small overlap test: player behind a tree, player in front of it, adjacent NPCs, an item on the ground and a roof near an interaction. Do not promise full occlusion or roof fading until the renderer implements and tests it.
+
+Measure texture memory, asset load time, visible entity counts and frame time on a recorded device. Choose atlas sizes and caching limits from that measurement rather than from a guessed universal budget. Keep developer debug overlays available when they explain a rendering or targeting problem.
+
+## 7. Animation contract
+
+Animation communicates a simulated event; it must not become an alternative authority for its result. Combat damage, resource depletion and item production remain governed by gameplay rules. A presentation can begin, interpolate or finish between simulation updates without granting an extra hit or gathered item.
+
+For each animated definition, record idle, movement, action and state-transition needs. Implement only the states the current game uses. Test interruption: movement during an interaction, a target disappearing, a player dying, a resource depleting and a camera zoom during the action. Select an explicit fallback frame for missing optional directions.
+
+Include a static or reduced-motion presentation where necessary for readability. Avoid relying on repeated flashing to identify every important object. The animation review should include whether the player can see a target and understand an action while several effects overlap.
+
+## 8. Audio plan
+
+This documentation does not verify a completed gameplay audio pipeline. Treat audio as a planned production area and first audit existing hooks before choosing a library or subsystem. The first useful sounds are action confirmations and warnings: movement context where useful, a successful gather, depletion, a hit or miss, low health, an interaction confirmation and a transaction error.
+
+Every sound should have an event, priority, volume category and repetition policy. A gathering loop must not play uncontrolled overlapping sounds for every update. Ambient water, woodland and workshop loops can communicate districts, but they must not mask critical feedback. Keep gameplay facts available through visual or textual cues as well.
+
+Provide separate master, music and effects controls when the pipeline is implemented; define an ambient category if it improves control. Record licence/provenance for audio exactly as for images. Avoid adding a large soundtrack before the event system, mixing and volume controls are reliable.
+
+## 9. Acceptance checklist and maintenance
+
+A new required visual asset is ready when it has a stable ID, valid metadata, traceable source, supported dimensions, correct pivot, appropriate state coverage, readable gameplay-scale presentation and no unintended collision change. Its preview must identify the game/content version used. If it changes a selection or interaction cue, include a short gameplay test.
+
+Before a content release, check every required asset reference, atlas rectangle, animation frame and generated-output checksum. Review the licence inventory and include required attribution. Make sure debug assets and development-only items do not enter the normal content package accidentally.
+
+Keep a small reference scene containing representative ground, water, trees, stations, friendly NPCs, enemies and UI. Use it to compare a new art batch against the existing style, while still checking the assets in the actual River Crossing map. Update this guide when the adopted format, style rules or production tools change; keep unselected options in the decision log rather than presenting them as established pipeline behaviour.

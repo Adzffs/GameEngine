@@ -2,6 +2,8 @@
 build/
 build_client/
 build_headless/
+build-client/
+build-headless/
 
 # Compiled files
 *.exe
@@ -16,3 +18,7 @@ Makefile
 
 # VS Code settings
 .vscode/
+
+
+# Local development player data (versioned fixtures belong under tests/)
+saves/

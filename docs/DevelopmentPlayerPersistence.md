@@ -1,5 +1,7 @@
 # Development Player persistence
 
+**Current application policy:** Source-backed lifecycle documentation. See the [save compatibility guide](embervale/03-engine/SAVE_COMPATIBILITY.md) for planned content migration and [Getting started](embervale/06-development/GETTING_STARTED.md) for launch-directory guidance.
+
 The development application opts into Player persistence at
 `saves/development-player.save`, relative to the process working directory.
 This path is application policy: `World` neither knows the path nor controls
@@ -25,3 +27,4 @@ signal-safe persistence, and physical-media flushing beyond the existing file
 store guarantees are also out of scope. Startup and controlled-shutdown
 failures propagate through `Engine::Run()` to the process exit status. This
 lifecycle is not crash-proof.
+

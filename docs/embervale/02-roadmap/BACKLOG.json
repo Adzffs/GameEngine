@@ -1,0 +1,1320 @@
+{
+  "version": 1,
+  "reviewed_date": "2026-11-18",
+  "repository": "Adzffs/GameEngine",
+  "baseline_commit": "e9d32932e8f9b27e96283313cca320058792a81f",
+  "status_policy": "Implementation tasks are planned until evidence proves acceptance; planning IDs are not issue numbers.",
+  "tasks": [
+    {
+      "id": "ENG-001",
+      "milestone": "R0",
+      "priority": "P0",
+      "title": "Investigate current CI failure",
+      "status": "planned",
+      "dependencies": [],
+      "acceptance": "Identify an evidenced cause or precise external blocker; obtain useful logs and rerun existing jobs; record exact commit and outcomes.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "ENG-002",
+      "milestone": "R0",
+      "priority": "P0",
+      "title": "Reproduce baseline builds",
+      "status": "planned",
+      "dependencies": [
+        "ENG-001"
+      ],
+      "acceptance": "Record compiler/CMake/SDL/platform versions, configure/build commands, test discovery and actual headless/client/graphics outcomes.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "DOC-001",
+      "milestone": "R0",
+      "priority": "P1",
+      "title": "Publish documentation and focused cleanup",
+      "status": "ready_for_review",
+      "dependencies": [],
+      "acceptance": "Add the indexed pack on a dedicated branch/PR, reconcile older docs, list exact removals, validate links and preserve useful existing material.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "DOC-002",
+      "milestone": "R0",
+      "priority": "P1",
+      "title": "Resolve source and documentation drift",
+      "status": "planned",
+      "dependencies": [
+        "DOC-001"
+      ],
+      "acceptance": "Correct the ledger; decide the final quest target wording; separate old PR findings from current verified issues; record remaining decisions.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-001",
+      "milestone": "R0",
+      "priority": "P0",
+      "title": "Inventory all placement ownership",
+      "status": "planned",
+      "dependencies": [
+        "ENG-002"
+      ],
+      "acceptance": "Trace ground, object, station, NPC, monster, label, quest and initialization ownership with source links.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-002",
+      "milestone": "R0",
+      "priority": "P0",
+      "title": "Audit position and save compatibility",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-001"
+      ],
+      "acceptance": "Cover player creation/loading/death/respawn, recovery piles, spawn catalogue checks, interaction approach tiles and historical saves.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-003",
+      "milestone": "R0",
+      "priority": "P1",
+      "title": "Decide minimal content architecture",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-001",
+        "STUDIO-002"
+      ],
+      "acceptance": "Record parser, schema representation, target dependencies, coordinates and preview design ADRs with consequences.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-004",
+      "milestone": "R0",
+      "priority": "P0",
+      "title": "Capture semantic baseline fixtures",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-001",
+        "STUDIO-002"
+      ],
+      "acceptance": "Snapshot terrain/occupancy and lifecycle stages; define deterministic behavioural checks without overfitting transient IDs.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "GAME-001",
+      "milestone": "R0",
+      "priority": "P0",
+      "title": "Define a genuine fresh-player profile",
+      "status": "planned",
+      "dependencies": [
+        "ENG-002"
+      ],
+      "acceptance": "Specify non-boosted skills/items/tutorial state and disposable saves; distinguish it from current development defaults.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "GAME-008",
+      "milestone": "R0",
+      "priority": "P0",
+      "title": "Reproduce multi-step shop arbitrage",
+      "status": "planned",
+      "dependencies": [
+        "ENG-002"
+      ],
+      "acceptance": "Replay the source-derived Log→planks→shield chain; record actual net coins, constraints and stock behaviour; correct/test confirmed loops before balance signoff.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-010",
+      "milestone": "R1",
+      "priority": "P1",
+      "title": "Define authored region model",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-003",
+        "STUDIO-004"
+      ],
+      "acceptance": "Represent region identity, dimensions, ground, placements, definition references and ground surface without changing current gameplay.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-011",
+      "milestone": "R1",
+      "priority": "P1",
+      "title": "Implement bounded codec and canonical writer",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-010"
+      ],
+      "acceptance": "Round-trip valid fixtures deterministically; reject malformed/oversized/unsupported/duplicate content before allocation or map writes.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-012",
+      "milestone": "R1",
+      "priority": "P1",
+      "title": "Export current world read-only",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-011",
+        "STUDIO-004"
+      ],
+      "acceptance": "Export actual 100×100 definitions, pond, overlays, placements and lifecycle metadata; compare complete semantic baseline.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-014",
+      "milestone": "R1",
+      "priority": "P1",
+      "title": "Integrate content validation providers",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-010",
+        "STUDIO-002"
+      ],
+      "acceptance": "Use existing rule semantics; establish one canonical definition provider and preserve spawn authority checks.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-015",
+      "milestone": "R1",
+      "priority": "P1",
+      "title": "Maintain stable ID and migration registry",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-010"
+      ],
+      "acceptance": "Map authored IDs to current enums, forbid silent reuse/renumbering, document aliases/removals and test references.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-050",
+      "milestone": "R1",
+      "priority": "P1",
+      "title": "Validate static placement safety",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-011",
+        "STUDIO-014"
+      ],
+      "acceptance": "Reject out-of-bounds/overlap/bad-reference/blocked-spawn cases using authoritative occupancy rules and precise diagnostics.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-051",
+      "milestone": "R1",
+      "priority": "P1",
+      "title": "Validate mandatory route and approach access",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-050"
+      ],
+      "acceptance": "Use actual diagonal and interaction semantics to prove required services, spawn and exits reachable; test false-positive traps.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-053",
+      "milestone": "R1",
+      "priority": "P1",
+      "title": "Define map-update position compatibility",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-002",
+        "STUDIO-015"
+      ],
+      "acceptance": "Specify and test safe player/respawn/recovery-data handling when geometry changes, preserving unrelated progress.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-013",
+      "milestone": "R2",
+      "priority": "P1",
+      "title": "Load content through compatibility adapter",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-012",
+        "STUDIO-014",
+        "STUDIO-050",
+        "STUDIO-051",
+        "STUDIO-053"
+      ],
+      "acceptance": "Match baseline terrain/occupancy/lifecycle and save behaviour; make rollback explicit and invalid file failure observable.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-020",
+      "milestone": "R2",
+      "priority": "P1",
+      "title": "Implement shared edit operations",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-010",
+        "STUDIO-050"
+      ],
+      "acceptance": "Typed inspect/paint/place/move/remove/validate/diff/save operations produce a candidate and affected references; first release exposes bounded scope.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-021",
+      "milestone": "R2",
+      "priority": "P1",
+      "title": "Guard writes and dry runs",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-020",
+        "STUDIO-011"
+      ],
+      "acceptance": "Expected content hash, file locking/recheck and atomic replacement prevent stale writes; dry-run persists nothing.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-022",
+      "milestone": "R2",
+      "priority": "P1",
+      "title": "Provide headless CLI",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-020",
+        "STUDIO-021"
+      ],
+      "acceptance": "Document supported syntax, structured diagnostics and exit outcomes; tests operate without SDL.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-023",
+      "milestone": "R2",
+      "priority": "P1",
+      "title": "Add undo and redo",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-020"
+      ],
+      "acceptance": "Reverse complete commands/batches while retaining authored identity; reject incompatible history after external changes.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-024",
+      "milestone": "R2",
+      "priority": "P1",
+      "title": "Produce reproducible previews",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-013"
+      ],
+      "acceptance": "Preview true content, occupancy and selected overlays; share interpretation and version rendering inputs.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-025",
+      "milestone": "R2",
+      "priority": "P1",
+      "title": "Recover separately stored drafts",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-021",
+        "STUDIO-023"
+      ],
+      "acceptance": "Recover last valid draft after interruption; distinguish draft/base/published states and handle conflicts without overwriting publication.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-026",
+      "milestone": "R2",
+      "priority": "P1",
+      "title": "Implement validated publication selection",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-013",
+        "STUDIO-021",
+        "STUDIO-050",
+        "STUDIO-051"
+      ],
+      "acceptance": "Bind validation to exact content/validator versions; publish immutable manifest and load its selected version in a fresh session.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-027",
+      "milestone": "R2",
+      "priority": "P1",
+      "title": "Make batch transactions conflict-safe",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-020",
+        "STUDIO-021"
+      ],
+      "acceptance": "Validate final candidate atomically; reject partial application, unexpected file changes and unsafe paths.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-030",
+      "milestone": "R2",
+      "priority": "P1",
+      "title": "Build minimal visual editor shell",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-022",
+        "STUDIO-024"
+      ],
+      "acceptance": "Open/select/inspect/move/paint with shared commands; preserve camera and coordinate transforms.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-032",
+      "milestone": "R2",
+      "priority": "P1",
+      "title": "Handle file state and recovery visibly",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-025",
+        "STUDIO-030"
+      ],
+      "acceptance": "Show dirty state, save/reopen, unsaved work and conflicts; demonstrate undo/redo and recovery.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-033",
+      "milestone": "R2",
+      "priority": "P1",
+      "title": "Provide essential overlays and access",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-030",
+        "STUDIO-050"
+      ],
+      "acceptance": "Grid, collision, spawn and approach overlays; keyboard focus, visible selection and text diagnostics.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-090",
+      "milestone": "R2",
+      "priority": "P1",
+      "title": "Publish machine-readable capabilities",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-022"
+      ],
+      "acceptance": "AI can inspect supported command/schema versions, dry-run a scoped change and interpret conflict/validation outcomes.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-031",
+      "milestone": "R3",
+      "priority": "P2",
+      "title": "Expand terrain tools",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-030",
+        "STUDIO-023"
+      ],
+      "acceptance": "Add bounded brushes, rectangle/fill, erase and selection; batch operations use one reversible command.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-040",
+      "milestone": "R3",
+      "priority": "P1",
+      "title": "Edit current resources and stations",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-013",
+        "STUDIO-030"
+      ],
+      "acceptance": "Move/place/remove supported single-tile definitions while preserving approach access and restored base ground.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-041",
+      "milestone": "R3",
+      "priority": "P1",
+      "title": "Edit NPC and monster spawn definitions",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-014",
+        "STUDIO-015",
+        "STUDIO-030"
+      ],
+      "acceptance": "Edit home/wander/cap/respawn fields allowed by runtime; preserve delayed lifecycle, quest references and authority.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-042",
+      "milestone": "R3",
+      "priority": "P2",
+      "title": "Add placement inspection and dependency views",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-040",
+        "STUDIO-041"
+      ],
+      "acceptance": "Search/filter/select/inspect current placements and warn of referenced content before moves/deletions.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-043",
+      "milestone": "R3",
+      "priority": "P1",
+      "title": "Migrate hardcoded placement categories",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-040",
+        "STUDIO-041",
+        "STUDIO-004"
+      ],
+      "acceptance": "Migrate category by category; retain baseline parity and mapping/creation-order obligations until explicitly changed.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-052",
+      "milestone": "R3",
+      "priority": "P1",
+      "title": "Automate edited-world smoke scenarios",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-013",
+        "STUDIO-022"
+      ],
+      "acceptance": "Exercise gathering, crafting, NPC interactions, banking, combat and save/reload on the exact content version; Alpha 0.1 uses its relevant subset.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-054",
+      "milestone": "R3",
+      "priority": "P2",
+      "title": "Measure geography and show diagnostics",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-024",
+        "STUDIO-051"
+      ],
+      "acceptance": "Record route distance/time, resource access and validation hotspots using documented, reproducible scenarios.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "GAME-002",
+      "milestone": "R3",
+      "priority": "P1",
+      "title": "Build flat River Crossing geography",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-040",
+        "GAME-001"
+      ],
+      "acceptance": "Create a named candidate with distributed routes, safe onboarding, legal crossings and no compulsory central core.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "GAME-003",
+      "milestone": "R3",
+      "priority": "P1",
+      "title": "Place services and NPCs deliberately",
+      "status": "planned",
+      "dependencies": [
+        "GAME-002",
+        "STUDIO-041"
+      ],
+      "acceptance": "Place current NPC/station roles and monster records along appropriate routes; validate required approaches, actual wander/aggression/leash behaviour and safe escape routes; align lore/location references.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "GAME-004",
+      "milestone": "R3",
+      "priority": "P1",
+      "title": "Tune first resource and upgrade loop",
+      "status": "planned",
+      "dependencies": [
+        "GAME-001",
+        "GAME-008",
+        "GAME-003"
+      ],
+      "acceptance": "Measure gathering, inventory, travel, bank/shop and crafting costs; compare actual fresh-player outcomes with stated targets.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "GAME-005",
+      "milestone": "R3",
+      "priority": "P1",
+      "title": "Run structured starter blockout playtests",
+      "status": "planned",
+      "dependencies": [
+        "GAME-002",
+        "GAME-003",
+        "GAME-004"
+      ],
+      "acceptance": "Capture uncoached navigation/task results, confusion and failure points; implement and retest priority fixes.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-060",
+      "milestone": "R4",
+      "priority": "P1",
+      "title": "Introduce asset identity and provenance",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-015"
+      ],
+      "acceptance": "Manifest names source/licence/author/path/version and stable IDs; missing references are diagnosed.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-061",
+      "milestone": "R4",
+      "priority": "P1",
+      "title": "Render sprites with cache and fallback",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-060"
+      ],
+      "acceptance": "One tile/tree appear in game and preview with correct pivot/scale/transparency; retain debug primitive mode.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-062",
+      "milestone": "R4",
+      "priority": "P2",
+      "title": "Import and preview sprite metadata",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-061",
+        "STUDIO-030"
+      ],
+      "acceptance": "Author animations/variants through validated metadata; verify atlas coordinates and render ordering.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-063",
+      "milestone": "R4",
+      "priority": "P1",
+      "title": "Validate image and atlas resources",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-060"
+      ],
+      "acceptance": "Reject invalid dimensions/rectangles/frames and excessive resource usage; record memory costs.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "ART-001",
+      "milestone": "R4",
+      "priority": "P1",
+      "title": "Choose a small coherent art pilot",
+      "status": "planned",
+      "dependencies": [
+        "GAME-005",
+        "STUDIO-060"
+      ],
+      "acceptance": "Compare style at real game scale using grass/tree/player/prop examples; record palette and readability decisions.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "ART-002",
+      "milestone": "R4",
+      "priority": "P2",
+      "title": "Produce starter visual kit",
+      "status": "planned",
+      "dependencies": [
+        "ART-001",
+        "STUDIO-061"
+      ],
+      "acceptance": "Complete only the terrain, cast, resources and props needed by the measured starter slice with provenance.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "ART-003",
+      "milestone": "R4",
+      "priority": "P2",
+      "title": "Improve readable UI and animation",
+      "status": "planned",
+      "dependencies": [
+        "ART-001",
+        "GAME-005"
+      ],
+      "acceptance": "Confirm selection, hit feedback, names, objectives and UI scale using real tasks and accessibility checks.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "ART-004",
+      "milestone": "R4",
+      "priority": "P2",
+      "title": "Introduce a restrained audio set",
+      "status": "planned",
+      "dependencies": [
+        "ART-001"
+      ],
+      "acceptance": "Add meaningful feedback and independent volume controls; document audio rights, formats and missing-asset behaviour.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "GAME-006",
+      "milestone": "R4",
+      "priority": "P1",
+      "title": "Deliver starter vertical slice",
+      "status": "planned",
+      "dependencies": [
+        "GAME-005",
+        "ART-002",
+        "ART-003",
+        "GAME-007"
+      ],
+      "acceptance": "New tester completes intended gathering/crafting/combat/quest loop; record recovery, pacing and confusion results.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "GAME-007",
+      "milestone": "R4",
+      "priority": "P1",
+      "title": "Reconcile narrative and progression text",
+      "status": "planned",
+      "dependencies": [
+        "DOC-002",
+        "GAME-003"
+      ],
+      "acceptance": "Current quest text, NPC names, objective targets, rewards and environmental cues agree on the tested journey.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-070",
+      "milestone": "R5",
+      "priority": "P2",
+      "title": "Author quests using supported behaviours",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-015",
+        "STUDIO-026",
+        "GAME-006"
+      ],
+      "acceptance": "One real quest is authored, validated, played and saved/reloaded; prerequisites and rewards remain authoritative.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-071",
+      "milestone": "R5",
+      "priority": "P2",
+      "title": "Author dialogue graphs",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-015",
+        "STUDIO-026",
+        "GAME-007"
+      ],
+      "acceptance": "One NPC conversation has valid reachable choices, session constraints and quest integration.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-072",
+      "milestone": "R5",
+      "priority": "P2",
+      "title": "Author items, equipment and recipes",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-015",
+        "STUDIO-026",
+        "GAME-004"
+      ],
+      "acceptance": "One item/recipe works with current requirements, patterns, stations, discovery, saves and economy checks.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-073",
+      "milestone": "R5",
+      "priority": "P2",
+      "title": "Author monsters and loot",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-015",
+        "STUDIO-026",
+        "STUDIO-041"
+      ],
+      "acceptance": "One encounter preserves spawn/AI/respawn/RNG/reward semantics and passes a bounded playtest.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-074",
+      "milestone": "R5",
+      "priority": "P2",
+      "title": "Support skill, shop and economy analysis",
+      "status": "planned",
+      "dependencies": [
+        "GAME-008",
+        "STUDIO-072"
+      ],
+      "acceptance": "Deterministic models cover input chains, sources/sinks, travel and anti-arbitrage, with assumptions visible.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-044",
+      "milestone": "R5",
+      "priority": "P3",
+      "title": "Add real multi-tile interaction footprints",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-040",
+        "STUDIO-051"
+      ],
+      "acceptance": "Runtime, pathfinding, interaction, selection and editor agree on footprints/approaches; sprite dimensions alone never create collision.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-091",
+      "milestone": "R6",
+      "priority": "P3",
+      "title": "Optionally wrap commands in MCP",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-090",
+        "STUDIO-027"
+      ],
+      "acceptance": "Expose the same validated operations with explicit workspace scope and capability versions; CLI remains usable independently.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-092",
+      "milestone": "R6",
+      "priority": "P2",
+      "title": "Improve Git-aware review and conflict workflow",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-021",
+        "STUDIO-027",
+        "DOC-003"
+      ],
+      "acceptance": "Show changed identities and dependencies; resolve Git conflicts through revalidation rather than coordinate-only auto-merging.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-093",
+      "milestone": "R6",
+      "priority": "P1",
+      "title": "Version content packages and migrations",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-026",
+        "STUDIO-015"
+      ],
+      "acceptance": "Publish engine/schema/asset/save compatibility matrix, migration tests and reversible package selection.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-094",
+      "milestone": "R6",
+      "priority": "P2",
+      "title": "Profile representative scale and contention",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-054",
+        "GAME-006"
+      ],
+      "acceptance": "Measure tick/route/validation/render/memory workloads before selecting chunking; document local simulation limits.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "QA-001",
+      "milestone": "R6",
+      "priority": "P1",
+      "title": "Maintain regression and content CI gates",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-052",
+        "STUDIO-093"
+      ],
+      "acceptance": "Require meaningful tests and content checks at release commit; preserve failure artifacts and prevent misleading skipped groups.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "QA-002",
+      "milestone": "R6",
+      "priority": "P2",
+      "title": "Exercise malformed content and failure recovery",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-011",
+        "STUDIO-021",
+        "STUDIO-093"
+      ],
+      "acceptance": "Bounded negative/fuzz/fault scenarios demonstrate safe failure and preserved previous content/player data.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "QA-003",
+      "milestone": "R6",
+      "priority": "P2",
+      "title": "Verify accessibility and usability",
+      "status": "planned",
+      "dependencies": [
+        "ART-003",
+        "STUDIO-033",
+        "GAME-006"
+      ],
+      "acceptance": "Record keyboard, focus, colour-independent state, readable scale and error recovery results with fixes.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "REL-001",
+      "milestone": "R6",
+      "priority": "P1",
+      "title": "Define versioned release metadata",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-093"
+      ],
+      "acceptance": "Tie engine/content/schema/assets/save compatibility and known issues to a reproducible release commit.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "REL-002",
+      "milestone": "R6",
+      "priority": "P1",
+      "title": "Package and verify clean installation",
+      "status": "planned",
+      "dependencies": [
+        "REL-001",
+        "QA-001"
+      ],
+      "acceptance": "Install/run on supported clean environments, verify dependencies, first launch, save location, update and rollback.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "REL-003",
+      "milestone": "R6",
+      "priority": "P1",
+      "title": "Establish release and maintenance ownership",
+      "status": "planned",
+      "dependencies": [
+        "REL-001",
+        "DOC-003"
+      ],
+      "acceptance": "Release checklist, issue triage, rollback decision and documentation freshness have named maintainers or explicit unassigned roles.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "DOC-003",
+      "milestone": "R6",
+      "priority": "P2",
+      "title": "Keep documentation synchronized",
+      "status": "planned",
+      "dependencies": [
+        "DOC-001"
+      ],
+      "acceptance": "Update affected inventory/decisions/user workflows with code changes; check links and archive superseded plans.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "ENG-010",
+      "milestone": "R7",
+      "priority": "P2",
+      "title": "Separate runtime ground and occupancy when required",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-013",
+        "STUDIO-004"
+      ],
+      "acceptance": "Preserve flat-world semantics while enabling a demonstrated new requirement; independent parity and rollback.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-080",
+      "milestone": "R7",
+      "priority": "P3",
+      "title": "Introduce tested surface metadata",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-093",
+        "STUDIO-015"
+      ],
+      "acceptance": "Flat maps remain unchanged; surface positions and unsupported values are validated.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-081",
+      "milestone": "R7",
+      "priority": "P3",
+      "title": "Implement explicit surface transitions",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-080",
+        "ENG-010"
+      ],
+      "acceptance": "24×24 fixture proves stairs/cliffs/diagonals and NPC navigation with authoritative transition rules.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-082",
+      "milestone": "R7",
+      "priority": "P3",
+      "title": "Render and select elevated content",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-081",
+        "STUDIO-061"
+      ],
+      "acceptance": "Camera, occlusion, draw order and clicks identify correct surface at overlaps.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-083",
+      "milestone": "R7",
+      "priority": "P3",
+      "title": "Support overlapping walkable surfaces",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-081",
+        "STUDIO-082"
+      ],
+      "acceptance": "Bridge/floor/tunnel fixture differentiates occupants above/below and rejects unintended cross-layer movement.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "STUDIO-084",
+      "milestone": "R7",
+      "priority": "P3",
+      "title": "Migrate interactions and saves for surfaces",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-080",
+        "STUDIO-053"
+      ],
+      "acceptance": "Combat, gathering, shops, respawn, recovery and old saves remain correct across surfaces before rollout.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "WORLD-001",
+      "milestone": "R8",
+      "priority": "P3",
+      "title": "Define region identity and transition contract",
+      "status": "planned",
+      "dependencies": [
+        "STUDIO-015",
+        "STUDIO-093"
+      ],
+      "acceptance": "Explicit exits, destinations, loading ownership and cross-region reference rules are documented and validated.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "WORLD-002",
+      "milestone": "R8",
+      "priority": "P3",
+      "title": "Connect two playable regions",
+      "status": "planned",
+      "dependencies": [
+        "WORLD-001",
+        "GAME-006"
+      ],
+      "acceptance": "Player travels both ways and retains valid state; broken destination produces defined recovery.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "WORLD-003",
+      "milestone": "R8",
+      "priority": "P3",
+      "title": "Handle regional saves and location-bearing state",
+      "status": "planned",
+      "dependencies": [
+        "WORLD-001",
+        "STUDIO-053"
+      ],
+      "acceptance": "Reload and recovery work in both regions; map updates cannot silently strand player or saved ground data.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "WORLD-004",
+      "milestone": "R8",
+      "priority": "P3",
+      "title": "Measure world-loading strategy",
+      "status": "planned",
+      "dependencies": [
+        "WORLD-002",
+        "STUDIO-094"
+      ],
+      "acceptance": "Profile real transition/memory workloads before adding streaming or chunks; record chosen approach.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "NET-001",
+      "milestone": "R9",
+      "priority": "P3",
+      "title": "Audit complete command authority",
+      "status": "planned",
+      "dependencies": [
+        "ENG-002",
+        "STUDIO-093"
+      ],
+      "acceptance": "Inventory every player mutation including direct running toggles; define trust boundaries and authoritative command ownership.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "NET-002",
+      "milestone": "R9",
+      "priority": "P3",
+      "title": "Choose protocol and identity model by ADR",
+      "status": "planned",
+      "dependencies": [
+        "NET-001",
+        "WORLD-001"
+      ],
+      "acceptance": "Specify bounded messages, sequence rules, snapshots, authentication needs and persistence identity without assuming an untested stack.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "NET-003",
+      "milestone": "R9",
+      "priority": "P3",
+      "title": "Build two-client authoritative prototype",
+      "status": "planned",
+      "dependencies": [
+        "NET-002"
+      ],
+      "acceptance": "Two controlled clients observe one authoritative simulation and consistent interaction outcomes.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "NET-004",
+      "milestone": "R9",
+      "priority": "P3",
+      "title": "Test network failure and contention",
+      "status": "planned",
+      "dependencies": [
+        "NET-003"
+      ],
+      "acceptance": "Reject invalid/duplicate/stale commands; demonstrate disconnect/reconnect and resource contention behaviour.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "NET-005",
+      "milestone": "R9",
+      "priority": "P3",
+      "title": "Decide hosted-playtest readiness",
+      "status": "planned",
+      "dependencies": [
+        "NET-004",
+        "REL-003"
+      ],
+      "acceptance": "Record security, recovery, observability, moderation and capacity requirements before public access.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "FUT-001",
+      "milestone": "R10",
+      "priority": "P3",
+      "title": "Prototype a collectible companion",
+      "status": "planned",
+      "dependencies": [
+        "GAME-006",
+        "STUDIO-073"
+      ],
+      "acceptance": "One acquisition/follow/persistence loop has a clear player purpose and reliable navigation; multiplayer is optional.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "FUT-002",
+      "milestone": "R10",
+      "priority": "P3",
+      "title": "Prototype a repeatable boss",
+      "status": "planned",
+      "dependencies": [
+        "GAME-006",
+        "STUDIO-073"
+      ],
+      "acceptance": "One readable encounter demonstrates repeat value, recovery and balanced rewards.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "FUT-003",
+      "milestone": "R10",
+      "priority": "P3",
+      "title": "Expand professions and regions selectively",
+      "status": "planned",
+      "dependencies": [
+        "GAME-006",
+        "STUDIO-074"
+      ],
+      "acceptance": "Each new resource/profession/region has demonstrated useful inputs, sinks and player decisions.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "When the chosen scope adds connected regions, WORLD-002 and WORLD-003 become required dependencies. Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "FUT-004",
+      "milestone": "R10",
+      "priority": "P3",
+      "title": "Scope persistent online operations",
+      "status": "planned",
+      "dependencies": [
+        "NET-005"
+      ],
+      "acceptance": "A separately approved hosted scope defines data integrity, support, recovery, moderation and operating responsibilities.",
+      "github_issue": null,
+      "evidence": [],
+      "notes": "Planning ID; not a GitHub issue number."
+    }
+  ]
+}
