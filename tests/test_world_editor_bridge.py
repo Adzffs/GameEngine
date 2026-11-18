@@ -233,6 +233,49 @@ class BridgeTests(unittest.TestCase):
         with self.assertRaisesRegex(StudioError, 'terrain differs from the source snapshot'):
             StudioBridge(self.tool, self.source)
 
+    def test_startup_rejects_backend_placement_position_drift(self):
+        original = "print(f'{kind_char[kind]}  {name}  ({x}, {y})')"
+        altered = "print(f'{kind_char[kind]}  {name}  ({x + 1}, {y})')"
+        self.assertIn(original, FAKE_TOOL)
+        self.tool.write_text(FAKE_TOOL.replace(original, altered), encoding='utf-8')
+        with self.assertRaisesRegex(StudioError, 'placements differ from the source'):
+            StudioBridge(self.tool, self.source)
+
+    def test_startup_rejects_backend_placement_kind_drift(self):
+        original = "print(f'{kind_char[kind]}  {name}  ({x}, {y})')"
+        self.assertIn(original, FAKE_TOOL)
+        self.tool.write_text(FAKE_TOOL.replace(
+            original, "print(f'R  {name}  ({x}, {y})')"), encoding='utf-8')
+        with self.assertRaisesRegex(StudioError, 'placements differ from the source'):
+            StudioBridge(self.tool, self.source)
+
+    def test_edit_rejects_spawn_drift_transactionally(self):
+        original = "print(f'{kind_char[kind]}  {name}  ({x}, {y})')"
+        altered = (
+            """print(f'{kind_char[kind]}  {name}  """
+            """({x + (1 if history and kind == "npc_spawn" else 0)}, {y})')"""
+        )
+        self.assertIn(original, FAKE_TOOL)
+        self.tool.write_text(FAKE_TOOL.replace(original, altered), encoding='utf-8')
+        with self.assertRaisesRegex(StudioError, 'read-only actor spawn'):
+            self.bridge.paint(1, 0, 'D')
+        self.assertEqual(self.bridge.commands, [])
+        self.assertEqual(self.bridge.terrain, self.world['terrain']['rows'])
+        self.assertEqual(self.bridge.placements['npc.guide.001'][1:], (2, 2))
+
+    def test_edit_rejects_out_of_bounds_backend_position(self):
+        original = "print(f'{kind_char[kind]}  {name}  ({x}, {y})')"
+        altered = (
+            """print(f'{kind_char[kind]}  {name}  """
+            """({x + (100 if history and kind == "resource" else 0)}, {y})')"""
+        )
+        self.assertIn(original, FAKE_TOOL)
+        self.tool.write_text(FAKE_TOOL.replace(original, altered), encoding='utf-8')
+        with self.assertRaisesRegex(StudioError, 'out-of-bounds placement'):
+            self.bridge.paint(1, 0, 'D')
+        self.assertEqual(self.bridge.commands, [])
+        self.assertEqual(self.bridge.placements['resource.tree.001'][1:], (1, 1))
+
     def test_rejected_paint_preserves_source_and_history(self):
         with self.assertRaisesRegex(StudioError, 'occupied or invalid tile'):
             self.bridge.paint(1, 1, 'W')
