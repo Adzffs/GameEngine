@@ -61,3 +61,30 @@ The new Python mock cases cover missing/malformed/mismatching terrain responses,
 The graphical bridge treats the C++ editor's placement list and terrain rows as authoritative, but the initial source file must agree with the backend *before editing starts*. The source's stable IDs, kinds and coordinates are now matched exactly against the C++ startup listing. Subsequent edits must preserve each ID and kind, keep every placement in bounds, and leave read-only NPC/monster spawn coordinates unchanged. Backend output that violates these invariants is refused before it changes the visible map or the Python replay list. This is a fail-closed view consistency check, not an alternative content validator. Resource/station moves and painting are still validated by the C++ runtime rules.
 
 Five mocked protocol regressions were added for mismatched startup placement coordinates/kinds and unexpected spawn/out-of-bounds positions after a command. Small isolated Python checks passed, but the complete committed bridge tests and the real C++/Tk integration are not yet executed in this environment. See [the dated evidence record](../06-development/STUDIO_AUTHORITATIVE_TERRAIN_VIEW_2026-11-18.md).
+
+## Real-executable / Python bridge integration gate (18 November 2026)
+
+When Python 3 is present at CMake configuration, the optional local test
+`StarterWorldVisualBridgeIntegration` runs the actual built
+`EmbervaleWorldMove` through `StudioBridge`, rather than the fake command
+backend used by the existing Python contract tests. Each case copies the
+real 100×100 starter fixture into a private temporary directory.
+
+The test checks initial stable-ID and terrain parity, tree movement,
+terrain painting and mixed undo/redo, rejected water at spawn/occupied
+objects, fresh sibling draft saving with spaces in the filename, runtime
+hash validation and reopening of that draft, existing-file protection
+and stale exact-byte source rejection. It does not touch the canonical
+fixture, user player saves or any live game world.
+
+After building locally, execute:
+
+```sh
+ctest --test-dir build-headless --output-on-failure -R StarterWorldVisualBridgeIntegration
+```
+
+Missing Python means the optional test is *not registered*, not that it
+passed. This is not a GUI interaction test or an actual game playtest.
+The test source passed local Python syntax checks, but the combined
+executable test remains unrun until a full repository checkout is
+available. See the dated evidence record in 06-development.

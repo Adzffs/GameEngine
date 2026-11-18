@@ -273,6 +273,21 @@ if(BUILD_TESTING)
                 -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/StarterWorldInteractiveSessionTests.cmake"
         )
         set_tests_properties(StarterWorldInteractiveSessionTests PROPERTIES LABELS "headless;content")
+
+        # Optional local test crosses the real C++ editor and Tk bridge.
+        # Python is optional; absence means no integration test registered.
+        find_package(Python3 COMPONENTS Interpreter QUIET)
+        if(Python3_Interpreter_FOUND)
+            add_test(
+                NAME StarterWorldVisualBridgeIntegration
+                COMMAND "${Python3_EXECUTABLE}"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/tests/StarterWorldVisualBridgeIntegration.py"
+                    --tool "$<TARGET_FILE:EmbervaleWorldMove>"
+                    --fixture "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/content/development-starter.snapshot.json"
+            )
+            set_tests_properties(StarterWorldVisualBridgeIntegration
+                PROPERTIES LABELS "headless;content;studio")
+        endif()
     endif()
 
     add_gameengine_headless_test(ActionFrameworkTests tests/ActionFrameworkTests.cpp)
