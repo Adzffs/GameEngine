@@ -73,3 +73,36 @@ world state.
   inspected was `3e1ddf8b6c993182feacf689cac31a32c9e648a2`; no full-repository build or live editing
   test was possible because the host still cannot resolve `github.com`.
   Keep the PR draft and avoid integration until full tests pass.
+
+## Follow-up: observed-revision checkpoint parity (18 November 2026)
+
+Review of the Python StudioBridge at the integration gate identified a remaining
+consistency hole: the existing transition checks required undo/redo cursor counts
+and **some** visible change, but accepted an undo or redo that returned an
+arbitrary in-bounds world instead of the earlier state. The C++ history protects
+its own canonical revisions, yet the graphical front end also needs to detect a
+malformed/mismatched response rather than silently displaying it.
+
+- The bridge now caches only world states **actually observed** from the
+  authoritative C++ tool: placements and terrain rows at each applied history
+  cursor. Undo and redo must reproduce the exact earlier observed state.
+- After a new move or paint from an undone cursor, the bridge drops cached redo
+  checkpoints before recording the new tool response. It does not compute
+  terrain inverses, modify authored JSON, or add another gameplay validator.
+- Rejected/mismatched backend responses leave the displayed state, replay
+  commands and checkpoint history unchanged.
+- Three committed mocked-backend regressions cover incorrect undo, incorrect
+  redo and redo-branch replacement after painting.
+
+**Executed locally:** Python 3.13.5 `py_compile` and **6/6 unittest cases**
+against the exact newly added *standalone helper* reproduced in an isolated
+test file. The cases covered accepted move/undo/redo, incorrect undo and redo,
+redo-branch replacement, impossible cursor and read-only no-op. This is **not**
+execution of the complete committed bridge or its mocked-backend suite.
+
+**Not executed:** the full Python bridge regression module, the new
+real-executable integration test, complete GameEngine C++ build, GUI click-through,
+Windows, or a gameplay playtest. Local `curl` to both github.com and
+api.github.com failed with DNS resolution errors; direct HTTPS IP connections
+were also unavailable. The repository was inspected and edited through its
+connected GitHub repository interface. Keep PR #18 draft and stacked.
