@@ -2,11 +2,13 @@
 
 #include <filesystem>
 #include <iosfwd>
+#include <string_view>
 
 // Interactive, terminal-based first editor surface. The shared typed history
 // and guarded draft writer remain the authority for all changes and saves.
 namespace EmbervaleStudioSession
 {
     int Run(const std::filesystem::path &sourcePath,
-        std::istream &input, std::ostream &output, std::ostream &errors);
+        std::istream &input, std::ostream &output, std::ostream &errors,
+        std::string_view requiredHash = {});
 }
