@@ -154,14 +154,23 @@
       "milestone": "R0",
       "priority": "P0",
       "title": "Reproduce multi-step shop arbitrage",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "ENG-002"
       ],
       "acceptance": "Replay the source-derived Log→planks→shield chain; record actual net coins, constraints and stock behaviour; correct/test confirmed loops before balance signoff.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/STARTER_ECONOMY_2026-11-19.md",
+        "docs/embervale/06-development/economy/2026-11-19/timber-before.json",
+        "docs/embervale/06-development/economy/2026-11-19/timber-after.json",
+        "src/Tools/EconomyReportMain.cpp",
+        "src/Economy/EconomyBalanceModel.h",
+        "src/Content/ContentValidator.cpp",
+        "src/Shop/ShopDefinitionDatabase.cpp",
+        "tests/ShopDefinitionTests.cpp"
+      ],
+      "notes": "Production World replay on River Crossing confirms two material-complete cycles: old prices 3->24->45 coins (+21 each). Log buy is now 10; corrected replay with an explicit 60-coin isolated budget records 60->54->48 (-6 each). Normal shop approaches, sessions and station actions ran without a finite stock gate. Shared intermediate material-cost analysis and startup shop validation reject nonnegative shop-funded crafting margins. Current catalogue validation/convergence and game/report builds passed. Old-price and break-even regressions are added but suites remain deferred at the owner's request. Replay uses the supported inventory-backed craft command, not cursor-driven UI. Balance signoff remains open."
     },
     {
       "id": "STUDIO-010",
@@ -743,7 +752,7 @@
       "milestone": "R3",
       "priority": "P1",
       "title": "Tune first resource and upgrade loop",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "GAME-001",
         "GAME-008",
@@ -751,8 +760,14 @@
       ],
       "acceptance": "Measure gathering, inventory, travel, bank/shop and crafting costs; compare actual fresh-player outcomes with stated targets.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/STARTER_ECONOMY_2026-11-19.md",
+        "docs/EconomyLedger.md",
+        "docs/embervale/06-development/economy/2026-11-19/starter-catalogue.json",
+        "src/Shop/ShopDefinitionDatabase.cpp",
+        "src/Tools/EconomyReportMain.cpp"
+      ],
+      "notes": "First bounded tuning delivered: shield buy 30->20, equal to the two ten-coin basic quest rewards; Log buy 1->10 closes the confirmed production profit. Recipe yields, quest rewards and Bronze sword price are unchanged. Source-derived sword+shield plan: two normal Logs, three Copper and three Tin, one plank remaining. Catalogue budget is reported by the production tool. Full fresh-player gathering, travel, bank/shop, food, requirements and upgrade timings remain unmeasured; the 10-15 minute target is not signed off."
     },
     {
       "id": "GAME-005",

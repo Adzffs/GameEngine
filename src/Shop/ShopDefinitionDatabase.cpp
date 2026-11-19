@@ -9,7 +9,9 @@ namespace
         "Development supplies",
         ItemType::COINS,
         {
-            {ItemType::LOG, 1, 1},
+            // Convenience timber must cost more than its full crafted resale.
+            // Three bought logs -> twelve planks -> two shields sells for 24.
+            {ItemType::LOG, 10, 1},
             {ItemType::COPPER_ORE, std::nullopt, 2},
             {ItemType::TIN_ORE, std::nullopt, 2},
             {ItemType::COAL, std::nullopt, 4},
@@ -18,7 +20,7 @@ namespace
             {ItemType::BRONZE_AXE, 25, 10},
             {ItemType::BRONZE_PICKAXE, 25, 10},
             {ItemType::BRONZE_SWORD, 40, 15},
-            {ItemType::WOODEN_SHIELD, 30, 12},
+            {ItemType::WOODEN_SHIELD, 20, 12},
         }};
 }
 

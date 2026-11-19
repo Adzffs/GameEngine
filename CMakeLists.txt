@@ -10,7 +10,7 @@ option(
 
 option(
     GAMEENGINE_BUILD_CONTENT_TOOLS
-    "Build the starter-world export and validation tools"
+    "Build world authoring, validation and economy tools"
     ON
 )
 
@@ -144,6 +144,9 @@ if(GAMEENGINE_BUILD_CONTENT_TOOLS)
 
     add_executable(EmbervaleWorldValidate src/Tools/WorldValidateMain.cpp)
     target_link_libraries(EmbervaleWorldValidate PRIVATE GameEngineCore)
+
+    add_executable(EmbervaleEconomyReport src/Tools/EconomyReportMain.cpp)
+    target_link_libraries(EmbervaleEconomyReport PRIVATE GameEngineCore)
 
     add_executable(EmbervaleWorldMove
         src/Tools/WorldMoveMain.cpp

@@ -1,5 +1,6 @@
 #include "TestSupport.h"
 #include "../src/Core/Engine.h"
+#include "../src/Shop/ShopDefinitionDatabase.h"
 
 struct GraphicsTestAccess
 {
@@ -130,6 +131,8 @@ int main()
     test.Expect(player != nullptr &&
                     graphics.GetShopPresentationState().IsOpen(),
                 "Authoritative shop opens in client presentation");
+    const int logBuyPrice = *ShopDefinitionDatabase::TryGetEntry(
+        ShopId::DEVELOPMENT_GUIDE_SUPPLIES, ItemType::LOG)->buyPrice;
     player->GetInventory().AddItem(ItemType::COINS, 100);
     player->GetInventory().AddItem(ItemType::LOG, 2);
     player->GetInventory().AddItem(ItemType::HEALING_TONIC, 2);
@@ -168,7 +171,7 @@ int main()
     test.Expect(!EngineTestAccess::HasPending(engine) &&
                     !graphics.IsShopCommandInFlight(),
                 "Matching result releases Buy lock exactly once");
-    test.Expect(player->GetInventory().GetItemAmount(ItemType::COINS) == 99 &&
+    test.Expect(player->GetInventory().GetItemAmount(ItemType::COINS) == 100 - logBuyPrice &&
                     player->GetInventory().GetItemAmount(ItemType::LOG) == 3,
                 "Accepted Buy still updates economy on authoritative tick");
     const int acceptedCoins = player->GetInventory().GetItemAmount(ItemType::COINS);
@@ -243,7 +246,7 @@ int main()
                     EngineTestAccess::IsType(engine, EngineTestAccess::Sell()),
                 "Result for another command cannot reconcile pending Sell");
     TickAndSync(engine);
-    test.Expect(player->GetInventory().GetItemAmount(ItemType::COINS) == 99 &&
+    test.Expect(player->GetInventory().GetItemAmount(ItemType::COINS) == 100 - 2 * logBuyPrice + 1 &&
                     player->GetInventory().GetItemAmount(ItemType::LOG) == 3,
                 "Accepted Sell still updates economy on authoritative tick");
 

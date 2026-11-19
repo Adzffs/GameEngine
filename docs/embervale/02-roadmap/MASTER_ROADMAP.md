@@ -19,7 +19,7 @@ Three findings change the implementation order:
 1. The development player receives boosted XP under the current configuration. Starter pacing must be measured using a deliberately defined fresh-player profile. See [DevelopmentConfig](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Core/DevelopmentConfig.h).
 2. Some existing economy and objective descriptions disagree with implementation. Correct documentation facts, then resolve any remaining gameplay or narrative disagreements explicitly.
 
-3. Source-derived shop/recipe arithmetic suggests a repeatable 3-coin to 24-coin log/plank/shield chain. This needs runtime reproduction and a separate correction if confirmed before starter balance can be signed off. See GAME-008 and the [economy ledger](../../EconomyLedger.md).
+3. GAME-008 reproduced the log/plank/shield trade twice on River Crossing: 3 -> 24 -> 45 coins. The corrected Log price makes each complete cycle lose six coins; the first shield now costs twenty, matching the two basic quest rewards combined. Production replay and builds passed; regression suites and complete starter timings remain deferred. See the [economy record](../06-development/STARTER_ECONOMY_2026-11-19.md) and [ledger](../../EconomyLedger.md).
 
 ## 3. Roadmap at a glance
 
@@ -128,7 +128,7 @@ crossings, connected routes, 18 resources, three stations and ten existing actor
 Production content validation and game/tool builds passed; dynamic/visible and pacing
 acceptance remain deferred. See the [candidate and launch guide](../../../content/worlds/README.md)
 and [implementation record](../06-development/RIVER_CROSSING_BLOCKOUT_2026-11-19.md).
-The next gameplay work is the starter resource/upgrade/economy loop (GAME-008/GAME-004).
+GAME-008/GAME-004 now include the confirmed timber correction, intermediate recipe-cost validation and a twenty-coin first shield. The source-derived sword/shield material budget is two normal Logs, three Copper and three Tin, with one plank remaining. [Production replay and budget evidence](../06-development/STARTER_ECONOMY_2026-11-19.md). The next gameplay acceptance is the complete fresh-player resource/upgrade journey: gathering attempts, requirements, travel, bank/shop use and food pressure. The 10-15 minute target remains unmeasured; deferred regressions still precede balance signoff.
 
 **Goal:** Make one real content change safely from end to end.
 
@@ -273,7 +273,7 @@ These are aspirations, not promised release dates. Keep features that reinforce 
 4. STUDIO-001: complete placement ownership inventory.
 5. STUDIO-002: trace save, respawn and position compatibility.
 6. GAME-001: define a genuine fresh-player profile.
-7. GAME-008: reproduce the source-derived multi-step economy cycle.
+7. GAME-008: production cycle reproduced and corrected; execute deferred regressions before balance signoff, then continue GAME-004 starter pacing.
 8. STUDIO-003: record model/parser/target-boundary decisions.
 9. STUDIO-004: capture baseline world observations and meaningful parity fixtures.
 10. STUDIO-010: implement the minimal authored model after the preceding inputs are clear.

@@ -2,6 +2,7 @@
 #include "../src/Command/ServerCommand.h"
 #include "../src/Core/RandomSource.h"
 #include "../src/Player/Player.h"
+#include "../src/Shop/ShopDefinitionDatabase.h"
 #include "../src/World/World.h"
 
 #include <climits>
@@ -71,8 +72,9 @@ int main()
         ItemType::LOG, 1});
     world.Update();
     test.ExpectEqual(player->GetInventory().GetItemAmount(ItemType::COINS),
-                     before.GetItemAmount(ItemType::COINS) - 1,
-                     "Authored one-Coin Log buy removes exact currency");
+                     before.GetItemAmount(ItemType::COINS) - *ShopDefinitionDatabase::TryGetEntry(
+                         ShopId::DEVELOPMENT_GUIDE_SUPPLIES, ItemType::LOG)->buyPrice,
+                     "Authored Log buy removes exact currency");
     test.ExpectEqual(player->GetInventory().GetItemAmount(ItemType::LOG), 1,
                      "Authored Log buy grants one Log");
     test.Expect(world.GetActiveShopSession(player->GetID()) != nullptr,
