@@ -2,7 +2,7 @@
   "version": 1,
   "reviewed_date": "2026-11-19",
   "current_verified_master": "2e3da94cf6bfaefc0b341824069b8af0472ff0e2",
-  "verification_reconciliation": "PRs #18–#22 merged. Master passes 84/84 headless, 96/96 SDL configuration and 37 Python tests. Earlier task notes describing stacked/unexecuted checks are historical and superseded by docs/embervale/06-development/MASTER_ACCEPTANCE_2026-11-19.md. Integrated features include move/paint/history, guarded sibling saves, dirty-state protection, reopen, isolated playtests and collision/spawn/reachability/approach overlays. R2 remains incomplete: interruption recovery, in-place atomic publication, manifests, machine-readable capabilities and accessibility acceptance remain open.",
+  "verification_reconciliation": "PRs #18–#22 merged. Master passes 84/84 headless, 96/96 SDL configuration and 37 Python tests. Earlier task notes describing stacked/unexecuted checks are historical and superseded by docs/embervale/06-development/MASTER_ACCEPTANCE_2026-11-19.md. Integrated features include move/paint/history, guarded sibling saves, dirty-state protection, reopen, isolated playtests and collision/spawn/reachability/approach overlays. R2 remains incomplete: interruption recovery, in-place atomic publication, manifests, machine-readable capabilities and accessibility acceptance remain open. STUDIO-040 completes bounded current resource/station placement with schema-2 retained allocation IDs, full snapshot protocol checks, 97/97 CTest checks, 39/39 Python checks and visible new-tree gathering; see STUDIO_PLACEMENT_VERIFICATION_2026-11-19.md.",
   "repository": "Adzffs/GameEngine",
   "baseline_commit": "e9d32932e8f9b27e96283313cca320058792a81f",
   "status_policy": "Implementation tasks require acceptance evidence and merge before complete; ready_for_review records verified branch work; in_progress and blocked preserve outstanding scope. Planning IDs are not issue numbers.",
@@ -525,7 +525,10 @@
       ],
       "acceptance": "Show dirty state, save/reopen, unsaved work and conflicts; demonstrate undo/redo and recovery.",
       "github_issue": null,
-      "evidence": ["tools/embervale_world_editor.py", "docs/embervale/06-development/MASTER_ACCEPTANCE_2026-11-19.md"],
+      "evidence": [
+        "tools/embervale_world_editor.py",
+        "docs/embervale/06-development/MASTER_ACCEPTANCE_2026-11-19.md"
+      ],
       "notes": "Merged PR #19 provides dirty-state checkpoints, close/switch warnings, verified saves and draft reopening. Visible Windows checks passed. Automatic interruption recovery remains open."
     },
     {
@@ -540,7 +543,11 @@
       ],
       "acceptance": "Grid, collision, spawn and approach overlays; keyboard focus, visible selection and text diagnostics.",
       "github_issue": null,
-      "evidence": ["tools/embervale_world_editor.py", "tests/test_world_editor_bridge.py", "docs/embervale/06-development/MASTER_ACCEPTANCE_2026-11-19.md"],
+      "evidence": [
+        "tools/embervale_world_editor.py",
+        "tests/test_world_editor_bridge.py",
+        "docs/embervale/06-development/MASTER_ACCEPTANCE_2026-11-19.md"
+      ],
       "notes": "Merged PRs #21–#22 provide collision, spawn, static reachability and selected resource/station approach overlays with an approach count. Keyboard/accessibility audit and broader diagnostics remain open."
     },
     {
@@ -577,15 +584,20 @@
       "milestone": "R3",
       "priority": "P1",
       "title": "Edit current resources and stations",
-      "status": "planned",
+      "status": "complete",
       "dependencies": [
         "STUDIO-013",
         "STUDIO-030"
       ],
       "acceptance": "Move/place/remove supported single-tile definitions while preserving approach access and restored base ground.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/STUDIO_PLACEMENT_VERIFICATION_2026-11-19.md",
+        "docs/embervale/07-decisions/ADR_018_BOUNDED_OBJECT_PLACEMENT.md",
+        "tests/StarterWorldPlacementTests.cpp",
+        "tests/StarterWorldVisualBridgeIntegration.py"
+      ],
+      "notes": "Move/place/remove for all seven existing resource and three station definitions; v1 compatibility, schema-2 allocation reservations, shared undo/redo, guarded save/reopen and visible new-tree gathering verified. NPC/enemy membership and general migration remain separate."
     },
     {
       "id": "STUDIO-041",

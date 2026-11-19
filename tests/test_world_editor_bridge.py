@@ -113,6 +113,16 @@ for line in sys.stdin:
         for row in terrain:
             print(row)
         print('End terrain rows')
+    elif op == 'snapshot':
+        observed = dict(world)
+        observed['placements'] = [
+            {**p, 'position': {**p['position'], 'x': placements[p['id']][1],
+                                'y': placements[p['id']][2]}}
+            for p in world['placements']]
+        observed['terrain'] = {'rows': terrain}
+        print('World snapshot JSON:')
+        print(json.dumps(observed))
+        print('End world snapshot')
     elif op == 'status':
         print(f'Changed: yes; undo: {len(history)}; redo: {len(redone)}; original SHA-256: {digest}')
     elif op == 'quit':
@@ -297,7 +307,7 @@ class BridgeTests(unittest.TestCase):
                         'help', 'map 0 0', 'quit', 'exit',
                         'move resource.tree.001 3 1 extra', 'paint 1 0 X'):
             with self.subTest(command=command):
-                with self.assertRaisesRegex(StudioError, 'Only move, paint, undo and redo'):
+                with self.assertRaisesRegex(StudioError, 'Only move, paint, place, remove, undo and redo'):
                     self.bridge.perform(command)
         self.assertFalse(draft.exists())
         self.assertEqual(self.bridge.commands, [])
@@ -353,6 +363,21 @@ class BridgeTests(unittest.TestCase):
         self.tool.write_text(FAKE_TOOL.replace("elif op == 'terrain':", "elif op == 'unused':"), encoding='utf-8')
         with self.assertRaisesRegex(StudioError, 'did not return authoritative terrain'):
             StudioBridge(self.tool, self.source)
+
+    def test_requires_complete_authoritative_snapshot(self):
+        self.tool.write_text(FAKE_TOOL.replace("elif op == 'snapshot':", "elif op == 'unused':"), encoding='utf-8')
+        with self.assertRaisesRegex(StudioError, 'world snapshot'):
+            StudioBridge(self.tool, self.source)
+
+    def test_full_snapshot_metadata_drift_is_transactional(self):
+        self.tool.write_text(FAKE_TOOL.replace(
+            "print(json.dumps(observed))",
+            "observed['player_spawn'] = {'x': 3, 'y': 0} if history else world['player_spawn']\n        print(json.dumps(observed))"),
+            encoding='utf-8')
+        with self.assertRaisesRegex(StudioError, 'unexpected world metadata'):
+            self.bridge.paint(1, 0, 'D')
+        self.assertEqual(self.bridge.commands, [])
+        self.assertEqual(self.bridge.terrain, self.world['terrain']['rows'])
 
     def test_rejects_incomplete_authoritative_terrain(self):
         self.tool.write_text(FAKE_TOOL.replace("print(row)", "print(row[:-1])"), encoding='utf-8')
