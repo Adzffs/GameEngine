@@ -1,5 +1,26 @@
 # Visual starter-world editor shell (STUDIO-030 first slice)
 
+## Play this draft
+
+Build the SDL client and launch Studio with `--tool build-client/EmbervaleWorldMove.exe`
+on Windows (omit `.exe` elsewhere). **Play this draft** prompts to save unsaved
+changes, validates a private temporary snapshot through the C++ importer, then
+launches the adjacent `GameEngine` with `--world <private-copy> --no-save`.
+Use `--game <executable>` when the game lives elsewhere. Closing or cancelling
+the save dialog keeps editing without starting a game. The private snapshot
+remains available until the game exits, then is removed. A running playtest
+disables another launch and Studio asks you to close the game before exiting.
+Player progress is temporary; the source world and player saves are untouched.
+
+On 19 November 2026 the button was exercised visibly on Windows against the
+real SDL client: it launched the saved world, showed the moved tree, disabled
+duplicate launch, and returned to its ready state after normal game exit.
+The seven real bridge regression scenarios and 36 Python contract/viewport
+tests passed. The new scenario verifies C++ validation of the private copy,
+exact launch arguments, dirty-state rejection, duplicate rejection, stale
+saved-world rejection and temporary snapshot cleanup. The actual game launch
+is mocked only in that regression; the visible button smoke used the real game.
+
 ## File state and reopening
 
 The title shows an asterisk and the toolbar says **Unsaved changes** when the

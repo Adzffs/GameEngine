@@ -16,19 +16,56 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch, Mock
 from pathlib import Path
 
 # Paths are supplied by CMake, never silently replaced with a fake backend.
 TOOL: Path
 FIXTURE: Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
-from embervale_world_editor import StudioBridge, StudioError  # noqa: E402
+from embervale_world_editor import StudioBridge, StudioError, DraftPlaytest  # noqa: E402
 
 TREE = "resource.normal_tree.001"
 FURNACE = "station.furnace.001"
 
 
 class RealWorldBridgeTests(unittest.TestCase):
+    def test_playtest_validates_private_copy_and_never_passes_save_path(self) -> None:
+        self.bridge.move(TREE, 30, 30)
+        runner = DraftPlaytest()
+        with self.assertRaisesRegex(StudioError, "Save a new draft"):
+            runner.start(self.bridge, TOOL)
+        draft = self.source.with_name("play draft.json")
+        self.bridge.save(draft)
+        process = Mock()
+        process.poll.return_value = None
+        real_popen = subprocess.Popen
+        launched = []
+        def spawn_game(arguments, **kwargs):
+            if "--session" in arguments:
+                return real_popen(arguments, **kwargs)
+            launched.append(arguments)
+            return process
+        with patch("embervale_world_editor.subprocess.Popen", side_effect=spawn_game):
+            runner.start(self.bridge, TOOL)
+            arguments = launched[0]
+            self.assertEqual(arguments[0], str(TOOL))
+            self.assertEqual(arguments[1], "--world")
+            self.assertEqual(arguments[3:], ["--no-save"])
+            private = Path(arguments[2])
+            self.assertNotEqual(private, draft)
+            self.assertEqual(private.read_bytes(), draft.read_bytes())
+            with self.assertRaisesRegex(StudioError, "already running"):
+                runner.start(self.bridge, TOOL)
+            self.assertEqual(len(launched), 1)
+        process.poll.return_value = 0
+        self.assertEqual(runner.poll(), 0)
+        self.assertFalse(private.exists())
+        self.assertEqual(self.source.read_bytes(), self.original)
+        draft.write_bytes(self.original)
+        with self.assertRaisesRegex(StudioError, "Saved draft differs"):
+            runner.start(self.bridge, TOOL)
+
     def setUp(self) -> None:
         self.directory = tempfile.TemporaryDirectory(prefix="embervale-bridge-")
         self.addCleanup(self.directory.cleanup)
