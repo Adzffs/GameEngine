@@ -2,6 +2,16 @@
 
 ## Inspection overlays
 
+**Reachability** adds green stippling to tiles connected to player spawn and
+yellow highlights to reachable cardinal approach tiles for the selected
+resource/station. The inspector reports their count. This static preview uses
+the current verified terrain and placements: water and resources/stations
+block access; NPC/monster spawn markers do not. Cardinal flood fill matches
+the starter importer's connectivity rule and prevents diagonal corner cutting.
+The C++ validator still accepts or rejects every edit. This display does not
+predict moving actors or runtime combat/path changes. Toggle it off for an
+unshaded map; selection, edits and undo/redo recompute the preview on repaint.
+
 Toggle **Static collision** to mark water and resource/station tiles with red
 outlines and diagonal strokes. This matches the starter importer static-blocking
 rules; it does not predict moving actors or prove route reachability. Toggle
