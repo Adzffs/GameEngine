@@ -1,0 +1,126 @@
+{
+  "schema": "embervale.authoring-batch",
+  "version": 1,
+  "id": "service-pilot",
+  "native_tile_size": 32,
+  "editor": "LibreSprite 1.1-dev",
+  "lighting": "upper left",
+  "status": "Static bank chest and crafting table runtime pilot",
+  "palette_rgb": [
+    "282d2c",
+    "30211d",
+    "463026",
+    "603e2b",
+    "7b4e2e",
+    "985f35",
+    "b97c43",
+    "d59b5a",
+    "ebba78",
+    "404542",
+    "555d59",
+    "8e9b99",
+    "b9c5bd",
+    "84622c",
+    "c8a653",
+    "e3c073",
+    "dbc79a",
+    "efe0b7"
+  ],
+  "images": {
+    "bank": {
+      "source": "source/bank.ase",
+      "image": "textures/bank.png",
+      "size": [
+        48,
+        48
+      ],
+      "editor_metadata": "textures/bank.export.json",
+      "source_sha256": "3028cf14df7e756e822f24690739a7acad34edc21ae9c5294c8e36da0e97f137",
+      "image_sha256": "9fb831e30df9c92b9b3476eb81f8c89e37e31c1819422b4a73c186d59bfab025"
+    },
+    "crafting-table": {
+      "source": "source/crafting-table.ase",
+      "image": "textures/crafting-table.png",
+      "size": [
+        48,
+        48
+      ],
+      "editor_metadata": "textures/crafting-table.export.json",
+      "source_sha256": "e173c5649f60886620a912dae7c201297732f39f7c88019cd6738467628309a1",
+      "image_sha256": "00d584d66ec9496ad1bc942769ebacd9b781cddeeb143a3878efd46f2028f432"
+    }
+  },
+  "assets": [
+    {
+      "id": "station.bank.idle",
+      "image": "bank",
+      "rect": [
+        0,
+        0,
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "intended_gameplay_footprint_tiles": [
+        1,
+        1
+      ],
+      "state": "static"
+    },
+    {
+      "id": "station.crafting_table.idle",
+      "image": "crafting-table",
+      "rect": [
+        0,
+        0,
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "intended_gameplay_footprint_tiles": [
+        1,
+        1
+      ],
+      "state": "static"
+    }
+  ],
+  "provenance": {
+    "creator": "OpenAI image generation and Codex-assisted LibreSprite authoring for Adam Holland",
+    "reference": "reference/service-reference.png",
+    "reference_sha256": "dbc3e8a1e6a589159991125a673fa38fe58ce915c0f02627564df16663274084",
+    "notes": "Original two-panel reference, no third-party image input. LibreSprite samples at native scale, quantizes the shared eighteen-colour palette, preserves leg gaps and enforces binary alpha.",
+    "licence": "No separate asset licence grant declared; repository distribution policy applies."
+  },
+  "previews": {
+    "service-pilot-2x.png": {
+      "path": "previews/service-pilot-2x.png",
+      "size": [
+        640,
+        256
+      ],
+      "sha256": "762189b3450e8684c761bae8fa71d064b77e51545a0f7ceaf59c9638c2d973cf"
+    },
+    "service-inspection-4x.png": {
+      "path": "previews/service-inspection-4x.png",
+      "size": [
+        384,
+        192
+      ],
+      "sha256": "cdf7eb3da6497ab783f94303f62122449d7dff5826a314bf6f66bf74d7081ea9"
+    }
+  }
+}

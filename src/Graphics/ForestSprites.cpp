@@ -1,6 +1,7 @@
 #include "ForestSprites.h"
 #include "../World/Map.h"
 #include "../World/Object/Resource/ResourceNode.h"
+#include "../World/Object/Station/StationType.h"
 #include <algorithm>
 #include <cmath>
 #include <filesystem>
@@ -58,6 +59,8 @@ void ForestSprites::Initialize(SDL_Renderer *target)
         if (frame.id == "resource.tree.normal.depleted") stump = &frame;
         if (frame.id == "character.mara.idle") mara = &frame;
         if (frame.id == "station.furnace.idle") furnace = &frame;
+        if (frame.id == "station.bank.idle") bank = &frame;
+        if (frame.id == "station.crafting_table.idle") craftingTable = &frame;
         constexpr std::array<std::string_view, 3> waterIDs{"terrain.water.01", "terrain.water.02", "terrain.water.03"};
         constexpr std::array<std::string_view, 3> stoneIDs{"terrain.stone.01", "terrain.stone.02", "terrain.stone.03"};
         for (std::size_t i = 0; i < water.size(); ++i)
@@ -324,9 +327,21 @@ bool ForestSprites::DrawCharacter(const Frame *frame, float tileX, float tileY) 
     return Draw(frame, Bounds(*frame, tileX, tileY));
 }
 
-bool ForestSprites::DrawFurnace(int tileX, int tileY) const
+const ForestSprites::Frame *ForestSprites::StationFrame(StationType type) const
 {
-    return Available(furnace) && Draw(furnace, Bounds(*furnace, tileX, tileY));
+    switch (type)
+    {
+    case StationType::FURNACE: return furnace;
+    case StationType::BANK: return bank;
+    case StationType::CRAFTING_TABLE: return craftingTable;
+    default: return nullptr;
+    }
+}
+
+bool ForestSprites::DrawStation(StationType type, int tileX, int tileY) const
+{
+    const auto *frame = StationFrame(type);
+    return Available(frame) && Draw(frame, Bounds(*frame, tileX, tileY));
 }
 
 bool ForestSprites::HitMara(int tileX, int tileY, float worldX, float worldY) const
@@ -334,9 +349,9 @@ bool ForestSprites::HitMara(int tileX, int tileY, float worldX, float worldY) co
     return Hit(mara, tileX, tileY, worldX, worldY);
 }
 
-bool ForestSprites::HitFurnace(int tileX, int tileY, float worldX, float worldY) const
+bool ForestSprites::HitStation(StationType type, int tileX, int tileY, float worldX, float worldY) const
 {
-    return Hit(furnace, tileX, tileY, worldX, worldY);
+    return Hit(StationFrame(type), tileX, tileY, worldX, worldY);
 }
 
 bool ForestSprites::Hit(const Frame *frame, int tileX, int tileY, float worldX, float worldY) const

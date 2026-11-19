@@ -1,0 +1,156 @@
+{
+  "date": "2026-11-19",
+  "base_commit": "9672a74bb781dee22b6a8c92e20b4c21da427f27",
+  "editor": "LibreSprite 1.1-dev",
+  "new_frames": 2,
+  "total_frames": 86,
+  "runtime_images": 12,
+  "renderer": "SDL 3.4.12 dummy video / software rendering",
+  "builds": [
+    {
+      "command": "cmake --build build-client --target GameEngine EmbervaleRenderPreview --parallel 6",
+      "result": "passed"
+    },
+    {
+      "command": "Play-RiverCrossing.cmd --build-only",
+      "result": "passed"
+    }
+  ],
+  "default_export": {
+    "editable_sources_preserved": 2,
+    "runtime_exports_identical": 2,
+    "default_export_completed": true
+  },
+  "prior_art_walk_and_world_unchanged": true,
+  "packaged_images_match_in": [
+    "build-client",
+    "build-river-crossing"
+  ],
+  "packaged_images": [
+    {
+      "path": "assets/embervale/forest-pilot/textures/terrain.png",
+      "sha256": "3fdf5fb4cc07bbb8ed039b9cb58333ac89db988352d5c629e61eb16ebc243e07"
+    },
+    {
+      "path": "assets/embervale/forest-pilot/textures/oak.png",
+      "sha256": "4769a241fbc0c19e89817abb8327f2b27d51698d3ca97672e88c9bbb9673caa9"
+    },
+    {
+      "path": "assets/embervale/forest-pilot/textures/stump.png",
+      "sha256": "0841127c68105a3b174af70a99e07e2ad1b17bc02de636e3cb88d9c548b29289"
+    },
+    {
+      "path": "assets/embervale/cast-pilot/textures/player.png",
+      "sha256": "9dcfdfec59ff7ad184c763b8846b98516495ae0a75fc4f83fbfe1e27176f9164"
+    },
+    {
+      "path": "assets/embervale/cast-pilot/textures/mara.png",
+      "sha256": "3f6ecc1b64e50ed4d49a413b1e0edd0aaf1d29bdb9acb5a6a9c3604efe8df885"
+    },
+    {
+      "path": "assets/embervale/cast-pilot/textures/furnace.png",
+      "sha256": "e8e1f512a5d1bdc355dcd569ff5cb9ee5a7566725ed54eba27efc74859c1b2f2"
+    },
+    {
+      "path": "assets/embervale/environment-pilot/textures/terrain.png",
+      "sha256": "ccc71b373af780b7a95e2a578a003154814a5b7d5dcd3e23f517225317441e77"
+    },
+    {
+      "path": "assets/embervale/environment-pilot/textures/copper.png",
+      "sha256": "823a3530bd2200428a7fd036323801d40a549c0109fed4345e8deb0f84b6ae80"
+    },
+    {
+      "path": "assets/embervale/environment-pilot/textures/tin.png",
+      "sha256": "37c8301960238d9ec4b0e1102d7c14b5aa66d2f2e2469dda5c082cd865e982ee"
+    },
+    {
+      "path": "assets/embervale/environment-pilot/textures/rubble.png",
+      "sha256": "bf55b0b4b241ff1150886926821c0f48658c186bc8af5f7b91d7b795d26ebdae"
+    },
+    {
+      "path": "assets/embervale/service-pilot/textures/bank.png",
+      "sha256": "9fb831e30df9c92b9b3476eb81f8c89e37e31c1819422b4a73c186d59bfab025"
+    },
+    {
+      "path": "assets/embervale/service-pilot/textures/crafting-table.png",
+      "sha256": "00d584d66ec9496ad1bc942769ebacd9b781cddeeb143a3878efd46f2028f432"
+    }
+  ],
+  "captures": [
+    {
+      "name": "bank",
+      "options": [
+        "--focus",
+        "33",
+        "28"
+      ],
+      "cache": "World art: 12/12 textures cached.",
+      "sha256": "bbe16dabb6524e11f20f406e40adfd4a61b190d76f7ec44343c61904c6d5f5af"
+    },
+    {
+      "name": "bank-1_5x",
+      "options": [
+        "--focus",
+        "33",
+        "28",
+        "--zoom",
+        "1.5"
+      ],
+      "cache": "World art: 12/12 textures cached.",
+      "sha256": "dc3764f71b88f1c27a55f5b3bb3856a47739095fa908d326962fdbacf51838fc"
+    },
+    {
+      "name": "crafting-table",
+      "options": [
+        "--focus",
+        "72",
+        "51"
+      ],
+      "cache": "World art: 12/12 textures cached.",
+      "sha256": "4bd61bd9de5b46403b4040d11da8593c7642bd113be079a9fa9b08171de76e41"
+    },
+    {
+      "name": "crafting-table-1_5x",
+      "options": [
+        "--focus",
+        "72",
+        "51",
+        "--zoom",
+        "1.5"
+      ],
+      "cache": "World art: 12/12 textures cached.",
+      "sha256": "2ff7d88b32142978ef33eebfc6fc420b8dd9b1b413b956a35d7513f5a9c3dd3a"
+    },
+    {
+      "name": "bank-basic",
+      "options": [
+        "--focus",
+        "33",
+        "28",
+        "--zoom",
+        "1.5",
+        "--basic"
+      ],
+      "cache": "World art: 12/12 textures cached.",
+      "sha256": "dfc24a1b90c52823382993242c29d5e45f1f781d0f2793980062fb5c9771a394"
+    },
+    {
+      "name": "crafting-table-basic",
+      "options": [
+        "--focus",
+        "72",
+        "51",
+        "--zoom",
+        "1.5",
+        "--basic"
+      ],
+      "cache": "World art: 12/12 textures cached.",
+      "sha256": "8739ca7c06dd98562d5b4f6929e5292fd54f6981e962c46032d1d5d806cc2a31"
+    }
+  ],
+  "limits": [
+    "Regression suites deferred at owner request",
+    "No visible interaction or GPU/window playthrough",
+    "No animated chest state implemented"
+  ]
+}

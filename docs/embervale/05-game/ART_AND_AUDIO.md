@@ -1,6 +1,6 @@
 # Art, animation and audio production guide
 
-**Status:** Forest, player/Mara/furnace and environment/mining pilots render in the SDL client, with a corrected player walk cycle. A general importer and the broader production workflow below remain proposed.\
+**Status:** Forest, cast, environment/mining and bank/table pilots render in the SDL client, with a corrected player walk cycle. A general importer and the broader production workflow below remain proposed.\
 **Reviewed:** 19 November 2026.\
 **Purpose:** Replace placeholder presentation in manageable steps while preserving gameplay and making assets easy for humans and AI to work with.
 
@@ -55,11 +55,15 @@ A large graphics source file and a large sprite atlas are different concerns. Th
 The [environment pilot](../../../assets/embervale/environment-pilot/README.md)
 adds static water, grass/earth/stone/dirt riverbank quarters, stone pavers and
 copper/tin rocks with shared depleted rubble. Ground persists beneath objects,
-preventing grass squares on the stone mining pad. The three batches share a
-generated layout and texture cache: 84 frames, ten runtime PNGs. See the
+preventing grass squares on the stone mining pad. See the
 [environment integration record](../06-development/ENVIRONMENT_RENDERING_2026-11-19.md)
 for editable sources and actual river, workshop and depleted mining captures.
-Other ore tiers, buildings, bank/table art and the full visual kit remain open.
+The [service pilot](../../../assets/embervale/service-pilot/README.md) adds
+bank and crafting-table sprites, editable masters and opaque-pixel targeting
+through their existing station actions. The four batches share a generated
+layout and texture cache: 86 frames in twelve PNGs. See the
+[service integration record](../06-development/SERVICE_RENDERING_2026-11-19.md).
+Other ore tiers, buildings, remaining cast and the full visual kit remain open.
 
 ## 2. Proposed visual direction
 

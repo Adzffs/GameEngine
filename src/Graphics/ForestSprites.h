@@ -7,6 +7,7 @@
 class Map;
 class ResourceNode;
 enum class ResourceType;
+enum class StationType;
 
 // One renderer-owned cache shared by the world-art batches. Missing art falls back
 // per image; initialization is the only place files are opened or decoded.
@@ -29,9 +30,9 @@ public:
     bool HasMara() const;
     bool DrawPlayer(float tileX, float tileY, int facing, int pose) const;
     bool DrawMara(int tileX, int tileY) const;
-    bool DrawFurnace(int tileX, int tileY) const;
+    bool DrawStation(StationType type, int tileX, int tileY) const;
     bool HitMara(int tileX, int tileY, float worldX, float worldY) const;
-    bool HitFurnace(int tileX, int tileY, float worldX, float worldY) const;
+    bool HitStation(StationType type, int tileX, int tileY, float worldX, float worldY) const;
     std::size_t LoadedImageCount() const;
 
 private:
@@ -54,6 +55,7 @@ private:
     std::array<std::array<const Frame *, 4>, 4> player{};
     const Frame *mara = nullptr;
     const Frame *furnace = nullptr;
+    const Frame *bank = nullptr, *craftingTable = nullptr;
     bool Available(const Frame *frame) const;
     bool Draw(const Frame *frame, const SDL_FRect &destination,
               const SDL_FRect *source = nullptr, Uint8 alpha = 255) const;
@@ -61,5 +63,6 @@ private:
     bool Hit(const Frame *frame, int tileX, int tileY, float worldX, float worldY) const;
     bool DrawCharacter(const Frame *frame, float tileX, float tileY) const;
     const Frame *MiningFrame(ResourceType type) const;
+    const Frame *StationFrame(StationType type) const;
     bool DrawWater(Map &map, int tileX, int tileY, const SDL_FRect &tile, std::size_t variant) const;
 };

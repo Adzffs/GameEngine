@@ -45,7 +45,7 @@ def png_size(path):
 def write_renderer_layout(manifest):
     """Compile this small authoring record into a checked, dependency-free binding."""
     manifests = [manifest]
-    for name in ['cast-pilot', 'environment-pilot']:
+    for name in ['cast-pilot', 'environment-pilot', 'service-pilot']:
         batch_path = REPO / f'assets/embervale/{name}/manifest.json'
         if batch_path.exists():
             manifests.append(json.loads(batch_path.read_text(encoding='utf-8')))
@@ -57,7 +57,7 @@ def write_renderer_layout(manifest):
     if len({asset['id'] for _, asset in assets}) != len(assets):
         raise RuntimeError('Duplicate asset ID')
     lines = [
-        '// Generated from forest, cast and environment manifests by tools/art/build_*_pilot.py.',
+        '// Generated from world-art batch manifests by tools/art/build_*_pilot.py.',
         '#pragma once', '#include <SDL3/SDL.h>', '#include <array>',
         '#include <cstddef>', '#include <string_view>', '', 'namespace ForestPilotLayout', '{',
         '    struct Image { std::string_view filename; int width, height; std::string_view directory; };',
