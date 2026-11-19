@@ -1,11 +1,11 @@
-# NPC/enemy home movement — draft review, 19 November 2026
+# NPC/enemy home movement — implementation record, 19 November 2026
 
-**Status:** DRAFT implementation; not compiled, executed or accepted.  
+**Status:** Implementation complete; testing and visible acceptance deferred at the owner's explicit request.  
 **Base:** master `914a581ece8e3b2c4255230a4a9fa8a19e2f3520` (PR #24).  
 **Planning scope:** First bounded slice of STUDIO-041: move existing actor
 spawn/home positions. Behaviour-configuration editing remains separate.
 
-## Prepared implementation
+## Implementation
 
 The shared C++ move operation accepts existing NPC and monster placement IDs.
 It moves the placement and its typed `NpcSpawnDefinition::spawnPosition`
@@ -27,7 +27,7 @@ promote schema 1 or consume an authored-object allocation ID. GUI and C++ tool
 must come from the same checkout because the placement-list heading now
 describes movable actor homes.
 
-## Prepared regression coverage
+## Added regression coverage
 
 - `StarterWorldEditTests`: all ten actor records, typed/home parity,
   unchanged bindings and lifecycle/settings, no-op moves, v1 round-trip,
@@ -48,9 +48,11 @@ describes movable actor homes.
 
 ## Verification state
 
-The desktop execution connection became unavailable before the first source
-patch could be applied locally. The branch was prepared through GitHub using
-the inspected base files. No replacement execution environment was available.
+The branch was initially prepared through GitHub after the desktop execution
+connection disconnected. On reconnection, the owner explicitly requested
+completing the work without testing for now. The implementation is therefore
+being integrated with testing deferred; no compilation or gameplay pass is
+claimed for this change.
 
 | Required check | Result for this change |
 |---|---|
@@ -62,9 +64,10 @@ the inspected base files. No replacement execution environment was available.
 | Visible Studio and SDL game acceptance | Not run |
 
 The earlier 97 CTest / 39 Python pass counts belong to PR #24. They are not
-test evidence for this draft. The roadmap retains STUDIO-041 as in progress.
+test evidence for this change. The broader STUDIO-041 task remains in progress
+because behaviour-configuration editing is separate from completed home movement.
 
-## Resume and acceptance
+## Deferred verification
 
 Build this branch's core/tools and SDL client, then run:
 
@@ -81,6 +84,7 @@ and reopen the exact draft, and use Play this draft. Confirm guide dialogue,
 quest actions and trading still work; kill the relocated monster and observe
 its return to the new home. Preserve ordinary player saves throughout.
 
-Keep the pull request in draft until compilation, regression checks and the
-visible acceptance are recorded. Continue broader STUDIO-041 configuration
-work only under its own explicit compatibility contract.
+The owner requested integration without waiting for these checks on
+19 November 2026. They remain follow-up verification work, rather than a merge
+blocker. Broader STUDIO-041 configuration work still needs its own explicit
+compatibility contract.

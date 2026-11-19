@@ -1,8 +1,8 @@
 # Visual starter-world editor shell (STUDIO-030 first slice)
 
-## Draft: move existing NPC and enemy homes
+## Move existing NPC and enemy homes
 
-In this branch, **Select / move** also moves existing NPC and monster spawn/home
+**Select / move** also moves existing NPC and monster spawn/home
 points. Select a character in the list or map, then click a clear destination.
 Undo/redo, validation, overlays and save/reopen use the same shared C++ command.
 The inspector shows **Spawn / home**; removing actors remains disabled.
@@ -10,8 +10,8 @@ Character identity, quest/dialogue/shop bindings and behaviour settings remain
 fixed. Home movement alone does not change the world schema or allocate an
 object ID. Use the editor and C++ tool from the same branch.
 
-**Verification is pending:** the execution environment disconnected before
-compilation or playtesting. See the [draft review and resume checks](../06-development/STUDIO_SPAWN_MOVE_REVIEW_2026-11-19.md).
+**Testing is deferred at the owner's request.** No build or gameplay pass is
+claimed for this slice; see the [implementation record and follow-up checks](../06-development/STUDIO_SPAWN_MOVE_REVIEW_2026-11-19.md).
 
 
 ## Create and remove resources/stations
@@ -20,7 +20,7 @@ Choose a type in **Place a resource or station**, press **Place selected type**,
 then click a free map tile. The palette includes normal/oak/willow trees,
 copper/tin/iron/coal rocks, a furnace, crafting table and bank. Select an object
 and press **Remove selected**, or Delete while the map/placement list has focus.
-NPC/enemy homes can be moved in the draft slice above; their bindings and
+NPC/enemy homes can be moved as described above; their bindings and
 behaviour settings remain fixed. Return to **Select / move** to move an existing
 placement. Rejected edits preserve the world, allocator and history.
 
