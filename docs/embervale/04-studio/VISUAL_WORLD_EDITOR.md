@@ -155,6 +155,11 @@ The 36 Python contract/viewport tests and six real bridge cases also passed.
 
 ## Run
 
+For the first River Crossing blockout, open `content/worlds/river-crossing.blockout.json`
+instead of the baseline fixture below. The [world pack](../../../content/worlds/README.md)
+contains the launch command and actual-data map overview. Studio uses the same
+shared terrain/placement/history workflow, with **Fresh player** selected for play.
+
 Build the content tools, then from the repository root run:
 
 ```sh

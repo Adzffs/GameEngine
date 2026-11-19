@@ -27,7 +27,7 @@ namespace
                "Tell me about combat.",
                DialogueNodeId::DEVELOPMENT_GUIDE_COMBAT_RESPONSE}}},
             {DialogueNodeId::DEVELOPMENT_GUIDE_GATHERING_RESPONSE,
-             "Start with the nearby trees and rocks. Bring your finds to the workshop, and waste nothing.",
+             "Follow the paths to the woodland and quarry. Bring your finds to the workshop, and waste nothing.",
              DialogueNodeKind::CONTINUE,
              DialogueNodeId::DEVELOPMENT_GUIDE_FUTURE,
              {}},

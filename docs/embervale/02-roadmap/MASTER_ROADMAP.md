@@ -23,7 +23,7 @@ Three findings change the implementation order:
 
 ## 3. Roadmap at a glance
 
-R0 and R1 remain **in progress**. The local baseline, ownership inventory, deterministic snapshot, bounded parser, runtime geography validation and selected spawn authority are implemented. R2 is **in progress** with shared move/paint/place/remove commands, history, guarded sibling drafts, the visual editor, overlays and isolated playtests implemented. Recovery, in-place publication, manifests, structured capabilities and broader accessibility remain open. The remaining baseline game tasks and broader identity/migration requirements are still open. R3 has a completed bounded resource/station placement slice; its remaining placement categories and River Crossing blockout remain planned. R4–R10 remain planned. See [current task progress](BACKLOG.md#current-progress) and the [runtime verification record](../06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md); no complete Studio release is claimed.
+R0 and R1 remain **in progress**. The local baseline, ownership inventory, deterministic snapshot, bounded parser, runtime geography validation and selected spawn authority are implemented. R2 is **in progress** with shared move/paint/place/remove commands, history, guarded sibling drafts, the visual editor, overlays and isolated playtests implemented. Recovery, in-place publication, manifests, structured capabilities and broader accessibility remain open. The remaining baseline game tasks and broader identity/migration requirements are still open. R3 has completed bounded resource/station placement and an authored first River Crossing blockout candidate with existing actor homes; dynamic/visible/pacing acceptance and broader placement tools remain open. R4–R10 remain planned. See [current task progress](BACKLOG.md#current-progress) and the [runtime verification record](../06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md); no complete Studio release is claimed.
 
 | Milestone | Outcome | Primary dependencies | Release or proof |
 |---|---|---|---|
@@ -123,7 +123,12 @@ bronze gathering tools, normal tutorial/quest/recipe state and no developer weap
 with a development-profile option. Existing selected saves retain their progress.
 Game/tool builds passed; runtime and visible acceptance remain deferred at the
 owner's request. See the [profile contract](../05-game/FRESH_PLAYER_PROFILE.md).
-The next gameplay implementation is the flat River Crossing blockout (GAME-002).
+GAME-002/003 now deliver the first named flat River Crossing candidate with two land
+crossings, connected routes, 18 resources, three stations and ten existing actor homes.
+Production content validation and game/tool builds passed; dynamic/visible and pacing
+acceptance remain deferred. See the [candidate and launch guide](../../../content/worlds/README.md)
+and [implementation record](../06-development/RIVER_CROSSING_BLOCKOUT_2026-11-19.md).
+The next gameplay work is the starter resource/upgrade/economy loop (GAME-008/GAME-004).
 
 **Goal:** Make one real content change safely from end to end.
 

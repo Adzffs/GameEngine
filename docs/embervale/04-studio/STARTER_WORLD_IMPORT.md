@@ -57,6 +57,16 @@ The move CLI uses exit `0` for success, `2` for invalid syntax, `3` for rejected
 
 The current output is plain text. Machine-readable diagnostics and a capabilities command remain part of the [planned CLI](CLI_AND_AI_CONTRACT.md).
 
+## River Crossing candidate
+
+The first authored [River Crossing world pack](../../../content/worlds/README.md)
+is available at `content/worlds/river-crossing.blockout.json`. Launch it with
+`GameEngine --world content/worlds/river-crossing.blockout.json --profile fresh --no-save`,
+or open that JSON in Studio. The file is a separate starter-region candidate
+using the existing bounded region token; it does not replace the compiled world.
+Old fixed-position area labels are hidden for imported maps. Production content
+validation/builds passed; visible/dynamic gameplay and pacing remain deferred.
+
 ## 3. Build and launch the client
 
 Install SDL3 for the selected toolchain; [Getting started](../06-development/GETTING_STARTED.md) includes the Windows UCRT64 packages. Configure a separate client build:

@@ -138,6 +138,7 @@ if(GAMEENGINE_BUILD_CONTENT_TOOLS)
 
     add_executable(EmbervaleWorldExport
         src/Tools/WorldExportMain.cpp
+        src/Tools/RiverCrossingBlockout.cpp
     )
     target_link_libraries(EmbervaleWorldExport PRIVATE EmbervaleWorldSnapshot)
 

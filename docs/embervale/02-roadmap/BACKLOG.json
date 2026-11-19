@@ -699,30 +699,44 @@
       "milestone": "R3",
       "priority": "P1",
       "title": "Build flat River Crossing geography",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-040",
         "GAME-001"
       ],
       "acceptance": "Create a named candidate with distributed routes, safe onboarding, legal crossings and no compulsory central core.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "content/worlds/river-crossing.blockout.json",
+        "content/worlds/river-crossing.overview.svg",
+        "content/worlds/README.md",
+        "src/Tools/RiverCrossingBlockout.cpp",
+        "docs/embervale/05-game/RIVER_CROSSING.md",
+        "docs/embervale/06-development/RIVER_CROSSING_BLOCKOUT_2026-11-19.md"
+      ],
+      "notes": "First loadable/editable flat River Crossing candidate implemented: five river bands, two explicit land causeways, distributed road loops, walkable building pads, woodland/quarry/workshop and optional encounter trail. Arrival (5,28); 18 resources, 3 stations and all 10 existing actor records. Schema 2 retains the current bounded region token, original bindings/lifecycle and eleven allocated resource IDs. Exporter production content validation, Windows game/tool builds and overview generation passed. Runtime/visible safety, AI, route quality and pacing acceptance remain deferred at the owner's request. Original compiled world/fixture remain available."
     },
     {
       "id": "GAME-003",
       "milestone": "R3",
       "priority": "P1",
       "title": "Place services and NPCs deliberately",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "GAME-002",
         "STUDIO-041"
       ],
       "acceptance": "Place current NPC/station roles and monster records along appropriate routes; validate required approaches, actual wander/aggression/leash behaviour and safe escape routes; align lore/location references.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "content/worlds/river-crossing.blockout.json",
+        "content/worlds/river-crossing.overview.svg",
+        "content/worlds/README.md",
+        "src/Tools/RiverCrossingBlockout.cpp",
+        "docs/embervale/05-game/RIVER_CROSSING.md",
+        "docs/embervale/06-development/RIVER_CROSSING_BLOCKOUT_2026-11-19.md"
+      ],
+      "notes": "All six friendly NPCs, three stations and four monster homes are placed at the planned district anchors in the River Crossing candidate. Underlying geography, overlap and static approach/access validation passed during production export. Actor identities, spawn settings and delayed lifecycle are retained. Imported maps hide the compiled area's fixed labels; Mara's gathering directions now refer to the woodland/quarry paths. Actual wander/aggression/leash/escape and quest/pacing acceptance remain deferred at the owner's request; the known Cinder Warden/alpha wording remains DOC-002."
     },
     {
       "id": "GAME-004",

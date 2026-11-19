@@ -2650,12 +2650,15 @@ void Graphics::DrawMap(Map &map)
         }
     }
 
-    SDL_SetRenderDrawColor(renderer, 225, 214, 176, 180);
-    SDL_RenderDebugText(renderer, 34.0f, 154.0f, "VILLAGE SQUARE");
-    SDL_RenderDebugText(renderer, 112.0f, 226.0f, "WOODLAND");
-    SDL_RenderDebugText(renderer, 112.0f, 414.0f, "COPPER MINE");
-    SDL_RenderDebugText(renderer, 424.0f, 414.0f, "WORKSHOP");
-    SDL_RenderDebugText(renderer, 168.0f, 122.0f, "TRAINING FIELD");
+    if (compiledMapLabelsVisible)
+    {
+        SDL_SetRenderDrawColor(renderer, 225, 214, 176, 180);
+        SDL_RenderDebugText(renderer, 34.0f, 154.0f, "VILLAGE SQUARE");
+        SDL_RenderDebugText(renderer, 112.0f, 226.0f, "WOODLAND");
+        SDL_RenderDebugText(renderer, 112.0f, 414.0f, "COPPER MINE");
+        SDL_RenderDebugText(renderer, 424.0f, 414.0f, "WORKSHOP");
+        SDL_RenderDebugText(renderer, 168.0f, 122.0f, "TRAINING FIELD");
+    }
 }
 void Graphics::DrawGrid(const Map &map)
 
