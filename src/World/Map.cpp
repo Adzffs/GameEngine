@@ -27,6 +27,11 @@ Tile &Map::GetTile(int x, int y)
     return tiles[static_cast<size_t>(y) * width + x];
 }
 
+TileType Map::GetGroundType(int x, int y)
+{
+    return GetTile(x, y).GetGroundType();
+}
+
 bool Map::IsValidPosition(int x, int y)
 {
     if (!IsInBounds(x, y))

@@ -491,7 +491,7 @@ private:
     ForestSprites forestSprites;
     bool worldArtEnabled = true;
     SDL_FRect visualPlayerRectangle{};
-    struct SpriteObjectTarget { int id, x, y; bool furnace = false; };
+    struct SpriteObjectTarget { int id, x, y; bool furnace = false; ResourceType resourceType = ResourceType::NORMAL_TREE; };
     std::vector<SpriteObjectTarget> spriteObjectTargets;
     std::vector<std::pair<int, int>> occupiedSpritePickTiles;
     WorldHoverTarget PickSpriteObject(float worldX, float worldY) const;

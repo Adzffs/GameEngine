@@ -15,6 +15,7 @@ A C++20 and SDL3 tile-based RPG project, with an existing playable development w
 | Design the starter region | [River Crossing](docs/embervale/05-game/RIVER_CROSSING.md) |
 | See the first in-game art | [Forest rendering and captures](docs/embervale/06-development/FOREST_RENDERING_2026-11-19.md) |
 | See player, Mara and furnace art | [Cast art and walking](docs/embervale/06-development/CAST_RENDERING_2026-11-19.md) |
+| See river, stone and mining art | [Environment art and captures](docs/embervale/06-development/ENVIRONMENT_RENDERING_2026-11-19.md) |
 | Find every document | [Documentation index](docs/embervale/README.md) |
 
 ## Project status

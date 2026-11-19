@@ -1,0 +1,151 @@
+{
+  "date": "2026-11-19",
+  "base_commit": "ec47382d4ce6509149f518fc097d58cce619aabf",
+  "editor": "LibreSprite 1.1-dev",
+  "native_tile_size": 32,
+  "new_frames": 45,
+  "total_frames": 84,
+  "runtime_images": 10,
+  "renderer": "SDL 3.4.12 dummy video / software rendering",
+  "builds": [
+    {
+      "command": "cmake --build build-client --target GameEngine EmbervaleRenderPreview --parallel 6",
+      "result": "passed"
+    },
+    {
+      "command": "Play-RiverCrossing.cmd --build-only",
+      "result": "passed"
+    }
+  ],
+  "export": {
+    "editable_sources_preserved": 4,
+    "runtime_exports_identical": 4,
+    "default_export_completed": true
+  },
+  "prior_forest_cast_walk_sources_and_world_unchanged": true,
+  "packaged_images_match_in": [
+    "build-client",
+    "build-river-crossing"
+  ],
+  "packaged_images": [
+    {
+      "path": "assets/embervale/forest-pilot/textures/terrain.png",
+      "sha256": "3fdf5fb4cc07bbb8ed039b9cb58333ac89db988352d5c629e61eb16ebc243e07"
+    },
+    {
+      "path": "assets/embervale/forest-pilot/textures/oak.png",
+      "sha256": "4769a241fbc0c19e89817abb8327f2b27d51698d3ca97672e88c9bbb9673caa9"
+    },
+    {
+      "path": "assets/embervale/forest-pilot/textures/stump.png",
+      "sha256": "0841127c68105a3b174af70a99e07e2ad1b17bc02de636e3cb88d9c548b29289"
+    },
+    {
+      "path": "assets/embervale/cast-pilot/textures/player.png",
+      "sha256": "9dcfdfec59ff7ad184c763b8846b98516495ae0a75fc4f83fbfe1e27176f9164"
+    },
+    {
+      "path": "assets/embervale/cast-pilot/textures/mara.png",
+      "sha256": "3f6ecc1b64e50ed4d49a413b1e0edd0aaf1d29bdb9acb5a6a9c3604efe8df885"
+    },
+    {
+      "path": "assets/embervale/cast-pilot/textures/furnace.png",
+      "sha256": "e8e1f512a5d1bdc355dcd569ff5cb9ee5a7566725ed54eba27efc74859c1b2f2"
+    },
+    {
+      "path": "assets/embervale/environment-pilot/textures/terrain.png",
+      "sha256": "ccc71b373af780b7a95e2a578a003154814a5b7d5dcd3e23f517225317441e77"
+    },
+    {
+      "path": "assets/embervale/environment-pilot/textures/copper.png",
+      "sha256": "823a3530bd2200428a7fd036323801d40a549c0109fed4345e8deb0f84b6ae80"
+    },
+    {
+      "path": "assets/embervale/environment-pilot/textures/tin.png",
+      "sha256": "37c8301960238d9ec4b0e1102d7c14b5aa66d2f2e2469dda5c082cd865e982ee"
+    },
+    {
+      "path": "assets/embervale/environment-pilot/textures/rubble.png",
+      "sha256": "bf55b0b4b241ff1150886926821c0f48658c186bc8af5f7b91d7b795d26ebdae"
+    }
+  ],
+  "captures": [
+    {
+      "name": "river",
+      "options": [
+        "--focus",
+        "46",
+        "29"
+      ],
+      "cache": "World art: 10/10 textures cached.",
+      "sha256": "e250b4a5af1ed27f6b4db9d8ef0ae0180296f61d255716c1de7d1d905a799c5f"
+    },
+    {
+      "name": "river-1_5x",
+      "options": [
+        "--focus",
+        "46",
+        "29",
+        "--zoom",
+        "1.5"
+      ],
+      "cache": "World art: 10/10 textures cached.",
+      "sha256": "0d38124bc09862662ced7be07147f40919fa260b3218085f48235d890db243d3"
+    },
+    {
+      "name": "workshop",
+      "options": [
+        "--focus",
+        "69",
+        "51",
+        "--zoom",
+        "1.5"
+      ],
+      "cache": "World art: 10/10 textures cached.",
+      "sha256": "a8d26395c2043860a050f2c24a7476f1f91a61fb9d077964574791cbe6655259"
+    },
+    {
+      "name": "mine",
+      "options": [
+        "--focus",
+        "87",
+        "57",
+        "--zoom",
+        "1.5"
+      ],
+      "cache": "World art: 10/10 textures cached.",
+      "sha256": "f86089f8a1d542be2a8be8a81fbcd7ceea4a3ba6e7e46cb153907b8cf71ad55d"
+    },
+    {
+      "name": "mine-depleted",
+      "options": [
+        "--focus",
+        "87",
+        "57",
+        "--zoom",
+        "1.5",
+        "--deplete-rocks"
+      ],
+      "cache": "World art: 10/10 textures cached.",
+      "sha256": "4866eb738ebf38d9dd01965a6fb0d95a550192bf9b5da7eb5d7e58bdfb1e73dd"
+    },
+    {
+      "name": "mine-basic",
+      "options": [
+        "--focus",
+        "87",
+        "57",
+        "--zoom",
+        "1.5",
+        "--basic"
+      ],
+      "cache": "World art: 10/10 textures cached.",
+      "sha256": "394e382b03cd12d6d469a6a6f8ba645e37e61fd7ccf6d9163a7c4a6cc5ec7040"
+    }
+  ],
+  "limits": [
+    "Regression suites deferred at owner request",
+    "No visible window/GPU or interaction playthrough",
+    "Depletion capture uses temporary in-memory node uses; respawn acceptance not established"
+  ]
+}

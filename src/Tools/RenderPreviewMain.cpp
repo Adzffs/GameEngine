@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     try
     {
         if (argc < 3)
-            throw std::invalid_argument("Usage: EmbervaleRenderPreview WORLD.json OUTPUT.png [--basic] [--deplete-trees] [--focus X Y] [--zoom 1|1.5] [--walk-to X Y] [--frames N]");
+            throw std::invalid_argument("Usage: EmbervaleRenderPreview WORLD.json OUTPUT.png [--basic] [--deplete-trees] [--deplete-rocks] [--focus X Y] [--zoom 1|1.5] [--walk-to X Y] [--frames N]");
         const auto input = std::filesystem::path(reinterpret_cast<const char8_t *>(argv[1]));
         const auto output = std::filesystem::path(reinterpret_cast<const char8_t *>(argv[2]));
         std::error_code equivalentError;
@@ -35,7 +35,7 @@ int main(int argc, char **argv)
             std::filesystem::weakly_canonical(input) == std::filesystem::weakly_canonical(output) ||
             std::filesystem::equivalent(input, output, equivalentError))
             throw std::invalid_argument("Preview output must be a separate .png file");
-        bool basic = false, deplete = false;
+        bool basic = false, deplete = false, depleteRocks = false;
         std::optional<std::pair<int, int>> focus;
         std::optional<std::pair<int, int>> walkTo;
         float zoom = 1.0f;
@@ -45,6 +45,7 @@ int main(int argc, char **argv)
             const std::string_view option = argv[index];
             if (option == "--basic") basic = true;
             else if (option == "--deplete-trees") deplete = true;
+            else if (option == "--deplete-rocks") depleteRocks = true;
             else if (option == "--focus" && index + 2 < argc)
             {
                 const int x = Coordinate(argv[++index]);
@@ -83,9 +84,11 @@ int main(int argc, char **argv)
                 throw std::invalid_argument("Focus must be a walkable map position");
             player->GetPosition().SetPosition(focus->first, focus->second);
         }
-        if (deplete)
+        if (deplete || depleteRocks)
             for (const auto &resource : world.GetResources())
-                if (resource.GetResourceType() == ResourceType::NORMAL_TREE)
+                if ((deplete && resource.GetResourceType() == ResourceType::NORMAL_TREE) ||
+                    (depleteRocks && (resource.GetResourceType() == ResourceType::COPPER_ROCK ||
+                                     resource.GetResourceType() == ResourceType::TIN_ROCK)))
                 {
                     auto *node = world.GetResourceAt(resource.GetX(), resource.GetY());
                     while (node->IsActive()) node->ConsumeUse();
@@ -143,7 +146,8 @@ int main(int argc, char **argv)
         SDL_SetRenderTarget(graphics.renderer, nullptr);
         std::cout << "Rendered " << pixels->w << 'x' << pixels->h
             << " through the game renderer; " << (basic ? "basic" : "world")
-            << " art, " << (deplete ? "depleted" : "intact") << " trees. No player or world files written.\n";
+            << " art, " << (deplete ? "depleted" : "intact") << " trees, "
+            << (depleteRocks ? "depleted" : "intact") << " copper/tin. No player or world files written.\n";
         return 0;
     }
     catch (const std::exception &error)

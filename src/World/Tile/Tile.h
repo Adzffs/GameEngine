@@ -8,6 +8,7 @@ public:
     Tile();
 
     TileType GetType();
+    TileType GetGroundType() const;
 
     void SetType(TileType type);
 
@@ -15,6 +16,7 @@ public:
 
 private:
     TileType type;
+    TileType groundType = TileType::GRASS;
 
     bool blocked;
 };

@@ -50,14 +50,32 @@ void ForestSprites::Initialize(SDL_Renderer *target)
     renderer = target;
     for (const auto &frame : ForestPilotLayout::Frames)
     {
-        if (frame.grassVariant >= 0 && frame.grassVariant < static_cast<int>(grass.size()))
+        if (frame.id.starts_with("terrain.grass.") && frame.grassVariant >= 0 && frame.grassVariant < static_cast<int>(grass.size()))
             grass[frame.grassVariant] = &frame;
-        if (frame.connectionMask >= 0 && frame.connectionMask < static_cast<int>(paths.size()))
+        if (frame.id.starts_with("terrain.path.") && frame.connectionMask >= 0 && frame.connectionMask < static_cast<int>(paths.size()))
             paths[frame.connectionMask] = &frame;
         if (frame.id == "resource.tree.normal.intact") tree = &frame;
         if (frame.id == "resource.tree.normal.depleted") stump = &frame;
         if (frame.id == "character.mara.idle") mara = &frame;
         if (frame.id == "station.furnace.idle") furnace = &frame;
+        constexpr std::array<std::string_view, 3> waterIDs{"terrain.water.01", "terrain.water.02", "terrain.water.03"};
+        constexpr std::array<std::string_view, 3> stoneIDs{"terrain.stone.01", "terrain.stone.02", "terrain.stone.03"};
+        for (std::size_t i = 0; i < water.size(); ++i)
+        {
+            if (frame.id == waterIDs[i]) water[i] = &frame;
+            if (frame.id == stoneIDs[i]) stone[i] = &frame;
+        }
+        constexpr std::array<std::string_view, 12> edges{"n", "e", "s", "w", "outer-nw", "outer-ne", "outer-sw", "outer-se",
+            "inner-nw", "inner-ne", "inner-sw", "inner-se"};
+        for (std::size_t i = 0; i < edges.size(); ++i)
+        {
+            if (frame.id.starts_with("terrain.bank.earth.") && frame.id.substr(19) == edges[i]) banks[0][i] = &frame;
+            if (frame.id.starts_with("terrain.bank.stone.") && frame.id.substr(19) == edges[i]) banks[1][i] = &frame;
+            if (frame.id.starts_with("terrain.bank.dirt.") && frame.id.substr(18) == edges[i]) banks[2][i] = &frame;
+        }
+        if (frame.id == "resource.rock.copper.intact") copper = &frame;
+        if (frame.id == "resource.rock.tin.intact") tin = &frame;
+        if (frame.id == "resource.rock.depleted") rubble = &frame;
         if (frame.id.starts_with("character.player.") && frame.facing >= 0 && frame.facing < 4 &&
             frame.animationFrame >= 0 && frame.animationFrame < 4)
             player[frame.facing][frame.animationFrame] = &frame;
@@ -153,19 +171,26 @@ bool ForestSprites::Draw(const Frame *frame, const SDL_FRect &destination,
 
 bool ForestSprites::DrawGround(Map &map, int x, int y) const
 {
-    const auto type = map.GetTileType(x, y);
+    // Walls are still drawn by the primitive tile pass, not the object queue.
+    if (map.GetTileType(x, y) == TileType::WALL) return false;
+    const auto type = map.GetGroundType(x, y);
     const SDL_FRect tile{static_cast<float>(x * ForestPilotLayout::TileSize),
         static_cast<float>(y * ForestPilotLayout::TileSize), 32.0f, 32.0f};
-    if (type == TileType::GRASS || type == TileType::TREE)
+    const auto variant = (static_cast<unsigned int>(x) * 73856093U ^
+                          static_cast<unsigned int>(y) * 19349663U) % grass.size();
+    if (type == TileType::GRASS)
     {
-        const auto variant = (static_cast<unsigned int>(x) * 73856093U ^
-                              static_cast<unsigned int>(y) * 19349663U) % grass.size();
         return Draw(grass[variant], tile);
     }
+    if (type == TileType::STONE) return Draw(stone[variant], tile);
+    if (type == TileType::WATER) return DrawWater(map, x, y, tile, variant);
     if (type != TileType::DIRT) return false;
     const auto dirt = [&map](int tx, int ty)
     {
-        return map.IsInBounds(tx, ty) && map.GetTileType(tx, ty) == TileType::DIRT;
+        if (!map.IsInBounds(tx, ty)) return false;
+        const auto ground = map.GetGroundType(tx, ty);
+        // Roads meet water cuts and stone floors at the boundary without a grass seam.
+        return ground == TileType::DIRT || ground == TileType::WATER || ground == TileType::STONE;
     };
     const bool north = dirt(x, y - 1), east = dirt(x + 1, y);
     const bool south = dirt(x, y + 1), west = dirt(x - 1, y);
@@ -186,6 +211,67 @@ bool ForestSprites::DrawGround(Map &map, int x, int y) const
         if (!Draw(frame, destination, &source)) return false;
     }
     return true;
+}
+
+bool ForestSprites::DrawWater(Map &map, int x, int y, const SDL_FRect &tile, std::size_t variant) const
+{
+    if (!Available(water[variant]) || !Available(banks[0][0]) || !Available(banks[1][0]) || !Available(banks[2][0])) return false;
+    const auto land = [&map](int tx, int ty)
+    {
+        return map.IsInBounds(tx, ty) && map.GetGroundType(tx, ty) != TileType::WATER;
+    };
+    const auto family = [&map](int tx, int ty)
+    {
+        if (!map.IsInBounds(tx, ty)) return 0;
+        const auto ground = map.GetGroundType(tx, ty);
+        return ground == TileType::STONE ? 1 : ground == TileType::DIRT ? 2 : 0;
+    };
+    if (!Draw(water[variant], tile)) return false;
+    for (int quarter = 0; quarter < 4; ++quarter)
+    {
+        const int dx = quarter % 2 == 0 ? -1 : 1, dy = quarter < 2 ? -1 : 1;
+        const bool vertical = land(x, y + dy), horizontal = land(x + dx, y);
+        int edge;
+        int bankFamily;
+        if (vertical || horizontal)
+        {
+            edge = vertical && horizontal ? 4 + quarter : vertical ? (dy < 0 ? 0 : 2) : (dx < 0 ? 3 : 1);
+            bankFamily = vertical ? family(x, y + dy) : family(x + dx, y);
+        }
+        else if (land(x + dx, y + dy))
+        {
+            edge = 8 + quarter;
+            bankFamily = family(x + dx, y + dy);
+        }
+        else continue;
+        const auto *frame = banks[bankFamily][edge];
+        if (!Available(frame)) return false;
+        const float qx = static_cast<float>((quarter % 2) * 16), qy = static_cast<float>((quarter / 2) * 16);
+        const SDL_FRect source{frame->source.x + qx, frame->source.y + qy, 16.0f, 16.0f};
+        const SDL_FRect destination{tile.x + qx, tile.y + qy, 16.0f, 16.0f};
+        if (!Draw(frame, destination, &source)) return false;
+    }
+    return true;
+}
+
+const ForestSprites::Frame *ForestSprites::MiningFrame(ResourceType type) const
+{
+    if (type == ResourceType::COPPER_ROCK) return copper;
+    if (type == ResourceType::TIN_ROCK) return tin;
+    return nullptr;
+}
+
+bool ForestSprites::DrawMining(const ResourceNode &resource) const
+{
+    const auto *intact = MiningFrame(resource.GetResourceType());
+    if (!intact) return false;
+    const auto *frame = resource.IsActive() ? intact : rubble;
+    return Available(frame) && Draw(frame, Bounds(*frame, resource.GetX(), resource.GetY()));
+}
+
+bool ForestSprites::HitMining(ResourceType type, int tileX, int tileY, float worldX, float worldY) const
+{
+    return Hit(MiningFrame(type), tileX, tileY, worldX, worldY);
 }
 
 bool ForestSprites::DrawTree(const ResourceNode &resource, const SDL_FRect &player) const
