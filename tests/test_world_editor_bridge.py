@@ -126,7 +126,7 @@ class BridgeTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         root = Path(self.tmp.name)
-        self.tool = root / 'fake_world_move'
+        self.tool = root / 'fake_world_move.py'
         self.tool.write_text(FAKE_TOOL, encoding='utf-8')
         os.chmod(self.tool, 0o755)
         self.source = root / 'source.json'

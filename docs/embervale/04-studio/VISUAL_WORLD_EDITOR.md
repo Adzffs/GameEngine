@@ -148,3 +148,16 @@ verification. Raw status, list, map, help and quit commands cannot be used as
 history edits. Two new regressions exercise the boundary with fake and real
 backends; only the isolated four-method guard check has actually run locally.
 The complete Studio integration gate remains open.
+
+## Complete Windows integration follow-up (19 November 2026)
+
+The stacked branch now builds cleanly on Windows and the complete registered
+headless/content suite passes **84/84**, including the real executable-backed
+bridge gate. That gate passes **6/6** cases against `EmbervaleWorldMove.exe` and
+the real starter fixture; the mocked bridge/viewport suite separately passes
+**35/35**. The run corrected Windows create-only draft publication, case-only
+temporary-path receipt comparison and portable Python mock-tool launching.
+Player-save tests passed in the full set, and the bridge continued to operate
+only on temporary fixture copies. A visible Tk interaction and SDL client
+playtest remain outside this verification. See the [Windows integration
+record](../06-development/STUDIO_WINDOWS_INTEGRATION_VERIFICATION_2026-11-19.md).

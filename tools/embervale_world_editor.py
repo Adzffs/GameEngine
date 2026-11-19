@@ -11,8 +11,10 @@ import argparse
 import copy
 import hashlib
 import json
+import os
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 SOURCE_HASH = re.compile(r"^Source SHA-256: ([0-9a-f]{64})$", re.MULTILINE)
@@ -128,7 +130,10 @@ def verify_saved_draft_receipt(transcript: str, destination: Path) -> bytes:
     target = str(destination)
     acknowledgements = re.findall(r"^Saved new draft: (.+)$", transcript, re.MULTILINE)
     digests = re.findall(r"^draft-sha256: ([0-9a-f]{64})$", transcript, re.MULTILINE)
-    if acknowledgements != [target] or len(digests) != 1:
+    acknowledged_targets = [os.path.normcase(os.path.abspath(path))
+                            for path in acknowledgements]
+    if (acknowledged_targets != [os.path.normcase(os.path.abspath(target))]
+            or len(digests) != 1):
         raise StudioError("Editor did not confirm the requested saved draft and hash")
     try:
         if destination.is_symlink() or not destination.is_file():
@@ -226,6 +231,8 @@ class StudioBridge:
 
     def _invoke(self, commands: list[str]) -> tuple[str, dict[str, tuple[str, int, int]], str, list[str], str]:
         arguments = [self.executable, "--session", str(self.source)]
+        if Path(self.executable).suffix.lower() == ".py":
+            arguments.insert(0, sys.executable)
         if self.hash:
             arguments += ["--expected-hash", self.hash]
         script = "\n".join([*commands, "list", "terrain", "status", "quit", ""])
@@ -324,6 +331,7 @@ class StudioBridge:
         self.perform("redo")
 
     def save(self, destination: Path) -> str:
+        requested = str(destination)
         target = str(Path(destination).resolve())
         if "\n" in target or "\r" in target:
             raise StudioError("Invalid draft filename")
@@ -331,7 +339,7 @@ class StudioBridge:
         result = self._invoke([*self.commands, "save " + target])
         saved_bytes = verify_saved_draft_receipt(result[4], Path(target))
         verify_saved_world_parity(self.snapshot, saved_bytes, self.placements, self.terrain)
-        return target
+        return requested
 
 
 def launch(bridge: StudioBridge) -> None:

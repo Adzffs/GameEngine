@@ -12,6 +12,13 @@
 #include <utility>
 #include <vector>
 
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
+
 namespace StarterWorldDraftFile
 {
     namespace
@@ -74,6 +81,44 @@ namespace StarterWorldDraftFile
             }
             Fail("could not allocate staging directory");
         }
+
+#ifdef _WIN32
+        void PublishExclusiveWindows(const std::filesystem::path &destination,
+            std::string_view candidateBytes)
+        {
+            const HANDLE file = CreateFileW(destination.c_str(), GENERIC_WRITE, 0,
+                nullptr, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, nullptr);
+            if (file == INVALID_HANDLE_VALUE)
+            {
+                const auto error = GetLastError();
+                if (error == ERROR_FILE_EXISTS || error == ERROR_ALREADY_EXISTS)
+                    Fail("output already exists");
+                Fail("cannot create new draft: Windows error " + std::to_string(error));
+            }
+
+            bool complete = false;
+            std::size_t offset = 0;
+            while (offset < candidateBytes.size())
+            {
+                const auto remaining = candidateBytes.size() - offset;
+                const auto requested = static_cast<DWORD>(remaining);
+                DWORD written = 0;
+                if (!WriteFile(file, candidateBytes.data() + offset, requested,
+                        &written, nullptr) || written == 0)
+                    break;
+                offset += written;
+            }
+            complete = offset == candidateBytes.size() && FlushFileBuffers(file);
+            const bool closed = CloseHandle(file) != 0;
+            if (!complete || !closed)
+            {
+                // CREATE_NEW proves this process owns the destination entry.
+                // Remove only that incomplete entry; never touch a pre-existing file.
+                DeleteFileW(destination.c_str());
+                Fail("new draft write failed");
+            }
+        }
+#endif
     }
 
     bool ValidDigest(std::string_view digest)
@@ -203,6 +248,12 @@ namespace StarterWorldDraftFile
             Fail("output already exists or cannot be checked");
         const auto directory = destination.parent_path().empty() ?
             std::filesystem::path{"."} : destination.parent_path();
+        // Windows supports an exclusive create directly. std::filesystem hard
+        // links are not reliably available there (including on otherwise
+        // writable volumes), so use CREATE_NEW to retain no-overwrite semantics.
+#ifdef _WIN32
+        PublishExclusiveWindows(destination, candidateBytes);
+#else
         OwnedDirectory stage(StagingDirectory(directory));
         const auto temporary = stage.Path() / "snapshot.json";
         {
@@ -221,5 +272,6 @@ namespace StarterWorldDraftFile
         if (error)
             Fail("cannot create new draft (target may already exist or filesystem lacks hard links): " +
                 error.message());
+#endif
     }
 }

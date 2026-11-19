@@ -22,8 +22,9 @@ namespace StarterWorldDraftFile
 
     // Requires: candidateBytes is the canonical, runtime-validated snapshot
     // produced by the typed editor. Recheck the source *under a cooperative
-    // directory lock*, then publish atomically to a fresh output file using
-    // a same-filesystem hard link. Existing output is never replaced.
+    // directory lock*, then publish to a fresh output file using an exclusive
+    // create on Windows or a same-filesystem hard link elsewhere. Existing
+    // output is never replaced.
     // Concurrent noncooperating edits to source cannot be made fully atomic.
     // Failure leaves source/destination intact; power-loss durability is not
     // guaranteed. Throws runtime_error; does not remove another writer's lock.
