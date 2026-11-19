@@ -1,5 +1,15 @@
 # Visual starter-world editor shell (STUDIO-030 first slice)
 
+## Inspection overlays
+
+Toggle **Static collision** to mark water and resource/station tiles with red
+outlines and diagonal strokes. This matches the starter importer static-blocking
+rules; it does not predict moving actors or prove route reachability. Toggle
+**Spawns** to mark the player, NPC and monster starting tiles in cyan, with text
+labels at larger zoom levels. Both overlays use the current verified terrain
+and placement response, so moves, paints and undo/redo update them on repaint.
+They are read-only display options and do not enter history or saved content.
+
 ## Play this draft
 
 Build the SDL client and launch Studio with `--tool build-client/EmbervaleWorldMove.exe`
