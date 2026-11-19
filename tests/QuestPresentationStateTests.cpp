@@ -33,7 +33,7 @@ int main()
                         quests[gatheringIndex].progress == progress &&
                         quests[gatheringIndex].required == 10 &&
                         quests[gatheringIndex].title == "Gathering Basics" &&
-                        quests[gatheringIndex].objective == "Logs" &&
+                        quests[gatheringIndex].objective == "Gather normal Logs" &&
                         quests[gatheringIndex].category == QuestCategory::TUTORIAL &&
                         quests[gatheringIndex].reward == "Coins" &&
                         quests[gatheringIndex].rewardAmount == 10 &&
@@ -42,7 +42,7 @@ int main()
         test.Expect(quests[miningIndex].id == QuestId::MINING_BASICS &&
                         quests[miningIndex].required == 5 &&
                         quests[miningIndex].title == "Mining Basics" &&
-                        quests[miningIndex].objective == "Copper ores",
+                        quests[miningIndex].objective == "Gather Copper ore",
                     "Active work stays ahead of completed journal history");
     }
     test.Expect(QuestSystem::TryRestore(journal, {
@@ -60,6 +60,23 @@ int main()
                         QuestId::SHIELD_OR_SHELTER &&
                     presentation.GetQuests().front().guidance ==
                         "Choose: Torren Ash or Nessa Thorne",
-                "Ready choice quests name both valid hand-in recipients");
+                "Ready choice quests name both valid reward contacts");
+    test.Expect(presentation.GetSuggestedQuest() != nullptr &&
+                    presentation.GetSuggestedQuest()->id == QuestId::SHIELD_OR_SHELTER,
+                "A ready reward choice takes priority over unstarted quests");
+    const auto details = QuestPresentationState::GetDetailLines(presentation.GetQuests().front());
+    test.Expect(std::find(details.begin(), details.end(), "Torren Ash: 25 Coins") != details.end() &&
+                    std::find(details.begin(), details.end(), "OR Nessa Thorne: 3 x Cooked meat") != details.end(),
+                "Both reward options remain visible before claiming either one");
+    QuestJournal fresh;
+    presentation.Synchronize(fresh);
+    test.Expect(presentation.GetSuggestedQuest() != nullptr &&
+                    presentation.GetSuggestedQuest()->id == QuestId::TRACKS_IN_THE_ASH,
+                "Optional unstarted basics do not hide the first story lead");
+    QuestSystem::Accept(fresh, QuestId::MINING_BASICS);
+    presentation.Synchronize(fresh);
+    test.Expect(presentation.GetSuggestedQuest() != nullptr &&
+                    presentation.GetSuggestedQuest()->id == QuestId::MINING_BASICS,
+                "An accepted optional task remains ahead of a new story offer");
     return test.Finish();
 }

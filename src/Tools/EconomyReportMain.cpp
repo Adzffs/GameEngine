@@ -7,6 +7,7 @@
 #include "Player/Player.h"
 #include "Recipe/RecipeDatabase.h"
 #include "Quest/QuestDefinitionDatabase.h"
+#include "Quest/QuestPresentationState.h"
 #include "Shop/ShopDefinitionDatabase.h"
 #include "Time/Clock.h"
 #include "Tutorial/StarterJourney.h"
@@ -34,7 +35,7 @@ namespace
         "Usage: EmbervaleEconomyReport [--replay-timber-cycle <starting-coins> <cycles> [--world <snapshot.json>]]\n"
         "       EmbervaleEconomyReport --replay-starter-upgrade [--world <snapshot.json>]\n"
         "       EmbervaleEconomyReport --help\n"
-        "No arguments: report current starter prices and recipes.\n"
+        "No arguments: validate content and report current starter prices, recipes and quest guidance.\n"
         "Timber replay uses explicit seed coins; starter replay gathers all its own materials and coins.\n"
         "It never reads or writes player saves. Coins: 1..1000000; cycles: 1..10.\n";
 
@@ -403,7 +404,7 @@ namespace
         return out.str();
     }
 
-    std::string StarterReport()
+    std::string StarterReport(bool &validContent)
     {
         const auto *shop = ShopDefinitionDatabase::TryGet(ShopId::DEVELOPMENT_GUIDE_SUPPLIES);
         if (shop == nullptr) throw std::runtime_error("starter shop is missing");
@@ -411,6 +412,8 @@ namespace
         out.imbue(std::locale::classic());
         const auto costs = EconomyBalanceModel::GetProductionCosts(*shop);
         const bool valid = ContentValidator::ValidateShopDefinition(shop->id, *shop).IsValid();
+        const auto contentValidation = ContentValidator::ValidateAll();
+        validContent = contentValidation.IsValid() && valid && costs.converged;
         int questCoins = 0;
         for (const auto id : {QuestId::GATHERING_BASICS, QuestId::MINING_BASICS})
         {
@@ -420,6 +423,8 @@ namespace
             questCoins += quest->rewardAmount;
         }
         out << "{\n  \"kind\": \"starter-economy-catalogue\",\n"
+            << "  \"content_validation_passed\": " << (contentValidation.IsValid() ? "true" : "false") << ",\n"
+            << "  \"content_validation_errors\": " << contentValidation.GetErrorCount() << ",\n"
             << "  \"shop_validation_passed\": " << (valid ? "true" : "false") << ",\n"
             << "  \"production_costs_converged\": " << (costs.converged ? "true" : "false") << ",\n"
             << "  \"basic_quest_coin_rewards\": " << questCoins << ",\n  \"shop_entries\": [\n";
@@ -443,7 +448,25 @@ namespace
             out << " }" << (i + 1 == types.size() ? "\n" : ",\n");
         }
         const auto plan = StarterJourney::GetMaterialPlan(true);
-        out << "  ],\n  \"one_sword_and_shield_material_plan\": {\n"
+        out << "  ],\n  \"quest_guides\": [\n";
+        QuestPresentationState presentation;
+        presentation.Synchronize(QuestJournal{});
+        const auto &quests = presentation.GetQuests();
+        for (std::size_t i = 0; i < quests.size(); ++i)
+        {
+            const auto &quest = quests[i];
+            const auto &definition = *QuestDefinitionDatabase::TryGet(quest.id);
+            const auto *npc = NpcDefinitionDatabase::TryGet(definition.objectiveNpc);
+            out << "    {\"quest\": " << Quote(quest.title) << ", \"required\": " << quest.required
+                << ", \"objective_npc\": " << (npc == nullptr ? "null" : Quote(npc->name)) << ", \"details\": [";
+            const auto lines = QuestPresentationState::GetDetailLines(quest);
+            for (std::size_t line = 0; line < lines.size(); ++line)
+                out << (line == 0 ? "" : ", ") << Quote(lines[line]);
+            out << "]}" << (i + 1 == quests.size() ? "\n" : ",\n");
+        }
+        const auto *suggested = presentation.GetSuggestedQuest();
+        out << "  ],\n  \"available_story_lead\": " << (suggested == nullptr ? "null" : Quote(suggested->title))
+            << ",\n  \"one_sword_and_shield_material_plan\": {\n"
             << "    \"normal_logs\": " << plan.normalLogs << ",\n"
             << "    \"copper_ore\": " << plan.copperOre << ",\n"
             << "    \"tin_ore\": " << plan.tinOre << ",\n"
@@ -461,7 +484,11 @@ int main(int argc, char **argv)
         if (argc == 2 && std::string_view(argv[1]) == "--help")
         { std::cout << Usage; return 0; }
         if (argc == 1)
-        { std::cout << StarterReport(); return 0; }
+        {
+            bool validContent = false;
+            std::cout << StarterReport(validContent);
+            return validContent && std::cout ? 0 : 1;
+        }
         if ((argc == 2 || argc == 4) && std::string_view(argv[1]) == "--replay-starter-upgrade")
         {
             std::optional<StarterWorldExport::Snapshot> snapshot;

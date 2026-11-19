@@ -17,7 +17,7 @@ The baseline is commit [e9d32932e8f9b27e96283313cca320058792a81f](https://github
 Three findings change the implementation order:
 
 1. The development player receives boosted XP under the current configuration. Starter pacing must be measured using a deliberately defined fresh-player profile. See [DevelopmentConfig](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Core/DevelopmentConfig.h).
-2. Some existing economy and objective descriptions disagree with implementation. Correct documentation facts, then resolve any remaining gameplay or narrative disagreements explicitly.
+2. The ledger and starter quest descriptions now reflect current mechanics. GAME-007 adopts Cinder Warden consistently, explains event-based progress and reward choices, and adds live quest guidance after the tutorial. [Continuity record](../06-development/QUEST_CONTINUITY_2026-11-19.md). Full journey and visible acceptance remain deferred.
 
 3. GAME-008 reproduced the log/plank/shield trade twice on River Crossing: 3 -> 24 -> 45 coins. The corrected Log price makes each complete cycle lose six coins; the first shield now costs twenty, matching the two basic quest rewards combined. Production replay and builds passed; regression suites and complete starter timings remain deferred. See the [economy record](../06-development/STARTER_ECONOMY_2026-11-19.md) and [ledger](../../EconomyLedger.md).
 
@@ -183,6 +183,8 @@ Add readable combat and interaction feedback, basic audio with independent volum
 Run a fresh-player vertical slice: learn movement and interaction, gather material, process it, make or obtain a meaningful upgrade, use banking/shop services, complete an early quest and investigate the region's next threat. Record route time, confusion, deaths, resource waits, food consumption and upgrade acquisition. The earlier 10–15 minute first-upgrade objective is a design target to test, not a measured fact.
 
 **Exit gate:** A new tester can complete the intended loop without developer coaching. Content and presentation failures are triaged; the team has evidence to choose the next improvements. It is acceptable to revise the map or pacing instead of adding more content.
+
+GAME-007 now implements the bounded narrative/quest continuity pass: names and reward rules agree with source, the next quest follows the tutorial, and full details identify both reward contacts. Builds and compiled content validation passed; [implementation and deferred acceptance](../06-development/QUEST_CONTINUITY_2026-11-19.md). The next implementation focus is the small asset identity / sprite import / coherent art pilot. Broader R4 playthrough and presentation acceptance are still required.
 
 **Work packages:** STUDIO-060–063; ART-001–004; GAME-006–007.
 

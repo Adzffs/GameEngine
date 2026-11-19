@@ -3,6 +3,7 @@
 #include "../Player/Player.h"
 #include "../Item/ItemDatabase.h"
 #include "../Quest/QuestDefinitionDatabase.h"
+#include "../Quest/QuestPresentationState.h"
 #include "../Recipe/RecipeDatabase.h"
 
 #include <algorithm>
@@ -253,8 +254,70 @@ StarterJourney::Guidance StarterJourney::Describe(const Player &player,
             "Mining Basics offers a separate Copper-gathering reward.", Destination::GUIDE};
     }
     case TutorialStep::COMPLETE:
-        return {"Choose your next adventure", "Try more quests, better tools or a tougher creature.",
+        return DescribeNextQuest(player, crafting);
+    }
+    return ToolHint(player, std::move(guide));
+}
+
+StarterJourney::Guidance StarterJourney::DescribeNextQuest(const Player &player,
+    const CraftingSessionSnapshot *crafting)
+{
+    QuestPresentationState presentation;
+    presentation.Synchronize(player.GetQuestJournal());
+    const auto *quest = presentation.GetSuggestedQuest();
+    if (quest == nullptr)
+        return {"Choose your next adventure", "Try better tools or revisit the region's creatures.",
             "H keeps the starter material plan available.", Destination::NONE};
+    const auto &definition = *QuestDefinitionDatabase::TryGet(quest->id);
+    Guidance guide{quest->title, quest->guidance, quest->objective,
+        Destination::QUEST_NPC, definition.giver.npcType, quest->id};
+    guide.questDetails = QuestPresentationState::GetDetailLines(*quest);
+    if (quest->state == QuestState::AVAILABLE)
+    {
+        guide.objective = "Start " + quest->title;
+        return guide;
+    }
+    if (quest->state == QuestState::READY_TO_COMPLETE)
+    {
+        guide.objective = "Claim " + quest->title;
+        guide.alternateNpcTarget = definition.alternateCompletion.npcType;
+        guide.instruction = definition.alternateCompletion.npcType != NpcType::NONE ?
+            "H or the Quest tab shows both reward choices." :
+            "Reward: " + QuestPresentationState::RewardText(definition.rewardItem, definition.rewardAmount);
+        return guide;
+    }
+    guide.instruction = QuestPresentationState::ProgressRule(definition.objectiveType);
+    switch (definition.objectiveType)
+    {
+    case QuestObjectiveType::TALK_TO_CHARACTER:
+    case QuestObjectiveType::DEFEAT_CHARACTER:
+        guide.npcTarget = definition.objectiveNpc;
+        break;
+    case QuestObjectiveType::GATHER_ITEM:
+        guide.destination = definition.objectiveItem == ItemType::LOG ? Destination::NORMAL_TREE : Destination::COPPER;
+        break;
+    case QuestObjectiveType::CRAFT_ITEM:
+    {
+        const int planks = Amount(RecipeDatabase::Get(RecipeType::WOODEN_SHIELD), ItemType::WOODEN_PLANKS);
+        const int perLog = RecipeDatabase::Get(RecipeType::WOODEN_PLANKS).GetOutputAmount();
+        guide.destination = Destination::TABLE;
+        const auto carriedPlanks = Carried(player, ItemType::WOODEN_PLANKS, crafting);
+        const auto carriedLogs = Carried(player, ItemType::LOG, crafting);
+        const auto potential = carriedPlanks + carriedLogs * perLog;
+        const auto ownedPotential = CountOwned(player, ItemType::WOODEN_PLANKS, crafting) +
+            CountOwned(player, ItemType::LOG, crafting) * perLog;
+        if (potential < planks && ownedPotential >= planks)
+        {
+            guide.destination = Destination::BANK;
+            guide.instruction = "Withdraw your planks or timber before crafting.";
+        }
+        else if (ownedPotential < planks)
+        {
+            guide.destination = Destination::NORMAL_TREE;
+            guide.instruction = "Need " + std::to_string(planks) + " planks; normal Logs make " + std::to_string(perLog) + " each.";
+        }
+        break;
+    }
     }
     return ToolHint(player, std::move(guide));
 }

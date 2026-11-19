@@ -2,9 +2,12 @@
 
 #include "TutorialState.h"
 #include "../Recipe/CraftingSession.h"
+#include "../NPC/NpcType.h"
+#include "../Quest/QuestId.h"
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 class Player;
 
@@ -23,7 +26,7 @@ namespace StarterJourney
 
     enum class Destination
     {
-        NONE, GUIDE, NORMAL_TREE, COPPER, TIN, TABLE, FURNACE, BANK, MOSSLING
+        NONE, GUIDE, NORMAL_TREE, COPPER, TIN, TABLE, FURNACE, BANK, MOSSLING, QUEST_NPC
     };
 
     struct Guidance
@@ -32,6 +35,10 @@ namespace StarterJourney
         std::string progress;
         std::string instruction;
         Destination destination = Destination::NONE;
+        NpcType npcTarget = NpcType::NONE;
+        QuestId questId = QuestId::NONE;
+        NpcType alternateNpcTarget = NpcType::NONE;
+        std::vector<std::string> questDetails;
     };
 
     // Derived from the current single-output starter recipes. Includes whole
@@ -45,5 +52,7 @@ namespace StarterJourney
     bool MaterialsReady(const Player &player, TutorialStep step,
         const CraftingSessionSnapshot *crafting = nullptr);
     Guidance Describe(const Player &player,
+        const CraftingSessionSnapshot *crafting = nullptr);
+    Guidance DescribeNextQuest(const Player &player,
         const CraftingSessionSnapshot *crafting = nullptr);
 }

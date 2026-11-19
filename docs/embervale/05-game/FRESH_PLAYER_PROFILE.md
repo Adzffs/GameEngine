@@ -88,3 +88,9 @@ the card opens the plan. Sword preparation needs three Copper/Tin pairs and thre
 Bronze bars; the equipment lesson requires the Bronze sword. Banked and processed
 materials are recognised, with withdrawal instructions before use. The shield
 remains optional. [Journey implementation and reference simulation](../06-development/STARTER_UPGRADE_JOURNEY_2026-11-19.md).
+
+After completing or skipping the tutorial, the objective card recommends a quest
+from the current journal: ready rewards first, then accepted work, then an
+available story lead before optional unstarted basics. H opens its full details;
+hovering a Quest-tab row previews that quest's rules and reward choices. Guidance
+does not accept or complete tasks for the player. [Quest continuity](../06-development/QUEST_CONTINUITY_2026-11-19.md).

@@ -152,11 +152,11 @@ int main()
 
     QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 0}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}, {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}, {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}, {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}});
     view = graphics.BuildQuestPanelView(player);
-    test.Expect(view.state == "ACTIVE" && view.progress == "Logs: 0 / 10",
+    test.Expect(view.state == "ACTIVE" && view.progress == "Gather normal Logs: 0 / 10",
                 "Active quest displays authoritative zero progress");
     QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::ACTIVE, 6}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}, {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}, {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}, {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}});
     view = graphics.BuildQuestPanelView(player);
-    test.Expect(view.progress == "Logs: 6 / 10",
+    test.Expect(view.progress == "Gather normal Logs: 6 / 10",
                 "Active quest displays authoritative updated progress");
 
     QuestSystem::TryRestore(player.GetQuestJournal(), {{QuestId::GATHERING_BASICS, QuestState::READY_TO_COMPLETE, 10}, {QuestId::MINING_BASICS, QuestState::AVAILABLE, 0}, {QuestId::TRACKS_IN_THE_ASH, QuestState::AVAILABLE, 0}, {QuestId::SHIELD_OR_SHELTER, QuestState::AVAILABLE, 0}, {QuestId::FANGS_AT_THE_GATE, QuestState::AVAILABLE, 0}, {QuestId::HEART_OF_THE_ASH, QuestState::AVAILABLE, 0}});
@@ -198,7 +198,7 @@ int main()
                     productionRows[1].quest.id == QuestId::MINING_BASICS &&
                     productionRows[1].quest.progress == 3 &&
                     Graphics::GetQuestProgressLabel(productionRows[1].quest) ==
-                        "Copper ores: 3 / 5" &&
+                        "Gather Copper ore: 3 / 5" &&
                     !Overlaps(productionRows[0].bounds, productionRows[1].bounds) &&
                     !productionRows.back().clipped,
                 "Production Quest panel keeps the full starter arc visible");

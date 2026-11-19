@@ -43,14 +43,22 @@
       "milestone": "R0",
       "priority": "P1",
       "title": "Resolve source and documentation drift",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "DOC-001"
       ],
       "acceptance": "Correct the ledger; decide the final quest target wording; separate old PR findings from current verified issues; record remaining decisions.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/EconomyLedger.md",
+        "docs/embervale/06-development/STARTER_ECONOMY_2026-11-19.md",
+        "docs/embervale/06-development/QUEST_CONTINUITY_2026-11-19.md",
+        "docs/embervale/05-game/CONTENT_CATALOGUE.md",
+        "docs/embervale/05-game/GAME_DESIGN.md",
+        "docs/StarterCharacters.md",
+        "docs/embervale/07-decisions/RISKS_AND_QUESTIONS.md"
+      ],
+      "notes": "Current ledger already records the corrected timber trade and starter budget. The canonical Cinder Warden decision is now applied to objectives, dialogue and current docs. Quest recipient/trophy wording is reconciled with recorded-progress rewards and no item consumption. Historical baseline discrepancy tables and earlier verification records remain dated; resolved naming/economy findings are labelled with current evidence rather than repeated as open current bugs. Broader legacy documentation and deferred full journey acceptance remain separate from this bounded source/text review."
     },
     {
       "id": "STUDIO-001",
@@ -746,7 +754,7 @@
         "docs/embervale/05-game/RIVER_CROSSING.md",
         "docs/embervale/06-development/RIVER_CROSSING_BLOCKOUT_2026-11-19.md"
       ],
-      "notes": "All six friendly NPCs, three stations and four monster homes are placed at the planned district anchors in the River Crossing candidate. Underlying geography, overlap and static approach/access validation passed during production export. Actor identities, spawn settings and delayed lifecycle are retained. Imported maps hide the compiled area's fixed labels; Mara's gathering directions now refer to the woodland/quarry paths. Actual wander/aggression/leash/escape and quest/pacing acceptance remain deferred at the owner's request; the known Cinder Warden/alpha wording remains DOC-002."
+      "notes": "All six friendly NPCs, three stations and four monster homes are placed at the planned district anchors in the River Crossing candidate. Underlying geography, overlap and static approach/access validation passed during production export. Actor identities, spawn settings and delayed lifecycle are retained. Imported maps hide the compiled area's fixed labels; Mara's gathering directions now refer to the woodland/quarry paths. Actual wander/aggression/leash/escape and quest/pacing acceptance remain deferred at the owner's request; the later GAME-007 continuity slice resolves the Cinder Warden wording and uses live target positions."
     },
     {
       "id": "GAME-004",
@@ -931,15 +939,25 @@
       "milestone": "R4",
       "priority": "P1",
       "title": "Reconcile narrative and progression text",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "DOC-002",
         "GAME-003"
       ],
       "acceptance": "Current quest text, NPC names, objective targets, rewards and environmental cues agree on the tested journey.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/QUEST_CONTINUITY_2026-11-19.md",
+        "docs/embervale/06-development/narrative/2026-11-19/authoring-review.json",
+        "docs/embervale/06-development/narrative/2026-11-19/quest-guides.json",
+        "src/Quest/QuestDefinitionDatabase.cpp",
+        "src/Dialogue/DialogueDefinitionDatabase.cpp",
+        "src/Quest/QuestPresentationState.h",
+        "src/Tutorial/StarterJourney.cpp",
+        "src/Graphics/Graphics.cpp",
+        "tests/QuestPresentationStateTests.cpp"
+      ],
+      "notes": "Starter continuity implementation delivered: Cinder Warden is canonical; all six named/objective and reward descriptions match current quest events. Dialogue explains acceptance, actual bank/station use, kept equipment and one reward choice without a trophy inventory requirement. Post-tutorial recommendations prioritise ready/active work, then unstarted story leads; live map hints identify targets and both reward contacts. H/current quest details, wrapped journal previews and NPC-specific reward buttons are implemented. Compiled content validation passed with zero errors; named Sera/Ashfang/Cinder Warden goals match NPC names; authored dialogue fits 154/184 characters. River Crossing validation and game/report/validator/launcher builds passed. Regression source is updated; suites and full quest-chain/visible acceptance remain deferred at the owner's request. Quest mechanics, amounts, rewards, IDs and persistence formats are retained."
     },
     {
       "id": "STUDIO-070",
