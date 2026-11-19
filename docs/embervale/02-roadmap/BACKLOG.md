@@ -19,12 +19,12 @@ reconciliation supersedes their unexecuted/stacked verification limitations.
 
 | Work | Current bounded result | Remaining acceptance |
 |---|---|---|
-| ENG-002 | Windows headless/client builds and complete regression sets executed | Other platforms and fresh-player measurements remain separate |
-| STUDIO-020–024 | Shared validated moves/paint, history, CLI/Tk preview and guarded create-only drafts integrated | Creation/removal, structured diagnostics, persistent history and in-place publication |
-| STUDIO-030 | Open/select/inspect/move/paint, zoom, undo/redo, save/reopen and play integrated | Broader editor/platform acceptance |
-| STUDIO-032 | Dirty-state indicator, close/switch warnings and draft reopening integrated | Interruption recovery and durable publication |
-| STUDIO-033 | Grid, collision, spawn, static reachability and selected approach overlays integrated | Keyboard/accessibility audit and richer diagnostics |
-| STUDIO-040 | Moving existing resources/stations works | Next: validated create/remove with stable-ID compatibility and undo/redo |
+| Baseline (ENG-002) | Windows headless/client builds and complete regression sets executed | Other platforms and fresh-player measurements remain separate |
+| Commands (STUDIO-020–024) | Shared validated moves/paint, history, CLI/Tk preview and guarded create-only drafts integrated | Creation/removal, structured diagnostics, persistent history and in-place publication |
+| Editor (STUDIO-030) | Open/select/inspect/move/paint, zoom, undo/redo, save/reopen and play integrated | Broader editor/platform acceptance |
+| File state (STUDIO-032) | Dirty-state indicator, close/switch warnings and draft reopening integrated | Interruption recovery and durable publication |
+| Overlays (STUDIO-033) | Grid, collision, spawn, static reachability and selected approach overlays integrated | Keyboard/accessibility audit and richer diagnostics |
+| Placement (STUDIO-040) | Moving existing resources/stations works | Next: validated create/remove with stable-ID compatibility and undo/redo |
 
 These tasks remain `in_progress` where broader acceptance is outstanding.
 R2/Alpha 0.1 is not declared complete. [Current master acceptance](../06-development/MASTER_ACCEPTANCE_2026-11-19.md).
