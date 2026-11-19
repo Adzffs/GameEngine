@@ -178,8 +178,13 @@ function(configure_gameengine_world_art target)
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/service-pilot/textures/bank.png"
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/service-pilot/textures/crafting-table.png"
     )
+    set(building_images
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/building-pilot/textures/walls.png"
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/building-pilot/textures/roof.png"
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/building-pilot/textures/floors.png"
+    )
     # Refresh packaged art when the images change, even if no C++ changed.
-    set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS ${forest_images} ${cast_images} ${environment_images} ${service_images})
+    set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS ${forest_images} ${cast_images} ${environment_images} ${service_images} ${building_images})
     add_custom_command(TARGET ${target} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
             "$<TARGET_FILE_DIR:${target}>/assets/embervale/forest-pilot/textures"
@@ -197,6 +202,10 @@ function(configure_gameengine_world_art target)
             "$<TARGET_FILE_DIR:${target}>/assets/embervale/service-pilot/textures"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${service_images}
             "$<TARGET_FILE_DIR:${target}>/assets/embervale/service-pilot/textures"
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            "$<TARGET_FILE_DIR:${target}>/assets/embervale/building-pilot/textures"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${building_images}
+            "$<TARGET_FILE_DIR:${target}>/assets/embervale/building-pilot/textures"
         VERBATIM
     )
 endfunction()

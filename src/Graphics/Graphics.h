@@ -507,7 +507,7 @@ private:
     void DrawStation(const CraftingStation &station);
     void DrawNpc(const Entity &entity);
     void DrawMonster(const Monster &monster, int selectedTargetID, int localPlayerID);
-    void DrawWorldObjects(const std::vector<std::unique_ptr<Entity>> &entities,
+    void DrawWorldObjects(Map &map, const std::vector<std::unique_ptr<Entity>> &entities,
         const std::vector<ResourceNode> &resources, const std::vector<CraftingStation> &stations,
         int playerX, int playerY, int selectedTargetID, int localPlayerID);
 

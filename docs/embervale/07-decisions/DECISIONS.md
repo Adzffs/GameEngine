@@ -1,7 +1,7 @@
 # Design decisions and architecture decision register
 
 **Purpose:** Preserve why choices were made and distinguish agreed direction from implementation proposals.\
-**Status date:** 18 November 2026. Use the [ADR template](../08-templates/ADR_TEMPLATE.md) for decisions that need more detail.
+**Status date:** 19 November 2026. Use the [ADR template](../08-templates/ADR_TEMPLATE.md) for decisions that need more detail.
 
 ## 1. Decision status
 
@@ -41,6 +41,8 @@
 | [ADR-017](ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md) | Bounded explicit runtime import | Implemented starter parser/validator, shared core, selected spawn catalogue and isolated playtests | Shared editing/publication remains separate |
 | [ADR-018](ADR_018_BOUNDED_OBJECT_PLACEMENT.md) | Bounded resource/station membership | Implemented schema-2 allocations, shared place/remove/history and guarded drafts | Larger footprints and actor membership remain separate |
 | [ADR-019](ADR_019_BOUNDED_SPAWN_SETTINGS.md) | Existing monster spawn settings | Implemented schema-3 wander/cap/respawn editing; game/tool builds passed, runtime/visible checks deferred | New actor identities, friendly wandering and population filling remain separate |
+
+| [ADR-020](ADR_020_STATIC_BUILDING_SHELLS.md) | Static building shells | Schema-4 rectangular shells, shared wall/door collision, readonly Studio footprint and independent roof visibility | More building styles, entrances and authoring controls remain separate |
 
 ## 4. Rationale for the key proposals
 

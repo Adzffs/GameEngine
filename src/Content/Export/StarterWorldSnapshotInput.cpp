@@ -269,6 +269,9 @@ namespace StarterWorldExport
         else if (schemaVersion == 2 || schemaVersion == 3)
             Keys(root, {"format", "schema_version", "region_id", "revision", "size",
                 "surfaces", "terrain", "player_spawn", "placements", "region_exits", "next_placement_id"});
+        else if (schemaVersion == 4)
+            Keys(root, {"format", "schema_version", "region_id", "revision", "size",
+                "surfaces", "terrain", "player_spawn", "placements", "region_exits", "next_placement_id", "buildings"});
         else
             Invalid("unsupported schema or revision");
         Expect(String(root, "format"), "embervale.starter-world-snapshot");
@@ -320,6 +323,19 @@ namespace StarterWorldExport
             snapshot.terrainRows.push_back(row.string);
         }
         snapshot.playerSpawn = ReadPosition(Field(root, "player_spawn"));
+        if (schemaVersion >= 4)
+        {
+            const auto &buildings = Field(root, "buildings");
+            if (buildings.type != Json::Type::Array || buildings.array.size() > 64)
+                Invalid("invalid building array");
+            for (const auto &item : buildings.array)
+            {
+                Keys(item, {"id", "definition_id", "x", "y", "width", "height", "door_offset"});
+                Expect(String(item, "definition_id"), "building.timber_stone");
+                snapshot.buildings.push_back({String(item, "id"), Number(item, "x"), Number(item, "y"),
+                    Number(item, "width"), Number(item, "height"), Number(item, "door_offset")});
+            }
+        }
 
         const Json &exits = Field(root, "region_exits");
         if (exits.type != Json::Type::Array || !exits.array.empty())

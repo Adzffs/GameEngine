@@ -23,3 +23,6 @@ Makefile
 
 # Local development player data (versioned fixtures belong under tests/)
 saves/
+
+# Python authoring cache
+__pycache__/

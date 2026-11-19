@@ -60,10 +60,16 @@ preventing grass squares on the stone mining pad. See the
 for editable sources and actual river, workshop and depleted mining captures.
 The [service pilot](../../../assets/embervale/service-pilot/README.md) adds
 bank and crafting-table sprites, editable masters and opaque-pixel targeting
-through their existing station actions. The four batches share a generated
+through their existing station actions. The first four batches share a generated
 layout and texture cache: 86 frames in twelve PNGs. See the
 [service integration record](../06-development/SERVICE_RENDERING_2026-11-19.md).
-Other ore tiers, buildings, remaining cast and the full visual kit remain open.
+The [building kit](../../../assets/embervale/building-pilot/README.md) adds 27
+overhead wall/window/door/corner, roof/ridge and floor pieces, assembled into the
+first workshop. Authored walls block movement; an open doorway preserves access,
+and the roof fades around the player. The five batches total 113 frames in
+fifteen PNGs. See the [building integration record](../06-development/BUILDING_RENDERING_2026-11-19.md).
+Further building assemblies, other ore tiers, remaining cast and full starter
+visual acceptance remain open.
 
 ## 2. Proposed visual direction
 

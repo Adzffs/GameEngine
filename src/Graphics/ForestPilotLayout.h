@@ -12,7 +12,7 @@ namespace ForestPilotLayout
         SDL_FPoint pivot, ground; int connectionMask, grassVariant, facing, animationFrame; };
     inline constexpr int TileSize = 32;
     inline constexpr float PlayerWalkCycleTiles = 1.0f;
-    inline constexpr std::array<Image, 12> Images{{
+    inline constexpr std::array<Image, 15> Images{{
         {"terrain.png", 128, 160, "assets/embervale/forest-pilot/textures"},
         {"oak.png", 64, 96, "assets/embervale/forest-pilot/textures"},
         {"stump.png", 64, 96, "assets/embervale/forest-pilot/textures"},
@@ -25,8 +25,11 @@ namespace ForestPilotLayout
         {"rubble.png", 32, 40, "assets/embervale/environment-pilot/textures"},
         {"bank.png", 48, 48, "assets/embervale/service-pilot/textures"},
         {"crafting-table.png", 48, 48, "assets/embervale/service-pilot/textures"},
+        {"walls.png", 256, 96, "assets/embervale/building-pilot/textures"},
+        {"roof.png", 96, 128, "assets/embervale/building-pilot/textures"},
+        {"floors.png", 96, 32, "assets/embervale/building-pilot/textures"},
     }};
-    inline constexpr std::array<Frame, 86> Frames{{
+    inline constexpr std::array<Frame, 113> Frames{{
         {"terrain.grass.01", 0, {0.0f, 0.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, 0, -1, 0},
         {"terrain.grass.02", 0, {32.0f, 0.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, 1, -1, 0},
         {"terrain.grass.03", 0, {64.0f, 0.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, 2, -1, 0},
@@ -113,5 +116,32 @@ namespace ForestPilotLayout
         {"resource.rock.depleted", 9, {0.0f, 0.0f, 32.0f, 40.0f}, {16.0f, 32.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
         {"station.bank.idle", 10, {0.0f, 0.0f, 48.0f, 48.0f}, {24.0f, 40.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
         {"station.crafting_table.idle", 11, {0.0f, 0.0f, 48.0f, 48.0f}, {24.0f, 40.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
+        {"building.wall.front", 12, {0.0f, 0.0f, 32.0f, 48.0f}, {16.0f, 40.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
+        {"building.wall.back", 12, {32.0f, 0.0f, 32.0f, 48.0f}, {16.0f, 40.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
+        {"building.wall.west", 12, {64.0f, 0.0f, 32.0f, 48.0f}, {16.0f, 40.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
+        {"building.wall.east", 12, {96.0f, 0.0f, 32.0f, 48.0f}, {16.0f, 40.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
+        {"building.wall.window-front", 12, {128.0f, 0.0f, 32.0f, 48.0f}, {16.0f, 40.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
+        {"building.wall.window-west", 12, {160.0f, 0.0f, 32.0f, 48.0f}, {16.0f, 40.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
+        {"building.wall.window-east", 12, {192.0f, 0.0f, 32.0f, 48.0f}, {16.0f, 40.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
+        {"building.wall.doorway", 12, {224.0f, 0.0f, 32.0f, 48.0f}, {16.0f, 40.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
+        {"building.wall.corner-nw", 12, {0.0f, 48.0f, 32.0f, 48.0f}, {16.0f, 40.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
+        {"building.wall.corner-ne", 12, {32.0f, 48.0f, 32.0f, 48.0f}, {16.0f, 40.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
+        {"building.wall.corner-sw", 12, {64.0f, 48.0f, 32.0f, 48.0f}, {16.0f, 40.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
+        {"building.wall.corner-se", 12, {96.0f, 48.0f, 32.0f, 48.0f}, {16.0f, 40.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
+        {"building.roof.nw", 13, {0.0f, 0.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, -1, -1, 0},
+        {"building.roof.n", 13, {32.0f, 0.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, -1, -1, 0},
+        {"building.roof.ne", 13, {64.0f, 0.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, -1, -1, 0},
+        {"building.roof.w", 13, {0.0f, 32.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, -1, -1, 0},
+        {"building.roof.center", 13, {32.0f, 32.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, -1, -1, 0},
+        {"building.roof.e", 13, {64.0f, 32.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, -1, -1, 0},
+        {"building.roof.sw", 13, {0.0f, 64.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, -1, -1, 0},
+        {"building.roof.s", 13, {32.0f, 64.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, -1, -1, 0},
+        {"building.roof.se", 13, {64.0f, 64.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, -1, -1, 0},
+        {"building.roof.ridge-w", 13, {0.0f, 96.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, -1, -1, 0},
+        {"building.roof.ridge", 13, {32.0f, 96.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, -1, -1, 0},
+        {"building.roof.ridge-e", 13, {64.0f, 96.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, -1, -1, 0},
+        {"building.floor.01", 14, {0.0f, 0.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, -1, -1, 0},
+        {"building.floor.02", 14, {32.0f, 0.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, -1, -1, 0},
+        {"building.floor.03", 14, {64.0f, 0.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, -1, -1, 0},
     }};
 }

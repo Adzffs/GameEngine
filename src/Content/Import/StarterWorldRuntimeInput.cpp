@@ -50,6 +50,10 @@ namespace StarterWorldImport
         for (int y = 0; y < height; ++y)
             for (int x = 0; x < width; ++x)
                 blocked[index(x, y)] = snapshot.terrainRows[y][x] == 'W';
+        for (const auto &b : snapshot.buildings)
+            for (int y = b.y; y < b.y + b.height; ++y)
+                for (int x = b.x; x < b.x + b.width; ++x)
+                    if (b.IsWall(x, y)) blocked[index(x, y)] = true;
 
         for (const Placement &placement : snapshot.placements)
         {
@@ -110,6 +114,17 @@ namespace StarterWorldImport
                     hasApproach = true;
             if (!hasApproach)
                 Invalid("no reachable approach tile: " + placement.id);
+        }
+        for (const auto &b : snapshot.buildings)
+        {
+            const auto door = index(b.x + b.doorOffset, b.y + b.height - 1);
+            const auto approach = index(b.x + b.doorOffset, b.y + b.height);
+            if (!reachable[door] || !reachable[approach] || !occupants[door].empty() || !occupants[approach].empty())
+                Invalid("building requires a clear reachable doorway and outside approach: " + b.id);
+            for (int y = b.y + 1; y < b.y + b.height - 1; ++y)
+                for (int x = b.x + 1; x < b.x + b.width - 1; ++x)
+                    if (!blocked[index(x, y)] && !reachable[index(x, y)])
+                        Invalid("unreachable building interior: " + b.id);
         }
         return snapshot;
     }

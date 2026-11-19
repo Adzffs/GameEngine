@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../NPC/NpcSpawnDefinition.h"
+#include "../../World/Building.h"
 #include "../../World/Object/Resource/ResourceType.h"
 #include "../../World/Object/Station/StationType.h"
 
@@ -53,6 +54,9 @@ namespace StarterWorldExport
         // v3 additionally supports bounded monster spawn settings.
         int schemaVersion = 1;
         int nextPlacementId = 1;
+        // Appended to preserve existing aggregate field order. Schema 4 adds
+        // bounded static shells independently of resource/station identities.
+        std::vector<Building> buildings;
     };
 
     constexpr int MaximumNextPlacementId = 1000000;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Tile/Tile.h"
+#include "Building.h"
 #include <vector>
 
 class Map
@@ -17,6 +18,9 @@ public:
     TileType GetTileType(int x, int y);
     // Objects retain their collision type while preserving the authored floor.
     TileType GetGroundType(int x, int y);
+    void SetBuildings(std::vector<Building> layout);
+    const std::vector<Building> &GetBuildings() const { return buildings; }
+    const Building *GetBuildingAt(int x, int y) const;
 
 private:
     int width;
@@ -24,6 +28,7 @@ private:
     int height;
 
     std::vector<Tile> tiles;
+    std::vector<Building> buildings;
 
     Tile &GetTile(int x, int y);
 };

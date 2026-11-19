@@ -2,10 +2,13 @@
 
 #include "ForestPilotLayout.h"
 #include <array>
+#include <map>
+#include <string>
 #include <vector>
 
 class Map;
 class ResourceNode;
+struct Building;
 enum class ResourceType;
 enum class StationType;
 
@@ -33,6 +36,8 @@ public:
     bool DrawStation(StationType type, int tileX, int tileY) const;
     bool HitMara(int tileX, int tileY, float worldX, float worldY) const;
     bool HitStation(StationType type, int tileX, int tileY, float worldX, float worldY) const;
+    bool DrawBuildingWall(const Building &building, int x, int y, const SDL_FRect &player) const;
+    bool DrawBuildingRoof(const Building &building, const SDL_FRect &player, float deltaSeconds);
     std::size_t LoadedImageCount() const;
 
 private:
@@ -56,6 +61,9 @@ private:
     const Frame *mara = nullptr;
     const Frame *furnace = nullptr;
     const Frame *bank = nullptr, *craftingTable = nullptr;
+    std::array<const Frame *, 12> buildingWalls{}, buildingRoof{};
+    std::array<const Frame *, 3> buildingFloors{};
+    std::map<std::string, float> roofAlphas;
     bool Available(const Frame *frame) const;
     bool Draw(const Frame *frame, const SDL_FRect &destination,
               const SDL_FRect *source = nullptr, Uint8 alpha = 255) const;
