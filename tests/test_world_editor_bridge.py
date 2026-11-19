@@ -105,7 +105,7 @@ for line in sys.stdin:
             print('Saved new draft:', target)
             print('draft-sha256:', hashlib.sha256(content).hexdigest())
     elif op == 'list':
-        print('Existing placements (only R and S can be moved):')
+        print('Existing placements (R/S objects; N/M spawn homes):')
         for name, (kind, x, y) in sorted(placements.items()):
             print(f'{kind_char[kind]}  {name}  ({x}, {y})')
     elif op == 'terrain':
@@ -197,8 +197,41 @@ class BridgeTests(unittest.TestCase):
             self.bridge.undo()
         self.assertEqual(self.bridge.commands, [])
         self.assertEqual(self.bridge.placements['resource.tree.001'][1:], (1, 1))
-        with self.assertRaisesRegex(StudioError, 'Only existing resource'):
-            self.bridge.move('npc.guide.001', 1, 0)
+        with self.assertRaisesRegex(StudioError, 'existing placement'):
+            self.bridge.move('npc.missing.001', 1, 0)
+
+    def test_actor_home_move_undo_redo_save_and_reopen(self):
+        self.bridge.move('npc.guide.001', 1, 0)
+        self.assertEqual(self.bridge.placements['npc.guide.001'], ('N', 1, 0))
+        self.bridge.undo()
+        self.assertEqual(self.bridge.placements['npc.guide.001'], ('N', 2, 2))
+        self.bridge.redo()
+        draft = self.source.with_name('relocated guide.json')
+        self.bridge.save(draft)
+        reopened = StudioBridge(self.tool, draft)
+        self.assertEqual(reopened.placements['npc.guide.001'], ('N', 1, 0))
+        self.assertEqual(reopened.definitions['npc.guide.001'], 'guide')
+        self.assertEqual(json.loads(self.source.read_text()), self.world)
+
+    def test_unrequested_actor_move_rejects_even_when_full_snapshot_agrees(self):
+        original = "print('Painted', (x, y), glyph)"
+        altered = "placements['npc.guide.001'] = ('npc_spawn', 3, 2)\n        " + original
+        self.tool.write_text(FAKE_TOOL.replace(original, altered), encoding='utf-8')
+        with self.assertRaisesRegex(StudioError, 'unexpected paint or placement'):
+            self.bridge.paint(1, 0, 'D')
+        self.assertEqual(self.bridge.commands, [])
+        self.assertEqual(self.bridge.placements['npc.guide.001'], ('N', 2, 2))
+        self.assertEqual(self.bridge.terrain, self.world['terrain']['rows'])
+
+    def test_actor_undo_requires_the_exact_observed_home(self):
+        self.bridge.move('npc.guide.001', 1, 0)
+        original = "placements[target] = (placements[target][0], *old)"
+        self.tool.write_text(FAKE_TOOL.replace(original,
+            "placements[target] = (placements[target][0], 0, 2)"), encoding='utf-8')
+        with self.assertRaisesRegex(StudioError, 'verified history checkpoint'):
+            self.bridge.undo()
+        self.assertEqual(self.bridge.placements['npc.guide.001'], ('N', 1, 0))
+        self.assertEqual(self.bridge.commands, ['move npc.guide.001 1 0'])
 
     def test_source_change_conflicts_without_saving(self):
         self.source.write_text(json.dumps(self.world) + '\n', encoding='utf-8')
@@ -413,7 +446,7 @@ class BridgeTests(unittest.TestCase):
         )
         self.assertIn(original, FAKE_TOOL)
         self.tool.write_text(FAKE_TOOL.replace(original, altered), encoding='utf-8')
-        with self.assertRaisesRegex(StudioError, 'read-only actor spawn'):
+        with self.assertRaisesRegex(StudioError, 'inconsistent world snapshot'):
             self.bridge.paint(1, 0, 'D')
         self.assertEqual(self.bridge.commands, [])
         self.assertEqual(self.bridge.terrain, self.world['terrain']['rows'])

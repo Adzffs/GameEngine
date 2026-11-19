@@ -604,7 +604,7 @@
       "milestone": "R3",
       "priority": "P1",
       "title": "Edit NPC and monster spawn definitions",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-014",
         "STUDIO-015",
@@ -612,8 +612,15 @@
       ],
       "acceptance": "Edit home/wander/cap/respawn fields allowed by runtime; preserve delayed lifecycle, quest references and authority.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/STUDIO_SPAWN_MOVE_REVIEW_2026-11-19.md",
+        "src/Content/Edit/StarterWorldEdit.cpp",
+        "tests/StarterWorldEditTests.cpp",
+        "tests/StarterWorldHistoryTests.cpp",
+        "tests/StarterWorldRuntimeTests.cpp",
+        "tests/StarterWorldVisualBridgeIntegration.py"
+      ],
+      "notes": "Existing NPC/enemy home-position editing implemented in PR #25 with shared move/history/save/reopen support and retained identity/lifecycle/settings. C++ core, game and editing-tool builds succeeded. Testing and visible acceptance deferred at the owner's explicit request on 19 November 2026; no test pass is claimed. Broader wander/capacity/respawn configuration editing remains separate."
     },
     {
       "id": "STUDIO-042",

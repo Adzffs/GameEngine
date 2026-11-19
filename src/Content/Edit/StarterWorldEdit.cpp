@@ -97,17 +97,17 @@ namespace StarterWorldEdit
         if (found == candidate.placements.end())
             throw std::runtime_error("starter world edit: unknown placement ID: " +
                 std::string(placementId));
-        if (found->kind != PlacementKind::Resource &&
-            found->kind != PlacementKind::Station)
-            throw std::runtime_error("starter world edit: moving actor spawns is not yet supported: " +
-                found->id);
-
         const Position previous = found->position;
         const bool changed = previous.GetX() != destination.GetX() ||
             previous.GetY() != destination.GetY();
         if (changed)
         {
             found->position = destination;
+            // Keep the authored spawn/home and its typed runtime definition in
+            // step. All other identity, lifecycle and behaviour fields remain
+            // unchanged; the full-world validator checks the new home.
+            if (auto *spawn = std::get_if<NpcSpawnDefinition>(&found->legacyDefinition))
+                spawn->spawnPosition = destination;
             // Includes the entire world's occupancy, access routes and spawn
             // semantics. A failed move only destroys this private candidate.
             candidate = StarterWorldImport::ValidateForRuntime(candidate);

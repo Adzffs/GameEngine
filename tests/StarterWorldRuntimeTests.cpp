@@ -2,6 +2,8 @@
 
 #include "../src/Command/ServerCommand.h"
 #include "../src/Content/Export/StarterWorldSnapshot.h"
+#include "../src/Content/Edit/StarterWorldEdit.h"
+#include "../src/Quest/QuestSystem.h"
 #include "../src/Content/Export/StarterWorldSnapshotInput.h"
 #include "../src/Entity/Monster/Monster.h"
 #include "../src/NPC/NPC.h"
@@ -205,10 +207,11 @@ namespace
     void CheckMovedSpawns(TestContext &test)
     {
         auto snapshot = Capture();
-        Move(Spawn(snapshot, NpcSpawnId::DEVELOPMENT_GUIDE_SPAWN), 30, 3);
-        Move(Spawn(snapshot, NpcSpawnId::PASSIVE_DEVELOPMENT_SPAWN), 32, 3);
-        Move(Spawn(snapshot, NpcSpawnId::DURABLE_DEVELOPMENT_SPAWN), 34, 3);
-        Move(Spawn(snapshot, NpcSpawnId::TORREN_ASH_SPAWN), 36, 3);
+        snapshot = StarterWorldEdit::MovePlacement(snapshot, "npc.development_guide.001", Position{30, 3}).candidate;
+        snapshot = StarterWorldEdit::MovePlacement(snapshot, "monster.passive_development.001", Position{32, 3}).candidate;
+        snapshot = StarterWorldEdit::MovePlacement(snapshot, "monster.durable_development.001", Position{34, 3}).candidate;
+        snapshot = StarterWorldEdit::MovePlacement(snapshot, "npc.torren_ash.001", Position{36, 3}).candidate;
+        snapshot = ParseSnapshot(SerializeCanonical(snapshot));
         World world(snapshot, 43U, 47U, 53U);
         const auto *guide = Actor(world, NpcSpawnId::DEVELOPMENT_GUIDE_SPAWN);
         test.Expect(guide && SamePosition(guide->GetPosition(), Position{30, 3}), "World-start NPC uses imported home");
@@ -263,6 +266,68 @@ namespace
             test.Expect(world.CreateNpc(authoredGuide.npcType, authoredGuide) > 0,
                 "Selected friendly NPC definition can refill released capacity");
         }
+    }
+
+    void CheckMovedGuideServices(TestContext &test)
+    {
+        const auto snapshot = StarterWorldEdit::MovePlacement(
+            Capture(), "npc.development_guide.001", Position{30, 3}).candidate;
+        // Reparse the same representation used by a saved and reopened draft.
+        World world(ParseSnapshot(SerializeCanonical(snapshot)), 101U, 103U, 107U);
+        auto *guide = dynamic_cast<NPC *>(Actor(world, NpcSpawnId::DEVELOPMENT_GUIDE_SPAWN));
+        auto *player = dynamic_cast<Player *>(world.GetEntityByID(world.CreatePlayer()));
+        if (!guide || !player) throw std::runtime_error("Missing relocated guide/player fixture");
+        player->GetPosition().SetPosition(29, 3);
+        const int actor = player->GetID();
+        const int target = guide->GetID();
+        world.EnqueueCommand(NpcInteractionCommand{actor, target, NpcInteractionType::TALK});
+        world.Update();
+        const auto *dialogue = world.GetActiveDialogueSession(actor);
+        test.Expect(dialogue != nullptr, "Relocated guide opens its ordinary dialogue");
+        if (!dialogue) throw std::runtime_error("Moved guide dialogue did not open");
+        const auto initialSession = dialogue->sessionId;
+        world.EnqueueCommand(QuestAcceptCommand{actor, target, initialSession, QuestId::GATHERING_BASICS});
+        world.Update();
+        const auto *quest = player->GetQuestJournal().TryGet(QuestId::GATHERING_BASICS);
+        test.Expect(quest && quest->state == QuestState::ACTIVE,
+            "Relocated guide accepts the existing quest through its real dialogue session");
+
+        // Feed the existing objective event; this tests the relocated giver's
+        // completion/reward binding, not the separately covered gathering roll.
+        QuestSystem::RecordGathered(player->GetQuestJournal(), ItemType::LOG, 10);
+        world.EnqueueCommand(DialogueCloseCommand{actor, initialSession});
+        world.Update();
+        world.EnqueueCommand(NpcInteractionCommand{actor, target, NpcInteractionType::TALK});
+        world.Update();
+        dialogue = world.GetActiveDialogueSession(actor);
+        if (!dialogue) throw std::runtime_error("Moved guide completion dialogue did not reopen");
+        const auto completionSession = dialogue->sessionId;
+        const int beforeCoins = player->GetInventory().GetItemAmount(ItemType::COINS);
+        world.EnqueueCommand(QuestCompleteCommand{actor, target, completionSession, QuestId::GATHERING_BASICS});
+        world.EnqueueCommand(QuestCompleteCommand{actor, target, completionSession, QuestId::GATHERING_BASICS});
+        world.Update();
+        quest = player->GetQuestJournal().TryGet(QuestId::GATHERING_BASICS);
+        test.Expect(quest && quest->state == QuestState::COMPLETED &&
+            player->GetInventory().GetItemAmount(ItemType::COINS) == beforeCoins + 10,
+            "Relocated guide completes and rewards the quest exactly once");
+        if (const auto *open = world.GetActiveDialogueSession(actor))
+        {
+            world.EnqueueCommand(DialogueCloseCommand{actor, open->sessionId});
+            world.Update();
+        }
+        world.EnqueueCommand(NpcInteractionCommand{actor, target, NpcInteractionType::TRADE});
+        world.Update();
+        const auto *shop = world.GetActiveShopSession(actor);
+        test.Expect(shop != nullptr, "Relocated guide still opens its authored shop");
+        if (!shop) throw std::runtime_error("Moved guide shop did not open");
+        const auto shopSession = shop->sessionId;
+        const int beforeFood = player->GetInventory().GetItemAmount(ItemType::COOKED_MEAT);
+        const int beforeBuyCoins = player->GetInventory().GetItemAmount(ItemType::COINS);
+        world.EnqueueCommand(ShopBuyCommand{actor, shopSession, ItemType::COOKED_MEAT, 1});
+        world.Update();
+        test.Expect(player->GetInventory().GetItemAmount(ItemType::COOKED_MEAT) == beforeFood + 1 &&
+            player->GetInventory().GetItemAmount(ItemType::COINS) == beforeBuyCoins - 8,
+            "Relocated guide shop keeps its ordinary validated purchase semantics");
     }
 
     void CheckPlayerPersistence(TestContext &test)
@@ -389,6 +454,7 @@ int main()
         CheckBaseline(test);
         CheckMovedResource(test);
         CheckMovedSpawns(test);
+        CheckMovedGuideServices(test);
         CheckPlayerPersistence(test);
         CheckDisconnectedSaveRecovery(test);
         CheckConstructorRejection(test);

@@ -30,6 +30,53 @@ FURNACE = "station.furnace.001"
 
 
 class RealWorldBridgeTests(unittest.TestCase):
+    def test_actor_homes_move_undo_redo_save_and_reopen(self) -> None:
+        guide, monster = "npc.development_guide.001", "monster.passive_development.001"
+        before = {p["id"]: p for p in self.bridge.current_snapshot["placements"]}
+        self.bridge.move(guide, 30, 3)
+        self.bridge.move(monster, 32, 3)
+        self.assertEqual(self.bridge.placements[guide], ("N", 30, 3))
+        self.assertEqual(self.bridge.placements[monster], ("M", 32, 3))
+        self.bridge.undo()
+        self.assertEqual(self.bridge.placements[monster], ("M", 6, 1))
+        self.bridge.redo()
+        after = {p["id"]: p for p in self.bridge.current_snapshot["placements"]}
+        for name in (guide, monster):
+            expected = dict(before[name])
+            expected["position"] = after[name]["position"]
+            self.assertEqual(after[name], expected)
+        self.assertEqual(self.bridge.current_snapshot["schema_version"], 1)
+        draft = self.source.with_name("relocated actor homes.json")
+        self.bridge.save(draft)
+        reopened = StudioBridge(TOOL, draft)
+        self.assertEqual(reopened.placements, self.bridge.placements)
+        self.assertEqual(reopened.current_snapshot, self.bridge.current_snapshot)
+        self.assertEqual(self.source.read_bytes(), self.original)
+
+    def test_actor_moves_reject_invalid_homes_and_preserve_v2_allocations(self) -> None:
+        guide = "npc.development_guide.001"
+        for x, y in ((0, 0), (10, 10), (5, 5), (6, 1)):
+            with self.assertRaises(StudioError):
+                self.bridge.move(guide, x, y)
+        self.assertEqual(self.bridge.commands, [])
+        self.assertFalse(self.bridge.dirty)
+        tree = self.bridge.place("resource.normal_tree", 40, 20)
+        self.bridge.move(guide, 30, 3)
+        self.bridge.undo()
+        self.assertEqual(self.bridge.current_snapshot["next_placement_id"], 2)
+        self.assertIn(tree, self.bridge.placements)
+        self.bridge.redo()
+        with self.assertRaises(StudioError):
+            self.bridge.remove(guide)
+        with self.assertRaises(StudioError):
+            self.bridge.perform("remove " + guide)
+        self.assertEqual(self.bridge.placements[guide], ("N", 30, 3))
+        draft = self.source.with_name("actor and object edits.json")
+        self.bridge.save(draft)
+        reopened = StudioBridge(TOOL, draft)
+        self.assertEqual(reopened.place("station.bank", 42, 20), "station.authored.000002")
+        self.assertEqual(self.source.read_bytes(), self.original)
+
     def test_create_remove_save_reopen_and_allocate_again(self) -> None:
         tree = self.bridge.place("resource.normal_tree", 40, 20)
         furnace = self.bridge.place("station.furnace", 42, 20)

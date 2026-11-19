@@ -175,5 +175,32 @@ int main()
     test.ExpectEqual(SerializeCanonical(mixed.Redo(redoOnlyMove)), mixedCanonical,
         "redo next replays painted ground");
 
+
+    // Actor homes participate in the same exact-revision history as objects.
+    StarterWorldHistory::History actors(baseline);
+    const auto actorMoved = actors.ApplyMoves(baseline, {
+        {"npc.development_guide.001", Position{30, 3}},
+        {"monster.passive_development.001", Position{40, 20}}});
+    const auto actorCanonical = SerializeCanonical(actorMoved);
+    const auto actorUndone = actors.Undo(actorMoved);
+    test.ExpectEqual(SerializeCanonical(actorUndone), original,
+        "Undo restores actor positions and typed spawn homes together");
+    test.ExpectEqual(SerializeCanonical(actors.Redo(actorUndone)), actorCanonical,
+        "Redo reproduces both actor home changes");
+    Reject(test, [&] { actors.ApplyMoves(actorMoved, {
+        {"npc.development_guide.001", Position{31, 3}},
+        {"monster.passive_development.001", Position{10, 10}}}); },
+        "An invalid actor home rolls back an entire mixed move batch");
+    test.Expect(actors.AppliedCount() == 1 && actors.EntryCount() == 1,
+        "Rejected actor batch preserves the history cursor");
+    const auto sourceWithObject = StarterWorldEdit::PlaceDefinition(
+        baseline, "resource.normal_tree", Position{40, 20}).candidate;
+    StarterWorldHistory::History versionTwo(sourceWithObject);
+    const auto actorInV2 = versionTwo.ApplyMoves(sourceWithObject,
+        {{"npc.development_guide.001", Position{30, 3}}});
+    test.ExpectEqual(SerializeCanonical(versionTwo.Undo(actorInV2)),
+        SerializeCanonical(sourceWithObject),
+        "Actor undo preserves schema-2 placements and allocation reservations");
+
     return test.Finish();
 }

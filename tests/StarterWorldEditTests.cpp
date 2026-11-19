@@ -129,8 +129,6 @@ int main()
     Reject(test, baseline, "", Position{30, 30}, "empty ID is rejected");
     Reject(test, baseline, "resource.normal_tree.missing", Position{30, 30},
         "unknown durable ID is rejected");
-    Reject(test, baseline, "npc.development_guide.001", Position{30, 30},
-        "unsupported actor spawn changes are explicit errors");
     Reject(test, baseline, TreeId, Position{-1, 30}, "out of bounds move rejected");
     Reject(test, baseline, TreeId, Position{100, 30}, "positive out of bounds move rejected");
     Reject(test, baseline, TreeId, Position{10, 10}, "water move rejected");
@@ -143,5 +141,48 @@ int main()
         "invalid source world is rejected before applying a legal move");
     test.ExpectEqual(SerializeCanonical(baseline), original,
         "failed moves never mutate caller content");
+
+    // Actor home edits keep their stable binding and initialization semantics.
+    for (const Placement &actor : baseline.placements)
+    {
+        if (actor.kind != PlacementKind::NpcSpawn && actor.kind != PlacementKind::MonsterSpawn)
+            continue;
+        const auto movedActor = StarterWorldEdit::MovePlacement(baseline, actor.id, Position{40, 20});
+        const auto &changedActor = Get(movedActor.candidate, actor.id);
+        const auto &beforeSpawn = std::get<NpcSpawnDefinition>(actor.legacyDefinition);
+        const auto &afterSpawn = std::get<NpcSpawnDefinition>(changedActor.legacyDefinition);
+        test.Expect(changedActor.position.GetX() == 40 && changedActor.position.GetY() == 20 &&
+            afterSpawn.spawnPosition.GetX() == 40 && afterSpawn.spawnPosition.GetY() == 20,
+            "Actor placement and typed spawn/home move together: " + actor.id);
+        test.Expect(changedActor.id == actor.id && changedActor.definitionId == actor.definitionId &&
+            changedActor.kind == actor.kind && changedActor.stage == actor.stage &&
+            changedActor.order == actor.order && afterSpawn.spawnId == beforeSpawn.spawnId &&
+            afterSpawn.npcType == beforeSpawn.npcType &&
+            afterSpawn.wanderRadius == beforeSpawn.wanderRadius &&
+            afterSpawn.wanderIntervalTicks == beforeSpawn.wanderIntervalTicks &&
+            afterSpawn.maximumActiveCount == beforeSpawn.maximumActiveCount &&
+            afterSpawn.respawns == beforeSpawn.respawns,
+            "Actor identity, lifecycle and behaviour settings are preserved: " + actor.id);
+        const auto canonical = SerializeCanonical(movedActor.candidate);
+        test.ExpectEqual(SerializeCanonical(ParseSnapshot(canonical)), canonical,
+            "Relocated actor round-trips through the existing schema: " + actor.id);
+        test.Expect(movedActor.candidate.schemaVersion == 1 && movedActor.candidate.nextPlacementId == 1,
+            "An actor move does not promote the schema or allocate an object ID");
+        const auto noop = StarterWorldEdit::MovePlacement(baseline, actor.id, actor.position);
+        test.Expect(!noop.changed && SerializeCanonical(noop.candidate) == original,
+            "Same-home actor move is a true no-op");
+    }
+    for (const Position tile : {Position{0, 0}, Position{10, 10}, Position{5, 5},
+        Position{6, 1}, Position{-1, 5}, Position{100, 5}})
+        Reject(test, baseline, "npc.development_guide.001", tile,
+            "Actor homes reject player spawn, water, objects, other actors and bounds");
+
+    Snapshot divided = baseline;
+    for (auto &row : divided.terrainRows) row[25] = 'W';
+    Reject(test, divided, "npc.development_guide.001", Position{30, 30},
+        "Actor homes must remain connected to the player spawn");
+    test.ExpectEqual(SerializeCanonical(baseline), original,
+        "Successful and failed actor moves leave the original world unchanged");
+
     return test.Finish();
 }

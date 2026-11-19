@@ -111,14 +111,14 @@ namespace
         std::ostream &out)
     {
         using Kind = StarterWorldExport::PlacementKind;
-        out << "Existing placements (only R and S can be moved):\n";
+        out << "Existing placements (R/S objects; N/M spawn homes):\n";
         for (const auto &placement : snapshot.placements)
         {
             out << PlacementGlyph(placement.kind) << "  " << placement.id
                 << "  (" << placement.position.GetX() << ", "
                 << placement.position.GetY() << ")";
             if (placement.kind != Kind::Resource && placement.kind != Kind::Station)
-                out << "  [read-only spawn]";
+                out << "  [spawn home]";
             out << '\n';
         }
     }
