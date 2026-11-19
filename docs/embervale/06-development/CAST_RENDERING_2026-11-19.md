@@ -29,6 +29,10 @@ which now covers 39 frames and six images across the two batches.
 
 ## Runtime presentation
 
+The later [walk continuity correction](WALK_CYCLE_CONTINUITY_2026-11-19.md)
+repairs the waist separation in the first stride sheet. Its enlarged previews
+and per-frame checks supersede the original walk art in this record.
+
 - The local player uses four facings and a four-pose walk cycle. Facing follows
   the dominant visual movement axis. Cycle phase advances by actual interpolated
   travel distance; it does not loop on a wall-clock timer while standing still.

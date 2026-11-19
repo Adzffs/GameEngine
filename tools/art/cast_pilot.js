@@ -66,44 +66,44 @@ if (cfg.regenerate) {
     }
     return out;
   }
-  function pose(base, direction, phase) {
-    if (phase === 0 || phase === 2) return crop(base, 0, 0, base.width, base.height);
-    var out = canvas(32, 48), sign = phase === 1 ? 1 : -1;
-    if (direction === 1 || direction === 2) {
-      // Draw a rear leg first, then the foreground leg; the torso covers hips.
-      for (var layer = 0; layer < 2; layer++) for (var y = 29; y < 40; y++) for (var x = 0; x < 32; x++) {
-        var c = base.pixels[y * 32 + x];
-        if (pc.rgbaA(c)) put(out, x + sign * (layer === 0 ? -2 : 2), y - (layer === 0 ? 1 : 0), c);
-      }
-    } else {
-      for (var y = 29; y < 40; y++) for (var x = 0; x < 32; x++) {
-        var c = base.pixels[y * 32 + x], left = x < 16;
-        if (pc.rgbaA(c)) put(out, x + (left ? -sign : sign), y - ((left && sign === 1) || (!left && sign === -1) ? 1 : 0), c);
-      }
-    }
-    for (var y = 0; y < 29; y++) for (var x = 0; x < 32; x++) {
-      var c = base.pixels[y * 32 + x];
-      if (pc.rgbaA(c)) put(out, x, y - 1, c);
-    }
-    return out;
-  }
   player = canvas(128, 192);
   for (var direction = 0; direction < 4; direction++) {
     var base = panel(direction, 32, 48, 36, 40, 26);
-    for (var phase = 0; phase < 4; phase++) blit(pose(base, direction, phase), player, phase * 32, direction * 48);
+    for (var phase = 0; phase < 4; phase++) blit(playerWalkPose(base, direction, phase), player, phase * 32, direction * 48);
   }
   mara = panel(4, 32, 48, 36, 40, 26);
   furnace = panel(5, 48, 64, 48, 56, 40);
-  save(player, cfg.fixtures.player, cfg.sources.player);
-  save(mara, cfg.fixtures.mara, cfg.sources.mara);
-  save(furnace, cfg.fixtures.furnace, cfg.sources.furnace);
 } else {
   player = read(cfg.sources.player); mara = read(cfg.sources.mara); furnace = read(cfg.sources.furnace);
+}
+if (cfg.rebuildWalk) {
+  var repaired = canvas(128, 192);
+  for (var direction = 0; direction < 4; direction++) {
+    var base = crop(player, 0, direction * 48, 32, 48);
+    for (var phase = 0; phase < 4; phase++) {
+      var frame = phase === 1 || phase === 3 ? playerWalkPose(base, direction, phase)
+        : crop(player, phase * 32, direction * 48, 32, 48);
+      blit(frame, repaired, phase * 32, direction * 48);
+    }
+  }
+  player = repaired;
 }
 if (player.width !== 128 || player.height !== 192 || mara.width !== 32 || mara.height !== 48 || furnace.width !== 48 || furnace.height !== 64) throw new Error('Cast master geometry changed');
 [player, mara, furnace].forEach(function(image) {
   image.pixels.forEach(function(c) { if (pc.rgbaA(c) !== 0 && pc.rgbaA(c) !== 255) throw new Error('Cast sprites require binary alpha'); });
 });
+var walkReport = inspectPlayerWalk(player);
+console.log('WALK_VALIDATION_JSON=' + JSON.stringify(walkReport));
+if (walkReport.failedFrames) {
+  var bad = walkReport.frames.filter(function(frame) { return !frame.ok; })[0];
+  throw new Error('Disconnected player walk: ' + bad.direction + ' pose ' + bad.pose
+    + ', missing waist pixels=' + bad.missingWaistPixels + ', detached leg pixels=' + bad.detachedLowerPixels);
+}
+if (cfg.regenerate || cfg.rebuildWalk) save(player, cfg.fixtures.player, cfg.sources.player);
+if (cfg.regenerate) {
+  save(mara, cfg.fixtures.mara, cfg.sources.mara);
+  save(furnace, cfg.fixtures.furnace, cfg.sources.furnace);
+}
 var terrain = read(cfg.terrain);
 function board(phase) {
   var out = canvas(320, 112);
@@ -114,4 +114,20 @@ function board(phase) {
 }
 save(scale(board(0), 2), cfg.fixtures.board, cfg.previews.board);
 for (var phase = 0; phase < 4; phase++) save(scale(board(phase), 2), cfg.fixtures.board, cfg.walkFrames[phase]);
-console.log('CAST_PILOT_OK: four player directions, four walk poses, Mara and furnace; binary alpha.');
+
+function inspection(phase) {
+  var out = canvas(160, 64);
+  for (var y = 0; y < out.height; y++) for (var x = 0; x < out.width; x++)
+    out.pixels[y * out.width + x] = ((x >> 3) + (y >> 3)) % 2 ? colour('b4c5cf') : colour('e5ded0');
+  for (var direction = 0; direction < 4; direction++)
+    blit(crop(player, phase * 32, direction * 48, 32, 48), out, 4 + direction * 40, 8);
+  return out;
+}
+for (var phase = 0; phase < 4; phase++) save(scale(inspection(phase), 4), cfg.fixtures.inspection, cfg.inspectionFrames[phase]);
+var contactSheet = canvas(160, 224);
+for (var y = 0; y < contactSheet.height; y++) for (var x = 0; x < contactSheet.width; x++)
+  contactSheet.pixels[y * contactSheet.width + x] = ((x >> 3) + (y >> 3)) % 2 ? colour('b4c5cf') : colour('e5ded0');
+for (var direction = 0; direction < 4; direction++) for (var phase = 0; phase < 4; phase++)
+  blit(crop(player, phase * 32, direction * 48, 32, 48), contactSheet, phase * 40 + 4, direction * 56 + 4);
+save(scale(contactSheet, 4), cfg.fixtures.contacts, cfg.previews.contacts);
+console.log('CAST_PILOT_OK: four player directions, four walk poses, Mara and furnace; binary alpha; waist continuity checked.');

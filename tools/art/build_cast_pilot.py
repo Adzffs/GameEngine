@@ -17,7 +17,7 @@ PALETTE = ['222b2b', '30211d', '563727', '7b4e2e', 'b27c48',
            '9e3f21', 'd76f27', 'e6943b', 'f5c05b', 'ffe08a']
 
 
-def build(editor, regenerate=False):
+def build(editor, regenerate=False, rebuild_walk=False):
     for folder in ['source', 'textures', 'previews']:
         (ART / folder).mkdir(parents=True, exist_ok=True)
     sizes = {'player': (128, 192), 'mara': (32, 48), 'furnace': (48, 64)}
@@ -35,30 +35,37 @@ def build(editor, regenerate=False):
     with tempfile.TemporaryDirectory(prefix='embervale-cast-') as scratch:
         temp = Path(scratch)
         fixtures = {}
-        for name, size in {**sizes, 'board': (640, 224)}.items():
+        for name, size in {**sizes, 'board': (640, 224), 'inspection': (640, 256), 'contacts': (640, 896)}.items():
             path = temp / f'{name}.png'
             blank_png(path, *size)
             fixtures[name] = path.as_posix()
         walk_frames = [(temp / f'walk-{i:02}.png').as_posix() for i in range(4)]
-        cfg = {'regenerate': regenerate, 'palette': PALETTE, 'fixtures': fixtures,
+        inspection_frames = [(temp / f'inspection-{i:02}.png').as_posix() for i in range(4)]
+        cfg = {'regenerate': regenerate, 'rebuildWalk': rebuild_walk, 'palette': PALETTE, 'fixtures': fixtures,
                'reference': (ART / 'reference/cast-reference.png').as_posix(),
                'terrain': (REPO / 'assets/embervale/forest-pilot/textures/terrain.png').as_posix(),
                'sources': {name: (ART / f'source/{name}.ase').as_posix() for name in sizes},
-               'previews': {'board': (ART / 'previews/cast-pilot-2x.png').as_posix()},
-               'walkFrames': walk_frames}
+               'previews': {'board': (ART / 'previews/cast-pilot-2x.png').as_posix(),
+                            'contacts': (ART / 'previews/walk-contact-sheet.png').as_posix()},
+               'walkFrames': walk_frames, 'inspectionFrames': inspection_frames}
         script = temp / 'cast-pilot.js'
         template = Path(__file__).with_name('cast_pilot.js').read_text(encoding='utf-8')
-        script.write_bytes(template.replace('__CONFIG__', json.dumps(cfg)).encode('utf-8'))
+        walk_module = Path(__file__).with_name('player_walk.js').read_text(encoding='utf-8')
+        script.write_bytes((walk_module + '\n' + template.replace('__CONFIG__', json.dumps(cfg))).encode('utf-8'))
         output = run('--script', script)
         if 'CAST_PILOT_OK:' not in output:
             raise RuntimeError('Cast authoring did not complete')
         print(output[output.index('CAST_PILOT_OK:'):].strip())
+        prefix = 'WALK_VALIDATION_JSON='
+        report = json.loads(next(line[len(prefix):] for line in output.splitlines() if line.startswith(prefix)))
+        (ART / 'previews/walk-validation.json').write_bytes((json.dumps(report, indent=2) + '\n').encode('utf-8'))
         # LibreSprite loads numbered PNG files as a sequence in batch mode.
-        run(walk_frames[0], '--save-as', ART / 'previews/walk-cycle.gif',
-            '--data', temp / 'walk.json', '--sheet', temp / 'walk.png')
-        frames = json.loads((temp / 'walk.json').read_text(encoding='utf-8'))['frames']
-        if len(frames) != 4:
-            raise RuntimeError('Walk preview did not load all four PNG sequence frames')
+        for name, sequence in [('walk-cycle', walk_frames), ('walk-inspection', inspection_frames)]:
+            run(sequence[0], '--save-as', ART / f'previews/{name}.gif',
+                '--data', temp / f'{name}.json', '--sheet', temp / f'{name}.png')
+            frames = json.loads((temp / f'{name}.json').read_text(encoding='utf-8'))['frames']
+            if len(frames) != 4:
+                raise RuntimeError('Walk preview did not load all four PNG sequence frames')
 
     images = {}
     for name, size in sizes.items():
@@ -92,7 +99,8 @@ def build(editor, regenerate=False):
                 'editor': 'LibreSprite 1.1-dev', 'palette_rgb': PALETTE,
                 'facing_order': ['south', 'west', 'east', 'north'],
                 'walk': {'frames_per_direction': 4, 'cycle_distance_tiles': 1.0,
-                         'idle_frame': 0, 'notes': 'Two neutral and two alternating stride poses; driven by visual travel distance.'},
+                         'idle_frame': 0, 'validation': 'previews/walk-validation.json',
+                         'notes': 'Two neutral and two alternating stride poses with a continuous pelvis; driven by visual travel distance.'},
                 'images': images, 'assets': assets,
                 'provenance': {'creator': 'OpenAI image generation and Codex-assisted LibreSprite authoring for Adam Holland',
                                'reference': 'reference/cast-reference.png',
@@ -100,7 +108,7 @@ def build(editor, regenerate=False):
                                'notes': 'Original six-panel reference; no third-party image input. LibreSprite performs native-size sampling, palette cleanup, binary-alpha cleanup and stride authoring.',
                                'licence': 'No separate asset licence grant declared; repository distribution policy applies.'},
                 'previews': {name: {'path': 'previews/' + name, 'sha256': checksum(ART / 'previews' / name)}
-                             for name in ['cast-pilot-2x.png', 'walk-cycle.gif']}}
+                             for name in ['cast-pilot-2x.png', 'walk-cycle.gif', 'walk-inspection.gif', 'walk-contact-sheet.png']}}
     (ART / 'manifest.json').write_bytes((json.dumps(manifest, indent=2) + '\n').encode('utf-8'))
     forest = json.loads((REPO / 'assets/embervale/forest-pilot/manifest.json').read_text(encoding='utf-8'))
     write_renderer_layout(forest)
@@ -110,6 +118,9 @@ def build(editor, regenerate=False):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--editor', required=True, type=Path)
-    parser.add_argument('--regenerate', action='store_true', help='Replace editable masters with the authored originals')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--regenerate', action='store_true', help='Replace editable masters with the authored originals')
+    mode.add_argument('--rebuild-walk', action='store_true',
+                      help='Repair only stride cells from the saved neutral frames; preserve other artwork')
     args = parser.parse_args()
-    build(args.editor.resolve(strict=True), args.regenerate)
+    build(args.editor.resolve(strict=True), args.regenerate, args.rebuild_walk)
