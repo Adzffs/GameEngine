@@ -1,8 +1,9 @@
 # Embervale forest art pilot
 
-**Created:** 19 November 2026. **Stage:** editable art batch and offline preview.
-The game still uses its existing renderer; these files are ready for the next
-sprite integration task. This authoring manifest is not a runtime import format.
+**Created:** 19 November 2026. **Stage:** editable art batch and first runtime pilot.
+The SDL client now draws this grass, dirt and normal-tree kit. A generated C++
+binding supplies its geometry; this authoring manifest is not a runtime JSON
+import format. [See the actual River Crossing renderer capture](../../../docs/embervale/06-development/art/2026-11-19/woodland.png).
 
 ![Forest pilot at 2x native scale](previews/forest-pilot-2x.png)
 
@@ -62,7 +63,8 @@ Python 3.9+ and the installed **LibreSprite 1.1-dev** JavaScript API are used.
 Python supplies empty canvases, launches the editor and writes metadata;
 LibreSprite performs all drawing, resampling, palette work and PNG exports.
 The default command preserves the editable masters and reads their actual
-pixels for the preview. Each export reopens its `.ase` file in a new editor
+pixels for the preview. It also refreshes the generated
+`src/Graphics/ForestPilotLayout.h` binding when geometry changes. Each export reopens its `.ase` file in a new editor
 process. Script exceptions are treated as failures even if the editor exits 0.
 
 To intentionally recreate the original masters from the reference and drawing
@@ -79,7 +81,14 @@ native and 2x scale. [forest-pilot.png](previews/forest-pilot.png) is 640x384;
 the enlarged preview uses exact nearest-neighbour 2x pixels. The scene is a
 composition of this kit, not a capture of the running game or River Crossing.
 
-The next task is to select these images in the runtime renderer with correct
-scale, pivot, draw order, resource state and a missing-image fallback. A player,
-NPC, station, water, rocks and a settlement kit still need their own art work.
-ART-001 and STUDIO-060/061 are not marked complete by this small batch.
+The runtime now selects the kit with its pivots, resource state, depth ordering,
+nearest-neighbour scaling and per-image fallback. **F6** switches the game
+between forest art and basic shapes. Opaque canopy pixels can target the tree;
+its one-tile gameplay footprint is preserved. Tall trees fade when overlapping
+the player behind them. See the
+[integration record](../../../docs/embervale/06-development/FOREST_RENDERING_2026-11-19.md)
+for captures, the real renderer preview command and remaining review limits.
+
+A player, NPC, station, water, rocks and a settlement kit still need their own
+art work. ART-001 and the general asset importer/Studio preview gates are not
+marked complete by this small runtime pilot.

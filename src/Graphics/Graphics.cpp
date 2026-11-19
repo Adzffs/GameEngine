@@ -290,6 +290,7 @@ Graphics::Graphics()
 
 Graphics::~Graphics()
 {
+    forestSprites.Clear();
     if (renderer != nullptr)
     {
         SDL_DestroyRenderer(renderer);
@@ -343,6 +344,8 @@ bool Graphics::Initialize()
     }
 
     SDL_SetWindowTitle(window, "Embervale - Adventure Prototype");
+
+    forestSprites.Initialize(renderer);
 
     return true;
 }
@@ -1762,6 +1765,13 @@ void Graphics::ProcessEvents(bool &running)
         if (event.type == SDL_EVENT_KEY_DOWN &&
             !event.key.repeat)
         {
+            if (event.key.scancode == SDL_SCANCODE_F6)
+            {
+                worldArtEnabled = !worldArtEnabled;
+                worldContextMenu.open = false;
+                worldHoverTarget = {};
+                continue;
+            }
             if (event.key.scancode == SDL_SCANCODE_R && !stationMenuOpen &&
                 !shopPresentationState.IsOpen() &&
                 !dialoguePresentationState.IsOpen())
@@ -2318,6 +2328,17 @@ bool Graphics::ConsumeClickedTile(
     mouseX = clickedMouseX;
     mouseY = clickedMouseY;
 
+    // Map painted canopy pixels back to the resource's authoritative tile.
+    // UI/modals and explicit Walk here use their existing paths.
+    const auto spriteTarget = PickSpriteTree(mouseX, mouseY);
+    if (spriteTarget.HasTarget())
+    {
+        tileX = static_cast<int>(spriteTarget.bounds.x) / TileSize;
+        tileY = static_cast<int>(spriteTarget.bounds.y) / TileSize;
+        clickedTileX = tileX;
+        clickedTileY = tileY;
+    }
+
     clickPending = false;
 
     return true;
@@ -2701,12 +2722,114 @@ void Graphics::DrawMinimap(
     drawMarker(playerX, playerY, 110, 215, 255, 6.0f);
 }
 
+SDL_FPoint Graphics::NextPlayerPosition(int playerX, int playerY) const
+{
+    if (!visualPlayerInitialized)
+        return {static_cast<float>(playerX), static_cast<float>(playerY)};
+    const float smoothing = 1.0f - std::exp(-14.0f * presentationDeltaSeconds);
+    SDL_FPoint position{visualPlayerX + (playerX - visualPlayerX) * smoothing,
+        visualPlayerY + (playerY - visualPlayerY) * smoothing};
+    if (std::abs(playerX - position.x) < 0.01f) position.x = static_cast<float>(playerX);
+    if (std::abs(playerY - position.y) < 0.01f) position.y = static_cast<float>(playerY);
+    return position;
+}
+
+void Graphics::UpdateSpritePicking(const std::vector<ResourceNode> &resources,
+    const std::vector<CraftingStation> &stations, const std::vector<GroundItem> &items)
+{
+    spriteTreeTargets.clear();
+    occupiedSpritePickTiles.clear();
+    for (const auto &resource : resources)
+    {
+        if (!resource.IsActive()) continue;
+        occupiedSpritePickTiles.emplace_back(resource.GetX(), resource.GetY());
+        if (resource.GetResourceType() == ResourceType::NORMAL_TREE)
+            spriteTreeTargets.push_back({resource.GetID(), resource.GetX(), resource.GetY()});
+    }
+    for (const auto &station : stations)
+        occupiedSpritePickTiles.emplace_back(station.GetX(), station.GetY());
+    for (const auto &item : items)
+        occupiedSpritePickTiles.emplace_back(item.position.GetX(), item.position.GetY());
+    std::stable_sort(spriteTreeTargets.begin(), spriteTreeTargets.end(),
+        [](const auto &a, const auto &b) { return a.y < b.y; });
+}
+
+Graphics::WorldHoverTarget Graphics::PickSpriteTree(float worldX, float worldY) const
+{
+    if (!worldArtEnabled || !forestSprites.HasTree()) return {};
+    const std::pair<int, int> tile{static_cast<int>(std::floor(worldX / TileSize)),
+        static_cast<int>(std::floor(worldY / TileSize))};
+    // Existing ground-item and object actions keep priority on occupied tiles.
+    if (std::find(occupiedSpritePickTiles.begin(), occupiedSpritePickTiles.end(), tile) !=
+        occupiedSpritePickTiles.end()) return {};
+    for (auto it = spriteTreeTargets.rbegin(); it != spriteTreeTargets.rend(); ++it)
+    {
+        if (!forestSprites.HitTree(it->x, it->y, worldX, worldY)) continue;
+        const SDL_FRect bounds{static_cast<float>(it->x * TileSize),
+            static_cast<float>(it->y * TileSize), static_cast<float>(TileSize), static_cast<float>(TileSize)};
+        return {WorldHoverTargetType::RESOURCE, it->id, bounds,
+            ResourceDatabase::Get(ResourceType::NORMAL_TREE).GetName(), "Gather"};
+    }
+    return {};
+}
+
+void Graphics::DrawWorldObjects(const std::vector<std::unique_ptr<Entity>> &entities,
+    const std::vector<ResourceNode> &resources, const std::vector<CraftingStation> &stations,
+    int playerX, int playerY, int selectedTargetID, int localPlayerID)
+{
+    static_assert(TileSize == ForestPilotLayout::TileSize);
+    enum class Kind { RESOURCE, STATION, MONSTER, NPC, PLAYER };
+    struct Entry { float depth; Kind kind; std::size_t index; };
+    std::vector<Entry> entries;
+    entries.reserve(resources.size() + stations.size() + entities.size() + 1);
+    for (std::size_t i = 0; i < resources.size(); ++i)
+        entries.push_back({resources[i].GetY() * TileSize + 24.0f, Kind::RESOURCE, i});
+    for (std::size_t i = 0; i < stations.size(); ++i)
+        entries.push_back({stations[i].GetY() * TileSize + 24.0f, Kind::STATION, i});
+    for (std::size_t i = 0; i < entities.size(); ++i)
+    {
+        const auto &entity = entities[i];
+        const float depth = entity->GetPosition().GetY() * TileSize + 24.0f;
+        if (dynamic_cast<const Monster *>(entity.get())) entries.push_back({depth, Kind::MONSTER, i});
+        else if (entity->GetType() == EntityType::NPC) entries.push_back({depth, Kind::NPC, i});
+    }
+    const auto nextPlayer = NextPlayerPosition(playerX, playerY);
+    visualPlayerRectangle = {nextPlayer.x * TileSize + 4.0f, nextPlayer.y * TileSize + 4.0f,
+        TileSize - 8.0f, TileSize - 8.0f};
+    entries.push_back({nextPlayer.y * TileSize + 24.0f, Kind::PLAYER, 0});
+    std::stable_sort(entries.begin(), entries.end(), [](const Entry &a, const Entry &b)
+    {
+        return a.depth == b.depth ? a.kind < b.kind : a.depth < b.depth;
+    });
+    for (const auto &entry : entries)
+    {
+        switch (entry.kind)
+        {
+        case Kind::RESOURCE: DrawResource(resources[entry.index]); break;
+        case Kind::STATION: DrawStation(stations[entry.index]); break;
+        case Kind::MONSTER:
+            DrawMonster(*static_cast<const Monster *>(entities[entry.index].get()),
+                selectedTargetID, localPlayerID);
+            break;
+        case Kind::NPC: DrawNpc(*entities[entry.index]); break;
+        case Kind::PLAYER: DrawPlayer(playerX, playerY); break;
+        }
+    }
+}
+
 void Graphics::DrawMap(Map &map)
 {
-    for (int y = 0; y < map.GetHeight(); y++)
+    const int firstX = std::max(0, static_cast<int>(std::floor(cameraPixelX / TileSize)));
+    const int firstY = std::max(0, static_cast<int>(std::floor(cameraPixelY / TileSize)));
+    const int lastX = std::min(map.GetWidth(), static_cast<int>(std::ceil(
+        (cameraPixelX + WindowWidth / cameraZoom) / TileSize)) + 1);
+    const int lastY = std::min(map.GetHeight(), static_cast<int>(std::ceil(
+        (cameraPixelY + WindowHeight / cameraZoom) / TileSize)) + 1);
+    for (int y = firstY; y < lastY; y++)
     {
-        for (int x = 0; x < map.GetWidth(); x++)
+        for (int x = firstX; x < lastX; x++)
         {
+            if (worldArtEnabled && forestSprites.DrawGround(map, x, y)) continue;
             SDL_FRect tileRectangle{
                 static_cast<float>(x * TileSize),
                 static_cast<float>(y * TileSize),
@@ -2827,20 +2950,10 @@ void Graphics::DrawPlayer(
     int playerX,
     int playerY)
 {
-    if (!visualPlayerInitialized)
-    {
-        visualPlayerX = static_cast<float>(playerX);
-        visualPlayerY = static_cast<float>(playerY);
-        visualPlayerInitialized = true;
-    }
-    const float targetX = static_cast<float>(playerX);
-    const float targetY = static_cast<float>(playerY);
-    const float smoothing = 1.0f - std::exp(
-        -14.0f * presentationDeltaSeconds);
-    visualPlayerX += (targetX - visualPlayerX) * smoothing;
-    visualPlayerY += (targetY - visualPlayerY) * smoothing;
-    if (std::abs(targetX - visualPlayerX) < 0.01f) visualPlayerX = targetX;
-    if (std::abs(targetY - visualPlayerY) < 0.01f) visualPlayerY = targetY;
+    const auto position = NextPlayerPosition(playerX, playerY);
+    visualPlayerX = position.x;
+    visualPlayerY = position.y;
+    visualPlayerInitialized = true;
 
     SDL_FRect playerRectangle =
         SDL_FRect{visualPlayerX * TileSize + 4.0f,
@@ -3087,6 +3200,9 @@ Graphics::WorldHoverTarget Graphics::ResolveWorldHoverTarget(
         }
     }
 
+    const auto spriteTarget = PickSpriteTree(screenX, screenY);
+    if (spriteTarget.HasTarget()) return spriteTarget;
+
     for (const auto &entity : entities)
     {
         const Monster *monster = dynamic_cast<const Monster *>(entity.get());
@@ -3160,6 +3276,9 @@ void Graphics::DrawWorldHoverFeedback()
 
 void Graphics::OpenWorldContextMenu(float screenX, float screenY)
 {
+    const SDL_FPoint worldPoint = ScreenToWorldPoint(screenX, screenY);
+    const auto spriteTarget = PickSpriteTree(worldPoint.x, worldPoint.y);
+    if (spriteTarget.HasTarget()) worldHoverTarget = spriteTarget;
     constexpr float rowHeight = 24.0f;
     constexpr float menuWidth = 210.0f;
     const int rowCount = worldHoverTarget.HasTarget() ? 4 : 2;
@@ -3169,7 +3288,6 @@ void Graphics::OpenWorldContextMenu(float screenX, float screenY)
 
     worldContextMenu.open = true;
     worldContextMenu.target = worldHoverTarget;
-    const SDL_FPoint worldPoint = ScreenToWorldPoint(screenX, screenY);
     worldContextMenu.tileX = static_cast<int>(worldPoint.x) / TileSize;
     worldContextMenu.tileY = static_cast<int>(worldPoint.y) / TileSize;
     worldContextMenu.screenX = static_cast<int>(worldPoint.x);
@@ -3295,76 +3413,80 @@ void Graphics::DrawWorldContextMenu()
 void Graphics::DrawNPCs(
     const std::vector<std::unique_ptr<Entity>> &entities)
 {
-    for (const auto &entity : entities)
+    for (const auto &entity : entities) DrawNpc(*entity);
+}
+
+void Graphics::DrawNpc(const Entity &value)
+{
+    const Entity *entity = &value;
+    if (entity->GetType() != EntityType::NPC)
     {
-        if (entity->GetType() != EntityType::NPC)
-        {
-            continue;
-        }
+        return;
+    }
 
-        SDL_FRect npcRectangle{
-            static_cast<float>(
-                entity->GetPosition().GetX() * TileSize + 5),
-            static_cast<float>(
-                entity->GetPosition().GetY() * TileSize + 5),
-            static_cast<float>(TileSize - 10),
-            static_cast<float>(TileSize - 10)};
+    SDL_FRect npcRectangle{
+        static_cast<float>(
+            entity->GetPosition().GetX() * TileSize + 5),
+        static_cast<float>(
+            entity->GetPosition().GetY() * TileSize + 5),
+        static_cast<float>(TileSize - 10),
+        static_cast<float>(TileSize - 10)};
 
-        const NPC *npc = dynamic_cast<const NPC *>(entity.get());
-        const bool isMara = npc != nullptr &&
-            npc->GetNpcType() == NpcType::DEVELOPMENT_GUIDE;
-        const bool isTorren = npc != nullptr &&
-            npc->GetNpcType() == NpcType::TORREN_ASH;
-        Uint8 red = 255, green = 150, blue = 50;
-        if (npc != nullptr)
+    const NPC *npc = dynamic_cast<const NPC *>(entity);
+    const bool isMara = npc != nullptr &&
+        npc->GetNpcType() == NpcType::DEVELOPMENT_GUIDE;
+    const bool isTorren = npc != nullptr &&
+        npc->GetNpcType() == NpcType::TORREN_ASH;
+    Uint8 red = 255, green = 150, blue = 50;
+    if (npc != nullptr)
+    {
+        switch (npc->GetNpcType())
         {
-            switch (npc->GetNpcType())
-            {
-            case NpcType::DEVELOPMENT_GUIDE: red = 48; green = 96; blue = 150; break;
-            case NpcType::TORREN_ASH: red = 135; green = 58; blue = 38; break;
-            case NpcType::ELIA_REED: red = 48; green = 112; blue = 72; break;
-            case NpcType::NESSA_THORNE: red = 74; green = 130; blue = 58; break;
-            case NpcType::BRANN_DEEPWELL: red = 105; green = 108; blue = 112; break;
-            case NpcType::SERA_FLINT: red = 142; green = 58; blue = 45; break;
-            default: break;
-            }
-        }
-        SDL_SetRenderDrawColor(renderer, red, green, blue, 255);
-
-        SDL_RenderFillRect(
-            renderer,
-            &npcRectangle);
-        if (isMara)
-        {
-            SDL_SetRenderDrawColor(renderer, 225, 184, 82, 255);
-            SDL_RenderRect(renderer, &npcRectangle);
-            const SDL_FRect wardenSash{
-                npcRectangle.x + 5.0f, npcRectangle.y + 2.0f,
-                4.0f, npcRectangle.h - 4.0f};
-            SDL_RenderFillRect(renderer, &wardenSash);
-        }
-        else if (isTorren)
-        {
-            SDL_SetRenderDrawColor(renderer, 232, 122, 54, 255);
-            SDL_RenderRect(renderer, &npcRectangle);
-            const SDL_FRect apron{
-                npcRectangle.x + 6.0f, npcRectangle.y + npcRectangle.h * 0.42f,
-                npcRectangle.w - 12.0f, npcRectangle.h * 0.50f};
-            SDL_SetRenderDrawColor(renderer, 72, 48, 36, 255);
-            SDL_RenderFillRect(renderer, &apron);
-        }
-        else if (npc != nullptr)
-        {
-            SDL_SetRenderDrawColor(renderer, 220, 205, 150, 255);
-            SDL_RenderRect(renderer, &npcRectangle);
-            const SDL_FRect roleMark{
-                npcRectangle.x + npcRectangle.w * 0.35f,
-                npcRectangle.y + 3.0f,
-                npcRectangle.w * 0.30f, 4.0f};
-            SDL_RenderFillRect(renderer, &roleMark);
+        case NpcType::DEVELOPMENT_GUIDE: red = 48; green = 96; blue = 150; break;
+        case NpcType::TORREN_ASH: red = 135; green = 58; blue = 38; break;
+        case NpcType::ELIA_REED: red = 48; green = 112; blue = 72; break;
+        case NpcType::NESSA_THORNE: red = 74; green = 130; blue = 58; break;
+        case NpcType::BRANN_DEEPWELL: red = 105; green = 108; blue = 112; break;
+        case NpcType::SERA_FLINT: red = 142; green = 58; blue = 45; break;
+        default: break;
         }
     }
+    SDL_SetRenderDrawColor(renderer, red, green, blue, 255);
+
+    SDL_RenderFillRect(
+        renderer,
+        &npcRectangle);
+    if (isMara)
+    {
+        SDL_SetRenderDrawColor(renderer, 225, 184, 82, 255);
+        SDL_RenderRect(renderer, &npcRectangle);
+        const SDL_FRect wardenSash{
+            npcRectangle.x + 5.0f, npcRectangle.y + 2.0f,
+            4.0f, npcRectangle.h - 4.0f};
+        SDL_RenderFillRect(renderer, &wardenSash);
+    }
+    else if (isTorren)
+    {
+        SDL_SetRenderDrawColor(renderer, 232, 122, 54, 255);
+        SDL_RenderRect(renderer, &npcRectangle);
+        const SDL_FRect apron{
+            npcRectangle.x + 6.0f, npcRectangle.y + npcRectangle.h * 0.42f,
+            npcRectangle.w - 12.0f, npcRectangle.h * 0.50f};
+        SDL_SetRenderDrawColor(renderer, 72, 48, 36, 255);
+        SDL_RenderFillRect(renderer, &apron);
+    }
+    else if (npc != nullptr)
+    {
+        SDL_SetRenderDrawColor(renderer, 220, 205, 150, 255);
+        SDL_RenderRect(renderer, &npcRectangle);
+        const SDL_FRect roleMark{
+            npcRectangle.x + npcRectangle.w * 0.35f,
+            npcRectangle.y + 3.0f,
+            npcRectangle.w * 0.30f, 4.0f};
+        SDL_RenderFillRect(renderer, &roleMark);
+    }
 }
+
 
 void Graphics::DrawMonsters(
     const std::vector<std::unique_ptr<Entity>> &entities,
@@ -3372,171 +3494,169 @@ void Graphics::DrawMonsters(
     int localPlayerID)
 {
     for (const auto &entity : entities)
+        if (const auto *monster = dynamic_cast<const Monster *>(entity.get()))
+            DrawMonster(*monster, selectedCombatTargetID, localPlayerID);
+}
+
+void Graphics::DrawMonster(const Monster &value, int selectedCombatTargetID, int localPlayerID)
+{
+    const Monster *monster = &value;
+    if (monster->IsAlive())
     {
-        Monster *monster =
-            dynamic_cast<Monster *>(entity.get());
+        SDL_FRect monsterRectangle =
+            GetMonsterScreenRectangle(*monster);
+        const bool selected = monster->GetID() == selectedCombatTargetID;
+        const bool aggressive = monster->HasAggressionDefinition();
+        const NpcType monsterType = monster->GetNpcType();
+        const bool durable =
+            monsterType == NpcType::DURABLE_DEVELOPMENT_MONSTER;
+        const bool elite =
+            monsterType == NpcType::ELITE_DEVELOPMENT_MONSTER;
+        const bool attackingPlayer =
+            monster->GetAggressionTargetEntityID() == localPlayerID;
 
-        if (monster == nullptr)
+        if (selected)
         {
-            continue;
+            const SDL_FRect targetRing{
+                monsterRectangle.x - 5.0f,
+                monsterRectangle.y + monsterRectangle.h - 6.0f,
+                monsterRectangle.w + 10.0f,
+                10.0f};
+            SDL_SetRenderDrawColor(renderer, 255, 211, 70, 255);
+            SDL_RenderRect(renderer, &targetRing);
         }
 
-        if (monster->IsAlive())
-        {
-            SDL_FRect monsterRectangle =
-                GetMonsterScreenRectangle(*monster);
-            const bool selected = monster->GetID() == selectedCombatTargetID;
-            const bool aggressive = monster->HasAggressionDefinition();
-            const NpcType monsterType = monster->GetNpcType();
-            const bool durable =
-                monsterType == NpcType::DURABLE_DEVELOPMENT_MONSTER;
-            const bool elite =
-                monsterType == NpcType::ELITE_DEVELOPMENT_MONSTER;
-            const bool attackingPlayer =
-                monster->GetAggressionTargetEntityID() == localPlayerID;
+        SDL_FRect shadow{
+            monsterRectangle.x + 2.0f,
+            monsterRectangle.y + monsterRectangle.h - 3.0f,
+            monsterRectangle.w - 4.0f, 6.0f};
+        SDL_SetRenderDrawColor(renderer, 25, 12, 14, 150);
+        SDL_RenderFillRect(renderer, &shadow);
 
-            if (selected)
-            {
-                const SDL_FRect targetRing{
-                    monsterRectangle.x - 5.0f,
-                    monsterRectangle.y + monsterRectangle.h - 6.0f,
-                    monsterRectangle.w + 10.0f,
-                    10.0f};
-                SDL_SetRenderDrawColor(renderer, 255, 211, 70, 255);
-                SDL_RenderRect(renderer, &targetRing);
-            }
-
-            SDL_FRect shadow{
-                monsterRectangle.x + 2.0f,
-                monsterRectangle.y + monsterRectangle.h - 3.0f,
-                monsterRectangle.w - 4.0f, 6.0f};
-            SDL_SetRenderDrawColor(renderer, 25, 12, 14, 150);
-            SDL_RenderFillRect(renderer, &shadow);
-
-            if (elite)
-                SDL_SetRenderDrawColor(renderer, 105, 38, 128, 255);
-            else if (durable)
-                SDL_SetRenderDrawColor(renderer, 92, 102, 112, 255);
-            else
-                SDL_SetRenderDrawColor(renderer,
-                    aggressive ? 164 : 70,
-                    aggressive ? 48 : 135,
-                    aggressive ? 48 : 78,
-                    255);
-
-            SDL_RenderFillRect(
-                renderer,
-                &monsterRectangle);
-
-            if (elite)
-                SDL_SetRenderDrawColor(renderer, 244, 106, 65, 255);
-            else if (durable)
-                SDL_SetRenderDrawColor(renderer, 188, 198, 205, 255);
-            else
-                SDL_SetRenderDrawColor(renderer,
-                    aggressive ? 235 : 135,
-                    aggressive ? 105 : 205,
-                    aggressive ? 95 : 145,
-                    255);
-
-            SDL_RenderRect(
-                renderer,
-                &monsterRectangle);
-
-            SDL_FRect eyeLeft{monsterRectangle.x + 5.0f,
-                              monsterRectangle.y + 7.0f, 3.0f, 3.0f};
-            SDL_FRect eyeRight{monsterRectangle.x + monsterRectangle.w - 8.0f,
-                               monsterRectangle.y + 7.0f, 3.0f, 3.0f};
-            SDL_SetRenderDrawColor(renderer, 255, 210, 115, 255);
-            SDL_RenderFillRect(renderer, &eyeLeft);
-            SDL_RenderFillRect(renderer, &eyeRight);
-            if (durable)
-            {
-                const SDL_FRect shell{
-                    monsterRectangle.x + 3.0f,
-                    monsterRectangle.y + 13.0f,
-                    monsterRectangle.w - 6.0f,
-                    monsterRectangle.h - 16.0f};
-                SDL_SetRenderDrawColor(renderer, 55, 66, 72, 255);
-                SDL_RenderRect(renderer, &shell);
-                SDL_RenderLine(renderer, shell.x, shell.y + shell.h * 0.5f,
-                    shell.x + shell.w, shell.y + shell.h * 0.5f);
-            }
-            if (elite)
-            {
-                SDL_SetRenderDrawColor(renderer, 255, 142, 55, 255);
-                SDL_RenderLine(renderer,
-                    monsterRectangle.x + 4.0f, monsterRectangle.y + 2.0f,
-                    monsterRectangle.x, monsterRectangle.y - 6.0f);
-                SDL_RenderLine(renderer,
-                    monsterRectangle.x + monsterRectangle.w - 4.0f,
-                    monsterRectangle.y + 2.0f,
-                    monsterRectangle.x + monsterRectangle.w,
-                    monsterRectangle.y - 6.0f);
-                const SDL_FRect core{
-                    monsterRectangle.x + monsterRectangle.w * 0.35f,
-                    monsterRectangle.y + monsterRectangle.h * 0.55f,
-                    monsterRectangle.w * 0.30f, 5.0f};
-                SDL_RenderFillRect(renderer, &core);
-            }
-            if (attackingPlayer)
-            {
-                SDL_SetRenderDrawColor(renderer, 255, 95, 75, 255);
-                SDL_RenderDebugText(renderer,
-                    monsterRectangle.x + 8.0f,
-                    monsterRectangle.y - 20.0f,
-                    "!");
-            }
-            continue;
-        }
-
-        SDL_FRect corpseRectangle =
-            GetMonsterCorpseRectangle(*monster);
-
-        SDL_SetRenderDrawColor(
-            renderer,
-            55,
-            35,
-            35,
-            255);
+        if (elite)
+            SDL_SetRenderDrawColor(renderer, 105, 38, 128, 255);
+        else if (durable)
+            SDL_SetRenderDrawColor(renderer, 92, 102, 112, 255);
+        else
+            SDL_SetRenderDrawColor(renderer,
+                aggressive ? 164 : 70,
+                aggressive ? 48 : 135,
+                aggressive ? 48 : 78,
+                255);
 
         SDL_RenderFillRect(
             renderer,
-            &corpseRectangle);
+            &monsterRectangle);
 
-        SDL_SetRenderDrawColor(
-            renderer,
-            25,
-            18,
-            18,
-            255);
+        if (elite)
+            SDL_SetRenderDrawColor(renderer, 244, 106, 65, 255);
+        else if (durable)
+            SDL_SetRenderDrawColor(renderer, 188, 198, 205, 255);
+        else
+            SDL_SetRenderDrawColor(renderer,
+                aggressive ? 235 : 135,
+                aggressive ? 105 : 205,
+                aggressive ? 95 : 145,
+                255);
 
         SDL_RenderRect(
             renderer,
-            &corpseRectangle);
+            &monsterRectangle);
 
-        SDL_SetRenderDrawColor(
-            renderer,
-            25,
-            10,
-            10,
-            255);
-
-        SDL_RenderLine(
-            renderer,
-            corpseRectangle.x + 1.0f,
-            corpseRectangle.y + 1.0f,
-            corpseRectangle.x + corpseRectangle.w - 1.0f,
-            corpseRectangle.y + corpseRectangle.h - 1.0f);
-
-        SDL_RenderLine(
-            renderer,
-            corpseRectangle.x + corpseRectangle.w - 1.0f,
-            corpseRectangle.y + 1.0f,
-            corpseRectangle.x + 1.0f,
-            corpseRectangle.y + corpseRectangle.h - 1.0f);
+        SDL_FRect eyeLeft{monsterRectangle.x + 5.0f,
+                          monsterRectangle.y + 7.0f, 3.0f, 3.0f};
+        SDL_FRect eyeRight{monsterRectangle.x + monsterRectangle.w - 8.0f,
+                           monsterRectangle.y + 7.0f, 3.0f, 3.0f};
+        SDL_SetRenderDrawColor(renderer, 255, 210, 115, 255);
+        SDL_RenderFillRect(renderer, &eyeLeft);
+        SDL_RenderFillRect(renderer, &eyeRight);
+        if (durable)
+        {
+            const SDL_FRect shell{
+                monsterRectangle.x + 3.0f,
+                monsterRectangle.y + 13.0f,
+                monsterRectangle.w - 6.0f,
+                monsterRectangle.h - 16.0f};
+            SDL_SetRenderDrawColor(renderer, 55, 66, 72, 255);
+            SDL_RenderRect(renderer, &shell);
+            SDL_RenderLine(renderer, shell.x, shell.y + shell.h * 0.5f,
+                shell.x + shell.w, shell.y + shell.h * 0.5f);
+        }
+        if (elite)
+        {
+            SDL_SetRenderDrawColor(renderer, 255, 142, 55, 255);
+            SDL_RenderLine(renderer,
+                monsterRectangle.x + 4.0f, monsterRectangle.y + 2.0f,
+                monsterRectangle.x, monsterRectangle.y - 6.0f);
+            SDL_RenderLine(renderer,
+                monsterRectangle.x + monsterRectangle.w - 4.0f,
+                monsterRectangle.y + 2.0f,
+                monsterRectangle.x + monsterRectangle.w,
+                monsterRectangle.y - 6.0f);
+            const SDL_FRect core{
+                monsterRectangle.x + monsterRectangle.w * 0.35f,
+                monsterRectangle.y + monsterRectangle.h * 0.55f,
+                monsterRectangle.w * 0.30f, 5.0f};
+            SDL_RenderFillRect(renderer, &core);
+        }
+        if (attackingPlayer)
+        {
+            SDL_SetRenderDrawColor(renderer, 255, 95, 75, 255);
+            SDL_RenderDebugText(renderer,
+                monsterRectangle.x + 8.0f,
+                monsterRectangle.y - 20.0f,
+                "!");
+        }
+        return;
     }
+
+    SDL_FRect corpseRectangle =
+        GetMonsterCorpseRectangle(*monster);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        55,
+        35,
+        35,
+        255);
+
+    SDL_RenderFillRect(
+        renderer,
+        &corpseRectangle);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        25,
+        18,
+        18,
+        255);
+
+    SDL_RenderRect(
+        renderer,
+        &corpseRectangle);
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        25,
+        10,
+        10,
+        255);
+
+    SDL_RenderLine(
+        renderer,
+        corpseRectangle.x + 1.0f,
+        corpseRectangle.y + 1.0f,
+        corpseRectangle.x + corpseRectangle.w - 1.0f,
+        corpseRectangle.y + corpseRectangle.h - 1.0f);
+
+    SDL_RenderLine(
+        renderer,
+        corpseRectangle.x + corpseRectangle.w - 1.0f,
+        corpseRectangle.y + 1.0f,
+        corpseRectangle.x + 1.0f,
+        corpseRectangle.y + corpseRectangle.h - 1.0f);
 }
+
 
 void Graphics::DrawCombatTargetPanel(
     const std::vector<std::unique_ptr<Entity>> &entities,
@@ -3782,471 +3902,476 @@ void Graphics::DrawMeleeAttackPresentations(
 void Graphics::DrawStations(
     const std::vector<CraftingStation> &stations)
 {
-    for (const CraftingStation &station :
-         stations)
+    for (const auto &station : stations) DrawStation(station);
+}
+
+void Graphics::DrawStation(const CraftingStation &station)
+{
+    float tileX =
+        static_cast<float>(
+            station.GetX() * TileSize);
+
+    float tileY =
+        static_cast<float>(
+            station.GetY() * TileSize);
+
+    switch (station.GetStationType())
     {
-        float tileX =
-            static_cast<float>(
-                station.GetX() * TileSize);
+    case StationType::FURNACE:
+    {
+        SDL_SetRenderDrawColor(
+            renderer,
+            80,
+            80,
+            85,
+            255);
 
-        float tileY =
-            static_cast<float>(
-                station.GetY() * TileSize);
+        SDL_FRect furnaceBody{
+            tileX + TileSize * 0.15f,
+            tileY + TileSize * 0.18f,
+            TileSize * 0.70f,
+            TileSize * 0.68f};
 
-        switch (station.GetStationType())
+        SDL_RenderFillRect(
+            renderer,
+            &furnaceBody);
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            40,
+            40,
+            45,
+            255);
+
+        SDL_FRect opening{
+            tileX + TileSize * 0.30f,
+            tileY + TileSize * 0.52f,
+            TileSize * 0.40f,
+            TileSize * 0.25f};
+
+        SDL_RenderFillRect(
+            renderer,
+            &opening);
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            240,
+            105,
+            25,
+            255);
+
+        SDL_FRect fire{
+            tileX + TileSize * 0.38f,
+            tileY + TileSize * 0.60f,
+            TileSize * 0.24f,
+            TileSize * 0.12f};
+
+        SDL_RenderFillRect(
+            renderer,
+            &fire);
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            65,
+            65,
+            70,
+            255);
+
+        SDL_FRect chimney{
+            tileX + TileSize * 0.58f,
+            tileY + TileSize * 0.05f,
+            TileSize * 0.20f,
+            TileSize * 0.25f};
+
+        SDL_RenderFillRect(
+            renderer,
+            &chimney);
+
+        break;
+    }
+
+    case StationType::CRAFTING_TABLE:
+    {
+        SDL_SetRenderDrawColor(
+            renderer, 126, 78, 38, 255);
+        SDL_FRect tableBody{
+            tileX + TileSize * 0.10f,
+            tileY + TileSize * 0.18f,
+            TileSize * 0.80f,
+            TileSize * 0.68f};
+        SDL_RenderFillRect(renderer, &tableBody);
+
+        SDL_SetRenderDrawColor(
+            renderer, 205, 151, 78, 255);
+        SDL_FRect tableTop{
+            tileX + TileSize * 0.06f,
+            tileY + TileSize * 0.12f,
+            TileSize * 0.88f,
+            TileSize * 0.18f};
+        SDL_RenderFillRect(renderer, &tableTop);
+
+        SDL_SetRenderDrawColor(
+            renderer, 75, 47, 26, 255);
+        for (int index = 1; index < 3; ++index)
         {
-        case StationType::FURNACE:
+            const float offset =
+                static_cast<float>(index) * TileSize * 0.28f;
+            SDL_FRect vertical{
+                tileX + TileSize * 0.08f + offset,
+                tileY + TileSize * 0.12f,
+                1.0f,
+                TileSize * 0.18f};
+            SDL_RenderFillRect(renderer, &vertical);
+        }
+        break;
+    }
+
+    case StationType::BANK:
+    {
+        SDL_SetRenderDrawColor(renderer, 94, 62, 32, 255);
+        SDL_FRect chest{tileX + 3.0f, tileY + 10.0f,
+            TileSize - 6.0f, TileSize - 13.0f};
+        SDL_RenderFillRect(renderer, &chest);
+        SDL_SetRenderDrawColor(renderer, 210, 171, 67, 255);
+        SDL_RenderRect(renderer, &chest);
+        SDL_FRect band{tileX + 3.0f, tileY + 16.0f,
+            TileSize - 6.0f, 4.0f};
+        SDL_RenderFillRect(renderer, &band);
+        SDL_FRect lock{tileX + 14.0f, tileY + 17.0f, 5.0f, 7.0f};
+        SDL_RenderFillRect(renderer, &lock);
+        break;
+    }
+
+    case StationType::NONE:
+    default:
+        break;
+    }
+}
+
+
+void Graphics::DrawResources(
+    const std::vector<ResourceNode> &resources)
+{
+    for (const auto &resource : resources) DrawResource(resource);
+}
+
+void Graphics::DrawResource(const ResourceNode &resource)
+{
+    if (worldArtEnabled && forestSprites.DrawTree(resource, visualPlayerRectangle)) return;
+    float tileX =
+        static_cast<float>(
+            resource.GetX() * TileSize);
+
+    float tileY =
+        static_cast<float>(
+            resource.GetY() * TileSize);
+
+    if (!resource.IsActive())
+    {
+        const ResourceDefinition &definition =
+            ResourceDatabase::Get(
+                resource.GetResourceType());
+
+        switch (definition.GetDepletedVisualType())
+        {
+        case DepletedVisualType::STUMP:
         {
             SDL_SetRenderDrawColor(
                 renderer,
-                80,
-                80,
-                85,
+                105,
+                65,
+                30,
                 255);
 
-            SDL_FRect furnaceBody{
-                tileX + TileSize * 0.15f,
-                tileY + TileSize * 0.18f,
-                TileSize * 0.70f,
-                TileSize * 0.68f};
-
-            SDL_RenderFillRect(
-                renderer,
-                &furnaceBody);
-
-            SDL_SetRenderDrawColor(
-                renderer,
-                40,
-                40,
-                45,
-                255);
-
-            SDL_FRect opening{
+            SDL_FRect stump{
                 tileX + TileSize * 0.30f,
-                tileY + TileSize * 0.52f,
+                tileY + TileSize * 0.58f,
                 TileSize * 0.40f,
                 TileSize * 0.25f};
 
             SDL_RenderFillRect(
                 renderer,
-                &opening);
+                &stump);
 
+            break;
+        }
+
+        case DepletedVisualType::ROCK_RUBBLE:
+        {
             SDL_SetRenderDrawColor(
                 renderer,
-                240,
-                105,
-                25,
+                85,
+                85,
+                90,
                 255);
 
-            SDL_FRect fire{
-                tileX + TileSize * 0.38f,
-                tileY + TileSize * 0.60f,
-                TileSize * 0.24f,
-                TileSize * 0.12f};
+            SDL_FRect leftRock{
+                tileX + TileSize * 0.18f,
+                tileY + TileSize * 0.68f,
+                TileSize * 0.25f,
+                TileSize * 0.16f};
+
+            SDL_FRect middleRock{
+                tileX + TileSize * 0.40f,
+                tileY + TileSize * 0.61f,
+                TileSize * 0.28f,
+                TileSize * 0.22f};
+
+            SDL_FRect rightRock{
+                tileX + TileSize * 0.66f,
+                tileY + TileSize * 0.70f,
+                TileSize * 0.18f,
+                TileSize * 0.13f};
 
             SDL_RenderFillRect(
                 renderer,
-                &fire);
-
-            SDL_SetRenderDrawColor(
-                renderer,
-                65,
-                65,
-                70,
-                255);
-
-            SDL_FRect chimney{
-                tileX + TileSize * 0.58f,
-                tileY + TileSize * 0.05f,
-                TileSize * 0.20f,
-                TileSize * 0.25f};
+                &leftRock);
 
             SDL_RenderFillRect(
                 renderer,
-                &chimney);
+                &middleRock);
+
+            SDL_RenderFillRect(
+                renderer,
+                &rightRock);
 
             break;
         }
 
-        case StationType::CRAFTING_TABLE:
-        {
-            SDL_SetRenderDrawColor(
-                renderer, 126, 78, 38, 255);
-            SDL_FRect tableBody{
-                tileX + TileSize * 0.10f,
-                tileY + TileSize * 0.18f,
-                TileSize * 0.80f,
-                TileSize * 0.68f};
-            SDL_RenderFillRect(renderer, &tableBody);
-
-            SDL_SetRenderDrawColor(
-                renderer, 205, 151, 78, 255);
-            SDL_FRect tableTop{
-                tileX + TileSize * 0.06f,
-                tileY + TileSize * 0.12f,
-                TileSize * 0.88f,
-                TileSize * 0.18f};
-            SDL_RenderFillRect(renderer, &tableTop);
-
-            SDL_SetRenderDrawColor(
-                renderer, 75, 47, 26, 255);
-            for (int index = 1; index < 3; ++index)
-            {
-                const float offset =
-                    static_cast<float>(index) * TileSize * 0.28f;
-                SDL_FRect vertical{
-                    tileX + TileSize * 0.08f + offset,
-                    tileY + TileSize * 0.12f,
-                    1.0f,
-                    TileSize * 0.18f};
-                SDL_RenderFillRect(renderer, &vertical);
-            }
-            break;
-        }
-
-        case StationType::BANK:
-        {
-            SDL_SetRenderDrawColor(renderer, 94, 62, 32, 255);
-            SDL_FRect chest{tileX + 3.0f, tileY + 10.0f,
-                TileSize - 6.0f, TileSize - 13.0f};
-            SDL_RenderFillRect(renderer, &chest);
-            SDL_SetRenderDrawColor(renderer, 210, 171, 67, 255);
-            SDL_RenderRect(renderer, &chest);
-            SDL_FRect band{tileX + 3.0f, tileY + 16.0f,
-                TileSize - 6.0f, 4.0f};
-            SDL_RenderFillRect(renderer, &band);
-            SDL_FRect lock{tileX + 14.0f, tileY + 17.0f, 5.0f, 7.0f};
-            SDL_RenderFillRect(renderer, &lock);
-            break;
-        }
-
-        case StationType::NONE:
+        case DepletedVisualType::NONE:
         default:
             break;
         }
+
+        return;
     }
-}
 
-void Graphics::DrawResources(
-    const std::vector<ResourceNode> &resources)
-{
-    for (const ResourceNode &resource :
-         resources)
+    int leafRed = 55;
+    int leafGreen = 140;
+    int leafBlue = 55;
+    bool drawDefaultTree = true;
+
+    switch (resource.GetResourceType())
     {
-        float tileX =
-            static_cast<float>(
-                resource.GetX() * TileSize);
+    case ResourceType::NORMAL_TREE:
+        leafRed = 55;
+        leafGreen = 140;
+        leafBlue = 55;
+        break;
 
-        float tileY =
-            static_cast<float>(
-                resource.GetY() * TileSize);
+    case ResourceType::OAK_TREE:
+        leafRed = 75;
+        leafGreen = 110;
+        leafBlue = 40;
+        break;
 
-        if (!resource.IsActive())
-        {
-            const ResourceDefinition &definition =
-                ResourceDatabase::Get(
-                    resource.GetResourceType());
+    case ResourceType::WILLOW_TREE:
+        leafRed = 65;
+        leafGreen = 135;
+        leafBlue = 95;
+        break;
 
-            switch (definition.GetDepletedVisualType())
-            {
-            case DepletedVisualType::STUMP:
-            {
-                SDL_SetRenderDrawColor(
-                    renderer,
-                    105,
-                    65,
-                    30,
-                    255);
+    case ResourceType::COPPER_ROCK:
+    {
+        SDL_SetRenderDrawColor(
+            renderer,
+            105,
+            105,
+            115,
+            255);
 
-                SDL_FRect stump{
-                    tileX + TileSize * 0.30f,
-                    tileY + TileSize * 0.58f,
-                    TileSize * 0.40f,
-                    TileSize * 0.25f};
+        SDL_FRect rockBody{
+            tileX + TileSize * 0.15f,
+            tileY + TileSize * 0.35f,
+            TileSize * 0.70f,
+            TileSize * 0.50f};
 
-                SDL_RenderFillRect(
-                    renderer,
-                    &stump);
-
-                break;
-            }
-
-            case DepletedVisualType::ROCK_RUBBLE:
-            {
-                SDL_SetRenderDrawColor(
-                    renderer,
-                    85,
-                    85,
-                    90,
-                    255);
-
-                SDL_FRect leftRock{
-                    tileX + TileSize * 0.18f,
-                    tileY + TileSize * 0.68f,
-                    TileSize * 0.25f,
-                    TileSize * 0.16f};
-
-                SDL_FRect middleRock{
-                    tileX + TileSize * 0.40f,
-                    tileY + TileSize * 0.61f,
-                    TileSize * 0.28f,
-                    TileSize * 0.22f};
-
-                SDL_FRect rightRock{
-                    tileX + TileSize * 0.66f,
-                    tileY + TileSize * 0.70f,
-                    TileSize * 0.18f,
-                    TileSize * 0.13f};
-
-                SDL_RenderFillRect(
-                    renderer,
-                    &leftRock);
-
-                SDL_RenderFillRect(
-                    renderer,
-                    &middleRock);
-
-                SDL_RenderFillRect(
-                    renderer,
-                    &rightRock);
-
-                break;
-            }
-
-            case DepletedVisualType::NONE:
-            default:
-                break;
-            }
-
-            continue;
-        }
-
-        int leafRed = 55;
-        int leafGreen = 140;
-        int leafBlue = 55;
-        bool drawDefaultTree = true;
-
-        switch (resource.GetResourceType())
-        {
-        case ResourceType::NORMAL_TREE:
-            leafRed = 55;
-            leafGreen = 140;
-            leafBlue = 55;
-            break;
-
-        case ResourceType::OAK_TREE:
-            leafRed = 75;
-            leafGreen = 110;
-            leafBlue = 40;
-            break;
-
-        case ResourceType::WILLOW_TREE:
-            leafRed = 65;
-            leafGreen = 135;
-            leafBlue = 95;
-            break;
-
-        case ResourceType::COPPER_ROCK:
-        {
-            SDL_SetRenderDrawColor(
-                renderer,
-                105,
-                105,
-                115,
-                255);
-
-            SDL_FRect rockBody{
-                tileX + TileSize * 0.15f,
-                tileY + TileSize * 0.35f,
-                TileSize * 0.70f,
-                TileSize * 0.50f};
-
-            SDL_RenderFillRect(
-                renderer,
-                &rockBody);
-
-            SDL_SetRenderDrawColor(
-                renderer,
-                190,
-                105,
-                55,
-                255);
-
-            SDL_FRect copperDeposit{
-                tileX + TileSize * 0.32f,
-                tileY + TileSize * 0.43f,
-                TileSize * 0.20f,
-                TileSize * 0.15f};
-
-            SDL_RenderFillRect(
-                renderer,
-                &copperDeposit);
-
-            drawDefaultTree = false;
-            break;
-        }
-
-        case ResourceType::TIN_ROCK:
-        {
-            SDL_SetRenderDrawColor(
-                renderer,
-                105,
-                105,
-                115,
-                255);
-
-            SDL_FRect rockBody{
-                tileX + TileSize * 0.15f,
-                tileY + TileSize * 0.35f,
-                TileSize * 0.70f,
-                TileSize * 0.50f};
-
-            SDL_RenderFillRect(
-                renderer,
-                &rockBody);
-
-            SDL_SetRenderDrawColor(
-                renderer,
-                190,
-                190,
-                200,
-                255);
-
-            SDL_FRect tinDeposit{
-                tileX + TileSize * 0.32f,
-                tileY + TileSize * 0.43f,
-                TileSize * 0.20f,
-                TileSize * 0.15f};
-
-            SDL_RenderFillRect(
-                renderer,
-                &tinDeposit);
-
-            drawDefaultTree = false;
-            break;
-        }
-
-        case ResourceType::IRON_ROCK:
-        {
-            SDL_SetRenderDrawColor(
-                renderer,
-                105,
-                105,
-                115,
-                255);
-
-            SDL_FRect rockBody{
-                tileX + TileSize * 0.15f,
-                tileY + TileSize * 0.35f,
-                TileSize * 0.70f,
-                TileSize * 0.50f};
-
-            SDL_RenderFillRect(
-                renderer,
-                &rockBody);
-
-            SDL_SetRenderDrawColor(
-                renderer,
-                135,
-                85,
-                65,
-                255);
-
-            SDL_FRect ironDeposit{
-                tileX + TileSize * 0.32f,
-                tileY + TileSize * 0.43f,
-                TileSize * 0.20f,
-                TileSize * 0.15f};
-
-            SDL_RenderFillRect(
-                renderer,
-                &ironDeposit);
-
-            drawDefaultTree = false;
-            break;
-        }
-
-        case ResourceType::COAL_ROCK:
-        {
-            SDL_SetRenderDrawColor(
-                renderer,
-                45,
-                45,
-                50,
-                255);
-
-            SDL_FRect rockBody{
-                tileX + TileSize * 0.15f,
-                tileY + TileSize * 0.35f,
-                TileSize * 0.70f,
-                TileSize * 0.50f};
-
-            SDL_RenderFillRect(
-                renderer,
-                &rockBody);
-
-            SDL_SetRenderDrawColor(
-                renderer,
-                35,
-                35,
-                40,
-                255);
-
-            SDL_FRect coalDeposit{
-                tileX + TileSize * 0.32f,
-                tileY + TileSize * 0.43f,
-                TileSize * 0.20f,
-                TileSize * 0.15f};
-
-            SDL_RenderFillRect(
-                renderer,
-                &coalDeposit);
-
-            drawDefaultTree = false;
-            break;
-        }
-        }
-
-        if (!drawDefaultTree)
-        {
-            continue;
-        }
-
-        SDL_FRect trunkRectangle{
-            tileX + 13.0f,
-            tileY + 14.0f,
-            6.0f,
-            15.0f};
+        SDL_RenderFillRect(
+            renderer,
+            &rockBody);
 
         SDL_SetRenderDrawColor(
             renderer,
-            125,
-            80,
+            190,
+            105,
+            55,
+            255);
+
+        SDL_FRect copperDeposit{
+            tileX + TileSize * 0.32f,
+            tileY + TileSize * 0.43f,
+            TileSize * 0.20f,
+            TileSize * 0.15f};
+
+        SDL_RenderFillRect(
+            renderer,
+            &copperDeposit);
+
+        drawDefaultTree = false;
+        break;
+    }
+
+    case ResourceType::TIN_ROCK:
+    {
+        SDL_SetRenderDrawColor(
+            renderer,
+            105,
+            105,
+            115,
+            255);
+
+        SDL_FRect rockBody{
+            tileX + TileSize * 0.15f,
+            tileY + TileSize * 0.35f,
+            TileSize * 0.70f,
+            TileSize * 0.50f};
+
+        SDL_RenderFillRect(
+            renderer,
+            &rockBody);
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            190,
+            190,
+            200,
+            255);
+
+        SDL_FRect tinDeposit{
+            tileX + TileSize * 0.32f,
+            tileY + TileSize * 0.43f,
+            TileSize * 0.20f,
+            TileSize * 0.15f};
+
+        SDL_RenderFillRect(
+            renderer,
+            &tinDeposit);
+
+        drawDefaultTree = false;
+        break;
+    }
+
+    case ResourceType::IRON_ROCK:
+    {
+        SDL_SetRenderDrawColor(
+            renderer,
+            105,
+            105,
+            115,
+            255);
+
+        SDL_FRect rockBody{
+            tileX + TileSize * 0.15f,
+            tileY + TileSize * 0.35f,
+            TileSize * 0.70f,
+            TileSize * 0.50f};
+
+        SDL_RenderFillRect(
+            renderer,
+            &rockBody);
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            135,
+            85,
+            65,
+            255);
+
+        SDL_FRect ironDeposit{
+            tileX + TileSize * 0.32f,
+            tileY + TileSize * 0.43f,
+            TileSize * 0.20f,
+            TileSize * 0.15f};
+
+        SDL_RenderFillRect(
+            renderer,
+            &ironDeposit);
+
+        drawDefaultTree = false;
+        break;
+    }
+
+    case ResourceType::COAL_ROCK:
+    {
+        SDL_SetRenderDrawColor(
+            renderer,
+            45,
+            45,
+            50,
+            255);
+
+        SDL_FRect rockBody{
+            tileX + TileSize * 0.15f,
+            tileY + TileSize * 0.35f,
+            TileSize * 0.70f,
+            TileSize * 0.50f};
+
+        SDL_RenderFillRect(
+            renderer,
+            &rockBody);
+
+        SDL_SetRenderDrawColor(
+            renderer,
+            35,
+            35,
             40,
             255);
 
-        SDL_RenderFillRect(
-            renderer,
-            &trunkRectangle);
-
-        SDL_FRect leavesRectangle{
-            tileX + 5.0f,
-            tileY + 3.0f,
-            22.0f,
-            18.0f};
-
-        SDL_SetRenderDrawColor(
-            renderer,
-            leafRed,
-            leafGreen,
-            leafBlue,
-            255);
+        SDL_FRect coalDeposit{
+            tileX + TileSize * 0.32f,
+            tileY + TileSize * 0.43f,
+            TileSize * 0.20f,
+            TileSize * 0.15f};
 
         SDL_RenderFillRect(
             renderer,
-            &leavesRectangle);
+            &coalDeposit);
+
+        drawDefaultTree = false;
+        break;
     }
+    }
+
+    if (!drawDefaultTree)
+    {
+        return;
+    }
+
+    SDL_FRect trunkRectangle{
+        tileX + 13.0f,
+        tileY + 14.0f,
+        6.0f,
+        15.0f};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        125,
+        80,
+        40,
+        255);
+
+    SDL_RenderFillRect(
+        renderer,
+        &trunkRectangle);
+
+    SDL_FRect leavesRectangle{
+        tileX + 5.0f,
+        tileY + 3.0f,
+        22.0f,
+        18.0f};
+
+    SDL_SetRenderDrawColor(
+        renderer,
+        leafRed,
+        leafGreen,
+        leafBlue,
+        255);
+
+    SDL_RenderFillRect(
+        renderer,
+        &leavesRectangle);
 }
+
 
 void Graphics::DrawGroundItems(const std::vector<GroundItem> &groundItems)
 {
@@ -4596,8 +4721,8 @@ void Graphics::DrawSettings()
     }
 
     SDL_SetRenderDrawColor(renderer, 235, 225, 202, 255);
-    const std::string gridLabel = std::string("WORLD GRID: ") +
-        (showGrid ? "ON" : "OFF");
+    const std::string gridLabel = std::string("GRID: ") + (showGrid ? "ON" : "OFF") +
+        " | ART: " + (worldArtEnabled ? "ON" : "OFF") + " (F6)";
     SDL_RenderDebugText(renderer, buttons[0].x + 12.0f,
                         buttons[0].y + 15.0f, gridLabel.c_str());
     SDL_RenderDebugText(renderer, buttons[1].x + 12.0f,
@@ -6209,6 +6334,7 @@ void Graphics::Render(
     }
     lastPresentationTick = presentationTick;
     UpdateCamera(playerX, playerY, map);
+    UpdateSpritePicking(resources, stations, groundItems);
     UpdateProgressionFeedback(player, inventory);
     displayedCurrency = inventory.GetItemAmount(ItemType::COINS);
     displayedLogCount = inventory.GetItemAmount(ItemType::LOG);
@@ -6289,12 +6415,9 @@ void Graphics::Render(
     DrawMap(map);
     if (showGrid) DrawGrid(map);
     DrawClickedTile();
-    DrawResources(resources);
-    DrawStations(stations);
     DrawGroundItems(groundItems);
-    DrawMonsters(entities, selectedCombatTargetID, player.GetID());
-    DrawNPCs(entities);
-    DrawPlayer(playerX, playerY);
+    DrawWorldObjects(entities, resources, stations, playerX, playerY,
+        selectedCombatTargetID, player.GetID());
     if (attackPresentations != nullptr)
         DrawMeleeAttackPresentations(entities, *attackPresentations);
     DrawMonsterHealthBars(entities);
@@ -6364,7 +6487,9 @@ void Graphics::Render(
             deathY);
     }
 
-    SDL_RenderPresent(renderer);
+    // Offscreen previews render into a target texture and read it before any
+    // window presentation. The normal game continues to present every frame.
+    if (SDL_GetRenderTarget(renderer) == nullptr) SDL_RenderPresent(renderer);
 }
 
 void Graphics::DrawDeathRecoveryOverlay(

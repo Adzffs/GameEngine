@@ -1,6 +1,6 @@
 # Art, animation and audio production guide
 
-**Status:** First editable forest art pilot created; runtime sprite import/rendering remains planned. The broader production workflow below is proposed.\
+**Status:** First editable forest kit renders in the SDL client with cache, pivots, resource states and basic-shape fallback. A general importer and the broader production workflow below remain proposed.\
 **Reviewed:** 19 November 2026.\
 **Purpose:** Replace placeholder presentation in manageable steps while preserving gameplay and making assets easy for humans and AI to work with.
 
@@ -15,10 +15,25 @@ tree reference is adapted through LibreSprite JavaScript; terrain is drawn by
 the script. A default export command preserves manual edits and rebuilds the
 offline native/2x previews from the saved masters.
 
-This is the first part of ART-001 and asset identity work, not a completed
-game/Studio importer or finished starter kit. Player, prop and in-game overlap
-reviews are still required. The pilot's `manifest.json` is explicitly an
-authoring record and does not establish a runtime-supported schema.
+The kit now has a generated C++ geometry binding and a renderer-owned texture
+cache. Normal trees choose intact/depleted images from authoritative resource
+state. Ground uses cardinal path connections, with filled quarters for wider
+roads. World objects sort by their ground contact points; a tree fades when it
+overlaps the player behind it. Opaque canopy pixels target the existing tree
+tile while transparent areas retain their normal world actions. F6 switches
+to basic shapes, and missing/invalid images fall back individually.
+
+The [integration record](../06-development/FOREST_RENDERING_2026-11-19.md)
+includes actual game-renderer captures for intact/depleted trees, overlap and
+basic mode, plus a reusable snapshot preview command. SDL 3.4+ enables the PNG
+pilot; builds with earlier SDL headers retain basic shapes. Assets are copied
+beside the executable by CMake and loaded once, outside the render loop.
+
+This is the first part of ART-001 and STUDIO-060/061/063, not a general
+game/Studio importer or finished starter kit. Player and prop art, Studio asset
+editing, visible interaction and wider acceptance remain. The pilot's
+`manifest.json` is an authoring record; the runtime consumes the generated
+binding and PNGs rather than parsing a new JSON schema.
 
 ## 1. Current presentation and the recommended transition
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL3/SDL.h>
+#include "ForestSprites.h"
 #include <array>
 #include <memory>
 #include <map>
@@ -486,6 +487,24 @@ public:
 
 private:
     friend struct GraphicsTestAccess;
+
+    ForestSprites forestSprites;
+    bool worldArtEnabled = true;
+    SDL_FRect visualPlayerRectangle{};
+    struct SpriteTreeTarget { int id, x, y; };
+    std::vector<SpriteTreeTarget> spriteTreeTargets;
+    std::vector<std::pair<int, int>> occupiedSpritePickTiles;
+    WorldHoverTarget PickSpriteTree(float worldX, float worldY) const;
+    void UpdateSpritePicking(const std::vector<ResourceNode> &resources,
+        const std::vector<CraftingStation> &stations, const std::vector<GroundItem> &items);
+    SDL_FPoint NextPlayerPosition(int playerX, int playerY) const;
+    void DrawResource(const ResourceNode &resource);
+    void DrawStation(const CraftingStation &station);
+    void DrawNpc(const Entity &entity);
+    void DrawMonster(const Monster &monster, int selectedTargetID, int localPlayerID);
+    void DrawWorldObjects(const std::vector<std::unique_ptr<Entity>> &entities,
+        const std::vector<ResourceNode> &resources, const std::vector<CraftingStation> &stations,
+        int playerX, int playerY, int selectedTargetID, int localPlayerID);
 
     bool inventorySlotClickPending;
     int clickedInventorySlotIndex;
