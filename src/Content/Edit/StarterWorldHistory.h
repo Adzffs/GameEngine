@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Export/StarterWorldSnapshot.h"
+#include "StarterWorldEdit.h"
 
 #include <cstddef>
 #include <string>
@@ -45,6 +46,9 @@ namespace StarterWorldHistory
         StarterWorldExport::Snapshot ApplyRemove(
             const StarterWorldExport::Snapshot &current,
             std::string_view placementId);
+        StarterWorldExport::Snapshot ApplySpawnSettings(
+            const StarterWorldExport::Snapshot &current,
+            std::string_view placementId, const StarterWorldEdit::SpawnSettings &settings);
 
         // Both require the exact current semantic revision previously returned
         // by this history. On conflict or invalid inverse, state is unchanged.
@@ -71,6 +75,13 @@ namespace StarterWorldHistory
         };
         struct Entry
         {
+            struct SpawnChange
+            {
+                std::string placementId;
+                StarterWorldEdit::SpawnSettings before;
+                StarterWorldEdit::SpawnSettings after;
+            };
+            std::vector<SpawnChange> spawns;
             std::vector<InverseMove> moves;
             std::vector<InversePaint> paints;
             std::vector<StarterWorldExport::Placement> added;

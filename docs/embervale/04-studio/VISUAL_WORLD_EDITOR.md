@@ -6,13 +6,38 @@
 points. Select a character in the list or map, then click a clear destination.
 Undo/redo, validation, overlays and save/reopen use the same shared C++ command.
 The inspector shows **Spawn / home**; removing actors remains disabled.
-Character identity, quest/dialogue/shop bindings and behaviour settings remain
-fixed. Home movement alone does not change the world schema or allocate an
+Character identity and quest/dialogue/shop bindings remain fixed. Monster behaviour
+settings can be edited separately through **Spawn settings…**, as described below. Home movement alone does not change the world schema or allocate an
 object ID. Use the editor and C++ tool from the same branch.
 
 **Testing is deferred at the owner's request.** The C++ game and editing tool
 build successfully; no runtime test pass is claimed. See the [implementation record and follow-up checks](../06-development/STUDIO_SPAWN_MOVE_REVIEW_2026-11-19.md).
 
+
+## Configure existing monster spawns
+
+Select a monster and press **Spawn settings…**. Edit its wander radius/interval,
+spawn cap, respawn checkbox and respawn delay, then press **Apply settings**.
+Set radius and interval to 0 for a stationary monster. A delay of 0 uses the
+enemy type's normal timing; positive ticks override it for this spawn.
+Disabling respawning clears its unused delay. Named NPC settings are read-only
+because the current runtime keeps them unique, stationary and non-respawning;
+their homes can still be moved on the map.
+
+The cap is an upper limit for authorized runtime creation, not a population
+target: raising it does not add extra enemies. The accepted settings appear in
+the inspector and share undo/redo, save/reopen and isolated draft launch with
+other edits. An invalid setting leaves the current draft and history intact.
+
+The first actual settings change upgrades a draft to schema 3. Versions 1 and 2
+keep their historical restrictions. Undo retains the new format and object ID
+reservations, and later object edits retain schema 3. Use matching game/editor
+binaries. The player-save version is unchanged.
+
+The terminal equivalent is `spawn <id> <radius> <wander-ticks> <cap> <0|1> <delay-ticks>`.
+For limits and timing semantics see [ADR-019](../07-decisions/ADR_019_BOUNDED_SPAWN_SETTINGS.md).
+Game/tool builds and Python syntax compilation passed; tests and visible
+acceptance remain deferred. [Implementation record](../06-development/STUDIO_SPAWN_SETTINGS_2026-11-19.md).
 
 ## Create and remove resources/stations
 
@@ -20,8 +45,8 @@ Choose a type in **Place a resource or station**, press **Place selected type**,
 then click a free map tile. The palette includes normal/oak/willow trees,
 copper/tin/iron/coal rocks, a furnace, crafting table and bank. Select an object
 and press **Remove selected**, or Delete while the map/placement list has focus.
-NPC/enemy homes can be moved as described above; their bindings and
-behaviour settings remain fixed. Return to **Select / move** to move an existing
+NPC/enemy homes can be moved as described above; monster settings have their
+own dialog while actor bindings remain fixed. Return to **Select / move** to move an existing
 placement. Rejected edits preserve the world, allocator and history.
 
 Creation, removal, moves and terrain paint share Ctrl+Z/Ctrl+Y history. Saving,
@@ -29,7 +54,7 @@ reopening, collision/access overlays and **Play this draft** use the same C++
 candidate. The editor checks the complete canonical snapshot, including new
 definition bindings, before accepting a reply or saved draft.
 
-The first create/remove upgrades a draft to schema 2. New IDs use a persisted
+The first create/remove upgrades a version-1 draft to schema 2; a schema-3 draft retains schema 3. New IDs use a persisted
 sequence that never rewinds on removal or undo. Undo can therefore restore the
 visible map while leaving unsaved format/ID reservations; save a new draft to
 preserve those reservations. Existing version-1 files retain their historical
@@ -116,8 +141,8 @@ After another move, choosing Yes in the close warning opened the Save dialog;
 cancelling that dialog kept the editor open, dirty, with the moved tree intact.
 The 36 Python contract/viewport tests and six real bridge cases also passed.
 
-**Status:** Experimental stacked development branch, not integrated into `master`.
-**Scope:** Select and move existing resource/workstation placements in a real mouse-driven grid, with read-only inspection, undo/redo and create-only draft saving. This does not claim the full STUDIO-030 acceptance story.
+**Status:** Integrated editing foundation with the latest implementation and deferred acceptance recorded above.
+**Scope:** Terrain, current resource/station placement, actor homes and bounded monster settings with history, guarded drafts and isolated launch. Broader STUDIO-030 acceptance remains open.
 
 ## Run
 
@@ -138,7 +163,7 @@ This is a deliberately thin standard-library Python/Tk shell. It reads the sourc
 
 A new optional `--expected-hash <sha256>` flag on `EmbervaleWorldMove --session` compares the **exact source bytes** with the initial snapshot revision before *any* replayed command can execute. On a conflict the session returns exit code 4; the user must reopen the source rather than silently editing a different revision. The C++ draft writer independently rechecks the same exact source hash under its cooperative lock, and continues to reject existing files. This does not make the filesystem lock mandatory for outside writers or guarantee power-loss durability.
 
-The UI now has a click-to-paint Grass/Dirt/Stone/Water brush. Accepted brush actions use the C++ session's paint command and share history with placement moves; rejected brush actions never modify the displayed map. The UI does not currently edit actor spawns, auto-save, preserve undo across process restarts, handle multiple regions or launch an isolated game playtest. It uses a simple logical grid, not game sprites. This initial desktop client is intended to exercise STUDIO-030's selection/inspection/move path and reuse of shared command authority; the broader acceptance criteria remain open.
+The UI now has a click-to-paint Grass/Dirt/Stone/Water brush. Accepted brush actions use the C++ session's paint command and share history with placement moves; rejected brush actions never modify the displayed map. The UI supports existing actor homes/settings and isolated draft launch. It does not auto-save, preserve undo across process restarts or handle multiple regions. It uses a simple logical grid, not game sprites. This initial desktop client is intended to exercise STUDIO-030's selection/inspection/move path and reuse of shared command authority; the broader acceptance criteria remain open.
 
 ## Navigation and coordinate safety
 

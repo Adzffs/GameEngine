@@ -186,7 +186,7 @@ namespace StarterWorldExport
 
         void Validate(const Snapshot &snapshot)
         {
-            if ((snapshot.schemaVersion != 1 && snapshot.schemaVersion != 2) ||
+            if ((snapshot.schemaVersion < 1 || snapshot.schemaVersion > 3) ||
                 snapshot.nextPlacementId < 1 ||
                 snapshot.nextPlacementId > MaximumNextPlacementId ||
                 (snapshot.schemaVersion == 1 && snapshot.nextPlacementId != 1))
@@ -241,8 +241,24 @@ namespace StarterWorldExport
                         Fail("spawn identity/kind mismatch: " + placement.id);
                     if (spawn.spawnPosition.GetX() != placement.position.GetX() ||
                         spawn.spawnPosition.GetY() != placement.position.GetY() ||
-                        spawn.wanderRadius < 0 || spawn.wanderIntervalTicks < 0 || spawn.maximumActiveCount <= 0)
+                        spawn.wanderRadius < 0 || spawn.wanderRadius > MaximumWanderRadius ||
+                        spawn.wanderIntervalTicks < 0 || spawn.wanderIntervalTicks > MaximumSpawnIntervalTicks ||
+                        (spawn.wanderRadius == 0) != (spawn.wanderIntervalTicks == 0) ||
+                        spawn.maximumActiveCount <= 0 || spawn.maximumActiveCount > MaximumSpawnActiveCount ||
+                        spawn.respawnDelayTicks < 0 || spawn.respawnDelayTicks > MaximumSpawnIntervalTicks ||
+                        (!spawn.respawns && spawn.respawnDelayTicks != 0) ||
+                        (snapshot.schemaVersion < 3 && spawn.respawnDelayTicks != 0))
                         Fail("invalid spawn configuration: " + placement.id);
+                    if (definition->kind == NpcKind::FRIENDLY &&
+                        (spawn.wanderRadius != 0 || spawn.wanderIntervalTicks != 0 ||
+                         spawn.maximumActiveCount != 1 || spawn.respawns || spawn.respawnDelayTicks != 0))
+                        Fail("named NPCs require one stationary, non-respawning actor: " + placement.id);
+                    if (definition->kind == NpcKind::MONSTER &&
+                        (!definition->combat.has_value() ||
+                         (spawn.respawns && spawn.respawnDelayTicks == 0 && definition->combat->respawnDelayTicks <= 0) ||
+                         (definition->combat->aggression.has_value() &&
+                          spawn.wanderRadius > definition->combat->aggression->leashRadius)))
+                        Fail("monster spawn exceeds supported combat/respawn/leash settings: " + placement.id);
                 }
             }
         }
@@ -408,7 +424,7 @@ namespace StarterWorldExport
             << "  \"schema_version\": " << snapshot.schemaVersion << ",\n"
             << "  \"region_id\": \"embervale.development_starter\",\n"
             << "  \"revision\": 1,\n";
-        if (snapshot.schemaVersion == 2)
+        if (snapshot.schemaVersion >= 2)
             out << "  \"next_placement_id\": " << snapshot.nextPlacementId << ",\n";
         out << "  \"size\": { \"width\": " << snapshot.width << ", \"height\": " << snapshot.height << " },\n"
             << "  \"surfaces\": [ { \"id\": \"ground\", \"elevation\": 0 } ],\n"
@@ -446,7 +462,10 @@ namespace StarterWorldExport
                     << ", \"wander_radius\": " << spawn->wanderRadius
                     << ", \"wander_interval_ticks\": " << spawn->wanderIntervalTicks
                     << ", \"maximum_active_count\": " << spawn->maximumActiveCount
-                    << ", \"respawns\": " << (spawn->respawns ? "true" : "false") << " }";
+                    << ", \"respawns\": " << (spawn->respawns ? "true" : "false");
+                if (snapshot.schemaVersion >= 3)
+                    out << ", \"respawn_delay_ticks\": " << spawn->respawnDelayTicks;
+                out << " }";
             }
             out << "\n    }" << (i + 1 == sorted.size() ? "\n" : ",\n");
         }

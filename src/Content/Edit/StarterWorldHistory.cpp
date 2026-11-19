@@ -22,7 +22,7 @@ namespace StarterWorldHistory
             // Undo restores authored world state, while allocation reservations
             // survive undo, branching, saving and reopening. Compare the world
             // independently of that monotonically increasing bookkeeping.
-            snapshot.schemaVersion = 2;
+            snapshot.schemaVersion = 3;
             snapshot.nextPlacementId = StarterWorldExport::MaximumNextPlacementId;
             return StarterWorldExport::SerializeCanonical(snapshot);
         }
@@ -148,6 +148,21 @@ namespace StarterWorldHistory
         return std::move(result.candidate);
     }
 
+    StarterWorldExport::Snapshot History::ApplySpawnSettings(
+        const StarterWorldExport::Snapshot &current,
+        std::string_view placementId, const StarterWorldEdit::SpawnSettings &settings)
+    {
+        CheckRevision(current);
+        auto result = StarterWorldEdit::ConfigureSpawn(current, placementId, settings);
+        if (!result.changed)
+            return std::move(result.candidate);
+        Entry entry;
+        entry.beforeCanonical = WorldCanonical(current);
+        entry.spawns.push_back({result.placementId, result.before, result.after});
+        Record(std::move(entry), result.candidate);
+        return std::move(result.candidate);
+    }
+
     StarterWorldExport::Snapshot History::Undo(
         const StarterWorldExport::Snapshot &current)
     {
@@ -159,6 +174,9 @@ namespace StarterWorldHistory
             Conflict();
 
         auto candidate = StarterWorldImport::ValidateForRuntime(current);
+        for (auto it = entry.spawns.rbegin(); it != entry.spawns.rend(); ++it)
+            candidate = StarterWorldEdit::ConfigureSpawn(
+                candidate, it->placementId, it->before).candidate;
         for (const auto &placement : entry.added)
             candidate = StarterWorldEdit::RemovePlacement(candidate, placement.id).candidate;
         for (const auto &placement : entry.removed)
@@ -199,6 +217,9 @@ namespace StarterWorldHistory
         for (const InversePaint &paint : entry.paints)
             candidate = StarterWorldEdit::PaintTerrain(
                 candidate, paint.tile, paint.after).candidate;
+        for (const auto &spawn : entry.spawns)
+            candidate = StarterWorldEdit::ConfigureSpawn(
+                candidate, spawn.placementId, spawn.after).candidate;
         if (WorldCanonical(candidate) != entry.afterCanonical)
             Conflict();
 

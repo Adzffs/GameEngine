@@ -2015,12 +2015,15 @@ void ContentValidator::AppendNpcSpawnValidation(
         report.AddError("StarterMonsterSpawn", contentID, "disabled wandering must use a zero interval");
     if (definition.maximumActiveCount <= 0)
         report.AddError("StarterMonsterSpawn", contentID, "maximum active count must be positive");
+    if (definition.respawnDelayTicks < 0 || (!definition.respawns && definition.respawnDelayTicks != 0))
+        report.AddError("StarterMonsterSpawn", contentID, "respawn delay must be non-negative and zero when respawning is disabled");
     if (definition.respawns && npcDefinition != nullptr &&
-        (!npcDefinition->combat.has_value() || npcDefinition->combat->respawnDelayTicks <= 0))
+        (!npcDefinition->combat.has_value() ||
+         (definition.respawnDelayTicks == 0 && npcDefinition->combat->respawnDelayTicks <= 0)))
     {
         report.AddError(
             "StarterMonsterSpawn",
             contentID,
-            "referenced definition must have a positive respawn delay when respawn is enabled");
+            "spawn or referenced definition must have a positive respawn delay when respawn is enabled");
     }
 }

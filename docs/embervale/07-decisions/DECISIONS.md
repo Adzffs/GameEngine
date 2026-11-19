@@ -39,6 +39,8 @@
 | ADR-015 | Repository and asset licensing | Open owner decision; no licence invented by documentation | Before distribution/contributor intake |
 | [ADR-016](ADR_016_READ_ONLY_WORLD_EXPORT.md) | Read-only snapshot before import | Original export decision; runtime boundary subsequently extended by ADR-017 | Retain compiled baseline export |
 | [ADR-017](ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md) | Bounded explicit runtime import | Implemented starter parser/validator, shared core, selected spawn catalogue and isolated playtests | Shared editing/publication remains separate |
+| [ADR-018](ADR_018_BOUNDED_OBJECT_PLACEMENT.md) | Bounded resource/station membership | Implemented schema-2 allocations, shared place/remove/history and guarded drafts | Larger footprints and actor membership remain separate |
+| [ADR-019](ADR_019_BOUNDED_SPAWN_SETTINGS.md) | Existing monster spawn settings | Implemented schema-3 wander/cap/respawn editing; game/tool builds passed, runtime/visible checks deferred | New actor identities, friendly wandering and population filling remain separate |
 
 ## 4. Rationale for the key proposals
 

@@ -266,7 +266,7 @@ namespace StarterWorldExport
         if (schemaVersion == 1)
             Keys(root, {"format", "schema_version", "region_id", "revision", "size",
                 "surfaces", "terrain", "player_spawn", "placements", "region_exits"});
-        else if (schemaVersion == 2)
+        else if (schemaVersion == 2 || schemaVersion == 3)
             Keys(root, {"format", "schema_version", "region_id", "revision", "size",
                 "surfaces", "terrain", "player_spawn", "placements", "region_exits", "next_placement_id"});
         else
@@ -306,7 +306,7 @@ namespace StarterWorldExport
 
         Snapshot snapshot;
         snapshot.schemaVersion = schemaVersion;
-        snapshot.nextPlacementId = schemaVersion == 2 ? Number(root, "next_placement_id") : 1;
+        snapshot.nextPlacementId = schemaVersion >= 2 ? Number(root, "next_placement_id") : 1;
         if (snapshot.nextPlacementId < 1 || snapshot.nextPlacementId > MaximumNextPlacementId)
             Invalid("invalid placement allocation counter");
         snapshot.width = width;
@@ -330,7 +330,8 @@ namespace StarterWorldExport
             Invalid("invalid placement array");
 
         // v1 retains its historical exact registry. v2 adds bounded object
-        // identities; compiled actor bindings and lifecycle remain mandatory.
+        // identities; v3 permits bounded spawn settings. Compiled actor
+        // bindings and lifecycle remain mandatory in every version.
         const Snapshot baseline = Capture();
         std::map<std::string, Placement> known;
         for (const auto &placement : baseline.placements)
@@ -384,17 +385,29 @@ namespace StarterWorldExport
             if (isSpawn)
             {
                 const Json &spawnJson = Field(item, "spawn");
-                Keys(spawnJson, {"spawn_id", "wander_radius", "wander_interval_ticks",
-                    "maximum_active_count", "respawns"});
+                if (schemaVersion >= 3)
+                    Keys(spawnJson, {"spawn_id", "wander_radius", "wander_interval_ticks",
+                        "maximum_active_count", "respawns", "respawn_delay_ticks"});
+                else
+                    Keys(spawnJson, {"spawn_id", "wander_radius", "wander_interval_ticks",
+                        "maximum_active_count", "respawns"});
                 auto &spawn = std::get<NpcSpawnDefinition>(placement.legacyDefinition);
                 // Capture's explicit spawn registry binds each stable placement ID.
                 // Match the reviewed baseline spawn token by reading the canonical
                 // baseline representation rather than trusting a supplied enum.
-                if (Number(spawnJson, "wander_radius") != spawn.wanderRadius ||
+                if (schemaVersion < 3 && (Number(spawnJson, "wander_radius") != spawn.wanderRadius ||
                     Number(spawnJson, "wander_interval_ticks") != spawn.wanderIntervalTicks ||
                     Number(spawnJson, "maximum_active_count") != spawn.maximumActiveCount ||
-                    Boolean(spawnJson, "respawns") != spawn.respawns)
+                    Boolean(spawnJson, "respawns") != spawn.respawns))
                     Invalid("unsupported spawn configuration change: " + id);
+                if (schemaVersion >= 3)
+                {
+                    spawn.wanderRadius = Number(spawnJson, "wander_radius");
+                    spawn.wanderIntervalTicks = Number(spawnJson, "wander_interval_ticks");
+                    spawn.maximumActiveCount = Number(spawnJson, "maximum_active_count");
+                    spawn.respawns = Boolean(spawnJson, "respawns");
+                    spawn.respawnDelayTicks = Number(spawnJson, "respawn_delay_ticks");
+                }
                 const std::string &token = String(spawnJson, "spawn_id");
                 if (token.empty() || token.size() > 128 ||
                     !std::all_of(token.begin(), token.end(), [](unsigned char c) {

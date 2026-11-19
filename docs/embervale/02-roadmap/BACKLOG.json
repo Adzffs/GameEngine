@@ -618,9 +618,11 @@
         "tests/StarterWorldEditTests.cpp",
         "tests/StarterWorldHistoryTests.cpp",
         "tests/StarterWorldRuntimeTests.cpp",
-        "tests/StarterWorldVisualBridgeIntegration.py"
+        "tests/StarterWorldVisualBridgeIntegration.py",
+        "docs/embervale/06-development/STUDIO_SPAWN_SETTINGS_2026-11-19.md",
+        "docs/embervale/07-decisions/ADR_019_BOUNDED_SPAWN_SETTINGS.md"
       ],
-      "notes": "Existing NPC/enemy home-position editing implemented in PR #25 with shared move/history/save/reopen support and retained identity/lifecycle/settings. C++ core, game and editing-tool builds succeeded. Testing and visible acceptance deferred at the owner's explicit request on 19 November 2026; no test pass is claimed. Broader wander/capacity/respawn configuration editing remains separate."
+      "notes": "Home movement was delivered in PR #25. Current-runtime spawn-settings implementation now adds monster wander radius/interval, active cap, respawn enablement and per-spawn timing through shared C++ commands/history, the terminal session and the visual inspector/dialog. Schema 3 preserves historical schema-1/2 restrictions; named NPCs retain supported stationary/unique settings. The cap remains a creation limit, not automatic population filling. C++ game/core/tool builds and Python syntax compilation passed. Tests and visible acceptance remain deferred at the owner's request; acceptance status stays in_progress."
     },
     {
       "id": "STUDIO-042",

@@ -110,8 +110,13 @@ and [ADR-018](../07-decisions/ADR_018_BOUNDED_OBJECT_PLACEMENT.md).
 NPC/enemy home movement, the first bounded slice of STUDIO-041, is implemented
 with shared history, save/reopen and regression scenarios. The owner requested
 integration without testing for now. Game/tool builds succeeded; tests and
-visible acceptance are recorded as deferred, with no test pass claimed. Broader spawn-configuration editing
-remains separate. See the [implementation record](../06-development/STUDIO_SPAWN_MOVE_REVIEW_2026-11-19.md).
+visible acceptance are recorded as deferred, with no test pass claimed. The remaining current-runtime
+spawn settings are now implemented: monster wander radius/interval, spawn cap, respawn enablement
+and per-spawn delay, with a shared command/history and Studio settings dialog. Schema 3 retains
+actor bindings/lifecycle and historical schema-1/2 restrictions; named NPCs remain unique and
+stationary. This follow-up also builds successfully, with tests deferred at the owner's request.
+See the [home movement record](../06-development/STUDIO_SPAWN_MOVE_REVIEW_2026-11-19.md) and
+[spawn-settings record](../06-development/STUDIO_SPAWN_SETTINGS_2026-11-19.md).
 The flat River Crossing blockout also needs the genuine fresh-player profile
 (GAME-001).
 
