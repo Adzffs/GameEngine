@@ -1,0 +1,71 @@
+{
+  "base": "021711805a7b1171da0cb30c6e8c1cc4ae63cc86",
+  "before_failed_frames": 8,
+  "after_failed_frames": 0,
+  "frames_checked": 16,
+  "detached_lower_pixels": 0,
+  "missing_waist_pixels": 0,
+  "builds": {
+    "GameEngine": "passed",
+    "EmbervaleRenderPreview": "passed",
+    "launcher": "passed"
+  },
+  "packaged_player_sha256": "9dcfdfec59ff7ad184c763b8846b98516495ae0a75fc4f83fbfe1e27176f9164",
+  "mara_and_furnace_unchanged": true,
+  "captures": [
+    {
+      "file": "east.png",
+      "focus": [
+        15,
+        26
+      ],
+      "target": [
+        16,
+        26
+      ],
+      "frames": 4,
+      "sha256": "93584bc69d95c2843599e638f9b9e36f248a3314d4ffe4601f3c27189721ed9f"
+    },
+    {
+      "file": "west.png",
+      "focus": [
+        15,
+        26
+      ],
+      "target": [
+        14,
+        26
+      ],
+      "frames": 4,
+      "sha256": "ee7f13d37deddb3cdeb17677dc3fcc914f4fc41c739e159da0c14e369a10c83a"
+    },
+    {
+      "file": "north.png",
+      "focus": [
+        15,
+        27
+      ],
+      "target": [
+        15,
+        26
+      ],
+      "frames": 4,
+      "sha256": "35dc8c6a181110cd5dade88af6b216fcf0460abd9d126c321810fb2e2641e150"
+    },
+    {
+      "file": "south.png",
+      "focus": [
+        15,
+        26
+      ],
+      "target": [
+        15,
+        27
+      ],
+      "frames": 4,
+      "sha256": "fb02968e3307ebbcc3bac7554f91ffc439d84264fc485583874dcac9e85f12b5"
+    }
+  ],
+  "environment": "Windows UCRT64; SDL 3.4.12 dummy video/software renderer",
+  "neutral_frames_unchanged": 8
+}

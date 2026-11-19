@@ -6,6 +6,13 @@
 
 ![Four-pose player walk preview](previews/walk-cycle.gif)
 
+The waist separation reported in the first stride frames is corrected. The
+torso now overlaps a retained pelvis and only the lower legs shift for the
+stride. [Larger walk preview](previews/walk-inspection.gif) and
+[all sixteen frames](previews/walk-contact-sheet.png) expose the join on a
+contrasting background. Rows in the contact sheet are south/west/east/north;
+columns are poses 0-3.
+
 The player has a chestnut-haired, blue-teal traveller outfit with empty hands.
 Mara keeps her canonical blue warden coat and gold sash, with tied-back hair and
 a grey streak. The furnace uses slate stone, a short chimney and a lit arch.
@@ -42,6 +49,12 @@ Normal export preserves all three masters, refreshes PNGs/metadata/previews and
 updates the shared C++ geometry binding. Both art batches use one texture cache.
 CMake copies the six runtime PNGs beside the executable; restart after export
 and build to see saved changes. F6 still switches to basic shapes.
+
+Exports reject missing waist pixels and lower-body pixels disconnected from
+the torso. [walk-validation.json](previews/walk-validation.json) records the
+per-frame result. To rebuild just the two stride cells in each direction from
+the saved neutral frames, add `--rebuild-walk`; this preserves neutral poses,
+Mara and the furnace. It is an explicit source edit, separate from normal export.
 
 `--regenerate` intentionally replaces the masters using the retained
 [original generated reference](reference/cast-reference.png) and LibreSprite

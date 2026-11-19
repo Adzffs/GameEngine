@@ -50,7 +50,8 @@
     "frames_per_direction": 4,
     "cycle_distance_tiles": 1.0,
     "idle_frame": 0,
-    "notes": "Two neutral and two alternating stride poses; driven by visual travel distance."
+    "validation": "previews/walk-validation.json",
+    "notes": "Two neutral and two alternating stride poses with a continuous pelvis; driven by visual travel distance."
   },
   "images": {
     "player": {
@@ -61,8 +62,8 @@
         192
       ],
       "editor_metadata": "textures/player.export.json",
-      "source_sha256": "10d7df39d89add433c5fa4fdb5fd2fd3ccb0dc66ef4da5c05f070d6d633671fb",
-      "image_sha256": "5e3c45096046f92dca45f21f50a80a11932df5c6aae68540290777e2ab4d83f3"
+      "source_sha256": "9f6e275f96bcfdf3e1f043e63b5c86b95fa237f1bc1d6c7e798f080348cad0c1",
+      "image_sha256": "9dcfdfec59ff7ad184c763b8846b98516495ae0a75fc4f83fbfe1e27176f9164"
     },
     "mara": {
       "source": "source/mara.ase",
@@ -459,7 +460,15 @@
     },
     "walk-cycle.gif": {
       "path": "previews/walk-cycle.gif",
-      "sha256": "6ca6186fe05278ea5b9426915b9f4e41460053ed8b970035c6aa561d416ba9a8"
+      "sha256": "14ace8b3cd5738af319f4e88f2706d3163cbe81fb11dff993d433bdbb1c2b55e"
+    },
+    "walk-inspection.gif": {
+      "path": "previews/walk-inspection.gif",
+      "sha256": "293eae80a0b34f2b944e02121b3a89091fcb8b846faec6095e8dd1e3675995ed"
+    },
+    "walk-contact-sheet.png": {
+      "path": "previews/walk-contact-sheet.png",
+      "sha256": "9c3b301a79e7b59788cb618a468bd49b7aa49d6bf2f3509bf2c48af164b033a9"
     }
   }
 }
