@@ -26,8 +26,8 @@
         384
       ],
       "editor_metadata": "textures/paths.export.json",
-      "source_sha256": "69e7e675ead3e3303ddbe15bcbf0a03fdef36212fdc94e26f31451ba14ba683f",
-      "image_sha256": "57b0229cf7a8f0072ee1a4b1b2d6cd9ec8984c9275d4f98c98361551959ea223"
+      "source_sha256": "31df6b5b5cf9c9a4e5710f311fcd3114036565bf2961ba4b53461e3ee4460ae4",
+      "image_sha256": "41e7f4054a00fcb9c7f1bca9bd13c08aa097cade50683dc430b477e45c1271e0"
     },
     "water": {
       "source": "source/water.ase",
@@ -48,8 +48,8 @@
         32
       ],
       "editor_metadata": "textures/stone.export.json",
-      "source_sha256": "ea830454592453cb271178cb72682d47cbd9358fca5b4a9d422de9b5b11c2b53",
-      "image_sha256": "34b9ace7f49f2df07892a7abd598a6a2d00cc67c824ce71841b7dc6edf0b436a"
+      "source_sha256": "2c9d0adee1336d915cc1ba02178b8914de2fdb0d6a522e30c5ae470fabea556a",
+      "image_sha256": "db226b3e3c3d66576a9c7539d235b8d04ebed291a6bf7aa457893b4bb0cc8959"
     },
     "flora": {
       "source": "source/flora.ase",
@@ -12216,7 +12216,7 @@
         1280,
         768
       ],
-      "sha256": "127dd23db7472dde7c5ce47d5c2b43c6df283be32341a3a9a705ab4b8b548037"
+      "sha256": "099ea898e3eb0bd94c72fe83344f23e16b602a8fb66a2c8d1fd5050b97c9438a"
     }
   }
 }

@@ -22,10 +22,10 @@
       "floors.ase": "f978c8727052f950c50fc1dde49eab05b6b34bf14679df00fec490cdc571e8f0",
       "flora.ase": "8b57d8b4cfad76d8f2f5bf35098838bbb38954bab611f4f9833155d67b8c38c6",
       "grass.ase": "71baf2acfdfe8f973ebbe7c1c1841971e01b8e259c9b73c8ffbd067d421a95e7",
-      "paths.ase": "69e7e675ead3e3303ddbe15bcbf0a03fdef36212fdc94e26f31451ba14ba683f",
+      "paths.ase": "31df6b5b5cf9c9a4e5710f311fcd3114036565bf2961ba4b53461e3ee4460ae4",
       "rocks.ase": "3055e180fb763c4f8c513e84ebebe1b50ab4a99597ab1e47a4bd2ef454cde1cc",
       "roof.ase": "421696da2f93d31cfff1450a4b3141e0027b77606d298d5c16885998bf2cde5b",
-      "stone.ase": "ea830454592453cb271178cb72682d47cbd9358fca5b4a9d422de9b5b11c2b53",
+      "stone.ase": "2c9d0adee1336d915cc1ba02178b8914de2fdb0d6a522e30c5ae470fabea556a",
       "stumps.ase": "145895c25bf7c483dff973a3c5b4af6dedced42e5a32d0ae99eba29ab276dec1",
       "trees.ase": "0685b495d0d378b8ca9f5aea891d870dec8d0b3edbacf29cce62771d8cfc7700",
       "walls.ase": "773c499c6e858f86d8ae673e3270788a1b589db91c371541b8e547a6ce70f458",
@@ -35,10 +35,10 @@
       "floors.png": "b33c3f7c9b7186cb7269c29e6ecd002920295a9f0963773e89b00151f5588181",
       "flora.png": "1466f185242148217811daa7821273a9e49fed685c6c278b70996ef5a68be9e5",
       "grass.png": "d09c0b6968ee3d489579dfb8f63544107fc63ed15353b72692ea93221072105b",
-      "paths.png": "57b0229cf7a8f0072ee1a4b1b2d6cd9ec8984c9275d4f98c98361551959ea223",
+      "paths.png": "41e7f4054a00fcb9c7f1bca9bd13c08aa097cade50683dc430b477e45c1271e0",
       "rocks.png": "c3b3babe18e61c5def51935597038f8ef53a3db17785e79af66b2c58d4b85df3",
       "roof.png": "cb3275a0819a94286f3ba7f656378534b2d2e6742e384be8dae06d049578b907",
-      "stone.png": "34b9ace7f49f2df07892a7abd598a6a2d00cc67c824ce71841b7dc6edf0b436a",
+      "stone.png": "db226b3e3c3d66576a9c7539d235b8d04ebed291a6bf7aa457893b4bb0cc8959",
       "stumps.png": "b77b9f99c542d866380bf259e5ff776e3d00ff8d2c2bc91e415d847c1258d8b7",
       "trees.png": "446d1f6c1d1968f69aa5a71f01d9fa81747d7d4bc29f9309c9ff954a4a8059a4",
       "walls.png": "8c0f223e8cc6737d8e471935be364ffcafd0c503b3059bda73c15a6856ede2f4",
@@ -49,10 +49,10 @@
         "floors.png": "b33c3f7c9b7186cb7269c29e6ecd002920295a9f0963773e89b00151f5588181",
         "flora.png": "1466f185242148217811daa7821273a9e49fed685c6c278b70996ef5a68be9e5",
         "grass.png": "d09c0b6968ee3d489579dfb8f63544107fc63ed15353b72692ea93221072105b",
-        "paths.png": "57b0229cf7a8f0072ee1a4b1b2d6cd9ec8984c9275d4f98c98361551959ea223",
+        "paths.png": "41e7f4054a00fcb9c7f1bca9bd13c08aa097cade50683dc430b477e45c1271e0",
         "rocks.png": "c3b3babe18e61c5def51935597038f8ef53a3db17785e79af66b2c58d4b85df3",
         "roof.png": "cb3275a0819a94286f3ba7f656378534b2d2e6742e384be8dae06d049578b907",
-        "stone.png": "34b9ace7f49f2df07892a7abd598a6a2d00cc67c824ce71841b7dc6edf0b436a",
+        "stone.png": "db226b3e3c3d66576a9c7539d235b8d04ebed291a6bf7aa457893b4bb0cc8959",
         "stumps.png": "b77b9f99c542d866380bf259e5ff776e3d00ff8d2c2bc91e415d847c1258d8b7",
         "trees.png": "446d1f6c1d1968f69aa5a71f01d9fa81747d7d4bc29f9309c9ff954a4a8059a4",
         "walls.png": "8c0f223e8cc6737d8e471935be364ffcafd0c503b3059bda73c15a6856ede2f4",
@@ -62,10 +62,10 @@
         "floors.png": "b33c3f7c9b7186cb7269c29e6ecd002920295a9f0963773e89b00151f5588181",
         "flora.png": "1466f185242148217811daa7821273a9e49fed685c6c278b70996ef5a68be9e5",
         "grass.png": "d09c0b6968ee3d489579dfb8f63544107fc63ed15353b72692ea93221072105b",
-        "paths.png": "57b0229cf7a8f0072ee1a4b1b2d6cd9ec8984c9275d4f98c98361551959ea223",
+        "paths.png": "41e7f4054a00fcb9c7f1bca9bd13c08aa097cade50683dc430b477e45c1271e0",
         "rocks.png": "c3b3babe18e61c5def51935597038f8ef53a3db17785e79af66b2c58d4b85df3",
         "roof.png": "cb3275a0819a94286f3ba7f656378534b2d2e6742e384be8dae06d049578b907",
-        "stone.png": "34b9ace7f49f2df07892a7abd598a6a2d00cc67c824ce71841b7dc6edf0b436a",
+        "stone.png": "db226b3e3c3d66576a9c7539d235b8d04ebed291a6bf7aa457893b4bb0cc8959",
         "stumps.png": "b77b9f99c542d866380bf259e5ff776e3d00ff8d2c2bc91e415d847c1258d8b7",
         "trees.png": "446d1f6c1d1968f69aa5a71f01d9fa81747d7d4bc29f9309c9ff954a4a8059a4",
         "walls.png": "8c0f223e8cc6737d8e471935be364ffcafd0c503b3059bda73c15a6856ede2f4",
@@ -141,7 +141,7 @@
         "--zoom",
         1.5
       ],
-      "sha256": "e15320a2e15a819aa57dfcb2bc108b8feadf6658592ae351ef51860dc464a742",
+      "sha256": "109a0fc4a5b8a1f72be70fedab92298799a608da842ecc43d7ab9aa16eb01ea9",
       "textures_cached": 26
     },
     {
@@ -154,7 +154,7 @@
         1.5,
         "--deplete-trees"
       ],
-      "sha256": "9d37aecaa92c5c405a8fefafc49e585c7872a92d9fda77073fac835c2cbf6e9c",
+      "sha256": "bb87edb3bdfb7b1b32c3b7f6fdacd7b2782a0efd3efef6a55f9fd4580cd6a633",
       "textures_cached": 26
     },
     {
@@ -179,7 +179,7 @@
         "--zoom",
         1.5
       ],
-      "sha256": "227a27f9edc0c92fb6fbe28e59be0da408c85eb952d1dfb8e773e1baa2b75b9d",
+      "sha256": "6ee78186dbc87d2e11452b7289e49cd4a70d7421292f02f954f657093235b87a",
       "textures_cached": 26
     },
     {
@@ -193,7 +193,7 @@
         "--condition",
         "new"
       ],
-      "sha256": "f3b7afc214edc92265a95e8a26154d7c820713d20d4cdac42ac14caaa2ce7aa4",
+      "sha256": "29e6630990854c605e061669562c0d660d0908283d32f04d14a791e699954fa5",
       "textures_cached": 26
     },
     {
@@ -207,7 +207,7 @@
         "--condition",
         "weathered"
       ],
-      "sha256": "68b9177594ad94e4bfd5aeceed31f146883c822d282566b714351dd64183687c",
+      "sha256": "1d803c006ac2c9d9dff1d75f6127a93c0153db3390f255a7a66e18dae89d5aab",
       "textures_cached": 26
     },
     {
@@ -219,7 +219,7 @@
         "--zoom",
         1.5
       ],
-      "sha256": "e7b5cabe68c815362fa298290eaca32e3249ba305d94a0cecde84e14489ad174",
+      "sha256": "76db65aa1d241b5b61e74fb33933f1d10e3216d72ce20890780b51b8a9336c9d",
       "textures_cached": 26
     },
     {
@@ -231,7 +231,7 @@
         "--zoom",
         1.5
       ],
-      "sha256": "dcd58f9efa74c1f1be6d7ecc281fa5d4c385680f28ccc8fd4fb7588d6253eab9",
+      "sha256": "8262f77a493cda1ab8fab30916aa9d8fdd93e8a6978596c20fd54f72a930f675",
       "textures_cached": 26
     },
     {
@@ -241,7 +241,7 @@
         46,
         29
       ],
-      "sha256": "9b350e45864e8797063b4c0535d31d7b886efc28310b34dcd33b3ca6503320dc",
+      "sha256": "8fa09a2d8593f93b3f61d592a1390ffddca58d986fbc3e44f3ece6afc382abbb",
       "textures_cached": 26
     },
     {
@@ -253,7 +253,7 @@
         "--zoom",
         1.5
       ],
-      "sha256": "795b786eb18d0d0cfde814765c90899602cd0278482ae9876ccac92bf03309da",
+      "sha256": "0c00cf002d0f980dbd67d37b47d43d923cf0db53a8e1b027c72ce8d0c1a4377c",
       "textures_cached": 26
     },
     {
@@ -266,7 +266,7 @@
         1.5,
         "--deplete-rocks"
       ],
-      "sha256": "1aeb0433c430069a683f9d25cae6ecc7bff6e5cb7a1107e1f6b17f75e1ecd9bf",
+      "sha256": "4083c11e2d6460de7612a90065010446c2768ff69691432f06be3ff9cdb5167c",
       "textures_cached": 26
     }
   ],

@@ -34,7 +34,7 @@ function grass(pattern,v){var o=canvas(32,32),cs=[],n=pattern;
 function distance(x,y,mask){var dx=x-15.5,dy=y-15.5,d=Math.sqrt(dx*dx+dy*dy);
  if((mask&1)&&dy<=0)d=Math.min(d,Math.abs(dx));if((mask&2)&&dx>=0)d=Math.min(d,Math.abs(dy));
  if((mask&4)&&dy>=0)d=Math.min(d,Math.abs(dx));if((mask&8)&&dx<=0)d=Math.min(d,Math.abs(dy));return d;}
-function path(mask,condition,v){var o=canvas(32,32),p=condition===0?['594b35','7b6040','98764c','a58656','b59664']:condition===1?['594a34','766045','8b7351','9d835b','af9569']:['4e4931','6e5e3c','867349','968353','a28d5d'];
+function path(mask,condition,v){var o=canvas(32,32),p=['594b35','7b6040','98764c','a58656',condition===0?'b59664':condition===1?'af9569':'a28d5d'];
  for(var y=0;y<32;y++)for(var x=0;x<32;x++){
   var d=mask===16?0:distance(x,y,mask),edge=x<2||y<2||x>29||y>29;
   if(d>11.8-(edge?0:noise(x,y,6)%3*0.18))continue;
@@ -64,7 +64,7 @@ function stone(condition,v){var o=canvas(32,32);
  for(var y=0;y<32;y++)for(var x=0;x<32;x++){
   var row=Math.floor(y/8),px=(x+row%2*8)%16,py=y%8;
   var c=py===0||px===0?'50594f':py===1||px===1?'929782':py===7||px===15?'646e60':'7b8471';
-  if(condition===3)c=(x<2||y<2||x>29||y>29)?c:['707762','777d67','7d826d'][noise(Math.floor(x/6),Math.floor(y/5),v)%3];
+  if(condition===3)c=x<2||y<2||x>29||y>29?'747c68':noise(Math.floor(x/7),Math.floor(y/6),v)%11===0?'7b826d':'747c68';
   put(o,x,y,colour(c));
  }
  if(condition===1){for(var i=0;i<7;i++){var x=4+i*3,y=8+v*4+Math.floor(i/2);put(o,x,y,colour('4b5548'));if(i%2)put(o,x,y+1,colour('626f50'));}
