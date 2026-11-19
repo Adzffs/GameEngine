@@ -142,6 +142,28 @@ class BridgeTests(unittest.TestCase):
         self.source.write_text(json.dumps(self.world), encoding='utf-8')
         self.bridge = StudioBridge(self.tool, self.source)
 
+    def test_unsaved_state_tracks_verified_world_and_saved_checkpoint(self):
+        self.assertFalse(self.bridge.dirty)
+        self.bridge.move('resource.tree.001', 3, 1)
+        self.assertTrue(self.bridge.dirty)
+        self.bridge.undo()
+        self.assertFalse(self.bridge.dirty)
+        self.bridge.redo()
+        draft = self.source.with_name('saved checkpoint.json')
+        self.bridge.save(draft)
+        self.assertFalse(self.bridge.dirty)
+        self.assertEqual(self.bridge.last_saved, draft.resolve())
+        self.bridge.paint(1, 0, 'D')
+        self.assertTrue(self.bridge.dirty)
+        with self.assertRaises(StudioError):
+            self.bridge.save(draft)
+        self.assertTrue(self.bridge.dirty)
+        self.bridge.undo()
+        self.assertFalse(self.bridge.dirty)
+        reopened = StudioBridge(self.tool, draft)
+        self.assertFalse(reopened.dirty)
+        self.assertEqual(reopened.placements, self.bridge.placements)
+
     def test_move_undo_redo_authoritatively(self):
         self.bridge.move('resource.tree.001', 3, 1)
         self.assertEqual(self.bridge.placements['resource.tree.001'][1:], (3, 1))

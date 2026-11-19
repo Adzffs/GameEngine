@@ -1,5 +1,16 @@
 # Visual starter-world editor shell (STUDIO-030 first slice)
 
+## File state and reopening
+
+The title shows an asterisk and the toolbar says **Unsaved changes** when the
+current authoritative world differs from the last verified save. Undoing back
+to that world clears the indicator. A failed or cancelled save does not clear
+it. Closing or opening another draft offers Save / Discard / Cancel; cancelling
+the save keeps the current world open. **Open draft…** validates a selected
+world before replacing the editor session. **Reopen last saved** starts a fresh
+session from the verified draft, with the same unsaved-change protection.
+Draft saves remain create-only sibling files; reopening starts a new history.
+
 **Status:** Experimental stacked development branch, not integrated into `master`.
 **Scope:** Select and move existing resource/workstation placements in a real mouse-driven grid, with read-only inspection, undo/redo and create-only draft saving. This does not claim the full STUDIO-030 acceptance story.
 
