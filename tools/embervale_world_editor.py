@@ -413,6 +413,8 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
     tile = 22
     selected: str | None = None
     brush = tk.StringVar(value="Select / move")
+    show_collision = tk.BooleanVar(value=False)
+    show_spawns = tk.BooleanVar(value=False)
     saved: str | None = None
     caption = tk.StringVar()
     cursor_label = tk.StringVar(value="Tile: —")
@@ -472,6 +474,26 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
                                width=3 if name == selected else 1)
             if name == selected:
                 inspector.set(f"{KINDS[kind]}\n{name}\n{bridge.definitions[name]}\nTile: ({x}, {y})")
+        if show_collision.get():
+            blocked = {(x, y) for y, row in enumerate(bridge.terrain)
+                       for x, glyph in enumerate(row) if glyph == "W"}
+            blocked.update((x, y) for kind, x, y in bridge.placements.values()
+                           if kind in ("R", "S"))
+            for x, y in sorted(blocked):
+                canvas.create_rectangle(x * tile, y * tile, (x + 1) * tile,
+                    (y + 1) * tile, outline="#ff5555", width=2)
+                canvas.create_line(x * tile, y * tile, (x + 1) * tile,
+                    (y + 1) * tile, fill="#ff5555", width=2)
+        if show_spawns.get():
+            spawns = [("Player", *bridge.spawn)] + [
+                ("NPC" if kind == "N" else "Monster", x, y)
+                for kind, x, y in bridge.placements.values() if kind in ("N", "M")]
+            for label, x, y in spawns:
+                canvas.create_rectangle(x * tile, y * tile, (x + 1) * tile,
+                    (y + 1) * tile, outline="#00ffff", width=3)
+                if tile >= 12:
+                    canvas.create_text((x + .5) * tile, (y + 1) * tile + 2 if y == 0 else y * tile - 2,
+                        text=label, fill="#00ffff", anchor="n" if y == 0 else "s")
         file_state = "Unsaved changes" if bridge.dirty else "Saved"
         root.title(f"{'* ' if bridge.dirty else ''}{bridge.source.name} | Embervale Studio")
         caption.set(f"{bridge.source.name} | {file_state} | {tile}px | undo/redo: {'/'.join(bridge.status.split('/')[1:])}")
@@ -639,6 +661,10 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
     root.protocol("WM_DELETE_WINDOW", close)
     filebar = ttk.Frame(frame)
     filebar.pack(fill="x", before=toolbar)
+    ttk.Checkbutton(filebar, text="Static collision", variable=show_collision,
+                    command=display).pack(side="left", padx=4)
+    ttk.Checkbutton(filebar, text="Spawns", variable=show_spawns,
+                    command=display).pack(side="left", padx=4)
     play_button = ttk.Button(filebar, text="Play this draft", command=play)
     play_button.pack(side="right")
     ttk.Label(filebar, text="Playtests use temporary progress").pack(side="right", padx=8)
