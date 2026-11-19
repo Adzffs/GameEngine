@@ -25,7 +25,7 @@ the development character's initial XP grants or developer weapon.
 | Progression | Existing gameplay XP/reward rules; no initial development XP grants |
 
 This preserves the engine's existing health, tutorial, recipe and quest defaults.
-It does not rebalance enemies, rewards, shop prices or travel. The bronze tools
+The profile itself does not change enemies, rewards, shop prices or travel. The bronze tools
 allow the existing woodcutting/mining and tutorial production loop to begin.
 
 ## Launch the game
@@ -72,3 +72,12 @@ saves or world snapshots; their formats are unchanged. Existing saves preserve
 their own state regardless of the selected new-character profile.
 
 [Implementation and deferred acceptance](../06-development/FRESH_PLAYER_PROFILE_2026-11-19.md).
+
+## First upgrade budget
+
+The starter-economy revision prices a Wooden shield at twenty coins, matching the
+combined Gathering Basics and Mining Basics rewards. The existing crafting route
+for one Bronze sword and one shield needs two normal Logs, three Copper ore and
+three Tin ore, leaving one plank. This is a material/coin budget; complete player
+gathering and upgrade timing remains unmeasured. See the
+[economy record](../06-development/STARTER_ECONOMY_2026-11-19.md).

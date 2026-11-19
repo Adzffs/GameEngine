@@ -23,8 +23,8 @@ int main()
     test.ExpectEqual(shop->entries.size(), std::size_t{10}, "Ten ordered entries");
     for (std::size_t i = 0; i < shop->entries.size(); ++i)
         test.Expect(shop->entries[i].itemType == order[i], "Entry order is authored");
-    const std::optional<int> buys[] = {1, std::nullopt,
-        std::nullopt, std::nullopt, 8, 20, 25, 25, 40, 30};
+    const std::optional<int> buys[] = {10, std::nullopt,
+        std::nullopt, std::nullopt, 8, 20, 25, 25, 40, 20};
     const std::optional<int> sells[] = {1, 2, 2, 4, 3, 6, 10, 10, 15, 12};
     for (std::size_t i = 0; i < shop->entries.size(); ++i)
     {
@@ -33,6 +33,13 @@ int main()
     }
     test.Expect(ContentValidator::ValidateShopDefinition(shop->id, *shop).IsValid(),
                 "Authored shop validates");
+    ShopDefinition legacyTimber = *shop;
+    legacyTimber.entries.front().buyPrice = 1;
+    test.Expect(!ContentValidator::ValidateShopDefinition(legacyTimber.id, legacyTimber).IsValid(),
+        "Multi-step Log/plank/shield profit rejects even without a plank shop entry");
+    legacyTimber.entries.front().buyPrice = 8;
+    test.Expect(!ContentValidator::ValidateShopDefinition(legacyTimber.id, legacyTimber).IsValid(),
+        "Material-complete break-even production is rejected as well as a positive loop");
 
     const std::optional<double> meatHealing =
         EconomyBalanceModel::GetHealingPerCoin(ItemType::COOKED_MEAT, *shop);

@@ -14,6 +14,7 @@
 #include "../NPC/NpcSpawnDatabase.h"
 #include "../Dialogue/DialogueDefinitionDatabase.h"
 #include "../Shop/ShopDefinitionDatabase.h"
+#include "../Economy/EconomyBalanceModel.h"
 #include "../Quest/QuestDefinitionDatabase.h"
 #include "../Skills/SkillType.h"
 #include "../Stats/StatType.h"
@@ -1808,6 +1809,7 @@ void ContentValidator::AppendShopDefinitionValidation(
     ShopId registryShopId, const ShopDefinition &definition,
     ContentValidationReport &report)
 {
+    const int errorsBefore = report.GetErrorCount();
     const std::string contentID = std::to_string(static_cast<int>(definition.id));
     if (registryShopId == ShopId::NONE || definition.id == ShopId::NONE ||
         registryShopId != definition.id || ShopDefinitionDatabase::TryGet(registryShopId) == nullptr)
@@ -1841,6 +1843,22 @@ void ContentValidator::AppendShopDefinitionValidation(
         if (entry.buyPrice.has_value() && entry.sellPrice.has_value() &&
             *entry.sellPrice > *entry.buyPrice)
             report.AddError("ShopDefinition", contentID, "sell price must not exceed buy price");
+    }
+    if (report.GetErrorCount() != errorsBefore) return;
+    const auto productionCosts = EconomyBalanceModel::GetProductionCosts(definition);
+    if (!productionCosts.converged)
+    {
+        report.AddError("ShopDefinition", contentID,
+            "shop-funded recipe costs do not converge; review the production cycle");
+        return;
+    }
+    for (const auto type : RecipeDatabase::GetAllRecipeTypes())
+    {
+        const auto &recipe = RecipeDatabase::Get(type);
+        const auto margin = EconomyBalanceModel::GetProductionMargin(recipe, definition, productionCosts);
+        if (margin && *margin >= -EconomyBalanceModel::PriceTolerance)
+            report.AddError("ShopDefinition", contentID,
+                "shop-funded production must sell below total material cost: " + recipe.GetName());
     }
 }
 

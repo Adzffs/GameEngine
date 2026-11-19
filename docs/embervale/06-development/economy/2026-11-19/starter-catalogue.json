@@ -1,0 +1,124 @@
+{
+  "kind": "starter-economy-catalogue",
+  "shop_validation_passed": true,
+  "production_costs_converged": true,
+  "basic_quest_coin_rewards": 20,
+  "shop_entries": [
+    {
+      "item": "Log",
+      "buy": 10,
+      "sell": 1
+    },
+    {
+      "item": "Copper ore",
+      "buy": null,
+      "sell": 2
+    },
+    {
+      "item": "Tin ore",
+      "buy": null,
+      "sell": 2
+    },
+    {
+      "item": "Coal",
+      "buy": null,
+      "sell": 4
+    },
+    {
+      "item": "Cooked meat",
+      "buy": 8,
+      "sell": 3
+    },
+    {
+      "item": "Healing tonic",
+      "buy": 20,
+      "sell": 6
+    },
+    {
+      "item": "Bronze axe",
+      "buy": 25,
+      "sell": 10
+    },
+    {
+      "item": "Bronze pickaxe",
+      "buy": 25,
+      "sell": 10
+    },
+    {
+      "item": "Bronze sword",
+      "buy": 40,
+      "sell": 15
+    },
+    {
+      "item": "Wooden shield",
+      "buy": 20,
+      "sell": 12
+    }
+  ],
+  "recipe_shop_funded_margins": [
+    {
+      "recipe": "Smelt Bronze bar",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Smelt Iron bar",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Smelt Steel bar",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Craft Wooden planks",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Craft Wooden shield",
+      "coins_per_batch": -3
+    },
+    {
+      "recipe": "Forge Bronze axe",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Forge Iron axe",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Forge Steel axe",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Forge Bronze pickaxe",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Forge Iron pickaxe",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Forge Steel pickaxe",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Forge Bronze sword",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Cut Oak planks",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Cut Willow planks",
+      "coins_per_batch": null
+    }
+  ],
+  "one_sword_and_shield_material_plan": {
+    "normal_logs": 2,
+    "copper_ore": 3,
+    "tin_ore": 3,
+    "leftover_planks": 1,
+    "leftover_bars": 0
+  },
+  "pacing_measured": false
+}
