@@ -88,7 +88,13 @@ Counts are a starting hypothesis. More trees can reduce waiting but also shorten
 
 Preserve the existing starter cast and each character's mechanical role. Their relationships should appear in optional dialogue and small choices as well as the main quest sequence. Current character metadata and the older character document sometimes use slightly different wording; edit them together when a decision changes. Source: [NPC definitions](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/NPC/NpcDefinitionDatabase.cpp) and [StarterCharacters.md](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/docs/StarterCharacters.md).
 
-Before expanding the story, resolve the existing mismatch between the final quest's reference to an “Ashfang alpha” and the elite definition's display name, Cinder Warden. This document records the mismatch rather than selecting new canon. Keep a single approved display name across objectives, dialogue, monster labels and release notes. Source: [quest definitions](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Quest/QuestDefinitionDatabase.cpp).
+**Cinder Warden** is the canonical elite encounter name. Heart of the Ash,
+Brann's dialogue, objective labels and the existing NPC name now agree. Quest
+completion acknowledges recorded progress: Shield or Shelter keeps the player's
+shield, and Heart of the Ash uses a victory report rather than a trophy item.
+Both reward contacts complete the same quest. Directions resolve named people
+and services in the loaded world. [Continuity decision, current rewards and
+remaining acceptance](../06-development/QUEST_CONTINUITY_2026-11-19.md).
 
 ## 8. Accessibility and interaction expectations
 

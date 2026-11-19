@@ -44,13 +44,13 @@ int main()
         test.Expect(welcome != nullptr && explanation != nullptr && prompt != nullptr &&
                         gathering != nullptr && combat != nullptr && future != nullptr,
                     "All stable nodes resolve");
-        test.Expect(welcome->text == "Welcome to Embervale. I'm Mara, the village warden.",
+        test.Expect(welcome->text == "Welcome to Embervale. I'm Mara Vale, the village warden. Accept a task before gathering, crafting or fighting for its progress.",
                     "Welcome text is exact");
         test.Expect(explanation->text ==
-            "The wilds provide what we need, but lately they have been pushing back.",
+            "Prepare a sword, shield and food. Start with a Mossling; ask me about Tracks in the Ash when you want to follow Sera's report.",
             "Explanation text is exact");
         test.Expect(future->text ==
-            "Return when you're ready. Embervale has work for capable hands.",
+            "Tracks in the Ash follows Sera's report. After it, Torren offers Shield or Shelter; Sera's Ashfang task comes next.",
             "Terminal text is exact");
         test.Expect(welcome->nextNodeId == DialogueNodeId::DEVELOPMENT_GUIDE_EXPLANATION,
                     "Welcome points to explanation");

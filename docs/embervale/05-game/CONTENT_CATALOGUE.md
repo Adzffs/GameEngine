@@ -100,16 +100,22 @@ Recipe editor work should preserve station requirements, quantities, skill rules
 
 ## 6. Quest inventory and progression links
 
-| Quest | Current objective | Prerequisite | Important continuity check |
+| Quest | Current objective after accepting | Prerequisite | Quest reward options |
 |---|---|---|---|
-| Gathering Basics | Gather 10 Logs | None | Preserve objective and reward semantics during map changes |
-| Mining Basics | Gather 5 Copper ore | None | Copper must be reachable without an advanced tool |
-| Tracks in the Ash | Speak to Sera Flint | None | Update objective directions when Sera moves |
-| Shield or Shelter | Craft a Wooden shield; alternative completion path | Tracks in the Ash | Both completion NPCs must remain reachable |
-| Fangs at the Gate | Defeat three Ashfangs | Shield or Shelter | Safe preparation and return route |
-| Heart of the Ash | Defeat the elite monster; alternative completion path | Fangs at the Gate | Resolve elite name inconsistency before content polish |
+| Gathering Basics | Gather 10 normal Logs; report to Mara Vale | None | 10 Coins |
+| Mining Basics | Gather 5 Copper ore; report to Mara | None | 10 Coins |
+| Tracks in the Ash | Speak to Sera Flint; report to Mara | None | 15 Coins |
+| Shield or Shelter | Craft 1 Wooden shield; report to Torren Ash or Nessa Thorne | Tracks in the Ash | 25 Coins from Torren or 3 Cooked meat from Nessa |
+| Fangs at the Gate | Defeat 3 Ashfangs; report to Sera | Shield or Shelter | 5 Cooked meat |
+| Heart of the Ash | Defeat the Cinder Warden; report to Mara or Brann Deepwell | Fangs at the Gate | 75 Coins from Mara or 2 Steel bars from Brann |
 
-Source: [QuestDefinitionDatabase.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Quest/QuestDefinitionDatabase.cpp). The current elite objective text calls the target an Ashfang alpha, while the referenced elite NPC definition displays Cinder Warden. Record a deliberate naming decision and update all relevant text together; changing only a label can leave a misleading objective.
+Current source: [quest definitions](../../../src/Quest/QuestDefinitionDatabase.cpp)
+and [NPC names](../../../src/NPC/NpcDefinitionDatabase.cpp). The elite's canonical
+name is **Cinder Warden**. Gathering/crafting/talk/kill events count after accepting.
+Respawned Ashfangs can contribute to the defeat count. Completion keeps crafted
+equipment and requires no inventory trophy. Each alternative chooses one reward
+and completes the same quest; normal monster drops remain separate.
+[Current continuity and guidance record](../06-development/QUEST_CONTINUITY_2026-11-19.md).
 
 Future quest specifications should include initial state, prerequisites, objective event, required amount, giver, completion locations, alternate completions, rewards, repeatability, failure/recovery behaviour and save-version implications. Test reconnect or reload at meaningful intermediate states. Dialogue must not provide a second path that grants the same one-time reward repeatedly.
 
@@ -120,9 +126,9 @@ Future quest specifications should include initial state, prerequisites, objecti
 | Iron ore row says bars have no equipment sink | Iron and Steel axe/pickaxe recipes are present | Update the economy explanation to describe current sinks |
 | Bronze sword row calls it a Gathering Basics requirement | Gathering Basics uses a Log objective | Correct the ledger, or propose a separately reviewed quest change |
 | Economy implementation list still asks for equipment recipes | Those recipes already exist in the catalogue | Reclassify as source-implemented and leave playtest validation open |
-| Final quest refers to an Ashfang alpha | Elite NPC display name is Cinder Warden | Agree the intended encounter name, then synchronise text |
+| Baseline final quest referred to an Ashfang alpha | Elite NPC display name is Cinder Warden | Resolved by GAME-007: current objectives/dialogue use Cinder Warden |
 
-Sources: [EconomyLedger.md](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/docs/EconomyLedger.md), [RecipeDatabase.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Recipe/RecipeDatabase.cpp), [QuestDefinitionDatabase.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Quest/QuestDefinitionDatabase.cpp). These findings describe the reviewed baseline. The corrected [economy ledger](../../EconomyLedger.md) included in this documentation pack reconciles its prose with current source; the quest naming decision remains open. Gameplay definitions are unchanged.
+Sources: [EconomyLedger.md](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/docs/EconomyLedger.md), [RecipeDatabase.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Recipe/RecipeDatabase.cpp), [QuestDefinitionDatabase.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Quest/QuestDefinitionDatabase.cpp). These findings describe the reviewed baseline. The corrected [economy ledger](../../EconomyLedger.md) included in this documentation pack reconciles its prose with current source; the later GAME-007 revision resolves the quest naming decision and reward wording. Earlier source-review findings remain historical; current gameplay text is linked above.
 
 The ledger also records a source-derived multi-stage profit cycle: three purchased Logs can yield twelve planks, two shields and 24 coins of sale value for three coins of input. This is a calculation from the current definitions, not a completed runtime reproduction. See the [ledger](../../EconomyLedger.md) and planned `GAME-008` investigation.
 

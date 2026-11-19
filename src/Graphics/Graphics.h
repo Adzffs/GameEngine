@@ -327,7 +327,8 @@ public:
     bool IsSidePanelOpen() const { return sidePanelOpen; }
 
     void DrawSidePanelTabs();
-    void DrawGameGuide(const StarterJourney::Guidance &guidance, const std::string &destination);
+    void DrawGameGuide(const StarterJourney::Guidance &guidance, const std::string &destination,
+        const std::string &questLead);
     void DrawWorldHud(const Player &player,
         const StarterJourney::Guidance &guidance, const std::string &destination);
     void DrawSettings();
@@ -540,7 +541,7 @@ private:
     Uint64 lastPresentationTick = 0;
     float presentationDeltaSeconds = 1.0f / 60.0f;
     bool gameGuideVisible = false;
-    bool displayedTutorialActive = false;
+    bool displayedJourneyActive = false;
     bool compiledMapLabelsVisible = true;
     bool showGrid = false;
     float mouseX = 0.0f;

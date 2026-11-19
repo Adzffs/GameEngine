@@ -1,0 +1,17 @@
+{
+  "kind": "starter-quest-authoring-review",
+  "base_commit": "b355bc912be781673cea5ee8ab233750497001ab",
+  "content_validation_passed": true,
+  "content_validation_errors": 0,
+  "quest_count": 6,
+  "named_objectives_match_npc_display_names": [
+    "Sera Flint",
+    "Ashfang",
+    "Cinder Warden"
+  ],
+  "dialogue_character_budget": 184,
+  "longest_authored_dialogue": 154,
+  "selected_world_validation": "Valid starter world: 100 x 100, 31 placements, player spawn (5, 28).",
+  "regression_suites": "deferred",
+  "visible_and_full_quest_chain_acceptance": "deferred"
+}

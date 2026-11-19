@@ -1,7 +1,7 @@
 # Embervale documentation
 
 **Documentation version:** 1.1 · **Review date:** 18 November 2026\
-**Code baseline:** [e9d32932e8f9b27e96283313cca320058792a81f](https://github.com/Adzffs/GameEngine/commit/e9d32932e8f9b27e96283313cca320058792a81f)
+**Original source-review baseline:** [e9d32932e8f9b27e96283313cca320058792a81f](https://github.com/Adzffs/GameEngine/commit/e9d32932e8f9b27e96283313cca320058792a81f)
 
 ## Start with the question you have
 
@@ -12,6 +12,7 @@
 | What should we do next? | [Master roadmap](02-roadmap/MASTER_ROADMAP.md) |
 | What task can I pick up? | [Backlog](02-roadmap/BACKLOG.md) |
 | How do I run the game? | [Getting started](06-development/GETTING_STARTED.md) |
+| Which quest follows the starter equipment journey? | [Quest continuity and current rewards](06-development/QUEST_CONTINUITY_2026-11-19.md) |
 | How does the first equipment journey work? | [Starter upgrade journey](06-development/STARTER_UPGRADE_JOURNEY_2026-11-19.md) |
 | What are the current starter costs and trade results? | [Starter economy correction](06-development/STARTER_ECONOMY_2026-11-19.md) |
 | How do I start without development boosts? | [Fresh-player profile](05-game/FRESH_PLAYER_PROFILE.md) |
@@ -96,6 +97,7 @@ The source contains substantial RPG systems, starter-world export, bounded valid
 | [RIVER_CROSSING_BLOCKOUT_2026-11-19.md](06-development/RIVER_CROSSING_BLOCKOUT_2026-11-19.md) | Authored map, generation/build evidence, identity/lifecycle contract and remaining acceptance |
 | [STARTER_ECONOMY_2026-11-19.md](06-development/STARTER_ECONOMY_2026-11-19.md) | Confirmed timber correction, starter budgets, report commands and deferred pacing |
 | [STARTER_UPGRADE_JOURNEY_2026-11-19.md](06-development/STARTER_UPGRADE_JOURNEY_2026-11-19.md) | Tutorial material goals, live hints and unfunded production route with timing limits |
+| [QUEST_CONTINUITY_2026-11-19.md](06-development/QUEST_CONTINUITY_2026-11-19.md) | Canonical encounter name, actual quest rules, reward choices and post-tutorial guidance |
 | [CONTRIBUTING.md](06-development/CONTRIBUTING.md) | Focused work, evidence, review, compatibility and parallel-agent handoff |
 | [TESTING.md](06-development/TESTING.md) | Current registrations, meaningful future tests and result records |
 | [RUNTIME_IMPORT_VERIFICATION_2026-11-18.md](06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md) | Runtime-input build/test results, real dummy-video launch and precise platform limits |

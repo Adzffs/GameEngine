@@ -132,3 +132,17 @@ without seeding items, coins or XP. Build `EmbervaleEconomyReport` with content
 tools enabled, then run `--replay-starter-upgrade --world content/worlds/river-crossing.blockout.json`.
 Its tick report does not measure human reading, discovery, cursor handling or
 combat. [Commands, route evidence and remaining acceptance](STARTER_UPGRADE_JOURNEY_2026-11-19.md).
+
+## 9. Continue into the starter quests
+
+After the tutorial, the **Next quest** card follows ready rewards and accepted
+tasks before offering another story lead. H or a left-click opens details.
+Hover a Quest-tab row for its complete objective, progress rules and rewards.
+Accept before gathering, crafting, talking to the target or defeating creatures
+for quest credit. Reward buttons show what the current contact provides.
+
+Tracks in the Ash starts with Mara, sends you to Sera, and opens Torren's Shield
+or Shelter after reporting back. Later tasks follow the journal's prerequisites.
+**Cinder Warden** is the final encounter name. Shield crafting and the final
+victory offer one reward choice each; crafting keeps the shield and victory
+reporting requires no inventory trophy. [Quest route and reward table](QUEST_CONTINUITY_2026-11-19.md).

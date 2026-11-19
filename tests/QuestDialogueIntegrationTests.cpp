@@ -389,7 +389,7 @@ int main()
                         ItemType::STEEL_BAR) == 2 &&
                     champion->GetInventory().GetItemAmount(
                         ItemType::COINS) == 0,
-                "Giving Brann the alpha trophy chooses useful steel over coins");
+                "Reporting the Cinder Warden victory to Brann chooses Steel bars");
 
     return test.Finish();
 }

@@ -1,0 +1,218 @@
+{
+  "kind": "starter-economy-catalogue",
+  "content_validation_passed": true,
+  "content_validation_errors": 0,
+  "shop_validation_passed": true,
+  "production_costs_converged": true,
+  "basic_quest_coin_rewards": 20,
+  "shop_entries": [
+    {
+      "item": "Log",
+      "buy": 10,
+      "sell": 1
+    },
+    {
+      "item": "Copper ore",
+      "buy": null,
+      "sell": 2
+    },
+    {
+      "item": "Tin ore",
+      "buy": null,
+      "sell": 2
+    },
+    {
+      "item": "Coal",
+      "buy": null,
+      "sell": 4
+    },
+    {
+      "item": "Cooked meat",
+      "buy": 8,
+      "sell": 3
+    },
+    {
+      "item": "Healing tonic",
+      "buy": 20,
+      "sell": 6
+    },
+    {
+      "item": "Bronze axe",
+      "buy": 25,
+      "sell": 10
+    },
+    {
+      "item": "Bronze pickaxe",
+      "buy": 25,
+      "sell": 10
+    },
+    {
+      "item": "Bronze sword",
+      "buy": 40,
+      "sell": 15
+    },
+    {
+      "item": "Wooden shield",
+      "buy": 20,
+      "sell": 12
+    }
+  ],
+  "recipe_shop_funded_margins": [
+    {
+      "recipe": "Smelt Bronze bar",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Smelt Iron bar",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Smelt Steel bar",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Craft Wooden planks",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Craft Wooden shield",
+      "coins_per_batch": -3
+    },
+    {
+      "recipe": "Forge Bronze axe",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Forge Iron axe",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Forge Steel axe",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Forge Bronze pickaxe",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Forge Iron pickaxe",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Forge Steel pickaxe",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Forge Bronze sword",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Cut Oak planks",
+      "coins_per_batch": null
+    },
+    {
+      "recipe": "Cut Willow planks",
+      "coins_per_batch": null
+    }
+  ],
+  "quest_guides": [
+    {
+      "quest": "Gathering Basics",
+      "required": 10,
+      "objective_npc": null,
+      "details": [
+        "Gathering Basics",
+        "Start: Speak to Mara Vale",
+        "Goal: Gather normal Logs",
+        "Progress: 0 / 10",
+        "Start / claim: Mara Vale",
+        "Mara Vale: 10 Coins",
+        "Gather after accepting; existing items do not add progress."
+      ]
+    },
+    {
+      "quest": "Mining Basics",
+      "required": 5,
+      "objective_npc": null,
+      "details": [
+        "Mining Basics",
+        "Start: Speak to Mara Vale",
+        "Goal: Gather Copper ore",
+        "Progress: 0 / 5",
+        "Start / claim: Mara Vale",
+        "Mara Vale: 10 Coins",
+        "Gather after accepting; existing items do not add progress."
+      ]
+    },
+    {
+      "quest": "Tracks in the Ash",
+      "required": 1,
+      "objective_npc": "Sera Flint",
+      "details": [
+        "Tracks in the Ash",
+        "Start: Speak to Mara Vale",
+        "Goal: Speak to Sera Flint",
+        "Progress: 0 / 1",
+        "Start / claim: Mara Vale",
+        "Mara Vale: 15 Coins",
+        "Speak to the named character after accepting."
+      ]
+    },
+    {
+      "quest": "Shield or Shelter",
+      "required": 1,
+      "objective_npc": null,
+      "details": [
+        "Shield or Shelter",
+        "Requires: Tracks in the Ash",
+        "Goal: Craft a Wooden shield",
+        "Progress: 0 / 1",
+        "Start / claim: Torren Ash",
+        "Torren Ash: 25 Coins",
+        "OR Nessa Thorne: 3 x Cooked meat",
+        "Choose one reward; either completes this quest.",
+        "Craft after accepting. Crafted items are yours to use.",
+        "Materials: 6 x Wooden planks (crafting table)"
+      ]
+    },
+    {
+      "quest": "Fangs at the Gate",
+      "required": 3,
+      "objective_npc": "Ashfang",
+      "details": [
+        "Fangs at the Gate",
+        "Requires: Shield or Shelter",
+        "Goal: Defeat Ashfangs",
+        "Progress: 0 / 3",
+        "Start / claim: Sera Flint",
+        "Sera Flint: 5 x Cooked meat",
+        "Your kills after accepting count, including respawns."
+      ]
+    },
+    {
+      "quest": "Heart of the Ash",
+      "required": 1,
+      "objective_npc": "Cinder Warden",
+      "details": [
+        "Heart of the Ash",
+        "Requires: Fangs at the Gate",
+        "Goal: Defeat the Cinder Warden",
+        "Progress: 0 / 1",
+        "Start / claim: Mara Vale",
+        "Mara Vale: 75 Coins",
+        "OR Brann Deepwell: 2 x Steel bar",
+        "Choose one reward; either completes this quest.",
+        "Your kills after accepting count, including respawns."
+      ]
+    }
+  ],
+  "available_story_lead": "Tracks in the Ash",
+  "one_sword_and_shield_material_plan": {
+    "normal_logs": 2,
+    "copper_ore": 3,
+    "tin_ore": 3,
+    "leftover_planks": 1,
+    "leftover_bars": 0
+  },
+  "pacing_measured": false
+}

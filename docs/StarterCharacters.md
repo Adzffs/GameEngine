@@ -28,3 +28,17 @@ Mara needs Torren’s equipment; Torren needs Brann’s ore and Nessa’s timber
 
 This loop should surface through optional dialogue and quest choices, not only quest exposition.
 
+
+## Current quest continuity
+
+The elite is **Cinder Warden**. Mara's Tracks in the Ash sends the player to
+Sera and back; its completion opens Torren's Shield or Shelter. Torren and Nessa
+offer coin/food alternatives for recorded crafting, while the player keeps the
+shield. Sera then offers Fangs at the Gate. Heart of the Ash ends with a victory
+report to Mara for coins or Brann for Steel bars. Either contact completes it;
+there is no trophy inventory requirement.
+
+Current conversations explain acceptance before progress, actual station/bank
+use, preparation and the next quest. Elia's ledger investigation remains future
+character intent. The cast's larger personal goals are not additional journal
+quests. [Current mechanics, rewards, guidance and validation](embervale/06-development/QUEST_CONTINUITY_2026-11-19.md).

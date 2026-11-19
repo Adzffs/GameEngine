@@ -123,11 +123,11 @@ The source includes names, roles, wants, voice descriptions, relationships, and 
 | Gathering Basics | Gather 10 logs | Initially available; 10 coins. |
 | Mining Basics | Gather 5 copper ore | Initially available; 10 coins. |
 | Tracks in the Ash | Speak to Sera | Initially available; 15 coins. |
-| Shield or Shelter | Craft a wooden shield; choose completion recipient | Follows Tracks in the Ash; 25 coins through Torren or 3 cooked meat through Nessa. |
+| Shield or Shelter | Craft a Wooden shield; choose reward contact and keep the shield | Follows Tracks in the Ash; 25 coins through Torren or 3 cooked meat through Nessa. |
 | Fangs at the Gate | Defeat 3 Ashfangs | Follows Shield or Shelter; 5 cooked meat. |
-| Heart of the Ash | Defeat the elite monster | Follows Fangs at the Gate; 75 coins through Mara or 2 steel bars through Brann. |
+| Heart of the Ash | Defeat the Cinder Warden and report the victory | Follows Fangs at the Gate; 75 coins through Mara or 2 steel bars through Brann. |
 
-This table records definitions, not a newly completed end-to-end quest playthrough. The quest system supports progress, prerequisites, journal state, dialogue integration, alternate completions, and persistence. One content inconsistency should be resolved: the final quest's objective copy calls the elite an “Ashfang alpha,” while the NPC definition names it “Cinder Warden.” The design decision should be explicit and applied to all associated copy. [Quest definitions][IS-QUEST] · [NPC definitions][IS-NPC]
+This table records definitions, not a newly completed end-to-end quest playthrough. The quest system supports progress, prerequisites, journal state, dialogue integration, alternate completions, and persistence. The later GAME-007 continuity revision applies Cinder Warden consistently and explains recorded-progress rewards, kept equipment and the two alternative contacts. Current quest details and post-tutorial guidance are implemented; [dated implementation and validation](../06-development/QUEST_CONTINUITY_2026-11-19.md). [Quest definitions][IS-QUEST] · [NPC definitions][IS-NPC]
 
 Tutorial state advances through meeting the guide, gathering, planks, mining, smelting, weapon crafting and equipping, safe combat, loot and banking, and a final choice. Completion and skip state are persisted. The interface includes quest guidance and progression notifications, but onboarding usability still requires observation with new players. [Tutorial state][IS-TUTORIAL] · [World][IS-WORLD] · [Graphics][IS-GRAPHICS]
 

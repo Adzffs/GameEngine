@@ -4,6 +4,7 @@
 #include "QuestJournal.h"
 #include "../Item/ItemDatabase.h"
 #include "../NPC/NpcDefinitionDatabase.h"
+#include "../Recipe/RecipeDatabase.h"
 
 #include <algorithm>
 #include <string>
@@ -37,7 +38,9 @@ public:
                 QuestDefinitionDatabase::TryGet(questId);
             if (definition == nullptr) continue;
             std::string objective;
-            if (definition->objectiveType == QuestObjectiveType::TALK_TO_CHARACTER ||
+            if (definition->objectiveText != nullptr && definition->objectiveText[0] != '\0')
+                objective = definition->objectiveText;
+            else if (definition->objectiveType == QuestObjectiveType::TALK_TO_CHARACTER ||
                 definition->objectiveType == QuestObjectiveType::DEFEAT_CHARACTER)
                 objective = definition->objectiveText == nullptr
                     ? "Speak with the character" : definition->objectiveText;
@@ -119,6 +122,86 @@ public:
     const std::vector<QuestPresentation> &GetQuests() const
     {
         return quests;
+    }
+
+    const QuestPresentation *GetSuggestedQuest() const
+    {
+        // Finish committed work before offering another quest. Optional basic
+        // tasks remain available without hiding the starter story's first lead.
+        for (const auto &quest : quests)
+            if (quest.state == QuestState::READY_TO_COMPLETE || quest.state == QuestState::ACTIVE)
+                return &quest;
+        for (const auto &quest : quests)
+            if (quest.state == QuestState::AVAILABLE && quest.category != QuestCategory::TUTORIAL)
+                return &quest;
+        for (const auto &quest : quests)
+            if (quest.state == QuestState::AVAILABLE) return &quest;
+        return nullptr;
+    }
+
+    static std::string RewardText(ItemType item, int amount)
+    {
+        return std::to_string(amount) + (item == ItemType::COINS ? " " : " x ") +
+            ItemDatabase::Get(item).GetName();
+    }
+
+    static std::string ProgressRule(QuestObjectiveType type)
+    {
+        switch (type)
+        {
+        case QuestObjectiveType::GATHER_ITEM:
+            return "Gather after accepting; existing items do not add progress.";
+        case QuestObjectiveType::CRAFT_ITEM:
+            return "Craft after accepting. Crafted items are yours to use.";
+        case QuestObjectiveType::TALK_TO_CHARACTER:
+            return "Speak to the named character after accepting.";
+        case QuestObjectiveType::DEFEAT_CHARACTER:
+            return "Your kills after accepting count, including respawns.";
+        }
+        return {};
+    }
+
+    static std::vector<std::string> GetDetailLines(const QuestPresentation &quest)
+    {
+        const auto *definition = QuestDefinitionDatabase::TryGet(quest.id);
+        if (definition == nullptr) return {quest.title, quest.guidance};
+        const auto *giver = NpcDefinitionDatabase::TryGet(definition->giver.npcType);
+        const std::string giverName = giver == nullptr ? "Quest giver" : giver->name;
+        std::vector<std::string> lines{quest.title, quest.guidance,
+            "Goal: " + quest.objective,
+            "Progress: " + std::to_string(quest.progress) + " / " + std::to_string(quest.required),
+            (quest.state == QuestState::COMPLETED ? "Contact: " : "Start / claim: ") + giverName,
+            giverName + ": " + RewardText(definition->rewardItem, definition->rewardAmount)};
+        if (definition->alternateCompletion.npcType != NpcType::NONE)
+        {
+            const auto *alternate = NpcDefinitionDatabase::TryGet(definition->alternateCompletion.npcType);
+            lines.push_back("OR " + (alternate == nullptr ? std::string("Alternate contact") : alternate->name) +
+                ": " + RewardText(definition->alternateCompletion.rewardItem, definition->alternateCompletion.rewardAmount));
+            lines.push_back(quest.state == QuestState::COMPLETED ?
+                "Reward options shown; this quest is already complete." :
+                "Choose one reward; either completes this quest.");
+        }
+        lines.push_back(ProgressRule(definition->objectiveType));
+        if (definition->objectiveType == QuestObjectiveType::CRAFT_ITEM)
+            for (const auto type : RecipeDatabase::GetAllRecipeTypes())
+            {
+                const auto &recipe = RecipeDatabase::Get(type);
+                if (recipe.GetOutputItem() != definition->objectiveItem) continue;
+                std::string materials = "Materials: ";
+                for (const auto &ingredient : recipe.GetIngredients())
+                {
+                    if (materials != "Materials: ") materials += " + ";
+                    materials += RewardText(ingredient.itemType, ingredient.amount);
+                }
+                if (recipe.GetRequiredStationType() == StationType::CRAFTING_TABLE) materials += " (crafting table)";
+                else if (recipe.GetRequiredStationType() == StationType::FURNACE) materials += " (furnace)";
+                lines.push_back(std::move(materials));
+                break;
+            }
+        if (quest.state != QuestState::UNAVAILABLE)
+            if (const auto *prerequisite = QuestDefinitionDatabase::TryGet(definition->prerequisiteQuest))
+                lines.push_back("Requires: " + std::string(prerequisite->name));
+        return lines;
     }
 
 private:
