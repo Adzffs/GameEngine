@@ -1,0 +1,123 @@
+{
+  "base": "2b2433f40d239f798163b6ec72a4f3282e9307a4",
+  "environment": {
+    "os": "Windows",
+    "compiler": "UCRT64 GCC 16.1",
+    "sdl": "3.4.12",
+    "video": "dummy",
+    "renderer": "software",
+    "size": [
+      1280,
+      720
+    ]
+  },
+  "builds": {
+    "GameEngine": "passed",
+    "EmbervaleRenderPreview": "passed",
+    "Play-RiverCrossing.cmd --build-only": "passed"
+  },
+  "captures": [
+    {
+      "file": "woodland.png",
+      "options": [
+        "--focus",
+        "18",
+        "58"
+      ],
+      "exit_code": 0,
+      "loaded_images": 3,
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "12fecddf731002f0de8afecf4991d682894eae3e9c7c3654e0e3dfbe29dbe9d8"
+    },
+    {
+      "file": "depleted.png",
+      "options": [
+        "--focus",
+        "18",
+        "58",
+        "--deplete-trees"
+      ],
+      "exit_code": 0,
+      "loaded_images": 3,
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "e6add5a769b80cf0321f46a7fb76b8e56e2cb07af8204fe43accf8086b3196f1"
+    },
+    {
+      "file": "player-behind.png",
+      "options": [
+        "--focus",
+        "12",
+        "57"
+      ],
+      "exit_code": 0,
+      "loaded_images": 3,
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "5997a1f4911561d787e3d4f3653e040034b55f342e2c12915e4d854b5a930563"
+    },
+    {
+      "file": "player-front.png",
+      "options": [
+        "--focus",
+        "12",
+        "59"
+      ],
+      "exit_code": 0,
+      "loaded_images": 3,
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "616490f4f4e0a3a1484cc8f5211e478e1e5302264fc10c674305c6e4935ece77"
+    },
+    {
+      "file": "basic.png",
+      "options": [
+        "--focus",
+        "18",
+        "58",
+        "--basic"
+      ],
+      "exit_code": 0,
+      "loaded_images": 3,
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "ddd32fced98bebe2f5525dee426cb8ef7faa028ccbda14fb289fb4ffab0be7cd"
+    }
+  ],
+  "missing_art_fallback": {
+    "exit_code": 0,
+    "loaded_images": 0,
+    "result": "Basic shapes rendered when neither executable nor working directory contains assets."
+  },
+  "packaged_images": {
+    "build-client": [
+      "terrain.png",
+      "oak.png",
+      "stump.png"
+    ],
+    "build-river-crossing": [
+      "terrain.png",
+      "oak.png",
+      "stump.png"
+    ]
+  },
+  "editable_masters_unchanged": 3,
+  "input_world_unchanged": "8a04f8fdc6b02f33f1cdcc5c0f71323deb2c9def39bfc3ca29fcd6ac951df0fb",
+  "deferred": [
+    "Full regression suites",
+    "Visible GPU/window playthrough",
+    "Interactive canopy picking",
+    "Gameplay pacing and full quest-chain acceptance"
+  ]
+}

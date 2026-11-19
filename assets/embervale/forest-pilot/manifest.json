@@ -2,7 +2,7 @@
   "schema": "embervale.authoring-batch",
   "version": 1,
   "id": "forest-pilot",
-  "status": "art-pilot; runtime integration pending",
+  "status": "runtime pilot: grass, dirt paths and normal tree states; other art pending",
   "native_tile_size": 32,
   "editor": "LibreSprite 1.1-dev",
   "lighting": "upper left",

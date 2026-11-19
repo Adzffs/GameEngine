@@ -13,11 +13,12 @@ A C++20 and SDL3 tile-based RPG project, with an existing playable development w
 | Work on a specific task | [Implementation backlog](docs/embervale/02-roadmap/BACKLOG.md) |
 | Understand the editor design | [Embervale Studio](docs/embervale/04-studio/STUDIO_DESIGN.md) |
 | Design the starter region | [River Crossing](docs/embervale/05-game/RIVER_CROSSING.md) |
+| See the first in-game art | [Forest rendering and captures](docs/embervale/06-development/FOREST_RENDERING_2026-11-19.md) |
 | Find every document | [Documentation index](docs/embervale/README.md) |
 
 ## Project status
 
-The source includes authoritative world updates, movement and running, gathering, crafting, melee combat, NPCs, quests, dialogue, shops, banking, progression, development-player persistence and an SDL3 client. The current development map is flat and uses placeholder visuals. The Studio foundation now includes [starter-world export](docs/embervale/04-studio/STARTER_WORLD_EXPORT.md), bounded validation and [explicit runtime loading](docs/embervale/04-studio/STARTER_WORLD_IMPORT.md) of the existing starter region. The game can consume supported terrain and coordinate changes while preserving placement identities and creation stages. Shared editing, guarded saving, undo, a visual editor and elevation remain planned.
+The source includes authoritative world updates, movement and running, gathering, crafting, melee combat, NPCs, quests, dialogue, shops, banking, progression, development-player persistence and an SDL3 client. The current development map is flat and uses a first grass/path/tree art kit alongside placeholder visuals. The Studio foundation now includes [starter-world export](docs/embervale/04-studio/STARTER_WORLD_EXPORT.md), bounded validation and [explicit runtime loading](docs/embervale/04-studio/STARTER_WORLD_IMPORT.md) of the existing starter region. The game can consume supported terrain and coordinate changes while preserving placement identities and creation stages. Shared editing, guarded saving, undo, a visual editor and elevation remain planned.
 
 On **18 November 2026**, the runtime-import slice passed **77/77 headless tests** and **89/89 tests** in the Linux SDL client configuration. A real game process also loaded an edited tree placement, ran with temporary progress and stopped cleanly without creating files. This used SDL’s dummy video/software rendering, not a visible manual playthrough. See the [runtime verification record](docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md) for exact source/environment evidence and platform limits; [earlier baseline/export results](docs/embervale/06-development/BASELINE_VERIFICATION_2026-11-18.md) remain separately recorded.
 
