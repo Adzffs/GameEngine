@@ -125,7 +125,8 @@ namespace
 
     void Help(std::ostream &out)
     {
-        out << "Commands: help, list, terrain, map [x y], move <id> <x> <y>,"
+        out << "Commands: help, list, terrain, snapshot, map [x y], move <id> <x> <y>,"
+            << " place <definition-id> <x> <y>, remove <id>,"
             << " paint <x> <y> <G|D|S|W>, undo, redo, status,"
             << " save <fresh-sibling.json>, quit\n"
             << "All changes are private until save. A save creates a NEW sibling"
@@ -183,6 +184,36 @@ namespace EmbervaleStudioSession
                 {
                     RequireEnd(args);
                     PrintTerrain(current, output);
+                }
+                else if (command == "snapshot")
+                {
+                    RequireEnd(args);
+                    output << "World snapshot JSON:\n"
+                        << StarterWorldExport::SerializeCanonical(current)
+                        << "End world snapshot\n";
+                }
+                else if (command == "place")
+                {
+                    std::string definition, sx, sy;
+                    int x = 0, y = 0;
+                    if (!(args >> definition >> sx >> sy) ||
+                        !Coordinate(sx, x) || !Coordinate(sy, y))
+                        throw std::runtime_error("usage: place <definition-id> <x> <y>");
+                    RequireEnd(args);
+                    auto next = history.ApplyPlace(current, definition, Position{x, y});
+                    const auto created = StarterWorldExport::AllocatePlacement(
+                        definition, current.nextPlacementId, Position{x, y});
+                    current = std::move(next);
+                    output << "Placed " << created.id << " at (" << x << ", " << y << ")\n";
+                }
+                else if (command == "remove")
+                {
+                    std::string id;
+                    if (!(args >> id))
+                        throw std::runtime_error("usage: remove <id>");
+                    RequireEnd(args);
+                    current = history.ApplyRemove(current, id);
+                    output << "Removed " << id << '\n';
                 }
                 else if (command == "map")
                 {

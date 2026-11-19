@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <charconv>
 #include <map>
+#include <set>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -259,10 +260,19 @@ namespace StarterWorldExport
     Snapshot ParseSnapshot(std::string_view input)
     {
         const Json root = Reader(input).Read();
-        Keys(root, {"format", "schema_version", "region_id", "revision", "size",
-            "surfaces", "terrain", "player_spawn", "placements", "region_exits"});
+        if (root.type != Json::Type::Object)
+            Invalid("unexpected object fields");
+        const int schemaVersion = Number(root, "schema_version");
+        if (schemaVersion == 1)
+            Keys(root, {"format", "schema_version", "region_id", "revision", "size",
+                "surfaces", "terrain", "player_spawn", "placements", "region_exits"});
+        else if (schemaVersion == 2)
+            Keys(root, {"format", "schema_version", "region_id", "revision", "size",
+                "surfaces", "terrain", "player_spawn", "placements", "region_exits", "next_placement_id"});
+        else
+            Invalid("unsupported schema or revision");
         Expect(String(root, "format"), "embervale.starter-world-snapshot");
-        if (Number(root, "schema_version") != 1 || Number(root, "revision") != 1)
+        if (Number(root, "revision") != 1)
             Invalid("unsupported schema or revision");
         Expect(String(root, "region_id"), "embervale.development_starter");
 
@@ -295,6 +305,10 @@ namespace StarterWorldExport
             Invalid("terrain row count mismatch");
 
         Snapshot snapshot;
+        snapshot.schemaVersion = schemaVersion;
+        snapshot.nextPlacementId = schemaVersion == 2 ? Number(root, "next_placement_id") : 1;
+        if (snapshot.nextPlacementId < 1 || snapshot.nextPlacementId > MaximumNextPlacementId)
+            Invalid("invalid placement allocation counter");
         snapshot.width = width;
         snapshot.height = height;
         for (const Json &row : rows.array)
@@ -315,25 +329,36 @@ namespace StarterWorldExport
         if (placements.type != Json::Type::Array || placements.array.size() > 4096)
             Invalid("invalid placement array");
 
-        // The current format is an export snapshot, not an open-ended authored
-        // catalogue. Bind each input identity to the reviewed compiled registry.
-        // Positions may change, but unknown IDs/definitions and lifecycle edits
-        // must wait for the dedicated authored-model migration.
+        // v1 retains its historical exact registry. v2 adds bounded object
+        // identities; compiled actor bindings and lifecycle remain mandatory.
         const Snapshot baseline = Capture();
         std::map<std::string, Placement> known;
         for (const auto &placement : baseline.placements)
             known.emplace(placement.id, placement);
 
+        std::set<std::string> seen;
+        std::set<int> allocatedSequences;
         for (const Json &item : placements.array)
         {
             if (item.type != Json::Type::Object)
                 Invalid("placement must be an object");
             const std::string &id = String(item, "id");
-            const auto found = known.find(id);
-            if (found == known.end())
+            if (!seen.insert(id).second)
                 Invalid("unknown or duplicate placement ID: " + id);
-            Placement placement = found->second;
-            known.erase(found);
+            const auto found = known.find(id);
+            if (found == known.end() && schemaVersion == 1)
+                Invalid("unknown or duplicate placement ID: " + id);
+            Placement placement = found != known.end() ? found->second :
+                BindAuthoredPlacement(id, String(item, "definition_id"), Position{0, 0});
+            if (found != known.end())
+                known.erase(found);
+            else
+            {
+                const int sequence = AuthoredPlacementSequence(id);
+                if (sequence >= snapshot.nextPlacementId ||
+                    !allocatedSequences.insert(sequence).second)
+                    Invalid("unreserved or duplicate authored allocation: " + id);
+            }
             const bool isSpawn = std::holds_alternative<NpcSpawnDefinition>(placement.legacyDefinition);
             if (isSpawn)
                 Keys(item, {"id", "kind", "definition_id", "initialization", "position", "spawn"});
@@ -383,8 +408,11 @@ namespace StarterWorldExport
             }
             snapshot.placements.push_back(std::move(placement));
         }
-        if (!known.empty())
+        if (schemaVersion == 1 && !known.empty())
             Invalid("missing compiled placement identities");
+        for (const auto &[id, placement] : known)
+            if (placement.kind == PlacementKind::NpcSpawn || placement.kind == PlacementKind::MonsterSpawn)
+                Invalid("missing compiled actor identities: " + id);
 
         // Reuse the writer's structural and typed validation, then compare
         // the caller's spawn references with canonical registry bindings.

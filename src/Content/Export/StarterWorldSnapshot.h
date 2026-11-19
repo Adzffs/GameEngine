@@ -5,6 +5,7 @@
 #include "../../World/Object/Station/StationType.h"
 
 #include <string>
+#include <string_view>
 #include <variant>
 #include <vector>
 
@@ -47,7 +48,22 @@ namespace StarterWorldExport
         std::vector<std::string> terrainRows;
         Position playerSpawn{0, 0};
         std::vector<Placement> placements;
+        // v1 retains the exact compiled registry. v2 permits object membership
+        // changes and persists an allocation high-water mark, including undo.
+        int schemaVersion = 1;
+        int nextPlacementId = 1;
     };
+
+    constexpr int MaximumNextPlacementId = 1000000;
+    constexpr int AuthoredPlacementOrderBase = 12;
+
+    // Only the seven resource and three station definitions already supported
+    // by the runtime may be instantiated. Actor identities remain compiled.
+    Placement BindAuthoredPlacement(std::string_view id,
+        std::string_view definitionId, const Position &position);
+    Placement AllocatePlacement(std::string_view definitionId,
+        int sequence, const Position &position);
+    int AuthoredPlacementSequence(std::string_view id);
 
     // Reads compiled definitions and a separate base Map, never a live World or
     // a save file. Throws std::runtime_error if the baseline registry is stale.

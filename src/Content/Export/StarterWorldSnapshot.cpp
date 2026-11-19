@@ -7,6 +7,8 @@
 
 #include <algorithm>
 #include <array>
+#include <charconv>
+#include <iomanip>
 #include <locale>
 #include <set>
 #include <sstream>
@@ -184,6 +186,11 @@ namespace StarterWorldExport
 
         void Validate(const Snapshot &snapshot)
         {
+            if ((snapshot.schemaVersion != 1 && snapshot.schemaVersion != 2) ||
+                snapshot.nextPlacementId < 1 ||
+                snapshot.nextPlacementId > MaximumNextPlacementId ||
+                (snapshot.schemaVersion == 1 && snapshot.nextPlacementId != 1))
+                Fail("unsupported schema or placement allocation counter");
             CheckSize(snapshot.width, snapshot.height);
             if (snapshot.terrainRows.size() != static_cast<std::size_t>(snapshot.height))
                 Fail("terrain row count does not match height");
@@ -276,6 +283,52 @@ namespace StarterWorldExport
         }
     }
 
+    int AuthoredPlacementSequence(std::string_view id)
+    {
+        const auto prefix = id.starts_with("resource.authored.") ?
+            std::string_view{"resource.authored."} : std::string_view{"station.authored."};
+        if (!id.starts_with(prefix) || id.size() != prefix.size() + 6)
+            Fail("invalid authored placement ID: " + std::string(id));
+        const auto digits = id.substr(prefix.size());
+        int sequence = 0;
+        const auto [end, error] = std::from_chars(digits.data(), digits.data() + digits.size(), sequence);
+        if (error != std::errc{} || end != digits.data() + digits.size() ||
+            sequence < 1 || sequence >= MaximumNextPlacementId ||
+            !std::all_of(digits.begin(), digits.end(), [](char ch) { return ch >= '0' && ch <= '9'; }))
+            Fail("invalid authored placement sequence: " + std::string(id));
+        return sequence;
+    }
+
+    Placement AllocatePlacement(std::string_view definitionId,
+        int sequence, const Position &position)
+    {
+        if (sequence < 1 || sequence >= MaximumNextPlacementId)
+            Fail("placement ID allocation exhausted");
+        std::ostringstream suffix;
+        suffix.imbue(std::locale::classic());
+        suffix << std::setw(6) << std::setfill('0') << sequence;
+        for (const auto &entry : ResourceIdentities)
+            if (definitionId == entry.definitionId)
+                return {"resource.authored." + suffix.str(), entry.definitionId,
+                    PlacementKind::Resource, InitializationStage::WorldStart,
+                    AuthoredPlacementOrderBase + sequence, position, entry.type};
+        for (const auto &entry : StationIdentities)
+            if (definitionId == entry.definitionId)
+                return {"station.authored." + suffix.str(), entry.definitionId,
+                    PlacementKind::Station, InitializationStage::WorldStart,
+                    AuthoredPlacementOrderBase + sequence, position, entry.type};
+        Fail("unsupported object definition: " + std::string(definitionId));
+    }
+
+    Placement BindAuthoredPlacement(std::string_view id,
+        std::string_view definitionId, const Position &position)
+    {
+        auto placement = AllocatePlacement(definitionId, AuthoredPlacementSequence(id), position);
+        if (placement.id != id)
+            Fail("authored placement ID/kind mismatch: " + std::string(id));
+        return placement;
+    }
+
     Snapshot Capture()
     {
         Snapshot snapshot;
@@ -352,10 +405,12 @@ namespace StarterWorldExport
         out.imbue(std::locale::classic());
         out << "{\n"
             << "  \"format\": \"embervale.starter-world-snapshot\",\n"
-            << "  \"schema_version\": 1,\n"
+            << "  \"schema_version\": " << snapshot.schemaVersion << ",\n"
             << "  \"region_id\": \"embervale.development_starter\",\n"
-            << "  \"revision\": 1,\n"
-            << "  \"size\": { \"width\": " << snapshot.width << ", \"height\": " << snapshot.height << " },\n"
+            << "  \"revision\": 1,\n";
+        if (snapshot.schemaVersion == 2)
+            out << "  \"next_placement_id\": " << snapshot.nextPlacementId << ",\n";
+        out << "  \"size\": { \"width\": " << snapshot.width << ", \"height\": " << snapshot.height << " },\n"
             << "  \"surfaces\": [ { \"id\": \"ground\", \"elevation\": 0 } ],\n"
             << "  \"terrain\": {\n"
             << "    \"encoding\": \"rows\",\n"

@@ -27,6 +27,22 @@ namespace StarterWorldEdit
         bool changed;
     };
 
+    struct PlacementResult
+    {
+        StarterWorldExport::Snapshot candidate;
+        StarterWorldExport::Placement placement;
+    };
+
+    PlacementResult PlaceDefinition(const StarterWorldExport::Snapshot &source,
+        std::string_view definitionId, const Position &destination);
+    PlacementResult RemovePlacement(const StarterWorldExport::Snapshot &source,
+        std::string_view placementId);
+
+    // A history inverse restores the same binding/ID; it never allocates one.
+    StarterWorldExport::Snapshot RestorePlacement(
+        const StarterWorldExport::Snapshot &source,
+        const StarterWorldExport::Placement &placement);
+
     // Paint exactly one existing base-ground tile with G (grass), D (dirt),
     // S (stone) or W (water). The source and resulting world must both be
     // runtime-valid; route/spawn/occupancy checks cannot be bypassed.

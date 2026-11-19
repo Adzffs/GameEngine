@@ -1,6 +1,6 @@
 # Embervale master roadmap
 
-**Version:** 1.0 · **Status date:** 18 November 2026\
+**Version:** 1.1 · **Status date:** 19 November 2026\
 **Scope:** GameEngine, Embervale, Embervale Studio and project delivery.\
 **Canonical roadmap:** This document replaces the competing phase sequences in the earlier Studio plans. The original STUDIO task IDs remain traceable in the [backlog](BACKLOG.md).
 
@@ -23,7 +23,7 @@ Three findings change the implementation order:
 
 ## 3. Roadmap at a glance
 
-R0 and R1 remain **in progress**. The local baseline, ownership inventory, deterministic snapshot, bounded parser, runtime geography validation and selected spawn authority are implemented. R2 is **in progress** through explicit starter-snapshot loading; shared editing, guarded writes, undo, preview and GUI work remain planned. The remaining baseline game tasks and broader identity/migration requirements are still open. R3–R10 remain **planned**. See [current task progress](BACKLOG.md#current-progress) and the [runtime verification record](../06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md); no complete Studio release is claimed.
+R0 and R1 remain **in progress**. The local baseline, ownership inventory, deterministic snapshot, bounded parser, runtime geography validation and selected spawn authority are implemented. R2 is **in progress** with shared move/paint/place/remove commands, history, guarded sibling drafts, the visual editor, overlays and isolated playtests implemented. Recovery, in-place publication, manifests, structured capabilities and broader accessibility remain open. The remaining baseline game tasks and broader identity/migration requirements are still open. R3 has a completed bounded resource/station placement slice; its remaining placement categories and River Crossing blockout remain planned. R4–R10 remain planned. See [current task progress](BACKLOG.md#current-progress) and the [runtime verification record](../06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md); no complete Studio release is claimed.
 
 | Milestone | Outcome | Primary dependencies | Release or proof |
 |---|---|---|---|
@@ -103,8 +103,12 @@ of STUDIO-020–024, STUDIO-030, STUDIO-032 and STUDIO-033, not the whole R2 gat
 Crash recovery, in-place atomic publication, versioned publication manifests,
 structured capabilities/diagnostics and broader accessibility remain open.
 See the [master acceptance record](../06-development/MASTER_ACCEPTANCE_2026-11-19.md).
-The next authoring feature is resource/station creation and removal (STUDIO-040),
-which must first extend stable-ID allocation and compatibility contracts.
+Resource/station creation and removal (STUDIO-040) are now implemented with
+schema-2 allocation reservations, shared history, guarded save/reopen and a
+visible game gathering acceptance. See [placement verification](../06-development/STUDIO_PLACEMENT_VERIFICATION_2026-11-19.md)
+and [ADR-018](../07-decisions/ADR_018_BOUNDED_OBJECT_PLACEMENT.md).
+The next placement category is NPC/enemy spawn editing (STUDIO-041). The flat
+River Crossing blockout also needs the genuine fresh-player profile (GAME-001).
 
 **Goal:** Make one real content change safely from end to end.
 

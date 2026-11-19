@@ -1,5 +1,44 @@
 # Visual starter-world editor shell (STUDIO-030 first slice)
 
+## Create and remove resources/stations
+
+Choose a type in **Place a resource or station**, press **Place selected type**,
+then click a free map tile. The palette includes normal/oak/willow trees,
+copper/tin/iron/coal rocks, a furnace, crafting table and bank. Select an object
+and press **Remove selected**, or Delete while the map/placement list has focus.
+NPC/enemy records remain read-only. Return to **Select / move** to move an
+existing object. Rejected edits preserve the world, allocator and history.
+
+Creation, removal, moves and terrain paint share Ctrl+Z/Ctrl+Y history. Saving,
+reopening, collision/access overlays and **Play this draft** use the same C++
+candidate. The editor checks the complete canonical snapshot, including new
+definition bindings, before accepting a reply or saved draft.
+
+The first create/remove upgrades a draft to schema 2. New IDs use a persisted
+sequence that never rewinds on removal or undo. Undo can therefore restore the
+visible map while leaving unsaved format/ID reservations; save a new draft to
+preserve those reservations. Existing version-1 files retain their historical
+rules, and player-save formats are unchanged. See [ADR-018](../07-decisions/ADR_018_BOUNDED_OBJECT_PLACEMENT.md).
+
+The terminal session exposes the same operations:
+
+```text
+place resource.normal_tree 40 20
+place station.furnace 42 20
+remove resource.authored.000001
+undo
+redo
+snapshot
+save new-placement-draft.json
+```
+
+`snapshot` returns the complete authoritative JSON between explicit delimiters.
+All commands still target a named source revision; saving only creates a fresh
+sibling. [Executed checks and visible tree-gathering acceptance](../06-development/STUDIO_PLACEMENT_VERIFICATION_2026-11-19.md).
+
+The remaining sections retain the earlier implementation/verification history;
+the dated placement record supersedes their older scope limitations.
+
 ## Inspection overlays
 
 **Reachability** adds green stippling to tiles connected to player spawn and

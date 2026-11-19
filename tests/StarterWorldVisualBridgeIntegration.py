@@ -30,6 +30,62 @@ FURNACE = "station.furnace.001"
 
 
 class RealWorldBridgeTests(unittest.TestCase):
+    def test_create_remove_save_reopen_and_allocate_again(self) -> None:
+        tree = self.bridge.place("resource.normal_tree", 40, 20)
+        furnace = self.bridge.place("station.furnace", 42, 20)
+        self.assertEqual(tree, "resource.authored.000001")
+        self.assertEqual(furnace, "station.authored.000002")
+        self.assertEqual(self.bridge.definitions[tree], "resource.normal_tree")
+        self.bridge.move(tree, 41, 20)
+        self.bridge.paint(40, 20, "S")
+        self.bridge.remove(TREE)
+        self.assertNotIn(TREE, self.bridge.placements)
+        self.bridge.undo()
+        self.assertIn(TREE, self.bridge.placements)
+        self.bridge.redo()
+        draft = self.source.with_name("placed and removed objects.json")
+        self.bridge.save(draft)
+        self.assertFalse(self.bridge.dirty)
+        reopened = StudioBridge(TOOL, draft)
+        self.assertEqual(reopened.placements, self.bridge.placements)
+        self.assertEqual(reopened.current_snapshot["schema_version"], 2)
+        reopened.remove(tree)
+        next_id = reopened.place("resource.copper_rock", 41, 20)
+        self.assertEqual(next_id, "resource.authored.000003")
+        self.assertEqual(self.source.read_bytes(), self.original)
+
+    def test_undone_and_removed_ids_remain_reserved_after_reopening(self) -> None:
+        first = self.bridge.place("resource.normal_tree", 40, 20)
+        self.bridge.undo()
+        self.assertNotIn(first, self.bridge.placements)
+        self.assertTrue(self.bridge.dirty)  # allocation reservation must be saved
+        self.bridge.redo()
+        self.assertIn(first, self.bridge.placements)
+        self.bridge.undo()
+        second = self.bridge.place("station.bank", 40, 20)
+        self.assertEqual(second, "station.authored.000002")
+        with self.assertRaises(StudioError):
+            self.bridge.redo()
+        self.bridge.remove(second)
+        draft = self.source.with_name("allocation reservations.json")
+        self.bridge.save(draft)
+        reopened = StudioBridge(TOOL, draft)
+        self.assertEqual(reopened.place("resource.oak_tree", 40, 20), "resource.authored.000003")
+
+    def test_creation_rejection_preserves_allocator_history_and_actor_spawns(self) -> None:
+        for x, y in ((0, 0), (5, 5), (10, 10)):
+            with self.assertRaises(StudioError):
+                self.bridge.place("resource.normal_tree", x, y)
+        with self.assertRaises(StudioError):
+            self.bridge.remove("npc.development_guide.001")
+        with self.assertRaises(StudioError):
+            self.bridge.perform("remove npc.development_guide.001")
+        self.assertEqual(self.bridge.commands, [])
+        self.assertEqual(self.bridge.current_snapshot["schema_version"], 1)
+        self.assertFalse(self.bridge.dirty)
+        self.assertEqual(self.bridge.place("station.crafting_table", 40, 20), "station.authored.000001")
+        self.assertEqual(self.source.read_bytes(), self.original)
+
     def test_playtest_validates_private_copy_and_never_passes_save_path(self) -> None:
         self.bridge.move(TREE, 30, 30)
         runner = DraftPlaytest()
@@ -154,7 +210,7 @@ class RealWorldBridgeTests(unittest.TestCase):
         draft = self.source.with_name('unverified writer bypass.json')
         for command in (f'save {draft}', 'status', 'list', 'terrain', 'quit'):
             with self.subTest(command=command):
-                with self.assertRaisesRegex(StudioError, 'Only move, paint, undo and redo'):
+                with self.assertRaisesRegex(StudioError, 'Only move, paint, place, remove, undo and redo'):
                     self.bridge.perform(command)
         self.assertFalse(draft.exists())
         self.assertEqual(self.bridge.commands, [])

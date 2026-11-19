@@ -7,7 +7,7 @@
 #include <vector>
 
 // In-memory Studio command history. It never touches a live World, draft, or
-// player save. Each inverse is an ordinary runtime-validated stable-ID move;
+// player save. Each inverse is an ordinary runtime-validated object/terrain edit;
 // no old whole-world snapshot is blindly restored over external changes.
 namespace StarterWorldHistory
 {
@@ -39,6 +39,13 @@ namespace StarterWorldHistory
             const StarterWorldExport::Snapshot &current,
             const Position &tile, char ground);
 
+        StarterWorldExport::Snapshot ApplyPlace(
+            const StarterWorldExport::Snapshot &current,
+            std::string_view definitionId, const Position &destination);
+        StarterWorldExport::Snapshot ApplyRemove(
+            const StarterWorldExport::Snapshot &current,
+            std::string_view placementId);
+
         // Both require the exact current semantic revision previously returned
         // by this history. On conflict or invalid inverse, state is unchanged.
         StarterWorldExport::Snapshot Undo(const StarterWorldExport::Snapshot &current);
@@ -66,11 +73,14 @@ namespace StarterWorldHistory
         {
             std::vector<InverseMove> moves;
             std::vector<InversePaint> paints;
+            std::vector<StarterWorldExport::Placement> added;
+            std::vector<StarterWorldExport::Placement> removed;
             std::string beforeCanonical;
             std::string afterCanonical;
         };
 
         void CheckRevision(const StarterWorldExport::Snapshot &current) const;
+        void Record(Entry entry, const StarterWorldExport::Snapshot &candidate);
         std::vector<Entry> entries_;
         std::size_t cursor_ = 0;
         std::string expectedCanonical_;

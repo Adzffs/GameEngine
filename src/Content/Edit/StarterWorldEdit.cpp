@@ -10,6 +10,50 @@
 
 namespace StarterWorldEdit
 {
+    PlacementResult PlaceDefinition(const StarterWorldExport::Snapshot &source,
+        std::string_view definitionId, const Position &destination)
+    {
+        using namespace StarterWorldExport;
+        auto candidate = StarterWorldImport::ValidateForRuntime(source);
+        const auto placement = AllocatePlacement(definitionId,
+            candidate.nextPlacementId, destination);
+        candidate.schemaVersion = 2;
+        ++candidate.nextPlacementId;
+        candidate.placements.push_back(placement);
+        candidate = StarterWorldImport::ValidateForRuntime(candidate);
+        return {std::move(candidate), placement};
+    }
+
+    PlacementResult RemovePlacement(const StarterWorldExport::Snapshot &source,
+        std::string_view placementId)
+    {
+        using namespace StarterWorldExport;
+        auto candidate = StarterWorldImport::ValidateForRuntime(source);
+        const auto found = std::find_if(candidate.placements.begin(), candidate.placements.end(),
+            [placementId](const Placement &placement) { return placement.id == placementId; });
+        if (found == candidate.placements.end())
+            throw std::runtime_error("starter world edit: unknown placement ID: " + std::string(placementId));
+        if (found->kind != PlacementKind::Resource && found->kind != PlacementKind::Station)
+            throw std::runtime_error("starter world edit: actor spawns cannot be removed: " + found->id);
+        const auto placement = *found;
+        candidate.schemaVersion = 2;
+        candidate.placements.erase(found);
+        candidate = StarterWorldImport::ValidateForRuntime(candidate);
+        return {std::move(candidate), placement};
+    }
+
+    StarterWorldExport::Snapshot RestorePlacement(
+        const StarterWorldExport::Snapshot &source,
+        const StarterWorldExport::Placement &placement)
+    {
+        using namespace StarterWorldExport;
+        if (placement.kind != PlacementKind::Resource && placement.kind != PlacementKind::Station)
+            throw std::runtime_error("starter world edit: only object history can be restored");
+        auto candidate = StarterWorldImport::ValidateForRuntime(source);
+        candidate.placements.push_back(placement);
+        return StarterWorldImport::ValidateForRuntime(candidate);
+    }
+
     PaintResult PaintTerrain(const StarterWorldExport::Snapshot &source,
         const Position &tile, char ground)
     {

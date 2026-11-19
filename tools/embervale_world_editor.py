@@ -23,7 +23,15 @@ SOURCE_HASH = re.compile(r"^Source SHA-256: ([0-9a-f]{64})$", re.MULTILINE)
 PLACEMENT = re.compile(r"^([RSMN])  ([A-Za-z0-9._-]+)  \((\d+), (\d+)\)", re.MULTILINE)
 KINDS = {"R": "Resource", "S": "Station", "N": "NPC spawn", "M": "Monster spawn"}
 MAX_COMMANDS = 256
-REPLAYABLE_EDIT = re.compile(r"(?:move [A-Za-z0-9._-]+ [0-9]+ [0-9]+|paint [0-9]+ [0-9]+ [GDSW]|undo|redo)\Z")
+EditorResponse = tuple[str, dict[str, tuple[str, int, int]], str, list[str], str, dict]
+REPLAYABLE_EDIT = re.compile(r"(?:move [A-Za-z0-9._-]+ [0-9]+ [0-9]+|place [a-z0-9._-]+ [0-9]+ [0-9]+|remove [A-Za-z0-9._-]+|paint [0-9]+ [0-9]+ [GDSW]|undo|redo)\Z")
+OBJECT_DEFINITIONS = {
+    "Normal tree": "resource.normal_tree", "Oak tree": "resource.oak_tree",
+    "Willow tree": "resource.willow_tree", "Copper rock": "resource.copper_rock",
+    "Tin rock": "resource.tin_rock", "Iron rock": "resource.iron_rock",
+    "Coal rock": "resource.coal_rock", "Furnace": "station.furnace",
+    "Crafting table": "station.crafting_table", "Bank": "station.bank",
+}
 MIN_TILE = 4
 MAX_TILE = 64
 
@@ -90,7 +98,7 @@ def validate_replayable_editor_command(command: str) -> None:
     if any(c in command for c in "\r\n"):
         raise StudioError("Newlines are not valid editor commands")
     if not REPLAYABLE_EDIT.fullmatch(command):
-        raise StudioError("Only move, paint, undo and redo can enter replay history")
+        raise StudioError("Only move, paint, place, remove, undo and redo can enter replay history")
 
 
 
@@ -100,14 +108,14 @@ def verify_editor_transition(command: str, old_placements: dict, old_terrain: li
     """Fail closed when the C++ response contradicts a requested editor action."""
     parts = command.split()
     action = parts[0] if parts else ""
-    if action not in ("move", "paint", "undo", "redo"):
+    if action not in ("move", "paint", "place", "remove", "undo", "redo"):
         return
     try:
         _, old_undo, old_redo = old_status.split("/")
         _, new_undo, new_redo = new_status.split("/")
         before, pending = int(old_undo), int(old_redo)
         after, remaining = int(new_undo), int(new_redo)
-        if action in ("move", "paint"):
+        if action in ("move", "paint", "place", "remove"):
             history_ok = after == before + 1 and remaining == 0
         elif action == "undo":
             history_ok = after == before - 1 and remaining == pending + 1
@@ -127,6 +135,21 @@ def verify_editor_transition(command: str, old_placements: dict, old_terrain: li
             expected[y] = expected[y][:x] + glyph + expected[y][x + 1:]
             if new_placements != old_placements or new_terrain != expected:
                 raise StudioError("Editor returned an unexpected paint or placement change")
+        elif action == "place":
+            added = set(new_placements) - set(old_placements)
+            if (len(added) != 1 or set(old_placements) - set(new_placements) or
+                    any(new_placements[name] != entry for name, entry in old_placements.items()) or
+                    new_terrain != old_terrain):
+                raise StudioError("Editor returned an unexpected placement change")
+            entry = new_placements[next(iter(added))]
+            kind = "R" if parts[1].startswith("resource.") else "S"
+            if entry != (kind, int(parts[2]), int(parts[3])):
+                raise StudioError("Editor placed the wrong object or position")
+        elif action == "remove":
+            expected = dict(old_placements)
+            del expected[parts[1]]
+            if new_placements != expected or new_terrain != old_terrain:
+                raise StudioError("Editor removed an unexpected object or changed ground")
         elif new_placements == old_placements and new_terrain == old_terrain:
             raise StudioError("Editor reported undo/redo without changing the world")
     except (IndexError, KeyError, TypeError, ValueError) as error:
@@ -135,7 +158,7 @@ def verify_editor_transition(command: str, old_placements: dict, old_terrain: li
 def verify_editor_checkpoint(action: str, checkpoints: list[tuple[dict, tuple[str, ...]]],
                              placements: dict, terrain: list[str], status: str) -> list[tuple[dict, tuple[str, ...]]]:
     """Compare undo/redo with previously observed authoritative world revisions."""
-    if action not in ("move", "paint", "undo", "redo"):
+    if action not in ("move", "paint", "place", "remove", "undo", "redo"):
         return checkpoints
     try:
         cursor = int(status.split("/")[1])
@@ -148,6 +171,64 @@ def verify_editor_checkpoint(action: str, checkpoints: list[tuple[dict, tuple[st
         return checkpoints
     if cursor < 1 or cursor > len(checkpoints):
         raise StudioError("Editor returned an impossible edit history checkpoint")
+    return [*checkpoints[:cursor], state]
+
+
+def world_checkpoint(world: dict) -> dict:
+    """World-state comparison excludes allocator reservations retained by undo."""
+    result = copy.deepcopy(world)
+    result.pop("schema_version", None)
+    result.pop("next_placement_id", None)
+    result["placements"].sort(key=lambda entry: entry["id"])
+    return result
+
+
+def verify_snapshot_transition(command: str, before: dict, after: dict,
+                               checkpoints: list[dict], status: str) -> list[dict]:
+    """Check full backend metadata as well as visible placement/terrain output."""
+    parts = command.split()
+    action = parts[0]
+    expected = copy.deepcopy(before)
+    old_counter = before.get("next_placement_id", 1)
+    if action == "place":
+        definition, x, y = parts[1], int(parts[2]), int(parts[3])
+        if definition not in OBJECT_DEFINITIONS.values():
+            raise StudioError("Unsupported object definition")
+        kind = definition.split(".")[0]
+        expected["schema_version"] = 2
+        expected["next_placement_id"] = old_counter + 1
+        expected["placements"].append({
+            "id": f"{kind}.authored.{old_counter:06d}", "kind": kind,
+            "definition_id": definition,
+            "initialization": {"stage": "world_start", "order": 12 + old_counter},
+            "position": {"x": x, "y": y, "surface_id": "ground"},
+        })
+    elif action == "remove":
+        target = next((p for p in expected["placements"] if p["id"] == parts[1]), None)
+        if target is None or target["kind"] not in ("resource", "station"):
+            raise StudioError("Only resources and stations can be removed")
+        expected["placements"].remove(target)
+        expected["schema_version"] = 2
+        expected["next_placement_id"] = old_counter
+    elif action == "move":
+        for entry in expected["placements"]:
+            if entry["id"] == parts[1]:
+                entry["position"]["x"], entry["position"]["y"] = int(parts[2]), int(parts[3])
+    elif action == "paint":
+        x, y, glyph = int(parts[1]), int(parts[2]), parts[3]
+        rows = expected["terrain"]["rows"]
+        rows[y] = rows[y][:x] + glyph + rows[y][x + 1:]
+    cursor = int(status.split("/")[1])
+    state = world_checkpoint(after)
+    if action in ("undo", "redo"):
+        if (after.get("schema_version", 1) != before.get("schema_version", 1) or
+                after.get("next_placement_id", 1) != old_counter or
+                not 0 <= cursor < len(checkpoints) or state != checkpoints[cursor]):
+            raise StudioError("Editor undo/redo changed world metadata or allocation reservations")
+        return checkpoints
+    if after != {**expected, "placements": sorted(expected["placements"], key=lambda entry: entry["id"])}:
+        # Dict equality is order-independent; placement array order is canonical.
+        raise StudioError("Editor changed unexpected world metadata or placement bindings")
     return [*checkpoints[:cursor], state]
 
 
@@ -253,22 +334,26 @@ class StudioBridge:
             raise StudioError("The authoritative placements differ from the source snapshot")
         if self.terrain != display_terrain:
             raise StudioError("The authoritative terrain differs from the source snapshot")
+        verify_saved_world_parity(self.snapshot,
+            json.dumps(self.current_snapshot).encode("utf-8"), self.placements, self.terrain)
         # Keep only responses already observed from C++; never infer undo inverses.
         self._checkpoints = [(dict(self.placements), tuple(self.terrain))]
         self._saved_state = (dict(self.placements), tuple(self.terrain))
+        self._world_checkpoints = [world_checkpoint(self.current_snapshot)]
+        self._saved_world = copy.deepcopy(self.current_snapshot)
         self.last_saved: Path | None = None
 
     @property
     def dirty(self) -> bool:
-        return (self.placements, tuple(self.terrain)) != self._saved_state
+        return self.current_snapshot != self._saved_world
 
-    def _invoke(self, commands: list[str]) -> tuple[str, dict[str, tuple[str, int, int]], str, list[str], str]:
+    def _invoke(self, commands: list[str]) -> EditorResponse:
         arguments = [self.executable, "--session", str(self.source)]
         if Path(self.executable).suffix.lower() == ".py":
             arguments.insert(0, sys.executable)
         if self.hash:
             arguments += ["--expected-hash", self.hash]
-        script = "\n".join([*commands, "list", "terrain", "status", "quit", ""])
+        script = "\n".join([*commands, "list", "terrain", "snapshot", "status", "quit", ""])
         try:
             result = subprocess.run(arguments, input=script, text=True,
                                     encoding="utf-8", errors="replace",
@@ -308,34 +393,61 @@ class StudioBridge:
                               result.stdout, re.MULTILINE)
         if not statuses or statuses[-1][-1] != digest:
             raise StudioError("Editor did not return an authoritative status")
-        return digest, placements, "/".join(statuses[-1][:3]), rows, result.stdout
+        if self.hash is None:
+            if placements != self.source_placements:
+                raise StudioError("The authoritative placements differ from the source snapshot")
+            if rows != self.terrain:
+                raise StudioError("The authoritative terrain differs from the source snapshot")
+        for name, (kind, x, y) in placements.items():
+            original = self.source_placements.get(name)
+            if original and kind != original[0]:
+                raise StudioError("Editing changed an authoritative placement kind")
+            if not (0 <= x < self.width and 0 <= y < self.height):
+                raise StudioError("Editor returned an out-of-bounds placement")
+            if kind in ("N", "M") and (original is None or (x, y) != original[1:]):
+                raise StudioError("Editor moved a read-only actor spawn")
+        try:
+            blocks = result.stdout.split("World snapshot JSON:\n")
+            if len(blocks) != 2:
+                raise ValueError("missing or duplicate snapshot")
+            encoded, delimiter, _ = blocks[1].partition("End world snapshot\n")
+            if not delimiter:
+                raise ValueError("incomplete snapshot")
+            world = json.loads(encoded)
+            kinds = {"resource": "R", "station": "S", "npc_spawn": "N", "monster_spawn": "M"}
+            full_placements = {p["id"]: (kinds[p["kind"]], p["position"]["x"], p["position"]["y"])
+                               for p in world["placements"]}
+            if (len(full_placements) != len(world["placements"]) or full_placements != placements or
+                    world["terrain"]["rows"] != rows):
+                raise ValueError("snapshot disagrees with placement/terrain response")
+            world["placements"].sort(key=lambda entry: entry["id"])
+        except (KeyError, ValueError, TypeError, AttributeError) as error:
+            raise StudioError("Editor returned a malformed or inconsistent world snapshot") from error
+        return digest, placements, "/".join(statuses[-1][:3]), rows, result.stdout, world
 
-    def _accept(self, result: tuple[str, dict[str, tuple[str, int, int]], str, list[str], str]) -> None:
-        self.hash, self.placements, self.status, self.terrain, _ = result
+    def _accept(self, result: EditorResponse) -> None:
+        self.hash, self.placements, self.status, self.terrain, _, self.current_snapshot = result
+        self.definitions = {p["id"]: p["definition_id"] for p in self.current_snapshot["placements"]}
 
     def perform(self, command: str) -> None:
         validate_replayable_editor_command(command)
         if len(self.commands) >= MAX_COMMANDS:
             raise StudioError("This session reached its 256-command limit; save a draft and reopen it")
         result = self._invoke([*self.commands, command])
-        if set(result[1]) != set(self.source_placements):
-            raise StudioError("Editing changed the authoritative placement identities")
-        for name, (kind, x, y) in result[1].items():
-            original_kind, original_x, original_y = self.source_placements[name]
-            if kind != original_kind:
-                raise StudioError("Editing changed an authoritative placement kind")
-            if not (0 <= x < self.width and 0 <= y < self.height):
-                raise StudioError("Editor returned an out-of-bounds placement")
-            if kind in ("N", "M") and (x, y) != (original_x, original_y):
-                raise StudioError("Editor moved a read-only actor spawn")
+        if any(kind in ("N", "M") and name not in result[1]
+               for name, (kind, _, _) in self.source_placements.items()):
+            raise StudioError("Editor removed a read-only actor spawn")
         # Both displayed placements and painted ground come from the same
         # successful backend replay. Rejections preserve all local state.
         verify_editor_transition(command, self.placements, self.terrain, self.status,
                                  result[1], result[3], result[2])
         checkpoints = verify_editor_checkpoint(command.split()[0], self._checkpoints,
                                                result[1], result[3], result[2])
+        world_checkpoints = verify_snapshot_transition(command, self.current_snapshot,
+            result[5], self._world_checkpoints, result[2])
         self._accept(result)
         self._checkpoints = checkpoints
+        self._world_checkpoints = world_checkpoints
         self.commands.append(command)
 
     def move(self, placement_id: str, x: int, y: int) -> None:
@@ -357,6 +469,21 @@ class StudioBridge:
         if self.terrain[y][x] != glyph:
             self.perform(f"paint {x} {y} {glyph}")
 
+    def place(self, definition_id: str, x: int, y: int) -> str:
+        if definition_id not in OBJECT_DEFINITIONS.values():
+            raise StudioError("Unsupported resource or station definition")
+        if not (0 <= x < self.width and 0 <= y < self.height):
+            raise StudioError("Placement is outside the starter world")
+        previous = set(self.placements)
+        self.perform(f"place {definition_id} {x} {y}")
+        return next(iter(set(self.placements) - previous))
+
+    def remove(self, placement_id: str) -> None:
+        entry = self.placements.get(placement_id)
+        if entry is None or entry[0] not in ("R", "S"):
+            raise StudioError("Select a resource or station to remove")
+        self.perform(f"remove {placement_id}")
+
     def undo(self) -> None:
         self.perform("undo")
 
@@ -371,8 +498,9 @@ class StudioBridge:
         # The C++ writer validates source SHA and publishes only a new sibling.
         result = self._invoke([*self.commands, "save " + target])
         saved_bytes = verify_saved_draft_receipt(result[4], Path(target))
-        verify_saved_world_parity(self.snapshot, saved_bytes, self.placements, self.terrain)
+        verify_saved_world_parity(self.current_snapshot, saved_bytes, self.placements, self.terrain)
         self._saved_state = (dict(self.placements), tuple(self.terrain))
+        self._saved_world = copy.deepcopy(self.current_snapshot)
         self.last_saved = Path(target)
         return requested
 
@@ -408,7 +536,7 @@ class DraftPlaytest:
             if target.stat().st_size > 2 * 1024 * 1024:
                 raise StudioError("Saved draft exceeds the 2 MiB input limit")
             content = target.read_bytes()
-            verify_saved_world_parity(bridge.snapshot, content, bridge.placements, bridge.terrain)
+            verify_saved_world_parity(bridge.current_snapshot, content, bridge.placements, bridge.terrain)
             directory = tempfile.TemporaryDirectory(prefix="embervale-playtest-")
             try:
                 snapshot = Path(directory.name) / "world.json"
@@ -439,6 +567,7 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
     tile = 22
     selected: str | None = None
     brush = tk.StringVar(value="Select / move")
+    object_choice = tk.StringVar(value="Normal tree")
     show_collision = tk.BooleanVar(value=False)
     show_spawns = tk.BooleanVar(value=False)
     show_reachability = tk.BooleanVar(value=False)
@@ -450,13 +579,18 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
     frame.pack(fill="both", expand=True)
     toolbar = ttk.Frame(frame)
     toolbar.pack(fill="x")
-    status_label = ttk.Label(toolbar, textvariable=caption)
-    status_label.pack(side="left", padx=(0, 16))
+    status_label = ttk.Label(frame, textvariable=caption)
+    status_label.pack(fill="x", before=toolbar, pady=(0, 4))
     body = ttk.Frame(frame)
     body.pack(fill="both", expand=True, pady=(8, 0))
     sidebar = ttk.Frame(body, width=260)
     sidebar.pack(side="right", fill="y", padx=(8, 0))
-    ttk.Label(sidebar, text="Placements (R/S movable)").pack(anchor="w")
+    ttk.Label(sidebar, text="Place a resource or station").pack(anchor="w")
+    ttk.Combobox(sidebar, textvariable=object_choice, state="readonly", width=27,
+                 values=tuple(OBJECT_DEFINITIONS)).pack(fill="x", pady=(4, 0))
+    ttk.Button(sidebar, text="Place selected type (click map)",
+               command=lambda: brush.set("Place object")).pack(fill="x", pady=4)
+    ttk.Label(sidebar, text="Placements (R/S editable)").pack(anchor="w")
     choices = tk.Listbox(sidebar, width=40, height=25, exportselection=False)
     choices.pack(fill="both", expand=True)
     ttk.Label(sidebar, textvariable=inspector, wraplength=250).pack(anchor="w", pady=8)
@@ -475,6 +609,10 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
     object_colors = {"R": "#e1d34b", "S": "#e89c4b", "N": "#f6f4f0", "M": "#e55d70"}
 
     def display() -> None:
+        nonlocal selected
+        if selected not in bridge.placements:
+            selected = None
+            inspector.set("Select an object to move or remove, or choose a type to place")
         canvas.delete("all")
         canvas.configure(scrollregion=(0, 0, tile * bridge.width, tile * bridge.height))
         for y, row in enumerate(bridge.terrain):
@@ -591,11 +729,20 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
                 select(name)
 
     def on_click(event: tk.Event) -> None:
+        nonlocal selected
+        canvas.focus_set()
         position = tile_at(canvas.canvasx(event.x), canvas.canvasy(event.y),
                            tile, bridge.width, bridge.height)
         if position is None:
             return
         x, y = position
+        if brush.get() == "Place object":
+            try:
+                selected = bridge.place(OBJECT_DEFINITIONS[object_choice.get()], x, y)
+                display()
+            except StudioError as error:
+                messagebox.showerror("Placement rejected", str(error), parent=root)
+            return
         if brush.get() != "Select / move":
             try:
                 bridge.paint(x, y, {"Grass": "G", "Dirt": "D",
@@ -631,10 +778,24 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
         except StudioError as error:
             messagebox.showerror("Edit rejected", str(error), parent=root)
 
+    def remove_selected(_event: object = None) -> str:
+        if selected is None:
+            messagebox.showinfo("Select an object", "Select a resource or station first.", parent=root)
+            return "break"
+        try:
+            bridge.remove(selected)
+            display()
+        except StudioError as error:
+            messagebox.showerror("Removal rejected", str(error), parent=root)
+        return "break"
+
+    ttk.Button(sidebar, text="Remove selected (Delete)", command=remove_selected).pack(fill="x", pady=4)
+
     def save() -> bool:
         nonlocal saved
         path = filedialog.asksaveasfilename(parent=root, title="Save new draft (never overwrites)",
                                             initialdir=str(bridge.source.parent),
+                                            initialfile=f"{bridge.source.stem}-draft.json",
                                             defaultextension=".json", filetypes=[("JSON", "*.json")])
         if not path:
             return False
@@ -720,7 +881,7 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
 
     ttk.Label(toolbar, text="Tool:").pack(side="left", padx=(4, 2))
     ttk.Combobox(toolbar, textvariable=brush, state="readonly", width=15,
-                 values=("Select / move", "Grass", "Dirt", "Stone", "Water")).pack(side="left", padx=(0, 8))
+                 values=("Select / move", "Place object", "Grass", "Dirt", "Stone", "Water")).pack(side="left", padx=(0, 8))
     ttk.Button(toolbar, text="−", command=lambda: zoom_to(tile - 2)).pack(side="left", padx=2)
     ttk.Button(toolbar, text="+", command=lambda: zoom_to(tile + 2)).pack(side="left", padx=2)
     ttk.Button(toolbar, text="Fit", command=fit_view).pack(side="left", padx=(2, 8))
@@ -741,6 +902,8 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
     root.bind_all("<Control-minus>", lambda _event: zoom_to(tile - 2))
     root.bind_all("<Control-0>", lambda _event: fit_view())
     choices.bind("<<ListboxSelect>>", on_choose)
+    choices.bind("<Delete>", remove_selected)
+    canvas.bind("<Delete>", remove_selected)
     display()
     root.mainloop()
 
