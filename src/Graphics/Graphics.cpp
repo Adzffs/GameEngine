@@ -2745,18 +2745,21 @@ void Graphics::UpdateSpritePicking(const std::vector<ResourceNode> &resources,
         occupiedSpritePickTiles.emplace_back(resource.GetX(), resource.GetY());
         const auto type = resource.GetResourceType();
         if (type == ResourceType::NORMAL_TREE || type == ResourceType::COPPER_ROCK || type == ResourceType::TIN_ROCK)
-            spriteObjectTargets.push_back({resource.GetID(), resource.GetX(), resource.GetY(), false, type});
+            spriteObjectTargets.push_back({resource.GetID(), resource.GetX(), resource.GetY(), StationType::NONE, type});
     }
     for (const auto &station : stations)
     {
         occupiedSpritePickTiles.emplace_back(station.GetX(), station.GetY());
-        if (station.GetStationType() == StationType::FURNACE)
-            spriteObjectTargets.push_back({station.GetID(), station.GetX(), station.GetY(), true});
+        if (station.GetStationType() != StationType::NONE)
+            spriteObjectTargets.push_back({station.GetID(), station.GetX(), station.GetY(), station.GetStationType()});
     }
     for (const auto &item : items)
         occupiedSpritePickTiles.emplace_back(item.position.GetX(), item.position.GetY());
     std::stable_sort(spriteObjectTargets.begin(), spriteObjectTargets.end(),
-        [](const auto &a, const auto &b) { return a.y == b.y ? a.furnace < b.furnace : a.y < b.y; });
+        [](const auto &a, const auto &b)
+        {
+            return a.y == b.y ? (a.stationType != StationType::NONE) < (b.stationType != StationType::NONE) : a.y < b.y;
+        });
 }
 
 Graphics::WorldHoverTarget Graphics::PickSpriteObject(float worldX, float worldY) const
@@ -2769,13 +2772,20 @@ Graphics::WorldHoverTarget Graphics::PickSpriteObject(float worldX, float worldY
         occupiedSpritePickTiles.end()) return {};
     for (auto it = spriteObjectTargets.rbegin(); it != spriteObjectTargets.rend(); ++it)
     {
-        const bool hit = it->furnace ? forestSprites.HitFurnace(it->x, it->y, worldX, worldY)
+        const bool station = it->stationType != StationType::NONE;
+        const bool hit = station ? forestSprites.HitStation(it->stationType, it->x, it->y, worldX, worldY)
             : it->resourceType == ResourceType::NORMAL_TREE ? forestSprites.HitTree(it->x, it->y, worldX, worldY)
             : forestSprites.HitMining(it->resourceType, it->x, it->y, worldX, worldY);
         if (!hit) continue;
         const SDL_FRect bounds{static_cast<float>(it->x * TileSize),
             static_cast<float>(it->y * TileSize), static_cast<float>(TileSize), static_cast<float>(TileSize)};
-        if (it->furnace) return {WorldHoverTargetType::STATION, it->id, bounds, "Furnace", "Smelt"};
+        if (station)
+        {
+            const bool furnace = it->stationType == StationType::FURNACE, bank = it->stationType == StationType::BANK;
+            return {WorldHoverTargetType::STATION, it->id, bounds,
+                furnace ? "Furnace" : (bank ? "Bank chest" : "Crafting table"),
+                furnace ? "Smelt" : (bank ? "Bank" : "Craft")};
+        }
         return {WorldHoverTargetType::RESOURCE, it->id, bounds,
             ResourceDatabase::Get(it->resourceType).GetName(), "Gather"};
     }
@@ -3937,8 +3947,7 @@ void Graphics::DrawStations(
 
 void Graphics::DrawStation(const CraftingStation &station)
 {
-    if (worldArtEnabled && station.GetStationType() == StationType::FURNACE &&
-        forestSprites.DrawFurnace(station.GetX(), station.GetY())) return;
+    if (worldArtEnabled && forestSprites.DrawStation(station.GetStationType(), station.GetX(), station.GetY())) return;
     float tileX =
         static_cast<float>(
             station.GetX() * TileSize);

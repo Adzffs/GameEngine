@@ -1,4 +1,4 @@
-// Generated from forest, cast and environment manifests by tools/art/build_*_pilot.py.
+// Generated from world-art batch manifests by tools/art/build_*_pilot.py.
 #pragma once
 #include <SDL3/SDL.h>
 #include <array>
@@ -12,7 +12,7 @@ namespace ForestPilotLayout
         SDL_FPoint pivot, ground; int connectionMask, grassVariant, facing, animationFrame; };
     inline constexpr int TileSize = 32;
     inline constexpr float PlayerWalkCycleTiles = 1.0f;
-    inline constexpr std::array<Image, 10> Images{{
+    inline constexpr std::array<Image, 12> Images{{
         {"terrain.png", 128, 160, "assets/embervale/forest-pilot/textures"},
         {"oak.png", 64, 96, "assets/embervale/forest-pilot/textures"},
         {"stump.png", 64, 96, "assets/embervale/forest-pilot/textures"},
@@ -23,8 +23,10 @@ namespace ForestPilotLayout
         {"copper.png", 32, 40, "assets/embervale/environment-pilot/textures"},
         {"tin.png", 32, 40, "assets/embervale/environment-pilot/textures"},
         {"rubble.png", 32, 40, "assets/embervale/environment-pilot/textures"},
+        {"bank.png", 48, 48, "assets/embervale/service-pilot/textures"},
+        {"crafting-table.png", 48, 48, "assets/embervale/service-pilot/textures"},
     }};
-    inline constexpr std::array<Frame, 84> Frames{{
+    inline constexpr std::array<Frame, 86> Frames{{
         {"terrain.grass.01", 0, {0.0f, 0.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, 0, -1, 0},
         {"terrain.grass.02", 0, {32.0f, 0.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, 1, -1, 0},
         {"terrain.grass.03", 0, {64.0f, 0.0f, 32.0f, 32.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, -1, 2, -1, 0},
@@ -109,5 +111,7 @@ namespace ForestPilotLayout
         {"resource.rock.copper.intact", 7, {0.0f, 0.0f, 32.0f, 40.0f}, {16.0f, 32.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
         {"resource.rock.tin.intact", 8, {0.0f, 0.0f, 32.0f, 40.0f}, {16.0f, 32.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
         {"resource.rock.depleted", 9, {0.0f, 0.0f, 32.0f, 40.0f}, {16.0f, 32.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
+        {"station.bank.idle", 10, {0.0f, 0.0f, 48.0f, 48.0f}, {24.0f, 40.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
+        {"station.crafting_table.idle", 11, {0.0f, 0.0f, 48.0f, 48.0f}, {24.0f, 40.0f}, {16.0f, 24.0f}, -1, -1, -1, 0},
     }};
 }
