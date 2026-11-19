@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     try
     {
         if (argc < 3)
-            throw std::invalid_argument("Usage: EmbervaleRenderPreview WORLD.json OUTPUT.png [--basic] [--deplete-trees] [--deplete-rocks] [--focus X Y] [--zoom 1|1.5] [--walk-to X Y] [--frames N]");
+            throw std::invalid_argument("Usage: EmbervaleRenderPreview WORLD.json OUTPUT.png [--basic] [--deplete-trees] [--deplete-rocks] [--focus X Y] [--zoom 1|1.5] [--condition new|weathered|repaired] [--walk-to X Y] [--frames N]");
         const auto input = std::filesystem::path(reinterpret_cast<const char8_t *>(argv[1]));
         const auto output = std::filesystem::path(reinterpret_cast<const char8_t *>(argv[2]));
         std::error_code equivalentError;
@@ -39,11 +39,19 @@ int main(int argc, char **argv)
         std::optional<std::pair<int, int>> focus;
         std::optional<std::pair<int, int>> walkTo;
         float zoom = 1.0f;
-        int frames = 0;
+        int frames = 0, condition = -1;
         for (int index = 3; index < argc; ++index)
         {
             const std::string_view option = argv[index];
             if (option == "--basic") basic = true;
+            else if (option == "--condition" && index + 1 < argc)
+            {
+                const std::string_view value = argv[++index];
+                if (value == "new") condition = 0;
+                else if (value == "weathered") condition = 1;
+                else if (value == "repaired") condition = 2;
+                else throw std::invalid_argument("Building condition must be new, weathered or repaired");
+            }
             else if (option == "--deplete-trees") deplete = true;
             else if (option == "--deplete-rocks") depleteRocks = true;
             else if (option == "--focus" && index + 2 < argc)
@@ -99,6 +107,7 @@ int main(int argc, char **argv)
         Graphics graphics;
         if (!graphics.Initialize()) throw std::runtime_error("Preview renderer initialization failed");
         graphics.SetCompiledMapLabelsVisible(false);
+        graphics.SetBuildingConditionPreview(condition);
         if (basic)
         {
             SDL_Event toggle{};

@@ -1,0 +1,36 @@
+{
+  "frames": {
+    "grass.ase": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 512,
+        "h": 352
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 512,
+        "h": 352
+      },
+      "sourceSize": {
+        "w": 512,
+        "h": 352
+      },
+      "duration": 100
+    }
+  },
+  "meta": {
+    "app": "https://github.com/LibreSprite/LibreSprite/",
+    "version": "1.1-dev",
+    "image": "grass.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 512,
+      "h": 352
+    },
+    "scale": "1"
+  }
+}

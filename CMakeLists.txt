@@ -157,7 +157,7 @@ if(GAMEENGINE_BUILD_CONTENT_TOOLS)
 endif()
 
 function(configure_gameengine_world_art target)
-    target_sources(${target} PRIVATE src/Graphics/ForestSprites.cpp)
+    target_sources(${target} PRIVATE src/Graphics/ForestSprites.cpp src/Graphics/WorldArtVariation.cpp)
     set(forest_images
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/forest-pilot/textures/terrain.png"
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/forest-pilot/textures/oak.png"
@@ -183,8 +183,12 @@ function(configure_gameengine_world_art target)
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/building-pilot/textures/roof.png"
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/building-pilot/textures/floors.png"
     )
+    set(variation_images)
+    foreach(name grass paths water stone flora walls roof floors trees stumps rocks)
+        list(APPEND variation_images "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/variation-pilot/textures/${name}.png")
+    endforeach()
     # Refresh packaged art when the images change, even if no C++ changed.
-    set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS ${forest_images} ${cast_images} ${environment_images} ${service_images} ${building_images})
+    set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS ${forest_images} ${cast_images} ${environment_images} ${service_images} ${building_images} ${variation_images})
     add_custom_command(TARGET ${target} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
             "$<TARGET_FILE_DIR:${target}>/assets/embervale/forest-pilot/textures"
@@ -206,6 +210,10 @@ function(configure_gameengine_world_art target)
             "$<TARGET_FILE_DIR:${target}>/assets/embervale/building-pilot/textures"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${building_images}
             "$<TARGET_FILE_DIR:${target}>/assets/embervale/building-pilot/textures"
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            "$<TARGET_FILE_DIR:${target}>/assets/embervale/variation-pilot/textures"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${variation_images}
+            "$<TARGET_FILE_DIR:${target}>/assets/embervale/variation-pilot/textures"
         VERBATIM
     )
 endfunction()

@@ -1,6 +1,6 @@
 # Art, animation and audio production guide
 
-**Status:** Forest, cast, environment/mining and bank/table pilots render in the SDL client, with a corrected player walk cycle. A general importer and the broader production workflow below remain proposed.\
+**Status:** Six world-art batches render terrain, cast, resources, services, the workshop and contextual variation in the SDL client, with the accepted player walk cycle preserved. A general importer and the broader production workflow below remain proposed.\
 **Reviewed:** 19 November 2026.\
 **Purpose:** Replace placeholder presentation in manageable steps while preserving gameplay and making assets easy for humans and AI to work with.
 
@@ -70,6 +70,17 @@ and the roof fades around the player. The five batches total 113 frames in
 fifteen PNGs. See the [building integration record](../06-development/BUILDING_RENDERING_2026-11-19.md).
 Further building assemblies, other ore tiers, remaining cast and full starter
 visual acceptance remain open.
+
+The [variation kit](../../../assets/embervale/variation-pilot/README.md) adds
+634 native frames in eleven masters. Landscape fields use actual settlement,
+path, water and tree positions to place coherent grass patches, varying dirt,
+shallow/deep water, stone conditions, meadow flower clusters, grass/reeds and
+leaf litter. Quiet woodland accumulates leaves beneath canopies and at stumps;
+maintained approaches stay clear. Building surfaces support new, weathered and
+repaired conditions and terracotta/slate roofing, with localized workshop repairs.
+Normal trees and copper/tin/rubble also have silhouette variants. All six batches
+total 747 frames in 26 cached PNGs. See the [contextual variation record](../06-development/WORLD_VARIATION_2026-11-19.md).
+These conditions are authored presentation, not simulated decay or seasons.
 
 ## 2. Proposed visual direction
 
