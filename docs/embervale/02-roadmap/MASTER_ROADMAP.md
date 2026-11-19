@@ -107,8 +107,13 @@ Resource/station creation and removal (STUDIO-040) are now implemented with
 schema-2 allocation reservations, shared history, guarded save/reopen and a
 visible game gathering acceptance. See [placement verification](../06-development/STUDIO_PLACEMENT_VERIFICATION_2026-11-19.md)
 and [ADR-018](../07-decisions/ADR_018_BOUNDED_OBJECT_PLACEMENT.md).
-The next placement category is NPC/enemy spawn editing (STUDIO-041). The flat
-River Crossing blockout also needs the genuine fresh-player profile (GAME-001).
+The next placement category is NPC/enemy spawn editing (STUDIO-041). Its first
+bounded slice, moving existing spawn/home positions, is prepared in this draft
+branch with shared history and regression scenarios; compilation, execution and
+visible acceptance remain pending because the execution connection is unavailable.
+See the [draft review](../06-development/STUDIO_SPAWN_MOVE_REVIEW_2026-11-19.md).
+The flat River Crossing blockout also needs the genuine fresh-player profile
+(GAME-001).
 
 **Goal:** Make one real content change safely from end to end.
 

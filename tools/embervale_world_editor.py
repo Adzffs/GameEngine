@@ -368,7 +368,7 @@ class StudioBridge:
         digest = match.group(1)
         if self.hash is not None and digest != self.hash:
             raise StudioError("CONTENT_CONFLICT: source changed; reopen the editor")
-        marker = "Existing placements (only R and S can be moved):\n"
+        marker = "Existing placements (R/S objects; N/M spawn homes):\n"
         if marker not in result.stdout:
             raise StudioError("Editor did not return a placement list")
         placements: dict[str, tuple[str, int, int]] = {}
@@ -404,8 +404,8 @@ class StudioBridge:
                 raise StudioError("Editing changed an authoritative placement kind")
             if not (0 <= x < self.width and 0 <= y < self.height):
                 raise StudioError("Editor returned an out-of-bounds placement")
-            if kind in ("N", "M") and (original is None or (x, y) != original[1:]):
-                raise StudioError("Editor moved a read-only actor spawn")
+            if kind in ("N", "M") and original is None:
+                raise StudioError("Editor added an unsupported actor spawn")
         try:
             blocks = result.stdout.split("World snapshot JSON:\n")
             if len(blocks) != 2:
@@ -436,7 +436,7 @@ class StudioBridge:
         result = self._invoke([*self.commands, command])
         if any(kind in ("N", "M") and name not in result[1]
                for name, (kind, _, _) in self.source_placements.items()):
-            raise StudioError("Editor removed a read-only actor spawn")
+            raise StudioError("Editor removed a required actor spawn")
         # Both displayed placements and painted ground come from the same
         # successful backend replay. Rejections preserve all local state.
         verify_editor_transition(command, self.placements, self.terrain, self.status,
@@ -454,8 +454,8 @@ class StudioBridge:
         if not re.fullmatch(r"[A-Za-z0-9._-]+", placement_id):
             raise StudioError("Invalid placement ID")
         entry = self.placements.get(placement_id)
-        if entry is None or entry[0] not in ("R", "S"):
-            raise StudioError("Only existing resource and station placements are movable")
+        if entry is None:
+            raise StudioError("Select an existing placement to move")
         if not (0 <= x < self.width and 0 <= y < self.height):
             raise StudioError("Destination is outside the starter world")
         if (x, y) != (entry[1], entry[2]):
@@ -574,7 +574,7 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
     saved: str | None = None
     caption = tk.StringVar()
     cursor_label = tk.StringVar(value="Tile: —")
-    inspector = tk.StringVar(value="Click a resource or station, then click an empty target tile")
+    inspector = tk.StringVar(value="Select a placement, then click an empty destination tile")
     frame = ttk.Frame(root, padding=8)
     frame.pack(fill="both", expand=True)
     toolbar = ttk.Frame(frame)
@@ -590,7 +590,7 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
                  values=tuple(OBJECT_DEFINITIONS)).pack(fill="x", pady=(4, 0))
     ttk.Button(sidebar, text="Place selected type (click map)",
                command=lambda: brush.set("Place object")).pack(fill="x", pady=4)
-    ttk.Label(sidebar, text="Placements (R/S editable)").pack(anchor="w")
+    ttk.Label(sidebar, text="Placements (select / move)").pack(anchor="w")
     choices = tk.Listbox(sidebar, width=40, height=25, exportselection=False)
     choices.pack(fill="both", expand=True)
     ttk.Label(sidebar, textvariable=inspector, wraplength=250).pack(anchor="w", pady=8)
@@ -612,7 +612,7 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
         nonlocal selected
         if selected not in bridge.placements:
             selected = None
-            inspector.set("Select an object to move or remove, or choose a type to place")
+            inspector.set("Select a placement to move, or choose an object type to place")
         canvas.delete("all")
         canvas.configure(scrollregion=(0, 0, tile * bridge.width, tile * bridge.height))
         for y, row in enumerate(bridge.terrain):
@@ -655,7 +655,8 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
                                outline="white" if name == selected else "#202020",
                                width=3 if name == selected else 1)
             if name == selected:
-                inspector.set(f"{KINDS[kind]}\n{name}\n{bridge.definitions[name]}\nTile: ({x}, {y}){access_text}")
+                location = "Spawn / home" if kind in ("N", "M") else "Tile"
+                inspector.set(f"{KINDS[kind]}\n{name}\n{bridge.definitions[name]}\n{location}: ({x}, {y}){access_text}")
         if show_collision.get():
             blocked = {(x, y) for y, row in enumerate(bridge.terrain)
                        for x, glyph in enumerate(row) if glyph == "W"}
@@ -686,6 +687,8 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
             choices.insert("end", f"{kind} {name} ({x},{y})")
         if selected in names:
             choices.selection_set(names.index(selected))
+        removable = selected in bridge.placements and bridge.placements[selected][0] in ("R", "S")
+        remove_button.configure(state="normal" if removable else "disabled")
 
     def zoom_to(requested_tile: int, anchor: tuple[int, int] | None = None) -> None:
         nonlocal tile
@@ -789,7 +792,8 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
             messagebox.showerror("Removal rejected", str(error), parent=root)
         return "break"
 
-    ttk.Button(sidebar, text="Remove selected (Delete)", command=remove_selected).pack(fill="x", pady=4)
+    remove_button = ttk.Button(sidebar, text="Remove selected (Delete)", command=remove_selected)
+    remove_button.pack(fill="x", pady=4)
 
     def save() -> bool:
         nonlocal saved
@@ -860,7 +864,7 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
         bridge = replacement
         selected = None
         saved = None
-        inspector.set("Click a resource or station, then click an empty target tile")
+        inspector.set("Select a placement, then click an empty destination tile")
         fit_view()
 
     root.protocol("WM_DELETE_WINDOW", close)

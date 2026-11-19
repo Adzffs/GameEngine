@@ -50,10 +50,10 @@ namespace StarterWorldEdit
     PaintResult PaintTerrain(const StarterWorldExport::Snapshot &source,
         const Position &tile, char ground);
 
-    // First supported command: relocate an existing resource or station by
-    // durable authored ID. Preserve its definition, stage, order, base ground
-    // and every other placement. Reject invalid source/destination and unknown
-    // or unsupported identities; never return a partially edited candidate.
+    // Relocate an existing object or actor spawn/home by durable authored ID.
+    // Actor moves update both placement and typed spawn coordinates. Preserve
+    // definition, lifecycle, spawn settings, base ground and other placements.
+    // Reject invalid input without returning a partially edited candidate.
     MoveResult MovePlacement(const StarterWorldExport::Snapshot &source,
         std::string_view placementId, const Position &destination);
 }
