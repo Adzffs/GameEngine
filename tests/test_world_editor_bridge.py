@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
-from embervale_world_editor import StudioBridge, StudioError, fitted_tile, scroll_fraction, tile_at
+from embervale_world_editor import StudioBridge, StudioError, fitted_tile, scroll_fraction, tile_at, inspect_reachability
 
 FAKE_TOOL = r'''#!/usr/bin/env python3
 import hashlib
@@ -518,6 +518,18 @@ class BridgeTests(unittest.TestCase):
 
 
 class ViewportMathTests(unittest.TestCase):
+    def test_access_preview_respects_water_objects_and_cardinal_connectivity(self):
+        terrain = ['GWG', 'WGG', 'GGG']
+        placements = {'tree': ('R', 1, 1), 'npc': ('N', 2, 1)}
+        reached, approaches = inspect_reachability(terrain, placements, (0, 0), 'tree')
+        self.assertEqual(reached, {(0, 0)})
+        self.assertEqual(approaches, set())
+        reached, approaches = inspect_reachability(terrain, placements, (2, 2), 'tree')
+        self.assertIn((2, 1), reached)  # actor spawns do not statically block
+        self.assertNotIn((1, 1), reached)
+        self.assertEqual(approaches, {(2, 1), (1, 2)})
+        self.assertEqual(inspect_reachability(terrain, placements, (1, 0))[0], set())
+
     def test_boundary_grid_after_zoom(self):
         self.assertEqual(tile_at(0, 0, 22, 100, 100), (0, 0))
         self.assertEqual(tile_at(21.9, 21.9, 22, 100, 100), (0, 0))

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+from collections import deque
 import hashlib
 import json
 import os
@@ -25,6 +26,31 @@ MAX_COMMANDS = 256
 REPLAYABLE_EDIT = re.compile(r"(?:move [A-Za-z0-9._-]+ [0-9]+ [0-9]+|paint [0-9]+ [0-9]+ [GDSW]|undo|redo)\Z")
 MIN_TILE = 4
 MAX_TILE = 64
+
+
+def inspect_reachability(terrain: list[str], placements: dict,
+                         spawn: tuple[int, int], selected: str | None = None) -> tuple[set, set]:
+    """Static cardinal-access preview; C++ remains the edit validator."""
+    height, width = len(terrain), len(terrain[0])
+    blocked = {(x, y) for y, row in enumerate(terrain)
+               for x, glyph in enumerate(row) if glyph == "W"}
+    blocked.update((x, y) for kind, x, y in placements.values() if kind in ("R", "S"))
+    def clear(x, y):
+        return 0 <= x < width and 0 <= y < height and (x, y) not in blocked
+    reachable = {spawn} if clear(*spawn) else set()
+    pending = deque(reachable)
+    while pending:
+        x, y = pending.popleft()
+        for cell in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)):
+            if clear(*cell) and cell not in reachable:
+                reachable.add(cell)
+                pending.append(cell)
+    approaches = set()
+    entry = placements.get(selected)
+    if entry and entry[0] in ("R", "S"):
+        _, x, y = entry
+        approaches = {(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)} & reachable
+    return reachable, approaches
 
 
 def tile_at(canvas_x: float, canvas_y: float, tile_size: int,
@@ -415,6 +441,7 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
     brush = tk.StringVar(value="Select / move")
     show_collision = tk.BooleanVar(value=False)
     show_spawns = tk.BooleanVar(value=False)
+    show_reachability = tk.BooleanVar(value=False)
     saved: str | None = None
     caption = tk.StringVar()
     cursor_label = tk.StringVar(value="Tile: —")
@@ -456,6 +483,23 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
                                         (y + 1) * tile, fill=terrain_colors.get(symbol, "#222222"),
                                         outline="#354235", width=1)
         spawn_x, spawn_y = bridge.spawn
+        if show_reachability.get():
+            reachable, approaches = inspect_reachability(
+                bridge.terrain, bridge.placements, bridge.spawn, selected)
+            for x, y in sorted(reachable):
+                canvas.create_rectangle(x * tile + 1, y * tile + 1,
+                    (x + 1) * tile - 1, (y + 1) * tile - 1,
+                    fill="#65bd8a", stipple="gray25", outline="")
+            for x, y in sorted(approaches):
+                canvas.create_rectangle(x * tile + 1, y * tile + 1,
+                    (x + 1) * tile - 1, (y + 1) * tile - 1,
+                    fill="#ffe46b", stipple="gray50", outline="#ffe46b", width=2)
+            if selected in bridge.placements and bridge.placements[selected][0] in ("R", "S"):
+                access_text = f"\nReachable approaches: {len(approaches)}"
+            else:
+                access_text = ""
+        else:
+            access_text = ""
         if tile >= 12:
             canvas.create_text((spawn_x + .5) * tile, (spawn_y + .5) * tile,
                                text="@", fill="white",
@@ -473,7 +517,7 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
                                outline="white" if name == selected else "#202020",
                                width=3 if name == selected else 1)
             if name == selected:
-                inspector.set(f"{KINDS[kind]}\n{name}\n{bridge.definitions[name]}\nTile: ({x}, {y})")
+                inspector.set(f"{KINDS[kind]}\n{name}\n{bridge.definitions[name]}\nTile: ({x}, {y}){access_text}")
         if show_collision.get():
             blocked = {(x, y) for y, row in enumerate(bridge.terrain)
                        for x, glyph in enumerate(row) if glyph == "W"}
@@ -661,6 +705,8 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
     root.protocol("WM_DELETE_WINDOW", close)
     filebar = ttk.Frame(frame)
     filebar.pack(fill="x", before=toolbar)
+    ttk.Checkbutton(filebar, text="Reachability", variable=show_reachability,
+                    command=display).pack(side="left", padx=4)
     ttk.Checkbutton(filebar, text="Static collision", variable=show_collision,
                     command=display).pack(side="left", padx=4)
     ttk.Checkbutton(filebar, text="Spawns", variable=show_spawns,
