@@ -1,6 +1,6 @@
 # Implementation backlog
 
-**Version:** 1.0 · **Reviewed:** 18 November 2026\
+**Version:** 1.1 · **Reviewed:** 19 November 2026\
 **Purpose:** Turn the roadmap into clear, expandable work packages. These are planning records, not automatically created GitHub issues.
 
 ## How to use this backlog
@@ -12,6 +12,22 @@ The acceptance column states what must be demonstrated. When opening a GitHub is
 Each dependency below is a direct prerequisite, not a suggestion that every earlier milestone must finish. The machine-readable [BACKLOG.json](BACKLOG.json) contains the same task records for future automation; it does not execute work or create issues.
 
 ## Current progress
+
+**Current master:** `2e3da94`, including merged PRs #18–#22. The historical
+progress entries below describe the earlier implementation sequence; this
+reconciliation supersedes their unexecuted/stacked verification limitations.
+
+| Work | Current bounded result | Remaining acceptance |
+|---|---|---|
+| Baseline (ENG-002) | Windows headless/client builds and complete regression sets executed | Other platforms and fresh-player measurements remain separate |
+| Commands (STUDIO-020–024) | Shared validated moves/paint, history, CLI/Tk preview and guarded create-only drafts integrated | Creation/removal, structured diagnostics, persistent history and in-place publication |
+| Editor (STUDIO-030) | Open/select/inspect/move/paint, zoom, undo/redo, save/reopen and play integrated | Broader editor/platform acceptance |
+| File state (STUDIO-032) | Dirty-state indicator, close/switch warnings and draft reopening integrated | Interruption recovery and durable publication |
+| Overlays (STUDIO-033) | Grid, collision, spawn, static reachability and selected approach overlays integrated | Keyboard/accessibility audit and richer diagnostics |
+| Placement (STUDIO-040) | Moving existing resources/stations works | Next: validated create/remove with stable-ID compatibility and undo/redo |
+
+These tasks remain `in_progress` where broader acceptance is outstanding.
+R2/Alpha 0.1 is not declared complete. [Current master acceptance](../06-development/MASTER_ACCEPTANCE_2026-11-19.md).
 
 The export foundation is followed by bounded parsing, geographic validation and explicit runtime import of the existing starter region. `in_progress` retains larger acceptance obligations; implementation below is not a claim that R1, R2 or Studio Alpha 0.1 is complete. [Runtime import](../04-studio/STARTER_WORLD_IMPORT.md) and [ADR-017](../07-decisions/ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md) document the current scope. The [runtime verification record](../06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md) records 77/77 headless tests, 89/89 Linux SDL tests, a content-tools-disabled check and a real dummy-video game launch. The earlier [baseline/export record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) remains separately dated.
 

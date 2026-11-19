@@ -95,6 +95,17 @@ An exported baseline is deterministic, validated and complete. Its semantics can
 
 ## 7. R2 — First complete editing slice: Studio Alpha 0.1
 
+**19 November 2026 reconciliation:** PRs #18–#22 are merged through master
+`2e3da94`. The bounded starter editor now supports move/paint, shared history,
+guarded sibling saves, dirty-state warnings, save/reopen, temporary game launch,
+and collision/spawn/reachability/approach overlays. These complete useful slices
+of STUDIO-020–024, STUDIO-030, STUDIO-032 and STUDIO-033, not the whole R2 gate.
+Crash recovery, in-place atomic publication, versioned publication manifests,
+structured capabilities/diagnostics and broader accessibility remain open.
+See the [master acceptance record](../06-development/MASTER_ACCEPTANCE_2026-11-19.md).
+The next authoring feature is resource/station creation and removal (STUDIO-040),
+which must first extend stable-ID allocation and compatibility contracts.
+
 **Goal:** Make one real content change safely from end to end.
 
 ### Deliverables
