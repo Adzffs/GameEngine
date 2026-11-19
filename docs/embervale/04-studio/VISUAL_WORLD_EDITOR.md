@@ -11,6 +11,16 @@ world before replacing the editor session. **Reopen last saved** starts a fresh
 session from the verified draft, with the same unsaved-change protection.
 Draft saves remain create-only sibling files; reopening starts a new history.
 
+Visible Windows acceptance on 19 November 2026 at `14a062a`: moving a tree
+set the title asterisk and unsaved indicator; Cancel in the close warning
+preserved the edit, and undo to the original world cleared the indicator.
+Open draft loaded the earlier user-saved world with its tree at (22,11).
+The native Save dialog published `file state acceptance.json`, and Reopen
+last saved loaded that file with the placement preserved and zero history.
+After another move, choosing Yes in the close warning opened the Save dialog;
+cancelling that dialog kept the editor open, dirty, with the moved tree intact.
+The 36 Python contract/viewport tests and six real bridge cases also passed.
+
 **Status:** Experimental stacked development branch, not integrated into `master`.
 **Scope:** Select and move existing resource/workstation placements in a real mouse-driven grid, with read-only inspection, undo/redo and create-only draft saving. This does not claim the full STUDIO-030 acceptance story.
 
