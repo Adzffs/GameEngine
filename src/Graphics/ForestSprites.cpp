@@ -56,23 +56,27 @@ void ForestSprites::Initialize(SDL_Renderer *target)
             paths[frame.connectionMask] = &frame;
         if (frame.id == "resource.tree.normal.intact") tree = &frame;
         if (frame.id == "resource.tree.normal.depleted") stump = &frame;
+        if (frame.id == "character.mara.idle") mara = &frame;
+        if (frame.id == "station.furnace.idle") furnace = &frame;
+        if (frame.id.starts_with("character.player.") && frame.facing >= 0 && frame.facing < 4 &&
+            frame.animationFrame >= 0 && frame.animationFrame < 4)
+            player[frame.facing][frame.animationFrame] = &frame;
     }
 #if SDL_VERSION_ATLEAST(3, 4, 0)
     if (!renderer) return;
-    const std::filesystem::path relative = "assets/embervale/forest-pilot/textures";
     std::vector<std::filesystem::path> roots;
     if (const char *base = SDL_GetBasePath())
-        roots.push_back(std::filesystem::path(reinterpret_cast<const char8_t *>(base)) / relative);
+        roots.emplace_back(reinterpret_cast<const char8_t *>(base));
     std::error_code error;
     const auto cwd = std::filesystem::current_path(error);
-    if (!error && (roots.empty() || roots.front() != cwd / relative)) roots.push_back(cwd / relative);
+    if (!error && (roots.empty() || roots.front() != cwd)) roots.push_back(cwd);
     for (std::size_t index = 0; index < images.size(); ++index)
     {
         const auto &expected = ForestPilotLayout::Images[index];
         SDL_Surface *surface = nullptr;
         for (const auto &root : roots)
         {
-            const auto path = root / expected.filename;
+            const auto path = root / expected.directory / expected.filename;
             if (!ValidPngHeader(path, expected)) continue;
             const auto utf8 = path.u8string();
             surface = SDL_LoadPNG(reinterpret_cast<const char *>(utf8.c_str()));
@@ -80,7 +84,7 @@ void ForestSprites::Initialize(SDL_Renderer *target)
         }
         if (!surface || surface->w != expected.width || surface->h != expected.height)
         {
-            std::cerr << "Forest art unavailable: " << expected.filename << "; using basic shapes.\n";
+            std::cerr << "World art unavailable: " << expected.filename << "; using basic shapes.\n";
             if (surface) SDL_DestroySurface(surface);
             continue;
         }
@@ -106,12 +110,12 @@ void ForestSprites::Initialize(SDL_Renderer *target)
             if (image.texture) SDL_DestroyTexture(image.texture);
             image.texture = nullptr;
             image.alpha.clear();
-            std::cerr << "Forest texture unavailable: " << expected.filename << "; using basic shapes.\n";
+            std::cerr << "World texture unavailable: " << expected.filename << "; using basic shapes.\n";
         }
     }
-    std::clog << "Forest art: " << LoadedImageCount() << '/' << images.size() << " textures cached.\n";
+    std::clog << "World art: " << LoadedImageCount() << '/' << images.size() << " textures cached.\n";
 #else
-    std::clog << "Forest PNG art needs SDL 3.4 or newer; using basic shapes.\n";
+    std::clog << "World PNG art needs SDL 3.4 or newer; using basic shapes.\n";
 #endif
 }
 
@@ -126,8 +130,10 @@ bool ForestSprites::Available(const Frame *frame) const
 }
 
 bool ForestSprites::HasTree() const { return Available(tree); }
+bool ForestSprites::HasPlayer() const { return Available(player[0][0]); }
+bool ForestSprites::HasMara() const { return Available(mara); }
 
-SDL_FRect ForestSprites::Bounds(const Frame &frame, int tileX, int tileY) const
+SDL_FRect ForestSprites::Bounds(const Frame &frame, float tileX, float tileY) const
 {
     return {tileX * ForestPilotLayout::TileSize + frame.ground.x - frame.pivot.x,
         tileY * ForestPilotLayout::TileSize + frame.ground.y - frame.pivot.y,
@@ -197,13 +203,65 @@ bool ForestSprites::DrawTree(const ResourceNode &resource, const SDL_FRect &play
 
 bool ForestSprites::HitTree(int tileX, int tileY, float worldX, float worldY) const
 {
-    if (!Available(tree)) return false;
-    const auto bounds = Bounds(*tree, tileX, tileY);
+    return Hit(tree, tileX, tileY, worldX, worldY);
+}
+
+bool ForestSprites::DrawPlayer(float tileX, float tileY, int facing, int pose) const
+{
+    const auto *frame = player[std::clamp(facing, 0, 3)][std::clamp(pose, 0, 3)];
+    return DrawCharacter(frame, tileX, tileY);
+}
+
+bool ForestSprites::DrawMara(int tileX, int tileY) const
+{
+    return DrawCharacter(mara, static_cast<float>(tileX), static_cast<float>(tileY));
+}
+
+bool ForestSprites::DrawCharacter(const Frame *frame, float tileX, float tileY) const
+{
+    if (!Available(frame)) return false;
+    SDL_BlendMode previousBlend;
+    Uint8 red, green, blue, alpha;
+    SDL_GetRenderDrawBlendMode(renderer, &previousBlend);
+    SDL_GetRenderDrawColor(renderer, &red, &green, &blue, &alpha);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(renderer, 17, 22, 18, 78);
+    const float footX = tileX * ForestPilotLayout::TileSize + frame->ground.x;
+    const float footY = tileY * ForestPilotLayout::TileSize + frame->ground.y;
+    for (int row = -2; row <= 2; ++row)
+    {
+        const float halfWidth = 10.0f - std::abs(row) * 2.0f;
+        SDL_RenderLine(renderer, footX - halfWidth, footY + row, footX + halfWidth, footY + row);
+    }
+    SDL_SetRenderDrawBlendMode(renderer, previousBlend);
+    SDL_SetRenderDrawColor(renderer, red, green, blue, alpha);
+    return Draw(frame, Bounds(*frame, tileX, tileY));
+}
+
+bool ForestSprites::DrawFurnace(int tileX, int tileY) const
+{
+    return Available(furnace) && Draw(furnace, Bounds(*furnace, tileX, tileY));
+}
+
+bool ForestSprites::HitMara(int tileX, int tileY, float worldX, float worldY) const
+{
+    return Hit(mara, tileX, tileY, worldX, worldY);
+}
+
+bool ForestSprites::HitFurnace(int tileX, int tileY, float worldX, float worldY) const
+{
+    return Hit(furnace, tileX, tileY, worldX, worldY);
+}
+
+bool ForestSprites::Hit(const Frame *frame, int tileX, int tileY, float worldX, float worldY) const
+{
+    if (!Available(frame)) return false;
+    const auto bounds = Bounds(*frame, tileX, tileY);
     const int x = static_cast<int>(std::floor(worldX - bounds.x));
     const int y = static_cast<int>(std::floor(worldY - bounds.y));
-    if (x < 0 || y < 0 || x >= tree->source.w || y >= tree->source.h) return false;
-    const auto &image = images[tree->image];
-    const int sourceX = static_cast<int>(tree->source.x) + x;
-    const int sourceY = static_cast<int>(tree->source.y) + y;
-    return image.alpha[static_cast<std::size_t>(sourceY) * ForestPilotLayout::Images[tree->image].width + sourceX] >= 128;
+    if (x < 0 || y < 0 || x >= frame->source.w || y >= frame->source.h) return false;
+    const auto &image = images[frame->image];
+    const int sourceX = static_cast<int>(frame->source.x) + x;
+    const int sourceY = static_cast<int>(frame->source.y) + y;
+    return image.alpha[static_cast<std::size_t>(sourceY) * ForestPilotLayout::Images[frame->image].width + sourceX] >= 128;
 }

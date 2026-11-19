@@ -1,6 +1,6 @@
 # Art, animation and audio production guide
 
-**Status:** First editable forest kit renders in the SDL client with cache, pivots, resource states and basic-shape fallback. A general importer and the broader production workflow below remain proposed.\
+**Status:** Forest and player/Mara/furnace pilots render in the SDL client, with a first player walk cycle. A general importer and the broader production workflow below remain proposed.\
 **Reviewed:** 19 November 2026.\
 **Purpose:** Replace placeholder presentation in manageable steps while preserving gameplay and making assets easy for humans and AI to work with.
 
@@ -30,12 +30,21 @@ pilot; builds with earlier SDL headers retain basic shapes. Assets are copied
 beside the executable by CMake and loaded once, outside the render loop.
 
 This is the first part of ART-001 and STUDIO-060/061/063, not a general
-game/Studio importer or finished starter kit. Player and prop art, Studio asset
+game/Studio importer or finished starter kit. The remaining cast/prop kit, Studio asset
 editing, visible interaction and wider acceptance remain. The pilot's
 `manifest.json` is an authoring record; the runtime consumes the generated
 binding and PNGs rather than parsing a new JSON schema.
 
 ## 1. Current presentation and the recommended transition
+
+The next [cast pilot](../../../assets/embervale/cast-pilot/README.md) is now
+integrated: a four-direction player walk sheet, Mara's blue/gold warden sprite,
+and a stone furnace. The same cache and generated binding handle both batches.
+Walking follows visual travel distance and stops on a neutral frame. See the
+[cast integration record](../06-development/CAST_RENDERING_2026-11-19.md) for
+editable source/export details and actual River Crossing captures. Player/prop
+art is now present in this bounded pilot; the remaining cast, gear, animation
+states and visible acceptance remain open.
 
 The current client uses SDL3 drawing code for the world and entities. `Graphics.h` defines a 32-pixel tile size and a 1280×720 window. The rendering code includes terrain colours, resource shapes, combat feedback and world labels. This does not establish an existing general-purpose sprite import pipeline. Sources: [Graphics.h](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Graphics/Graphics.h), [Graphics.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Graphics/Graphics.cpp).
 

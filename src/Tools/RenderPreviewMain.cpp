@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     try
     {
         if (argc < 3)
-            throw std::invalid_argument("Usage: EmbervaleRenderPreview WORLD.json OUTPUT.png [--basic] [--deplete-trees] [--focus X Y]");
+            throw std::invalid_argument("Usage: EmbervaleRenderPreview WORLD.json OUTPUT.png [--basic] [--deplete-trees] [--focus X Y] [--zoom 1|1.5] [--walk-to X Y] [--frames N]");
         const auto input = std::filesystem::path(reinterpret_cast<const char8_t *>(argv[1]));
         const auto output = std::filesystem::path(reinterpret_cast<const char8_t *>(argv[2]));
         std::error_code equivalentError;
@@ -37,6 +37,9 @@ int main(int argc, char **argv)
             throw std::invalid_argument("Preview output must be a separate .png file");
         bool basic = false, deplete = false;
         std::optional<std::pair<int, int>> focus;
+        std::optional<std::pair<int, int>> walkTo;
+        float zoom = 1.0f;
+        int frames = 0;
         for (int index = 3; index < argc; ++index)
         {
             const std::string_view option = argv[index];
@@ -48,9 +51,29 @@ int main(int argc, char **argv)
                 const int y = Coordinate(argv[++index]);
                 focus = std::pair{x, y};
             }
+            else if (option == "--walk-to" && index + 2 < argc)
+            {
+                const int x = Coordinate(argv[++index]);
+                const int y = Coordinate(argv[++index]);
+                walkTo = std::pair{x, y};
+            }
+            else if (option == "--zoom" && index + 1 < argc)
+            {
+                const std::string_view value = argv[++index];
+                if (value == "1") zoom = 1.0f;
+                else if (value == "1.5") zoom = 1.5f;
+                else throw std::invalid_argument("Preview zoom must be 1 or 1.5");
+            }
+            else if (option == "--frames" && index + 1 < argc)
+            {
+                frames = Coordinate(argv[++index]);
+                if (frames < 1 || frames > 120) throw std::invalid_argument("Preview frame count must be 1..120");
+            }
             else throw std::invalid_argument("Unknown or incomplete preview option");
         }
         World world(StarterWorldImport::LoadFile(input));
+        if (walkTo && !world.GetMap().IsValidPosition(walkTo->first, walkTo->second))
+            throw std::invalid_argument("Walk preview destination must be walkable");
         const int playerID = world.CreatePlayer(PlayerInitializationMode::FRESH_START);
         auto *player = dynamic_cast<Player *>(world.GetEntityByID(playerID));
         if (!player) throw std::runtime_error("Preview player could not be created");
@@ -87,9 +110,31 @@ int main(int argc, char **argv)
                 SDL_TEXTUREACCESS_TARGET, Graphics::WindowWidth, Graphics::WindowHeight), SDL_DestroyTexture);
         if (!target || !SDL_SetRenderTarget(graphics.renderer, target.get()))
             throw std::runtime_error(SDL_GetError());
-        graphics.Render(world.GetMap(), world.GetEntities(), world.GetResources(), world.GetStations(),
-            world.GetGroundItems(), {}, player->GetPosition().GetX(), player->GetPosition().GetY(),
-            player->GetInventory(), player->GetEquipment(), *player, nullptr);
+        const auto draw = [&]
+        {
+            graphics.Render(world.GetMap(), world.GetEntities(), world.GetResources(), world.GetStations(),
+                world.GetGroundItems(), {}, player->GetPosition().GetX(), player->GetPosition().GetY(),
+                player->GetInventory(), player->GetEquipment(), *player, nullptr);
+        };
+        // Initialize the real camera before applying the same anchored zoom
+        // used by mouse-wheel input in the game.
+        draw();
+        while (graphics.GetCameraZoom() + 0.001f < zoom)
+        {
+            const float before = graphics.GetCameraZoom();
+            graphics.AdjustCameraZoom(1, Graphics::WindowWidth * 0.5f, Graphics::WindowHeight * 0.5f);
+            if (graphics.GetCameraZoom() == before) throw std::runtime_error("Requested preview zoom is unavailable");
+        }
+        const int frameCount = frames > 0 ? frames : (walkTo ? 2 : 1);
+        for (int frame = 0; frame < frameCount; ++frame)
+        {
+            if (frame > 0)
+            {
+                if (walkTo) player->GetPosition().SetPosition(walkTo->first, walkTo->second);
+                SDL_Delay(40);
+            }
+            draw();
+        }
         std::unique_ptr<SDL_Surface, decltype(&SDL_DestroySurface)> pixels(
             SDL_RenderReadPixels(graphics.renderer, nullptr), SDL_DestroySurface);
         if (!pixels) throw std::runtime_error(SDL_GetError());
@@ -97,7 +142,7 @@ int main(int argc, char **argv)
         if (!SDL_SavePNG(pixels.get(), argv[2])) throw std::runtime_error(SDL_GetError());
         SDL_SetRenderTarget(graphics.renderer, nullptr);
         std::cout << "Rendered " << pixels->w << 'x' << pixels->h
-            << " through the game renderer; " << (basic ? "basic" : "forest")
+            << " through the game renderer; " << (basic ? "basic" : "world")
             << " art, " << (deplete ? "depleted" : "intact") << " trees. No player or world files written.\n";
         return 0;
     }

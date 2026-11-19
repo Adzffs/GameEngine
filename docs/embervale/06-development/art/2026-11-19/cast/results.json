@@ -1,0 +1,185 @@
+{
+  "base": "6f137db8ded3827481972ac22d4922843a59531c",
+  "environment": {
+    "os": "Windows",
+    "compiler": "UCRT64 GCC 16.1",
+    "sdl": "3.4.12",
+    "video": "dummy",
+    "renderer": "software"
+  },
+  "builds": {
+    "GameEngine": "passed",
+    "EmbervaleRenderPreview": "passed",
+    "Play-RiverCrossing.cmd --build-only": "passed"
+  },
+  "cast_sources_preserved_on_export": {
+    "furnace.ase": "6545113ce212270876cb1cf3d395786d73a6eda8abbb581cf41f3ecb42f57b3d",
+    "mara.ase": "f4c21fdf5ce0e80e7c0934c9331216113bf8738c3b19139d3bd4291968fd9b2e",
+    "player.ase": "10d7df39d89add433c5fa4fdb5fd2fd3ccb0dc66ef4da5c05f070d6d633671fb"
+  },
+  "forest_masters_unchanged": true,
+  "captures": [
+    {
+      "file": "mara.png",
+      "options": [
+        "--focus",
+        "15",
+        "26",
+        "--zoom",
+        "1.5"
+      ],
+      "exit_code": 0,
+      "loaded_images": 6,
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "1b8b5939dfbb5eb0d13517c566cddaa88733bb64dc95ad5beda5075eec569bb4"
+    },
+    {
+      "file": "furnace.png",
+      "options": [
+        "--focus",
+        "69",
+        "51",
+        "--zoom",
+        "1.5"
+      ],
+      "exit_code": 0,
+      "loaded_images": 6,
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "c26509031c595b3017d96fef014f6755c695ce0e92de6edbe863b40d1171fa45"
+    },
+    {
+      "file": "walk-east.png",
+      "options": [
+        "--focus",
+        "15",
+        "26",
+        "--walk-to",
+        "16",
+        "26",
+        "--zoom",
+        "1.5"
+      ],
+      "exit_code": 0,
+      "loaded_images": 6,
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "4b2ad82b065a4b6d4d2e0b4cc2f1f00d1c193e223174e8c134301ea91f30a602"
+    },
+    {
+      "file": "walk-west.png",
+      "options": [
+        "--focus",
+        "15",
+        "26",
+        "--walk-to",
+        "14",
+        "26",
+        "--zoom",
+        "1.5"
+      ],
+      "exit_code": 0,
+      "loaded_images": 6,
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "beec205dc3dbf3cacd643be36fbd3e2e3db606f0949c9cbdc5f06503d67c5d26"
+    },
+    {
+      "file": "walk-north.png",
+      "options": [
+        "--focus",
+        "15",
+        "27",
+        "--walk-to",
+        "15",
+        "26",
+        "--zoom",
+        "1.5"
+      ],
+      "exit_code": 0,
+      "loaded_images": 6,
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "48c64d2769edf972852c659f6f01ca4f03e73c8d356a7f8a8c4d4e2fc8275f1d"
+    },
+    {
+      "file": "walk-south.png",
+      "options": [
+        "--focus",
+        "15",
+        "26",
+        "--walk-to",
+        "15",
+        "27",
+        "--zoom",
+        "1.5"
+      ],
+      "exit_code": 0,
+      "loaded_images": 6,
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "4427fef022db03d1068c78021bd7272fde7e91ed3ee0f45ad943b62cbe65ef74"
+    },
+    {
+      "file": "basic.png",
+      "options": [
+        "--focus",
+        "15",
+        "26",
+        "--zoom",
+        "1.5",
+        "--basic"
+      ],
+      "exit_code": 0,
+      "loaded_images": 6,
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "cdd6446da7b25dfcae857e560c75a0bcf6fcd3c46ba3f91457c61e75c004741c"
+    }
+  ],
+  "missing_art": {
+    "exit_code": 0,
+    "loaded_images": 0,
+    "result": "Basic shapes rendered successfully"
+  },
+  "packaged_pngs": {
+    "build-client": [
+      "assets/embervale/forest-pilot/textures/terrain.png",
+      "assets/embervale/forest-pilot/textures/oak.png",
+      "assets/embervale/forest-pilot/textures/stump.png",
+      "assets/embervale/cast-pilot/textures/player.png",
+      "assets/embervale/cast-pilot/textures/mara.png",
+      "assets/embervale/cast-pilot/textures/furnace.png"
+    ],
+    "build-river-crossing": [
+      "assets/embervale/forest-pilot/textures/terrain.png",
+      "assets/embervale/forest-pilot/textures/oak.png",
+      "assets/embervale/forest-pilot/textures/stump.png",
+      "assets/embervale/cast-pilot/textures/player.png",
+      "assets/embervale/cast-pilot/textures/mara.png",
+      "assets/embervale/cast-pilot/textures/furnace.png"
+    ]
+  },
+  "input_world_unchanged": "8a04f8fdc6b02f33f1cdcc5c0f71323deb2c9def39bfc3ca29fcd6ac951df0fb",
+  "deferred": [
+    "Full regression suites",
+    "Visible GPU/window playthrough",
+    "Interactive Mara/furnace picking",
+    "Full gameplay acceptance"
+  ]
+}

@@ -156,20 +156,29 @@ if(GAMEENGINE_BUILD_CONTENT_TOOLS)
     target_link_libraries(EmbervaleWorldMove PRIVATE GameEngineCore)
 endif()
 
-function(configure_gameengine_forest_art target)
+function(configure_gameengine_world_art target)
     target_sources(${target} PRIVATE src/Graphics/ForestSprites.cpp)
     set(forest_images
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/forest-pilot/textures/terrain.png"
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/forest-pilot/textures/oak.png"
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/forest-pilot/textures/stump.png"
     )
+    set(cast_images
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/cast-pilot/textures/player.png"
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/cast-pilot/textures/mara.png"
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/cast-pilot/textures/furnace.png"
+    )
     # Refresh packaged art when the images change, even if no C++ changed.
-    set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS ${forest_images})
+    set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS ${forest_images} ${cast_images})
     add_custom_command(TARGET ${target} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
             "$<TARGET_FILE_DIR:${target}>/assets/embervale/forest-pilot/textures"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${forest_images}
             "$<TARGET_FILE_DIR:${target}>/assets/embervale/forest-pilot/textures"
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            "$<TARGET_FILE_DIR:${target}>/assets/embervale/cast-pilot/textures"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${cast_images}
+            "$<TARGET_FILE_DIR:${target}>/assets/embervale/cast-pilot/textures"
         VERBATIM
     )
 endfunction()
@@ -183,7 +192,7 @@ if(GAMEENGINE_BUILD_CLIENT)
     )
 
     target_link_libraries(GameEngine PRIVATE GameEngineCore SDL3::SDL3)
-    configure_gameengine_forest_art(GameEngine)
+    configure_gameengine_world_art(GameEngine)
 
     if(GAMEENGINE_BUILD_CONTENT_TOOLS AND SDL3_VERSION VERSION_GREATER_EQUAL 3.4.0)
         add_executable(EmbervaleRenderPreview
@@ -191,7 +200,7 @@ if(GAMEENGINE_BUILD_CLIENT)
             src/Graphics/Graphics.cpp
         )
         target_link_libraries(EmbervaleRenderPreview PRIVATE GameEngineCore SDL3::SDL3)
-        configure_gameengine_forest_art(EmbervaleRenderPreview)
+        configure_gameengine_world_art(EmbervaleRenderPreview)
     endif()
 endif()
 
@@ -222,7 +231,7 @@ function(add_gameengine_graphics_test target source)
     )
 
     target_link_libraries(${target} PRIVATE GameEngineCore SDL3::SDL3)
-    configure_gameengine_forest_art(${target})
+    configure_gameengine_world_art(${target})
 
     add_test(
         NAME ${target}
@@ -356,7 +365,7 @@ if(BUILD_TESTING)
             src/Graphics/Graphics.cpp
         )
         target_link_libraries(EnginePlayerPersistenceLifecycleTests PRIVATE GameEngineCore SDL3::SDL3)
-        configure_gameengine_forest_art(EnginePlayerPersistenceLifecycleTests)
+        configure_gameengine_world_art(EnginePlayerPersistenceLifecycleTests)
         add_test(NAME EnginePlayerPersistenceLifecycleTests COMMAND EnginePlayerPersistenceLifecycleTests)
         set_tests_properties(EnginePlayerPersistenceLifecycleTests PROPERTIES LABELS "client")
     endif()
@@ -425,7 +434,7 @@ if(BUILD_TESTING)
             src/Graphics/Graphics.cpp
         )
         target_link_libraries(ClientDialogueIntegrationTests PRIVATE GameEngineCore SDL3::SDL3)
-        configure_gameengine_forest_art(ClientDialogueIntegrationTests)
+        configure_gameengine_world_art(ClientDialogueIntegrationTests)
         add_test(NAME ClientDialogueIntegrationTests COMMAND ClientDialogueIntegrationTests)
         set_tests_properties(ClientDialogueIntegrationTests PROPERTIES LABELS "client")
         add_executable(ClientShopIntegrationTests
@@ -434,7 +443,7 @@ if(BUILD_TESTING)
             src/Input/InputManager.cpp
             src/Graphics/Graphics.cpp)
         target_link_libraries(ClientShopIntegrationTests PRIVATE GameEngineCore SDL3::SDL3)
-        configure_gameengine_forest_art(ClientShopIntegrationTests)
+        configure_gameengine_world_art(ClientShopIntegrationTests)
         add_test(NAME ClientShopIntegrationTests COMMAND ClientShopIntegrationTests)
         set_tests_properties(ClientShopIntegrationTests PROPERTIES LABELS "client")
 
@@ -444,7 +453,7 @@ if(BUILD_TESTING)
             src/Input/InputManager.cpp
             src/Graphics/Graphics.cpp)
         target_link_libraries(ClientCraftingIntegrationTests PRIVATE GameEngineCore SDL3::SDL3)
-        configure_gameengine_forest_art(ClientCraftingIntegrationTests)
+        configure_gameengine_world_art(ClientCraftingIntegrationTests)
         add_test(NAME ClientCraftingIntegrationTests COMMAND ClientCraftingIntegrationTests)
         set_tests_properties(ClientCraftingIntegrationTests PROPERTIES LABELS "client")
     endif()

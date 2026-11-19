@@ -491,10 +491,10 @@ private:
     ForestSprites forestSprites;
     bool worldArtEnabled = true;
     SDL_FRect visualPlayerRectangle{};
-    struct SpriteTreeTarget { int id, x, y; };
-    std::vector<SpriteTreeTarget> spriteTreeTargets;
+    struct SpriteObjectTarget { int id, x, y; bool furnace = false; };
+    std::vector<SpriteObjectTarget> spriteObjectTargets;
     std::vector<std::pair<int, int>> occupiedSpritePickTiles;
-    WorldHoverTarget PickSpriteTree(float worldX, float worldY) const;
+    WorldHoverTarget PickSpriteObject(float worldX, float worldY) const;
     void UpdateSpritePicking(const std::vector<ResourceNode> &resources,
         const std::vector<CraftingStation> &stations, const std::vector<GroundItem> &items);
     SDL_FPoint NextPlayerPosition(int playerX, int playerY) const;
@@ -547,6 +547,8 @@ private:
     float visualPlayerX = 0.0f;
     float visualPlayerY = 0.0f;
     bool visualPlayerInitialized = false;
+    int playerFacing = 0;
+    float playerWalkDistance = 0.0f;
     float cameraPixelX = 0.0f;
     float cameraPixelY = 0.0f;
     float cameraZoom = 1.0f;

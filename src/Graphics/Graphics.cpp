@@ -2328,9 +2328,9 @@ bool Graphics::ConsumeClickedTile(
     mouseX = clickedMouseX;
     mouseY = clickedMouseY;
 
-    // Map painted canopy pixels back to the resource's authoritative tile.
+    // Map painted object pixels back to their authoritative interaction tile.
     // UI/modals and explicit Walk here use their existing paths.
-    const auto spriteTarget = PickSpriteTree(mouseX, mouseY);
+    const auto spriteTarget = PickSpriteObject(mouseX, mouseY);
     if (spriteTarget.HasTarget())
     {
         tileX = static_cast<int>(spriteTarget.bounds.x) / TileSize;
@@ -2737,36 +2737,43 @@ SDL_FPoint Graphics::NextPlayerPosition(int playerX, int playerY) const
 void Graphics::UpdateSpritePicking(const std::vector<ResourceNode> &resources,
     const std::vector<CraftingStation> &stations, const std::vector<GroundItem> &items)
 {
-    spriteTreeTargets.clear();
+    spriteObjectTargets.clear();
     occupiedSpritePickTiles.clear();
     for (const auto &resource : resources)
     {
         if (!resource.IsActive()) continue;
         occupiedSpritePickTiles.emplace_back(resource.GetX(), resource.GetY());
         if (resource.GetResourceType() == ResourceType::NORMAL_TREE)
-            spriteTreeTargets.push_back({resource.GetID(), resource.GetX(), resource.GetY()});
+            spriteObjectTargets.push_back({resource.GetID(), resource.GetX(), resource.GetY()});
     }
     for (const auto &station : stations)
+    {
         occupiedSpritePickTiles.emplace_back(station.GetX(), station.GetY());
+        if (station.GetStationType() == StationType::FURNACE)
+            spriteObjectTargets.push_back({station.GetID(), station.GetX(), station.GetY(), true});
+    }
     for (const auto &item : items)
         occupiedSpritePickTiles.emplace_back(item.position.GetX(), item.position.GetY());
-    std::stable_sort(spriteTreeTargets.begin(), spriteTreeTargets.end(),
-        [](const auto &a, const auto &b) { return a.y < b.y; });
+    std::stable_sort(spriteObjectTargets.begin(), spriteObjectTargets.end(),
+        [](const auto &a, const auto &b) { return a.y == b.y ? a.furnace < b.furnace : a.y < b.y; });
 }
 
-Graphics::WorldHoverTarget Graphics::PickSpriteTree(float worldX, float worldY) const
+Graphics::WorldHoverTarget Graphics::PickSpriteObject(float worldX, float worldY) const
 {
-    if (!worldArtEnabled || !forestSprites.HasTree()) return {};
+    if (!worldArtEnabled) return {};
     const std::pair<int, int> tile{static_cast<int>(std::floor(worldX / TileSize)),
         static_cast<int>(std::floor(worldY / TileSize))};
     // Existing ground-item and object actions keep priority on occupied tiles.
     if (std::find(occupiedSpritePickTiles.begin(), occupiedSpritePickTiles.end(), tile) !=
         occupiedSpritePickTiles.end()) return {};
-    for (auto it = spriteTreeTargets.rbegin(); it != spriteTreeTargets.rend(); ++it)
+    for (auto it = spriteObjectTargets.rbegin(); it != spriteObjectTargets.rend(); ++it)
     {
-        if (!forestSprites.HitTree(it->x, it->y, worldX, worldY)) continue;
+        const bool hit = it->furnace ? forestSprites.HitFurnace(it->x, it->y, worldX, worldY)
+            : forestSprites.HitTree(it->x, it->y, worldX, worldY);
+        if (!hit) continue;
         const SDL_FRect bounds{static_cast<float>(it->x * TileSize),
             static_cast<float>(it->y * TileSize), static_cast<float>(TileSize), static_cast<float>(TileSize)};
+        if (it->furnace) return {WorldHoverTargetType::STATION, it->id, bounds, "Furnace", "Smelt"};
         return {WorldHoverTargetType::RESOURCE, it->id, bounds,
             ResourceDatabase::Get(ResourceType::NORMAL_TREE).GetName(), "Gather"};
     }
@@ -2796,6 +2803,8 @@ void Graphics::DrawWorldObjects(const std::vector<std::unique_ptr<Entity>> &enti
     const auto nextPlayer = NextPlayerPosition(playerX, playerY);
     visualPlayerRectangle = {nextPlayer.x * TileSize + 4.0f, nextPlayer.y * TileSize + 4.0f,
         TileSize - 8.0f, TileSize - 8.0f};
+    if (worldArtEnabled && forestSprites.HasPlayer())
+        visualPlayerRectangle = {nextPlayer.x * TileSize + 4.0f, nextPlayer.y * TileSize - 12.0f, 24.0f, 36.0f};
     entries.push_back({nextPlayer.y * TileSize + 24.0f, Kind::PLAYER, 0});
     std::stable_sort(entries.begin(), entries.end(), [](const Entry &a, const Entry &b)
     {
@@ -2951,9 +2960,21 @@ void Graphics::DrawPlayer(
     int playerY)
 {
     const auto position = NextPlayerPosition(playerX, playerY);
+    const float dx = visualPlayerInitialized ? position.x - visualPlayerX : 0.0f;
+    const float dy = visualPlayerInitialized ? position.y - visualPlayerY : 0.0f;
+    const float travelled = std::hypot(dx, dy);
+    int walkPose = 0;
+    if (travelled > 0.002f)
+    {
+        playerFacing = std::abs(dx) > std::abs(dy) ? (dx < 0.0f ? 1 : 2) : (dy < 0.0f ? 3 : 0);
+        playerWalkDistance = std::fmod(playerWalkDistance + travelled, ForestPilotLayout::PlayerWalkCycleTiles);
+        walkPose = static_cast<int>(playerWalkDistance * 4.0f / ForestPilotLayout::PlayerWalkCycleTiles) % 4;
+    }
     visualPlayerX = position.x;
     visualPlayerY = position.y;
     visualPlayerInitialized = true;
+
+    if (worldArtEnabled && forestSprites.DrawPlayer(visualPlayerX, visualPlayerY, playerFacing, walkPose)) return;
 
     SDL_FRect playerRectangle =
         SDL_FRect{visualPlayerX * TileSize + 4.0f,
@@ -3134,7 +3155,10 @@ std::optional<int> Graphics::GetFriendlyNpcAtScreenPosition(
 
         const SDL_FRect rectangle = GetFriendlyNpcScreenRectangle(
             *npc, cameraTileX, cameraTileY);
-        if (IsPointInsideRectangle(
+        const bool spriteHit = worldArtEnabled && npc->GetNpcType() == NpcType::DEVELOPMENT_GUIDE &&
+            forestSprites.HitMara(npc->GetPosition().GetX(), npc->GetPosition().GetY(),
+                static_cast<float>(mouseX + cameraTileX * TileSize), static_cast<float>(mouseY + cameraTileY * TileSize));
+        if (spriteHit || IsPointInsideRectangle(
                 static_cast<float>(mouseX),
                 static_cast<float>(mouseY),
                 rectangle))
@@ -3200,7 +3224,7 @@ Graphics::WorldHoverTarget Graphics::ResolveWorldHoverTarget(
         }
     }
 
-    const auto spriteTarget = PickSpriteTree(screenX, screenY);
+    const auto spriteTarget = PickSpriteObject(screenX, screenY);
     if (spriteTarget.HasTarget()) return spriteTarget;
 
     for (const auto &entity : entities)
@@ -3230,7 +3254,9 @@ Graphics::WorldHoverTarget Graphics::ResolveWorldHoverTarget(
         }
 
         const SDL_FRect bounds = GetFriendlyNpcScreenRectangle(*npc);
-        if (IsPointInsideRectangle(screenX, screenY, bounds))
+        const bool spriteHit = worldArtEnabled && npc->GetNpcType() == NpcType::DEVELOPMENT_GUIDE &&
+            forestSprites.HitMara(npc->GetPosition().GetX(), npc->GetPosition().GetY(), screenX, screenY);
+        if (spriteHit || IsPointInsideRectangle(screenX, screenY, bounds))
         {
             return {WorldHoverTargetType::FRIENDLY_NPC, npc->GetID(),
                 bounds, definition->name, "Talk-to", definition->examineText};
@@ -3277,7 +3303,7 @@ void Graphics::DrawWorldHoverFeedback()
 void Graphics::OpenWorldContextMenu(float screenX, float screenY)
 {
     const SDL_FPoint worldPoint = ScreenToWorldPoint(screenX, screenY);
-    const auto spriteTarget = PickSpriteTree(worldPoint.x, worldPoint.y);
+    const auto spriteTarget = PickSpriteObject(worldPoint.x, worldPoint.y);
     if (spriteTarget.HasTarget()) worldHoverTarget = spriteTarget;
     constexpr float rowHeight = 24.0f;
     constexpr float menuWidth = 210.0f;
@@ -3435,6 +3461,8 @@ void Graphics::DrawNpc(const Entity &value)
     const NPC *npc = dynamic_cast<const NPC *>(entity);
     const bool isMara = npc != nullptr &&
         npc->GetNpcType() == NpcType::DEVELOPMENT_GUIDE;
+    if (isMara && worldArtEnabled && forestSprites.DrawMara(
+            npc->GetPosition().GetX(), npc->GetPosition().GetY())) return;
     const bool isTorren = npc != nullptr &&
         npc->GetNpcType() == NpcType::TORREN_ASH;
     Uint8 red = 255, green = 150, blue = 50;
@@ -3907,6 +3935,8 @@ void Graphics::DrawStations(
 
 void Graphics::DrawStation(const CraftingStation &station)
 {
+    if (worldArtEnabled && station.GetStationType() == StationType::FURNACE &&
+        forestSprites.DrawFurnace(station.GetX(), station.GetY())) return;
     float tileX =
         static_cast<float>(
             station.GetX() * TileSize);
