@@ -15,6 +15,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 SOURCE_HASH = re.compile(r"^Source SHA-256: ([0-9a-f]{64})$", re.MULTILINE)
@@ -350,7 +351,55 @@ class StudioBridge:
         return requested
 
 
-def launch(bridge: StudioBridge) -> None:
+class DraftPlaytest:
+    """Run a validated private snapshot with temporary player progress."""
+
+    def __init__(self) -> None:
+        self.process = None
+        self.directory = None
+
+    def poll(self) -> int | None:
+        if self.process is None:
+            return None
+        result = self.process.poll()
+        if result is not None and self.directory is not None:
+            self.directory.cleanup()
+            self.directory = None
+        return result
+
+    def start(self, bridge: StudioBridge, game: Path) -> None:
+        if self.process is not None and self.poll() is None:
+            raise StudioError("A draft playtest is already running")
+        if bridge.dirty:
+            raise StudioError("Save a new draft before playing your changes")
+        game = game.resolve()
+        if not game.is_file():
+            raise StudioError("Build the SDL game or select its executable with --game")
+        target = bridge.last_saved or bridge.source
+        if target.is_symlink():
+            raise StudioError("Select a regular saved world draft")
+        try:
+            if target.stat().st_size > 2 * 1024 * 1024:
+                raise StudioError("Saved draft exceeds the 2 MiB input limit")
+            content = target.read_bytes()
+            verify_saved_world_parity(bridge.snapshot, content, bridge.placements, bridge.terrain)
+            directory = tempfile.TemporaryDirectory(prefix="embervale-playtest-")
+            try:
+                snapshot = Path(directory.name) / "world.json"
+                snapshot.write_bytes(content)
+                # Validate the exact private bytes through the C++ runtime importer.
+                StudioBridge(Path(bridge.executable).resolve(), snapshot)
+                process = subprocess.Popen([str(game), "--world", str(snapshot), "--no-save"],
+                    cwd=directory.name)
+            except BaseException:
+                directory.cleanup()
+                raise
+        except (OSError, subprocess.SubprocessError) as error:
+            raise StudioError(f"Cannot launch draft playtest: {error}") from error
+        self.directory, self.process = directory, process
+
+
+def launch(bridge: StudioBridge, game: Path | None = None) -> None:
     # Imported lazily: headless tests and command-line help do not need a display.
     import tkinter as tk
     from tkinter import filedialog, messagebox, ttk
@@ -358,6 +407,9 @@ def launch(bridge: StudioBridge) -> None:
     root = tk.Tk()
     root.title("Embervale Studio | Starter World")
     root.geometry("1120x760")
+    playtest = DraftPlaytest()
+    game = game or Path(bridge.executable).resolve().with_name(
+        "GameEngine.exe" if os.name == "nt" else "GameEngine")
     tile = 22
     selected: str | None = None
     brush = tk.StringVar(value="Select / move")
@@ -537,8 +589,30 @@ def launch(bridge: StudioBridge) -> None:
         return save() if answer is True else answer is False
 
     def close() -> None:
+        if playtest.process is not None and playtest.poll() is None:
+            messagebox.showinfo("Playtest running", "Close the game before closing Studio.", parent=root)
+            return
         if may_leave():
             root.destroy()
+
+    def play() -> None:
+        if bridge.dirty and not save():
+            return
+        try:
+            playtest.start(bridge, game)
+            play_button.configure(state="disabled", text="Playtest running")
+            root.after(250, check_playtest)
+        except StudioError as error:
+            messagebox.showerror("Playtest rejected", str(error), parent=root)
+
+    def check_playtest() -> None:
+        result = playtest.poll()
+        if result is None:
+            root.after(250, check_playtest)
+            return
+        play_button.configure(state="normal", text="Play this draft")
+        if result != 0:
+            messagebox.showerror("Playtest failed", f"Game exited with code {result}. Check its startup output.", parent=root)
 
     def open_world(path: Path | None = None) -> None:
         nonlocal bridge, selected, saved
@@ -565,6 +639,9 @@ def launch(bridge: StudioBridge) -> None:
     root.protocol("WM_DELETE_WINDOW", close)
     filebar = ttk.Frame(frame)
     filebar.pack(fill="x", before=toolbar)
+    play_button = ttk.Button(filebar, text="Play this draft", command=play)
+    play_button.pack(side="right")
+    ttk.Label(filebar, text="Playtests use temporary progress").pack(side="right", padx=8)
     ttk.Button(filebar, text="Open draft…", command=open_world).pack(side="left")
     ttk.Button(filebar, text="Reopen last saved", command=lambda: open_world(bridge.last_saved)
         if bridge.last_saved else messagebox.showinfo("No saved draft", "Save a new draft first.", parent=root)).pack(side="left", padx=4)
@@ -601,9 +678,10 @@ def main() -> int:
     parser.add_argument("snapshot", type=Path, help="Existing validated starter-world snapshot JSON")
     parser.add_argument("--tool", type=Path, default=Path("EmbervaleWorldMove"),
                         help="Path to the built EmbervaleWorldMove executable")
+    parser.add_argument("--game", type=Path, help="SDL GameEngine executable (defaults beside --tool)")
     args = parser.parse_args()
     try:
-        launch(StudioBridge(args.tool, args.snapshot))
+        launch(StudioBridge(args.tool, args.snapshot), args.game)
     except StudioError as error:
         parser.exit(1, f"Embervale Studio: {error}\n")
     return 0
