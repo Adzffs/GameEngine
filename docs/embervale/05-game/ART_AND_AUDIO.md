@@ -1,6 +1,6 @@
 # Art, animation and audio production guide
 
-**Status:** Forest and player/Mara/furnace pilots render in the SDL client, with a first player walk cycle. A general importer and the broader production workflow below remain proposed.\
+**Status:** Forest, player/Mara/furnace and environment/mining pilots render in the SDL client, with a corrected player walk cycle. A general importer and the broader production workflow below remain proposed.\
 **Reviewed:** 19 November 2026.\
 **Purpose:** Replace placeholder presentation in manageable steps while preserving gameplay and making assets easy for humans and AI to work with.
 
@@ -51,6 +51,15 @@ The current client uses SDL3 drawing code for the world and entities. `Graphics.
 Keep that presentation as a useful debug mode. Begin custom art with one coherent terrain family, one tree, one station and one character. Validate those assets in the game, Studio and previews before producing hundreds more. The first goal is a reliable asset-to-game workflow, followed by a consistent visual identity.
 
 A large graphics source file and a large sprite atlas are different concerns. The former needs maintainable code boundaries; the latter is an asset packaging decision. Neither requires drawing the entire world as one enormous image. Keep source artwork editable and identifiable, then pack runtime atlases when a measured need or a chosen pipeline justifies them.
+
+The [environment pilot](../../../assets/embervale/environment-pilot/README.md)
+adds static water, grass/earth/stone/dirt riverbank quarters, stone pavers and
+copper/tin rocks with shared depleted rubble. Ground persists beneath objects,
+preventing grass squares on the stone mining pad. The three batches share a
+generated layout and texture cache: 84 frames, ten runtime PNGs. See the
+[environment integration record](../06-development/ENVIRONMENT_RENDERING_2026-11-19.md)
+for editable sources and actual river, workshop and depleted mining captures.
+Other ore tiers, buildings, bank/table art and the full visual kit remain open.
 
 ## 2. Proposed visual direction
 

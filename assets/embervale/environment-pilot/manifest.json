@@ -1,0 +1,752 @@
+{
+  "schema": "embervale.authoring-batch",
+  "version": 1,
+  "id": "environment-pilot",
+  "native_tile_size": 32,
+  "editor": "LibreSprite 1.1-dev",
+  "status": "Static river water/banks, stone floors, copper/tin and depleted rubble runtime pilot",
+  "lighting": "upper left",
+  "resource_palette_rgb": [
+    "354038",
+    "4b554d",
+    "677165",
+    "858d7a",
+    "adb299",
+    "76452f",
+    "ae693e",
+    "d49458",
+    "e2ba7c",
+    "8e9b99",
+    "b9c5bd",
+    "dde1c9"
+  ],
+  "bank_order": [
+    "n",
+    "e",
+    "s",
+    "w",
+    "outer-nw",
+    "outer-ne",
+    "outer-sw",
+    "outer-se",
+    "inner-nw",
+    "inner-ne",
+    "inner-sw",
+    "inner-se"
+  ],
+  "images": {
+    "terrain": {
+      "source": "source/terrain.ase",
+      "image": "textures/terrain.png",
+      "size": [
+        256,
+        192
+      ],
+      "editor_metadata": "textures/terrain.export.json",
+      "source_sha256": "4aa5f743ca9b1eac37328e0c08024d9d8a3ad83b9344df3d9bc62a8d2a2e6ed1",
+      "image_sha256": "ccc71b373af780b7a95e2a578a003154814a5b7d5dcd3e23f517225317441e77"
+    },
+    "copper": {
+      "source": "source/copper.ase",
+      "image": "textures/copper.png",
+      "size": [
+        32,
+        40
+      ],
+      "editor_metadata": "textures/copper.export.json",
+      "source_sha256": "53c478feeccfd4710437371ebcb108e6e47f30b6d994e630f2731abc9f75df7c",
+      "image_sha256": "823a3530bd2200428a7fd036323801d40a549c0109fed4345e8deb0f84b6ae80"
+    },
+    "tin": {
+      "source": "source/tin.ase",
+      "image": "textures/tin.png",
+      "size": [
+        32,
+        40
+      ],
+      "editor_metadata": "textures/tin.export.json",
+      "source_sha256": "5ce3734e2e5219912f9d7c5c248935df3f9659ae324ca1c1c528dabce74a2740",
+      "image_sha256": "37c8301960238d9ec4b0e1102d7c14b5aa66d2f2e2469dda5c082cd865e982ee"
+    },
+    "rubble": {
+      "source": "source/rubble.ase",
+      "image": "textures/rubble.png",
+      "size": [
+        32,
+        40
+      ],
+      "editor_metadata": "textures/rubble.export.json",
+      "source_sha256": "2df6b9d3fc8e5c4836028b72a7f517e7266f15136a5d3cf616ff1d15077c18ff",
+      "image_sha256": "bf55b0b4b241ff1150886926821c0f48658c186bc8af5f7b91d7b795d26ebdae"
+    }
+  },
+  "assets": [
+    {
+      "id": "terrain.water.01",
+      "image": "terrain",
+      "rect": [
+        0,
+        0,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.water.02",
+      "image": "terrain",
+      "rect": [
+        32,
+        0,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.water.03",
+      "image": "terrain",
+      "rect": [
+        64,
+        0,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.stone.01",
+      "image": "terrain",
+      "rect": [
+        96,
+        0,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.stone.02",
+      "image": "terrain",
+      "rect": [
+        128,
+        0,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.stone.03",
+      "image": "terrain",
+      "rect": [
+        160,
+        0,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.earth.n",
+      "image": "terrain",
+      "rect": [
+        192,
+        0,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.earth.e",
+      "image": "terrain",
+      "rect": [
+        224,
+        0,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.earth.s",
+      "image": "terrain",
+      "rect": [
+        0,
+        32,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.earth.w",
+      "image": "terrain",
+      "rect": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.earth.outer-nw",
+      "image": "terrain",
+      "rect": [
+        64,
+        32,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.earth.outer-ne",
+      "image": "terrain",
+      "rect": [
+        96,
+        32,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.earth.outer-sw",
+      "image": "terrain",
+      "rect": [
+        128,
+        32,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.earth.outer-se",
+      "image": "terrain",
+      "rect": [
+        160,
+        32,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.earth.inner-nw",
+      "image": "terrain",
+      "rect": [
+        192,
+        32,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.earth.inner-ne",
+      "image": "terrain",
+      "rect": [
+        224,
+        32,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.earth.inner-sw",
+      "image": "terrain",
+      "rect": [
+        0,
+        64,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.earth.inner-se",
+      "image": "terrain",
+      "rect": [
+        32,
+        64,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.stone.n",
+      "image": "terrain",
+      "rect": [
+        64,
+        64,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.stone.e",
+      "image": "terrain",
+      "rect": [
+        96,
+        64,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.stone.s",
+      "image": "terrain",
+      "rect": [
+        128,
+        64,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.stone.w",
+      "image": "terrain",
+      "rect": [
+        160,
+        64,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.stone.outer-nw",
+      "image": "terrain",
+      "rect": [
+        192,
+        64,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.stone.outer-ne",
+      "image": "terrain",
+      "rect": [
+        224,
+        64,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.stone.outer-sw",
+      "image": "terrain",
+      "rect": [
+        0,
+        96,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.stone.outer-se",
+      "image": "terrain",
+      "rect": [
+        32,
+        96,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.stone.inner-nw",
+      "image": "terrain",
+      "rect": [
+        64,
+        96,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.stone.inner-ne",
+      "image": "terrain",
+      "rect": [
+        96,
+        96,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.stone.inner-sw",
+      "image": "terrain",
+      "rect": [
+        128,
+        96,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.stone.inner-se",
+      "image": "terrain",
+      "rect": [
+        160,
+        96,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.dirt.n",
+      "image": "terrain",
+      "rect": [
+        192,
+        96,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.dirt.e",
+      "image": "terrain",
+      "rect": [
+        224,
+        96,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.dirt.s",
+      "image": "terrain",
+      "rect": [
+        0,
+        128,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.dirt.w",
+      "image": "terrain",
+      "rect": [
+        32,
+        128,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.dirt.outer-nw",
+      "image": "terrain",
+      "rect": [
+        64,
+        128,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.dirt.outer-ne",
+      "image": "terrain",
+      "rect": [
+        96,
+        128,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.dirt.outer-sw",
+      "image": "terrain",
+      "rect": [
+        128,
+        128,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.dirt.outer-se",
+      "image": "terrain",
+      "rect": [
+        160,
+        128,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.dirt.inner-nw",
+      "image": "terrain",
+      "rect": [
+        192,
+        128,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.dirt.inner-ne",
+      "image": "terrain",
+      "rect": [
+        224,
+        128,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.dirt.inner-sw",
+      "image": "terrain",
+      "rect": [
+        0,
+        160,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "terrain.bank.dirt.inner-se",
+      "image": "terrain",
+      "rect": [
+        32,
+        160,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "resource.rock.copper.intact",
+      "image": "copper",
+      "rect": [
+        0,
+        0,
+        32,
+        40
+      ],
+      "pivot": [
+        16,
+        32
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "intended_gameplay_footprint_tiles": [
+        1,
+        1
+      ]
+    },
+    {
+      "id": "resource.rock.tin.intact",
+      "image": "tin",
+      "rect": [
+        0,
+        0,
+        32,
+        40
+      ],
+      "pivot": [
+        16,
+        32
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "intended_gameplay_footprint_tiles": [
+        1,
+        1
+      ]
+    },
+    {
+      "id": "resource.rock.depleted",
+      "image": "rubble",
+      "rect": [
+        0,
+        0,
+        32,
+        40
+      ],
+      "pivot": [
+        16,
+        32
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "intended_gameplay_footprint_tiles": [
+        1,
+        1
+      ]
+    }
+  ],
+  "provenance": {
+    "creator": "OpenAI image generation and Codex-assisted LibreSprite authoring for Adam Holland",
+    "reference": "reference/mining-reference.png",
+    "reference_sha256": "ea61c18fe72c5cc644bea4bb023d4b0ab242441cd80c3a76c48d6c39df2f6bee",
+    "notes": "Original three-panel rock reference, no third-party input. LibreSprite samples at shared scale, quantizes a twelve-colour palette and enforces binary alpha. Water, pavers and bank overlays are drawn in LibreSprite JavaScript.",
+    "licence": "No separate asset licence grant declared; repository distribution policy applies."
+  },
+  "previews": {
+    "environment-pilot-2x.png": {
+      "path": "previews/environment-pilot-2x.png",
+      "sha256": "cf1a64b354d2cc698a68985e20055ebb591cea26a6fb8409def89d798dd08933"
+    }
+  }
+}

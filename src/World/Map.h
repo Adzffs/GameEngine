@@ -15,6 +15,8 @@ public:
 
     void SetTileType(int x, int y, TileType type);
     TileType GetTileType(int x, int y);
+    // Objects retain their collision type while preserving the authored floor.
+    TileType GetGroundType(int x, int y);
 
 private:
     int width;

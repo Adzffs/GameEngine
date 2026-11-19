@@ -6,8 +6,9 @@
 
 class Map;
 class ResourceNode;
+enum class ResourceType;
 
-// One renderer-owned cache shared by the forest and cast pilots. Missing art falls back
+// One renderer-owned cache shared by the world-art batches. Missing art falls back
 // per image; initialization is the only place files are opened or decoded.
 class ForestSprites
 {
@@ -20,6 +21,8 @@ public:
     void Clear();
     bool DrawGround(Map &map, int tileX, int tileY) const;
     bool DrawTree(const ResourceNode &resource, const SDL_FRect &player) const;
+    bool DrawMining(const ResourceNode &resource) const;
+    bool HitMining(ResourceType type, int tileX, int tileY, float worldX, float worldY) const;
     bool HitTree(int tileX, int tileY, float worldX, float worldY) const;
     bool HasTree() const;
     bool HasPlayer() const;
@@ -42,6 +45,10 @@ private:
     std::array<Image, ForestPilotLayout::Images.size()> images{};
     std::array<const Frame *, 3> grass{};
     std::array<const Frame *, 16> paths{};
+    std::array<const Frame *, 3> water{}, stone{};
+    // N/E/S/W, outer NW/NE/SW/SE, inner NW/NE/SW/SE; grass, stone and bare dirt banks.
+    std::array<std::array<const Frame *, 12>, 3> banks{};
+    const Frame *copper = nullptr, *tin = nullptr, *rubble = nullptr;
     const Frame *tree = nullptr;
     const Frame *stump = nullptr;
     std::array<std::array<const Frame *, 4>, 4> player{};
@@ -53,4 +60,6 @@ private:
     SDL_FRect Bounds(const Frame &frame, float tileX, float tileY) const;
     bool Hit(const Frame *frame, int tileX, int tileY, float worldX, float worldY) const;
     bool DrawCharacter(const Frame *frame, float tileX, float tileY) const;
+    const Frame *MiningFrame(ResourceType type) const;
+    bool DrawWater(Map &map, int tileX, int tileY, const SDL_FRect &tile, std::size_t variant) const;
 };

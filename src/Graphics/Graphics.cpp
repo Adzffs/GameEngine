@@ -2743,8 +2743,9 @@ void Graphics::UpdateSpritePicking(const std::vector<ResourceNode> &resources,
     {
         if (!resource.IsActive()) continue;
         occupiedSpritePickTiles.emplace_back(resource.GetX(), resource.GetY());
-        if (resource.GetResourceType() == ResourceType::NORMAL_TREE)
-            spriteObjectTargets.push_back({resource.GetID(), resource.GetX(), resource.GetY()});
+        const auto type = resource.GetResourceType();
+        if (type == ResourceType::NORMAL_TREE || type == ResourceType::COPPER_ROCK || type == ResourceType::TIN_ROCK)
+            spriteObjectTargets.push_back({resource.GetID(), resource.GetX(), resource.GetY(), false, type});
     }
     for (const auto &station : stations)
     {
@@ -2769,13 +2770,14 @@ Graphics::WorldHoverTarget Graphics::PickSpriteObject(float worldX, float worldY
     for (auto it = spriteObjectTargets.rbegin(); it != spriteObjectTargets.rend(); ++it)
     {
         const bool hit = it->furnace ? forestSprites.HitFurnace(it->x, it->y, worldX, worldY)
-            : forestSprites.HitTree(it->x, it->y, worldX, worldY);
+            : it->resourceType == ResourceType::NORMAL_TREE ? forestSprites.HitTree(it->x, it->y, worldX, worldY)
+            : forestSprites.HitMining(it->resourceType, it->x, it->y, worldX, worldY);
         if (!hit) continue;
         const SDL_FRect bounds{static_cast<float>(it->x * TileSize),
             static_cast<float>(it->y * TileSize), static_cast<float>(TileSize), static_cast<float>(TileSize)};
         if (it->furnace) return {WorldHoverTargetType::STATION, it->id, bounds, "Furnace", "Smelt"};
         return {WorldHoverTargetType::RESOURCE, it->id, bounds,
-            ResourceDatabase::Get(ResourceType::NORMAL_TREE).GetName(), "Gather"};
+            ResourceDatabase::Get(it->resourceType).GetName(), "Gather"};
     }
     return {};
 }
@@ -4087,7 +4089,7 @@ void Graphics::DrawResources(
 
 void Graphics::DrawResource(const ResourceNode &resource)
 {
-    if (worldArtEnabled && forestSprites.DrawTree(resource, visualPlayerRectangle)) return;
+    if (worldArtEnabled && (forestSprites.DrawTree(resource, visualPlayerRectangle) || forestSprites.DrawMining(resource))) return;
     float tileX =
         static_cast<float>(
             resource.GetX() * TileSize);
