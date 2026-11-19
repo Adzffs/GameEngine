@@ -46,6 +46,7 @@ public:
 
     bool Initialize();
     void ShowGameGuide() { gameGuideVisible = true; }
+    void SetCompiledMapLabelsVisible(bool visible) { compiledMapLabelsVisible = visible; }
     void ProcessEvents(bool &running);
     bool ConsumeClickedTile(int &tileX, int &tileY);
     bool ConsumeClickedTile(
@@ -537,6 +538,7 @@ private:
     Uint64 lastPresentationTick = 0;
     float presentationDeltaSeconds = 1.0f / 60.0f;
     bool gameGuideVisible = false;
+    bool compiledMapLabelsVisible = true;
     bool showGrid = false;
     float mouseX = 0.0f;
     float mouseY = 0.0f;

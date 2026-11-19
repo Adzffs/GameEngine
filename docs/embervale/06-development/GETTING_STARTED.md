@@ -13,6 +13,7 @@
 | Play a selected starter snapshot | Client ON; `GameEngine --world <file>` | Yes |
 | Export compiled starter content | `EmbervaleWorldExport`, content tools ON (default) | No in headless configuration |
 | Play a normal starting character | `GameEngine --profile fresh` (temporary by default) | Yes |
+| Play the River Crossing blockout | `GameEngine --world content/worlds/river-crossing.blockout.json --profile fresh --no-save` | Yes |
 | Edit maps in Embervale Studio | Python/Tk shell with `EmbervaleWorldMove`; see the [editor guide](../04-studio/VISUAL_WORLD_EDITOR.md) | SDL3 only for game play |
 
 The project uses C++20 and CMake 3.20 or newer. It defines `GameEngineCore`, an optional `GameEngine` client and tests controlled by `BUILD_TESTING`. `GAMEENGINE_BUILD_CLIENT` defaults ON; the default for graphics tests follows that option. Set both flags explicitly when creating a headless build. [Source: CMakeLists.txt](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/CMakeLists.txt).

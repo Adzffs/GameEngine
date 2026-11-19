@@ -44,6 +44,8 @@ Engine::Engine()
 Engine::Engine(EngineConfiguration configuration)
     : world(configuration.starterWorldSnapshot), playerID(-1), newPlayerMode(configuration.newPlayerMode)
 {
+    // The old area's fixed pixel labels do not describe an imported map.
+    graphics.SetCompiledMapLabelsVisible(!configuration.starterWorldSnapshot.has_value());
     if (configuration.developmentPlayerSavePath.has_value())
     {
         playerPersistenceLifecycle =

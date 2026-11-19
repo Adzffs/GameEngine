@@ -1,14 +1,14 @@
 # Export the current starter world
 
-**Scope:** Read-only export of compiled initial content. [Runtime validation and loading](STARTER_WORLD_IMPORT.md) are separate implemented entry points; shared map editing remains planned.\
-**Format:** `embervale.starter-world-snapshot`, schema version `1`.\
+**Scope:** Read-only compiled baseline export, plus explicit authoring of the separate River Crossing candidate. [Runtime validation/loading](STARTER_WORLD_IMPORT.md) and [shared visual editing](VISUAL_WORLD_EDITOR.md) use the same bounded model.\
+**Format:** `embervale.starter-world-snapshot`; default baseline schema `1`, River Crossing candidate schema `2`.\
 **Implementation:** [snapshot model and writer](../../../src/Content/Export/StarterWorldSnapshot.h), [command entry point](../../../src/Tools/WorldExportMain.cpp).
 
 ## What this makes possible
 
 The current starter area's geography can now be inspected as one deterministic JSON document. It includes the ground beneath objects, every resource and workstation, and all ten NPC/monster spawn definitions, including actors created only after the first player is registered. The checked-in [baseline snapshot](../../../tests/fixtures/content/development-starter.snapshot.json) is a reviewable reference for runtime parity and editing work.
 
-Normal startup constructs the compiled world. `GameEngine --world <snapshot.json>` explicitly selects a validated snapshot, including supported terrain and placement-coordinate changes. The exporter always captures the compiled baseline, irrespective of which content a game instance is using. See [Starter-world import](STARTER_WORLD_IMPORT.md) for the exact input contract and isolated playtest behaviour.
+Normal startup constructs the compiled world. `GameEngine --world <snapshot.json>` explicitly selects a validated snapshot, including supported terrain and placement-coordinate changes. The no-argument exporter captures the compiled baseline, irrespective of which content a game instance is using. `--river-crossing` explicitly builds the separate runtime-validated [River Crossing candidate](../../../content/worlds/README.md); it does not alter that baseline. See [Starter-world import](STARTER_WORLD_IMPORT.md) for the exact input contract and isolated playtest behaviour.
 
 ## Build and run
 
@@ -28,8 +28,9 @@ On Windows, use the corresponding executable in your build directory, for exampl
 | Invocation | Result |
 |---|---|
 | `EmbervaleWorldExport` | Canonical JSON on standard output; no progress messages mixed into JSON |
+| `EmbervaleWorldExport --river-crossing` | Canonical schema-2 River Crossing candidate, with full production content validation before output |
 | `EmbervaleWorldExport --help` | Usage and scope |
-| `EmbervaleWorldExport --version` | Exporter snapshot schema version |
+| `EmbervaleWorldExport --version` | Default compiled-baseline schema version (1) |
 | Any other arguments | Exit `2`, diagnostic on standard error, empty standard output |
 | Capture, validation or output failure | Exit `1` with a diagnostic |
 | Successful operation | Exit `0` |
@@ -37,6 +38,11 @@ On Windows, use the corresponding executable in your build directory, for exampl
 The exporter accepts no input filename and has no `--output`, edit or save option. Shell redirection chooses the destination and can overwrite that destination; use a new output filename when keeping a previous snapshot. The executable does not inspect player saves, enter the game lifecycle, or create files in its working directory.
 
 ## What the document contains
+
+The table below describes the default compiled-baseline export. The named River
+Crossing candidate uses the same terrain/placement contract with arrival `(5,28)`,
+31 placements (18 resources, 3 stations, 10 actor records), schema 2 and allocation
+counter 12. Its authoring source is [RiverCrossingBlockout.cpp](../../../src/Tools/RiverCrossingBlockout.cpp).
 
 | Section | Meaning |
 |---|---|
@@ -61,7 +67,7 @@ Live state is excluded: player inventory, current health, wandering positions, r
 
 The in-memory writer accepts dimensions from 1 through 1024, at most 4096 placements, and identity strings of 1–128 characters from lowercase ASCII letters, digits, `.`, `_` and `-`. Rows must exactly match the dimensions and use only `G`, `D`, `S` and `W`. Positions must be within bounds; placement IDs and stage/order pairs must be unique. Typed definition bindings and spawn fields are checked for consistency.
 
-The actual exporter captures only the current compiled 100×100 baseline and its explicit registry. These writer limits do not declare larger-map gameplay support or define a hostile-file parser policy. The [runtime validator](STARTER_WORLD_IMPORT.md) additionally enforces the exact 100×100 starter registry, overlap/terrain rules, player-spawn clearance and reachable approaches. Larger or general authoring formats remain separate work.
+The default exporter captures the current compiled 100×100 baseline and its explicit registry. The explicit `--river-crossing` builder authors another 100×100 candidate with bounded allocated resources and retained actor bindings/lifecycle. These writer limits do not declare larger-map gameplay support or define a hostile-file parser policy. The [runtime validator](STARTER_WORLD_IMPORT.md) additionally enforces the exact 100×100 starter registry, overlap/terrain rules, player-spawn clearance and reachable approaches. Larger or general authoring formats remain separate work.
 
 ## Identity and ordering
 
@@ -92,7 +98,7 @@ See the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18
 
 ## Input and runtime use
 
-The [bounded parser and runtime importer](STARTER_WORLD_IMPORT.md) accept schema-1 documents containing the complete current identity registry. They validate supported geography before runtime construction and preserve ground, spawn authority and creation stages. Parser round-trip/rejection tests and imported-world tests supplement the original exporter checks.
+The [bounded parser and runtime importer](STARTER_WORLD_IMPORT.md) accept schema 1 with the complete baseline registry, schema 2 with bounded object allocations/removals, and schema 3 with supported spawn settings. They validate supported geography before runtime construction and preserve ground, spawn authority and creation stages. Parser round-trip/rejection tests and imported-world tests supplement the original exporter checks.
 
 The current input path has a 2 MiB byte budget and independent limits for nesting, total values, strings and containers. It accepts ASCII schema strings and rejects unknown fields, identities, changed spawn settings and unsupported features. Runtime use remains restricted to the existing 100×100 region. The import guide documents all limits, commands and save isolation.
 

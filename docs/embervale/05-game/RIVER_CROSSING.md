@@ -1,9 +1,32 @@
 # River Crossing: geography and settlement blockout
 
-**Status:** Proposed candidate for future authoring and playtesting. No map in this document has been implemented or accepted as final geography.  
-**Reviewed:** 18 November 2026.  
+**Status:** First loadable/editable candidate implemented. Game/tool builds and production content validation passed. Dynamic/visible and pacing acceptance are deferred at the owner's request; this is not final geography.\
+**Reviewed:** 19 November 2026.\
 **Design constraints:** Balanced starter experience; no central service core; flat ground first; preserve the existing development world during migration.  
 **Related:** [Game design](GAME_DESIGN.md), [content catalogue](CONTENT_CATALOGUE.md), [Studio workflows](../04-studio/EDITOR_WORKFLOWS.md).
+
+## Current candidate
+
+The [world pack](../../../content/worlds/README.md) contains the loadable
+[snapshot](../../../content/worlds/river-crossing.blockout.json) and an
+[overview rendered from its actual data](../../../content/worlds/river-crossing.overview.svg).
+The coordinates below are now authored in the first candidate. Seven building
+reservations are walkable stone pads; a stone quarry yard, a passive clearing
+and a narrow southeast encounter trail extend the base plan. The overview below
+shows the delivered terrain and placements.
+
+![Authored River Crossing blockout, with two land causeways and the placed services, resources and cast.](../../../content/worlds/river-crossing.overview.svg)
+
+Launch from the repository root on Windows:
+
+```powershell
+.\build-client\GameEngine.exe --world content\worlds\river-crossing.blockout.json --profile fresh --no-save
+```
+
+Use Studio's **Open draft** for the same JSON, or follow the world-pack command.
+The existing compiled world and its fixture are retained. The candidate uses
+schema 2 and the bounded legacy region token; a separate region registry and
+transitions remain future work. [Implementation and deferred acceptance](../06-development/RIVER_CROSSING_BLOCKOUT_2026-11-19.md).
 
 ## 1. What this candidate tests
 
@@ -31,7 +54,7 @@ This is deliberately a coordinate-complete starting hypothesis for routes and ke
 | Proposed test-player arrival | `(5,28)`; does not replace the current `(0,0)` default |
 | Road width | Three passable tiles for the two main loops, narrower paths only after testing |
 | Building rectangles | Reserved visual/functional footprints, not completed buildings or automatic collision masks |
-| Suggested region identity | A new River Crossing candidate identity, assigned through the future content registry |
+| Candidate identity | `content/worlds/river-crossing.blockout.json`; bounded legacy region token retained until general region identity is implemented |
 
 The existing map is also 100×100, but equal dimensions do not make this candidate save-compatible. The old spawn, seeded pond, placements and lifecycle need their own preserved parity fixture. Source: [DevelopmentWorldContent.h](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/World/Development/DevelopmentWorldContent.h).
 
@@ -149,7 +172,7 @@ Use a single strong landmark per district rather than many equally bright object
 
 Before any subjective playtest, check bounds, water collision, unique IDs, placement overlap, approach access, door access, both crossing routes and connections from arrival to every mandatory service. Verify diagonal movement around riverbanks and occupied tiles using the same rules as the runtime.
 
-Run a complete beginner route with a recorded starting profile. Current development defaults award extra skill XP, so a normal debug start cannot establish beginner pacing. The source enables test-player bonuses of 2,000 Woodcutting XP and 5,000 each in Mining and Smithing; player construction also provides Bronze axe and Bronze pickaxe under development defaults. Sources: [DevelopmentConfig.h](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Core/DevelopmentConfig.h), [Player.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Player/Player.cpp).
+Run a complete beginner route with a recorded starting profile. Use **Fresh player** in Studio or `--profile fresh --no-save`; the [fresh-player contract](FRESH_PLAYER_PROFILE.md) records starting skills, tools and tutorial state. Current development defaults award extra skill XP, so a normal debug start cannot establish beginner pacing. The source enables test-player bonuses of 2,000 Woodcutting XP and 5,000 each in Mining and Smithing; player construction also provides Bronze axe and Bronze pickaxe under development defaults. Sources: [DevelopmentConfig.h](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Core/DevelopmentConfig.h), [Player.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Player/Player.cpp).
 
 | Question | Measurement | Change if it fails |
 |---|---|---|
@@ -160,10 +183,10 @@ Run a complete beginner route with a recorded starting profile. Current developm
 | Do both crossings matter? | Route usage and stated reasons | Shorten, repurpose or remove an unused loop |
 | Does recovery work? | Path from respawn to recovery and ability to resume | Revisit spawn, recovery rules or encounter access |
 
-Record the map hash, game commit, player profile, tester experience, problems and proposed change for each session. Publish a candidate only after its validation report and playtest findings are attached. Keep the prior candidate available for comparison.
+Record the map hash, game commit, player profile, tester experience, problems and proposed change for each session. Attach validation results and clearly record deferred playtest findings when sharing a candidate. The owner authorized implementation with tests deferred; no balance/final-geography acceptance is implied. Keep the prior candidate available for comparison.
 
 ## 9. Implementation sequence
 
-First preserve and export the current world. Next prove one resource move through the shared content pipeline. Then author this candidate's ground, water and roads; inspect its connectivity before placing any NPC. Add the three services and existing cast, followed by beginner resources. Add progression resources and encounters only after the safe loop works. Finally add building shells and a limited decoration pass.
+The compiled fixture, shared content editing, fresh-player profile and first authored River Crossing ground/routes/placements are now delivered. Static content validation accepts the candidate. Dynamic safety, quest completion, both crossing routes and first-upgrade pacing remain deferred acceptance work. Next tune the starter resource/upgrade/economy loop, then use player observations to refine travel and content density. Building shells and a limited decoration pass remain later presentation work.
 
 Introduce custom art after the blockout answers the route and density questions. Add height only after an isolated engine test proves movement, interaction, rendering and saves across surfaces. The settlement plan should support those later improvements without depending on them for its first useful version.
