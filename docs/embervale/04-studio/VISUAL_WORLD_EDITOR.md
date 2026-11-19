@@ -104,12 +104,21 @@ They are read-only display options and do not enter history or saved content.
 Build the SDL client and launch Studio with `--tool build-client/EmbervaleWorldMove.exe`
 on Windows (omit `.exe` elsewhere). **Play this draft** prompts to save unsaved
 changes, validates a private temporary snapshot through the C++ importer, then
-launches the adjacent `GameEngine` with `--world <private-copy> --no-save`.
+launches the adjacent `GameEngine` with `--world <private-copy> --no-save --profile fresh`
+by default. Select **Development** next to the button to use the boosted
+development character instead. **Fresh player** starts at level 1 with bronze
+tools, the normal tutorial and no developer godsword. See the [fresh-player
+contract](../05-game/FRESH_PLAYER_PROFILE.md). The selector affects the next
+launch and neither profile reads or writes a persistent save.
 Use `--game <executable>` when the game lives elsewhere. Closing or cancelling
 the save dialog keeps editing without starting a game. The private snapshot
 remains available until the game exits, then is removed. A running playtest
 disables another launch and Studio asks you to close the game before exiting.
 Player progress is temporary; the source world and player saves are untouched.
+
+The new profile selector builds successfully and its Python syntax check
+passes. Runtime/visible acceptance for the profile change is deferred at the
+owner's request; the earlier button acceptance below predates profile selection.
 
 On 19 November 2026 the button was exercised visibly on Windows against the
 real SDL client: it launched the saved world, showed the moved tree, disabled

@@ -9,10 +9,10 @@
 EntityManager::EntityManager()
 {
 }
-int EntityManager::CreatePlayer()
+int EntityManager::CreatePlayer(PlayerInitializationMode initializationMode)
 {
     int playerID = GetNextEntityIDCandidate();
-    return RegisterPreparedPlayer(std::make_unique<Player>(playerID));
+    return RegisterPreparedPlayer(std::make_unique<Player>(playerID, initializationMode));
 }
 
 int EntityManager::GetNextEntityIDCandidate() const

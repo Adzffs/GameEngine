@@ -117,8 +117,13 @@ actor bindings/lifecycle and historical schema-1/2 restrictions; named NPCs rema
 stationary. This follow-up also builds successfully, with tests deferred at the owner's request.
 See the [home movement record](../06-development/STUDIO_SPAWN_MOVE_REVIEW_2026-11-19.md) and
 [spawn-settings record](../06-development/STUDIO_SPAWN_SETTINGS_2026-11-19.md).
-The flat River Crossing blockout also needs the genuine fresh-player profile
-(GAME-001).
+GAME-001 now implements an explicit fresh-player profile: level-1/zero-XP skills,
+bronze gathering tools, normal tutorial/quest/recipe state and no developer weapon.
+`--profile fresh` has no implicit save; Studio defaults to a temporary fresh start
+with a development-profile option. Existing selected saves retain their progress.
+Game/tool builds passed; runtime and visible acceptance remain deferred at the
+owner's request. See the [profile contract](../05-game/FRESH_PLAYER_PROFILE.md).
+The next gameplay implementation is the flat River Crossing blockout (GAME-002).
 
 **Goal:** Make one real content change safely from end to end.
 

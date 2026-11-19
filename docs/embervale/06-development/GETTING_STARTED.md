@@ -12,7 +12,8 @@
 | Validate a starter snapshot | `EmbervaleWorldValidate`, content tools ON | No in headless configuration |
 | Play a selected starter snapshot | Client ON; `GameEngine --world <file>` | Yes |
 | Export compiled starter content | `EmbervaleWorldExport`, content tools ON (default) | No in headless configuration |
-| Edit maps in Embervale Studio | Future roadmap deliverable | GUI/backend still to be selected |
+| Play a normal starting character | `GameEngine --profile fresh` (temporary by default) | Yes |
+| Edit maps in Embervale Studio | Python/Tk shell with `EmbervaleWorldMove`; see the [editor guide](../04-studio/VISUAL_WORLD_EDITOR.md) | SDL3 only for game play |
 
 The project uses C++20 and CMake 3.20 or newer. It defines `GameEngineCore`, an optional `GameEngine` client and tests controlled by `BUILD_TESTING`. `GAMEENGINE_BUILD_CLIENT` defaults ON; the default for graphics tests follows that option. Set both flags explicitly when creating a headless build. [Source: CMakeLists.txt](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/CMakeLists.txt).
 
@@ -90,7 +91,7 @@ No-argument startup uses the compiled world and `saves/development-player.save`,
 
 Keep ordinary development saves separate from test fixtures. Before a save-related experiment, preserve a copy and record the launch directory. Do not delete your save as a routine troubleshooting step. Normal controlled shutdown is the documented save boundary; a forced termination is not guaranteed to preserve progress. [Source: DevelopmentPlayerPersistence.md](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/docs/DevelopmentPlayerPersistence.md).
 
-The current `ENABLE_TEST_PLAYER` setting is true. New development-default players receive boosted Woodcutting, Mining and Smithing XP. A newly created development save is consequently not a genuine unboosted starter account. The roadmap includes a dedicated fresh-player test profile before measuring onboarding and upgrade pacing. [Sources: DevelopmentConfig.h](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Core/DevelopmentConfig.h), [Player.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Player/Player.cpp).
+The current `ENABLE_TEST_PLAYER` setting is true. New development-default players receive boosted Woodcutting, Mining and Smithing XP. A newly created development save is consequently not a genuine unboosted starter account. Use `GameEngine --profile fresh` for level-1/zero-XP skills, bronze gathering tools and no developer godsword. Fresh launches have no implicit save, including compiled-world play. Studio defaults to **Fresh player**, with a temporary **Development** option. An explicitly selected existing save restores its saved progress rather than resetting it. The [fresh-player contract](../05-game/FRESH_PLAYER_PROFILE.md) specifies the full starting state; runtime and visible acceptance remain deferred at the owner's request. [Sources: DevelopmentConfig.h](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Core/DevelopmentConfig.h), [Player.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Player/Player.cpp).
 
 ## 6. VS Code and other editors
 

@@ -56,7 +56,8 @@ Player::Player(
       healthPool(1)
 {
     if (initializationMode ==
-        PlayerInitializationMode::DEVELOPMENT_DEFAULTS)
+        PlayerInitializationMode::DEVELOPMENT_DEFAULTS ||
+        initializationMode == PlayerInitializationMode::FRESH_START)
     {
         inventory.AddItem(
             ItemType::BRONZE_AXE,
@@ -66,7 +67,8 @@ Player::Player(
             ItemType::BRONZE_PICKAXE,
             1);
 
-        if (DevelopmentConfig::ENABLE_TEST_PLAYER)
+        if (initializationMode == PlayerInitializationMode::DEVELOPMENT_DEFAULTS &&
+            DevelopmentConfig::ENABLE_TEST_PLAYER)
         {
             skills.AddXP(
                 SkillType::WOODCUTTING,

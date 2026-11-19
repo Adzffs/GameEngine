@@ -1,6 +1,7 @@
 #pragma once
 
 #include "WorldPlayerPersistenceLifecycleResult.h"
+#include "../Player/PlayerInitializationMode.h"
 
 #include <filesystem>
 #include <optional>
@@ -18,7 +19,8 @@ enum class WorldPlayerPersistenceLifecycleState
 class WorldPlayerPersistenceLifecycle
 {
 public:
-    explicit WorldPlayerPersistenceLifecycle(std::filesystem::path savePath);
+    explicit WorldPlayerPersistenceLifecycle(std::filesystem::path savePath,
+        PlayerInitializationMode newPlayerMode = PlayerInitializationMode::DEVELOPMENT_DEFAULTS);
 
     WorldPlayerPersistenceStartupResult Start(World &world);
     WorldPlayerPersistenceOperationResult SaveNow(const World &world);
@@ -32,6 +34,7 @@ private:
     WorldPlayerPersistenceOperationResult SaveActivePlayer(const World &world);
 
     std::filesystem::path savePath;
+    PlayerInitializationMode newPlayerMode;
     WorldPlayerPersistenceLifecycleState state =
         WorldPlayerPersistenceLifecycleState::NOT_STARTED;
     std::optional<int> playerEntityID;

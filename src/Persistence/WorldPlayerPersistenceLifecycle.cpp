@@ -5,8 +5,8 @@
 #include <utility>
 
 WorldPlayerPersistenceLifecycle::WorldPlayerPersistenceLifecycle(
-    std::filesystem::path savePath)
-    : savePath(std::move(savePath))
+    std::filesystem::path savePath, PlayerInitializationMode newPlayerMode)
+    : savePath(std::move(savePath)), newPlayerMode(newPlayerMode)
 {
 }
 
@@ -29,7 +29,7 @@ WorldPlayerPersistenceStartupResult WorldPlayerPersistenceLifecycle::Start(World
         return result;
     }
 
-    WorldPlayerLoadResult worldResult = world.LoadOrCreatePlayerFromFile(savePath);
+    WorldPlayerLoadResult worldResult = world.LoadOrCreatePlayerFromFile(savePath, newPlayerMode);
     const bool loaded = worldResult.WasLoadedFromFile();
     const bool created = worldResult.WasCreatedNew();
     const int runtimeID = worldResult.GetPlayerEntityID();

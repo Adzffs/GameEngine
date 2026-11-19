@@ -33,6 +33,7 @@ private:
     TickPerformanceStats tickPerformanceStats;
 
     int playerID = -1;
+    PlayerInitializationMode newPlayerMode = PlayerInitializationMode::DEVELOPMENT_DEFAULTS;
     bool initializationSucceeded = false;
     std::unique_ptr<WorldPlayerPersistenceLifecycle> playerPersistenceLifecycle;
 
