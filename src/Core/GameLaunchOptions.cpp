@@ -9,6 +9,7 @@ GameLaunchOptions ParseGameLaunchOptions(std::span<const std::string_view> argum
     GameLaunchOptions options;
     bool compiledWorld = false;
     bool noSave = false;
+    bool profileSelected = false;
     if (arguments.size() == 1 && arguments.front() == "--help")
     {
         options.showHelp = true;
@@ -28,6 +29,21 @@ GameLaunchOptions ParseGameLaunchOptions(std::span<const std::string_view> argum
             if (noSave || options.playerSavePath)
                 throw std::invalid_argument("select either --save or --no-save");
             noSave = true;
+        }
+        else if (argument == "--profile")
+        {
+            if (profileSelected)
+                throw std::invalid_argument("select exactly one player profile");
+            if (i + 1 == arguments.size())
+                throw std::invalid_argument("missing profile after --profile (fresh or development)");
+            const auto profile = arguments[++i];
+            if (profile == "fresh")
+                options.newPlayerMode = PlayerInitializationMode::FRESH_START;
+            else if (profile == "development")
+                options.newPlayerMode = PlayerInitializationMode::DEVELOPMENT_DEFAULTS;
+            else
+                throw std::invalid_argument("unknown player profile: " + std::string(profile));
+            profileSelected = true;
         }
         else if (argument == "--world" || argument == "--save")
         {
@@ -51,7 +67,8 @@ GameLaunchOptions ParseGameLaunchOptions(std::span<const std::string_view> argum
         else
             throw std::invalid_argument("unknown argument: " + std::string(argument));
     }
-    if (!options.playerSavePath && !noSave && !options.worldSnapshotPath)
+    if (!options.playerSavePath && !noSave && !options.worldSnapshotPath &&
+        options.newPlayerMode == PlayerInitializationMode::DEVELOPMENT_DEFAULTS)
         options.playerSavePath = std::filesystem::path{"saves"} / "development-player.save";
     return options;
 }
@@ -88,13 +105,17 @@ void ValidateGameLaunchPaths(const GameLaunchOptions &options)
 std::string_view GameLaunchUsage()
 {
     return "Usage: GameEngine [--world <snapshot.json> | --compiled-world] "
-        "[--save <player.save> | --no-save]\n"
+        "[--save <player.save> | --no-save] [--profile fresh|development]\n"
         "       GameEngine --help\n"
         "\n"
         "No arguments: use the compiled starter world and normal development save.\n"
         "--world: validate and load the selected starter snapshot; a bad file fails startup.\n"
         "Imported-world playtests keep progress temporary unless --save is supplied.\n"
         "--compiled-world: explicitly select the original starter content.\n"
+        "--profile fresh: new characters get normal starting skills and bronze tools, with no developer equipment.\n"
+        "Fresh starts keep progress temporary unless --save is supplied.\n"
+        "--profile development: use the existing boosted development defaults (the default profile).\n"
+        "Profiles apply only when creating a character; an existing selected save retains its progress.\n"
         "--save: use the selected player save file.\n"
         "--no-save: do not read or write a player save.\n";
 }

@@ -23,6 +23,7 @@ SOURCE_HASH = re.compile(r"^Source SHA-256: ([0-9a-f]{64})$", re.MULTILINE)
 PLACEMENT = re.compile(r"^([RSMN])  ([A-Za-z0-9._-]+)  \((\d+), (\d+)\)", re.MULTILINE)
 KINDS = {"R": "Resource", "S": "Station", "N": "NPC spawn", "M": "Monster spawn"}
 MAX_COMMANDS = 256
+PLAYTEST_PROFILES = {"Fresh player": "fresh", "Development": "development"}
 EditorResponse = tuple[str, dict[str, tuple[str, int, int]], str, list[str], str, dict]
 REPLAYABLE_EDIT = re.compile(r"(?:move [A-Za-z0-9._-]+ [0-9]+ [0-9]+|place [a-z0-9._-]+ [0-9]+ [0-9]+|remove [A-Za-z0-9._-]+|spawn [A-Za-z0-9._-]+ [0-9]+ [0-9]+ [0-9]+ [01] [0-9]+|paint [0-9]+ [0-9]+ [GDSW]|undo|redo)\Z")
 SPAWN_FIELDS = ("wander_radius", "wander_interval_ticks", "maximum_active_count",
@@ -569,7 +570,9 @@ class DraftPlaytest:
             self.directory = None
         return result
 
-    def start(self, bridge: StudioBridge, game: Path) -> None:
+    def start(self, bridge: StudioBridge, game: Path, profile: str = "fresh") -> None:
+        if profile not in PLAYTEST_PROFILES.values():
+            raise StudioError("Select a fresh-player or development playtest profile")
         if self.process is not None and self.poll() is None:
             raise StudioError("A draft playtest is already running")
         if bridge.dirty:
@@ -591,7 +594,8 @@ class DraftPlaytest:
                 snapshot.write_bytes(content)
                 # Validate the exact private bytes through the C++ runtime importer.
                 StudioBridge(Path(bridge.executable).resolve(), snapshot)
-                process = subprocess.Popen([str(game), "--world", str(snapshot), "--no-save"],
+                process = subprocess.Popen([str(game), "--world", str(snapshot), "--no-save",
+                    "--profile", profile],
                     cwd=directory.name)
             except BaseException:
                 directory.cleanup()
@@ -616,6 +620,7 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
     selected: str | None = None
     brush = tk.StringVar(value="Select / move")
     object_choice = tk.StringVar(value="Normal tree")
+    playtest_profile = tk.StringVar(value="Fresh player")
     show_collision = tk.BooleanVar(value=False)
     show_spawns = tk.BooleanVar(value=False)
     show_reachability = tk.BooleanVar(value=False)
@@ -960,7 +965,7 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
         if bridge.dirty and not save():
             return
         try:
-            playtest.start(bridge, game)
+            playtest.start(bridge, game, PLAYTEST_PROFILES[playtest_profile.get()])
             play_button.configure(state="disabled", text="Playtest running")
             root.after(250, check_playtest)
         except StudioError as error:
@@ -1008,7 +1013,9 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
                     command=display).pack(side="left", padx=4)
     play_button = ttk.Button(filebar, text="Play this draft", command=play)
     play_button.pack(side="right")
-    ttk.Label(filebar, text="Playtests use temporary progress").pack(side="right", padx=8)
+    ttk.Combobox(filebar, textvariable=playtest_profile, state="readonly", width=13,
+                 values=tuple(PLAYTEST_PROFILES)).pack(side="right", padx=4)
+    ttk.Label(filebar, text="Temporary progress").pack(side="right", padx=4)
     ttk.Button(filebar, text="Open draft…", command=open_world).pack(side="left")
     ttk.Button(filebar, text="Reopen last saved", command=lambda: open_world(bridge.last_saved)
         if bridge.last_saved else messagebox.showinfo("No saved draft", "Save a new draft first.", parent=root)).pack(side="left", padx=4)

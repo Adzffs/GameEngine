@@ -20,7 +20,8 @@ class EntityManager
 public:
     EntityManager();
 
-    int CreatePlayer();
+    int CreatePlayer(PlayerInitializationMode initializationMode =
+        PlayerInitializationMode::DEVELOPMENT_DEFAULTS);
 
     int CreateNPC(int x, int y, NpcType npcType = NpcType::NONE,
                   NpcSpawnId spawnId = NpcSpawnId::NONE);

@@ -409,9 +409,9 @@ void World::CreateStation(
         y,
         TileType::STATION);
 }
-int World::CreatePlayer()
+int World::CreatePlayer(PlayerInitializationMode initializationMode)
 {
-    const int playerID = entityManager.CreatePlayer();
+    const int playerID = entityManager.CreatePlayer(initializationMode);
     if (playerID > 0)
     {
         const Position spawn = GetStarterPlayerSpawn();
@@ -467,7 +467,8 @@ void World::EnsureStarterSupportingCharacters()
 }
 
 WorldPlayerLoadResult World::LoadOrCreatePlayerFromFile(
-    const std::filesystem::path &savePath)
+    const std::filesystem::path &savePath,
+    PlayerInitializationMode newPlayerMode)
 {
     const Position playerSpawn = GetStarterPlayerSpawn();
     WorldPlayerLoadResult result;
@@ -499,7 +500,7 @@ WorldPlayerLoadResult World::LoadOrCreatePlayerFromFile(
         }
         candidateID = entityManager.GetNextEntityIDCandidate();
         player = std::make_unique<Player>(
-            candidateID, PlayerInitializationMode::DEVELOPMENT_DEFAULTS);
+            candidateID, newPlayerMode);
         player->GetPosition().SetPosition(playerSpawn.GetX(), playerSpawn.GetY());
     }
     else

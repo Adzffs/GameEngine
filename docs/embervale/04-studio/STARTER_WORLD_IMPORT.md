@@ -81,6 +81,9 @@ If SDL3 is installed in a private prefix, add `-DCMAKE_PREFIX_PATH=/absolute/pat
 | `--compiled-world --no-save` | Original compiled starter world | Temporary |
 | `--save saves/alternate.save` | Original compiled starter world | Explicit alternate save |
 | `--no-save` | Original compiled starter world | Temporary |
+| `--profile fresh` | Original compiled starter world | Temporary normal starting character |
+| `--world candidate.json --profile fresh` | Validated selected snapshot | Temporary normal starting character |
+| `--profile fresh --save saves/fresh.save` | Compiled world, or selected `--world` | Explicit save; fresh defaults only if a new character is created |
 | `--help` | No game startup | Show usage only |
 
 All relative paths resolve from the process working directory. Duplicate world selectors, `--world` with `--compiled-world`, duplicate save selectors, `--save` with `--no-save`, missing values and unknown arguments are rejected before game startup. Invalid arguments return `2`; a selected-content startup failure returns `1`.
@@ -93,7 +96,7 @@ For a persistent map playtest, select a dedicated save explicitly:
 
 The save target and its `.tmp` and `.bak` recovery paths must be separate from the world input. Startup checks normalized paths and existing file aliases, including symlinks and hard links, to prevent the player-save transaction from replacing the selected content. This is startup path validation, not a general concurrent-filesystem transaction guarantee.
 
-Omitting `--save` during an imported-world playtest avoids reading or changing the normal development save. Normal controlled shutdown remains the persistence boundary when a save is selected. Temporary players still use existing development-player defaults, including skill boosts; they do not establish the planned unboosted starter profile.
+Omitting `--save` during an imported-world playtest avoids reading or changing the normal development save. Normal controlled shutdown remains the persistence boundary when a save is selected. The CLI retains development defaults unless `--profile fresh` is selected. Fresh characters start with normal skills and bronze tools, without developer XP/equipment. Fresh compiled-world launches also have no implicit save. Studio defaults to fresh temporary play and offers a development option. Profiles apply only to new characters; an existing explicitly selected save restores its own progress. See the [fresh-player contract](../05-game/FRESH_PLAYER_PROFILE.md).
 
 ## 4. Input contract
 

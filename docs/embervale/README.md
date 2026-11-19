@@ -12,12 +12,13 @@
 | What should we do next? | [Master roadmap](02-roadmap/MASTER_ROADMAP.md) |
 | What task can I pick up? | [Backlog](02-roadmap/BACKLOG.md) |
 | How do I run the game? | [Getting started](06-development/GETTING_STARTED.md) |
+| How do I start without development boosts? | [Fresh-player profile](05-game/FRESH_PLAYER_PROFILE.md) |
 | Export the actual starter world? | [Starter-world export](04-studio/STARTER_WORLD_EXPORT.md) |
 | How will the editor work? | [Studio design](04-studio/STUDIO_DESIGN.md) |
 | Where should the settlement go? | [River Crossing proposal](05-game/RIVER_CROSSING.md) |
 | What still needs resolving? | [Risk register](07-decisions/RISKS_AND_QUESTIONS.md) |
 
-The source contains substantial RPG systems, starter-world export, bounded validation and explicit runtime loading of supported starter snapshots. Shared editing, guarded saving, undo, the visual editor and the proposed geographic redesign remain planned. The runtime-import slice passed 77/77 headless and 89/89 Linux SDL tests; see the [runtime verification record](06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md) for executed source/environment evidence. The [earlier baseline/export results](06-development/BASELINE_VERIFICATION_2026-11-18.md) remain separately recorded.
+The source contains substantial RPG systems, starter-world export, bounded validation and explicit runtime loading of supported starter snapshots. Shared editing, guarded sibling saving, undo/redo and the visual editor are implemented in bounded slices. The [fresh-player profile](05-game/FRESH_PLAYER_PROFILE.md) is now available for normal starting progression, with its runtime/visible acceptance deferred at the owner's request. The proposed geographic redesign remains planned. Follow the [current backlog](02-roadmap/BACKLOG.md) for implementation status. The runtime-import slice passed 77/77 headless and 89/89 Linux SDL tests; see the [runtime verification record](06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md) for executed source/environment evidence. The [earlier baseline/export results](06-development/BASELINE_VERIFICATION_2026-11-18.md) remain separately recorded.
 
 ## Suggested reading paths
 
@@ -78,6 +79,7 @@ The source contains substantial RPG systems, starter-world export, bounded valid
 | Document | What it contains |
 |---|---|
 | [GAME_DESIGN.md](05-game/GAME_DESIGN.md) | Game pillars, progression, starter journey and expansion boundaries |
+| [FRESH_PLAYER_PROFILE.md](05-game/FRESH_PLAYER_PROFILE.md) | Normal starting skills/tools/tutorial, launch profiles and save isolation |
 | [RIVER_CROSSING.md](05-game/RIVER_CROSSING.md) | A proposed flat tile layout, roads, reservations, placements and playtest rules |
 | [CONTENT_CATALOGUE.md](05-game/CONTENT_CATALOGUE.md) | Current items, recipes, skills, NPCs, quests, stations and resources |
 | [ART_AND_AUDIO.md](05-game/ART_AND_AUDIO.md) | Small art pilot, asset pipeline, animation, sound, readability and provenance |
@@ -87,6 +89,7 @@ The source contains substantial RPG systems, starter-world export, bounded valid
 | Document | What it contains |
 |---|---|
 | [GETTING_STARTED.md](06-development/GETTING_STARTED.md) | Local CMake setup, Windows client, saves and editor guidance |
+| [FRESH_PLAYER_PROFILE_2026-11-19.md](06-development/FRESH_PLAYER_PROFILE_2026-11-19.md) | Fresh-profile implementation, successful builds and deferred acceptance |
 | [CONTRIBUTING.md](06-development/CONTRIBUTING.md) | Focused work, evidence, review, compatibility and parallel-agent handoff |
 | [TESTING.md](06-development/TESTING.md) | Current registrations, meaningful future tests and result records |
 | [RUNTIME_IMPORT_VERIFICATION_2026-11-18.md](06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md) | Runtime-input build/test results, real dummy-video launch and precise platform limits |

@@ -36,6 +36,7 @@ int main(int argc, char **argv)
     try
     {
         EngineConfiguration configuration;
+        configuration.newPlayerMode = options.newPlayerMode;
         if (options.worldSnapshotPath)
         {
             configuration.starterWorldSnapshot =

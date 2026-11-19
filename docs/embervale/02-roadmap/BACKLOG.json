@@ -131,14 +131,23 @@
       "milestone": "R0",
       "priority": "P0",
       "title": "Define a genuine fresh-player profile",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "ENG-002"
       ],
       "acceptance": "Specify non-boosted skills/items/tutorial state and disposable saves; distinguish it from current development defaults.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/05-game/FRESH_PLAYER_PROFILE.md",
+        "docs/embervale/06-development/FRESH_PLAYER_PROFILE_2026-11-19.md",
+        "src/Player/Player.cpp",
+        "src/Core/GameLaunchOptions.cpp",
+        "src/Core/Engine.cpp",
+        "src/World/World.cpp",
+        "src/Persistence/WorldPlayerPersistenceLifecycle.cpp",
+        "tools/embervale_world_editor.py"
+      ],
+      "notes": "Fresh-start initialization and --profile fresh|development are implemented through CLI/engine/world/entity creation and the missing-save lifecycle. Fresh characters start all skills at level 1/0 XP with bronze gathering tools, normal tutorial/quest/recipe defaults and no developer godsword. Fresh launches have no implicit save; explicit existing saves restore their own progress. Studio defaults to fresh temporary play with an optional development selector. Game/core/tool builds and editor Python syntax check passed. Runtime and visible acceptance are deferred at the owner's request; no pacing/balance claim is made."
     },
     {
       "id": "GAME-008",

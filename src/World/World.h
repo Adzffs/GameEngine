@@ -97,9 +97,11 @@ public:
 
     Map &GetMap();
 
-    int CreatePlayer();
+    int CreatePlayer(PlayerInitializationMode initializationMode =
+        PlayerInitializationMode::DEVELOPMENT_DEFAULTS);
     WorldPlayerLoadResult LoadOrCreatePlayerFromFile(
-        const std::filesystem::path &savePath);
+        const std::filesystem::path &savePath,
+        PlayerInitializationMode newPlayerMode = PlayerInitializationMode::DEVELOPMENT_DEFAULTS);
     WorldPlayerSaveResult SavePlayerToFile(
         int playerEntityID,
         const std::filesystem::path &savePath) const;

@@ -42,13 +42,13 @@ Engine::Engine()
 }
 
 Engine::Engine(EngineConfiguration configuration)
-    : world(configuration.starterWorldSnapshot), playerID(-1)
+    : world(configuration.starterWorldSnapshot), playerID(-1), newPlayerMode(configuration.newPlayerMode)
 {
     if (configuration.developmentPlayerSavePath.has_value())
     {
         playerPersistenceLifecycle =
             std::make_unique<WorldPlayerPersistenceLifecycle>(
-                *configuration.developmentPlayerSavePath);
+                *configuration.developmentPlayerSavePath, newPlayerMode);
     }
 
 }
@@ -82,11 +82,15 @@ bool Engine::InitializeWorldForRun()
     }
     else
     {
-        playerID = world.CreatePlayer();
+        playerID = world.CreatePlayer(newPlayerMode);
     }
 
     if (playerID <= 0) return false;
-    if (createdNew) AddDevelopmentEquipment();
+    if (createdNew && newPlayerMode == PlayerInitializationMode::DEVELOPMENT_DEFAULTS)
+        AddDevelopmentEquipment();
+    Logger::Info(std::string("Player start: ") +
+        (!createdNew ? "saved progress restored" :
+         newPlayerMode == PlayerInitializationMode::FRESH_START ? "fresh player" : "development player"));
     initializationSucceeded = true;
     return true;
 }
