@@ -44,6 +44,19 @@ void ForestSprites::Clear()
     }
     renderer = nullptr;
     roofAlphas.clear();
+    variation.Clear();
+}
+
+void ForestSprites::PrepareWorld(Map &map, const std::vector<ResourceNode> &resources,
+    const std::vector<CraftingStation> &stations, const std::vector<std::unique_ptr<Entity>> &entities)
+{
+    variation.Prepare(map, resources, stations, entities);
+}
+
+int ForestSprites::Condition(const Building &b) const
+{
+    return buildingConditionPreview >= 0 && buildingConditionPreview <= 2 ? buildingConditionPreview :
+        WorldArtVariation::BuildingCondition(b.id.c_str());
 }
 
 void ForestSprites::Initialize(SDL_Renderer *target)
@@ -52,6 +65,17 @@ void ForestSprites::Initialize(SDL_Renderer *target)
     renderer = target;
     for (const auto &frame : ForestPilotLayout::Frames)
     {
+        const auto bind = [&frame](auto &frames, std::string_view prefix)
+        {
+            if (frame.id.starts_with(prefix) && frame.grassVariant >= 0 &&
+                static_cast<std::size_t>(frame.grassVariant) < frames.size()) frames[frame.grassVariant] = &frame;
+        };
+        bind(variedGrass, "variation.grass."); bind(variedPaths, "variation.paths.");
+        bind(variedWater, "variation.water."); bind(variedStone, "variation.stone.");
+        bind(flora, "variation.flora."); bind(variedWalls, "variation.walls.");
+        bind(variedRoof, "variation.roof."); bind(variedFloors, "variation.floors.");
+        bind(variedTrees, "variation.trees."); bind(variedStumps, "variation.stumps.");
+        bind(variedRocks, "variation.rocks.");
         if (frame.id.starts_with("terrain.grass.") && frame.grassVariant >= 0 && frame.grassVariant < static_cast<int>(grass.size()))
             grass[frame.grassVariant] = &frame;
         if (frame.id.starts_with("terrain.path.") && frame.connectionMask >= 0 && frame.connectionMask < static_cast<int>(paths.size()))
@@ -161,7 +185,7 @@ bool ForestSprites::Available(const Frame *frame) const
     return frame && frame->image < images.size() && images[frame->image].texture;
 }
 
-bool ForestSprites::HasTree() const { return Available(tree); }
+bool ForestSprites::HasTree() const { return Available(tree) || Available(variedTrees[0]); }
 bool ForestSprites::HasPlayer() const { return Available(player[0][0]); }
 bool ForestSprites::HasMara() const { return Available(mara); }
 
@@ -193,15 +217,25 @@ bool ForestSprites::DrawGround(Map &map, int x, int y) const
         static_cast<float>(y * ForestPilotLayout::TileSize), 32.0f, 32.0f};
     const auto variant = (static_cast<unsigned int>(x) * 73856093U ^
                           static_cast<unsigned int>(y) * 19349663U) % grass.size();
+    const auto &cell = variation.At(x, y);
+    const auto *grassFrame = Available(variedGrass[cell.grass]) ? variedGrass[cell.grass] : grass[variant];
     if (type == TileType::GRASS)
     {
-        return Draw(grass[variant], tile);
+        if (!Draw(grassFrame, tile)) return false;
+        DressGround(cell, tile);
+        return true;
     }
     if (type == TileType::STONE)
     {
-        if (building && !building->IsWall(x, y) && !building->IsDoor(x, y) && Available(buildingFloors[variant]))
-            return Draw(buildingFloors[variant], tile);
-        return Draw(stone[variant], tile);
+        if (building && !building->IsWall(x, y) && !building->IsDoor(x, y))
+        {
+            const auto *floor = variedFloors[Condition(*building) * 3 + variant];
+            if (Available(floor)) return Draw(floor, tile);
+            if (Available(buildingFloors[variant])) return Draw(buildingFloors[variant], tile);
+        }
+        if (!Draw(Available(variedStone[cell.stone]) ? variedStone[cell.stone] : stone[variant], tile)) return false;
+        DressGround(cell, tile);
+        return true;
     }
     if (type == TileType::WATER) return DrawWater(map, x, y, tile, variant);
     if (type != TileType::DIRT) return false;
@@ -215,7 +249,10 @@ bool ForestSprites::DrawGround(Map &map, int x, int y) const
     const bool north = dirt(x, y - 1), east = dirt(x + 1, y);
     const bool south = dirt(x, y + 1), west = dirt(x - 1, y);
     const int mask = (north ? 1 : 0) | (east ? 2 : 0) | (south ? 4 : 0) | (west ? 8 : 0);
-    if (!Available(paths[mask]) || !Available(paths[15])) return false;
+    const bool transparentPaths = Available(variedPaths[cell.path * 17 + mask]) &&
+        Available(variedPaths[cell.path * 17 + 16]) && Available(grassFrame);
+    if (!transparentPaths && (!Available(paths[mask]) || !Available(paths[15]))) return false;
+    if (transparentPaths && !Draw(grassFrame, tile)) return false;
     const std::array<bool, 4> interior{{
         north && west && dirt(x - 1, y - 1), north && east && dirt(x + 1, y - 1),
         south && west && dirt(x - 1, y + 1), south && east && dirt(x + 1, y + 1)}};
@@ -224,18 +261,27 @@ bool ForestSprites::DrawGround(Map &map, int x, int y) const
     {
         const float qx = static_cast<float>((quarter % 2) * 16);
         const float qy = static_cast<float>((quarter / 2) * 16);
-        const auto *frame = interior[quarter] ? paths[15] : paths[mask];
-        const SDL_FRect source{frame->source.x + (interior[quarter] ? 8.0f : qx),
-            frame->source.y + (interior[quarter] ? 8.0f : qy), 16.0f, 16.0f};
+        const auto *frame = transparentPaths ? variedPaths[cell.path * 17 + (interior[quarter] ? 16 : mask)] :
+            interior[quarter] ? paths[15] : paths[mask];
+        const SDL_FRect source{frame->source.x + (interior[quarter] && !transparentPaths ? 8.0f : qx),
+            frame->source.y + (interior[quarter] && !transparentPaths ? 8.0f : qy), 16.0f, 16.0f};
         const SDL_FRect destination{tile.x + qx, tile.y + qy, 16.0f, 16.0f};
         if (!Draw(frame, destination, &source)) return false;
     }
+    DressGround(cell, tile);
     return true;
+}
+
+void ForestSprites::DressGround(const WorldArtVariation::Cell &cell, const SDL_FRect &tile) const
+{
+    for (const int index : {cell.leaves, cell.detail, cell.plant})
+        if (index >= 0 && index < static_cast<int>(flora.size())) Draw(flora[index], tile);
 }
 
 bool ForestSprites::DrawWater(Map &map, int x, int y, const SDL_FRect &tile, std::size_t variant) const
 {
-    if (!Available(water[variant]) || !Available(banks[0][0]) || !Available(banks[1][0]) || !Available(banks[2][0])) return false;
+    const auto *waterFrame = Available(variedWater[variation.At(x, y).water]) ? variedWater[variation.At(x, y).water] : water[variant];
+    if (!Available(waterFrame) || !Available(banks[0][0]) || !Available(banks[1][0]) || !Available(banks[2][0])) return false;
     const auto land = [&map](int tx, int ty)
     {
         return map.IsInBounds(tx, ty) && map.GetGroundType(tx, ty) != TileType::WATER;
@@ -246,7 +292,7 @@ bool ForestSprites::DrawWater(Map &map, int x, int y, const SDL_FRect &tile, std
         const auto ground = map.GetGroundType(tx, ty);
         return ground == TileType::STONE ? 1 : ground == TileType::DIRT ? 2 : 0;
     };
-    if (!Draw(water[variant], tile)) return false;
+    if (!Draw(waterFrame, tile)) return false;
     for (int quarter = 0; quarter < 4; ++quarter)
     {
         const int dx = quarter % 2 == 0 ? -1 : 1, dy = quarter < 2 ? -1 : 1;
@@ -274,8 +320,11 @@ bool ForestSprites::DrawWater(Map &map, int x, int y, const SDL_FRect &tile, std
     return true;
 }
 
-const ForestSprites::Frame *ForestSprites::MiningFrame(ResourceType type) const
+const ForestSprites::Frame *ForestSprites::MiningFrame(ResourceType type, int x, int y) const
 {
+    const auto variant = WorldArtVariation::Hash(x, y, 24) % 3;
+    if (type == ResourceType::COPPER_ROCK && Available(variedRocks[variant])) return variedRocks[variant];
+    if (type == ResourceType::TIN_ROCK && Available(variedRocks[3 + variant])) return variedRocks[3 + variant];
     if (type == ResourceType::COPPER_ROCK) return copper;
     if (type == ResourceType::TIN_ROCK) return tin;
     return nullptr;
@@ -283,15 +332,16 @@ const ForestSprites::Frame *ForestSprites::MiningFrame(ResourceType type) const
 
 bool ForestSprites::DrawMining(const ResourceNode &resource) const
 {
-    const auto *intact = MiningFrame(resource.GetResourceType());
+    const auto *intact = MiningFrame(resource.GetResourceType(), resource.GetX(), resource.GetY());
     if (!intact) return false;
-    const auto *frame = resource.IsActive() ? intact : rubble;
+    const auto *depleted = variedRocks[6 + WorldArtVariation::Hash(resource.GetX(), resource.GetY(), 24) % 3];
+    const auto *frame = resource.IsActive() ? intact : Available(depleted) ? depleted : rubble;
     return Available(frame) && Draw(frame, Bounds(*frame, resource.GetX(), resource.GetY()));
 }
 
 bool ForestSprites::HitMining(ResourceType type, int tileX, int tileY, float worldX, float worldY) const
 {
-    return Hit(MiningFrame(type), tileX, tileY, worldX, worldY);
+    return Hit(MiningFrame(type, tileX, tileY), tileX, tileY, worldX, worldY);
 }
 
 bool ForestSprites::DrawBuildingWall(const Building &b, int x, int y, const SDL_FRect &player) const
@@ -303,7 +353,11 @@ bool ForestSprites::DrawBuildingWall(const Building &b, int x, int y, const SDL_
         index = column == 0 ? 10 : column == b.width - 1 ? 11 : b.IsDoor(x, y) ? 7 :
             column == 2 || column == b.width - 3 ? 4 : 0;
     else index = column == 0 ? (row == b.height / 2 ? 5 : 2) : (row == b.height / 2 ? 6 : 3);
-    const auto *frame = buildingWalls[index];
+    const int condition = Condition(b);
+    const bool repair = row == b.height - 1 && (column == b.doorOffset + 1 || column == 1);
+    const int panelCondition = condition == 2 ? (repair ? 2 : 1) : condition;
+    const auto *varied = variedWalls[panelCondition * 24 + WorldArtVariation::Hash(x, y, 6) % 2 * 12 + index];
+    const auto *frame = Available(varied) ? varied : buildingWalls[index];
     if (!Available(frame)) return false;
     const auto bounds = Bounds(*frame, static_cast<float>(x), static_cast<float>(y));
     const bool overlap = SDL_HasRectIntersectionFloat(&bounds, &player);
@@ -313,7 +367,15 @@ bool ForestSprites::DrawBuildingWall(const Building &b, int x, int y, const SDL_
 
 bool ForestSprites::DrawBuildingRoof(const Building &b, const SDL_FRect &player, float deltaSeconds)
 {
-    for (const auto *frame : buildingRoof) if (!Available(frame)) return false;
+    const int condition = Condition(b), material = WorldArtVariation::BuildingMaterial(b.id.c_str());
+    const auto roofFrame = [&](int part, float localX, float localY)
+    {
+        const bool repair = part < 9 && localX >= 64 && localX < 128 && localY >= 32 && localY < 64;
+        const int surfaceCondition = condition == 2 ? (repair ? 2 : 1) : condition;
+        const auto *frame = variedRoof[material * 36 + surfaceCondition * 12 + part];
+        return Available(frame) ? frame : buildingRoof[part];
+    };
+    for (int i = 0; i < 12; ++i) if (!Available(roofFrame(i, 0, 0))) return false;
     const SDL_FRect bounds{b.x * 32.0f - 8.0f, b.y * 32.0f - 48.0f, b.width * 32.0f + 16.0f, b.height * 32.0f};
     const int px = static_cast<int>(std::floor((player.x + player.w / 2) / 32));
     const int py = static_cast<int>(std::floor((player.y + player.h) / 32));
@@ -327,7 +389,7 @@ bool ForestSprites::DrawBuildingRoof(const Building &b, const SDL_FRect &player,
     for (int row = 0; row < 3; ++row) for (int column = 0; column < 3; ++column)
         for (float y = 0; y < heights[row]; y += 32) for (float x = 0; x < widths[column]; x += 32)
         {
-            const auto *frame = buildingRoof[row * 3 + column];
+            const auto *frame = roofFrame(row * 3 + column, xs[column] + x, ys[row] + y);
             const float w = std::min(32.0f, widths[column] - x), h = std::min(32.0f, heights[row] - y);
             const SDL_FRect source{frame->source.x, frame->source.y, w, h};
             const SDL_FRect dest{bounds.x + xs[column] + x, bounds.y + ys[row] + y, w, h};
@@ -336,7 +398,7 @@ bool ForestSprites::DrawBuildingRoof(const Building &b, const SDL_FRect &player,
     for (int section = 0; section < 3; ++section)
         for (float x = 0; x < widths[section]; x += 32)
         {
-            const auto *frame = buildingRoof[9 + section];
+            const auto *frame = roofFrame(9 + section, xs[section] + x, 16);
             const float w = std::min(32.0f, widths[section] - x);
             const SDL_FRect source{frame->source.x, frame->source.y, w, 32};
             const SDL_FRect dest{bounds.x + xs[section] + x, bounds.y + 16, w, 32};
@@ -348,7 +410,7 @@ bool ForestSprites::DrawBuildingRoof(const Building &b, const SDL_FRect &player,
 bool ForestSprites::DrawTree(const ResourceNode &resource, const SDL_FRect &player) const
 {
     if (resource.GetResourceType() != ResourceType::NORMAL_TREE) return false;
-    const auto *frame = resource.IsActive() ? tree : stump;
+    const auto *frame = TreeFrame(resource.GetX(), resource.GetY(), resource.IsActive());
     if (!Available(frame)) return false;
     const auto bounds = Bounds(*frame, resource.GetX(), resource.GetY());
     const float footY = bounds.y + frame->pivot.y;
@@ -360,7 +422,14 @@ bool ForestSprites::DrawTree(const ResourceNode &resource, const SDL_FRect &play
 
 bool ForestSprites::HitTree(int tileX, int tileY, float worldX, float worldY) const
 {
-    return Hit(tree, tileX, tileY, worldX, worldY);
+    return Hit(TreeFrame(tileX, tileY), tileX, tileY, worldX, worldY);
+}
+
+const ForestSprites::Frame *ForestSprites::TreeFrame(int x, int y, bool active) const
+{
+    const auto index = WorldArtVariation::Hash(x, y, 20) % 3;
+    const auto *frame = active ? variedTrees[index] : variedStumps[index];
+    return Available(frame) ? frame : active ? tree : stump;
 }
 
 bool ForestSprites::DrawPlayer(float tileX, float tileY, int facing, int pose) const

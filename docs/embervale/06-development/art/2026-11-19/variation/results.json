@@ -1,0 +1,279 @@
+{
+  "date": "2026-11-19",
+  "base": "0a127434be42e5e0f17736ad7f63bbc7b81b773e",
+  "environment": {
+    "platform": "Windows",
+    "compiler": "g++ (Rev5, Built by MSYS2 project) 16.1.0",
+    "cmake": "cmake version 4.4.3",
+    "SDL": "3.4.12",
+    "editor": "LibreSprite 1.1-dev"
+  },
+  "builds": {
+    "GameEngine_and_EmbervaleRenderPreview": "passed",
+    "Play-RiverCrossing.cmd --build-only": "passed; content tools/tests disabled"
+  },
+  "assets": {
+    "new_frames": 634,
+    "new_masters": 11,
+    "cached_images": 26,
+    "default_export_preserves_all_master_bytes": true,
+    "default_export_reproduces_PNG_bytes": true,
+    "source_sha256": {
+      "floors.ase": "f978c8727052f950c50fc1dde49eab05b6b34bf14679df00fec490cdc571e8f0",
+      "flora.ase": "8b57d8b4cfad76d8f2f5bf35098838bbb38954bab611f4f9833155d67b8c38c6",
+      "grass.ase": "71baf2acfdfe8f973ebbe7c1c1841971e01b8e259c9b73c8ffbd067d421a95e7",
+      "paths.ase": "31df6b5b5cf9c9a4e5710f311fcd3114036565bf2961ba4b53461e3ee4460ae4",
+      "rocks.ase": "3055e180fb763c4f8c513e84ebebe1b50ab4a99597ab1e47a4bd2ef454cde1cc",
+      "roof.ase": "421696da2f93d31cfff1450a4b3141e0027b77606d298d5c16885998bf2cde5b",
+      "stone.ase": "2c9d0adee1336d915cc1ba02178b8914de2fdb0d6a522e30c5ae470fabea556a",
+      "stumps.ase": "145895c25bf7c483dff973a3c5b4af6dedced42e5a32d0ae99eba29ab276dec1",
+      "trees.ase": "0685b495d0d378b8ca9f5aea891d870dec8d0b3edbacf29cce62771d8cfc7700",
+      "walls.ase": "773c499c6e858f86d8ae673e3270788a1b589db91c371541b8e547a6ce70f458",
+      "water.ase": "2973ae18c53ec42b76386f9bed12606d4f11619eda0ff6bb8e927874fc34ec61"
+    },
+    "PNG_sha256": {
+      "floors.png": "b33c3f7c9b7186cb7269c29e6ecd002920295a9f0963773e89b00151f5588181",
+      "flora.png": "1466f185242148217811daa7821273a9e49fed685c6c278b70996ef5a68be9e5",
+      "grass.png": "d09c0b6968ee3d489579dfb8f63544107fc63ed15353b72692ea93221072105b",
+      "paths.png": "41e7f4054a00fcb9c7f1bca9bd13c08aa097cade50683dc430b477e45c1271e0",
+      "rocks.png": "c3b3babe18e61c5def51935597038f8ef53a3db17785e79af66b2c58d4b85df3",
+      "roof.png": "cb3275a0819a94286f3ba7f656378534b2d2e6742e384be8dae06d049578b907",
+      "stone.png": "db226b3e3c3d66576a9c7539d235b8d04ebed291a6bf7aa457893b4bb0cc8959",
+      "stumps.png": "b77b9f99c542d866380bf259e5ff776e3d00ff8d2c2bc91e415d847c1258d8b7",
+      "trees.png": "446d1f6c1d1968f69aa5a71f01d9fa81747d7d4bc29f9309c9ff954a4a8059a4",
+      "walls.png": "8c0f223e8cc6737d8e471935be364ffcafd0c503b3059bda73c15a6856ede2f4",
+      "water.png": "9c7a64a2272fe5421c00f4ea431ed0566d3b5197d2c2dd353147631365a9fc2a"
+    },
+    "packaged_PNG_sha256": {
+      "build-client": {
+        "floors.png": "b33c3f7c9b7186cb7269c29e6ecd002920295a9f0963773e89b00151f5588181",
+        "flora.png": "1466f185242148217811daa7821273a9e49fed685c6c278b70996ef5a68be9e5",
+        "grass.png": "d09c0b6968ee3d489579dfb8f63544107fc63ed15353b72692ea93221072105b",
+        "paths.png": "41e7f4054a00fcb9c7f1bca9bd13c08aa097cade50683dc430b477e45c1271e0",
+        "rocks.png": "c3b3babe18e61c5def51935597038f8ef53a3db17785e79af66b2c58d4b85df3",
+        "roof.png": "cb3275a0819a94286f3ba7f656378534b2d2e6742e384be8dae06d049578b907",
+        "stone.png": "db226b3e3c3d66576a9c7539d235b8d04ebed291a6bf7aa457893b4bb0cc8959",
+        "stumps.png": "b77b9f99c542d866380bf259e5ff776e3d00ff8d2c2bc91e415d847c1258d8b7",
+        "trees.png": "446d1f6c1d1968f69aa5a71f01d9fa81747d7d4bc29f9309c9ff954a4a8059a4",
+        "walls.png": "8c0f223e8cc6737d8e471935be364ffcafd0c503b3059bda73c15a6856ede2f4",
+        "water.png": "9c7a64a2272fe5421c00f4ea431ed0566d3b5197d2c2dd353147631365a9fc2a"
+      },
+      "build-river-crossing": {
+        "floors.png": "b33c3f7c9b7186cb7269c29e6ecd002920295a9f0963773e89b00151f5588181",
+        "flora.png": "1466f185242148217811daa7821273a9e49fed685c6c278b70996ef5a68be9e5",
+        "grass.png": "d09c0b6968ee3d489579dfb8f63544107fc63ed15353b72692ea93221072105b",
+        "paths.png": "41e7f4054a00fcb9c7f1bca9bd13c08aa097cade50683dc430b477e45c1271e0",
+        "rocks.png": "c3b3babe18e61c5def51935597038f8ef53a3db17785e79af66b2c58d4b85df3",
+        "roof.png": "cb3275a0819a94286f3ba7f656378534b2d2e6742e384be8dae06d049578b907",
+        "stone.png": "db226b3e3c3d66576a9c7539d235b8d04ebed291a6bf7aa457893b4bb0cc8959",
+        "stumps.png": "b77b9f99c542d866380bf259e5ff776e3d00ff8d2c2bc91e415d847c1258d8b7",
+        "trees.png": "446d1f6c1d1968f69aa5a71f01d9fa81747d7d4bc29f9309c9ff954a4a8059a4",
+        "walls.png": "8c0f223e8cc6737d8e471935be364ffcafd0c503b3059bda73c15a6856ede2f4",
+        "water.png": "9c7a64a2272fe5421c00f4ea431ed0566d3b5197d2c2dd353147631365a9fc2a"
+      }
+    }
+  },
+  "world_snapshot_unchanged": true,
+  "world_snapshot_sha256": "72c9d565ad1db11fc4e27eb8e512ef0dd23b5a902ef18da6a486a3c2ed28297f",
+  "placement_inspection": {
+    "field_fingerprint": "6461486170577132269",
+    "flower_tiles": 584,
+    "leaf_tiles": 131,
+    "quiet_path_leaf_tiles": 1,
+    "reed_tiles": 133,
+    "grass_clump_tiles": 3085,
+    "invalid_flower_placements": 0,
+    "leaves_without_tree_cover": 0,
+    "cached_prepare_stable": true,
+    "depletion_and_player_move_stable": true,
+    "terrain_revision_invalidates_cache": true,
+    "terrain_restore_reproduces_field": true,
+    "flora_variant_tile_counts": [
+      71,
+      76,
+      95,
+      93,
+      92,
+      95,
+      31,
+      31,
+      520,
+      474,
+      455,
+      512,
+      275,
+      267,
+      275,
+      307,
+      39,
+      26,
+      34,
+      34,
+      11,
+      15,
+      9,
+      11,
+      9,
+      13,
+      16,
+      10,
+      15,
+      12,
+      13,
+      13,
+      0,
+      0,
+      0,
+      0,
+      9,
+      15,
+      4,
+      9
+    ]
+  },
+  "captures": [
+    {
+      "name": "woodland",
+      "options": [
+        "--focus",
+        23,
+        59,
+        "--zoom",
+        1.5
+      ],
+      "sha256": "109a0fc4a5b8a1f72be70fedab92298799a608da842ecc43d7ab9aa16eb01ea9",
+      "textures_cached": 26
+    },
+    {
+      "name": "woodland-depleted",
+      "options": [
+        "--focus",
+        23,
+        59,
+        "--zoom",
+        1.5,
+        "--deplete-trees"
+      ],
+      "sha256": "bb87edb3bdfb7b1b32c3b7f6fdacd7b2782a0efd3efef6a55f9fd4580cd6a633",
+      "textures_cached": 26
+    },
+    {
+      "name": "basic",
+      "options": [
+        "--focus",
+        23,
+        59,
+        "--zoom",
+        1.5,
+        "--basic"
+      ],
+      "sha256": "e304d51652497956be355a739b9cb18636e435d9d0f6ea5507569fe1d5111d88",
+      "textures_cached": 26
+    },
+    {
+      "name": "workshop",
+      "options": [
+        "--focus",
+        66,
+        49,
+        "--zoom",
+        1.5
+      ],
+      "sha256": "6ee78186dbc87d2e11452b7289e49cd4a70d7421292f02f954f657093235b87a",
+      "textures_cached": 26
+    },
+    {
+      "name": "workshop-new",
+      "options": [
+        "--focus",
+        66,
+        49,
+        "--zoom",
+        1.5,
+        "--condition",
+        "new"
+      ],
+      "sha256": "29e6630990854c605e061669562c0d660d0908283d32f04d14a791e699954fa5",
+      "textures_cached": 26
+    },
+    {
+      "name": "workshop-weathered",
+      "options": [
+        "--focus",
+        66,
+        49,
+        "--zoom",
+        1.5,
+        "--condition",
+        "weathered"
+      ],
+      "sha256": "1d803c006ac2c9d9dff1d75f6127a93c0153db3390f255a7a66e18dae89d5aab",
+      "textures_cached": 26
+    },
+    {
+      "name": "workshop-interior",
+      "options": [
+        "--focus",
+        69,
+        46,
+        "--zoom",
+        1.5
+      ],
+      "sha256": "76db65aa1d241b5b61e74fb33933f1d10e3216d72ce20890780b51b8a9336c9d",
+      "textures_cached": 26
+    },
+    {
+      "name": "village",
+      "options": [
+        "--focus",
+        32,
+        28,
+        "--zoom",
+        1.5
+      ],
+      "sha256": "8262f77a493cda1ab8fab30916aa9d8fdd93e8a6978596c20fd54f72a930f675",
+      "textures_cached": 26
+    },
+    {
+      "name": "river",
+      "options": [
+        "--focus",
+        46,
+        29
+      ],
+      "sha256": "8fa09a2d8593f93b3f61d592a1390ffddca58d986fbc3e44f3ece6afc382abbb",
+      "textures_cached": 26
+    },
+    {
+      "name": "mine",
+      "options": [
+        "--focus",
+        87,
+        57,
+        "--zoom",
+        1.5
+      ],
+      "sha256": "0c00cf002d0f980dbd67d37b47d43d923cf0db53a8e1b027c72ce8d0c1a4377c",
+      "textures_cached": 26
+    },
+    {
+      "name": "mine-depleted",
+      "options": [
+        "--focus",
+        87,
+        57,
+        "--zoom",
+        1.5,
+        "--deplete-rocks"
+      ],
+      "sha256": "4083c11e2d6460de7612a90065010446c2768ff69691432f06be3ff9cdb5167c",
+      "textures_cached": 26
+    }
+  ],
+  "limits": [
+    "Software/dummy-video captures, not GPU performance or visible interaction playthrough",
+    "Authored visual conditions, not simulated age or seasons",
+    "Regression suites and full starter acceptance deferred at owner request",
+    "Only the current workshop is assembled; other buildings and broader cast/ore art remain open"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "frames": {
+    "paths.ase": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 544,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 544,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 544,
+        "h": 384
+      },
+      "duration": 100
+    }
+  },
+  "meta": {
+    "app": "https://github.com/LibreSprite/LibreSprite/",
+    "version": "1.1-dev",
+    "image": "paths.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 544,
+      "h": 384
+    },
+    "scale": "1"
+  }
+}

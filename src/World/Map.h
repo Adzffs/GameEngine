@@ -2,6 +2,7 @@
 
 #include "Tile/Tile.h"
 #include "Building.h"
+#include <cstdint>
 #include <vector>
 
 class Map
@@ -21,6 +22,7 @@ public:
     void SetBuildings(std::vector<Building> layout);
     const std::vector<Building> &GetBuildings() const { return buildings; }
     const Building *GetBuildingAt(int x, int y) const;
+    std::uint64_t GetRevision() const { return revision; }
 
 private:
     int width;
@@ -29,6 +31,7 @@ private:
 
     std::vector<Tile> tiles;
     std::vector<Building> buildings;
+    std::uint64_t revision = 0;
 
     Tile &GetTile(int x, int y);
 };

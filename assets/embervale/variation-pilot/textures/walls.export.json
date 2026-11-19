@@ -1,0 +1,36 @@
+{
+  "frames": {
+    "walls.ase": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 288
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 288
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 288
+      },
+      "duration": 100
+    }
+  },
+  "meta": {
+    "app": "https://github.com/LibreSprite/LibreSprite/",
+    "version": "1.1-dev",
+    "image": "walls.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 384,
+      "h": 288
+    },
+    "scale": "1"
+  }
+}

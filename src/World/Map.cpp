@@ -20,6 +20,7 @@ void Map::SetBuildings(std::vector<Building> layout)
                 if (b.IsWall(x, y) && GetTile(x, y).GetType() == TileType::WALL)
                     GetTile(x, y).SetType(GetTile(x, y).GetGroundType());
     buildings = std::move(layout);
+    ++revision;
     for (const auto &b : buildings)
         for (int y = b.y; y < b.y + b.height; ++y)
             for (int x = b.x; x < b.x + b.width; ++x)
@@ -41,6 +42,7 @@ Map::Map(int width, int height)
 void Map::SetTileType(int x, int y, TileType type)
 {
     GetTile(x, y).SetType(type);
+    ++revision;
 }
 
 TileType Map::GetTileType(int x, int y)

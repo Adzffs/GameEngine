@@ -6473,6 +6473,7 @@ void Graphics::Render(
         map.GetHeight() * TileSize};
     SDL_SetRenderViewport(renderer, &worldViewport);
 
+    if (worldArtEnabled) forestSprites.PrepareWorld(map, resources, stations, entities);
     DrawMap(map);
     if (showGrid) DrawGrid(map);
     DrawClickedTile();

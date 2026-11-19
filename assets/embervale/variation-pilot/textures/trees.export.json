@@ -1,0 +1,36 @@
+{
+  "frames": {
+    "trees.ase": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 96
+      },
+      "duration": 100
+    }
+  },
+  "meta": {
+    "app": "https://github.com/LibreSprite/LibreSprite/",
+    "version": "1.1-dev",
+    "image": "trees.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 192,
+      "h": 96
+    },
+    "scale": "1"
+  }
+}

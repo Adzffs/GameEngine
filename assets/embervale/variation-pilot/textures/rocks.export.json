@@ -1,0 +1,36 @@
+{
+  "frames": {
+    "rocks.ase": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 288,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 288,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 288,
+        "h": 40
+      },
+      "duration": 100
+    }
+  },
+  "meta": {
+    "app": "https://github.com/LibreSprite/LibreSprite/",
+    "version": "1.1-dev",
+    "image": "rocks.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 288,
+      "h": 40
+    },
+    "scale": "1"
+  }
+}

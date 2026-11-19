@@ -49,6 +49,8 @@ public:
     bool Initialize();
     void ShowGameGuide() { gameGuideVisible = true; }
     void SetCompiledMapLabelsVisible(bool visible) { compiledMapLabelsVisible = visible; }
+    // Authoring inspection only; normal play uses each building's stable profile.
+    void SetBuildingConditionPreview(int condition) { forestSprites.SetBuildingConditionPreview(condition); }
     void ProcessEvents(bool &running);
     bool ConsumeClickedTile(int &tileX, int &tileY);
     bool ConsumeClickedTile(

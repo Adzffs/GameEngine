@@ -1,0 +1,36 @@
+{
+  "frames": {
+    "stone.ase": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 32
+      },
+      "duration": 100
+    }
+  },
+  "meta": {
+    "app": "https://github.com/LibreSprite/LibreSprite/",
+    "version": "1.1-dev",
+    "image": "stone.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 384,
+      "h": 32
+    },
+    "scale": "1"
+  }
+}
