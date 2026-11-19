@@ -88,6 +88,15 @@ If SDL3 cannot be found, verify the selected toolchain and the package installat
 
 ## 5. Understand saves and development boosts
 
+For River Crossing on Windows, use the repository-root **Play-RiverCrossing.cmd**
+launcher. It configures/builds a dedicated `build-river-crossing` directory with
+the UCRT64 compiler, supplies the runtime DLL path and opens a temporary fresh
+character. It works from another current directory and skips test targets.
+An older local checkout or executable will not understand the new `--world` and
+`--profile` options until its source is updated and rebuilt. The launcher does
+not pull Git changes or modify existing saves. See the [launch diagnosis and
+confirmed visible startup](LOCAL_RIVER_LAUNCH_2026-11-19.md).
+
 No-argument startup uses the compiled world and `saves/development-player.save`, relative to the process working directory. `--world <snapshot.json>` explicitly validates and loads a supported starter snapshot and defaults to temporary progress with no player save. Add `--save saves/map-playtest.save` to select an isolated persistent playtest, or use `--no-save` for temporary compiled-world play. `--compiled-world` explicitly selects the original content; `--help` lists current options. See [runtime import and launch examples](../04-studio/STARTER_WORLD_IMPORT.md).
 
 Keep ordinary development saves separate from test fixtures. Before a save-related experiment, preserve a copy and record the launch directory. Do not delete your save as a routine troubleshooting step. Normal controlled shutdown is the documented save boundary; a forced termination is not guaranteed to preserve progress. [Source: DevelopmentPlayerPersistence.md](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/docs/DevelopmentPlayerPersistence.md).

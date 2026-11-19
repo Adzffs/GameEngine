@@ -4,6 +4,7 @@ build_client/
 build_headless/
 build-client/
 build-headless/
+build-river-crossing/
 
 # Compiled files
 *.exe

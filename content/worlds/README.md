@@ -11,7 +11,19 @@ It contains 18 resources, three stations, six named NPCs and four monster homes.
 Arrival is `(5,28)`. Mara is at `(14,25)`, the bank at `(33,27)`, and the workshop
 stations at `(68,50)` and `(73,50)`. The existing compiled world remains available.
 
-Launch a temporary fresh character from the repository root on Windows:
+On Windows, double-click **Play-RiverCrossing.cmd** in the repository root.
+It builds the current checkout into a separate `build-river-crossing` directory,
+sets the matching UCRT64 DLL path for that process and launches this map with a
+temporary fresh character. It works from any working directory, skips test
+targets, and does not update Git or select an old executable from another build.
+The default toolchain is `C:\msys64\ucrt64\bin`; set `GAMEENGINE_UCRT64_BIN` when
+MSYS2 is installed elsewhere. `Play-RiverCrossing.cmd --build-only` builds without
+opening the game.
+
+The current source is required: an older checkout/executable does not gain the
+new map or `--profile` support simply by receiving command-line arguments.
+
+For an already updated/built checkout, the manual command from its root is:
 
 ```powershell
 .\build-client\GameEngine.exe --world content\worlds\river-crossing.blockout.json --profile fresh --no-save
