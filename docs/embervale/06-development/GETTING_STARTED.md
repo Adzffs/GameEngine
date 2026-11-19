@@ -11,6 +11,7 @@
 | Play the development game and run all test groups | Client ON, graphics tests ON | Yes |
 | Validate a starter snapshot | `EmbervaleWorldValidate`, content tools ON | No in headless configuration |
 | Play a selected starter snapshot | Client ON; `GameEngine --world <file>` | Yes |
+| Inspect starter prices or replay the equipment route | `EmbervaleEconomyReport`, content tools ON | No in headless configuration |
 | Export compiled starter content | `EmbervaleWorldExport`, content tools ON (default) | No in headless configuration |
 | Play a normal starting character | `GameEngine --profile fresh` (temporary by default) | Yes |
 | Play the River Crossing blockout | `GameEngine --world content/worlds/river-crossing.blockout.json --profile fresh --no-save` | Yes |
@@ -114,3 +115,20 @@ Machine-specific `.vscode` files containing paths such as `c:/GameEngine` are no
 Record the exact commit, command, tool versions, build directory and error output. Separate configure failures, compilation failures, test failures and runtime failures.
 
 The unchanged baseline’s 81 tests now have a fresh local Linux pass. The exporter milestone added two headless CTest entries. Later parser, runtime and command tests have their own source and execution evidence. See [Testing](TESTING.md) and the [verification record](BASELINE_VERIFICATION_2026-11-18.md) for exact outcomes and limits. Use [Starter-world export](../04-studio/STARTER_WORLD_EXPORT.md) and [Starter-world import](../04-studio/STARTER_WORLD_IMPORT.md) for the current command surface.
+
+## 8. Follow the starter equipment journey
+
+Use the fresh River Crossing launcher, then talk to Mara. The next-step card
+shows material progress and a destination from the selected map. Press **H** or
+left-click the card for the complete sword/shield material plan and quest choices.
+Left-click an axe or pickaxe in your bag to equip the appropriate gathering tool.
+The sword needs three Bronze bars and one Wooden plank; keep its plank when
+making the optional shield. Accept Gathering Basics / Mining Basics before
+gathering their ten normal Logs / five Copper. The two rewards total twenty
+coins, enough to buy a shield or keep for supplies if you craft your equipment.
+
+The developer reference replay gathers and trades through production commands
+without seeding items, coins or XP. Build `EmbervaleEconomyReport` with content
+tools enabled, then run `--replay-starter-upgrade --world content/worlds/river-crossing.blockout.json`.
+Its tick report does not measure human reading, discovery, cursor handling or
+combat. [Commands, route evidence and remaining acceptance](STARTER_UPGRADE_JOURNEY_2026-11-19.md).

@@ -37,6 +37,7 @@ class Monster;
 class NPC;
 struct ActiveDialogueSession;
 struct GraphicsTestAccess;
+namespace StarterJourney { struct Guidance; }
 
 class Graphics
 {
@@ -326,8 +327,9 @@ public:
     bool IsSidePanelOpen() const { return sidePanelOpen; }
 
     void DrawSidePanelTabs();
-    void DrawGameGuide(const Player &player);
-    void DrawWorldHud(const Player &player);
+    void DrawGameGuide(const StarterJourney::Guidance &guidance, const std::string &destination);
+    void DrawWorldHud(const Player &player,
+        const StarterJourney::Guidance &guidance, const std::string &destination);
     void DrawSettings();
     void DrawSidePanelFrame(const char *title, float headingYOffset = 10.0f);
 
@@ -538,6 +540,7 @@ private:
     Uint64 lastPresentationTick = 0;
     float presentationDeltaSeconds = 1.0f / 60.0f;
     bool gameGuideVisible = false;
+    bool displayedTutorialActive = false;
     bool compiledMapLabelsVisible = true;
     bool showGrid = false;
     float mouseX = 0.0f;

@@ -145,9 +145,10 @@
         "src/Core/Engine.cpp",
         "src/World/World.cpp",
         "src/Persistence/WorldPlayerPersistenceLifecycle.cpp",
-        "tools/embervale_world_editor.py"
+        "tools/embervale_world_editor.py",
+        "docs/embervale/06-development/STARTER_UPGRADE_JOURNEY_2026-11-19.md"
       ],
-      "notes": "Fresh-start initialization and --profile fresh|development are implemented through CLI/engine/world/entity creation and the missing-save lifecycle. Fresh characters start all skills at level 1/0 XP with bronze gathering tools, normal tutorial/quest/recipe defaults and no developer godsword. Fresh launches have no implicit save; explicit existing saves restore their own progress. Studio defaults to fresh temporary play with an optional development selector. Game/core/tool builds and editor Python syntax check passed. Runtime and visible acceptance are deferred at the owner's request; no pacing/balance claim is made."
+      "notes": "Fresh-start initialization and --profile fresh|development are implemented through CLI/engine/world/entity creation and the missing-save lifecycle. Fresh characters start all skills at level 1/0 XP with bronze gathering tools, normal tutorial/quest/recipe defaults and no developer godsword. Fresh launches have no implicit save; explicit existing saves restore their own progress. Studio defaults to fresh temporary play with an optional development selector. Game/core/tool builds and editor Python syntax check passed. The later GAME-004 replay exercises unfunded fresh gathering/crafting, equipment, banking and quest rewards. Full profile/persistence and visible acceptance remain deferred; human pacing is not established."
     },
     {
       "id": "GAME-008",
@@ -765,9 +766,16 @@
         "docs/EconomyLedger.md",
         "docs/embervale/06-development/economy/2026-11-19/starter-catalogue.json",
         "src/Shop/ShopDefinitionDatabase.cpp",
-        "src/Tools/EconomyReportMain.cpp"
+        "src/Tools/EconomyReportMain.cpp",
+        "docs/embervale/06-development/STARTER_UPGRADE_JOURNEY_2026-11-19.md",
+        "docs/embervale/06-development/economy/2026-11-19/starter-upgrade.json",
+        "src/Tutorial/StarterJourney.cpp",
+        "src/Tutorial/StarterJourney.h",
+        "src/Graphics/Graphics.cpp",
+        "src/World/World.cpp",
+        "tests/ServerCommandQueueTests.cpp"
       ],
-      "notes": "First bounded tuning delivered: shield buy 30->20, equal to the two ten-coin basic quest rewards; Log buy 1->10 closes the confirmed production profit. Recipe yields, quest rewards and Bronze sword price are unchanged. Source-derived sword+shield plan: two normal Logs, three Copper and three Tin, one plank remaining. Catalogue budget is reported by the production tool. Full fresh-player gathering, travel, bank/shop, food, requirements and upgrade timings remain unmeasured; the 10-15 minute target is not signed off."
+      "notes": "Starter prices remain Log buy 10 and shield buy 20, with recipes/rewards unchanged. Tutorial now derives sword requirements from recipes: three ore pairs, three bars and the Bronze sword equipment requirement. Shared holdings recognise processed, banked, equipped and crafting cursor/grid items. Live-map destination hints, tool/withdrawal instructions and the H/click material/quest plan are implemented. Unfunded fresh production replay on River Crossing gathers 10 normal Logs, 5 Copper and 3 Tin in 31 attempts, equips sword and shield, banks 8 Logs, earns 20 quest coins and buys two meat for 16, leaving 4 coins. Shield at tick 245, sword at 376, prepared return at 451; these are simulation ticks, not human playthrough times. Core/game/report and launcher builds passed. Deferred regression source covers one-pair/one-bar premature progress and an equipped axe. Regression suites, visible interaction, combat food pressure and uncoached 10-15 minute target acceptance remain deferred; GAME-004 is not signed off."
     },
     {
       "id": "GAME-005",

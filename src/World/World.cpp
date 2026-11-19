@@ -9,6 +9,7 @@
 #include "../Pathfinding/Pathfinder.h"
 #include <cstdlib>
 #include "../Player/Player.h"
+#include "../Tutorial/StarterJourney.h"
 #include "../Entity/Monster/Monster.h"
 #include "../Inventory/ItemType.h"
 #include "../Inventory/ItemAmount.h"
@@ -2047,35 +2048,23 @@ void World::ProcessTutorialProgress()
         Player *player = dynamic_cast<Player *>(owner.get());
         if (player == nullptr || player->GetTutorialState().IsCompleted()) continue;
         const TutorialStep step = player->GetTutorialState().GetStep();
-        const Inventory &inventory = player->GetInventory();
         bool complete = false;
         switch (step)
         {
         case TutorialStep::MEET_GUIDE:
-            complete = dialogueSystem.GetSession(player->GetID()) != nullptr;
+        {
+            const auto *session = dialogueSystem.GetSession(player->GetID());
+            complete = session != nullptr && session->npcType == NpcType::DEVELOPMENT_GUIDE;
             break;
+        }
         case TutorialStep::GATHER_LOG:
-            complete = inventory.HasItem(ItemType::LOG) ||
-                inventory.HasItem(ItemType::OAK_LOG) ||
-                inventory.HasItem(ItemType::WILLOW_LOG);
-            break;
         case TutorialStep::MAKE_PLANKS:
-            complete = inventory.HasItem(ItemType::WOODEN_PLANKS);
-            break;
         case TutorialStep::MINE_ORES:
-            complete = inventory.HasItem(ItemType::COPPER_ORE) &&
-                inventory.HasItem(ItemType::TIN_ORE);
-            break;
         case TutorialStep::SMELT_BRONZE:
-            complete = inventory.HasItem(ItemType::BRONZE_BAR);
-            break;
         case TutorialStep::CRAFT_WEAPON:
-            complete = inventory.HasItem(ItemType::BRONZE_SWORD) ||
-                player->GetEquipment().IsEquipped(ItemType::BRONZE_SWORD);
-            break;
         case TutorialStep::EQUIP_WEAPON:
-            complete = player->GetEquipment().GetEquippedItem(
-                EquipmentSlotType::WEAPON) != ItemType::NONE;
+            complete = StarterJourney::MaterialsReady(*player, step,
+                craftingSessionSystem.Get(player->GetID()));
             break;
         case TutorialStep::SAFE_COMBAT:
             complete = std::any_of(entityDiedEvents.begin(), entityDiedEvents.end(),

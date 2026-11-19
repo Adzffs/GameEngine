@@ -9,6 +9,8 @@
 #include "../Recipe/RecipeDatabase.h"
 #include "../Recipe/RecipeProductionPacing.h"
 #include "../Quest/QuestDefinitionDatabase.h"
+#include "../Shop/ShopDefinitionDatabase.h"
+#include "../Tutorial/StarterJourney.h"
 #include "../Combat/Combatant.h"
 #include "../World/Object/Resource/ResourceDatabase.h"
 #include "../World/Object/Resource/DepletedVisualType.h"
@@ -22,6 +24,64 @@
 
 namespace
 {
+    constexpr SDL_FRect TutorialPanel{18.0f, 78.0f, 560.0f, 104.0f};
+    std::string TutorialDestination(
+        StarterJourney::Destination destination, const Player &player,
+        const std::vector<std::unique_ptr<Entity>> &entities,
+        const std::vector<ResourceNode> &resources,
+        const std::vector<CraftingStation> &stations)
+    {
+        using Destination = StarterJourney::Destination;
+        if (destination == Destination::NONE) return "H: material plan and starter choices";
+        struct Target { int x, y, distance; std::string name; bool available; };
+        std::optional<Target> closest;
+        const int px = player.GetPosition().GetX(), py = player.GetPosition().GetY();
+        const auto consider = [&](int x, int y, const std::string &name, bool available = true)
+        {
+            const int distance = std::abs(px - x) + std::abs(py - y);
+            if (!closest || (available && !closest->available) ||
+                (available == closest->available && distance < closest->distance))
+                closest = Target{x, y, distance, name, available};
+        };
+        for (const auto &resource : resources)
+        {
+            const auto type = resource.GetResourceType();
+            if ((destination == Destination::NORMAL_TREE && type == ResourceType::NORMAL_TREE) ||
+                (destination == Destination::COPPER && type == ResourceType::COPPER_ROCK) ||
+                (destination == Destination::TIN && type == ResourceType::TIN_ROCK))
+                consider(resource.GetX(), resource.GetY(), ResourceDatabase::Get(type).GetName(), resource.IsActive());
+        }
+        for (const auto &station : stations)
+        {
+            const auto type = station.GetStationType();
+            if ((destination == Destination::TABLE && type == StationType::CRAFTING_TABLE) ||
+                (destination == Destination::FURNACE && type == StationType::FURNACE) ||
+                (destination == Destination::BANK && type == StationType::BANK))
+                consider(station.GetX(), station.GetY(), type == StationType::CRAFTING_TABLE ?
+                    "Crafting table" : type == StationType::FURNACE ? "Furnace" : "Bank");
+        }
+        for (const auto &entity : entities)
+        {
+            if (const auto *npc = dynamic_cast<const NPC *>(entity.get());
+                destination == Destination::GUIDE && npc != nullptr && npc->GetNpcType() == NpcType::DEVELOPMENT_GUIDE)
+                consider(npc->GetPosition().GetX(), npc->GetPosition().GetY(), "Mara");
+            if (const auto *monster = dynamic_cast<const Monster *>(entity.get());
+                destination == Destination::MOSSLING && monster != nullptr && monster->IsAlive() &&
+                monster->GetNpcType() == NpcType::PASSIVE_DEVELOPMENT_MONSTER)
+                consider(monster->GetPosition().GetX(), monster->GetPosition().GetY(), "Mossling");
+        }
+        if (!closest) return "Target unavailable here. H: starter plan";
+        std::string direction;
+        if (closest->y < py) direction += "N";
+        else if (closest->y > py) direction += "S";
+        if (closest->x > px) direction += "E";
+        else if (closest->x < px) direction += "W";
+        if (closest->distance <= 1) direction = "nearby";
+        return closest->name + " (" + std::to_string(closest->x) + "," +
+            std::to_string(closest->y) + ") " + direction +
+            (closest->available ? " | follow paths" : " | regrowing");
+    }
+
     const char *GetSkillDisplayName(SkillType skillType)
     {
         switch (skillType)
@@ -1786,6 +1846,12 @@ void Graphics::ProcessEvents(bool &running)
                     mouseY,
                     event.button.button == SDL_BUTTON_RIGHT))
             {
+                continue;
+            }
+
+            if (displayedTutorialActive && IsPointInsideRectangle(mouseX, mouseY, TutorialPanel))
+            {
+                if (event.button.button == SDL_BUTTON_LEFT) gameGuideVisible = true;
                 continue;
             }
 
@@ -4594,7 +4660,8 @@ void Graphics::DrawSidePanelTabs()
     }
 }
 
-void Graphics::DrawWorldHud(const Player &player)
+void Graphics::DrawWorldHud(const Player &player,
+    const StarterJourney::Guidance &guidance, const std::string &destination)
 {
     const float healthRatio = CalculateHealthRatio(
         player.GetCurrentHealth(), player.GetMaximumHealth());
@@ -4631,28 +4698,21 @@ void Graphics::DrawWorldHud(const Player &player)
 
     if (!player.GetTutorialState().IsCompleted())
     {
-        const std::array<const char *, 10> objectives{
-            "Talk to the guide at the crossroads",
-            "Gather a log from a tree",
-            "Make wooden planks at the crafting table",
-            "Mine both copper and tin ore",
-            "Smelt a bronze bar at the furnace",
-            "Craft a bronze sword",
-            "Equip a weapon from your bag",
-            "Defeat a training enemy",
-            "Take loot and deposit an item in the bank",
-            "Return to the guide and finish Gathering Basics"};
         const int step = static_cast<int>(player.GetTutorialState().GetStep());
-        const SDL_FRect objectivePanel{18.0f, 78.0f, 430.0f, 48.0f};
+        const SDL_FRect objectivePanel = TutorialPanel;
         SDL_SetRenderDrawColor(renderer, 20, 24, 28, 220);
         SDL_RenderFillRect(renderer, &objectivePanel);
         SDL_SetRenderDrawColor(renderer, 190, 151, 78, 255);
         SDL_RenderRect(renderer, &objectivePanel);
         SDL_SetRenderDrawColor(renderer, 250, 226, 170, 255);
-        const std::string heading = "NEXT STEP " + std::to_string(step + 1) + "/10";
+        const std::string heading = "NEXT STEP " + std::to_string(step + 1) + "/10  [H / CLICK: PLAN]";
         SDL_RenderDebugText(renderer, 30.0f, 90.0f, heading.c_str());
         SDL_SetRenderDrawColor(renderer, 235, 225, 202, 255);
-        SDL_RenderDebugText(renderer, 30.0f, 110.0f, objectives[step]);
+        SDL_RenderDebugText(renderer, 30.0f, 108.0f, guidance.objective.c_str());
+        SDL_RenderDebugText(renderer, 30.0f, 126.0f, guidance.progress.c_str());
+        SDL_RenderDebugText(renderer, 30.0f, 144.0f, guidance.instruction.c_str());
+        SDL_SetRenderDrawColor(renderer, 150, 205, 220, 255);
+        SDL_RenderDebugText(renderer, 30.0f, 162.0f, destination.c_str());
     }
 
     SDL_SetRenderDrawColor(renderer, 235, 225, 202, 220);
@@ -4660,9 +4720,8 @@ void Graphics::DrawWorldHud(const Player &player)
                         "Click to move/interact   H: Guide   Esc: Close");
 }
 
-void Graphics::DrawGameGuide(const Player &player)
+void Graphics::DrawGameGuide(const StarterJourney::Guidance &guidance, const std::string &destination)
 {
-    (void)player;
     if (!gameGuideVisible) return;
 
     const SDL_FRect shade{0.0f, 0.0f,
@@ -4680,32 +4739,51 @@ void Graphics::DrawGameGuide(const Player &player)
     SDL_RenderDebugText(renderer, 350.0f, 160.0f,
                         "WELCOME TO EMBERVALE");
     SDL_SetRenderDrawColor(renderer, 225, 225, 215, 255);
-    SDL_RenderDebugText(renderer, 350.0f, 198.0f,
-                        "Build your strength, craft better gear, and tame the wilds.");
+    SDL_RenderDebugText(renderer, 350.0f, 194.0f, guidance.objective.c_str());
+    SDL_RenderDebugText(renderer, 350.0f, 216.0f, guidance.progress.c_str());
+    SDL_RenderDebugText(renderer, 350.0f, 238.0f, guidance.instruction.c_str());
+    SDL_SetRenderDrawColor(renderer, 150, 205, 220, 255);
+    SDL_RenderDebugText(renderer, 350.0f, 260.0f, destination.c_str());
 
-    SDL_SetRenderDrawColor(renderer, 115, 185, 235, 255);
-    SDL_RenderDebugText(renderer, 350.0f, 242.0f, "1  MOVE & EXPLORE");
-    SDL_SetRenderDrawColor(renderer, 220, 220, 210, 255);
-    SDL_RenderDebugText(renderer, 350.0f, 264.0f,
-                        "Click a ground tile. Your destination glows gold.");
+    const auto sword = StarterJourney::GetMaterialPlan(false);
+    const auto both = StarterJourney::GetMaterialPlan(true);
+    const auto &shield = RecipeDatabase::Get(RecipeType::WOODEN_SHIELD);
+    const std::array<std::string, 4> planLines{
+        "Sword: " + std::to_string(sword.normalLogs) + " Log, " + std::to_string(sword.copperOre) +
+            " Copper, " + std::to_string(sword.tinOre) + " Tin",
+        "Sword + shield: " + std::to_string(both.normalLogs) + " Logs, " + std::to_string(both.copperOre) +
+            " Copper, " + std::to_string(both.tinOre) + " Tin",
+        "Furnace: " + std::to_string(sword.bronzeBars) + " Bronze bars + " +
+            std::to_string(sword.woodenPlanks) + " Wooden plank -> sword",
+        "Table: " + std::to_string(shield.GetIngredients().front().amount) + " planks -> optional shield"};
+    SDL_SetRenderDrawColor(renderer, 250, 226, 170, 255);
+    SDL_RenderDebugText(renderer, 350.0f, 296.0f, "YOUR FIRST EQUIPMENT");
+    SDL_SetRenderDrawColor(renderer, 225, 225, 215, 255);
+    for (std::size_t i = 0; i < planLines.size(); ++i)
+        SDL_RenderDebugText(renderer, 350.0f, 320.0f + i * 22.0f, planLines[i].c_str());
 
-    SDL_SetRenderDrawColor(renderer, 224, 143, 82, 255);
-    SDL_RenderDebugText(renderer, 350.0f, 306.0f, "2  GATHER & CRAFT");
-    SDL_SetRenderDrawColor(renderer, 220, 220, 210, 255);
-    SDL_RenderDebugText(renderer, 350.0f, 328.0f,
-                        "Click trees, rocks, the furnace, or the crafting table.");
-
-    SDL_SetRenderDrawColor(renderer, 216, 85, 85, 255);
-    SDL_RenderDebugText(renderer, 350.0f, 370.0f, "3  FIGHT SMART");
-    SDL_SetRenderDrawColor(renderer, 220, 220, 210, 255);
-    SDL_RenderDebugText(renderer, 350.0f, 392.0f,
-                        "Click a creature to engage. Watch your health and gear.");
-
-    SDL_SetRenderDrawColor(renderer, 198, 174, 102, 255);
-    SDL_RenderDebugText(renderer, 350.0f, 434.0f, "YOUR FIRST GOAL");
-    SDL_SetRenderDrawColor(renderer, 240, 232, 206, 255);
-    SDL_RenderDebugText(renderer, 350.0f, 456.0f,
-                        "Talk to the nearby villager and begin your first quest.");
+    int questCoins = 0;
+    for (const auto id : {QuestId::GATHERING_BASICS, QuestId::MINING_BASICS})
+        if (const auto *quest = QuestDefinitionDatabase::TryGet(id);
+            quest != nullptr && quest->rewardItem == ItemType::COINS)
+            questCoins += quest->rewardAmount;
+    const auto *shopShield = ShopDefinitionDatabase::TryGetEntry(
+        ShopId::DEVELOPMENT_GUIDE_SUPPLIES, ItemType::WOODEN_SHIELD);
+    const std::string budget = "Basic quest rewards: " + std::to_string(questCoins) +
+        " coins" + (shopShield != nullptr && shopShield->buyPrice ?
+            " | Shield: " + std::to_string(*shopShield->buyPrice) : "");
+    SDL_SetRenderDrawColor(renderer, 250, 226, 170, 255);
+    SDL_RenderDebugText(renderer, 350.0f, 424.0f, budget.c_str());
+    SDL_SetRenderDrawColor(renderer, 225, 225, 215, 255);
+    const auto *gathering = QuestDefinitionDatabase::TryGet(QuestId::GATHERING_BASICS);
+    const auto *mining = QuestDefinitionDatabase::TryGet(QuestId::MINING_BASICS);
+    const std::string questTargets = gathering != nullptr && mining != nullptr ?
+        "Quest targets: " + std::to_string(gathering->requiredAmount) + " normal Logs / " +
+            std::to_string(mining->requiredAmount) + " Copper. Accept first!" :
+        "Accept quests first; only newly gathered items count.";
+    SDL_RenderDebugText(renderer, 350.0f, 446.0f, questTargets.c_str());
+    SDL_RenderDebugText(renderer, 350.0f, 468.0f,
+        "Click to move. Carry food. Keep tools; bank spare materials.");
 
     const SDL_FRect button{470.0f, 514.0f, 340.0f, 42.0f};
     SDL_SetRenderDrawColor(renderer, 132, 92, 41, 255);
@@ -4714,7 +4792,7 @@ void Graphics::DrawGameGuide(const Player &player)
     SDL_RenderRect(renderer, &button);
     SDL_SetRenderDrawColor(renderer, 255, 244, 214, 255);
     SDL_RenderDebugText(renderer, 547.0f, 531.0f,
-                        "CLICK ANYWHERE TO BEGIN");
+                        "CLICK ANYWHERE TO RETURN");
 }
 
 void Graphics::DrawAxeIcon(
@@ -6084,6 +6162,7 @@ void Graphics::Render(
     displayedKnownRecipes = knownRecipes;
     recipeKnowledgeInitialized = true;
     displayedInventorySlots = inventory.GetSlots();
+    displayedTutorialActive = !player.GetTutorialState().IsCompleted();
     recipeActionActive =
         activeAction != nullptr &&
         activeAction->GetType() == ActionType::RECIPE;
@@ -6095,7 +6174,8 @@ void Graphics::Render(
     const bool worldHoverBlocked = stationMenuOpen || worldContextMenu.open ||
         shopPresentationState.IsOpen() ||
         dialoguePresentationState.IsOpen() || gameGuideVisible ||
-        pointerOverSideUi;
+        pointerOverSideUi ||
+        (displayedTutorialActive && IsPointInsideRectangle(mouseX, mouseY, TutorialPanel));
     worldHoverTarget = worldHoverBlocked
         ? WorldHoverTarget{}
         : ResolveWorldHoverTarget(
@@ -6140,7 +6220,11 @@ void Graphics::Render(
     SDL_SetRenderViewport(renderer, nullptr);
     SDL_SetRenderScale(renderer, 1.0f, 1.0f);
     SDL_SetRenderClipRect(renderer, nullptr);
-    DrawWorldHud(player);
+    const auto tutorialGuidance = StarterJourney::Describe(player,
+        craftingSessionSnapshot ? &*craftingSessionSnapshot : nullptr);
+    const auto tutorialDestination = TutorialDestination(tutorialGuidance.destination,
+        player, entities, resources, stations);
+    DrawWorldHud(player, tutorialGuidance, tutorialDestination);
     DrawCombatTargetPanel(
         entities, selectedCombatTargetID, player.GetID());
     DrawProgressionFeedback();
@@ -6183,7 +6267,7 @@ void Graphics::Render(
 
     DrawWorldContextMenu();
 
-    DrawGameGuide(player);
+    DrawGameGuide(tutorialGuidance, tutorialDestination);
 
     if (deathRecoveryTicksRemaining >= 0)
     {

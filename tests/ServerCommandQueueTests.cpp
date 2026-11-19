@@ -312,10 +312,21 @@ int main()
         player->GetInventory().AddItem(ItemType::WOODEN_PLANKS, 1); world.Update();
         player->GetInventory().AddItem(ItemType::COPPER_ORE, 1);
         player->GetInventory().AddItem(ItemType::TIN_ORE, 1); world.Update();
+        test.Expect(player->GetTutorialState().GetStep() == TutorialStep::MINE_ORES,
+            "One ore pair cannot finish preparation for a three-bar sword");
+        player->GetInventory().AddItem(ItemType::COPPER_ORE, 2);
+        player->GetInventory().AddItem(ItemType::TIN_ORE, 2); world.Update();
         player->GetInventory().AddItem(ItemType::BRONZE_BAR, 1); world.Update();
+        test.Expect(player->GetTutorialState().GetStep() == TutorialStep::SMELT_BRONZE,
+            "One Bronze bar cannot finish the three-bar smelting goal");
+        player->GetInventory().AddItem(ItemType::BRONZE_BAR, 2); world.Update();
         player->GetInventory().AddItem(ItemType::BRONZE_SWORD, 1); world.Update();
         test.Expect(player->GetTutorialState().GetStep() == TutorialStep::EQUIP_WEAPON,
             "Crafting milestones advance in the authored sequence");
+        world.TryEquipInventoryItem(playerID, FindSlot(player->GetInventory(), ItemType::BRONZE_AXE));
+        world.Update();
+        test.Expect(player->GetTutorialState().GetStep() == TutorialStep::EQUIP_WEAPON,
+            "An axe in the weapon slot cannot complete the sword equipment lesson");
         const int swordSlot = FindSlot(player->GetInventory(), ItemType::BRONZE_SWORD);
         world.TryEquipInventoryItem(playerID, swordSlot); world.Update();
         test.Expect(player->GetTutorialState().GetStep() == TutorialStep::SAFE_COMBAT,
