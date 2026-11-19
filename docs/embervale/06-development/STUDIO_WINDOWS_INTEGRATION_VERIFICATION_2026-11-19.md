@@ -61,8 +61,30 @@ fresh space-containing sibling draft publication, receipt/hash verification,
 semantic readback and reopening the saved draft. The original snapshot remains
 byte-identical in every successful case.
 
-## Remaining boundary
+## Visible editor and saved-world follow-up
+
+The full Windows SDL client/graphics configuration built successfully at
+`26354a52d3c228ecf0cc71f9194af3c41219184e`. With SDL's dummy video driver,
+the complete expanded CTest set passed **96/96**, including 84 headless,
+7 graphics and 5 client tests.
+
+The real Tk editor was opened visibly. Mouse selection, moving the normal
+tree, keyboard undo/redo and dirt painting were observed working. After an
+editor restart, the user saved `visible edited draft.json` through the native
+Save dialog. The validated draft moves `resource.normal_tree.001` from (5,5)
+to (22,11); its terrain is unchanged. Its SHA-256 is
+`b4ad3f4706e649e0d0651a1c8c06c4ccc44d339e97070f46cfbf9419c7dc7713`.
+
+The exact draft was launched using `GameEngine --world <draft> --no-save`.
+Startup confirmed temporary player progress; the visible game showed the
+relocated normal tree being gathered. The user confirmed the game appeared
+to work as intended. This is a bounded move/save/play smoke test, not a full
+gameplay or fresh-player acceptance pass. The saved draft itself contains no
+paint change; paint save/reopen remains covered by the six real bridge tests.
+
+## Consolidation and remaining boundary
 
 The stacked branch is locally consolidated and all earlier Studio branch tips
 are ancestors of this verified head. A visible Tk interaction and SDL client
-playtest of the produced draft remain separate manual acceptance work.
+playtest have now been exercised as described above. Broader editor recovery,
+platform coverage and full authoring acceptance remain separate work.
