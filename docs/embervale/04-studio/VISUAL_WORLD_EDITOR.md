@@ -10,8 +10,8 @@ Character identity, quest/dialogue/shop bindings and behaviour settings remain
 fixed. Home movement alone does not change the world schema or allocate an
 object ID. Use the editor and C++ tool from the same branch.
 
-**Testing is deferred at the owner's request.** No build or gameplay pass is
-claimed for this slice; see the [implementation record and follow-up checks](../06-development/STUDIO_SPAWN_MOVE_REVIEW_2026-11-19.md).
+**Testing is deferred at the owner's request.** The C++ game and editing tool
+build successfully; no runtime test pass is claimed. See the [implementation record and follow-up checks](../06-development/STUDIO_SPAWN_MOVE_REVIEW_2026-11-19.md).
 
 
 ## Create and remove resources/stations

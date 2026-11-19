@@ -26,7 +26,7 @@ reconciliation supersedes their unexecuted/stacked verification limitations.
 | File state (STUDIO-032) | Dirty-state indicator, close/switch warnings and draft reopening integrated | Interruption recovery and durable publication |
 | Overlays (STUDIO-033) | Grid, collision, spawn, static reachability and selected approach overlays integrated | Keyboard/accessibility audit and richer diagnostics |
 | Placement (STUDIO-040) | Complete for current single-tile resources/stations: move/place/remove, retained IDs, undo/redo, save/reopen and live gathering | NPC/enemy editing remains STUDIO-041; larger footprints remain STUDIO-044 |
-| Actor homes (STUDIO-041) | Existing NPC/enemy home movement implemented with shared commands, undo/redo and save/reopen; regression cases added | Testing deferred at the owner's request; behaviour-configuration editing remains separate |
+| Actor homes (STUDIO-041) | Existing NPC/enemy home movement implemented with shared commands, undo/redo and save/reopen; game/tool builds succeeded; regression cases added | Testing deferred at the owner's request; behaviour-configuration editing remains separate |
 
 The broader editor tasks remain `in_progress` where acceptance is outstanding. STUDIO-040 is complete for its bounded current-definition scope; [placement acceptance](../06-development/STUDIO_PLACEMENT_VERIFICATION_2026-11-19.md) records 97/97 CTest, 39/39 Python checks and visible editor/game gathering.
 [Actor-home implementation and deferred verification](../06-development/STUDIO_SPAWN_MOVE_REVIEW_2026-11-19.md) record the owner's decision to integrate this slice without testing for now.

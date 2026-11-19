@@ -620,7 +620,7 @@
         "tests/StarterWorldRuntimeTests.cpp",
         "tests/StarterWorldVisualBridgeIntegration.py"
       ],
-      "notes": "Existing NPC/enemy home-position editing implemented in PR #25 with shared move/history/save/reopen support and retained identity/lifecycle/settings. Testing and visible acceptance deferred at the owner's explicit request on 19 November 2026; no pass is claimed. Broader wander/capacity/respawn configuration editing remains separate."
+      "notes": "Existing NPC/enemy home-position editing implemented in PR #25 with shared move/history/save/reopen support and retained identity/lifecycle/settings. C++ core, game and editing-tool builds succeeded. Testing and visible acceptance deferred at the owner's explicit request on 19 November 2026; no test pass is claimed. Broader wander/capacity/respawn configuration editing remains separate."
     },
     {
       "id": "STUDIO-042",

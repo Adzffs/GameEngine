@@ -50,13 +50,20 @@ describes movable actor homes.
 
 The branch was initially prepared through GitHub after the desktop execution
 connection disconnected. On reconnection, the owner explicitly requested
-completing the work without testing for now. The implementation is therefore
-being integrated with testing deferred; no compilation or gameplay pass is
-claimed for this change.
+completing the work without testing for now. The C++ core, SDL game and editing
+tool were subsequently built successfully with the existing Windows/UCRT64
+Debug configuration. Tests and visible gameplay acceptance remain deferred;
+no runtime test pass is claimed for this change.
+
+Executed build command (no test targets or suites):
+
+```sh
+cmake --build build-client --target GameEngine EmbervaleWorldMove --parallel 6
+```
 
 | Required check | Result for this change |
 |---|---|
-| C++ compilation | Not run |
+| C++ core / game / editing-tool compilation | Passed; test executables were not built or run |
 | C++ edit/history/runtime regressions | Not run |
 | Python mocked bridge/protocol checks | Not run |
 | Real C++/Python bridge scenarios | Not run |
