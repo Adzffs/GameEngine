@@ -101,6 +101,15 @@ elapsed upgrade time. Before timing, record XP, items, coins, equipment, quest
 state, recipe knowledge and save origin. The trade replay seeds its coin budget
 explicitly and does not stand in for gathering those coins.
 
+The subsequent [starter journey](embervale/06-development/STARTER_UPGRADE_JOURNEY_2026-11-19.md)
+replays actual gathering, crafting, equipment, banking and quest-funded food from
+an unfunded fresh character. It reaches an equipped shield at tick 245, an
+equipped sword at 376, and the prepared return at 451. These are nominal
+simulation timings, not observed player timings. The route gathers ten Logs and
+five Copper for the quests, plus three Tin; crafting alone needs fewer inputs.
+It buys two meat for sixteen of the twenty reward coins and consumes no food.
+Human progression and combat food pressure remain unmeasured.
+
 ## Anti-arbitrage rule and validation scope
 
 For each fully purchasable production chain, total output sell value should be less than total input buy cost. Count intermediate recipes, quantity conversions, alternative inputs and leftover outputs. A one-step calculation is useful but incomplete when ingredients can be crafted.
@@ -132,7 +141,7 @@ The authoritative clock interval is 600 ms, equivalent to 100 ticks per minute. 
 ## Next implementation and validation work
 
 1. Execute the deferred economy regressions before balance signoff; retain the production before/after record.
-2. Record complete gathering-to-equipment timings using the implemented fresh profile.
+2. Compare the recorded production starter route with uncoached player gathering-to-equipment timings.
 3. Verify the recipe UI exposes requirements, output, duration, capacity and access clearly.
 4. Compare crafting and buying the first sword/shield, including coin sources and travel.
 5. Measure tool-upgrade time, food consumption, contention and banking on River Crossing.

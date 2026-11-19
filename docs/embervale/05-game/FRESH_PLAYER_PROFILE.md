@@ -2,8 +2,8 @@
 
 **Updated:** 19 November 2026  
 **Work package:** GAME-001  
-**Status:** Implemented; game/tool builds passed. Runtime and visible acceptance
-are deferred at the owner's request. This is not a starter-balance signoff.
+**Status:** Implemented; game/tool builds and the production starter upgrade route passed.
+Full profile/persistence and visible acceptance remain deferred. Human starter pacing is not signed off.
 
 ## Starting state
 
@@ -81,3 +81,10 @@ for one Bronze sword and one shield needs two normal Logs, three Copper ore and
 three Tin ore, leaving one plank. This is a material/coin budget; complete player
 gathering and upgrade timing remains unmeasured. See the
 [economy record](../06-development/STARTER_ECONOMY_2026-11-19.md).
+
+The next-step card and **H** guide now show recipe-derived material counts,
+equipment/tool instructions and destinations from the loaded map. Left-clicking
+the card opens the plan. Sword preparation needs three Copper/Tin pairs and three
+Bronze bars; the equipment lesson requires the Bronze sword. Banked and processed
+materials are recognised, with withdrawal instructions before use. The shield
+remains optional. [Journey implementation and reference simulation](../06-development/STARTER_UPGRADE_JOURNEY_2026-11-19.md).

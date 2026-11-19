@@ -1,0 +1,94 @@
+{
+  "kind": "authoritative-starter-upgrade-replay",
+  "profile": "fresh",
+  "uses_imported_world": true,
+  "starting_coins": 0,
+  "injected_materials_or_xp": false,
+  "seeds": {
+    "combat": 1337,
+    "rewards": 7331,
+    "gathering": 9001
+  },
+  "gathered": {
+    "normal_logs": 10,
+    "copper_ore": 5,
+    "tin_ore": 3
+  },
+  "gathering_attempts": 31,
+  "phases": [
+    {
+      "name": "accept_basic_quests",
+      "ticks": 11,
+      "cumulative_ticks": 11,
+      "tutorial_step": 1,
+      "next_objective": "Equip an axe before gathering"
+    },
+    {
+      "name": "gather_normal_logs",
+      "ticks": 164,
+      "cumulative_ticks": 175,
+      "tutorial_step": 2,
+      "next_objective": "Make Wooden planks at a crafting table"
+    },
+    {
+      "name": "craft_and_equip_shield",
+      "ticks": 70,
+      "cumulative_ticks": 245,
+      "tutorial_step": 3,
+      "next_objective": "Equip a pickaxe before mining"
+    },
+    {
+      "name": "gather_copper",
+      "ticks": 73,
+      "cumulative_ticks": 318,
+      "tutorial_step": 3,
+      "next_objective": "Mine Copper and Tin for your Bronze sword"
+    },
+    {
+      "name": "gather_tin",
+      "ticks": 24,
+      "cumulative_ticks": 342,
+      "tutorial_step": 4,
+      "next_objective": "Smelt enough Bronze bars for the sword"
+    },
+    {
+      "name": "smelt_bronze_bars",
+      "ticks": 28,
+      "cumulative_ticks": 370,
+      "tutorial_step": 5,
+      "next_objective": "Forge a Bronze sword at the furnace"
+    },
+    {
+      "name": "forge_and_equip_sword",
+      "ticks": 6,
+      "cumulative_ticks": 376,
+      "tutorial_step": 7,
+      "next_objective": "Defeat a creature and return safely"
+    },
+    {
+      "name": "bank_spare_logs",
+      "ticks": 50,
+      "cumulative_ticks": 426,
+      "tutorial_step": 7,
+      "next_objective": "Defeat a creature and return safely"
+    },
+    {
+      "name": "claim_rewards_and_buy_food",
+      "ticks": 25,
+      "cumulative_ticks": 451,
+      "tutorial_step": 7,
+      "next_objective": "Defeat a creature and return safely"
+    }
+  ],
+  "first_shield_equipped_tick": 245,
+  "first_sword_equipped_tick": 376,
+  "simulation_ticks": 451,
+  "nominal_tick_milliseconds": 600,
+  "quest_coins_earned": 20,
+  "food_coins_spent": 16,
+  "coins_remaining": 4,
+  "cooked_meat_carried": 2,
+  "logs_banked": 8,
+  "tutorial_step": "SAFE_COMBAT",
+  "human_pacing_measured": false
+}

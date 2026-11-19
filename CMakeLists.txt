@@ -32,6 +32,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(GAMEENGINE_CORE_SOURCES
+    src/Tutorial/StarterJourney.cpp
     src/Dialogue/DialogueDefinitionDatabase.cpp
     src/Dialogue/DialogueSystem.cpp
     src/Dialogue/DialoguePresentationState.cpp
