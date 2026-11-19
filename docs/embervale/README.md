@@ -16,6 +16,7 @@
 | Where are the new player, Mara and furnace sprites? | [Cast art and walking](06-development/CAST_RENDERING_2026-11-19.md) |
 | Where are river banks, stone floors and mining sprites? | [Environment art and captures](06-development/ENVIRONMENT_RENDERING_2026-11-19.md) |
 | Where are the bank chest and crafting table sprites? | [Service art and captures](06-development/SERVICE_RENDERING_2026-11-19.md) |
+| Where is the first building and reusable kit? | [Workshop, camera and roof visibility](06-development/BUILDING_RENDERING_2026-11-19.md) |
 | Which quest follows the starter equipment journey? | [Quest continuity and current rewards](06-development/QUEST_CONTINUITY_2026-11-19.md) |
 | How does the first equipment journey work? | [Starter upgrade journey](06-development/STARTER_UPGRADE_JOURNEY_2026-11-19.md) |
 | What are the current starter costs and trade results? | [Starter economy correction](06-development/STARTER_ECONOMY_2026-11-19.md) |
@@ -106,6 +107,7 @@ The source contains substantial RPG systems, starter-world export, bounded valid
 | [CAST_RENDERING_2026-11-19.md](06-development/CAST_RENDERING_2026-11-19.md) | Player/Mara/furnace art, distance-driven walk poses, reusable export and actual renderer captures |
 | [ENVIRONMENT_RENDERING_2026-11-19.md](06-development/ENVIRONMENT_RENDERING_2026-11-19.md) | Water/bank quarters, stone floors, preserved ground and copper/tin depletion captures |
 | [SERVICE_RENDERING_2026-11-19.md](06-development/SERVICE_RENDERING_2026-11-19.md) | Bank/table masters, typed station sprites and actual River Crossing captures |
+| [BUILDING_RENDERING_2026-11-19.md](06-development/BUILDING_RENDERING_2026-11-19.md) | Modular overhead building kit, schema-4 workshop, collision, editor preservation and roof cutaway |
 | [CONTRIBUTING.md](06-development/CONTRIBUTING.md) | Focused work, evidence, review, compatibility and parallel-agent handoff |
 | [TESTING.md](06-development/TESTING.md) | Current registrations, meaningful future tests and result records |
 | [RUNTIME_IMPORT_VERIFICATION_2026-11-18.md](06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md) | Runtime-input build/test results, real dummy-video launch and precise platform limits |

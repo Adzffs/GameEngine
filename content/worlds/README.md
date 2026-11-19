@@ -67,7 +67,15 @@ python tools/render_world_overview.py content/worlds/river-crossing.blockout.jso
 ```
 
 The current canonical candidate SHA-256 is
-`8a04f8fdc6b02f33f1cdcc5c0f71323deb2c9def39bfc3ca29fcd6ac951df0fb`.
+`72c9d565ad1db11fc4e27eb8e512ef0dd23b5a902ef18da6a486a3c2ed28297f`.
 Generation/content validation and builds passed. Test suites, visible gameplay,
 AI behaviour and pacing acceptance remain deferred at the owner's request.
 [Implementation record](../../docs/embervale/06-development/RIVER_CROSSING_BLOCKOUT_2026-11-19.md).
+
+
+The candidate now uses schema 4 with the first 9x5 timber/stone workshop at
+(65,44), an open south doorway at (69,48), and a connected yard path. The
+furnace/table and all existing resource/actor homes retain their positions.
+The [building record](../../docs/embervale/06-development/BUILDING_RENDERING_2026-11-19.md)
+explains the modular kit, collision and fading roof. The overview includes the
+same wall shell. Update/rebuild the client before loading this schema-4 file.

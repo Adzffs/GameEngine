@@ -872,9 +872,9 @@
       "github_issue": null,
       "evidence": [
         "docs/embervale/05-game/ART_AND_AUDIO.md",
-        "docs/embervale/06-development/SERVICE_RENDERING_2026-11-19.md"
+        "docs/embervale/06-development/BUILDING_RENDERING_2026-11-19.md"
       ],
-      "notes": "Four bounded LibreSprite art pilots establish palette, 32-pixel ground scale, character/resource/prop pivots and binary alpha, with native/enlarged boards and actual game-renderer captures. Client and launcher builds passed. Full style/readability, editor preview parity and visible playthrough acceptance remain open."
+      "notes": "Five bounded LibreSprite art pilots establish palette, 32-pixel ground scale, character/resource/prop pivots and binary alpha, with native/enlarged boards and actual game-renderer captures. Client and launcher builds passed. Full style/readability, editor preview parity and visible playthrough acceptance remain open."
     },
     {
       "id": "ART-002",
@@ -890,9 +890,9 @@
       "github_issue": null,
       "evidence": [
         "docs/embervale/05-game/ART_AND_AUDIO.md",
-        "docs/embervale/06-development/SERVICE_RENDERING_2026-11-19.md"
+        "docs/embervale/06-development/BUILDING_RENDERING_2026-11-19.md"
       ],
-      "notes": "Starter kit implementation is in progress across forest, cast, environment and service batches: grass/paths, normal tree/stump, player/Mara/furnace, water/banks/stone, copper/tin/rubble and bank/table. Editable masters, provenance and default exports cover 86 frames in twelve PNGs. Builds, packaged PNG checksums and software-renderer captures passed. Buildings, remaining cast/tiers, general importing and full starter acceptance remain open; regression suites and visible interaction remain deferred at owner request."
+      "notes": "Starter kit implementation is in progress across forest, cast, environment, service and building batches: grass/paths, normal tree/stump, player/Mara/furnace, water/banks/stone, copper/tin/rubble bank/table, and a modular workshop shell with real collision/roof visibility. Editable masters, provenance and default exports cover 113 frames in fifteen PNGs. Builds, packaged PNG checksums and software-renderer captures passed. Further building assemblies, remaining cast/tiers, general importing and full starter acceptance remain open; regression suites and visible interaction remain deferred at owner request."
     },
     {
       "id": "ART-003",

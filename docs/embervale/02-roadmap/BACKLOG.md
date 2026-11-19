@@ -20,7 +20,7 @@ reconciliation supersedes their unexecuted/stacked verification limitations.
 
 | Work | Current bounded result | Remaining acceptance |
 |---|---|---|
-| Art pilots (ART-001/002) | Four editable batches cover terrain, normal tree/stump, player/Mara/furnace, copper/tin/rubble and bank/table; 86 frames in twelve PNGs; builds, default exports and software captures passed | Buildings, remaining cast/tiers, general importing and full visible starter acceptance remain open; [current record](../06-development/SERVICE_RENDERING_2026-11-19.md) |
+| Art pilots (ART-001/002) | Five editable batches cover terrain, normal tree/stump, player/Mara/furnace, copper/tin/rubble, bank/table and a modular building kit with the first workshop; 113 frames in fifteen PNGs; builds, exports and camera captures passed | Further building assemblies, remaining cast/tiers, general importing and full visible starter acceptance remain open; [current record](../06-development/BUILDING_RENDERING_2026-11-19.md) |
 | Baseline (ENG-002) | Windows headless/client builds and complete regression sets executed | Other platforms and fresh-player measurements remain separate |
 | Commands (STUDIO-020–024) | Shared validated move/paint/place/remove, history, complete snapshot inspection and guarded create-only drafts | Structured diagnostics, persistent history and in-place publication |
 | Editor (STUDIO-030) | Open/select/inspect/move/paint, zoom, undo/redo, save/reopen and play integrated | Broader editor/platform acceptance |

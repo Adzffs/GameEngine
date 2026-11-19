@@ -74,13 +74,19 @@ namespace
         out << "Map x=" << left << ".." << right << " y="
             << top << ".." << bottom << " (each glyph is one tile)\n"
             << "Legend . grass, : dirt, # stone, ~ water,"
-            << " R resource, S station, N npc, M monster, @ spawn\n";
+            << " X wall, + open doorway, R resource, S station, N npc, M monster, @ spawn\n";
         for (int y = top; y <= bottom; ++y)
         {
             std::string row;
             row.reserve(static_cast<std::size_t>(right - left + 1));
             for (int x = left; x <= right; ++x)
                 row.push_back(TerrainGlyph(snapshot.terrainRows[y][x]));
+            for (const auto &b : snapshot.buildings)
+                for (int x = left; x <= right; ++x)
+                {
+                    if (b.IsWall(x, y)) row[static_cast<std::size_t>(x - left)] = 'X';
+                    if (b.IsDoor(x, y)) row[static_cast<std::size_t>(x - left)] = '+';
+                }
             for (const auto &placement : snapshot.placements)
             {
                 const int x = placement.position.GetX();

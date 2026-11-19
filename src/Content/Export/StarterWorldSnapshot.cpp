@@ -186,7 +186,7 @@ namespace StarterWorldExport
 
         void Validate(const Snapshot &snapshot)
         {
-            if ((snapshot.schemaVersion < 1 || snapshot.schemaVersion > 3) ||
+            if ((snapshot.schemaVersion < 1 || snapshot.schemaVersion > 4) ||
                 snapshot.nextPlacementId < 1 ||
                 snapshot.nextPlacementId > MaximumNextPlacementId ||
                 (snapshot.schemaVersion == 1 && snapshot.nextPlacementId != 1))
@@ -206,6 +206,28 @@ namespace StarterWorldExport
                 Fail("placement count exceeds 4096");
 
             std::set<std::string> ids;
+            if (snapshot.buildings.size() > 64 || (snapshot.schemaVersion < 4 && !snapshot.buildings.empty()))
+                Fail("building shells require schema 4 and at most 64 entries");
+            std::set<std::pair<int, int>> buildingCells;
+            for (const Building &building : snapshot.buildings)
+            {
+                CheckIdentity(building.id);
+                if (!building.id.starts_with("building.") || !ids.insert(building.id).second)
+                    Fail("invalid or duplicate building ID: " + building.id);
+                if (building.width < 5 || building.width > 16 || building.height < 4 || building.height > 12 ||
+                    building.x < 1 || building.y < 1 || building.x > snapshot.width - building.width - 1 ||
+                    building.y > snapshot.height - building.height - 1 ||
+                    building.doorOffset < 1 || building.doorOffset >= building.width - 1)
+                    Fail("invalid building dimensions, bounds or doorway: " + building.id);
+                for (int y = building.y; y < building.y + building.height; ++y)
+                    for (int x = building.x; x < building.x + building.width; ++x)
+                    {
+                        if (!buildingCells.emplace(x, y).second)
+                            Fail("overlapping building footprints: " + building.id);
+                        if (snapshot.terrainRows[y][x] != 'S')
+                            Fail("building footprint requires stone ground: " + building.id);
+                    }
+            }
             std::set<std::pair<InitializationStage, int>> orderKeys;
             for (const Placement &placement : snapshot.placements)
             {
@@ -436,6 +458,21 @@ namespace StarterWorldExport
             out << "      " << Quote(snapshot.terrainRows[i]) << (i + 1 == snapshot.terrainRows.size() ? "\n" : ",\n");
         out << "    ]\n  },\n  \"player_spawn\": ";
         WritePosition(out, snapshot.playerSpawn);
+        if (snapshot.schemaVersion >= 4)
+        {
+            out << ",\n  \"buildings\": [";
+            auto buildings = snapshot.buildings;
+            std::sort(buildings.begin(), buildings.end(), [](const Building &a, const Building &b) { return a.id < b.id; });
+            for (std::size_t i = 0; i < buildings.size(); ++i)
+            {
+                const auto &b = buildings[i];
+                out << (i ? ",\n" : "\n") << "    { \"id\": " << Quote(b.id)
+                    << ", \"definition_id\": \"building.timber_stone\", \"x\": " << b.x << ", \"y\": " << b.y
+                    << ", \"width\": " << b.width << ", \"height\": " << b.height
+                    << ", \"door_offset\": " << b.doorOffset << " }";
+            }
+            out << (buildings.empty() ? "]" : "\n  ]");
+        }
         out << ",\n  \"placements\": [\n";
 
         std::vector<const Placement *> sorted;

@@ -1,4 +1,30 @@
 #include "Map.h"
+#include <stdexcept>
+#include <utility>
+
+const Building *Map::GetBuildingAt(int x, int y) const
+{
+    for (const auto &b : buildings) if (b.Contains(x, y)) return &b;
+    return nullptr;
+}
+
+void Map::SetBuildings(std::vector<Building> layout)
+{
+    for (const auto &b : layout)
+        if (b.x < 0 || b.y < 0 || b.width < 5 || b.width > 16 || b.height < 4 || b.height > 12 ||
+            b.x > width - b.width || b.y > height - b.height || b.doorOffset < 1 || b.doorOffset >= b.width - 1)
+            throw std::invalid_argument("Invalid building map bounds");
+    for (const auto &b : buildings)
+        for (int y = b.y; y < b.y + b.height; ++y)
+            for (int x = b.x; x < b.x + b.width; ++x)
+                if (b.IsWall(x, y) && GetTile(x, y).GetType() == TileType::WALL)
+                    GetTile(x, y).SetType(GetTile(x, y).GetGroundType());
+    buildings = std::move(layout);
+    for (const auto &b : buildings)
+        for (int y = b.y; y < b.y + b.height; ++y)
+            for (int x = b.x; x < b.x + b.width; ++x)
+                if (b.IsWall(x, y)) GetTile(x, y).SetType(TileType::WALL);
+}
 
 Map::Map(int width, int height)
 {

@@ -1,0 +1,196 @@
+{
+  "date": "2026-11-19",
+  "base_commit": "be1fc875a8892aa96060193c79c44f2b3c864fb6",
+  "platform": "Linux",
+  "compiler": "GCC 14.2.0",
+  "cmake": "4.4.5",
+  "SDL": "3.4.12",
+  "editor": "LibreSprite 1.3",
+  "new_frames": 27,
+  "total_frames": 113,
+  "runtime_images": 15,
+  "world_sha256": "72c9d565ad1db11fc4e27eb8e512ef0dd23b5a902ef18da6a486a3c2ed28297f",
+  "builds": [
+    {
+      "configuration": "build-client; client and content tools; BUILD_TESTING=OFF",
+      "targets": [
+        "GameEngine",
+        "EmbervaleRenderPreview",
+        "EmbervaleWorldValidate",
+        "EmbervaleWorldMove"
+      ],
+      "result": "passed"
+    },
+    {
+      "configuration": "build-river-crossing; client with content tools and tests disabled",
+      "targets": [
+        "GameEngine"
+      ],
+      "result": "passed"
+    }
+  ],
+  "production_validation": "100 x 100, 31 existing placements, first 9x5 workshop accepted",
+  "checks": {
+    "wall_cells": 23,
+    "doorway_reachable": true,
+    "interior_reachable": true,
+    "studio_paint_undo_redo_save_reopen_preserves_schema4": true,
+    "pre_schema4_buildings_rejected": "starter world input: unexpected object fields",
+    "invalid_floor_edit_rejected": "Error: starter world export: building footprint requires stone ground: building.workshop.001",
+    "source_unchanged": true,
+    "masters_preserved": 3,
+    "png_exports_identical": 3,
+    "runtime_wall_focus_rejected": "Focus must be a walkable map position"
+  },
+  "previous_art_and_walk_unchanged": true,
+  "packaged_images_match_in": [
+    "build-client",
+    "build-river-crossing"
+  ],
+  "images": [
+    {
+      "path": "assets/embervale/forest-pilot/textures/terrain.png",
+      "sha256": "3fdf5fb4cc07bbb8ed039b9cb58333ac89db988352d5c629e61eb16ebc243e07"
+    },
+    {
+      "path": "assets/embervale/forest-pilot/textures/oak.png",
+      "sha256": "4769a241fbc0c19e89817abb8327f2b27d51698d3ca97672e88c9bbb9673caa9"
+    },
+    {
+      "path": "assets/embervale/forest-pilot/textures/stump.png",
+      "sha256": "0841127c68105a3b174af70a99e07e2ad1b17bc02de636e3cb88d9c548b29289"
+    },
+    {
+      "path": "assets/embervale/cast-pilot/textures/player.png",
+      "sha256": "9dcfdfec59ff7ad184c763b8846b98516495ae0a75fc4f83fbfe1e27176f9164"
+    },
+    {
+      "path": "assets/embervale/cast-pilot/textures/mara.png",
+      "sha256": "3f6ecc1b64e50ed4d49a413b1e0edd0aaf1d29bdb9acb5a6a9c3604efe8df885"
+    },
+    {
+      "path": "assets/embervale/cast-pilot/textures/furnace.png",
+      "sha256": "e8e1f512a5d1bdc355dcd569ff5cb9ee5a7566725ed54eba27efc74859c1b2f2"
+    },
+    {
+      "path": "assets/embervale/environment-pilot/textures/terrain.png",
+      "sha256": "ccc71b373af780b7a95e2a578a003154814a5b7d5dcd3e23f517225317441e77"
+    },
+    {
+      "path": "assets/embervale/environment-pilot/textures/copper.png",
+      "sha256": "823a3530bd2200428a7fd036323801d40a549c0109fed4345e8deb0f84b6ae80"
+    },
+    {
+      "path": "assets/embervale/environment-pilot/textures/tin.png",
+      "sha256": "37c8301960238d9ec4b0e1102d7c14b5aa66d2f2e2469dda5c082cd865e982ee"
+    },
+    {
+      "path": "assets/embervale/environment-pilot/textures/rubble.png",
+      "sha256": "bf55b0b4b241ff1150886926821c0f48658c186bc8af5f7b91d7b795d26ebdae"
+    },
+    {
+      "path": "assets/embervale/service-pilot/textures/bank.png",
+      "sha256": "9fb831e30df9c92b9b3476eb81f8c89e37e31c1819422b4a73c186d59bfab025"
+    },
+    {
+      "path": "assets/embervale/service-pilot/textures/crafting-table.png",
+      "sha256": "00d584d66ec9496ad1bc942769ebacd9b781cddeeb143a3878efd46f2028f432"
+    },
+    {
+      "path": "assets/embervale/building-pilot/textures/walls.png",
+      "sha256": "6c7ee4aaf0cffb1efca78560d2ab979bd6392292005c63c10308f3ce99747f17"
+    },
+    {
+      "path": "assets/embervale/building-pilot/textures/roof.png",
+      "sha256": "210a2dbe03ec4c17dc6f9cfa92bbba5e4299fd2a1aa366e43cea92c0cc3f62b0"
+    },
+    {
+      "path": "assets/embervale/building-pilot/textures/floors.png",
+      "sha256": "0ddf1d44668da431f2d4e69533cc16e17e9db8de06ac2764433f9d1abb585f39"
+    }
+  ],
+  "captures": [
+    {
+      "name": "workshop-native",
+      "options": [
+        "--focus",
+        "66",
+        "49"
+      ],
+      "cache": "World art: 15/15 textures cached.",
+      "sha256": "6e73a548b3835ba146d7fb9ada1c0e0d45d8dcab00cddf8d3cb61164bfff2fc0"
+    },
+    {
+      "name": "workshop-1_5x",
+      "options": [
+        "--focus",
+        "66",
+        "49",
+        "--zoom",
+        "1.5"
+      ],
+      "cache": "World art: 15/15 textures cached.",
+      "sha256": "f6caa8f70a56c1ea99851446b46f1c0983e0580804786ce622dbbbee0bf8c9a6"
+    },
+    {
+      "name": "interior",
+      "options": [
+        "--focus",
+        "69",
+        "46",
+        "--zoom",
+        "1.5"
+      ],
+      "cache": "World art: 15/15 textures cached.",
+      "sha256": "61234eb63bd726506a6a2b775976f998db0b878fc214c018a3fc4d0f1eecbdb8"
+    },
+    {
+      "name": "doorway",
+      "options": [
+        "--focus",
+        "69",
+        "48",
+        "--zoom",
+        "1.5"
+      ],
+      "cache": "World art: 15/15 textures cached.",
+      "sha256": "72a5e66a6fadc62aff0eb69fe5885b568bfd540cee58f6c869ed9c16ec845100"
+    },
+    {
+      "name": "exit-restored",
+      "options": [
+        "--focus",
+        "69",
+        "46",
+        "--walk-to",
+        "69",
+        "50",
+        "--frames",
+        "40",
+        "--zoom",
+        "1.5"
+      ],
+      "cache": "World art: 15/15 textures cached.",
+      "sha256": "23843113934037bacb7eb4b91cf03075fc7c5fa7fa5273742bfaaebd4ed71624"
+    },
+    {
+      "name": "basic-interior",
+      "options": [
+        "--focus",
+        "69",
+        "46",
+        "--zoom",
+        "1.5",
+        "--basic"
+      ],
+      "cache": "World art: 15/15 textures cached.",
+      "sha256": "40ca0fa3d4613ec9ba28b44612a66b5899c1eaa3efb76fde2396b2203fd52517"
+    }
+  ],
+  "limits": [
+    "Regression suites deferred at owner request",
+    "No visible GPU/window interaction playthrough",
+    "Windows execution/export unavailable in this Linux session",
+    "Movement preview is presentation interpolation, not server pathfinding"
+  ]
+}

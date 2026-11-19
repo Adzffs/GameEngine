@@ -43,6 +43,7 @@ void ForestSprites::Clear()
         image.alpha.clear();
     }
     renderer = nullptr;
+    roofAlphas.clear();
 }
 
 void ForestSprites::Initialize(SDL_Renderer *target)
@@ -61,6 +62,16 @@ void ForestSprites::Initialize(SDL_Renderer *target)
         if (frame.id == "station.furnace.idle") furnace = &frame;
         if (frame.id == "station.bank.idle") bank = &frame;
         if (frame.id == "station.crafting_table.idle") craftingTable = &frame;
+        constexpr std::array<std::string_view, 12> walls{"front", "back", "west", "east", "window-front", "window-west",
+            "window-east", "doorway", "corner-nw", "corner-ne", "corner-sw", "corner-se"};
+        constexpr std::array<std::string_view, 12> roof{"nw", "n", "ne", "w", "center", "e", "sw", "s", "se", "ridge-w", "ridge", "ridge-e"};
+        for (std::size_t i = 0; i < walls.size(); ++i)
+        {
+            if (frame.id.starts_with("building.wall.") && frame.id.substr(14) == walls[i]) buildingWalls[i] = &frame;
+            if (frame.id.starts_with("building.roof.") && frame.id.substr(14) == roof[i]) buildingRoof[i] = &frame;
+        }
+        constexpr std::array<std::string_view, 3> floors{"building.floor.01", "building.floor.02", "building.floor.03"};
+        for (std::size_t i = 0; i < floors.size(); ++i) if (frame.id == floors[i]) buildingFloors[i] = &frame;
         constexpr std::array<std::string_view, 3> waterIDs{"terrain.water.01", "terrain.water.02", "terrain.water.03"};
         constexpr std::array<std::string_view, 3> stoneIDs{"terrain.stone.01", "terrain.stone.02", "terrain.stone.03"};
         for (std::size_t i = 0; i < water.size(); ++i)
@@ -174,8 +185,9 @@ bool ForestSprites::Draw(const Frame *frame, const SDL_FRect &destination,
 
 bool ForestSprites::DrawGround(Map &map, int x, int y) const
 {
-    // Walls are still drawn by the primitive tile pass, not the object queue.
-    if (map.GetTileType(x, y) == TileType::WALL) return false;
+    // Legacy walls keep the primitive pass; authored shells use the object queue.
+    const auto *building = map.GetBuildingAt(x, y);
+    if (map.GetTileType(x, y) == TileType::WALL && !building) return false;
     const auto type = map.GetGroundType(x, y);
     const SDL_FRect tile{static_cast<float>(x * ForestPilotLayout::TileSize),
         static_cast<float>(y * ForestPilotLayout::TileSize), 32.0f, 32.0f};
@@ -185,7 +197,12 @@ bool ForestSprites::DrawGround(Map &map, int x, int y) const
     {
         return Draw(grass[variant], tile);
     }
-    if (type == TileType::STONE) return Draw(stone[variant], tile);
+    if (type == TileType::STONE)
+    {
+        if (building && !building->IsWall(x, y) && !building->IsDoor(x, y) && Available(buildingFloors[variant]))
+            return Draw(buildingFloors[variant], tile);
+        return Draw(stone[variant], tile);
+    }
     if (type == TileType::WATER) return DrawWater(map, x, y, tile, variant);
     if (type != TileType::DIRT) return false;
     const auto dirt = [&map](int tx, int ty)
@@ -275,6 +292,57 @@ bool ForestSprites::DrawMining(const ResourceNode &resource) const
 bool ForestSprites::HitMining(ResourceType type, int tileX, int tileY, float worldX, float worldY) const
 {
     return Hit(MiningFrame(type), tileX, tileY, worldX, worldY);
+}
+
+bool ForestSprites::DrawBuildingWall(const Building &b, int x, int y, const SDL_FRect &player) const
+{
+    const int column = x - b.x, row = y - b.y;
+    int index;
+    if (row == 0) index = column == 0 ? 8 : column == b.width - 1 ? 9 : 1;
+    else if (row == b.height - 1)
+        index = column == 0 ? 10 : column == b.width - 1 ? 11 : b.IsDoor(x, y) ? 7 :
+            column == 2 || column == b.width - 3 ? 4 : 0;
+    else index = column == 0 ? (row == b.height / 2 ? 5 : 2) : (row == b.height / 2 ? 6 : 3);
+    const auto *frame = buildingWalls[index];
+    if (!Available(frame)) return false;
+    const auto bounds = Bounds(*frame, static_cast<float>(x), static_cast<float>(y));
+    const bool overlap = SDL_HasRectIntersectionFloat(&bounds, &player);
+    const bool behind = player.y + player.h <= y * 32.0f + 24.0f;
+    return Draw(frame, bounds, nullptr, overlap && behind ? 110 : 255);
+}
+
+bool ForestSprites::DrawBuildingRoof(const Building &b, const SDL_FRect &player, float deltaSeconds)
+{
+    for (const auto *frame : buildingRoof) if (!Available(frame)) return false;
+    const SDL_FRect bounds{b.x * 32.0f - 8.0f, b.y * 32.0f - 48.0f, b.width * 32.0f + 16.0f, b.height * 32.0f};
+    const int px = static_cast<int>(std::floor((player.x + player.w / 2) / 32));
+    const int py = static_cast<int>(std::floor((player.y + player.h) / 32));
+    const float target = b.Contains(px, py) || SDL_HasRectIntersectionFloat(&bounds, &player) ? 25.0f : 255.0f;
+    auto [entry, inserted] = roofAlphas.try_emplace(b.id, target);
+    entry->second += (target - entry->second) * std::clamp(deltaSeconds * 12.0f, 0.0f, 1.0f);
+    const auto alpha = static_cast<Uint8>(std::round(entry->second));
+    const std::array<float, 3> xs{0, 32, bounds.w - 32}, ys{0, 32, bounds.h - 32};
+    const std::array<float, 3> widths{32, bounds.w - 64, 32}, heights{32, bounds.h - 64, 32};
+    // Repeat native tiles; clip the final repeat instead of stretching its pixels.
+    for (int row = 0; row < 3; ++row) for (int column = 0; column < 3; ++column)
+        for (float y = 0; y < heights[row]; y += 32) for (float x = 0; x < widths[column]; x += 32)
+        {
+            const auto *frame = buildingRoof[row * 3 + column];
+            const float w = std::min(32.0f, widths[column] - x), h = std::min(32.0f, heights[row] - y);
+            const SDL_FRect source{frame->source.x, frame->source.y, w, h};
+            const SDL_FRect dest{bounds.x + xs[column] + x, bounds.y + ys[row] + y, w, h};
+            if (!Draw(frame, dest, &source, alpha)) return false;
+        }
+    for (int section = 0; section < 3; ++section)
+        for (float x = 0; x < widths[section]; x += 32)
+        {
+            const auto *frame = buildingRoof[9 + section];
+            const float w = std::min(32.0f, widths[section] - x);
+            const SDL_FRect source{frame->source.x, frame->source.y, w, 32};
+            const SDL_FRect dest{bounds.x + xs[section] + x, bounds.y + 16, w, 32};
+            if (!Draw(frame, dest, &source, alpha)) return false;
+        }
+    return true;
 }
 
 bool ForestSprites::DrawTree(const ResourceNode &resource, const SDL_FRect &player) const

@@ -31,7 +31,7 @@ namespace StarterWorldEdit
             spawn->maximumActiveCount = settings.maximumActiveCount;
             spawn->respawns = settings.respawns;
             spawn->respawnDelayTicks = settings.respawnDelayTicks;
-            candidate.schemaVersion = 3;
+            candidate.schemaVersion = std::max(3, candidate.schemaVersion);
             candidate = StarterWorldImport::ValidateForRuntime(candidate);
         }
         return {std::move(candidate), std::string(placementId), before, settings, changed};

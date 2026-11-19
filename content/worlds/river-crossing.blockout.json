@@ -1,6 +1,6 @@
 {
   "format": "embervale.starter-world-snapshot",
-  "schema_version": 2,
+  "schema_version": 4,
   "region_id": "embervale.development_starter",
   "revision": 1,
   "next_placement_id": 12,
@@ -59,9 +59,9 @@
       "GGGGGGGSSSSSSSGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDGSSSSSSSSSSSGGGGGGGGGGGGGGGGGGGGGGGG",
       "GGGGGGGSSSSSSSGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDGSSSSSSSSSSSGGSSSSSSGGGGGGGGGGGGGGGG",
       "GGGGGGGSSSSSSSGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDGSSSSSSSSSSSGGSSSSSSGGGGGGGGGGGGGGGG",
-      "GGGGGGGSSSSSSSGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDGGGGGGGGGGGGGGSSSSSSGGGGGGGGGGGGGGGG",
-      "GGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDGGGGDGGGGDGGGGSSSSSSGGGGGGGGGGGGGGGG",
-      "GGGGGGGGGGGGGGGGDDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDGGGGDGGGGDGGGGSSSSSSGGGGGGGGGGGGGGGG",
+      "GGGGGGGSSSSSSSGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDGGGGGDGGGGGGGGSSSSSSGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDGGGGDDGGGDGGGGSSSSSSGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGDDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDGGGGDDGGGDGGGGSSSSSSGGGGGGGGGGGGGGGG",
       "GGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDDDDDDDDDDDDDDDSSSSSSGGGGGGGGGGGGGGGG",
       "GGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDDDDDDDDDDDDDDDGGGGGGGGGGGGGGGGGGGGGG",
       "GGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGGGGWWWWWWWWGGGGGDDDDDDDDDDDDDDDDDGGDGGGGGGGGGGGGGGGGGGG",
@@ -113,6 +113,9 @@
     ]
   },
   "player_spawn": { "x": 5, "y": 28, "surface_id": "ground" },
+  "buildings": [
+    { "id": "building.workshop.001", "definition_id": "building.timber_stone", "x": 65, "y": 44, "width": 9, "height": 5, "door_offset": 4 }
+  ],
   "placements": [
     {
       "id": "monster.aggressive_development.001",
@@ -120,7 +123,7 @@
       "definition_id": "npc.aggressive_development_monster",
       "initialization": { "stage": "world_start", "order": 2 },
       "position": { "x": 84, "y": 82, "surface_id": "ground" },
-      "spawn": { "spawn_id": "spawn.aggressive_development", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": true }
+      "spawn": { "spawn_id": "spawn.aggressive_development", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": true, "respawn_delay_ticks": 0 }
     },
     {
       "id": "monster.durable_development.001",
@@ -128,7 +131,7 @@
       "definition_id": "npc.durable_development_monster",
       "initialization": { "stage": "first_player_registration", "order": 0 },
       "position": { "x": 91, "y": 80, "surface_id": "ground" },
-      "spawn": { "spawn_id": "spawn.durable_development", "wander_radius": 1, "wander_interval_ticks": 7, "maximum_active_count": 1, "respawns": true }
+      "spawn": { "spawn_id": "spawn.durable_development", "wander_radius": 1, "wander_interval_ticks": 7, "maximum_active_count": 1, "respawns": true, "respawn_delay_ticks": 0 }
     },
     {
       "id": "monster.elite_development.001",
@@ -136,7 +139,7 @@
       "definition_id": "npc.elite_development_monster",
       "initialization": { "stage": "first_player_registration", "order": 1 },
       "position": { "x": 93, "y": 92, "surface_id": "ground" },
-      "spawn": { "spawn_id": "spawn.elite_development", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": true }
+      "spawn": { "spawn_id": "spawn.elite_development", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": true, "respawn_delay_ticks": 0 }
     },
     {
       "id": "monster.passive_development.001",
@@ -144,7 +147,7 @@
       "definition_id": "npc.passive_development_monster",
       "initialization": { "stage": "world_start", "order": 1 },
       "position": { "x": 27, "y": 68, "surface_id": "ground" },
-      "spawn": { "spawn_id": "spawn.passive_development", "wander_radius": 2, "wander_interval_ticks": 5, "maximum_active_count": 1, "respawns": true }
+      "spawn": { "spawn_id": "spawn.passive_development", "wander_radius": 2, "wander_interval_ticks": 5, "maximum_active_count": 1, "respawns": true, "respawn_delay_ticks": 0 }
     },
     {
       "id": "npc.brann_deepwell.001",
@@ -152,7 +155,7 @@
       "definition_id": "npc.brann_deepwell",
       "initialization": { "stage": "first_player_registration", "order": 5 },
       "position": { "x": 80, "y": 54, "surface_id": "ground" },
-      "spawn": { "spawn_id": "spawn.brann_deepwell", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": false }
+      "spawn": { "spawn_id": "spawn.brann_deepwell", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": false, "respawn_delay_ticks": 0 }
     },
     {
       "id": "npc.development_guide.001",
@@ -160,7 +163,7 @@
       "definition_id": "npc.development_guide",
       "initialization": { "stage": "world_start", "order": 0 },
       "position": { "x": 14, "y": 25, "surface_id": "ground" },
-      "spawn": { "spawn_id": "spawn.development_guide", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": false }
+      "spawn": { "spawn_id": "spawn.development_guide", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": false, "respawn_delay_ticks": 0 }
     },
     {
       "id": "npc.elia_reed.001",
@@ -168,7 +171,7 @@
       "definition_id": "npc.elia_reed",
       "initialization": { "stage": "first_player_registration", "order": 3 },
       "position": { "x": 35, "y": 27, "surface_id": "ground" },
-      "spawn": { "spawn_id": "spawn.elia_reed", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": false }
+      "spawn": { "spawn_id": "spawn.elia_reed", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": false, "respawn_delay_ticks": 0 }
     },
     {
       "id": "npc.nessa_thorne.001",
@@ -176,7 +179,7 @@
       "definition_id": "npc.nessa_thorne",
       "initialization": { "stage": "first_player_registration", "order": 4 },
       "position": { "x": 16, "y": 51, "surface_id": "ground" },
-      "spawn": { "spawn_id": "spawn.nessa_thorne", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": false }
+      "spawn": { "spawn_id": "spawn.nessa_thorne", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": false, "respawn_delay_ticks": 0 }
     },
     {
       "id": "npc.sera_flint.001",
@@ -184,7 +187,7 @@
       "definition_id": "npc.sera_flint",
       "initialization": { "stage": "first_player_registration", "order": 6 },
       "position": { "x": 80, "y": 24, "surface_id": "ground" },
-      "spawn": { "spawn_id": "spawn.sera_flint", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": false }
+      "spawn": { "spawn_id": "spawn.sera_flint", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": false, "respawn_delay_ticks": 0 }
     },
     {
       "id": "npc.torren_ash.001",
@@ -192,7 +195,7 @@
       "definition_id": "npc.torren_ash",
       "initialization": { "stage": "first_player_registration", "order": 2 },
       "position": { "x": 70, "y": 51, "surface_id": "ground" },
-      "spawn": { "spawn_id": "spawn.torren_ash", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": false }
+      "spawn": { "spawn_id": "spawn.torren_ash", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": false, "respawn_delay_ticks": 0 }
     },
     {
       "id": "resource.authored.000001",

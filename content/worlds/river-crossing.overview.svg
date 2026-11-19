@@ -360,7 +360,9 @@
 <rect x="360" y="455" width="49" height="7" fill="#416f99"/>
 <rect x="409" y="455" width="63" height="7" fill="#718b59"/>
 <rect x="472" y="455" width="21" height="7" fill="#c4a575"/>
-<rect x="493" y="455" width="98" height="7" fill="#718b59"/>
+<rect x="493" y="455" width="35" height="7" fill="#718b59"/>
+<rect x="528" y="455" width="7" height="7" fill="#c4a575"/>
+<rect x="535" y="455" width="56" height="7" fill="#718b59"/>
 <rect x="591" y="455" width="42" height="7" fill="#98a3a4"/>
 <rect x="633" y="455" width="112" height="7" fill="#718b59"/>
 <rect x="45" y="462" width="119" height="7" fill="#718b59"/>
@@ -372,8 +374,8 @@
 <rect x="409" y="462" width="63" height="7" fill="#718b59"/>
 <rect x="472" y="462" width="21" height="7" fill="#c4a575"/>
 <rect x="493" y="462" width="28" height="7" fill="#718b59"/>
-<rect x="521" y="462" width="7" height="7" fill="#c4a575"/>
-<rect x="528" y="462" width="28" height="7" fill="#718b59"/>
+<rect x="521" y="462" width="14" height="7" fill="#c4a575"/>
+<rect x="535" y="462" width="21" height="7" fill="#718b59"/>
 <rect x="556" y="462" width="7" height="7" fill="#c4a575"/>
 <rect x="563" y="462" width="28" height="7" fill="#718b59"/>
 <rect x="591" y="462" width="42" height="7" fill="#98a3a4"/>
@@ -387,8 +389,8 @@
 <rect x="409" y="469" width="63" height="7" fill="#718b59"/>
 <rect x="472" y="469" width="21" height="7" fill="#c4a575"/>
 <rect x="493" y="469" width="28" height="7" fill="#718b59"/>
-<rect x="521" y="469" width="7" height="7" fill="#c4a575"/>
-<rect x="528" y="469" width="28" height="7" fill="#718b59"/>
+<rect x="521" y="469" width="14" height="7" fill="#c4a575"/>
+<rect x="535" y="469" width="21" height="7" fill="#718b59"/>
 <rect x="556" y="469" width="7" height="7" fill="#c4a575"/>
 <rect x="563" y="469" width="28" height="7" fill="#718b59"/>
 <rect x="591" y="469" width="42" height="7" fill="#98a3a4"/>
@@ -709,6 +711,29 @@
 <text x="13" y="397.0" font-size="11" fill="#c0cebb" font-weight="normal">40</text>
 <text x="13" y="537.0" font-size="11" fill="#c0cebb" font-weight="normal">60</text>
 <text x="13" y="677.0" font-size="11" fill="#c0cebb" font-weight="normal">80</text>
+<rect x="500" y="420" width="7" height="7" fill="#554335"/>
+<rect x="507" y="420" width="7" height="7" fill="#554335"/>
+<rect x="514" y="420" width="7" height="7" fill="#554335"/>
+<rect x="521" y="420" width="7" height="7" fill="#554335"/>
+<rect x="528" y="420" width="7" height="7" fill="#554335"/>
+<rect x="535" y="420" width="7" height="7" fill="#554335"/>
+<rect x="542" y="420" width="7" height="7" fill="#554335"/>
+<rect x="549" y="420" width="7" height="7" fill="#554335"/>
+<rect x="556" y="420" width="7" height="7" fill="#554335"/>
+<rect x="500" y="427" width="7" height="7" fill="#554335"/>
+<rect x="556" y="427" width="7" height="7" fill="#554335"/>
+<rect x="500" y="434" width="7" height="7" fill="#554335"/>
+<rect x="556" y="434" width="7" height="7" fill="#554335"/>
+<rect x="500" y="441" width="7" height="7" fill="#554335"/>
+<rect x="556" y="441" width="7" height="7" fill="#554335"/>
+<rect x="500" y="448" width="7" height="7" fill="#554335"/>
+<rect x="507" y="448" width="7" height="7" fill="#554335"/>
+<rect x="514" y="448" width="7" height="7" fill="#554335"/>
+<rect x="521" y="448" width="7" height="7" fill="#554335"/>
+<rect x="535" y="448" width="7" height="7" fill="#554335"/>
+<rect x="542" y="448" width="7" height="7" fill="#554335"/>
+<rect x="549" y="448" width="7" height="7" fill="#554335"/>
+<rect x="556" y="448" width="7" height="7" fill="#554335"/>
 <g><title>resource.authored.000001 · resource.normal_tree · (12, 58)</title>
 <circle cx="132.5" cy="521.5" r="4" fill="#c5e194" stroke="#24352a" stroke-width="1.5"/>
 </g>
@@ -849,5 +874,5 @@
 <text x="399" y="847" font-size="13" fill="#e8eedf" font-weight="normal">Stone pads</text>
 <rect x="540" y="835" width="15" height="15" rx="3" fill="#416f99"/>
 <text x="564" y="847" font-size="13" fill="#e8eedf" font-weight="normal">Water</text>
-<text x="45" y="880" font-size="13" fill="#c0cebb" font-weight="normal">Building pads are walkable. Hover markers for exact IDs. Gameplay and pacing acceptance remain deferred.</text>
+<text x="45" y="880" font-size="13" fill="#c0cebb" font-weight="normal">Stone pads are walkable; authored wall shells block movement except doorways. Gameplay/pacing acceptance remains open.</text>
 </g></svg>

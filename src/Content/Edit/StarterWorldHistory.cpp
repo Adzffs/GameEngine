@@ -2,6 +2,7 @@
 
 #include "StarterWorldEdit.h"
 #include "../Import/StarterWorldRuntimeInput.h"
+#include <algorithm>
 
 #include <stdexcept>
 #include <string>
@@ -22,7 +23,7 @@ namespace StarterWorldHistory
             // Undo restores authored world state, while allocation reservations
             // survive undo, branching, saving and reopening. Compare the world
             // independently of that monotonically increasing bookkeeping.
-            snapshot.schemaVersion = 3;
+            snapshot.schemaVersion = std::max(3, snapshot.schemaVersion);
             snapshot.nextPlacementId = StarterWorldExport::MaximumNextPlacementId;
             return StarterWorldExport::SerializeCanonical(snapshot);
         }

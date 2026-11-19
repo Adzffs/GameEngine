@@ -39,13 +39,22 @@ MIN_TILE = 4
 MAX_TILE = 64
 
 
+def building_walls(buildings) -> set[tuple[int, int]]:
+    return {(x, y) for b in buildings
+            for y in range(b['y'], b['y'] + b['height'])
+            for x in range(b['x'], b['x'] + b['width'])
+            if (x in (b['x'], b['x'] + b['width'] - 1) or y in (b['y'], b['y'] + b['height'] - 1))
+            and (x, y) != (b['x'] + b['door_offset'], b['y'] + b['height'] - 1)}
+
+
 def inspect_reachability(terrain: list[str], placements: dict,
-                         spawn: tuple[int, int], selected: str | None = None) -> tuple[set, set]:
+                         spawn: tuple[int, int], selected: str | None = None, buildings=()) -> tuple[set, set]:
     """Static cardinal-access preview; C++ remains the edit validator."""
     height, width = len(terrain), len(terrain[0])
     blocked = {(x, y) for y, row in enumerate(terrain)
                for x, glyph in enumerate(row) if glyph == "W"}
     blocked.update((x, y) for kind, x, y in placements.values() if kind in ("R", "S"))
+    blocked.update(building_walls(buildings))
     def clear(x, y):
         return 0 <= x < width and 0 <= y < height and (x, y) not in blocked
     reachable = {spawn} if clear(*spawn) else set()
@@ -230,7 +239,7 @@ def verify_snapshot_transition(command: str, before: dict, after: dict,
         target = next((p for p in expected["placements"] if p["id"] == parts[1]), None)
         if target is None or "spawn" not in target:
             raise StudioError("Select an actor spawn to configure")
-        expected["schema_version"] = 3
+        expected["schema_version"] = max(3, before["schema_version"])
         expected["next_placement_id"] = old_counter
         for placement in expected["placements"]:
             if "spawn" in placement:
@@ -673,10 +682,14 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
                 canvas.create_rectangle(x * tile, y * tile, (x + 1) * tile,
                                         (y + 1) * tile, fill=terrain_colors.get(symbol, "#222222"),
                                         outline="#354235", width=1)
+        # Building shells are currently inspected read-only; C++ validates all edits around them.
+        for x, y in sorted(building_walls(bridge.snapshot.get('buildings', []))):
+            canvas.create_rectangle(x * tile, y * tile, (x + 1) * tile, (y + 1) * tile,
+                                    fill="#554335", outline="#b6a17d")
         spawn_x, spawn_y = bridge.spawn
         if show_reachability.get():
             reachable, approaches = inspect_reachability(
-                bridge.terrain, bridge.placements, bridge.spawn, selected)
+                bridge.terrain, bridge.placements, bridge.spawn, selected, bridge.snapshot.get('buildings', []))
             for x, y in sorted(reachable):
                 canvas.create_rectangle(x * tile + 1, y * tile + 1,
                     (x + 1) * tile - 1, (y + 1) * tile - 1,
@@ -726,6 +739,7 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
                        for x, glyph in enumerate(row) if glyph == "W"}
             blocked.update((x, y) for kind, x, y in bridge.placements.values()
                            if kind in ("R", "S"))
+            blocked.update(building_walls(bridge.snapshot.get('buildings', [])))
             for x, y in sorted(blocked):
                 canvas.create_rectangle(x * tile, y * tile, (x + 1) * tile,
                     (y + 1) * tile, outline="#ff5555", width=2)

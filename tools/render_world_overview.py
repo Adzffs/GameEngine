@@ -64,6 +64,12 @@ def render(world: dict, title: str) -> str:
     for y in range(0, height, 20):
         text(13, top + y * scale + 5, y, 11, "#c0cebb")
 
+    for b in world.get("buildings", []):
+        for y in range(b["y"], b["y"] + b["height"]):
+            for x in range(b["x"], b["x"] + b["width"]):
+                if (x in (b["x"], b["x"] + b["width"] - 1) or y in (b["y"], b["y"] + b["height"] - 1)) and (x, y) != (b["x"] + b["door_offset"], b["y"] + b["height"] - 1):
+                    parts.append(f'<rect x="{left+x*scale:g}" y="{top+y*scale:g}" width="{scale:g}" height="{scale:g}" fill="#554335"/>')
+
     for p in sorted(world["placements"], key=lambda p: (p["kind"] != "resource", p["id"])):
         x, y = p["position"]["x"], p["position"]["y"]
         cx, cy = left + (x + .5) * scale, top + (y + .5) * scale
@@ -117,7 +123,7 @@ def render(world: dict, title: str) -> str:
         x = 45 + index * 165
         parts.append(f'<rect x="{x}" y="835" width="15" height="15" rx="3" fill="{TERRAIN[glyph]}"/>')
         text(x + 24, 847, name, 13)
-    text(45, 880, "Building pads are walkable. Hover markers for exact IDs. Gameplay and pacing acceptance remain deferred.", 13, "#c0cebb")
+    text(45, 880, "Stone pads are walkable; authored wall shells block movement except doorways. Gameplay/pacing acceptance remains open.", 13, "#c0cebb")
     parts.append('</g></svg>\n')
     return "\n".join(parts)
 

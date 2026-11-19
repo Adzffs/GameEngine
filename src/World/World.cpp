@@ -232,6 +232,7 @@ World::World(
                 }
                 map.SetTileType(x, y, type);
             }
+        map.SetBuildings(content.buildings);
         for (const auto &placement : content.placements)
             if (const auto *spawn = std::get_if<NpcSpawnDefinition>(&placement.legacyDefinition))
             {

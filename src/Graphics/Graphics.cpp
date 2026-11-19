@@ -2792,14 +2792,24 @@ Graphics::WorldHoverTarget Graphics::PickSpriteObject(float worldX, float worldY
     return {};
 }
 
-void Graphics::DrawWorldObjects(const std::vector<std::unique_ptr<Entity>> &entities,
+void Graphics::DrawWorldObjects(Map &map, const std::vector<std::unique_ptr<Entity>> &entities,
     const std::vector<ResourceNode> &resources, const std::vector<CraftingStation> &stations,
     int playerX, int playerY, int selectedTargetID, int localPlayerID)
 {
     static_assert(TileSize == ForestPilotLayout::TileSize);
-    enum class Kind { RESOURCE, STATION, MONSTER, NPC, PLAYER };
+    enum class Kind { WALL, RESOURCE, STATION, MONSTER, NPC, PLAYER };
     struct Entry { float depth; Kind kind; std::size_t index; };
     std::vector<Entry> entries;
+    struct Wall { const Building *building; int x, y; };
+    std::vector<Wall> walls;
+    for (const auto &b : map.GetBuildings())
+        for (int y = b.y; y < b.y + b.height; ++y)
+            for (int x = b.x; x < b.x + b.width; ++x)
+                if (b.IsWall(x, y) || b.IsDoor(x, y))
+                {
+                    entries.push_back({y * TileSize + 24.0f, Kind::WALL, walls.size()});
+                    walls.push_back({&b, x, y});
+                }
     entries.reserve(resources.size() + stations.size() + entities.size() + 1);
     for (std::size_t i = 0; i < resources.size(); ++i)
         entries.push_back({resources[i].GetY() * TileSize + 24.0f, Kind::RESOURCE, i});
@@ -2826,6 +2836,16 @@ void Graphics::DrawWorldObjects(const std::vector<std::unique_ptr<Entity>> &enti
     {
         switch (entry.kind)
         {
+        case Kind::WALL:
+        {
+            const auto &wall = walls[entry.index];
+            if (worldArtEnabled && forestSprites.DrawBuildingWall(*wall.building, wall.x, wall.y, visualPlayerRectangle)) break;
+            if (wall.building->IsDoor(wall.x, wall.y)) break;
+            SDL_SetRenderDrawColor(renderer, 78, 77, 70, 255);
+            const SDL_FRect rect{wall.x * 32.0f, wall.y * 32.0f, 32, 32};
+            SDL_RenderFillRect(renderer, &rect);
+            break;
+        }
         case Kind::RESOURCE: DrawResource(resources[entry.index]); break;
         case Kind::STATION: DrawStation(stations[entry.index]); break;
         case Kind::MONSTER:
@@ -6457,8 +6477,11 @@ void Graphics::Render(
     if (showGrid) DrawGrid(map);
     DrawClickedTile();
     DrawGroundItems(groundItems);
-    DrawWorldObjects(entities, resources, stations, playerX, playerY,
+    DrawWorldObjects(map, entities, resources, stations, playerX, playerY,
         selectedCombatTargetID, player.GetID());
+    if (worldArtEnabled)
+        for (const auto &building : map.GetBuildings())
+            forestSprites.DrawBuildingRoof(building, visualPlayerRectangle, presentationDeltaSeconds);
     if (attackPresentations != nullptr)
         DrawMeleeAttackPresentations(entities, *attackPresentations);
     DrawMonsterHealthBars(entities);

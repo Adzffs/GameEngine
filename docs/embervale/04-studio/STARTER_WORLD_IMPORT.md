@@ -165,3 +165,17 @@ On 18 November 2026, this slice passed **77/77 headless tests**, **89/89 tests**
 Implementation and tests: [parser](../../../src/Content/Export/StarterWorldSnapshotInput.cpp), [runtime input](../../../src/Content/Import/StarterWorldRuntimeInput.cpp), [World](../../../src/World/World.cpp), [launch options](../../../src/Core/GameLaunchOptions.cpp), [parser tests](../../../tests/StarterWorldSnapshotInputTests.cpp), [input tests](../../../tests/StarterWorldRuntimeInputTests.cpp), [runtime tests](../../../tests/StarterWorldRuntimeTests.cpp), [launch tests](../../../tests/GameLaunchOptionsTests.cpp), [validator CLI tests](../../../tests/StarterWorldValidateCliTests.cmake), [real application startup tests](../../../tests/GameEngineStartupCliTests.cmake).
 
 Shared history, guarded sibling drafts, preview/editor and isolated launch are now available. Interruption recovery, durable in-place publication and broader release acceptance remain open. The latest [spawn-settings implementation](../06-development/STUDIO_SPAWN_SETTINGS_2026-11-19.md) builds successfully; runtime and visible checks were explicitly deferred. The earlier verification totals above describe their dated revisions, not the schema-3 change. R1, R2 and Studio Alpha 0.1 are not declared complete.
+
+
+## Schema 4: static building shells
+
+The first workshop now uses bounded `buildings` metadata in schema 4. It owns
+perimeter collision and one open south entrance, independently of ground and
+resource/station placements. The parser/writer, runtime, Studio collision/access
+overlays and draft round trips share those definitions. Existing object edits
+preserve the shells; dedicated building creation/movement controls remain open.
+Schemas 1..3 retain their historical fields and reject building data. See
+[ADR-020](../07-decisions/ADR_020_STATIC_BUILDING_SHELLS.md) for bounds and
+[workshop integration](../06-development/BUILDING_RENDERING_2026-11-19.md) for
+production validation, editor round trip and actual camera captures. This
+addition does not declare the broader import/editor release gates complete.
