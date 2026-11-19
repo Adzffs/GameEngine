@@ -1,8 +1,24 @@
 # Art, animation and audio production guide
 
-**Status:** Proposed production workflow and quality requirements. The current visual baseline is source-reviewed; the asset pipeline described here is planned.  
-**Reviewed:** 18 November 2026.  
+**Status:** First editable forest art pilot created; runtime sprite import/rendering remains planned. The broader production workflow below is proposed.\
+**Reviewed:** 19 November 2026.\
 **Purpose:** Replace placeholder presentation in manageable steps while preserving gameplay and making assets easy for humans and AI to work with.
+
+## First editable batch
+
+The [forest pilot](../../../assets/embervale/forest-pilot/README.md) contains
+three grass variants, sixteen connected dirt path tiles, and an ordinary tree
+with its matching depleted stump. The 32-pixel ground tiles and 64x96 resource
+sprites have LibreSprite `.ase` masters, PNG exports, stable authoring IDs,
+pivots, source/output checksums and recorded provenance. The retained generated
+tree reference is adapted through LibreSprite JavaScript; terrain is drawn by
+the script. A default export command preserves manual edits and rebuilds the
+offline native/2x previews from the saved masters.
+
+This is the first part of ART-001 and asset identity work, not a completed
+game/Studio importer or finished starter kit. Player, prop and in-game overlap
+reviews are still required. The pilot's `manifest.json` is explicitly an
+authoring record and does not establish a runtime-supported schema.
 
 ## 1. Current presentation and the recommended transition
 

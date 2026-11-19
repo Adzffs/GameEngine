@@ -1,0 +1,507 @@
+{
+  "schema": "embervale.authoring-batch",
+  "version": 1,
+  "id": "forest-pilot",
+  "status": "art-pilot; runtime integration pending",
+  "native_tile_size": 32,
+  "editor": "LibreSprite 1.1-dev",
+  "lighting": "upper left",
+  "path_mask_bits": {
+    "north": 1,
+    "east": 2,
+    "south": 4,
+    "west": 8
+  },
+  "resource_palette_rgb": [
+    "17271e",
+    "203823",
+    "30492a",
+    "40592d",
+    "52672f",
+    "657838",
+    "7c8c40",
+    "959f49",
+    "b2b254",
+    "d0c56d",
+    "e1d388",
+    "2f211d",
+    "463026",
+    "603e2b",
+    "7b4e2e",
+    "985f35",
+    "b97c43",
+    "d59b5a",
+    "ebba78",
+    "f4d69b"
+  ],
+  "images": {
+    "terrain": {
+      "source": "source/terrain.ase",
+      "image": "textures/terrain.png",
+      "editor_metadata": "textures/terrain.export.json",
+      "size": [
+        128,
+        160
+      ],
+      "source_sha256": "59b55ab1645e363d4d583074e482f907e2de302e15a4e0f636b237abedfc292b",
+      "image_sha256": "3fdf5fb4cc07bbb8ed039b9cb58333ac89db988352d5c629e61eb16ebc243e07"
+    },
+    "oak": {
+      "source": "source/oak.ase",
+      "image": "textures/oak.png",
+      "editor_metadata": "textures/oak.export.json",
+      "size": [
+        64,
+        96
+      ],
+      "source_sha256": "71dd61166e05b69a085eb7cf2253a997f625d4dd3adcf10745edb4cbb95c3f97",
+      "image_sha256": "4769a241fbc0c19e89817abb8327f2b27d51698d3ca97672e88c9bbb9673caa9"
+    },
+    "stump": {
+      "source": "source/stump.ase",
+      "image": "textures/stump.png",
+      "editor_metadata": "textures/stump.export.json",
+      "size": [
+        64,
+        96
+      ],
+      "source_sha256": "5528748700aa7542ab8a1ab32dd0c4e859546e6cba6c8719881bf2396acfc64f",
+      "image_sha256": "0841127c68105a3b174af70a99e07e2ad1b17bc02de636e3cb88d9c548b29289"
+    }
+  },
+  "assets": [
+    {
+      "id": "terrain.grass.01",
+      "image": "terrain",
+      "rect": [
+        0,
+        0,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "tile_size": [
+        32,
+        32
+      ],
+      "variant": 0
+    },
+    {
+      "id": "terrain.grass.02",
+      "image": "terrain",
+      "rect": [
+        32,
+        0,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "tile_size": [
+        32,
+        32
+      ],
+      "variant": 1
+    },
+    {
+      "id": "terrain.grass.03",
+      "image": "terrain",
+      "rect": [
+        64,
+        0,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "tile_size": [
+        32,
+        32
+      ],
+      "variant": 2
+    },
+    {
+      "id": "terrain.path.isolated",
+      "image": "terrain",
+      "rect": [
+        96,
+        0,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "tile_size": [
+        32,
+        32
+      ],
+      "connection_mask": 0
+    },
+    {
+      "id": "terrain.path.n",
+      "image": "terrain",
+      "rect": [
+        0,
+        32,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "tile_size": [
+        32,
+        32
+      ],
+      "connection_mask": 1
+    },
+    {
+      "id": "terrain.path.e",
+      "image": "terrain",
+      "rect": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "tile_size": [
+        32,
+        32
+      ],
+      "connection_mask": 2
+    },
+    {
+      "id": "terrain.path.ne",
+      "image": "terrain",
+      "rect": [
+        64,
+        32,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "tile_size": [
+        32,
+        32
+      ],
+      "connection_mask": 3
+    },
+    {
+      "id": "terrain.path.s",
+      "image": "terrain",
+      "rect": [
+        96,
+        32,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "tile_size": [
+        32,
+        32
+      ],
+      "connection_mask": 4
+    },
+    {
+      "id": "terrain.path.ns",
+      "image": "terrain",
+      "rect": [
+        0,
+        64,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "tile_size": [
+        32,
+        32
+      ],
+      "connection_mask": 5
+    },
+    {
+      "id": "terrain.path.es",
+      "image": "terrain",
+      "rect": [
+        32,
+        64,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "tile_size": [
+        32,
+        32
+      ],
+      "connection_mask": 6
+    },
+    {
+      "id": "terrain.path.nes",
+      "image": "terrain",
+      "rect": [
+        64,
+        64,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "tile_size": [
+        32,
+        32
+      ],
+      "connection_mask": 7
+    },
+    {
+      "id": "terrain.path.w",
+      "image": "terrain",
+      "rect": [
+        96,
+        64,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "tile_size": [
+        32,
+        32
+      ],
+      "connection_mask": 8
+    },
+    {
+      "id": "terrain.path.nw",
+      "image": "terrain",
+      "rect": [
+        0,
+        96,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "tile_size": [
+        32,
+        32
+      ],
+      "connection_mask": 9
+    },
+    {
+      "id": "terrain.path.ew",
+      "image": "terrain",
+      "rect": [
+        32,
+        96,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "tile_size": [
+        32,
+        32
+      ],
+      "connection_mask": 10
+    },
+    {
+      "id": "terrain.path.new",
+      "image": "terrain",
+      "rect": [
+        64,
+        96,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "tile_size": [
+        32,
+        32
+      ],
+      "connection_mask": 11
+    },
+    {
+      "id": "terrain.path.sw",
+      "image": "terrain",
+      "rect": [
+        96,
+        96,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "tile_size": [
+        32,
+        32
+      ],
+      "connection_mask": 12
+    },
+    {
+      "id": "terrain.path.nsw",
+      "image": "terrain",
+      "rect": [
+        0,
+        128,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "tile_size": [
+        32,
+        32
+      ],
+      "connection_mask": 13
+    },
+    {
+      "id": "terrain.path.esw",
+      "image": "terrain",
+      "rect": [
+        32,
+        128,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "tile_size": [
+        32,
+        32
+      ],
+      "connection_mask": 14
+    },
+    {
+      "id": "terrain.path.nesw",
+      "image": "terrain",
+      "rect": [
+        64,
+        128,
+        32,
+        32
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "tile_size": [
+        32,
+        32
+      ],
+      "connection_mask": 15
+    },
+    {
+      "id": "resource.tree.normal.intact",
+      "image": "oak",
+      "rect": [
+        0,
+        0,
+        64,
+        96
+      ],
+      "pivot": [
+        32,
+        88
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "intended_gameplay_footprint_tiles": [
+        1,
+        1
+      ],
+      "state": "intact"
+    },
+    {
+      "id": "resource.tree.normal.depleted",
+      "image": "stump",
+      "rect": [
+        0,
+        0,
+        64,
+        96
+      ],
+      "pivot": [
+        32,
+        88
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "intended_gameplay_footprint_tiles": [
+        1,
+        1
+      ],
+      "state": "depleted"
+    }
+  ],
+  "provenance": {
+    "creator": "OpenAI image generation and Codex-assisted LibreSprite authoring for Adam Holland",
+    "reference": "reference/oak-and-stump.png",
+    "reference_sha256": "dac2f9503762269b654a102b60601a8bb6880e464845742236fb54ff8ffa501c",
+    "reference_notes": "Original generated tree/stump reference; no third-party image input.",
+    "modifications": "Shared scale and ground pivot, nearest-neighbour sampling, 20-colour tree palette, binary alpha; grass and paths drawn in LibreSprite JavaScript.",
+    "licence": "No separate asset licence grant declared. Follow the repository distribution policy."
+  },
+  "previews": {
+    "forest-pilot.png": {
+      "path": "previews/forest-pilot.png",
+      "size": [
+        640,
+        384
+      ],
+      "sha256": "c2076e887a987ae342c81c1f2e10863436d948e5eba182510801d739402ec662"
+    },
+    "forest-pilot-2x.png": {
+      "path": "previews/forest-pilot-2x.png",
+      "size": [
+        1280,
+        768
+      ],
+      "sha256": "88d9d2e641ca084ab4ba077c7d39a283e8180a0e13174985ccd546aab7ad083d"
+    }
+  }
+}
