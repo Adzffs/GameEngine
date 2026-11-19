@@ -24,7 +24,9 @@ PLACEMENT = re.compile(r"^([RSMN])  ([A-Za-z0-9._-]+)  \((\d+), (\d+)\)", re.MUL
 KINDS = {"R": "Resource", "S": "Station", "N": "NPC spawn", "M": "Monster spawn"}
 MAX_COMMANDS = 256
 EditorResponse = tuple[str, dict[str, tuple[str, int, int]], str, list[str], str, dict]
-REPLAYABLE_EDIT = re.compile(r"(?:move [A-Za-z0-9._-]+ [0-9]+ [0-9]+|place [a-z0-9._-]+ [0-9]+ [0-9]+|remove [A-Za-z0-9._-]+|paint [0-9]+ [0-9]+ [GDSW]|undo|redo)\Z")
+REPLAYABLE_EDIT = re.compile(r"(?:move [A-Za-z0-9._-]+ [0-9]+ [0-9]+|place [a-z0-9._-]+ [0-9]+ [0-9]+|remove [A-Za-z0-9._-]+|spawn [A-Za-z0-9._-]+ [0-9]+ [0-9]+ [0-9]+ [01] [0-9]+|paint [0-9]+ [0-9]+ [GDSW]|undo|redo)\Z")
+SPAWN_FIELDS = ("wander_radius", "wander_interval_ticks", "maximum_active_count",
+                "respawns", "respawn_delay_ticks")
 OBJECT_DEFINITIONS = {
     "Normal tree": "resource.normal_tree", "Oak tree": "resource.oak_tree",
     "Willow tree": "resource.willow_tree", "Copper rock": "resource.copper_rock",
@@ -98,24 +100,25 @@ def validate_replayable_editor_command(command: str) -> None:
     if any(c in command for c in "\r\n"):
         raise StudioError("Newlines are not valid editor commands")
     if not REPLAYABLE_EDIT.fullmatch(command):
-        raise StudioError("Only move, paint, place, remove, undo and redo can enter replay history")
+        raise StudioError("Only move, paint, place, remove, spawn, undo and redo can enter replay history")
 
 
 
 def verify_editor_transition(command: str, old_placements: dict, old_terrain: list[str],
                              old_status: str, new_placements: dict,
-                             new_terrain: list[str], new_status: str) -> None:
+                             new_terrain: list[str], new_status: str,
+                             allow_settings_change: bool = False) -> None:
     """Fail closed when the C++ response contradicts a requested editor action."""
     parts = command.split()
     action = parts[0] if parts else ""
-    if action not in ("move", "paint", "place", "remove", "undo", "redo"):
+    if action not in ("move", "paint", "place", "remove", "spawn", "undo", "redo"):
         return
     try:
         _, old_undo, old_redo = old_status.split("/")
         _, new_undo, new_redo = new_status.split("/")
         before, pending = int(old_undo), int(old_redo)
         after, remaining = int(new_undo), int(new_redo)
-        if action in ("move", "paint", "place", "remove"):
+        if action in ("move", "paint", "place", "remove", "spawn"):
             history_ok = after == before + 1 and remaining == 0
         elif action == "undo":
             history_ok = after == before - 1 and remaining == pending + 1
@@ -150,15 +153,20 @@ def verify_editor_transition(command: str, old_placements: dict, old_terrain: li
             del expected[parts[1]]
             if new_placements != expected or new_terrain != old_terrain:
                 raise StudioError("Editor removed an unexpected object or changed ground")
-        elif new_placements == old_placements and new_terrain == old_terrain:
+        elif action == "spawn" and (new_placements != old_placements or new_terrain != old_terrain):
+            raise StudioError("Editor changed placement or ground while configuring a spawn")
+        elif (action in ("undo", "redo") and new_placements == old_placements and
+              new_terrain == old_terrain and not allow_settings_change):
             raise StudioError("Editor reported undo/redo without changing the world")
+        # Spawn-only undo/redo has no visible coordinate/terrain change. The
+        # complete snapshot checkpoint below verifies that settings changed.
     except (IndexError, KeyError, TypeError, ValueError) as error:
         raise StudioError("Editor returned malformed command/history data") from error
 
 def verify_editor_checkpoint(action: str, checkpoints: list[tuple[dict, tuple[str, ...]]],
                              placements: dict, terrain: list[str], status: str) -> list[tuple[dict, tuple[str, ...]]]:
     """Compare undo/redo with previously observed authoritative world revisions."""
-    if action not in ("move", "paint", "place", "remove", "undo", "redo"):
+    if action not in ("move", "paint", "place", "remove", "spawn", "undo", "redo"):
         return checkpoints
     try:
         cursor = int(status.split("/")[1])
@@ -179,6 +187,9 @@ def world_checkpoint(world: dict) -> dict:
     result = copy.deepcopy(world)
     result.pop("schema_version", None)
     result.pop("next_placement_id", None)
+    for placement in result["placements"]:
+        if "spawn" in placement:
+            placement["spawn"].setdefault("respawn_delay_ticks", 0)
     result["placements"].sort(key=lambda entry: entry["id"])
     return result
 
@@ -195,7 +206,7 @@ def verify_snapshot_transition(command: str, before: dict, after: dict,
         if definition not in OBJECT_DEFINITIONS.values():
             raise StudioError("Unsupported object definition")
         kind = definition.split(".")[0]
-        expected["schema_version"] = 2
+        expected["schema_version"] = max(2, before["schema_version"])
         expected["next_placement_id"] = old_counter + 1
         expected["placements"].append({
             "id": f"{kind}.authored.{old_counter:06d}", "kind": kind,
@@ -208,12 +219,24 @@ def verify_snapshot_transition(command: str, before: dict, after: dict,
         if target is None or target["kind"] not in ("resource", "station"):
             raise StudioError("Only resources and stations can be removed")
         expected["placements"].remove(target)
-        expected["schema_version"] = 2
+        expected["schema_version"] = max(2, before["schema_version"])
         expected["next_placement_id"] = old_counter
     elif action == "move":
         for entry in expected["placements"]:
             if entry["id"] == parts[1]:
                 entry["position"]["x"], entry["position"]["y"] = int(parts[2]), int(parts[3])
+    elif action == "spawn":
+        target = next((p for p in expected["placements"] if p["id"] == parts[1]), None)
+        if target is None or "spawn" not in target:
+            raise StudioError("Select an actor spawn to configure")
+        expected["schema_version"] = 3
+        expected["next_placement_id"] = old_counter
+        for placement in expected["placements"]:
+            if "spawn" in placement:
+                placement["spawn"].setdefault("respawn_delay_ticks", 0)
+        values = [int(value) for value in parts[2:]]
+        values[3] = bool(values[3])
+        target["spawn"].update(zip(SPAWN_FIELDS, values))
     elif action == "paint":
         x, y, glyph = int(parts[1]), int(parts[2]), parts[3]
         rows = expected["terrain"]["rows"]
@@ -223,7 +246,8 @@ def verify_snapshot_transition(command: str, before: dict, after: dict,
     if action in ("undo", "redo"):
         if (after.get("schema_version", 1) != before.get("schema_version", 1) or
                 after.get("next_placement_id", 1) != old_counter or
-                not 0 <= cursor < len(checkpoints) or state != checkpoints[cursor]):
+                not 0 <= cursor < len(checkpoints) or state != checkpoints[cursor] or
+                state == world_checkpoint(before)):
             raise StudioError("Editor undo/redo changed world metadata or allocation reservations")
         return checkpoints
     if after != {**expected, "placements": sorted(expected["placements"], key=lambda entry: entry["id"])}:
@@ -440,7 +464,8 @@ class StudioBridge:
         # Both displayed placements and painted ground come from the same
         # successful backend replay. Rejections preserve all local state.
         verify_editor_transition(command, self.placements, self.terrain, self.status,
-                                 result[1], result[3], result[2])
+                                 result[1], result[3], result[2],
+                                 allow_settings_change=world_checkpoint(self.current_snapshot) != world_checkpoint(result[5]))
         checkpoints = verify_editor_checkpoint(command.split()[0], self._checkpoints,
                                                result[1], result[3], result[2])
         world_checkpoints = verify_snapshot_transition(command, self.current_snapshot,
@@ -468,6 +493,29 @@ class StudioBridge:
             raise StudioError("Paint tile is outside the map")
         if self.terrain[y][x] != glyph:
             self.perform(f"paint {x} {y} {glyph}")
+
+    def spawn_settings(self, placement_id: str) -> dict:
+        entry = next((p for p in self.current_snapshot["placements"]
+                      if p["id"] == placement_id), None)
+        if entry is None or "spawn" not in entry:
+            raise StudioError("Select an NPC or enemy spawn")
+        return {key: entry["spawn"].get(key, 0) for key in SPAWN_FIELDS}
+
+    def configure_spawn(self, placement_id: str, radius: int, interval: int,
+                        cap: int, respawns: bool, delay: int) -> None:
+        if any(type(value) is not int for value in (radius, interval, cap, delay)) or type(respawns) is not bool:
+            raise StudioError("Spawn settings require whole numbers and a respawn checkbox")
+        if not (0 <= radius <= 32 and 0 <= interval <= 86400 and
+                1 <= cap <= 8 and 0 <= delay <= 86400):
+            raise StudioError("Use radius 0–32, cap 1–8 and timing 0–86400 ticks")
+        if (radius == 0) != (interval == 0):
+            raise StudioError("Stationary enemies need radius and interval 0; wandering needs both above 0")
+        if not respawns and delay != 0:
+            raise StudioError("Disable the respawn delay when respawning is off")
+        values = (radius, interval, cap, respawns, delay)
+        current = self.spawn_settings(placement_id)
+        if tuple(current[key] for key in SPAWN_FIELDS) != values:
+            self.perform(f"spawn {placement_id} {radius} {interval} {cap} {int(respawns)} {delay}")
 
     def place(self, definition_id: str, x: int, y: int) -> str:
         if definition_id not in OBJECT_DEFINITIONS.values():
@@ -591,7 +639,7 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
     ttk.Button(sidebar, text="Place selected type (click map)",
                command=lambda: brush.set("Place object")).pack(fill="x", pady=4)
     ttk.Label(sidebar, text="Placements (select / move)").pack(anchor="w")
-    choices = tk.Listbox(sidebar, width=40, height=25, exportselection=False)
+    choices = tk.Listbox(sidebar, width=40, height=16, exportselection=False)
     choices.pack(fill="both", expand=True)
     ttk.Label(sidebar, textvariable=inspector, wraplength=250).pack(anchor="w", pady=8)
     viewport = ttk.Frame(body)
@@ -656,7 +704,18 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
                                width=3 if name == selected else 1)
             if name == selected:
                 location = "Spawn / home" if kind in ("N", "M") else "Tile"
-                inspector.set(f"{KINDS[kind]}\n{name}\n{bridge.definitions[name]}\n{location}: ({x}, {y}){access_text}")
+                settings_text = ""
+                if kind in ("N", "M"):
+                    settings = bridge.spawn_settings(name)
+                    if kind == "M":
+                        timing = settings["respawn_delay_ticks"] or "enemy default"
+                        respawn = f"on, {timing} ticks" if settings["respawns"] else "off"
+                        settings_text = (f"\nWander: {settings['wander_radius']} tiles / "
+                            f"{settings['wander_interval_ticks']} ticks\nSpawn cap: "
+                            f"{settings['maximum_active_count']}\nRespawn: {respawn}")
+                    else:
+                        settings_text = "\nUnique named NPC; stationary"
+                inspector.set(f"{KINDS[kind]}\n{name}\n{bridge.definitions[name]}\n{location}: ({x}, {y}){settings_text}{access_text}")
         if show_collision.get():
             blocked = {(x, y) for y, row in enumerate(bridge.terrain)
                        for x, glyph in enumerate(row) if glyph == "W"}
@@ -689,6 +748,8 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
             choices.selection_set(names.index(selected))
         removable = selected in bridge.placements and bridge.placements[selected][0] in ("R", "S")
         remove_button.configure(state="normal" if removable else "disabled")
+        actor = selected in bridge.placements and bridge.placements[selected][0] in ("N", "M")
+        spawn_button.configure(state="normal" if actor else "disabled")
 
     def zoom_to(requested_tile: int, anchor: tuple[int, int] | None = None) -> None:
         nonlocal tile
@@ -794,6 +855,75 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
 
     remove_button = ttk.Button(sidebar, text="Remove selected (Delete)", command=remove_selected)
     remove_button.pack(fill="x", pady=4)
+
+    def edit_spawn() -> None:
+        if selected not in bridge.placements or bridge.placements[selected][0] not in ("N", "M"):
+            return
+        placement_id = selected
+        editable = bridge.placements[placement_id][0] == "M"
+        settings = bridge.spawn_settings(placement_id)
+        dialog = tk.Toplevel(root)
+        dialog.title("Spawn settings")
+        dialog.transient(root)
+        dialog.resizable(False, False)
+        panel = ttk.Frame(dialog, padding=16)
+        panel.pack(fill="both", expand=True)
+        ttk.Label(panel, text=placement_id, wraplength=380).grid(
+            row=0, column=0, columnspan=2, sticky="w", pady=(0, 12))
+        variables = {}
+        for row, (key, label, limit) in enumerate((
+            ("wander_radius", "Wander radius (tiles)", 32),
+            ("wander_interval_ticks", "Wander interval (ticks)", 86400),
+            ("maximum_active_count", "Spawn cap", 8),
+            ("respawn_delay_ticks", "Respawn delay (ticks)", 86400)), 1):
+            variables[key] = tk.StringVar(value=str(settings[key]))
+            ttk.Label(panel, text=label).grid(row=row, column=0, sticky="w", padx=(0, 16), pady=4)
+            ttk.Spinbox(panel, textvariable=variables[key], width=12,
+                        from_=1 if key == "maximum_active_count" else 0, to=limit,
+                        state="normal" if editable else "disabled").grid(row=row, column=1, pady=4)
+        respawns = tk.BooleanVar(value=settings["respawns"])
+        ttk.Checkbutton(panel, text="Respawn after death", variable=respawns,
+                        state="normal" if editable else "disabled").grid(
+                            row=5, column=0, columnspan=2, sticky="w", pady=8)
+        help_text = ("Set radius and interval to 0 to stay at home.\n"
+            "Respawn delay 0 uses this enemy type's normal delay.\n"
+            "The cap limits this spawn; it does not add extra enemies.") if editable else (
+            "Named NPCs remain unique and stationary.\nMove their home directly on the map.")
+        ttk.Label(panel, text=help_text, wraplength=390).grid(
+            row=6, column=0, columnspan=2, sticky="w", pady=8)
+
+        def apply() -> None:
+            try:
+                values = {}
+                for key, variable in variables.items():
+                    value = variable.get().strip()
+                    if not re.fullmatch(r"[0-9]+", value):
+                        raise StudioError("Enter whole numbers for spawn settings")
+                    values[key] = int(value)
+                # Turning a behaviour off also clears its unused timing.
+                interval = values["wander_interval_ticks"] if values["wander_radius"] else 0
+                delay = values["respawn_delay_ticks"] if respawns.get() else 0
+                bridge.configure_spawn(placement_id, values["wander_radius"], interval,
+                    values["maximum_active_count"], respawns.get(), delay)
+            except (StudioError, ValueError) as error:
+                messagebox.showerror("Spawn settings rejected", str(error), parent=dialog)
+                return
+            dialog.destroy()
+            display()
+
+        buttons = ttk.Frame(panel)
+        buttons.grid(row=7, column=0, columnspan=2, sticky="e", pady=(8, 0))
+        ttk.Button(buttons, text="Cancel" if editable else "Close", command=dialog.destroy).pack(side="left", padx=4)
+        if editable:
+            ttk.Button(buttons, text="Apply settings", command=apply).pack(side="left", padx=4)
+        dialog.bind("<Escape>", lambda _event: dialog.destroy())
+        dialog.bind("<Control-z>", lambda _event: "break")
+        dialog.bind("<Control-y>", lambda _event: "break")
+        dialog.grab_set()
+        dialog.focus_set()
+
+    spawn_button = ttk.Button(sidebar, text="Spawn settings…", command=edit_spawn)
+    spawn_button.pack(fill="x", pady=4)
 
     def save() -> bool:
         nonlocal saved

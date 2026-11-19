@@ -745,6 +745,7 @@ int World::CreateMonster(
         authoredSpawn->wanderIntervalTicks != spawn.wanderIntervalTicks ||
         authoredSpawn->maximumActiveCount != spawn.maximumActiveCount ||
         authoredSpawn->respawns != spawn.respawns ||
+        authoredSpawn->respawnDelayTicks != spawn.respawnDelayTicks ||
         definition->kind != NpcKind::MONSTER || !definition->combat.has_value() ||
         definition->name.empty() ||
         definition->combat->ratings.attackAccuracy < 0 ||
@@ -762,7 +763,9 @@ int World::CreateMonster(
         (spawn.wanderRadius > 0 && spawn.wanderIntervalTicks <= 0) ||
         (spawn.wanderRadius == 0 && spawn.wanderIntervalTicks != 0) ||
         spawn.maximumActiveCount <= 0 ||
-        (spawn.respawns && definition->combat->respawnDelayTicks <= 0))
+        spawn.respawnDelayTicks < 0 ||
+        (!spawn.respawns && spawn.respawnDelayTicks != 0) ||
+        (spawn.respawns && spawn.respawnDelayTicks == 0 && definition->combat->respawnDelayTicks <= 0))
     {
         return 0;
     }
@@ -786,7 +789,7 @@ int World::CreateMonster(
         spawn.respawns
             ? std::optional<MonsterRespawnDefinition>{
                   MonsterRespawnDefinition{
-                      definition->combat->respawnDelayTicks}}
+                      spawn.respawnDelayTicks > 0 ? spawn.respawnDelayTicks : definition->combat->respawnDelayTicks}}
             : std::nullopt,
         definition->combat->aggression,
         definition->type,
@@ -828,6 +831,7 @@ int World::CreateNpc(NpcType npcType, const NpcSpawnDefinition &spawn)
         authored->wanderIntervalTicks != spawn.wanderIntervalTicks ||
         authored->maximumActiveCount != spawn.maximumActiveCount ||
         authored->respawns != spawn.respawns || spawn.respawns ||
+        authored->respawnDelayTicks != spawn.respawnDelayTicks || spawn.respawnDelayTicks != 0 ||
         !npcSpawnManager.HasCapacity(spawn.spawnId) ||
         !map.IsValidPosition(spawn.spawnPosition.GetX(), spawn.spawnPosition.GetY()))
         return 0;

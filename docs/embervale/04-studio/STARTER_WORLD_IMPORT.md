@@ -1,17 +1,17 @@
 # Validate and play a starter-world snapshot
 
-**Status:** Runtime bridge and bounded dry-run move are integrated; an experimental create-only draft-writing extension is staged on a separate development branch, pending full verification. Undo, publication and visual editing remain planned.\
-**Updated:** 18 November 2026\
-**Format:** `embervale.starter-world-snapshot`, schema version `1`, region `embervale.development_starter`.\
+**Status:** Runtime bridge, shared editing/history, guarded sibling drafts and the visual editor are integrated. Latest spawn-setting tests and visible acceptance are deferred by the owner. Durable publication/recovery remain open.\
+**Updated:** 19 November 2026\
+**Format:** `embervale.starter-world-snapshot`, schema versions `1`, `2`, `3`, region `embervale.development_starter`.\
 **Related:** [Export guide](STARTER_WORLD_EXPORT.md), [runtime import decision](../07-decisions/ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md), [save compatibility](../03-engine/SAVE_COMPATIBILITY.md).
 
 ## 1. What is available
 
-The game can load an explicitly selected JSON snapshot of its existing 100×100 starter region. Terrain, placement coordinates and the player-spawn coordinate can change. The document must retain the current 20 placement identities: seven resources, three stations and ten NPC/monster spawns. Their definition bindings, spawn settings and creation stages remain fixed.
+The game can load an explicitly selected JSON snapshot of its existing 100×100 starter region. Terrain, placement coordinates and the player-spawn coordinate can change. Version 1 retains the current 20 placement identities. Versions 2 and 3 permit bounded resource/station creation and removal; all ten NPC/monster identities, definition bindings and creation stages remain mandatory. Version 3 additionally permits bounded monster spawn settings and per-spawn respawn timing. Named friendly NPC behaviour remains unique, stationary and non-respawning.
 
 `EmbervaleWorldValidate` reads a candidate and applies the same parser and runtime validation used by game startup. `GameEngine --world <path>` then constructs the world from the validated snapshot. A missing, malformed or unsafe file stops startup with a diagnostic; it does not silently select a different world.
 
-The game and validator do not write the selected world file. A shared typed move operation now produces an independently validated in-memory candidate for an existing resource or station, exposed through a dry-run CLI. The base CLI does not persist candidates. A stacked development change adds guarded creation of a **new** sibling draft file after validated move; it never replaces its source. Undo history, publication manifest, general-purpose editor and an in-place revision workflow remain unfinished.
+The game and validator do not write the selected world file. Shared typed editing commands produce validated private candidates for terrain, object placement, actor homes and supported spawn settings. The terminal session and visual editor share undo/redo and guarded creation of a **new** sibling draft; they never replace the source. A publication manifest, interruption recovery, general-purpose authoring and in-place publication remain unfinished. See the [visual editor guide](VISUAL_WORLD_EDITOR.md).
 
 ## 2. Build and validate without SDL
 
@@ -37,13 +37,13 @@ Shell redirection creates or replaces its destination. The exporter always captu
 
 ### Resource/station move preview (STUDIO-020 subset)
 
-`EmbervaleWorldMove` uses the same bounded input parser and full runtime geography validation as game startup. The shared `StarterWorldEdit::MovePlacement` function works on a copy and returns the runtime-valid candidate and before/after coordinates. Existing resource/station IDs are supported; NPC and monster spawn moves are deliberately excluded until their editing rules are implemented.
+`EmbervaleWorldMove` uses the same bounded input parser and full runtime geography validation as game startup. The shared `StarterWorldEdit::MovePlacement` function works on a copy and returns the runtime-valid candidate and before/after coordinates. Existing resource/station and NPC/monster spawn-home IDs are supported. The terminal session additionally exposes supported monster settings through the shared `spawn` command.
 
 ```bash
 ./build-headless/EmbervaleWorldMove tests/fixtures/content/development-starter.snapshot.json resource.normal_tree.001 30 30
 ```
 
-The development extension uses exit `0` for success, `2` for invalid syntax, `3` for rejected content/move, `4` for stale hash or occupied output, and `5` for bounded file/lock/write errors. **This is a dry run: no file, player save, or live world is modified.** It reports the stable ID and old/new coordinates. On the development branch it can inspect the raw-file SHA-256 and create a validated candidate at a **new** filename in the same directory when supplied the expected source hash. It does not generate a semantic diff, undo history, or preview image. Use it to check a move, not to claim that content has been published. Full repository unit and CLI regression tests must still be executed on the exact stacked revision before it is considered verified. See [guarded revisions](GUARDED_DRAFT_REVISIONS.md).
+The move CLI uses exit `0` for success, `2` for invalid syntax, `3` for rejected content/move, `4` for stale hash or occupied output, and `5` for bounded file/lock/write errors. A plain move invocation is a dry run and reports the stable ID and old/new coordinates. The guarded-save options can inspect the source SHA-256 and create a validated candidate at a **new** sibling filename. The `--session` interface adds shared history and the visual editor uses that interface. A saved draft is not a versioned publication. See [guarded revisions](GUARDED_DRAFT_REVISIONS.md) and the [editor guide](VISUAL_WORLD_EDITOR.md).
 
 ### Validator command results
 
@@ -110,10 +110,10 @@ The file reader checks for a regular file and enforces **2 MiB** both before rea
 | Encoding | ASCII strings; JSON Unicode escapes are unsupported |
 | Structural model dimensions | 1–1024 per axis; not a runtime-map support claim |
 | Runtime map dimensions | Exactly 100×100 |
-| Runtime placements | Exactly the current 20 stable IDs and bindings |
+| Runtime placements | Version 1: exact 20-ID registry; versions 2/3: up to 4096 placements with the ten mandatory actor identities and reserved object IDs |
 | Surface/exits | One `ground` surface at elevation `0`; no region exits |
 
-The terrain rows must match dimensions exactly and use `G` grass, `D` dirt, `S` stone or `W` water. Positions must be in bounds. The current stable-ID registry binds each placement to its resource/station/NPC type, lifecycle stage and order. Spawn IDs, wander radius/interval, active population limit and respawn setting must match the supported definition. Adding/removing placements or changing those settings requires a deliberate registry/content-system extension.
+The terrain rows must match dimensions exactly and use `G` grass, `D` dirt, `S` stone or `W` water. Positions must be in bounds. The current stable-ID registry binds each placement to its resource/station/NPC type, lifecycle stage and order. Spawn IDs remain fixed. Versions 1 and 2 retain their exact baseline spawn settings. Version 3 accepts bounded monster wander/cap/respawn fields and requires `respawn_delay_ticks` on every actor; 0 inherits the enemy type delay. A cap is a creation limit and does not fill a population. See [ADR-018](../07-decisions/ADR_018_BOUNDED_OBJECT_PLACEMENT.md) and [ADR-019](../07-decisions/ADR_019_BOUNDED_SPAWN_SETTINGS.md).
 
 ## 5. Geography validation and runtime construction
 
@@ -151,4 +151,4 @@ On 18 November 2026, this slice passed **77/77 headless tests**, **89/89 tests**
 
 Implementation and tests: [parser](../../../src/Content/Export/StarterWorldSnapshotInput.cpp), [runtime input](../../../src/Content/Import/StarterWorldRuntimeInput.cpp), [World](../../../src/World/World.cpp), [launch options](../../../src/Core/GameLaunchOptions.cpp), [parser tests](../../../tests/StarterWorldSnapshotInputTests.cpp), [input tests](../../../tests/StarterWorldRuntimeInputTests.cpp), [runtime tests](../../../tests/StarterWorldRuntimeTests.cpp), [launch tests](../../../tests/GameLaunchOptionsTests.cpp), [validator CLI tests](../../../tests/StarterWorldValidateCliTests.cmake), [real application startup tests](../../../tests/GameEngineStartupCliTests.cmake).
 
-The next bounded step is guarded draft saving with expected-hash conflict detection and atomic replacement, followed by undo/redo, previews and a minimal visual editor. The bounded move preview provides the underlying shared command and is not yet a complete editing workflow. This importer alone does not complete R1, R2 or Studio Alpha 0.1.
+Shared history, guarded sibling drafts, preview/editor and isolated launch are now available. Interruption recovery, durable in-place publication and broader release acceptance remain open. The latest [spawn-settings implementation](../06-development/STUDIO_SPAWN_SETTINGS_2026-11-19.md) builds successfully; runtime and visible checks were explicitly deferred. The earlier verification totals above describe their dated revisions, not the schema-3 change. R1, R2 and Studio Alpha 0.1 are not declared complete.

@@ -13,4 +13,7 @@ struct NpcSpawnDefinition
     int wanderIntervalTicks = 0;
     int maximumActiveCount = 0;
     bool respawns = false;
+    // Zero inherits the NPC combat definition. Authored monster spawns may
+    // override the delay without changing the shared enemy type.
+    int respawnDelayTicks = 0;
 };

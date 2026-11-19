@@ -10,6 +10,33 @@
 
 namespace StarterWorldEdit
 {
+    SpawnSettingsResult ConfigureSpawn(const StarterWorldExport::Snapshot &source,
+        std::string_view placementId, const SpawnSettings &settings)
+    {
+        auto candidate = StarterWorldImport::ValidateForRuntime(source);
+        const auto found = std::find_if(candidate.placements.begin(), candidate.placements.end(),
+            [placementId](const auto &placement) { return placement.id == placementId; });
+        if (found == candidate.placements.end())
+            throw std::runtime_error("starter world edit: unknown spawn ID: " + std::string(placementId));
+        auto *spawn = std::get_if<NpcSpawnDefinition>(&found->legacyDefinition);
+        if (spawn == nullptr)
+            throw std::runtime_error("starter world edit: select an actor spawn to configure");
+        const SpawnSettings before{spawn->wanderRadius, spawn->wanderIntervalTicks,
+            spawn->maximumActiveCount, spawn->respawns, spawn->respawnDelayTicks};
+        const bool changed = before != settings;
+        if (changed)
+        {
+            spawn->wanderRadius = settings.wanderRadius;
+            spawn->wanderIntervalTicks = settings.wanderIntervalTicks;
+            spawn->maximumActiveCount = settings.maximumActiveCount;
+            spawn->respawns = settings.respawns;
+            spawn->respawnDelayTicks = settings.respawnDelayTicks;
+            candidate.schemaVersion = 3;
+            candidate = StarterWorldImport::ValidateForRuntime(candidate);
+        }
+        return {std::move(candidate), std::string(placementId), before, settings, changed};
+    }
+
     PlacementResult PlaceDefinition(const StarterWorldExport::Snapshot &source,
         std::string_view definitionId, const Position &destination)
     {
@@ -17,7 +44,7 @@ namespace StarterWorldEdit
         auto candidate = StarterWorldImport::ValidateForRuntime(source);
         const auto placement = AllocatePlacement(definitionId,
             candidate.nextPlacementId, destination);
-        candidate.schemaVersion = 2;
+        candidate.schemaVersion = std::max(2, candidate.schemaVersion);
         ++candidate.nextPlacementId;
         candidate.placements.push_back(placement);
         candidate = StarterWorldImport::ValidateForRuntime(candidate);
@@ -36,7 +63,7 @@ namespace StarterWorldEdit
         if (found->kind != PlacementKind::Resource && found->kind != PlacementKind::Station)
             throw std::runtime_error("starter world edit: actor spawns cannot be removed: " + found->id);
         const auto placement = *found;
-        candidate.schemaVersion = 2;
+        candidate.schemaVersion = std::max(2, candidate.schemaVersion);
         candidate.placements.erase(found);
         candidate = StarterWorldImport::ValidateForRuntime(candidate);
         return {std::move(candidate), placement};

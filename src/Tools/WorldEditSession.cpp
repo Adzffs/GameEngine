@@ -127,6 +127,7 @@ namespace
     {
         out << "Commands: help, list, terrain, snapshot, map [x y], move <id> <x> <y>,"
             << " place <definition-id> <x> <y>, remove <id>,"
+            << " spawn <id> <radius> <wander-ticks> <cap> <respawns:0|1> <respawn-ticks:0=type-default>,"
             << " paint <x> <y> <G|D|S|W>, undo, redo, status,"
             << " save <fresh-sibling.json>, quit\n"
             << "All changes are private until save. A save creates a NEW sibling"
@@ -246,6 +247,26 @@ namespace EmbervaleStudioSession
                     current = std::move(next);
                     output << (changed ? "Moved " : "Unchanged ") << id
                         << " to (" << x << ", " << y << ")\n";
+                }
+                else if (command == "spawn")
+                {
+                    std::string id, radius, interval, capacity, enabled, delay;
+                    StarterWorldEdit::SpawnSettings settings;
+                    int respawns = 0;
+                    if (!(args >> id >> radius >> interval >> capacity >> enabled >> delay) ||
+                        !Coordinate(radius, settings.wanderRadius) ||
+                        !Coordinate(interval, settings.wanderIntervalTicks) ||
+                        !Coordinate(capacity, settings.maximumActiveCount) ||
+                        !Coordinate(enabled, respawns) || (respawns != 0 && respawns != 1) ||
+                        !Coordinate(delay, settings.respawnDelayTicks))
+                        throw std::runtime_error("usage: spawn <id> <radius> <wander-ticks> <cap> <respawns:0|1> <respawn-ticks:0=type-default>");
+                    RequireEnd(args);
+                    settings.respawns = respawns == 1;
+                    auto next = history.ApplySpawnSettings(current, id, settings);
+                    const bool changed = StarterWorldExport::SerializeCanonical(next) !=
+                        StarterWorldExport::SerializeCanonical(current);
+                    current = std::move(next);
+                    output << (changed ? "Configured spawn " : "Unchanged spawn ") << id << '\n';
                 }
                 else if (command == "paint")
                 {

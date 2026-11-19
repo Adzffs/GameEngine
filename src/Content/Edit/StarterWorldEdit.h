@@ -9,6 +9,29 @@
 // A successful result is runtime-valid, but no live World or disk file is changed.
 namespace StarterWorldEdit
 {
+    struct SpawnSettings
+    {
+        int wanderRadius = 0;
+        int wanderIntervalTicks = 0;
+        int maximumActiveCount = 1;
+        bool respawns = false;
+        int respawnDelayTicks = 0;
+
+        bool operator==(const SpawnSettings &) const = default;
+    };
+
+    struct SpawnSettingsResult
+    {
+        StarterWorldExport::Snapshot candidate;
+        std::string placementId;
+        SpawnSettings before;
+        SpawnSettings after;
+        bool changed;
+    };
+
+    SpawnSettingsResult ConfigureSpawn(const StarterWorldExport::Snapshot &source,
+        std::string_view placementId, const SpawnSettings &settings);
+
     struct MoveResult
     {
         StarterWorldExport::Snapshot candidate;

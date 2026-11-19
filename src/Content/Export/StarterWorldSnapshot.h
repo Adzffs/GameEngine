@@ -50,12 +50,16 @@ namespace StarterWorldExport
         std::vector<Placement> placements;
         // v1 retains the exact compiled registry. v2 permits object membership
         // changes and persists an allocation high-water mark, including undo.
+        // v3 additionally supports bounded monster spawn settings.
         int schemaVersion = 1;
         int nextPlacementId = 1;
     };
 
     constexpr int MaximumNextPlacementId = 1000000;
     constexpr int AuthoredPlacementOrderBase = 12;
+    constexpr int MaximumWanderRadius = 32;
+    constexpr int MaximumSpawnIntervalTicks = 86400;
+    constexpr int MaximumSpawnActiveCount = 8;
 
     // Only the seven resource and three station definitions already supported
     // by the runtime may be instantiated. Actor identities remain compiled.
