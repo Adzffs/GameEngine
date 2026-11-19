@@ -1,0 +1,23 @@
+# Bounded starter-world terrain paint — 18 November 2026
+
+**Stack:** `studio/validated-terrain-paint` on `studio/visual-map-editor` (draft). **Planning:** STUDIO-020 / STUDIO-022.
+
+## Player/editor capability
+
+The first shared **single-tile base terrain** command is implemented. `PaintTerrain` accepts `G` grass, `D` dirt, `S` stone and `W` water; it validates source and resulting content through the same complete starter-world runtime validator used by import and stable-ID placement moves. Rejected edits cannot modify the caller. Grass/dirt/stone are walkable in the current game and water blocks travel; the validator rejects invalid occupancy, player spawn, unreachable actors, missing approaches and other runtime constraints.
+
+The content tool now exposes a dry run:
+
+```sh
+EmbervaleWorldMove --paint source.json 30 30 D
+```
+
+For an explicitly selected fresh **sibling** draft, pass `--expected-hash <exact-source-SHA256> --write-draft <new-sibling.json>`. This routes through the existing byte-rechecking, create-only publisher; it cannot overwrite the source, an existing draft or a player save. Default mode never writes a file.
+
+## Verification boundary
+
+The branch adds direct C++ paint candidate regression assertions to `StarterWorldEditTests` and a new `StarterWorldPaintCliTests` scripted scenario covering dry run, no-op, bad symbols, blocked placements/spawn, out-of-bounds, valid guarded publication, existing target and stale hash. **Executed locally:** an isolated GCC 14.2 C++20 compiler/link smoke of the new paint API copied into minimal mock content headers passed with `-Wall -Wextra -Werror`, and 10 stub-validator assertions passed (no-op, reverse edit, caller immutability, bounds, glyph, spawn and placement water conflicts, stone). The CMake `foreach` test-case list parsing was also checked under CMake 3.31.6. The real fixture's `(1,0)` / `(0,1)` corner-spawn route was inspected against a separate read-only reachability check; the former painted alone retains access and adding both disconnects it. These checks **do not** execute the actual GameEngine runtime validator or CLI. The newly registered C++/CLI tests and complete stacked build must still be run against a full checkout before merge. The repository cannot be cloned from this execution host (GitHub DNS resolution); **the full build, registered C++ tests, real game and Windows playtest were not executed**. This is a reviewable draft, not a release verification claim.
+
+## Next
+
+The stacked follow-up adds reversible one-tile terrain paint entries to the existing stable-ID move history, and exposes `paint x y G|D|S|W` in the interactive session. Move and paint edits now share undo/redo and the same guarded save path. **Verification of the follow-up is pending:** source and test changes were committed via GitHub, but this execution host cannot clone the complete repository for actual C++ builds or runtime runs. Next, run the full stacked build and registered tests, return authoritative painted rows for the graphical viewport, then add the GUI brush. Keep current move/undo/save support, stable IDs, spawn lifecycle, and imported-player recovery unchanged.

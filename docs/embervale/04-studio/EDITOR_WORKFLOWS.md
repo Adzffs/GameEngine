@@ -61,6 +61,14 @@ Changing a display name is different from changing a stable ID. Before deleting 
 
 Simulation tools should state their assumptions. A combat/economy report needs the definition revision, scenario, seeds or sampling method and the quantities measured. Use such reports to compare alternatives; use playtests to evaluate actual comprehension and pacing.
 
+For the experimental in-memory history implementation, a sequence of supported
+resource/workstation moves can be grouped into one reversible command.
+Undo and redo run the same validated move operation in reverse/forward order;
+any externally changed semantic revision produces an explicit conflict and leaves
+both the caller snapshot and history cursor untouched. Undo does not yet survive
+process restart and does not bypass guarded draft publication. See
+[bounded undo/redo](BOUNDED_UNDO_REDO.md).
+
 ## 7. Save, recover and resolve conflicts
 
 ### Ordinary save

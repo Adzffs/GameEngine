@@ -77,7 +77,7 @@ The history appendix selects gameplay and project commits from the reviewed `mas
 - Local builds and automated tests are now recorded above. No visible manual playthrough, performance profile, coverage measurement, accessibility assessment or production security audit was performed.
 - Existing save codec, file-store, world and engine persistence tests passed in the local suites. This does not prove every legacy edge case or a future edited-map saved-location migration matrix.
 - Branch/ruleset observations do not establish all account, organisation, or external enforcement settings.
-- The original baseline had no Studio files. Later work adds export, bounded validation and starter runtime import. Shared editing, guarded publication, undo and preview remain future work.
+- The original baseline had no Studio files. Later work adds export, bounded validation and starter runtime import. A narrow resource/station move-preview command is now on a development branch; full editing, guarded publication, undo and graphical preview remain future work.
 - Existing economy and character documents contain design intentions as well as factual claims. Code and explicit current decisions take precedence where the documents are stale.
 - The old PR #1 quest-verification gaps are historical review notes. Recheck them against current code and tests before marking them unresolved defects or closing them.
 
@@ -86,3 +86,13 @@ The history appendix selects gameplay and project commits from the reviewed `mas
 For each future baseline, record the new game-code SHA, date, changed systems, exact build/test commands and environments, result records, and a concise limitation statement. Keep old evidence immutable or clearly dated. Update current-state pages and roadmap statuses together so that implementation and documentation do not drift apart.
 
 When a check is blocked, record the operation, observed failure, and what remains unknown. When a hypothesis is tested, link the result and remove only the uncertainty that result resolves. This keeps the roadmap useful as both a plan and a trustworthy record.
+
+## 8. Bounded guarded draft experiment (18 November 2026)
+
+The separate development branch `studio/guarded-draft-revisions` adds a raw-byte SHA-256 inspector and guarded *new sibling file* publication to the resource/station move preview. The source is re-read under a cooperative lock, the expected hash must still match, and a new destination is installed using a same-filesystem hard link from private staging. This is **not** in-place replacement, noncooperating-writer isolation, power-loss durability, full editor support, or a guarantee across every filesystem. The parent move PR #9 is itself still a draft.
+
+The source file and test harness compiled with strict GCC C++20 settings on Linux in a local isolated workspace; NIST SHA-256 test vectors, create-only publication, existing-target rejection, stale source detection, lock rejection and input symlink rejection passed. The expanded CLI compiled and ran against **mocked gameplay validation and move APIs**, and its CMake command script passed against that mock. The local container could not resolve GitHub to check out the complete repository. Neither the actual game tests nor the full-game executable were run at this branch tip. See [bounded verification record](../06-development/GUARDED_DRAFT_VERIFICATION_2026-11-18.md). The experimental source must remain under review until those checks run.
+
+## 9. Bounded in-memory placement history experiment (18 November 2026)
+
+On the separate stacked `studio/placement-undo-redo` branch, `StarterWorldHistory` supports grouped reversible resource/workstation moves by durable ID. Undo and redo replay validated inverse/forward commands, reject unexpected canonical semantic revisions, preserve base terrain and avoid overwriting unrelated content. The history is process-local and writes neither snapshots nor player saves. The registered new regression suite was compiled and executed **only with reconstructed mock snapshot/runtime definitions**: 30 checks passed; full repository builds, real geometry/runtime tests and Windows remain unverified. Do not consider STUDIO-023 complete before integration and editor-session verification. [Evidence](../06-development/STUDIO_HISTORY_VERIFICATION_2026-11-18.md).

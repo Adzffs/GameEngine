@@ -113,6 +113,9 @@ set(GAMEENGINE_CORE_SOURCES
     src/Content/Export/StarterWorldSnapshot.cpp
     src/Content/Export/StarterWorldSnapshotInput.cpp
     src/Content/Import/StarterWorldRuntimeInput.cpp
+    src/Content/Edit/StarterWorldEdit.cpp
+    src/Content/Edit/StarterWorldDraftFile.cpp
+    src/Content/Edit/StarterWorldHistory.cpp
     src/Reward/RewardTable.cpp
     src/Reward/RewardTableRoller.cpp
     src/Reward/DevelopmentRewardTables.cpp
@@ -140,6 +143,12 @@ if(GAMEENGINE_BUILD_CONTENT_TOOLS)
 
     add_executable(EmbervaleWorldValidate src/Tools/WorldValidateMain.cpp)
     target_link_libraries(EmbervaleWorldValidate PRIVATE GameEngineCore)
+
+    add_executable(EmbervaleWorldMove
+        src/Tools/WorldMoveMain.cpp
+        src/Tools/WorldEditSession.cpp
+    )
+    target_link_libraries(EmbervaleWorldMove PRIVATE GameEngineCore)
 endif()
 
 if(GAMEENGINE_BUILD_CLIENT)
@@ -206,6 +215,9 @@ if(BUILD_TESTING)
     endif()
     add_gameengine_headless_test(GameLaunchOptionsTests tests/GameLaunchOptionsTests.cpp)
     add_gameengine_headless_test(StarterWorldRuntimeInputTests tests/StarterWorldRuntimeInputTests.cpp)
+    add_gameengine_headless_test(StarterWorldEditTests tests/StarterWorldEditTests.cpp)
+    add_gameengine_headless_test(StarterWorldDraftFileTests tests/StarterWorldDraftFileTests.cpp)
+    add_gameengine_headless_test(StarterWorldHistoryTests tests/StarterWorldHistoryTests.cpp)
     add_gameengine_headless_test(StarterWorldRuntimeTests tests/StarterWorldRuntimeTests.cpp)
     if(GAMEENGINE_BUILD_CONTENT_TOOLS)
         add_gameengine_headless_test(StarterWorldSnapshotTests tests/StarterWorldSnapshotTests.cpp)
@@ -233,6 +245,49 @@ if(BUILD_TESTING)
                 -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/StarterWorldValidateCliTests.cmake"
         )
         set_tests_properties(StarterWorldValidateCliTests PROPERTIES LABELS "headless;content")
+
+        add_test(
+            NAME StarterWorldMoveCliTests
+            COMMAND ${CMAKE_COMMAND}
+                "-DMOVER=$<TARGET_FILE:EmbervaleWorldMove>"
+                "-DFIXTURE=${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/content/development-starter.snapshot.json"
+                "-DWORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/starter-world-move-cli-test"
+                -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/StarterWorldMoveCliTests.cmake"
+        )
+        set_tests_properties(StarterWorldMoveCliTests PROPERTIES LABELS "headless;content")
+        add_test(
+            NAME StarterWorldPaintCliTests
+            COMMAND ${CMAKE_COMMAND}
+                "-DMOVER=$<TARGET_FILE:EmbervaleWorldMove>"
+                "-DFIXTURE=${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/content/development-starter.snapshot.json"
+                "-DWORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/starter-world-paint-cli-test"
+                -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/StarterWorldPaintCliTests.cmake"
+        )
+        set_tests_properties(StarterWorldPaintCliTests PROPERTIES LABELS "headless;content")
+        add_test(
+            NAME StarterWorldInteractiveSessionTests
+            COMMAND ${CMAKE_COMMAND}
+                "-DMOVER=$<TARGET_FILE:EmbervaleWorldMove>"
+                "-DFIXTURE=${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/content/development-starter.snapshot.json"
+                "-DWORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/starter-world-session-test"
+                -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/StarterWorldInteractiveSessionTests.cmake"
+        )
+        set_tests_properties(StarterWorldInteractiveSessionTests PROPERTIES LABELS "headless;content")
+
+        # Optional local test crosses the real C++ editor and Tk bridge.
+        # Python is optional; absence means no integration test registered.
+        find_package(Python3 COMPONENTS Interpreter QUIET)
+        if(Python3_Interpreter_FOUND)
+            add_test(
+                NAME StarterWorldVisualBridgeIntegration
+                COMMAND "${Python3_EXECUTABLE}"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/tests/StarterWorldVisualBridgeIntegration.py"
+                    --tool "$<TARGET_FILE:EmbervaleWorldMove>"
+                    --fixture "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/content/development-starter.snapshot.json"
+            )
+            set_tests_properties(StarterWorldVisualBridgeIntegration
+                PROPERTIES LABELS "headless;content;studio")
+        endif()
     endif()
 
     add_gameengine_headless_test(ActionFrameworkTests tests/ActionFrameworkTests.cpp)

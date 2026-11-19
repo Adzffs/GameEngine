@@ -339,30 +339,47 @@
       "milestone": "R2",
       "priority": "P1",
       "title": "Implement shared edit operations",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-010",
         "STUDIO-050"
       ],
       "acceptance": "Typed inspect/paint/place/move/remove/validate/diff/save operations produce a candidate and affected references; first release exposes bounded scope.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "src/Content/Edit/StarterWorldEdit.h",
+        "src/Content/Edit/StarterWorldEdit.cpp",
+        "src/Tools/WorldMoveMain.cpp",
+        "tests/StarterWorldEditTests.cpp",
+        "tests/StarterWorldMoveCliTests.cmake",
+        "tests/StarterWorldPaintCliTests.cmake",
+        "docs/embervale/06-development/STUDIO_TERRAIN_PAINT_EXPERIMENT_2026-11-18.md",
+        "docs/embervale/06-development/STUDIO_MOVE_PREVIEW_2026-11-18.md"
+      ],
+      "notes": "The stacked edit operations now include pure runtime-validated stable-ID resource/station moves and one-tile G/D/S/W ground painting; the terminal history supports undo and redo across both kinds, and the Tk bridge can issue mouse paint. The C++ validation authority is shared. Broader placement creation/removal, structured diagnostics, full project compilation and real editor/game verification remain open."
     },
     {
       "id": "STUDIO-021",
       "milestone": "R2",
       "priority": "P1",
       "title": "Guard writes and dry runs",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-020",
         "STUDIO-011"
       ],
       "acceptance": "Expected content hash, file locking/recheck and atomic replacement prevent stale writes; dry-run persists nothing.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "src/Content/Edit/StarterWorldDraftFile.h",
+        "src/Content/Edit/StarterWorldDraftFile.cpp",
+        "src/Tools/WorldMoveMain.cpp",
+        "tests/StarterWorldDraftFileTests.cpp",
+        "tests/StarterWorldMoveCliTests.cmake",
+        "docs/embervale/04-studio/GUARDED_DRAFT_REVISIONS.md",
+        "docs/embervale/06-development/GUARDED_DRAFT_VERIFICATION_2026-11-18.md"
+      ],
+      "notes": "Experimental create-only sibling draft publication with raw-byte SHA-256 expected hash, source recheck under cooperating-directory lock, private staging and exclusive hard-link commit. Original source and save files never overwritten. No in-place atomic replacement, crash-durability guarantee or general editor yet. Full repository build/tests and Windows are unverified; isolated C++ storage tests and mock CLI/CMake checks only."
     },
     {
       "id": "STUDIO-022",
@@ -383,35 +400,45 @@
         "docs/embervale/04-studio/STARTER_WORLD_IMPORT.md",
         "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
       ],
-      "notes": "EmbervaleWorldExport and EmbervaleWorldValidate run headlessly; the client has explicit --world/--save selection. Shared edits, guarded writes and structured machine diagnostics remain planned."
+      "notes": "Headless export, snapshot validation, dry-run moves and terrain paint, guarded draft publication and an interactive terminal map/list/move/paint/undo/redo/save session are staged. Structured machine diagnostics, full project compilation and real command execution have not been verified on the stacked editor branch."
     },
     {
       "id": "STUDIO-023",
       "milestone": "R2",
       "priority": "P1",
       "title": "Add undo and redo",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-020"
       ],
       "acceptance": "Reverse complete commands/batches while retaining authored identity; reject incompatible history after external changes.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "src/Content/Edit/StarterWorldHistory.h",
+        "src/Content/Edit/StarterWorldHistory.cpp",
+        "tests/StarterWorldHistoryTests.cpp",
+        "docs/embervale/04-studio/BOUNDED_UNDO_REDO.md",
+        "docs/embervale/06-development/STUDIO_HISTORY_VERIFICATION_2026-11-18.md"
+      ],
+      "notes": "C++ history stages bounded stable-ID move batches and one-tile terrain paint with a shared cursor, semantic conflict check and reversible undo/redo. Both text and Tk editing sessions use the shared engine history. Unit/regression sources are committed, but a complete C++ build, real runtime tests and persisted history acceptance remain open."
     },
     {
       "id": "STUDIO-024",
       "milestone": "R2",
       "priority": "P1",
       "title": "Produce reproducible previews",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-013"
       ],
       "acceptance": "Preview true content, occupancy and selected overlays; share interpretation and version rendering inputs.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "src/Tools/WorldEditSession.cpp",
+        "tests/StarterWorldInteractiveSessionTests.cmake",
+        "docs/embervale/06-development/STUDIO_SESSION_VERIFICATION_2026-11-18.md"
+      ],
+      "notes": "A bounded terminal 21x21 terrain-and-occupancy preview now accompanies in-memory shared-history move/undo/redo and guarded new-draft saving. This is not a graphical editor, complete renderer, preview-artifact format or verified publication. New code passed isolated GCC C++20 syntax and mock-backed session smoke checks; full project tests remain unrun."
     },
     {
       "id": "STUDIO-025",
@@ -465,15 +492,24 @@
       "milestone": "R2",
       "priority": "P1",
       "title": "Build minimal visual editor shell",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-022",
         "STUDIO-024"
       ],
       "acceptance": "Open/select/inspect/move/paint with shared commands; preserve camera and coordinate transforms.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "tools/embervale_world_editor.py",
+        "tests/test_world_editor_bridge.py",
+        "docs/embervale/04-studio/VISUAL_WORLD_EDITOR.md",
+        "docs/embervale/06-development/STUDIO_VIEWPORT_NAVIGATION_VERIFICATION_2026-11-18.md",
+        "docs/embervale/06-development/STUDIO_AUTHORITATIVE_TERRAIN_VIEW_2026-11-18.md",
+        "tests/StarterWorldVisualBridgeIntegration.py",
+        "docs/embervale/06-development/STUDIO_REAL_BRIDGE_INTEGRATION_GATE_2026-11-18.md",
+        "docs/embervale/06-development/STUDIO_WINDOWS_INTEGRATION_VERIFICATION_2026-11-19.md"
+      ],
+      "notes": "First mouse-driven Python/Tk editor stages zoom, selection, stable-ID resource/station moves, G/D/S/W painting, shared C++ undo/redo and guarded create-only draft saving. C++ returns authoritative terrain and placement state; the bridge validates exact command deltas, verified history checkpoints, source revision, publication receipt and saved-world semantic parity. It rejects actor drift and arbitrary terminal commands in the replay path. On 19 November 2026 the consolidated PR #18 stack built on Windows and passed 84/84 registered headless/content tests, including 6/6 real executable-backed bridge cases; the mocked bridge and viewport suite passed 35/35. Windows create-only publication and platform path/script handling were corrected without changing player-save behavior. Visible Tk interaction and an SDL client playtest of a saved draft remain outstanding."
     },
     {
       "id": "STUDIO-032",
