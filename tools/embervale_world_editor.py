@@ -228,6 +228,12 @@ class StudioBridge:
             raise StudioError("The authoritative terrain differs from the source snapshot")
         # Keep only responses already observed from C++; never infer undo inverses.
         self._checkpoints = [(dict(self.placements), tuple(self.terrain))]
+        self._saved_state = (dict(self.placements), tuple(self.terrain))
+        self.last_saved: Path | None = None
+
+    @property
+    def dirty(self) -> bool:
+        return (self.placements, tuple(self.terrain)) != self._saved_state
 
     def _invoke(self, commands: list[str]) -> tuple[str, dict[str, tuple[str, int, int]], str, list[str], str]:
         arguments = [self.executable, "--session", str(self.source)]
@@ -339,6 +345,8 @@ class StudioBridge:
         result = self._invoke([*self.commands, "save " + target])
         saved_bytes = verify_saved_draft_receipt(result[4], Path(target))
         verify_saved_world_parity(self.snapshot, saved_bytes, self.placements, self.terrain)
+        self._saved_state = (dict(self.placements), tuple(self.terrain))
+        self.last_saved = Path(target)
         return requested
 
 
@@ -412,7 +420,9 @@ def launch(bridge: StudioBridge) -> None:
                                width=3 if name == selected else 1)
             if name == selected:
                 inspector.set(f"{KINDS[kind]}\n{name}\n{bridge.definitions[name]}\nTile: ({x}, {y})")
-        caption.set(f"{bridge.source.name} | {bridge.hash[:10]} | {tile}px/tile | changed/undo/redo: {bridge.status}")
+        file_state = "Unsaved changes" if bridge.dirty else "Saved"
+        root.title(f"{'* ' if bridge.dirty else ''}{bridge.source.name} | Embervale Studio")
+        caption.set(f"{bridge.source.name} | {file_state} | {tile}px | undo/redo: {'/'.join(bridge.status.split('/')[1:])}")
         choices.delete(0, "end")
         names = sorted(bridge.placements)
         for name in names:
@@ -503,18 +513,61 @@ def launch(bridge: StudioBridge) -> None:
         except StudioError as error:
             messagebox.showerror("Edit rejected", str(error), parent=root)
 
-    def save() -> None:
+    def save() -> bool:
         nonlocal saved
         path = filedialog.asksaveasfilename(parent=root, title="Save new draft (never overwrites)",
                                             initialdir=str(bridge.source.parent),
                                             defaultextension=".json", filetypes=[("JSON", "*.json")])
         if not path:
-            return
+            return False
         try:
             saved = bridge.save(Path(path))
+            display()
             messagebox.showinfo("Draft saved", f"Created {saved}\nOriginal world and player saves were not modified.", parent=root)
+            return True
         except StudioError as error:
             messagebox.showerror("Save rejected", str(error), parent=root)
+            return False
+
+    def may_leave() -> bool:
+        if not bridge.dirty:
+            return True
+        answer = messagebox.askyesnocancel("Unsaved changes",
+            "Save a new draft before leaving this world?\nYes: save a draft. No: discard unsaved changes. Cancel: keep editing.", parent=root)
+        return save() if answer is True else answer is False
+
+    def close() -> None:
+        if may_leave():
+            root.destroy()
+
+    def open_world(path: Path | None = None) -> None:
+        nonlocal bridge, selected, saved
+        if path is None:
+            filename = filedialog.askopenfilename(parent=root, title="Open world draft",
+                initialdir=str(bridge.source.parent), filetypes=[("JSON", "*.json")])
+            if not filename:
+                return
+            path = Path(filename)
+        # Validate the replacement before offering to discard the current world.
+        try:
+            replacement = StudioBridge(Path(bridge.executable), path)
+        except StudioError as error:
+            messagebox.showerror("Open rejected", str(error), parent=root)
+            return
+        if not may_leave():
+            return
+        bridge = replacement
+        selected = None
+        saved = None
+        inspector.set("Click a resource or station, then click an empty target tile")
+        fit_view()
+
+    root.protocol("WM_DELETE_WINDOW", close)
+    filebar = ttk.Frame(frame)
+    filebar.pack(fill="x", before=toolbar)
+    ttk.Button(filebar, text="Open draft…", command=open_world).pack(side="left")
+    ttk.Button(filebar, text="Reopen last saved", command=lambda: open_world(bridge.last_saved)
+        if bridge.last_saved else messagebox.showinfo("No saved draft", "Save a new draft first.", parent=root)).pack(side="left", padx=4)
 
     ttk.Label(toolbar, text="Tool:").pack(side="left", padx=(4, 2))
     ttk.Combobox(toolbar, textvariable=brush, state="readonly", width=15,
