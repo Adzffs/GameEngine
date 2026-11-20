@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     try
     {
         if (argc < 3)
-            throw std::invalid_argument("Usage: EmbervaleRenderPreview WORLD.json OUTPUT.png [--basic] [--deplete-trees] [--deplete-rocks] [--focus X Y] [--zoom 1|1.5] [--condition new|weathered|repaired] [--walk-to X Y | --chop X Y] [--frames N]");
+            throw std::invalid_argument("Usage: EmbervaleRenderPreview WORLD.json OUTPUT.png [--basic] [--deplete-trees] [--deplete-rocks] [--focus X Y] [--zoom 1|1.5] [--condition new|weathered|repaired] [--walk-to X Y | --chop X Y | --mine X Y] [--frames N]");
         const auto input = std::filesystem::path(reinterpret_cast<const char8_t *>(argv[1]));
         const auto output = std::filesystem::path(reinterpret_cast<const char8_t *>(argv[2]));
         std::error_code equivalentError;
@@ -39,6 +39,7 @@ int main(int argc, char **argv)
         std::optional<std::pair<int, int>> focus;
         std::optional<std::pair<int, int>> walkTo;
         std::optional<std::pair<int, int>> chop;
+        std::optional<std::pair<int, int>> mine;
         float zoom = 1.0f;
         int frames = 0, condition = -1;
         for (int index = 3; index < argc; ++index)
@@ -67,11 +68,11 @@ int main(int argc, char **argv)
                 const int y = Coordinate(argv[++index]);
                 walkTo = std::pair{x, y};
             }
-            else if (option == "--chop" && index + 2 < argc)
+            else if ((option == "--chop" || option == "--mine") && index + 2 < argc)
             {
                 const int x = Coordinate(argv[++index]);
                 const int y = Coordinate(argv[++index]);
-                chop = std::pair{x, y};
+                (option == "--chop" ? chop : mine) = std::pair{x, y};
             }
             else if (option == "--zoom" && index + 1 < argc)
             {
@@ -90,7 +91,8 @@ int main(int argc, char **argv)
         // Fixed, independent streams keep authored captures reproducible.
         // Production game launches retain their normal random sources.
         World world(StarterWorldImport::LoadFile(input), 1337U, 7331U, 1U);
-        if (chop && (walkTo || deplete)) throw std::invalid_argument("Chopping preview requires an intact target and no walk-to fixture");
+        if (chop && (mine || walkTo || deplete)) throw std::invalid_argument("Chopping preview requires an intact target and no walk-to fixture");
+        if (mine && (walkTo || depleteRocks)) throw std::invalid_argument("Mining preview requires an intact target and no walk-to fixture");
         if (walkTo && !world.GetMap().IsValidPosition(walkTo->first, walkTo->second))
             throw std::invalid_argument("Walk preview destination must be walkable");
         const int playerID = world.CreatePlayer(PlayerInitializationMode::FRESH_START);
@@ -112,25 +114,28 @@ int main(int argc, char **argv)
                     while (node->IsActive()) node->ConsumeUse();
                 }
 
-        if (chop)
+        const auto gatheringTarget = chop ? chop : mine;
+        if (gatheringTarget)
         {
-            auto *tree = world.GetResourceAt(chop->first, chop->second);
-            if (!tree || tree->GetResourceType() != ResourceType::NORMAL_TREE)
-                throw std::invalid_argument("Fresh-player chopping preview requires a normal tree");
+            auto *node = world.GetResourceAt(gatheringTarget->first, gatheringTarget->second);
+            const bool valid = node && (chop ? node->GetResourceType() == ResourceType::NORMAL_TREE :
+                node->GetResourceType() == ResourceType::COPPER_ROCK || node->GetResourceType() == ResourceType::TIN_ROCK);
+            if (!valid) throw std::invalid_argument("Fresh gathering preview requires a normal tree or copper/tin rock");
+            const ItemType tool = chop ? ItemType::BRONZE_AXE : ItemType::BRONZE_PICKAXE;
             const auto &slots = player->GetInventory().GetSlots();
             bool equipped = false;
             for (std::size_t slot = 0; slot < slots.size(); ++slot)
-                if (slots[slot].GetItemType() == ItemType::BRONZE_AXE)
+                if (slots[slot].GetItemType() == tool)
                 {
                     equipped = world.TryEquipInventoryItem(playerID, static_cast<int>(slot));
                     break;
                 }
-            if (!equipped) throw std::runtime_error("Preview could not equip the starting axe");
-            world.QueueResourceInteraction(playerID, tree->GetID());
+            if (!equipped) throw std::runtime_error("Preview could not equip the starting gathering tool");
+            world.QueueResourceInteraction(playerID, node->GetID());
             world.Update();
             const auto *action = world.GetActionForEntity(playerID);
-            if (!action || action->GetType() != ActionType::GATHERING || action->GetTargetID() != tree->GetID())
-                throw std::invalid_argument("Chopping focus must be adjacent to the tree");
+            if (!action || action->GetType() != ActionType::GATHERING || action->GetTargetID() != node->GetID())
+                throw std::invalid_argument("Gathering focus must be adjacent to its target");
         }
 
         SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "dummy");
@@ -169,7 +174,7 @@ int main(int argc, char **argv)
             graphics.AdjustCameraZoom(1, Graphics::WindowWidth * 0.5f, Graphics::WindowHeight * 0.5f);
             if (graphics.GetCameraZoom() == before) throw std::runtime_error("Requested preview zoom is unavailable");
         }
-        const int frameCount = frames > 0 ? frames : (chop ? 18 : walkTo ? 2 : 1);
+        const int frameCount = frames > 0 ? frames : (gatheringTarget ? 18 : walkTo ? 2 : 1);
         for (int frame = 0; frame < frameCount; ++frame)
         {
             if (frame > 0)
@@ -177,7 +182,7 @@ int main(int argc, char **argv)
                 if (walkTo) player->GetPosition().SetPosition(walkTo->first, walkTo->second);
                 // Bounded presentation fixture: advance real gathering every
                 // fifteen 40-ms frames and consume each authoritative result.
-                if (chop && frame % 15 == 0)
+                if (gatheringTarget && frame % 15 == 0)
                 {
                     world.Update();
                     graphics.SynchronizeGatheringRewards(playerID, world.GetGatheringRewardEvents());
@@ -194,8 +199,8 @@ int main(int argc, char **argv)
         SDL_SetRenderTarget(graphics.renderer, nullptr);
         std::cout << "Rendered " << pixels->w << 'x' << pixels->h
             << " through the game renderer; " << (basic ? "basic" : "world")
-            << " art, " << (deplete ? "depleted" : "intact") << " trees, "
-            << (depleteRocks ? "depleted" : "intact") << " copper/tin. No player or world files written.\n";
+            << " art, " << (mine ? "mining" : chop ? "woodcutting" : walkTo ? "walking" : "static")
+            << " preview. No player or world files written.\n";
         return 0;
     }
     catch (const std::exception &error)

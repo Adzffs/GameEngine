@@ -121,6 +121,9 @@ void ForestSprites::Initialize(SDL_Renderer *target)
         if (frame.facing >= 0 && frame.facing < 8 && frame.animationFrame >= 0 && frame.animationFrame < 6)
         {
             if (frame.id.starts_with("character.woodcutting.")) chopping[frame.facing][frame.animationFrame] = &frame;
+            if (frame.id.starts_with("character.mining.")) miningPlayer[frame.facing][frame.animationFrame] = &frame;
+            if (frame.id.starts_with("tool.pickaxe.") && frame.grassVariant >= 0 && frame.grassVariant < 3)
+                miningPickaxes[frame.grassVariant][frame.facing][frame.animationFrame] = &frame;
             if (frame.id.starts_with("tool.axe.") && frame.grassVariant >= 0 && frame.grassVariant < 3)
                 choppingAxes[frame.grassVariant][frame.facing][frame.animationFrame] = &frame;
         }
@@ -481,6 +484,18 @@ bool ForestSprites::DrawWoodcutting(float tileX, float tileY, int facing, int po
     if (behind) Draw(axe, Bounds(*axe, tileX, tileY));
     DrawCharacter(body, tileX, tileY);
     if (!behind) Draw(axe, Bounds(*axe, tileX, tileY));
+    return true;
+}
+
+bool ForestSprites::DrawMiningAction(float tileX, float tileY, int facing, int pose, int pickaxeTier) const
+{
+    if (facing < 0 || facing >= 8 || pose < 0 || pose >= 6 || pickaxeTier < 0 || pickaxeTier >= 3) return false;
+    const auto *body = miningPlayer[facing][pose], *pickaxe = miningPickaxes[pickaxeTier][facing][pose];
+    if (!Available(body) || !Available(pickaxe)) return false;
+    const bool behind = facing == 3 || facing == 6 || facing == 7;
+    if (behind) Draw(pickaxe, Bounds(*pickaxe, tileX, tileY));
+    DrawCharacter(body, tileX, tileY);
+    if (!behind) Draw(pickaxe, Bounds(*pickaxe, tileX, tileY));
     return true;
 }
 

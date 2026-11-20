@@ -49,7 +49,10 @@ public:
 
     bool Initialize();
     void SynchronizeGatheringRewards(int actorID, const std::vector<GatheringRewardEvent> &events)
-    { woodcuttingPresentation.SynchronizeRewards(actorID, events); }
+    {
+        woodcuttingPresentation.SynchronizeRewards(actorID, events);
+        miningPresentation.SynchronizeRewards(actorID, events);
+    }
     void ShowGameGuide() { gameGuideVisible = true; }
     void SetCompiledMapLabelsVisible(bool visible) { compiledMapLabelsVisible = visible; }
     // Authoring inspection only; normal play uses each building's stable profile.
@@ -361,7 +364,7 @@ public:
     void DrawGrid(const Map &map);
     void DrawClickedTile();
     void DrawPlayer(int playerX, int playerY);
-    void DrawWoodcuttingFeedback();
+    void DrawGatheringFeedback(const GatheringPresentationState &presentation);
     void DrawPlayerHealthBar(
         const Player &player);
     SDL_FRect GetMonsterScreenRectangle(
@@ -561,6 +564,7 @@ private:
     int playerFacing = 0;
     float playerWalkDistance = 0.0f;
     WoodcuttingPresentationState woodcuttingPresentation;
+    GatheringPresentationState miningPresentation{SkillType::MINING};
     float cameraPixelX = 0.0f;
     float cameraPixelY = 0.0f;
     float cameraZoom = 1.0f;

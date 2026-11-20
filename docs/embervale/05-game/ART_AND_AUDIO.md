@@ -1,6 +1,6 @@
 # Art, animation and audio production guide
 
-**Status:** Seven world-art batches render terrain, cast, resources, services, buildings, contextual variation and woodcutting actions. The player has eight-way walking and chopping; the shared cache covers 983 frames in 28 textures. A general importer and the broader production workflow below remain proposed.\
+**Status:** Eight world-art batches render terrain, cast, resources, services, buildings, contextual variation and gathering actions. The player has eight-way walking, chopping and mining; the shared cache covers 1,175 frames in 30 textures. A general importer and the broader production workflow below remain proposed.\
 **Reviewed:** 20 November 2026.\
 **Purpose:** Replace placeholder presentation in manageable steps while preserving gameplay and making assets easy for humans and AI to work with.
 
@@ -51,7 +51,12 @@ adds six action poses in every direction and bronze/iron/steel axe overlays.
 The player faces the active tree, swings while gathering and stops cleanly on
 interruption. Contact chips are cosmetic; floating log/XP feedback consumes
 committed world rewards, including depletion. [Local checks and game captures](../06-development/WOODCUTTING_ANIMATION_2026-11-20.md).
-Mining, combat, remaining cast and other action states remain open.
+The [mining batch](../../../assets/embervale/mining-pilot/README.md) adds lower
+rock strikes and bronze/iron/steel pickaxe overlays in all eight directions.
+It shares the gathering presentation and interruption rules with woodcutting.
+Rock chips mark contact; actual ore and Mining XP notices come from committed
+world rewards. [Local checks and game captures](../06-development/MINING_ANIMATION_2026-11-20.md).
+Combat, remaining cast and other action states remain open.
 
 The current client uses SDL3 drawing code for the world and entities. `Graphics.h` defines a 32-pixel tile size and a 1280×720 window. The rendering code includes terrain colours, resource shapes, combat feedback and world labels. This does not establish an existing general-purpose sprite import pipeline. Sources: [Graphics.h](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Graphics/Graphics.h), [Graphics.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Graphics/Graphics.cpp).
 
