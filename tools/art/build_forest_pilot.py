@@ -43,55 +43,14 @@ def png_size(path):
 
 
 def write_renderer_layout(manifest):
-    """Compile this small authoring record into a checked, dependency-free binding."""
-    manifests = [manifest]
-    for name in ['cast-pilot', 'environment-pilot', 'service-pilot', 'building-pilot', 'variation-pilot', 'woodcutting-pilot', 'mining-pilot']:
-        batch_path = REPO / f'assets/embervale/{name}/manifest.json'
-        if batch_path.exists():
-            manifests.append(json.loads(batch_path.read_text(encoding='utf-8')))
-    images = [(batch, name, image) for batch in manifests for name, image in batch['images'].items()]
-    assets = [(batch, asset) for batch in manifests for asset in batch['assets']]
-    walk_cycle = float(next((batch['walk']['cycle_distance_tiles'] for batch in manifests if 'walk' in batch), 1.0))
-    if not 0.0 < walk_cycle <= 8.0:
-        raise RuntimeError('Invalid player walk-cycle distance')
-    if len({asset['id'] for _, asset in assets}) != len(assets):
-        raise RuntimeError('Duplicate asset ID')
-    lines = [
-        '// Generated from world-art batch manifests by tools/art/build_*_pilot.py.',
-        '#pragma once', '#include <SDL3/SDL.h>', '#include <array>',
-        '#include <cstddef>', '#include <string_view>', '', 'namespace ForestPilotLayout', '{',
-        '    struct Image { std::string_view filename; int width, height; std::string_view directory; };',
-        '    struct Frame { std::string_view id; std::size_t image; SDL_FRect source;',
-        '        SDL_FPoint pivot, ground; int connectionMask, grassVariant, facing, animationFrame; };',
-        f'    inline constexpr int TileSize = {manifest["native_tile_size"]};',
-        f'    inline constexpr float PlayerWalkCycleTiles = {walk_cycle}f;',
-        f'    inline constexpr std::array<Image, {len(images)}> Images{{{{',
-    ]
-    for batch, name, image in images:
-        filename = Path(image['image']).name
-        width, height = image['size']
-        directory = f'assets/embervale/{batch["id"]}/textures'
-        lines.append(f'        {{{json.dumps(filename)}, {width}, {height}, {json.dumps(directory)}}},')
-    lines += ['    }};', f'    inline constexpr std::array<Frame, {len(assets)}> Frames{{{{']
-    def point(values):
-        return '{' + ', '.join(f'{value}.0f' for value in values) + '}'
-    for batch, asset in assets:
-        x, y, w, h = asset['rect']
-        width, height = batch['images'][asset['image']]['size']
-        if min(x, y) < 0 or min(w, h) <= 0 or x + w > width or y + h > height:
-            raise RuntimeError('Frame outside texture: ' + asset['id'])
-        lines.append('        {' + json.dumps(asset['id']) + ', '
-                     + str(next(i for i, (owner, name, _) in enumerate(images)
-                                if owner is batch and name == asset['image'])) + ', ' + point(asset['rect'])
-                     + ', ' + point(asset['pivot']) + ', '
-                     + point(asset.get('intended_ground_point_in_tile', [0, 0])) + ', '
-                     + str(asset.get('connection_mask', -1)) + ', '
-                     + str(asset.get('variant', -1)) + ', '
-                     + str(asset.get('facing', -1)) + ', '
-                     + str(asset.get('animation_frame', 0)) + '},')
-    lines += ['    }};', '}', '']
+    """Validate the complete current catalogue before replacing generated bindings."""
+    from world_art_resources import load_limits, load_manifests, renderer_layout, validate_manifests
+    limits = load_limits(REPO)
+    manifests = load_manifests(REPO, limits)
+    manifests[0] = manifest
+    validate_manifests(REPO, manifests, limits)
     header = REPO / 'src/Graphics/ForestPilotLayout.h'
-    content = '\n'.join(lines).encode('utf-8')
+    content = renderer_layout(manifests).encode('utf-8')
     if not header.exists() or header.read_bytes() != content:
         header.write_bytes(content)
 

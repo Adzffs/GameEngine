@@ -1,0 +1,7 @@
+#pragma once
+// Generated from assets/embervale/world-art-limits.json. Do not edit this output.
+inline constexpr WorldArtResources::Limits WorldArtDefaultLimits{
+    @art_max_images@, @art_max_frames@, @art_max_image_edge@, @art_max_image_pixels@,
+    @art_max_png_bytes@, @art_max_manifest_bytes@, @art_max_catalogue_png_bytes@,
+    @art_max_texture_bytes@, @art_max_alpha_bytes@, @art_max_staging_bytes@
+};

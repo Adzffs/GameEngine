@@ -5,44 +5,25 @@
 #include <algorithm>
 #include <cmath>
 #include <filesystem>
-#include <fstream>
+#include <stdexcept>
 #include <iostream>
 
-namespace
-{
-    bool ValidPngHeader(const std::filesystem::path &path,
-                        const ForestPilotLayout::Image &expected)
-    {
-        std::error_code error;
-        const auto bytes = std::filesystem::file_size(path, error);
-        if (error || bytes < 24 || bytes > 4 * 1024 * 1024) return false;
-        std::array<unsigned char, 24> header{};
-        std::ifstream file(path, std::ios::binary);
-        if (!file.read(reinterpret_cast<char *>(header.data()), header.size())) return false;
-        constexpr std::array<unsigned char, 8> signature{137, 80, 78, 71, 13, 10, 26, 10};
-        if (!std::equal(signature.begin(), signature.end(), header.begin()) ||
-            header[12] != 'I' || header[13] != 'H' || header[14] != 'D' || header[15] != 'R')
-            return false;
-        const auto number = [&header](std::size_t offset)
-        {
-            return (static_cast<Uint32>(header[offset]) << 24) |
-                (static_cast<Uint32>(header[offset + 1]) << 16) |
-                (static_cast<Uint32>(header[offset + 2]) << 8) | header[offset + 3];
-        };
-        return number(16) == static_cast<Uint32>(expected.width) &&
-            number(20) == static_cast<Uint32>(expected.height);
-    }
-}
 
 void ForestSprites::Clear()
 {
     for (auto &image : images)
     {
         if (image.texture) SDL_DestroyTexture(image.texture);
-        image.texture = nullptr;
-        image.alpha.clear();
+        image = Image{};
     }
     renderer = nullptr;
+    encodedBytes = peakStagingBytes = 0;
+    grass = {}; paths = {}; water = {}; stone = {}; banks = {};
+    player = {}; chopping = {}; choppingAxes = {}; miningPlayer = {}; miningPickaxes = {};
+    variedGrass = {}; variedPaths = {}; variedWater = {}; variedStone = {}; flora = {};
+    variedWalls = {}; variedRoof = {}; variedFloors = {}; variedTrees = {}; variedStumps = {}; variedRocks = {};
+    buildingWalls = {}; buildingRoof = {}; buildingFloors = {};
+    copper = tin = rubble = tree = stump = mara = furnace = bank = craftingTable = nullptr;
     roofAlphas.clear();
     variation.Clear();
 }
@@ -61,9 +42,43 @@ int ForestSprites::Condition(const Building &b) const
 
 void ForestSprites::Initialize(SDL_Renderer *target)
 {
+    std::vector<std::filesystem::path> roots;
+    if (const char *base = SDL_GetBasePath())
+        roots.emplace_back(reinterpret_cast<const char8_t *>(base));
+    std::error_code error;
+    const auto cwd = std::filesystem::current_path(error);
+    if (!error && (roots.empty() || roots.front() != cwd)) roots.push_back(cwd);
+    InitializeCatalogue(target, ForestPilotLayout::Images, ForestPilotLayout::Frames, roots,
+        WorldArtResources::DefaultLimits());
+}
+
+void ForestSprites::InitializeCatalogue(SDL_Renderer *target,
+    std::span<const ForestPilotLayout::Image> imageSpecs, std::span<const Frame> frames,
+    const std::vector<std::filesystem::path> &roots, const WorldArtResources::Limits &limits)
+{
     Clear();
     renderer = target;
-    for (const auto &frame : ForestPilotLayout::Frames)
+    std::vector<WorldArtResources::Image> specs;
+    try
+    {
+        if (imageSpecs.empty() || imageSpecs.size() > images.size() || imageSpecs.size() > limits.images ||
+            frames.empty() || frames.size() > limits.frames)
+            throw std::runtime_error("catalogue exceeds the bounded cache");
+        for (const auto &image : imageSpecs)
+            specs.push_back({image.filename, image.width, image.height, image.directory});
+        std::vector<WorldArtResources::Frame> metadata;
+        metadata.reserve(frames.size());
+        for (const auto &f : frames)
+            metadata.push_back({f.id, f.image, {f.source.x, f.source.y, f.source.w, f.source.h},
+                {f.pivot.x, f.pivot.y}, {f.ground.x, f.ground.y}, f.connectionMask, f.grassVariant, f.facing, f.animationFrame});
+        (void)WorldArtResources::ValidateCatalogue(specs, metadata, limits);
+    }
+    catch (const std::exception &error)
+    {
+        std::cerr << "World art catalogue unavailable: " << error.what() << "; using basic shapes.\n";
+        return;
+    }
+    for (const auto &frame : frames)
     {
         const auto bind = [&frame](auto &frames, std::string_view prefix)
         {
@@ -130,27 +145,39 @@ void ForestSprites::Initialize(SDL_Renderer *target)
     }
 #if SDL_VERSION_ATLEAST(3, 4, 0)
     if (!renderer) return;
-    std::vector<std::filesystem::path> roots;
-    if (const char *base = SDL_GetBasePath())
-        roots.emplace_back(reinterpret_cast<const char8_t *>(base));
-    std::error_code error;
-    const auto cwd = std::filesystem::current_path(error);
-    if (!error && (roots.empty() || roots.front() != cwd)) roots.push_back(cwd);
-    for (std::size_t index = 0; index < images.size(); ++index)
+    const auto backendEdge = SDL_GetNumberProperty(SDL_GetRendererProperties(renderer),
+        SDL_PROP_RENDERER_MAX_TEXTURE_SIZE_NUMBER, 0);
+    for (std::size_t index = 0; index < specs.size(); ++index)
     {
-        const auto &expected = ForestPilotLayout::Images[index];
+        const auto &expected = specs[index];
         SDL_Surface *surface = nullptr;
-        for (const auto &root : roots)
+        std::string reason = "no matching supported PNG";
+        if (backendEdge > 0 && (expected.width > backendEdge || expected.height > backendEdge))
+            reason = "image exceeds renderer texture-size limit";
+        else for (const auto &root : roots)
         {
-            const auto path = root / expected.directory / expected.filename;
-            if (!ValidPngHeader(path, expected)) continue;
-            const auto utf8 = path.u8string();
-            surface = SDL_LoadPNG(reinterpret_cast<const char *>(utf8.c_str()));
-            if (surface) break;
+            try
+            {
+                const auto bytes = WorldArtResources::ReadPng(root / expected.directory / expected.filename, expected, limits);
+                if (encodedBytes > limits.cataloguePngBytes || bytes.size() > limits.cataloguePngBytes - encodedBytes)
+                    throw std::runtime_error("catalogue exceeds encoded PNG budget");
+                encodedBytes += bytes.size();
+                const auto cost = WorldArtResources::MeasureImage(expected.width, expected.height, limits);
+                peakStagingBytes = std::max(peakStagingBytes,
+                    std::max(cost.textureBytes, WorldArtResources::PreflightScratchBytes) + bytes.size());
+                if (auto *stream = SDL_IOFromConstMem(bytes.data(), bytes.size()))
+                    surface = SDL_LoadPNG_IO(stream, true);
+                if (surface) break;
+                reason = "PNG decode failed";
+            }
+            catch (const std::exception &error) { reason = error.what(); }
         }
-        if (!surface || surface->w != expected.width || surface->h != expected.height)
+        if (!surface || surface->w != expected.width || surface->h != expected.height ||
+            surface->pitch <= 0 || std::uint64_t(surface->pitch) * surface->h >
+                std::uint64_t(expected.width) * expected.height * 4)
         {
-            std::cerr << "World art unavailable: " << expected.filename << "; using basic shapes.\n";
+            std::cerr << "World art unavailable: " << expected.directory << '/' << expected.filename << ": "
+                << reason << "; using basic shapes.\n";
             if (surface) SDL_DestroySurface(surface);
             continue;
         }
@@ -174,12 +201,15 @@ void ForestSprites::Initialize(SDL_Renderer *target)
             !SDL_SetTextureBlendMode(image.texture, SDL_BLENDMODE_BLEND))
         {
             if (image.texture) SDL_DestroyTexture(image.texture);
-            image.texture = nullptr;
-            image.alpha.clear();
+            image = Image{};
             std::cerr << "World texture unavailable: " << expected.filename << "; using basic shapes.\n";
         }
+        else { image.width = expected.width; image.height = expected.height; }
     }
-    std::clog << "World art: " << LoadedImageCount() << '/' << images.size() << " textures cached.\n";
+    const auto usage = GetResourceUsage();
+    std::clog << "World art: " << LoadedImageCount() << '/' << specs.size() << " textures cached; "
+        << usage.textureBytes << " RGBA estimate bytes, " << usage.alphaBytes << " alpha bytes, "
+        << usage.peakStagingBytes << " peak image staging estimate bytes.\n";
 #else
     std::clog << "World PNG art needs SDL 3.4 or newer; using basic shapes.\n";
 #endif
@@ -188,6 +218,17 @@ void ForestSprites::Initialize(SDL_Renderer *target)
 std::size_t ForestSprites::LoadedImageCount() const
 {
     return std::count_if(images.begin(), images.end(), [](const Image &image) { return image.texture != nullptr; });
+}
+
+ForestSprites::ResourceUsage ForestSprites::GetResourceUsage() const
+{
+    ResourceUsage usage{0, 0, encodedBytes, peakStagingBytes};
+    for (const auto &image : images)
+    {
+        if (image.texture) usage.textureBytes += std::uint64_t(image.width) * image.height * 4;
+        usage.alphaBytes += image.alpha.size();
+    }
+    return usage;
 }
 
 bool ForestSprites::Available(const Frame *frame) const
@@ -557,5 +598,6 @@ bool ForestSprites::Hit(const Frame *frame, int tileX, int tileY, float worldX, 
     const auto &image = images[frame->image];
     const int sourceX = static_cast<int>(frame->source.x) + x;
     const int sourceY = static_cast<int>(frame->source.y) + y;
-    return image.alpha[static_cast<std::size_t>(sourceY) * ForestPilotLayout::Images[frame->image].width + sourceX] >= 128;
+    const auto pixel = static_cast<std::size_t>(sourceY) * image.width + sourceX;
+    return pixel < image.alpha.size() && image.alpha[pixel] >= 128;
 }

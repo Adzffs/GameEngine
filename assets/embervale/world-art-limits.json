@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "max_images": 64,
+  "max_frames": 16384,
+  "max_image_edge": 4096,
+  "max_image_pixels": 4194304,
+  "max_png_bytes": 4194304,
+  "max_manifest_bytes": 2097152,
+  "max_catalogue_png_bytes": 33554432,
+  "max_texture_bytes": 67108864,
+  "max_alpha_bytes": 16777216,
+  "max_staging_bytes": 20971520
+}

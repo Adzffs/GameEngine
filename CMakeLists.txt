@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(GameEngine)
+find_package(ZLIB REQUIRED)
 
 option(
     GAMEENGINE_BUILD_CLIENT
@@ -118,6 +119,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/Content/Export/StarterWorldSnapshotInput.cpp
     src/Content/Json/BoundedJson.cpp
     src/Content/Publication/WorldPublication.cpp
+    src/Content/Assets/WorldArtResources.cpp
     src/Content/Import/StarterWorldRuntimeInput.cpp
     src/Content/Edit/StarterWorldEdit.cpp
     src/Content/Edit/StarterWorldDraftFile.cpp
@@ -134,6 +136,25 @@ add_library(GameEngineCore
 )
 
 target_include_directories(GameEngineCore PUBLIC src)
+target_link_libraries(GameEngineCore PUBLIC ZLIB::ZLIB)
+
+# One recorded resource policy is shared by offline checks and the runtime.
+set(world_art_policy "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/world-art-limits.json")
+file(READ "${world_art_policy}" world_art_limits_json)
+string(JSON world_art_policy_version GET "${world_art_limits_json}" version)
+if(NOT world_art_policy_version EQUAL 1)
+    message(FATAL_ERROR "Unsupported world-art resource policy version")
+endif()
+foreach(art_limit IN ITEMS max_images max_frames max_image_edge max_image_pixels
+        max_png_bytes max_manifest_bytes max_catalogue_png_bytes max_texture_bytes
+        max_alpha_bytes max_staging_bytes)
+    string(JSON art_${art_limit} GET "${world_art_limits_json}" ${art_limit})
+    if(NOT art_${art_limit} MATCHES "^[1-9][0-9]*$" OR art_${art_limit} GREATER 2147483647)
+        message(FATAL_ERROR "Invalid world-art resource policy: ${art_limit}")
+    endif()
+endforeach()
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${world_art_policy}")
+configure_file(src/Content/Assets/WorldArtLimits.h.in Generated/WorldArtLimits.h @ONLY)
 
 # Receipts bind the exact validation implementation inputs. Old published
 # versions remain loadable only after current-profile runtime revalidation.
@@ -141,6 +162,8 @@ file(GLOB_RECURSE world_validation_headers CONFIGURE_DEPENDS "${CMAKE_CURRENT_SO
 set(world_validation_inputs ${GAMEENGINE_CORE_SOURCES} ${world_validation_headers}
     "${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Content/Publication/WorldValidatorRevision.h.in")
+list(APPEND world_validation_inputs "${world_art_policy}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Content/Assets/WorldArtLimits.h.in")
 list(SORT world_validation_inputs)
 set(world_validation_signature "${CMAKE_SYSTEM_NAME}|${CMAKE_CXX_COMPILER_ID}|${CMAKE_CXX_COMPILER_VERSION}|C++20")
 foreach(validation_input IN LISTS world_validation_inputs)
@@ -188,6 +211,8 @@ if(GAMEENGINE_BUILD_CONTENT_TOOLS)
     )
     target_link_libraries(EmbervaleWorldMove PRIVATE GameEngineCore)
 endif()
+
+find_package(Python3 COMPONENTS Interpreter QUIET)
 
 function(configure_gameengine_world_art target)
     target_link_libraries(${target} PRIVATE GameEngineAudio)
@@ -238,6 +263,11 @@ function(configure_gameengine_world_art target)
     # concurrent writes, and checks the package even when no executable relinks.
     # TARGET_FILE_DIR does not add an executable dependency under CMP0112 NEW.
     if(NOT TARGET GameEngineWorldArt)
+        if(Python3_Interpreter_FOUND)
+            add_custom_target(GameEngineWorldArtCheck
+                COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tools/art/check_world_art.py" --check --summary
+                VERBATIM)
+        endif()
         add_custom_target(GameEngineWorldArt
             COMMAND ${CMAKE_COMMAND} -E make_directory
                 "$<TARGET_FILE_DIR:${target}>/assets/embervale/forest-pilot/textures"
@@ -280,6 +310,9 @@ function(configure_gameengine_world_art target)
                 ${woodcutting_images} ${mining_images} ${audio_files}
             VERBATIM
         )
+        if(TARGET GameEngineWorldArtCheck)
+            add_dependencies(GameEngineWorldArt GameEngineWorldArtCheck)
+        endif()
     endif()
     add_dependencies(${target} GameEngineWorldArt)
 endfunction()
@@ -362,6 +395,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(StarterWorldEditTests tests/StarterWorldEditTests.cpp)
     add_gameengine_headless_test(StarterWorldDraftFileTests tests/StarterWorldDraftFileTests.cpp)
     add_gameengine_headless_test(WorldPublicationTests tests/WorldPublicationTests.cpp)
+    add_gameengine_headless_test(WorldArtResourcesTests tests/WorldArtResourcesTests.cpp)
     add_gameengine_headless_test(StarterWorldHistoryTests tests/StarterWorldHistoryTests.cpp)
     add_gameengine_headless_test(StarterWorldPlacementTests tests/StarterWorldPlacementTests.cpp)
     add_gameengine_headless_test(StarterWorldRuntimeTests tests/StarterWorldRuntimeTests.cpp)
@@ -433,6 +467,9 @@ if(BUILD_TESTING)
             add_test(NAME AudioAssetChecks
                 COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tools/audio/build_audio_pilot.py" --check)
             set_tests_properties(AudioAssetChecks PROPERTIES LABELS "headless;audio")
+            add_test(NAME WorldArtAssetChecks
+                COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tools/art/check_world_art.py" --check)
+            set_tests_properties(WorldArtAssetChecks PROPERTIES LABELS "headless;content;art" TIMEOUT 30)
             add_test(
                 NAME StarterWorldVisualBridgeIntegration
                 COMMAND "${Python3_EXECUTABLE}"
@@ -471,6 +508,14 @@ if(BUILD_TESTING)
                     --client "$<TARGET_FILE:GameEngine>" --publisher "$<TARGET_FILE:EmbervaleWorldPublish>"
                     --fixture "${CMAKE_CURRENT_SOURCE_DIR}/content/worlds/river-crossing.blockout.json")
                 set_tests_properties(PublishedWorldClientLaunchTests PROPERTIES LABELS "client;content;studio" TIMEOUT 90)
+                if(CMAKE_GENERATOR MATCHES "^Ninja")
+                    add_test(NAME WorldArtPackagingIntegration COMMAND "${Python3_EXECUTABLE}"
+                        "${CMAKE_CURRENT_SOURCE_DIR}/tests/WorldArtPackagingIntegration.py"
+                        --source "${CMAKE_CURRENT_SOURCE_DIR}" --cmake "${CMAKE_COMMAND}"
+                        --make-program "${CMAKE_MAKE_PROGRAM}" --sdl-dir "${SDL3_DIR}"
+                        --python "${Python3_EXECUTABLE}")
+                    set_tests_properties(WorldArtPackagingIntegration PROPERTIES LABELS "client;content;art" TIMEOUT 180)
+                endif()
             endif()
         endif()
     endif()
@@ -589,6 +634,7 @@ if(BUILD_TESTING)
         add_gameengine_graphics_test(PlayerAnimationTests tests/PlayerAnimationTests.cpp)
         add_gameengine_graphics_test(WoodcuttingGraphicsTests tests/WoodcuttingGraphicsTests.cpp)
         add_gameengine_graphics_test(MiningGraphicsTests tests/MiningGraphicsTests.cpp)
+        add_gameengine_graphics_test(WorldArtResourceGraphicsTests tests/WorldArtResourceGraphicsTests.cpp)
         add_gameengine_graphics_test(MonsterGraphicsTests tests/MonsterGraphicsTests.cpp)
         add_gameengine_graphics_test(MeleeClickIntegrationTests tests/MeleeClickIntegrationTests.cpp)
         add_gameengine_graphics_test(CombatFeedbackTests tests/CombatFeedbackTests.cpp)

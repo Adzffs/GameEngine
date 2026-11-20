@@ -2,6 +2,7 @@
 
 #include "ForestPilotLayout.h"
 #include "WorldArtVariation.h"
+#include "../Content/Assets/WorldArtResources.h"
 #include <array>
 #include <map>
 #include <string>
@@ -48,13 +49,20 @@ public:
     bool DrawBuildingWall(const Building &building, int x, int y, const SDL_FRect &player) const;
     bool DrawBuildingRoof(const Building &building, const SDL_FRect &player, float deltaSeconds);
     std::size_t LoadedImageCount() const;
+    struct ResourceUsage
+    {
+        std::uint64_t textureBytes = 0, alphaBytes = 0, encodedBytes = 0, peakStagingBytes = 0;
+    };
+    ResourceUsage GetResourceUsage() const;
 
 private:
+    friend struct WorldArtResourceTestAccess;
     using Frame = ForestPilotLayout::Frame;
     struct Image
     {
         SDL_Texture *texture = nullptr;
         std::vector<Uint8> alpha;
+        int width = 0, height = 0;
     };
     SDL_Renderer *renderer = nullptr;
     std::array<Image, ForestPilotLayout::Images.size()> images{};
@@ -90,6 +98,10 @@ private:
     std::array<const Frame *, 9> variedFloors{}, variedRocks{};
     std::array<const Frame *, 3> variedTrees{}, variedStumps{};
     int buildingConditionPreview = -1;
+    std::uint64_t encodedBytes = 0, peakStagingBytes = 0;
+    void InitializeCatalogue(SDL_Renderer *target, std::span<const ForestPilotLayout::Image> imageSpecs,
+        std::span<const Frame> frames, const std::vector<std::filesystem::path> &roots,
+        const WorldArtResources::Limits &limits);
     int Condition(const Building &building) const;
     void DressGround(const WorldArtVariation::Cell &cell, const SDL_FRect &tile) const;
     const Frame *TreeFrame(int tileX, int tileY, bool active = true) const;
