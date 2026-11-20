@@ -615,14 +615,38 @@ class DraftPlaytest:
             raise StudioError(f"Cannot launch draft playtest: {error}") from error
         self.directory, self.process = directory, process
 
+    def start_version(self, publisher, manifest: Path, game: Path, profile: str = "fresh") -> None:
+        if profile not in PLAYTEST_PROFILES.values():
+            raise StudioError("Select a fresh-player or development playtest profile")
+        if self.process is not None and self.poll() is None:
+            raise StudioError("A game is already running; close it before launching another version")
+        game = Path(game).resolve()
+        if not game.is_file():
+            raise StudioError("Build the SDL game or select its executable with --game")
+        version = publisher.inspect(manifest)
+        directory = tempfile.TemporaryDirectory(prefix="embervale-version-playtest-")
+        try:
+            process = subprocess.Popen([str(game), "--world-version", str(version.manifest),
+                "--no-save", "--profile", profile], cwd=directory.name)
+        except BaseException:
+            directory.cleanup()
+            raise
+        self.directory, self.process = directory, process
 
-def launch(bridge: StudioBridge, game: Path | None = None, recovery_root: Path | None = None) -> None:
+
+def launch(bridge: StudioBridge, game: Path | None = None, recovery_root: Path | None = None,
+           publisher: Path | None = None, library_dir: Path | None = None) -> None:
     # Imported lazily: headless tests and command-line help do not need a display.
     import tkinter as tk
     from tkinter import filedialog, messagebox, ttk
     from embervale_recovery import RecoveryStore, RecoveryError
     from embervale_recovery_ui import choose_recovery
+    from embervale_publication import PublicationClient
+    from embervale_publication_ui import show_versions
 
+    publisher_client = PublicationClient(publisher or Path(bridge.executable).resolve().with_name(
+        "EmbervaleWorldPublish.exe" if os.name == "nt" else "EmbervaleWorldPublish"))
+    version_library = library_dir or bridge.source.parent / "world-versions"
     recovery_store = RecoveryStore(recovery_root)
     recovery_writer = None
     root = tk.Tk()
@@ -1071,6 +1095,14 @@ def launch(bridge: StudioBridge, game: Path | None = None, recovery_root: Path |
         inspector.set("Recovered draft opened. Select an object or paint terrain to keep editing.")
         fit_view()
 
+    def versions() -> None:
+        nonlocal version_library
+        def play_version(manifest: Path) -> None:
+            playtest.start_version(publisher_client, manifest, game, PLAYTEST_PROFILES[playtest_profile.get()])
+            play_button.configure(state="disabled", text="Playtest running")
+            root.after(250, check_playtest)
+        version_library = show_versions(root, bridge, publisher_client, version_library, play_version)
+
     root.protocol("WM_DELETE_WINDOW", close)
     filebar = ttk.Frame(frame)
     filebar.pack(fill="x", before=toolbar)
@@ -1087,6 +1119,7 @@ def launch(bridge: StudioBridge, game: Path | None = None, recovery_root: Path |
     ttk.Label(filebar, text="Temporary progress").pack(side="right", padx=4)
     ttk.Button(filebar, text="Open draft…", command=open_world).pack(side="left")
     ttk.Button(toolbar, text="Recovery…", command=recover).pack(side="right", padx=4)
+    ttk.Button(toolbar, text="Versions…", command=versions).pack(side="right", padx=4)
     ttk.Button(filebar, text="Reopen last saved", command=lambda: open_world(bridge.last_saved)
         if bridge.last_saved else messagebox.showinfo("No saved draft", "Save a new draft first.", parent=root)).pack(side="left", padx=4)
 
@@ -1131,6 +1164,8 @@ def main() -> int:
                         help="Path to the built EmbervaleWorldMove executable")
     parser.add_argument("--game", type=Path, help="SDL GameEngine executable (defaults beside --tool)")
     parser.add_argument("--recovery-dir", type=Path, help="Private recovery directory (defaults to user-local state)")
+    parser.add_argument("--publisher", type=Path, help="EmbervaleWorldPublish executable (defaults beside --tool)")
+    parser.add_argument("--library-dir", type=Path, help="World-version library (defaults to world-versions beside the draft)")
     args = parser.parse_args()
     from embervale_recovery import RecoveryStore, RecoveryError
     try:
@@ -1145,7 +1180,7 @@ def main() -> int:
             bridge = choose_recovery(store, args.tool, args.snapshot)
             if bridge is None:
                 return 0
-        launch(bridge, args.game, args.recovery_dir)
+        launch(bridge, args.game, args.recovery_dir, args.publisher, args.library_dir)
     except (StudioError, RecoveryError, OSError) as error:
         parser.exit(1, f"Embervale Studio: {error}\n")
     return 0

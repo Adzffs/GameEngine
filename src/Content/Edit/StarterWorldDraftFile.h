@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <filesystem>
+#include <functional>
 #include <string>
 #include <string_view>
 
@@ -15,7 +16,13 @@ namespace StarterWorldDraftFile
     std::string Digest(std::string_view bytes);
 
     // Bounded binary read; reject symlinks, directories and input over 2 MiB.
-    std::string Read(const std::filesystem::path &path);
+    std::string Read(const std::filesystem::path &path, std::size_t byteLimit = MaximumBytes);
+
+    // Typed publication callers supply already validated bytes. Uses the same
+    // staged, exclusive final-file commit as ordinary drafts.
+    void PublishNewBytes(std::string_view bytes, const std::filesystem::path &destination);
+    void WithVerifiedSource(const std::filesystem::path &source, std::string_view expectedHash,
+        const std::function<void()> &operation);
 
     // A valid expected hash is exactly 64 lowercase hex ASCII characters.
     bool ValidDigest(std::string_view digest);

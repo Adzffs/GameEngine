@@ -1,0 +1,349 @@
+{
+  "format": "embervale.starter-world-snapshot",
+  "schema_version": 4,
+  "region_id": "embervale.development_starter",
+  "revision": 1,
+  "next_placement_id": 12,
+  "size": { "width": 100, "height": 100 },
+  "surfaces": [ { "id": "ground", "elevation": 0 } ],
+  "terrain": {
+    "encoding": "rows",
+    "legend": { "G": "terrain.grass", "D": "terrain.dirt", "S": "terrain.stone", "W": "terrain.water" },
+    "rows": [
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGSSSSSSSGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGSSSSSSSGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWGGGGGGGGGGGGGGGGGGGGGGSSSSSSSGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWGGGGGGGGGGGGGGGGGGGGGGSSSSSSSGGGGGGGGGGGGGGGG",
+      "GGGGGGGGSSSSSSSSGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWGGGGGGGGGGGGGGGGGGGGGGSSSSSSSGGGGGGGGGGGGGGGG",
+      "GGGGGGGGSSSSSSSSGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWGGGGGGGGGGGGGGGGGGGGGGSSSSSSSGGGGGGGGGGGGGGGG",
+      "GGGGGGGGSSSSSSSSGGGGGGGGGGGGGSSSSSSSSSGGGGGGGGGGWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGSSSSSSSSGGGGGGGGGGGGGSSSSSSSSSGGGGGGGGGGWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGSSSSSSSSGGGGGGGGGGGGGSSSSSSSSSGGGGGGGGGGWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGDGGGGGGGGGGGGGGSSSSSSSSSGGGGGGGGGGWWWWWWWGGGGGGDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "GGGGGGGGGGGGGGDGGGGGGGGGGGGGGSSSSSSSSSGGGGGGGGGGWWWWWWWGGGGGGDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "DDDDDDDDDDDDDDDDDDDDDDGGGGGGGSSSSDSSSSGGGGGGGGGGWWWWWWWGGGGGGDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "DDDDDDDDDDDDDDDDDDDDDDGGGGGGGGGGGDGGGGGGGGGGGGGGWWWWWWWGGGGGGDDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGDDDGGGGGGWWWWWWWGGGGGGDDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGDDDGGGGGGWWWWWWWGGGGGGDDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGDDDGGGGGGWWWWWWWGGGGGGDDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGDDDGGGGGGWWWWWWWGGGGGGDDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGDDDGGGGGSSSSSSSSSGGGDDDGGGWWWWWWWGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGDDDGGGGGSSSSSSSSSGGGDDDGGGWWWWWWWGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGDDDGGGGGSSSSSSSSSGGGDDDGGGWWWWWWWGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGDDDGGGGGSSSSSSSSSGGGDDDGGGWWWWWWWGGGGGGGGGDDDGSSSSSSSSSSSGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGDDDDDGGGGGSSSSSSSSSGGGDDDGGGWWWWWWWGGGGGGGGGDDDGSSSSSSSSSSSGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGDDDDDGGGGGSSSSSSSSSGGGDDDGGGWWWWWWWGGGGGGGGGDDDGSSSSSSSSSSSGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGDDDDDGGGGGSSSSSSSSSGGGDDDGGGWWWWWWWGGGGGGGGGDDDGSSSSSSSSSSSGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGSSSSSSSGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDGSSSSSSSSSSSGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGSSSSSSSGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDGSSSSSSSSSSSGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGSSSSSSSGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDGSSSSSSSSSSSGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGSSSSSSSGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDGSSSSSSSSSSSGGSSSSSSGGGGGGGGGGGGGGGG",
+      "GGGGGGGSSSSSSSGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDGSSSSSSSSSSSGGSSSSSSGGGGGGGGGGGGGGGG",
+      "GGGGGGGSSSSSSSGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDGGGGGDGGGGGGGGSSSSSSGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDGGGGDDGGGDGGGGSSSSSSGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGDDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDGGGGDDGGGDGGGGSSSSSSGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDDDDDDDDDDDDDDDSSSSSSGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGWWWWWWWGGGGGGGGGDDDDDDDDDDDDDDDDDGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGGGGWWWWWWWWGGGGGDDDDDDDDDDDDDDDDDGGDGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGGGGWWWWWWWWGGGGGDDDDDDDDDDDDDDDDDDDDDDDGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGGGGWWWWWWWWGGGGGDDDDDDDDDDDDDDDDDDDDDDDGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGGGGWWWWWWWWGGGGGDDDDDDDDDDDDDDDDDDDDDDDSSSSSSSSSSSSSGGG",
+      "GGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGDDDGGGGGDDDSSSSSSSSSSSSSGGG",
+      "GGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGDDDGGGGGDDDSSSSSSSSSSSSSGGG",
+      "GGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGDDDGGGGGDDDSSSSSSSSSSSSSGGG",
+      "GGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGGGGGGDDDGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGDDDGGGGGDDDSSSSSSSSSSSSSGGG",
+      "GGGGGGGGGGGGGGGGGDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDGGGGGDDDSSSSSSSSSSSSSGGG",
+      "GGGGGGGGGGGGGGGGGDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDGGGGGDDDSSSSSSSSSSSSSGGG",
+      "GGGGGGGGGGGGGGGGGDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDGGGGGDDDSSSSSSSSSSSSSGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGDDDSSSSSSSSSSSSSGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGDDDDDGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGDDDSSSSSSSSSSSSSGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGDDDDDGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGDDDSSSSSSSSSSSSSGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGDDDDDGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGDDDSSSSSSSSSSSSSGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGDDDDDGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGDDDSSSSSSSSSSSSSGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGDDDDDGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGDDDSSSSSSSSSSSSSGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGDDDSSSSSSSSSSSSSGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDDDGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGGDGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGGDGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDDDDDDDDDDGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
+    ]
+  },
+  "player_spawn": { "x": 5, "y": 28, "surface_id": "ground" },
+  "buildings": [
+    { "id": "building.workshop.001", "definition_id": "building.timber_stone", "x": 65, "y": 44, "width": 9, "height": 5, "door_offset": 4 }
+  ],
+  "placements": [
+    {
+      "id": "monster.aggressive_development.001",
+      "kind": "monster_spawn",
+      "definition_id": "npc.aggressive_development_monster",
+      "initialization": { "stage": "world_start", "order": 2 },
+      "position": { "x": 84, "y": 82, "surface_id": "ground" },
+      "spawn": { "spawn_id": "spawn.aggressive_development", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": true, "respawn_delay_ticks": 0 }
+    },
+    {
+      "id": "monster.durable_development.001",
+      "kind": "monster_spawn",
+      "definition_id": "npc.durable_development_monster",
+      "initialization": { "stage": "first_player_registration", "order": 0 },
+      "position": { "x": 91, "y": 80, "surface_id": "ground" },
+      "spawn": { "spawn_id": "spawn.durable_development", "wander_radius": 1, "wander_interval_ticks": 7, "maximum_active_count": 1, "respawns": true, "respawn_delay_ticks": 0 }
+    },
+    {
+      "id": "monster.elite_development.001",
+      "kind": "monster_spawn",
+      "definition_id": "npc.elite_development_monster",
+      "initialization": { "stage": "first_player_registration", "order": 1 },
+      "position": { "x": 93, "y": 92, "surface_id": "ground" },
+      "spawn": { "spawn_id": "spawn.elite_development", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": true, "respawn_delay_ticks": 0 }
+    },
+    {
+      "id": "monster.passive_development.001",
+      "kind": "monster_spawn",
+      "definition_id": "npc.passive_development_monster",
+      "initialization": { "stage": "world_start", "order": 1 },
+      "position": { "x": 27, "y": 68, "surface_id": "ground" },
+      "spawn": { "spawn_id": "spawn.passive_development", "wander_radius": 2, "wander_interval_ticks": 5, "maximum_active_count": 1, "respawns": true, "respawn_delay_ticks": 0 }
+    },
+    {
+      "id": "npc.brann_deepwell.001",
+      "kind": "npc_spawn",
+      "definition_id": "npc.brann_deepwell",
+      "initialization": { "stage": "first_player_registration", "order": 5 },
+      "position": { "x": 80, "y": 54, "surface_id": "ground" },
+      "spawn": { "spawn_id": "spawn.brann_deepwell", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": false, "respawn_delay_ticks": 0 }
+    },
+    {
+      "id": "npc.development_guide.001",
+      "kind": "npc_spawn",
+      "definition_id": "npc.development_guide",
+      "initialization": { "stage": "world_start", "order": 0 },
+      "position": { "x": 14, "y": 25, "surface_id": "ground" },
+      "spawn": { "spawn_id": "spawn.development_guide", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": false, "respawn_delay_ticks": 0 }
+    },
+    {
+      "id": "npc.elia_reed.001",
+      "kind": "npc_spawn",
+      "definition_id": "npc.elia_reed",
+      "initialization": { "stage": "first_player_registration", "order": 3 },
+      "position": { "x": 35, "y": 27, "surface_id": "ground" },
+      "spawn": { "spawn_id": "spawn.elia_reed", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": false, "respawn_delay_ticks": 0 }
+    },
+    {
+      "id": "npc.nessa_thorne.001",
+      "kind": "npc_spawn",
+      "definition_id": "npc.nessa_thorne",
+      "initialization": { "stage": "first_player_registration", "order": 4 },
+      "position": { "x": 16, "y": 51, "surface_id": "ground" },
+      "spawn": { "spawn_id": "spawn.nessa_thorne", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": false, "respawn_delay_ticks": 0 }
+    },
+    {
+      "id": "npc.sera_flint.001",
+      "kind": "npc_spawn",
+      "definition_id": "npc.sera_flint",
+      "initialization": { "stage": "first_player_registration", "order": 6 },
+      "position": { "x": 80, "y": 24, "surface_id": "ground" },
+      "spawn": { "spawn_id": "spawn.sera_flint", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": false, "respawn_delay_ticks": 0 }
+    },
+    {
+      "id": "npc.torren_ash.001",
+      "kind": "npc_spawn",
+      "definition_id": "npc.torren_ash",
+      "initialization": { "stage": "first_player_registration", "order": 2 },
+      "position": { "x": 70, "y": 51, "surface_id": "ground" },
+      "spawn": { "spawn_id": "spawn.torren_ash", "wander_radius": 0, "wander_interval_ticks": 0, "maximum_active_count": 1, "respawns": false, "respawn_delay_ticks": 0 }
+    },
+    {
+      "id": "resource.authored.000001",
+      "kind": "resource",
+      "definition_id": "resource.normal_tree",
+      "initialization": { "stage": "world_start", "order": 13 },
+      "position": { "x": 12, "y": 58, "surface_id": "ground" }
+    },
+    {
+      "id": "resource.authored.000002",
+      "kind": "resource",
+      "definition_id": "resource.normal_tree",
+      "initialization": { "stage": "world_start", "order": 14 },
+      "position": { "x": 7, "y": 63, "surface_id": "ground" }
+    },
+    {
+      "id": "resource.authored.000003",
+      "kind": "resource",
+      "definition_id": "resource.normal_tree",
+      "initialization": { "stage": "world_start", "order": 15 },
+      "position": { "x": 15, "y": 66, "surface_id": "ground" }
+    },
+    {
+      "id": "resource.authored.000004",
+      "kind": "resource",
+      "definition_id": "resource.normal_tree",
+      "initialization": { "stage": "world_start", "order": 16 },
+      "position": { "x": 24, "y": 51, "surface_id": "ground" }
+    },
+    {
+      "id": "resource.authored.000005",
+      "kind": "resource",
+      "definition_id": "resource.normal_tree",
+      "initialization": { "stage": "world_start", "order": 17 },
+      "position": { "x": 28, "y": 55, "surface_id": "ground" }
+    },
+    {
+      "id": "resource.authored.000006",
+      "kind": "resource",
+      "definition_id": "resource.normal_tree",
+      "initialization": { "stage": "world_start", "order": 18 },
+      "position": { "x": 26, "y": 61, "surface_id": "ground" }
+    },
+    {
+      "id": "resource.authored.000007",
+      "kind": "resource",
+      "definition_id": "resource.normal_tree",
+      "initialization": { "stage": "world_start", "order": 19 },
+      "position": { "x": 32, "y": 65, "surface_id": "ground" }
+    },
+    {
+      "id": "resource.authored.000008",
+      "kind": "resource",
+      "definition_id": "resource.oak_tree",
+      "initialization": { "stage": "world_start", "order": 20 },
+      "position": { "x": 14, "y": 74, "surface_id": "ground" }
+    },
+    {
+      "id": "resource.authored.000009",
+      "kind": "resource",
+      "definition_id": "resource.oak_tree",
+      "initialization": { "stage": "world_start", "order": 21 },
+      "position": { "x": 25, "y": 73, "surface_id": "ground" }
+    },
+    {
+      "id": "resource.authored.000010",
+      "kind": "resource",
+      "definition_id": "resource.copper_rock",
+      "initialization": { "stage": "world_start", "order": 22 },
+      "position": { "x": 88, "y": 58, "surface_id": "ground" }
+    },
+    {
+      "id": "resource.authored.000011",
+      "kind": "resource",
+      "definition_id": "resource.tin_rock",
+      "initialization": { "stage": "world_start", "order": 23 },
+      "position": { "x": 91, "y": 61, "surface_id": "ground" }
+    },
+    {
+      "id": "resource.coal_rock.001",
+      "kind": "resource",
+      "definition_id": "resource.coal_rock",
+      "initialization": { "stage": "world_start", "order": 9 },
+      "position": { "x": 95, "y": 69, "surface_id": "ground" }
+    },
+    {
+      "id": "resource.copper_rock.001",
+      "kind": "resource",
+      "definition_id": "resource.copper_rock",
+      "initialization": { "stage": "world_start", "order": 6 },
+      "position": { "x": 84, "y": 60, "surface_id": "ground" }
+    },
+    {
+      "id": "resource.iron_rock.001",
+      "kind": "resource",
+      "definition_id": "resource.iron_rock",
+      "initialization": { "stage": "world_start", "order": 8 },
+      "position": { "x": 91, "y": 68, "surface_id": "ground" }
+    },
+    {
+      "id": "resource.normal_tree.001",
+      "kind": "resource",
+      "definition_id": "resource.normal_tree",
+      "initialization": { "stage": "world_start", "order": 3 },
+      "position": { "x": 8, "y": 55, "surface_id": "ground" }
+    },
+    {
+      "id": "resource.oak_tree.001",
+      "kind": "resource",
+      "definition_id": "resource.oak_tree",
+      "initialization": { "stage": "world_start", "order": 4 },
+      "position": { "x": 5, "y": 72, "surface_id": "ground" }
+    },
+    {
+      "id": "resource.tin_rock.001",
+      "kind": "resource",
+      "definition_id": "resource.tin_rock",
+      "initialization": { "stage": "world_start", "order": 7 },
+      "position": { "x": 87, "y": 64, "surface_id": "ground" }
+    },
+    {
+      "id": "resource.willow_tree.001",
+      "kind": "resource",
+      "definition_id": "resource.willow_tree",
+      "initialization": { "stage": "world_start", "order": 5 },
+      "position": { "x": 38, "y": 74, "surface_id": "ground" }
+    },
+    {
+      "id": "station.bank.001",
+      "kind": "station",
+      "definition_id": "station.bank",
+      "initialization": { "stage": "world_start", "order": 12 },
+      "position": { "x": 33, "y": 27, "surface_id": "ground" }
+    },
+    {
+      "id": "station.crafting_table.001",
+      "kind": "station",
+      "definition_id": "station.crafting_table",
+      "initialization": { "stage": "world_start", "order": 11 },
+      "position": { "x": 73, "y": 50, "surface_id": "ground" }
+    },
+    {
+      "id": "station.furnace.001",
+      "kind": "station",
+      "definition_id": "station.furnace",
+      "initialization": { "stage": "world_start", "order": 10 },
+      "position": { "x": 68, "y": 50, "surface_id": "ground" }
+    }
+  ],
+  "region_exits": []
+}

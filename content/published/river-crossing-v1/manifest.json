@@ -1,0 +1,10 @@
+{
+  "manifest_version": 1,
+  "revision": "river-crossing-v1",
+  "world_file": "world.json",
+  "source_sha256": "72c9d565ad1db11fc4e27eb8e512ef0dd23b5a902ef18da6a486a3c2ed28297f",
+  "world_sha256": "72c9d565ad1db11fc4e27eb8e512ef0dd23b5a902ef18da6a486a3c2ed28297f",
+  "world_schema_version": 4,
+  "validator_profile": "starter-runtime-v1",
+  "validator_revision": "4f7a4cc5ab2b7e315c957396d16c11c23f9bce5031d667dbfd2c0681f2e316dd"
+}

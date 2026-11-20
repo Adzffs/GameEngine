@@ -40,6 +40,14 @@ int main()
     test.Expect(!Parse({"--compiled-world", "--no-save"}).playerSavePath,
         "compiled fallback can use disposable profile");
     test.Expect(Parse({"--help"}).showHelp, "help is parsed without loading content");
+    const auto version = Parse({"--world-version", "library/v1/manifest.json"});
+    test.Expect(version.worldVersionManifestPath == std::filesystem::path("library/v1/manifest.json") &&
+        !version.worldSnapshotPath && !version.playerSavePath,
+        "Published versions select an explicit manifest and temporary progress by default");
+    Reject(test, {"--world-version"}, "Missing manifest rejects");
+    Reject(test, {"--world-version", "a.json", "--world", "b.json"}, "World sources conflict");
+    Reject(test, {"--compiled-world", "--world-version", "a.json"}, "Compiled and published sources conflict");
+    Reject(test, {"--world-version", "a.json", "--world-version", "b.json"}, "Duplicate manifests reject");
     Reject(test, {"--world"}, "missing snapshot path rejected");
     Reject(test, {"--world", ""}, "empty snapshot path rejected");
     Reject(test, {"--save", "--no-save"}, "a flag is not a filename");
@@ -85,6 +93,20 @@ int main()
     separate.worldSnapshotPath = world;
     separate.playerSavePath = directory / "player.save";
     ValidateGameLaunchPaths(separate);
+    std::filesystem::create_directories(directory / "versions/v1");
+    { std::ofstream file(directory / "versions/v1/manifest.json"); file << "protected manifest"; }
+    { std::ofstream file(directory / "versions/v1/world.json"); file << "protected world"; }
+    GameLaunchOptions published;
+    published.worldVersionManifestPath = directory / "versions/v1/manifest.json";
+    published.playerSavePath = directory / "versions/v1/player.save";
+    test.Expect([&]{ try { ValidateGameLaunchPaths(published); } catch(const std::invalid_argument &) { return true; } return false; }(),
+        "Player saves cannot pollute a selected immutable version");
+    published.playerSavePath = directory / "versions/other/player.save";
+    test.Expect([&]{ try { ValidateGameLaunchPaths(published); } catch(const std::invalid_argument &) { return true; } return false; }(),
+        "Player saves must remain outside the whole selected version library");
+    published.playerSavePath = directory / "persistent-character.save";
+    ValidateGameLaunchPaths(published);
+    test.Expect(!std::filesystem::exists(*published.playerSavePath), "Published save-path checks are read-only");
     test.Expect(!std::filesystem::exists(*separate.playerSavePath), "path validation is read-only");
     std::ifstream intact(world);
     std::string contents;

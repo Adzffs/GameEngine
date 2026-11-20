@@ -9,6 +9,7 @@
 #include "Core/ContentStartupValidation.h"
 #include "Core/GameLaunchOptions.h"
 #include "Content/Import/StarterWorldRuntimeInput.h"
+#include "Content/Publication/WorldPublication.h"
 
 int main(int argc, char **argv)
 {
@@ -37,14 +38,20 @@ int main(int argc, char **argv)
     {
         EngineConfiguration configuration;
         configuration.newPlayerMode = options.newPlayerMode;
-        if (options.worldSnapshotPath)
+        if (options.worldVersionManifestPath)
+        {
+            auto loaded = WorldPublication::Load(*options.worldVersionManifestPath);
+            std::cout << "Published world: " << loaded.manifest.revision << " | SHA-256: "
+                << loaded.manifest.validation.worldSha256 << std::endl;
+            configuration.starterWorldSnapshot = std::move(loaded.snapshot);
+        }
+        else if (options.worldSnapshotPath)
         {
             configuration.starterWorldSnapshot =
                 StarterWorldImport::LoadFile(*options.worldSnapshotPath);
-            if (!options.playerSavePath)
-                std::cout << "World playtest: player progress is temporary. "
-                    "Use --save <player.save> to keep it.\n";
         }
+        if ((options.worldSnapshotPath || options.worldVersionManifestPath) && !options.playerSavePath)
+            std::cout << "World playtest: player progress is temporary. Use --save <player.save> to keep it.\n";
         configuration.developmentPlayerSavePath = options.playerSavePath;
         Engine engine(configuration);
 

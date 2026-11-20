@@ -10,6 +10,7 @@ struct GameLaunchOptions
 {
     bool showHelp = false;
     std::optional<std::filesystem::path> worldSnapshotPath;
+    std::optional<std::filesystem::path> worldVersionManifestPath;
     std::optional<std::filesystem::path> playerSavePath;
     PlayerInitializationMode newPlayerMode = PlayerInitializationMode::DEVELOPMENT_DEFAULTS;
 };

@@ -1,0 +1,2 @@
+#pragma once
+#define EMBERVALE_WORLD_VALIDATOR_REVISION "@world_validator_revision@"

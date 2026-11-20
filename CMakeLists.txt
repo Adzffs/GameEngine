@@ -116,6 +116,8 @@ set(GAMEENGINE_CORE_SOURCES
     src/Core/GameLaunchOptions.cpp
     src/Content/Export/StarterWorldSnapshot.cpp
     src/Content/Export/StarterWorldSnapshotInput.cpp
+    src/Content/Json/BoundedJson.cpp
+    src/Content/Publication/WorldPublication.cpp
     src/Content/Import/StarterWorldRuntimeInput.cpp
     src/Content/Edit/StarterWorldEdit.cpp
     src/Content/Edit/StarterWorldDraftFile.cpp
@@ -132,6 +134,25 @@ add_library(GameEngineCore
 )
 
 target_include_directories(GameEngineCore PUBLIC src)
+
+# Receipts bind the exact validation implementation inputs. Old published
+# versions remain loadable only after current-profile runtime revalidation.
+file(GLOB_RECURSE world_validation_headers CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h")
+set(world_validation_inputs ${GAMEENGINE_CORE_SOURCES} ${world_validation_headers}
+    "${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Content/Publication/WorldValidatorRevision.h.in")
+list(SORT world_validation_inputs)
+set(world_validation_signature "${CMAKE_SYSTEM_NAME}|${CMAKE_CXX_COMPILER_ID}|${CMAKE_CXX_COMPILER_VERSION}|C++20")
+foreach(validation_input IN LISTS world_validation_inputs)
+    get_filename_component(validation_absolute "${validation_input}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+    file(RELATIVE_PATH validation_relative "${CMAKE_CURRENT_SOURCE_DIR}" "${validation_absolute}")
+    file(SHA256 "${validation_absolute}" validation_sha)
+    string(APPEND world_validation_signature "\n${validation_relative}:${validation_sha}")
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${validation_absolute}")
+endforeach()
+string(SHA256 world_validator_revision "${world_validation_signature}")
+configure_file(src/Content/Publication/WorldValidatorRevision.h.in Generated/WorldValidatorRevision.h @ONLY)
+target_include_directories(GameEngineCore PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 
 if(GAMEENGINE_BUILD_CLIENT OR GAMEENGINE_BUILD_GRAPHICS_TESTS)
     add_library(GameEngineAudio src/Audio/SdlAudioPlayer.cpp)
@@ -153,6 +174,8 @@ if(GAMEENGINE_BUILD_CONTENT_TOOLS)
 
     add_executable(EmbervaleWorldValidate src/Tools/WorldValidateMain.cpp)
     target_link_libraries(EmbervaleWorldValidate PRIVATE GameEngineCore)
+    add_executable(EmbervaleWorldPublish src/Tools/WorldPublishMain.cpp)
+    target_link_libraries(EmbervaleWorldPublish PRIVATE GameEngineCore)
 
     add_executable(EmbervaleEconomyReport
         src/Tools/EconomyReportMain.cpp
@@ -338,6 +361,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(StarterWorldRuntimeInputTests tests/StarterWorldRuntimeInputTests.cpp)
     add_gameengine_headless_test(StarterWorldEditTests tests/StarterWorldEditTests.cpp)
     add_gameengine_headless_test(StarterWorldDraftFileTests tests/StarterWorldDraftFileTests.cpp)
+    add_gameengine_headless_test(WorldPublicationTests tests/WorldPublicationTests.cpp)
     add_gameengine_headless_test(StarterWorldHistoryTests tests/StarterWorldHistoryTests.cpp)
     add_gameengine_headless_test(StarterWorldPlacementTests tests/StarterWorldPlacementTests.cpp)
     add_gameengine_headless_test(StarterWorldRuntimeTests tests/StarterWorldRuntimeTests.cpp)
@@ -429,6 +453,25 @@ if(BUILD_TESTING)
                     --probe "$<TARGET_FILE:StarterWorldDraftCrashProbe>"
                     --fixture "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/content/development-starter.snapshot.json")
             set_tests_properties(StudioRecoveryIntegration PROPERTIES LABELS "headless;content;studio" TIMEOUT 90)
+            add_executable(WorldPublicationCrashProbe tests/WorldPublicationCrashProbe.cpp
+                src/Content/Publication/WorldPublication.cpp)
+            target_compile_definitions(WorldPublicationCrashProbe PRIVATE GAMEENGINE_PUBLICATION_CRASH_TEST)
+            target_include_directories(WorldPublicationCrashProbe PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+            target_link_libraries(WorldPublicationCrashProbe PRIVATE GameEngineCore)
+            add_test(NAME WorldPublicationIntegration COMMAND "${Python3_EXECUTABLE}"
+                "${CMAKE_CURRENT_SOURCE_DIR}/tests/WorldPublicationIntegration.py"
+                --publisher "$<TARGET_FILE:EmbervaleWorldPublish>"
+                --editor "$<TARGET_FILE:EmbervaleWorldMove>"
+                --probe "$<TARGET_FILE:WorldPublicationCrashProbe>"
+                --fixture "${CMAKE_CURRENT_SOURCE_DIR}/content/worlds/river-crossing.blockout.json")
+            set_tests_properties(WorldPublicationIntegration PROPERTIES LABELS "headless;content;studio" TIMEOUT 90)
+            if(GAMEENGINE_BUILD_CLIENT)
+                add_test(NAME PublishedWorldClientLaunchTests COMMAND "${Python3_EXECUTABLE}"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/tests/PublishedWorldClientLaunchTests.py"
+                    --client "$<TARGET_FILE:GameEngine>" --publisher "$<TARGET_FILE:EmbervaleWorldPublish>"
+                    --fixture "${CMAKE_CURRENT_SOURCE_DIR}/content/worlds/river-crossing.blockout.json")
+                set_tests_properties(PublishedWorldClientLaunchTests PROPERTIES LABELS "client;content;studio" TIMEOUT 90)
+            endif()
         endif()
     endif()
 

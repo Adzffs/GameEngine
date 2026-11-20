@@ -254,15 +254,15 @@ namespace StarterWorldDraftFile
         return output;
     }
 
-    std::string Read(const std::filesystem::path &path)
+    std::string Read(const std::filesystem::path &path, std::size_t byteLimit)
     {
         std::error_code error;
         const auto status = std::filesystem::symlink_status(path, error);
         if (error || !std::filesystem::is_regular_file(status))
             Fail("source must be a regular non-symlink file: " + path.string());
         const auto size = std::filesystem::file_size(path, error);
-        if (error || size > MaximumBytes)
-            Fail("source is unreadable or exceeds 2 MiB: " + path.string());
+        if (error || size > byteLimit || byteLimit > MaximumBytes)
+            Fail("source is unreadable or exceeds its byte limit: " + path.string());
         std::ifstream input(path, std::ios::binary);
         if (!input) Fail("cannot open source: " + path.string());
         std::string bytes;
@@ -272,7 +272,7 @@ namespace StarterWorldDraftFile
         {
             input.read(chunk.data(), static_cast<std::streamsize>(chunk.size()));
             const auto count = static_cast<std::size_t>(input.gcount());
-            if (count > MaximumBytes - bytes.size()) Fail("source grew beyond 2 MiB");
+            if (count > byteLimit - bytes.size()) Fail("source grew beyond its byte limit");
             bytes.append(chunk.data(), count);
         }
         if (input.bad() || !input.eof()) Fail("source read failed");
@@ -311,6 +311,24 @@ namespace StarterWorldDraftFile
         const auto current = Read(source);
         if (Digest(current) != expectedHash)
             Fail("CONTENT_CONFLICT: source bytes no longer match expected SHA-256");
+        PublishNewBytes(candidateBytes, destination);
+    }
+
+    void WithVerifiedSource(const std::filesystem::path &source, std::string_view expectedHash,
+        const std::function<void()> &operation)
+    {
+        if (!ValidDigest(expectedHash)) Fail("invalid expected source hash");
+        SourceLock lock(source);
+        if (Digest(Read(source)) != expectedHash)
+            Fail("CONTENT_CONFLICT: source bytes no longer match expected SHA-256");
+        operation();
+    }
+
+    void PublishNewBytes(std::string_view candidateBytes, const std::filesystem::path &destination)
+    {
+        if (candidateBytes.empty() || candidateBytes.size() > MaximumBytes || destination.filename().empty())
+            Fail("invalid new-file content or destination");
+        std::error_code error;
         if (std::filesystem::exists(destination, error) || error)
             Fail("output already exists or cannot be checked");
         const auto directory = destination.parent_path().empty() ?
