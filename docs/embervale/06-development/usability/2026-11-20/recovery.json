@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "date": "2026-11-20",
+  "work_package": "QA-003",
+  "status": "draft_recovered_requires_verification",
+  "base_commit": "b0ab668e0b4d09899c135e08c8211456d5f999e7",
+  "candidate_code_commit": "f9c45e0a1e8ad744d9859c15ca32a11a60908a95",
+  "candidate_code_tree": "a7b540d33b7da531f9be53abdc9c39b3f8517e9b",
+  "branch": "feat/river-crossing-usability-recovery",
+  "source_recovery": {
+    "method": "exact base Git blobs plus uniquely matched recorded replacements",
+    "intermediate_fingerprints": {
+      "engine": "167ca14afe99d415fe0455ea0360e3cc45984e15",
+      "graphics": "0d6500618f4b93cab38a8a5bfe654a3374101c9b"
+    },
+    "final_filesystem_comparison": "unavailable",
+    "final_cpp_lines": 6859,
+    "usability_test_lines": 128
+  },
+  "final_candidate_blobs": [
+    {
+      "path": "src/Core/Engine.h",
+      "mode": "100644",
+      "sha": "9094acf8e0de66842f15929adf4461bd018e5a14"
+    },
+    {
+      "path": "src/Core/Engine.cpp",
+      "mode": "100644",
+      "sha": "b607ba9df0be8434928b1d56a99ebaf3fcd9c439"
+    },
+    {
+      "path": "src/Graphics/Graphics.h",
+      "mode": "100644",
+      "sha": "c27b9e145dfb1bfc78795893f0f51696a0d8de53"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "mode": "100644",
+      "sha": "d3e61789b345755154cc3cfeeb9cbd25917aad68"
+    },
+    {
+      "path": "src/Graphics/Graphics.cpp",
+      "mode": "100644",
+      "sha": "e5abf230e0b53a3a3d0bd655067de7b11eb650b5"
+    },
+    {
+      "path": "tests/ClientDialogueIntegrationTests.cpp",
+      "mode": "100644",
+      "sha": "3d76588b2360418ea286101758c970b7c790367b"
+    },
+    {
+      "path": "tests/PlayerSaveGraphicsTests.cpp",
+      "mode": "100644",
+      "sha": "b0732a3d02386ab562ee1ef37aa96b82de68e320"
+    },
+    {
+      "path": "tests/UsabilityGraphicsTests.cpp",
+      "mode": "100644",
+      "sha": "c08f0858409a5c28293651dd87c1823c1b552782"
+    }
+  ],
+  "pre_interruption_observations": {
+    "earlier_client_ctest": {
+      "passed": 121,
+      "total": 121,
+      "headless": 98,
+      "client": 9,
+      "graphics": 14,
+      "scope": "before final context/message/layout revisions"
+    },
+    "standalone_headless_ctest": {
+      "passed": 98,
+      "total": 98
+    },
+    "python_units": {
+      "passed_per_interpreter": 79,
+      "versions": [
+        "3.12.14",
+        "3.13.5"
+      ]
+    },
+    "later_focused_assertions": {
+      "usability": 20,
+      "dialogue_integration": 41,
+      "save_warning": 6
+    },
+    "native_error_before": {
+      "width": 1371,
+      "height": 102
+    },
+    "native_error_after": {
+      "width": 650,
+      "height": 177
+    },
+    "native_unsaved_exit_code": 1,
+    "retained_checkpoint_sha256": "c2e49941d7fe450e5eeaa595adace828dd02b5662f0e996eb4f74258cd2d0898",
+    "final_withdrawal_recheck": "interrupted_not_observed"
+  },
+  "current_reconstructed_commit_checks": {
+    "compile": "pending",
+    "full_suites": "pending",
+    "native_acceptance": "pending",
+    "documentation_checker": "pending"
+  },
+  "broader_qa003": "in_progress",
+  "animation_polish": "owner_deferred"
+}

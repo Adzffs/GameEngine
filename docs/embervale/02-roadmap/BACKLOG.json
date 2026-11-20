@@ -2,7 +2,7 @@
   "version": 1,
   "reviewed_date": "2026-11-20",
   "current_verified_master": "4d7d01cb16ce5025687d2f1e0f2bb87513475f58",
-  "verification_reconciliation": "Latest resource-validation code 4d7d01cb16ce5025687d2f1e0f2bb87513475f58: Linux 120/120 SDL CTest entries (98 headless, 9 client, 13 graphics), separate SDL-free/zlib-linked 98/98 and Python 79/79 on each of 3.12.14 and 3.13.5. Resource core has 46 assertions; real SDL guard/cache tests have 12; 15 new Python cases cover bounds, metadata, checksums, compressed streams and unchanged files. Private packaging checks reject bad source before copy, retain old outputs, repair corrupted/deleted outputs without relinking and verify 30 textures/15 sounds in spaced single-config and multi-config Release paths. Existing world-publication/recovery/starter suites remain included. Current 30 textures require 11681792 logical RGBA bytes plus 2920448 alpha bytes; driver/allocator/decoder overhead is excluded. Artwork/masters/bindings are unchanged. Current Windows/native GPU, full human starter acceptance and original animation integration remain open. See docs/embervale/06-development/ASSET_RESOURCE_VALIDATION_2026-11-20.md.",
+  "verification_reconciliation": "Latest resource-validation code 4d7d01cb16ce5025687d2f1e0f2bb87513475f58: Linux 120/120 SDL CTest entries (98 headless, 9 client, 13 graphics), separate SDL-free/zlib-linked 98/98 and Python 79/79 on each of 3.12.14 and 3.13.5. Resource core has 46 assertions; real SDL guard/cache tests have 12; 15 new Python cases cover bounds, metadata, checksums, compressed streams and unchanged files. Private packaging checks reject bad source before copy, retain old outputs, repair corrupted/deleted outputs without relinking and verify 30 textures/15 sounds in spaced single-config and multi-config Release paths. Existing world-publication/recovery/starter suites remain included. Current 30 textures require 11681792 logical RGBA bytes plus 2920448 alpha bytes; driver/allocator/decoder overhead is excluded. Artwork/masters/bindings are unchanged. Current Windows/native GPU, full human starter acceptance and original animation integration remain open. See docs/embervale/06-development/ASSET_RESOURCE_VALIDATION_2026-11-20.md. Later QA-003 usability changes are a recovered draft candidate, not verified master: see docs/embervale/06-development/USABILITY_REVIEW_2026-11-20.md. Earlier candidate and focused observations are recorded separately; final reconstructed-tree build/full checks and merge remain pending after environment failure.",
   "repository": "Adzffs/GameEngine",
   "baseline_commit": "e9d32932e8f9b27e96283313cca320058792a81f",
   "status_policy": "Complete means bounded stated acceptance has evidence and is published on the default branch. In_progress retains remaining scope/acceptance; planned is future work. Historical reports remain dated. Acceptance tasks can measure an implemented candidate before human signoff closes its parent feature.",
@@ -175,7 +175,7 @@
       "dependencies": [
         "ENG-002"
       ],
-      "acceptance": "Replay the source-derived Log\u2192planks\u2192shield chain; record actual net coins, constraints and stock behaviour; correct/test confirmed loops before balance signoff.",
+      "acceptance": "Replay the source-derived Log→planks→shield chain; record actual net coins, constraints and stock behaviour; correct/test confirmed loops before balance signoff.",
       "github_issue": null,
       "evidence": [
         "docs/embervale/06-development/STARTER_ECONOMY_2026-11-19.md",
@@ -242,7 +242,7 @@
         "STUDIO-011",
         "STUDIO-004"
       ],
-      "acceptance": "Export actual 100\u00d7100 definitions, pond, overlays, placements and lifecycle metadata; compare complete semantic baseline.",
+      "acceptance": "Export actual 100×100 definitions, pond, overlays, placements and lifecycle metadata; compare complete semantic baseline.",
       "github_issue": null,
       "evidence": [
         "src/Tools/WorldExportMain.cpp",
@@ -617,7 +617,7 @@
         "tests/test_world_editor_bridge.py",
         "docs/embervale/06-development/MASTER_ACCEPTANCE_2026-11-19.md"
       ],
-      "notes": "Merged PRs #21\u2013#22 provide collision, spawn, static reachability and selected resource/station approach overlays with an approach count. Keyboard/accessibility audit and broader diagnostics remain open."
+      "notes": "Merged PRs #21–#22 provide collision, spawn, static reachability and selected resource/station approach overlays with an approach count. Keyboard/accessibility audit and broader diagnostics remain open."
     },
     {
       "id": "STUDIO-090",
@@ -1245,14 +1245,17 @@
       "milestone": "R4",
       "priority": "P1",
       "title": "Verify accessibility and usability",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [],
       "acceptance": "Record keyboard, focus, colour-independent state, readable scale and error recovery results with fixes.",
       "github_issue": null,
       "evidence": [
-        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
+        "docs/embervale/06-development/USABILITY_REVIEW_2026-11-20.md",
+        "docs/embervale/05-game/CONTROLS_AND_RECOVERY.md",
+        "docs/embervale/06-development/usability/2026-11-20/recovery.json"
       ],
-      "notes": "Usability/accessibility feedback feeds ART-003, STUDIO-033 and GAME-005 during R4. Do not require the finished starter slice before testing it. Include keyboard/focus/text scale, non-color-only feedback and visible save-failure Return/Exit choices; the new dialog was not manually exercised."
+      "notes": "Focused fixes are preserved on feat/river-crossing-usability-recovery, not merged master: Escape/modal priority, bank h/Backspace, read-only live right-click picking, focus-loss drag cancellation, dialogue keyboard/command acknowledgement and save-error/warning layout. Earlier candidate passed 121/121 client-config tests, 98/98 standalone headless and 79/79 Python units per interpreter; later focused checks passed 20 usability, 41 dialogue and 6 save-warning assertions. Native Linux Return/Exit/retry, quest keyboard selection, bank search/deposit and unobstructed warning layout were observed. Execution environment failed before final reconstructed-tree build/full suite/docs check and withdrawal recheck; complete these and queued crafting mouse-close acceptance before merge. Wider keyboard access, fonts/text scale, ordinary focus/high-DPI, Windows and uncoached full starter acceptance remain open. REL-004 and owner-deferred ART-005 remain separate."
     },
     {
       "id": "REL-001",
@@ -1356,7 +1359,7 @@
         "STUDIO-080",
         "ENG-010"
       ],
-      "acceptance": "24\u00d724 fixture proves stairs/cliffs/diagonals and NPC navigation with authoritative transition rules.",
+      "acceptance": "24×24 fixture proves stairs/cliffs/diagonals and NPC navigation with authoritative transition rules.",
       "github_issue": null,
       "evidence": [],
       "notes": "Planning ID; not a GitHub issue number."

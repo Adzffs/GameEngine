@@ -16,6 +16,8 @@ The [world publication follow-up](docs/embervale/06-development/WORLD_PUBLICATIO
 
 The [asset resource follow-up](docs/embervale/06-development/ASSET_RESOURCE_VALIDATION_2026-11-20.md) completes current-art STUDIO-063. Preserve shared numeric budgets, metadata/binding validation, CRC/bounded PNG inflation and owned decoder input. Core now links zlib; headless must stay SDL-free. Keep the read-only asset gate before the single copy owner and preserve per-image primitive fallback/cache accounting. Art/masters/generated geometry are unchanged by this task. Future pose-count changes must update runtime arrays and both validation tables with matching tests; the missing eight-pose prototype must not silently bypass the current six-pose gathering boundary. Current Windows/native GPU and broader installation remain open.
 
+The [usability recovery handoff](docs/embervale/06-development/USABILITY_REVIEW_2026-11-20.md) records QA-003's independently recovered draft on `feat/river-crossing-usability-recovery`. Preserve that GitHub candidate before reapplying patches. Its earlier 121/98 CTest and later 20/41/6 focused assertion results predate execution-environment loss; the reconstructed final tree still needs a fresh build, full checks and documentation validation before merge. Native Return/Exit/retry and bank warning layout were observed; final withdrawal recheck was interrupted. Keep dialogue acknowledgements per committed tick, read-only live picking, safe save-dialog defaults and focus-loss cancellation. Master's verified-code pin remains the asset-validation source until candidate acceptance.
+
 For tasks that create or change animation, read:
 
 1. [Animation guide](docs/embervale/05-game/ANIMATION_GUIDE.md).
