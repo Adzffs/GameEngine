@@ -228,6 +228,31 @@ void Graphics::UpdateProgressionFeedback(
     }
 }
 
+void Graphics::SetPlayerSaveNotice(PlayerSaveNotice notice)
+{
+    playerSaveNotice = notice;
+    playerSaveNoticeUntil = notice == PlayerSaveNotice::SAVED ? SDL_GetTicks() + 3000 : 0;
+}
+
+void Graphics::DrawPlayerSaveNotice(Uint64 now)
+{
+    if (playerSaveNotice == PlayerSaveNotice::SAVED && now >= playerSaveNoticeUntil)
+        playerSaveNotice = PlayerSaveNotice::NONE;
+    if (playerSaveNotice == PlayerSaveNotice::NONE) return;
+    const bool saved = playerSaveNotice == PlayerSaveNotice::SAVED;
+    const char *text = saved ? "Progress saved" :
+        playerSaveNotice == PlayerSaveNotice::CRAFTING_BLOCKED ?
+        "Progress not saved. Free bag space or finish crafting." :
+        "Progress not saved. Check save folder / disk space.";
+    const SDL_FRect bounds{18.0f, 200.0f, saved ? 144.0f : 448.0f, saved ? 30.0f : 48.0f};
+    SDL_SetRenderDrawColor(renderer, 20, 24, 28, 245);
+    SDL_RenderFillRect(renderer, &bounds);
+    SDL_SetRenderDrawColor(renderer, saved ? 115 : 245, saved ? 205 : 190, saved ? 130 : 74, 255);
+    SDL_RenderRect(renderer, &bounds);
+    SDL_RenderDebugText(renderer, bounds.x + 10, bounds.y + 10, text);
+    if (!saved) SDL_RenderDebugText(renderer, bounds.x + 10, bounds.y + 28, "Retrying automatically every 10 seconds.");
+}
+
 void Graphics::DrawProgressionFeedback()
 {
     float y = 22.0f;
@@ -6667,6 +6692,8 @@ void Graphics::Render(
             deathX,
             deathY);
     }
+
+    DrawPlayerSaveNotice(presentationTick);
 
     // Offscreen previews render into a target texture and read it before any
     // window presentation. The normal game continues to present every frame.

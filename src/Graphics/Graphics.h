@@ -49,6 +49,8 @@ public:
     ~Graphics();
 
     bool Initialize();
+    enum class PlayerSaveNotice { NONE, SAVED, RETRYING, CRAFTING_BLOCKED };
+    void SetPlayerSaveNotice(PlayerSaveNotice notice);
     const AudioSettings &GetAudioSettings() const { return audioSettings; }
     bool ConsumeGatheringContact(SkillType &skill)
     {
@@ -604,6 +606,9 @@ private:
     };
     ProgressionPresentationState progressionPresentationState;
     std::vector<ActiveProgressionNotice> progressionNotices;
+    PlayerSaveNotice playerSaveNotice = PlayerSaveNotice::NONE;
+    Uint64 playerSaveNoticeUntil = 0;
+    void DrawPlayerSaveNotice(Uint64 now);
 
     bool stationMenuOpen;
     StationType openStationType;

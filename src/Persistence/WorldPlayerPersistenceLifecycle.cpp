@@ -1,6 +1,7 @@
 #include "WorldPlayerPersistenceLifecycle.h"
 
 #include "../World/World.h"
+#include "../Player/Player.h"
 
 #include <utility>
 
@@ -10,7 +11,7 @@ WorldPlayerPersistenceLifecycle::WorldPlayerPersistenceLifecycle(
 {
 }
 
-WorldPlayerPersistenceStartupResult WorldPlayerPersistenceLifecycle::Start(World &world)
+WorldPlayerPersistenceStartupResult WorldPlayerPersistenceLifecycle::Start(World &world, TimePoint now)
 {
     WorldPlayerPersistenceStartupResult result;
     if (state != WorldPlayerPersistenceLifecycleState::NOT_STARTED)
@@ -65,6 +66,7 @@ WorldPlayerPersistenceStartupResult WorldPlayerPersistenceLifecycle::Start(World
                             : WorldPlayerPersistenceStartupStatus::CREATED_NEW);
     playerEntityID = runtimeID;
     state = WorldPlayerPersistenceLifecycleState::ACTIVE;
+    nextAutosave = now + AutosaveInterval;
     return result;
 }
 
@@ -103,12 +105,35 @@ WorldPlayerPersistenceOperationResult WorldPlayerPersistenceLifecycle::SaveActiv
     return result;
 }
 
-WorldPlayerPersistenceOperationResult WorldPlayerPersistenceLifecycle::SaveNow(const World &world)
+WorldPlayerPersistenceOperationResult WorldPlayerPersistenceLifecycle::SaveNow(const World &world, TimePoint now)
 {
-    return SaveActivePlayer(world);
+    auto result = SaveActivePlayer(world);
+    if (state == WorldPlayerPersistenceLifecycleState::ACTIVE)
+        nextAutosave = now + (result.IsSuccess() ? AutosaveInterval : RetryInterval);
+    return result;
 }
 
-WorldPlayerPersistenceOperationResult WorldPlayerPersistenceLifecycle::Shutdown(const World &world)
+PlayerAutosaveResult WorldPlayerPersistenceLifecycle::PollAutosave(const World &world, TimePoint now)
+{
+    if (state != WorldPlayerPersistenceLifecycleState::ACTIVE || !nextAutosave)
+        return {};
+    if (now < *nextAutosave)
+        return {PlayerAutosaveStatus::NOT_DUE, std::nullopt};
+
+    // Death is a normal transient state, not a failed file write. Leave the
+    // deadline due so the first completed respawn tick can checkpoint the pile.
+    for (const auto &entity : world.GetEntities())
+        if (playerEntityID && entity->GetID() == *playerEntityID)
+            if (const auto *player = dynamic_cast<const Player *>(entity.get());
+                player != nullptr && !player->IsAlive())
+                return {PlayerAutosaveStatus::WAITING_FOR_RESPAWN, std::nullopt};
+
+    auto result = SaveNow(world, now);
+    const auto status = result.IsSuccess() ? PlayerAutosaveStatus::SAVED : PlayerAutosaveStatus::FAILED;
+    return {status, std::move(result)};
+}
+
+WorldPlayerPersistenceOperationResult WorldPlayerPersistenceLifecycle::Shutdown(const World &world, TimePoint now)
 {
     if (state == WorldPlayerPersistenceLifecycleState::SHUT_DOWN)
     {
@@ -118,7 +143,11 @@ WorldPlayerPersistenceOperationResult WorldPlayerPersistenceLifecycle::Shutdown(
         return result;
     }
 
-    WorldPlayerPersistenceOperationResult result = SaveActivePlayer(world);
-    if (result.IsSuccess()) state = WorldPlayerPersistenceLifecycleState::SHUT_DOWN;
+    WorldPlayerPersistenceOperationResult result = SaveNow(world, now);
+    if (result.IsSuccess())
+    {
+        state = WorldPlayerPersistenceLifecycleState::SHUT_DOWN;
+        nextAutosave.reset();
+    }
     return result;
 }

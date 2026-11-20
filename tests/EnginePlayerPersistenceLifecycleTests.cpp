@@ -11,12 +11,20 @@
 #include <iterator>
 #include <string>
 
+struct GraphicsTestAccess
+{
+    static Graphics::PlayerSaveNotice Notice(const Graphics &graphics) { return graphics.playerSaveNotice; }
+};
+
 struct EngineTestAccess
 {
-    static bool InitializeWorldForRun(Engine &engine)
+    static bool InitializeWorldForRun(Engine &engine, Clock::TimePoint now = Clock::ClockType::now())
     {
-        return engine.InitializeWorldForRun();
+        return engine.InitializeWorldForRun(now);
     }
+    static void Update(Engine &engine, Clock::TimePoint now) { engine.Update(now); }
+    static Graphics::PlayerSaveNotice Notice(const Engine &engine)
+    { return GraphicsTestAccess::Notice(engine.graphics); }
     static bool FinalizeWorldAfterRun(Engine &engine)
     {
         return engine.FinalizeWorldAfterRun();
@@ -183,5 +191,55 @@ int main()
                     "Engine shutdown succeeds after correcting path failure");
     }
 
+    {
+        using namespace std::chrono_literals;
+        const Clock::TimePoint start{};
+        const auto path = fixture.path / "automatic" / "player.save";
+        EngineConfiguration configuration;
+        configuration.developmentPlayerSavePath = path;
+        configuration.newPlayerMode = PlayerInitializationMode::FRESH_START;
+        Engine engine(configuration);
+        test.Expect(EngineTestAccess::InitializeWorldForRun(engine, start), "Timed Engine starts");
+        World &world = EngineTestAccess::GetWorld(engine);
+        const int id = EngineTestAccess::GetPlayerID(engine);
+        Player *player = dynamic_cast<Player *>(world.GetEntityByID(id));
+        player->GetInventory().AddItem(ItemType::COINS, 8);
+        EngineTestAccess::Update(engine, start + 59s);
+        test.Expect(!std::filesystem::exists(path), "Real Engine update does not write before the minute");
+        // This command commits in the very tick that triggers the checkpoint.
+        world.EnqueueCommand(DropInventoryItemCommand{id, 2, 1});
+        EngineTestAccess::Update(engine, start + 60s);
+        World restored;
+        const auto loaded = restored.LoadOrCreatePlayerFromFile(path);
+        auto *saved = dynamic_cast<Player *>(restored.GetEntityByID(loaded.GetPlayerEntityID()));
+        test.Expect(loaded.IsSuccess() && saved != nullptr &&
+                    saved->GetInventory().GetItemAmount(ItemType::COINS) ==
+                        player->GetInventory().GetItemAmount(ItemType::COINS) &&
+                    player->GetInventory().GetItemAmount(ItemType::COINS) == 7,
+                    "Engine autosave observes the completed command batch, not the previous tick");
+        test.Expect(EngineTestAccess::Notice(engine) == Graphics::PlayerSaveNotice::SAVED,
+                    "Successful checkpoint publishes visible save confirmation");
+        auto blocked = path; blocked += ".tmp";
+        std::filesystem::create_directories(blocked);
+        std::ofstream(blocked / "blocker") << "keep";
+        EngineTestAccess::Update(engine, start + 120s);
+        test.Expect(EngineTestAccess::Notice(engine) == Graphics::PlayerSaveNotice::RETRYING,
+                    "Filesystem failure publishes a nonmodal retry warning");
+        std::filesystem::remove_all(blocked);
+        EngineTestAccess::Update(engine, start + 129s);
+        test.Expect(EngineTestAccess::Notice(engine) == Graphics::PlayerSaveNotice::RETRYING,
+                    "Warning stays visible through retry backoff");
+        EngineTestAccess::Update(engine, start + 130s);
+        test.Expect(EngineTestAccess::Notice(engine) == Graphics::PlayerSaveNotice::SAVED,
+                    "Successful retry clears the persistent failure warning");
+
+        Engine temporary;
+        test.Expect(EngineTestAccess::InitializeWorldForRun(temporary, start), "Temporary Engine starts");
+        for (int minute = 1; minute <= 10; ++minute)
+            EngineTestAccess::Update(temporary, start + std::chrono::minutes(minute));
+        test.Expect(EngineTestAccess::GetLifecycle(temporary) == nullptr &&
+                    EngineTestAccess::Notice(temporary) == Graphics::PlayerSaveNotice::NONE,
+                    "Ten minutes of temporary play never arms autosave or claims progress was saved");
+    }
     return test.Finish();
 }

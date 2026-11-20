@@ -40,12 +40,13 @@ private:
     int playerID = -1;
     PlayerInitializationMode newPlayerMode = PlayerInitializationMode::DEVELOPMENT_DEFAULTS;
     bool initializationSucceeded = false;
+    bool autosaveWarningActive = false;
     std::unique_ptr<WorldPlayerPersistenceLifecycle> playerPersistenceLifecycle;
 
     static constexpr int MaxCatchUpTicks = 3;
 
-    void Update();
-    bool InitializeWorldForRun();
+    void Update(Clock::TimePoint now = Clock::ClockType::now());
+    bool InitializeWorldForRun(Clock::TimePoint now = Clock::ClockType::now());
     bool FinalizeWorldAfterRun();
     void AddDevelopmentEquipment();
     void SynchronizeDialoguePresentation();

@@ -77,7 +77,7 @@ Engine::Engine(EngineConfiguration configuration)
 
 }
 
-bool Engine::InitializeWorldForRun()
+bool Engine::InitializeWorldForRun(Clock::TimePoint now)
 {
     if (initializationSucceeded) return true;
 
@@ -85,7 +85,7 @@ bool Engine::InitializeWorldForRun()
     if (playerPersistenceLifecycle != nullptr)
     {
         WorldPlayerPersistenceStartupResult result =
-            playerPersistenceLifecycle->Start(world);
+            playerPersistenceLifecycle->Start(world, now);
         if (!result.IsSuccess())
         {
             Logger::Error(
@@ -737,7 +737,7 @@ bool Engine::FinalizeWorldAfterRun()
     return true;
 }
 
-void Engine::Update()
+void Engine::Update(Clock::TimePoint now)
 {
     const Clock::TimePoint updateStart =
         Clock::ClockType::now();
@@ -753,6 +753,29 @@ void Engine::Update()
 
     // Consume before another catch-up tick can replace the published events.
     graphics.SynchronizeGatheringRewards(playerID, world.GetGatheringRewardEvents());
+
+    if (playerPersistenceLifecycle)
+    {
+        const auto checkpoint = playerPersistenceLifecycle->PollAutosave(world, now);
+        if (checkpoint.status == PlayerAutosaveStatus::SAVED)
+        {
+            graphics.SetPlayerSaveNotice(Graphics::PlayerSaveNotice::SAVED);
+            if (autosaveWarningActive) Logger::Info("Player autosave recovered; progress saved");
+            autosaveWarningActive = false;
+        }
+        else if (checkpoint.status == PlayerAutosaveStatus::FAILED)
+        {
+            const bool craftingBlocked = checkpoint.operation->GetWorldSaveResult().Contains(
+                WorldPlayerPersistenceIssueCode::CRAFTING_ITEMS_NOT_SAVED);
+            graphics.SetPlayerSaveNotice(craftingBlocked ? Graphics::PlayerSaveNotice::CRAFTING_BLOCKED
+                                                        : Graphics::PlayerSaveNotice::RETRYING);
+            if (!autosaveWarningActive)
+                Logger::Warn("Player autosave failed; retrying in 10 seconds | path=" +
+                    playerPersistenceLifecycle->GetSavePath().string() +
+                    (craftingBlocked ? " | crafting items need bag space" : " | check save path/storage"));
+            autosaveWarningActive = true;
+        }
+    }
 
     const Clock::TimePoint updateEnd =
         Clock::ClockType::now();

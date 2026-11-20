@@ -5,6 +5,7 @@
 
 #include <filesystem>
 #include <optional>
+#include <chrono>
 
 class World;
 
@@ -16,15 +17,30 @@ enum class WorldPlayerPersistenceLifecycleState
     FAILED
 };
 
+enum class PlayerAutosaveStatus { INACTIVE, NOT_DUE, WAITING_FOR_RESPAWN, SAVED, FAILED };
+
+struct PlayerAutosaveResult
+{
+    PlayerAutosaveStatus status = PlayerAutosaveStatus::INACTIVE;
+    std::optional<WorldPlayerPersistenceOperationResult> operation;
+};
+
 class WorldPlayerPersistenceLifecycle
 {
 public:
+    using Clock = std::chrono::steady_clock;
+    using TimePoint = Clock::time_point;
+    static constexpr std::chrono::seconds AutosaveInterval{60};
+    static constexpr std::chrono::seconds RetryInterval{10};
+
     explicit WorldPlayerPersistenceLifecycle(std::filesystem::path savePath,
         PlayerInitializationMode newPlayerMode = PlayerInitializationMode::DEVELOPMENT_DEFAULTS);
 
-    WorldPlayerPersistenceStartupResult Start(World &world);
-    WorldPlayerPersistenceOperationResult SaveNow(const World &world);
-    WorldPlayerPersistenceOperationResult Shutdown(const World &world);
+    WorldPlayerPersistenceStartupResult Start(World &world, TimePoint now = Clock::now());
+    WorldPlayerPersistenceOperationResult SaveNow(const World &world, TimePoint now = Clock::now());
+    WorldPlayerPersistenceOperationResult Shutdown(const World &world, TimePoint now = Clock::now());
+    // Call after a committed World tick; never mutates live gameplay state.
+    PlayerAutosaveResult PollAutosave(const World &world, TimePoint now = Clock::now());
 
     WorldPlayerPersistenceLifecycleState GetState() const { return state; }
     std::optional<int> GetTrackedPlayerEntityID() const { return playerEntityID; }
@@ -38,4 +54,5 @@ private:
     WorldPlayerPersistenceLifecycleState state =
         WorldPlayerPersistenceLifecycleState::NOT_STARTED;
     std::optional<int> playerEntityID;
+    std::optional<TimePoint> nextAutosave;
 };

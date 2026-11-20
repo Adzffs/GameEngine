@@ -435,6 +435,7 @@ if(BUILD_TESTING)
             ENVIRONMENT "SDL_AUDIODRIVER=nonexistent-test-driver")
         if(GAMEENGINE_BUILD_GRAPHICS_TESTS)
             add_gameengine_graphics_test(AudioGraphicsTests tests/AudioGraphicsTests.cpp)
+            add_gameengine_graphics_test(PlayerSaveGraphicsTests tests/PlayerSaveGraphicsTests.cpp)
         endif()
     endif()
     add_gameengine_headless_test(GameplayActionIntegrationTests tests/GameplayActionIntegrationTests.cpp)
@@ -458,6 +459,13 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(PlayerSaveFileStoreTests tests/PlayerSaveFileStoreTests.cpp)
     add_gameengine_headless_test(WorldPlayerPersistenceTests tests/WorldPlayerPersistenceTests.cpp)
     add_gameengine_headless_test(WorldPlayerPersistenceLifecycleTests tests/WorldPlayerPersistenceLifecycleTests.cpp)
+    add_gameengine_headless_test(PlayerAutosaveTests tests/PlayerAutosaveTests.cpp)
+    if(Python3_Interpreter_FOUND)
+        add_test(NAME PlayerAutosaveInterruptionTests COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/PlayerAutosaveInterruptionTests.py"
+            "$<TARGET_FILE:PlayerAutosaveTests>")
+        set_tests_properties(PlayerAutosaveInterruptionTests PROPERTIES LABELS "headless" TIMEOUT 30)
+    endif()
 
     if(GAMEENGINE_BUILD_CLIENT OR GAMEENGINE_BUILD_GRAPHICS_TESTS)
         add_executable(EnginePlayerPersistenceLifecycleTests
