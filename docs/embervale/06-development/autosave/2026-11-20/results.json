@@ -1,0 +1,74 @@
+{
+  "date": "2026-11-20",
+  "task": "GAME-010",
+  "status": "complete",
+  "code_commit": "fa5e0e93efa71ac60519287cfd9a35b328ec6270",
+  "base_commit": "9c4feb28258fd8a41047daebd56e5e054f9e77f3",
+  "tested_tree": "d94642245dc3a6c5f9ed01bc14405c25e713ab32",
+  "toolchain": {
+    "platform": "Linux",
+    "compiler": "GCC 14.2.0",
+    "cmake": "4.4.5",
+    "ninja": "1.13.2",
+    "python": "3.12.14",
+    "sdl": "3.4.12 audio enabled"
+  },
+  "policy": {
+    "clock": "std::chrono::steady_clock",
+    "interval_seconds": 60,
+    "retry_seconds": 10,
+    "boundary": "after committed World update",
+    "dead_due": "defer until living/respawn tick",
+    "temporary_sessions": "no lifecycle and no autosave",
+    "save_format": 13
+  },
+  "checks": {
+    "client": {
+      "passed": 112,
+      "total": 112,
+      "headless": 93,
+      "client": 7,
+      "graphics": 12
+    },
+    "separate_headless": {
+      "passed": 93,
+      "total": 93
+    },
+    "python_editor_units": {
+      "passed": 42,
+      "total": 42
+    },
+    "autosave_assertions": 31,
+    "engine_persistence_assertions": 34,
+    "save_graphics_assertions": 5,
+    "interruption": {
+      "passed": true,
+      "method": "SIGKILL after completed periodic checkpoint",
+      "saved_coins": 71,
+      "later_unsaved_coins": 1,
+      "reloaded_coins": 71,
+      "private_disposable_profile": true
+    }
+  },
+  "limitations": [
+    "No process kill inside an individual filesystem operation",
+    "No power-loss or physical-media flush guarantee",
+    "Death, slow ticks and save failures can extend checkpoint gaps",
+    "No current Windows/human acceptance",
+    "No editor recovery or original animation integration"
+  ],
+  "documentation_validation": {
+    "markdown_files": 98,
+    "links": 1216,
+    "matching_backlog_tasks": 96,
+    "acyclic_dependencies": true,
+    "legacy_studio_ids_retained": 45,
+    "external_urls_fetched": false
+  },
+  "artifacts": {
+    "save-warning.png": {
+      "sha256": "6ac36853873cc01d043906aec5aa8815508e13fd72a81aa99a44aa09d1d73ce1",
+      "scope": "real SDL software-renderer HUD/notice fixture"
+    }
+  }
+}

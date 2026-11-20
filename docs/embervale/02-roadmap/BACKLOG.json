@@ -1,8 +1,8 @@
 {
   "version": 1,
   "reviewed_date": "2026-11-20",
-  "current_verified_master": "0a866280849aaca3c907cfcd77ba90883636d8a2",
-  "verification_reconciliation": "Latest starter combat/recovery source 0a866280849aaca3c907cfcd77ba90883636d8a2: Linux 109/109 SDL configuration, 91/91 standalone headless and 42/42 Python editor units. New five-case CLI suite and 18-assertion tutorial regression pass; 12 real editor bridge cases are included. Six canonical save/reload checkpoints, food, actual combat/death/respawn and persisted recovery pass. Normal tutorial completes at tick 741; intentional death/recovery extends the software exercise to 2370. Human time, visible Windows/combined local animation and audible acceptance remain open. See docs/embervale/06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md",
+  "current_verified_master": "fa5e0e93efa71ac60519287cfd9a35b328ec6270",
+  "verification_reconciliation": "Latest autosave code fa5e0e93efa71ac60519287cfd9a35b328ec6270: Linux SDL 112/112 CTest entries (93 headless, 7 client, 12 graphics), separate headless 93/93 and Python editor 42/42. GAME-010 passes interval/retry, crafting/escrow, real death/respawn, Engine committed-tick and killed-process reload checks. Starter replay/bridge suites remain included. Current Windows, human, physical-media durability and original combined local animation acceptance remain open. See docs/embervale/06-development/PLAYER_AUTOSAVE_2026-11-20.md.",
   "repository": "Adzffs/GameEngine",
   "baseline_commit": "e9d32932e8f9b27e96283313cca320058792a81f",
   "status_policy": "Complete means bounded stated acceptance has evidence and is published on the default branch. In_progress retains remaining scope/acceptance; planned is future work. Historical reports remain dated. Acceptance tasks can measure an implemented candidate before human signoff closes its parent feature.",
@@ -1665,7 +1665,7 @@
       "milestone": "R4",
       "priority": "P1",
       "title": "Add bounded periodic player autosave",
-      "status": "planned",
+      "status": "complete",
       "dependencies": [
         "ENG-003",
         "GAME-009"
@@ -1673,9 +1673,10 @@
       "acceptance": "Checkpoint only explicitly persistent players at safe intervals/events; keep no-save/fresh playtests temporary, preserve valid data on failure, handle crafting/death and test interruption/reload.",
       "github_issue": null,
       "evidence": [
-        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+        "docs/embervale/06-development/PLAYER_AUTOSAVE_2026-11-20.md",
+        "docs/embervale/06-development/autosave/2026-11-20/results.json"
       ],
-      "notes": "Only controlled shutdown and explicit SaveNow exist. Define policy/interval before coding; never silently persist temporary world/profile launches."
+      "notes": "Published in fa5e0e93efa71ac60519287cfd9a35b328ec6270: explicit persistent lifecycle only, steady-clock 60-second interval and 10-second retry, post-tick snapshots, due-death deferral through respawn, crafting projection and nonmodal warning/recovery. Killed-process reload after completed checkpoint passes. Save version 13 unchanged; temporary launches remain unsaved. Windows/human and power-loss durability are not claimed."
     },
     {
       "id": "ENG-005",

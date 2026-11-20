@@ -8,6 +8,8 @@ The later [action-audio/packaging follow-up](docs/embervale/06-development/ACTIO
 
 The later [starter combat/recovery verification](docs/embervale/06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) fixes tutorial bank/return predicates and verifies the software journey. Preserve current-tick committed-deposit and live-Mara-dialogue requirements; saved bank contents or previously claimed rewards must not bypass those checkpoints.
 
+The [periodic autosave follow-up](docs/embervale/06-development/PLAYER_AUTOSAVE_2026-11-20.md) completes GAME-010. Preserve explicit persistent-session opt-in, monotonic 60-second checkpoints after committed ticks, ten-second failure retries, crafting projection and due-death deferral until respawn. Never arm autosave for temporary playtests or failed startup. Player save format remains 13; editor draft recovery is separate.
+
 For tasks that create or change animation, read:
 
 1. [Animation guide](docs/embervale/05-game/ANIMATION_GUIDE.md).

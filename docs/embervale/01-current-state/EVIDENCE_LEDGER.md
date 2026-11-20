@@ -1,6 +1,6 @@
 # Evidence ledger and review limits
 
-**Current evidence reconciliation, 20 November:** The [project review](../06-development/PROJECT_REVIEW_2026-11-20.md) and [current status](CURRENT_STATUS.md) record current Windows builds, 102/102 SDL and 87/87 headless CTest entries, 42/42 Python units and the published safety fixes. The chronological sections below retain earlier source/method limits; their unbuilt/Windows-unverified/awaiting-integration descriptions are historical.
+**Current evidence reconciliation, 20 November:** [Periodic autosave](../06-development/PLAYER_AUTOSAVE_2026-11-20.md) pins current code fa5e0e93efa71ac60519287cfd9a35b328ec6270 and Linux results: 112/112 SDL, 93/93 separate headless and 42/42 Python units, including killed-process reload after a completed checkpoint. The earlier [project review](../06-development/PROJECT_REVIEW_2026-11-20.md) retains Windows 102/87 results for its source. See [current status](CURRENT_STATUS.md) for scope. Chronological descriptions below retain their original source/method limits.
 
 
 **Original review:** 18 November 2026.\

@@ -20,9 +20,11 @@ The review fixed recovery-file deletion after failed loads (ENG-003), crafting c
 2. **GAME-005 / GAME-004:** automated combat/food, death/recovery and six save/reload checkpoints now pass, with the tutorial skip fixed. Preparation remains 454 ticks; actual tutorial return is 741 and the deliberate death/recovery exercise totals 2370. Finish visible/uncoached navigation, input/confusion, balance and real-time acceptance on the recovered candidate.
 3. **ART-004:** finish acceptance of the implemented first sound pass: audible/device balance, Windows and synchronization with the recovered animation candidate.
 
-The owner is not satisfied with the current animation appearance and deferred polish. Keep ART-005 open. Autosave, interrupted editor recovery, validated publication, asset-copy ownership and accessibility have explicit tasks.
+The owner is not satisfied with the current animation appearance and deferred polish. Keep ART-005 open. GAME-010 periodic autosave is complete. Interrupted editor recovery, validated publication, asset-copy ownership and accessibility remain separately scoped tasks.
 
 The original Windows integration worktree remains unavailable, so REL-004 stays **in progress**. Independent work on the restored published source has delivered the first sound pass and fixed runtime asset copying; [results and limits](../06-development/ACTION_AUDIO_2026-11-20.md). ART-004 is **in progress** with audible/device and integration acceptance open. GAME-005 is **in progress** with the [automated starter continuation](../06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) passing; human/visible acceptance remains open. The [original recovery handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md) still applies.
+
+GAME-010 is now **complete** for bounded periodic player persistence: 60-second checkpoints, 10-second retries, crafting/death safety, temporary-save isolation and killed-process reload. See the [autosave policy and verification](../06-development/PLAYER_AUTOSAVE_2026-11-20.md). Current Linux checks pass 112/112 SDL and 93/93 standalone headless entries, plus 42/42 Python units; current Windows/human acceptance stays open.
 
 ## 3. Roadmap at a glance
 
@@ -276,11 +278,11 @@ These are aspirations, not promised release dates. Keep features that reinforce 
 
 | Order | Work | Observable result |
 |---|---|---|
-| Completed in this review | ENG-003, ENG-004, GAME-009, QA-004 | Reproduced integrity defects fixed; current checks and stale expectations reconciled |
+| Completed in this review/follow-ups | ENG-003, ENG-004, GAME-009, GAME-010, QA-004 | Integrity fixes, periodic player saves and current verification published |
 | Next | REL-004 | Combined published Mining/melee/equipment and matching assets/previews |
 | Then | GAME-005 and GAME-004 | Fresh route with real elapsed time, confusion, food/combat/recovery findings |
 | During starter acceptance | ART-004 | First sound pass implemented; finish audible/device review and synchronization with the recovered animation candidate |
-| Reliability work | GAME-010, STUDIO-025/026, STUDIO-063, QA-003 | Autosave, recovery/publication, packaging and visible usability |
+| Reliability work | STUDIO-025/026, STUDIO-063, QA-003 | Editor recovery/publication, packaging and visible usability |
 | Owner-deferred | ART-005 | Posing, weight, timing/transitions and visual acceptance |
 | As concrete changes require | ENG-005/006 | Progression/health integer policy and targeted responsibility extraction |
 

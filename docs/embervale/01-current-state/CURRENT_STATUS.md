@@ -1,7 +1,7 @@
 # Current project status
 
 **Reviewed:** 20 November 2026.\
-**Published code:** [0a86628](https://github.com/Adzffs/GameEngine/commit/0a866280849aaca3c907cfcd77ba90883636d8a2).\
+**Published code:** [fa5e0e9](https://github.com/Adzffs/GameEngine/commit/fa5e0e93efa71ac60519287cfd9a35b328ec6270).\
 **Source of truth:** Current code and the [project review](../06-development/PROJECT_REVIEW_2026-11-20.md). The older [engine inventory](IMPLEMENTED_SYSTEMS.md) retains its explicitly dated baseline.
 
 Embervale is a playable local C++20/SDL3 RPG prototype with a bounded world editor and an authored River Crossing starter region. It has substantial gameplay systems. It is not yet a completed starter vertical slice, a released Studio product or an implemented online MMO.
@@ -14,7 +14,7 @@ Embervale is a playable local C++20/SDL3 RPG prototype with a bounded world edit
 | Movement | Eight-direction pathfinding, corner safety, queued destinations, walking/running and camera presentation | Uncoached route quality and map pacing |
 | Gameplay | Gathering, processing/crafting, inventory/equipment, shops, banking, melee, monster AI/leash/respawn, loot, food and recovery | Visible/full story journey, combat/food feel and economy balance acceptance |
 | Progression | Five persisted skills, six starter quests, tutorial guidance, dialogue choices and recipe discovery | Observe first-time players completing the whole chain without coaching |
-| Persistence | Save version 13, historical migration, bounded loading, transactional file handling and controlled shutdown saving | Periodic autosave and stronger interruption/durability policy |
+| Persistence | Save version 13, historical migration, bounded loading, transactional replacement, 60-second autosave and controlled shutdown | Windows/human notice review and stronger physical-media durability policy |
 | Data-safety corrections | Failed loads preserve backups; saves include crafting escrow; overflowing inventory additions reject; failed shutdown saves offer return to game or explicit exit without saving | Native save-failure dialog interaction still needs visible Windows acceptance |
 | Authored world | Flat 100x100 River Crossing candidate, distributed services, existing actor homes and static workshop buildings | Visible encounter/escape/recovery and human pacing acceptance; more building assemblies |
 | World format | Schemas 1-4, bounded parser/runtime validation, stable placements, retained allocation IDs and staged spawn semantics | General region/definition authoring and versioned publication manifests |
@@ -34,12 +34,14 @@ The owner is not satisfied with the animation quality and explicitly deferred fu
 
 The [starter combat/recovery follow-up](../06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) completes the automated tutorial and deliberate recovery exercise. It fixes skipped post-combat bank/Mara steps and misleading loot/reward hints. Six save/reload checkpoints and single persisted recovery pass; full human/visible acceptance remains open.
 
+The [autosave policy and verification](../06-development/PLAYER_AUTOSAVE_2026-11-20.md) completes GAME-010: persistent players checkpoint after committed ticks every 60 seconds, retry failures after 10 seconds and defer due saves through respawn. Crafting ownership and temporary-play isolation remain intact; a killed process reloads its completed checkpoint. This does not guarantee power-loss durability.
+
 ## Executed checks
 
 | Source/configuration | Executed result | Scope |
 |---|---:|---|
-| Current starter combat/recovery source, Linux SDL configuration | 109/109 CTest entries | 91 headless, 7 client, 11 graphics; includes new tutorial and CLI checks |
-| Same current source, Linux with client/graphics disabled | 91/91 CTest entries | SDL-free core and full starter replay |
+| Current autosave source, Linux SDL configuration | 112/112 CTest entries | 93 headless, 7 client, 12 graphics; includes killed-process reload and status rendering |
+| Same current source, Linux with client/graphics disabled | 93/93 CTest entries | SDL-free core, starter replay and periodic-save/interruption checks |
 | Current Python editor unit suite | 42/42 tests | Python 3.12.14; real bridge still 12 cases within one CTest entry |
 | Earlier published source plus critical fixes, Windows SDL client configuration | 102/102 CTest entries | Includes 87 headless, 5 client and 10 graphics labels; SDL dummy/software presentation |
 | Same source, separate Windows build with client and graphics disabled | 87/87 CTest entries | Confirms the changed core builds without SDL |
@@ -53,10 +55,10 @@ The unchanged preparation replay equips the shield at tick 245, equips the sword
 
 ## Current work order
 
-1. **Completed in this review:** ENG-003, ENG-004 and GAME-009 protect saves/items; QA-004 reconciles current automated evidence.
+1. **Completed in this review:** ENG-003, ENG-004 and GAME-009 protect saves/items; QA-004 reconciles current automated evidence; GAME-010 now adds bounded periodic saves.
 2. **REL-004:** combine the published Mining work and local melee/equipment first pass; publish the matching sources, outputs and previews.
 3. **GAME-005 / GAME-004:** automated combat, food, death/recovery and save/reload now pass; finish the visible/uncoached route, input/confusion, balance and real elapsed-time acceptance.
 4. **ART-004:** the bounded sound pass is implemented against published source; finish original animation synchronization and audible/device/Windows acceptance after recovery.
-5. Continue the separately prioritized recovery, asset packaging, autosave and accessibility tasks. Animation quality remains ART-005, deferred by the owner.
+5. Continue the separately prioritized editor recovery, asset packaging and accessibility tasks. GAME-010 autosave is complete for its stated scope. Animation quality remains ART-005, deferred by the owner.
 
 R0-R4 remain partial milestones. Optional editor expansion, elevation, multiple regions, companions, bosses and multiplayer do not need to be completed before the existing flat starter experience improves. Use the [roadmap](../02-roadmap/MASTER_ROADMAP.md) and synchronized [backlog](../02-roadmap/BACKLOG.md) for exact tasks and dependencies.

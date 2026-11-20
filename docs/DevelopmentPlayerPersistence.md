@@ -1,32 +1,19 @@
 # Development Player persistence
 
-**20 November safety update:** The [project review](embervale/06-development/PROJECT_REVIEW_2026-11-20.md) records current corrections. Failed primary loads retain recovery files until validation succeeds. Crafting cursor/grid items are projected into saved inventory without live mutation; insufficient capacity rejects before writing. Failed shutdown saving offers return to play or explicit unsaved exit. Save version 13 is unchanged; autosave is planned.
+**Current code:** [fa5e0e9](https://github.com/Adzffs/GameEngine/commit/fa5e0e93efa71ac60519287cfd9a35b328ec6270), 20 November 2026. See the [autosave policy and verification](embervale/06-development/PLAYER_AUTOSAVE_2026-11-20.md) and [save compatibility guide](embervale/03-engine/SAVE_COMPATIBILITY.md). Save format 13 is unchanged.
 
-**Current application policy:** Source-backed lifecycle documentation. See the [save compatibility guide](embervale/03-engine/SAVE_COMPATIBILITY.md) for planned content migration and [Getting started](embervale/06-development/GETTING_STARTED.md) for launch-directory guidance.
+The normal development application selects saves/development-player.save relative to its working directory. Imported-world and fresh-profile launches are temporary by default; --no-save stays temporary. An explicit --save path opts into the same lifecycle. Existing launch-path checks prevent a save or sidecar from replacing the selected world file. See [launch examples](embervale/06-development/GETTING_STARTED.md).
 
-The development application opts into Player persistence at
-`saves/development-player.save`, relative to the process working directory.
-This path is application policy: `World` neither knows the path nor controls
-startup or shutdown timing. Command-line and production configuration are
-future work.
+EngineConfiguration::developmentPlayerSavePath controls this application policy. Its default nullopt preserves the nonpersistent Engine path. World neither selects a path nor starts a timer. Runtime entity IDs are assigned afresh and are not persistent identities.
 
-`EngineConfiguration::developmentPlayerSavePath` controls the policy. Its
-default `std::nullopt` value preserves the nonpersistent Engine path; supplying
-a complete path opts in. Runtime entity IDs are assigned afresh by the World
-and are never stored as persistent identities.
+Startup loads an existing Player or creates a new one according to the selected profile. Missing files are not written immediately; directories are created only when a save actually occurs. Corrupt startup fails without enabling autosave or erasing recovery artifacts.
 
-Startup loads an existing Player or creates the development-default Player
-before gameplay. A missing file is not written during startup, and the file
-store creates its parent directory only when an actual save occurs. Controlled
-shutdown saves the tracked runtime Player through the existing atomic file
-store. Startup does not rewrite loaded data, and ticks do not autosave; callers
-may explicitly use `SaveNow` at a future policy boundary.
+After each completed World tick, Engine polls WorldPlayerPersistenceLifecycle. The first steady-clock deadline is 60 seconds after successful startup. A successful periodic save or SaveNow restarts that interval. Long gaps and catch-up ticks produce one current snapshot, not a burst of historical writes. A failed save retains the active lifecycle and retries after 10 seconds.
 
-This guarantees structured startup/shutdown failure reporting and a save on a
-successful controlled shutdown. It does not guarantee saving after forced
-termination, an operating-system crash, or power loss; periodic autosave,
-signal-safe persistence, and physical-media flushing beyond the existing file
-store guarantees are also out of scope. Startup and controlled-shutdown
-failures propagate through `Engine::Run()` to the process exit status. This
-lifecycle is not crash-proof.
+A due save waits while the player is dead and runs on the first committed living/respawn tick. Crafting cursor/grid items are projected into saved inventory without live mutation or closing the session. Insufficient capacity rejects before writing and preserves the old save and live items.
 
+Successful periodic saves show a brief “Progress saved” notice. A nonmodal storage/crafting warning remains visible until a retry succeeds. Controlled shutdown still saves current state and then disarms autosave. Failed shutdown retains the existing return-to-game or explicit unsaved-exit choices.
+
+The synchronous file store uses bounded text, temporary/backup files and transactional replacement. It is not a physical-media durability guarantee. Forced termination restores the last completed checkpoint; later progress can be lost. Normally that is roughly a minute, but slow ticks/I/O, death or failures can extend the gap. No power-loss, OS-crash or signal-safe write guarantee is added. A killed-process test verifies reload after a completed autosave; it does not kill inside a filesystem operation.
+
+Lifecycle startup and controlled-shutdown failures remain structured and propagate through Engine::Run to process status. The [dated report](embervale/06-development/PLAYER_AUTOSAVE_2026-11-20.md) records the policy, tests, code boundaries and remaining Windows/human acceptance.

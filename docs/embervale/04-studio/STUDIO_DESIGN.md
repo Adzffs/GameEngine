@@ -85,7 +85,7 @@ Editing a validated draft returns it to Draft. Publication selects the exact val
 
 Autosaves should preserve a small documented recovery history in the editor workspace, using transactional writes. On reopening after interruption, show the original revision and the recovered candidate with a diff. Recovering must be a deliberate choice and must never overwrite the active published content or a player save as a side effect.
 
-This workflow is proposed; the current game's documented player persistence is a separate controlled-startup/shutdown system. [Source: DevelopmentPlayerPersistence.md](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/docs/DevelopmentPlayerPersistence.md).
+This editor workflow is proposed. The game's [periodic player autosave](../06-development/PLAYER_AUTOSAVE_2026-11-20.md) is a separate system and does not recover editor drafts.
 
 ## 7. Human accessibility and discoverability
 
