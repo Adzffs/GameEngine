@@ -154,7 +154,9 @@ if(GAMEENGINE_BUILD_CONTENT_TOOLS)
     add_executable(EmbervaleWorldValidate src/Tools/WorldValidateMain.cpp)
     target_link_libraries(EmbervaleWorldValidate PRIVATE GameEngineCore)
 
-    add_executable(EmbervaleEconomyReport src/Tools/EconomyReportMain.cpp)
+    add_executable(EmbervaleEconomyReport
+        src/Tools/EconomyReportMain.cpp
+        src/Tools/StarterJourneyReplay.cpp)
     target_link_libraries(EmbervaleEconomyReport PRIVATE GameEngineCore)
 
     add_executable(EmbervaleWorldMove
@@ -398,6 +400,12 @@ if(BUILD_TESTING)
         # Python is optional; absence means no integration test registered.
         find_package(Python3 COMPONENTS Interpreter QUIET)
         if(Python3_Interpreter_FOUND)
+            add_test(NAME StarterJourneyReplayCliTests
+                COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/StarterJourneyReplayCliTests.py"
+                    --tool "$<TARGET_FILE:EmbervaleEconomyReport>"
+                    --world "${CMAKE_CURRENT_SOURCE_DIR}/content/worlds/river-crossing.blockout.json")
+            set_tests_properties(StarterJourneyReplayCliTests PROPERTIES
+                LABELS "headless;content" TIMEOUT 90)
             add_test(NAME AudioAssetChecks
                 COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tools/audio/build_audio_pilot.py" --check)
             set_tests_properties(AudioAssetChecks PROPERTIES LABELS "headless;audio")
@@ -498,6 +506,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(MovementSystemTests tests/MovementSystemTests.cpp)
     add_gameengine_headless_test(EntityManagerLookupTests tests/EntityManagerLookupTests.cpp)
     add_gameengine_headless_test(ServerCommandQueueTests tests/ServerCommandQueueTests.cpp)
+    add_gameengine_headless_test(StarterTutorialCheckpointTests tests/StarterTutorialCheckpointTests.cpp)
     add_gameengine_headless_test(TickSchedulerTests tests/TickSchedulerTests.cpp)
     add_gameengine_headless_test(NpcDefinitionTests tests/NpcDefinitionTests.cpp)
     add_gameengine_headless_test(NpcSpawnManagerTests tests/NpcSpawnManagerTests.cpp)

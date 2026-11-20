@@ -2025,6 +2025,7 @@ void World::Update()
 
     publishedCommandProcessingResults.clear();
     pendingCommandProcessingResults.clear();
+    bankDepositorsThisTick.clear();
     ProcessQueuedCommands();
 
     currentTick++;
@@ -2103,14 +2104,16 @@ void World::ProcessTutorialProgress()
                 });
             break;
         case TutorialStep::LOOT_AND_BANK:
-            complete = !player->GetBank().GetEntries().empty();
+            complete = bankDepositorsThisTick.contains(player->GetID());
             break;
         case TutorialStep::RETURN_AND_CHOOSE:
         {
             const QuestRecord *gathering = player->GetQuestJournal().TryGet(
                 QuestId::GATHERING_BASICS);
+            const auto *session = dialogueSystem.GetSession(player->GetID());
             complete = gathering != nullptr &&
-                gathering->state == QuestState::COMPLETED;
+                gathering->state == QuestState::COMPLETED &&
+                session != nullptr && session->npcType == NpcType::DEVELOPMENT_GUIDE;
             break;
         }
         case TutorialStep::COMPLETE:
@@ -2447,6 +2450,7 @@ void World::ProcessQueuedCommands()
                     std::is_same_v<CommandType, BankWithdrawCommand> ||
                     std::is_same_v<CommandType, BankDepositInventoryCommand>)
                 {
+                    const auto revisionBefore = actor->GetBank().GetRevision();
                     const ActiveBankSession *session =
                         GetBankSession(data.actorEntityID);
                     if (session == nullptr || session->sessionId != data.sessionId ||
@@ -2478,6 +2482,12 @@ void World::ProcessQueuedCommands()
                                  actor->GetInventory()))
                     {
                         resultCode = CommandResultCode::ACCEPTED;
+                    }
+                    if constexpr (!std::is_same_v<CommandType, BankWithdrawCommand>)
+                    {
+                        if (resultCode == CommandResultCode::ACCEPTED &&
+                            actor->GetBank().GetRevision() != revisionBefore)
+                            bankDepositorsThisTick.insert(data.actorEntityID);
                     }
                 }
                 else if constexpr (

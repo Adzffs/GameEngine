@@ -237,7 +237,7 @@ StarterJourney::Guidance StarterJourney::Describe(const Player &player,
             "Carry food. Left-click food in your bag to heal.", Destination::MOSSLING};
     case TutorialStep::LOOT_AND_BANK:
         return {"Deposit an item in the bank",
-            "Click ground loot to pick it up when nearby.",
+            "Monster loot is added directly to your bag.",
             "Keep your gathering tools when storing spare materials.", Destination::BANK};
     case TutorialStep::RETURN_AND_CHOOSE:
     {
@@ -245,6 +245,9 @@ StarterJourney::Guidance StarterJourney::Describe(const Player &player,
         const auto *definition = QuestDefinitionDatabase::TryGet(QuestId::GATHERING_BASICS);
         if (quest == nullptr || definition == nullptr)
             throw std::runtime_error("starter journey requires Gathering Basics");
+        if (quest->state == QuestState::COMPLETED)
+            return {"Return to Mara", "Your Gathering Basics reward is already claimed.",
+                "Talk to Mara to finish the tutorial and choose your next activity.", Destination::GUIDE};
         if (quest->state == QuestState::ACTIVE)
             return ToolHint(player, {"Finish Gathering Basics, then return to Mara",
                 "Normal Logs gathered " + Progress(quest->progress, definition->requiredAmount),

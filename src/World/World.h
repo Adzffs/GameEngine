@@ -453,6 +453,7 @@ private:
     int nextGroundItemID = 1;
     std::map<int, int> pendingGroundItemPickups;
     std::map<int, PlayerRecoveryPile> playerRecoveryPiles;
+    std::set<int> bankDepositorsThisTick;
     static constexpr int PlayerRecoveryPileLifetimeTicks = 600;
 
     std::vector<CommandProcessingResult>

@@ -336,6 +336,17 @@ int main()
         const int coinSlot = FindSlot(player->GetInventory(), ItemType::COINS);
         player->GetBank().TryDeposit(player->GetInventory(), coinSlot, 1);
         world.Update();
+        test.Expect(player->GetTutorialState().GetStep() == TutorialStep::LOOT_AND_BANK,
+            "Existing bank contents do not prove a new tutorial deposit");
+        player->GetPosition().SetPosition(19, 3);
+        const auto *bank = world.GetStationAt(20, 3);
+        world.EnqueueCommand(InteractCommand{playerID, InteractionTargetType::STATION,
+            bank->GetID(), Position(20, 3)});
+        world.Update();
+        player->GetInventory().AddItem(ItemType::COINS, 1);
+        world.EnqueueCommand(BankDepositCommand{playerID, world.GetBankSession(playerID)->sessionId,
+            player->GetBank().GetRevision(), FindSlot(player->GetInventory(), ItemType::COINS), 1});
+        world.Update();
         test.Expect(player->GetTutorialState().GetStep() ==
                 TutorialStep::RETURN_AND_CHOOSE,
             "A committed bank deposit advances the loot-and-bank lesson");
