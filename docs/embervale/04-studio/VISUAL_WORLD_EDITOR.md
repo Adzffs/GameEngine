@@ -2,6 +2,8 @@
 
 **20 November current follow-up:** [Private editor recovery](EDITOR_RECOVERY.md) now records accepted edits and offers validated restore to a new draft. The [recovery verification](../06-development/EDITOR_RECOVERY_2026-11-20.md) passes 113/113 Linux SDL checks, 94/94 standalone headless and 53/53 Python units per interpreter, plus a native changed-original restore. The phase notes below retain their original dates; deferred automated-test statements describe those historical snapshots, not the current suite. Full accessibility/Windows acceptance remains open.
 
+**Current publication follow-up:** **Versions…** now validates the saved draft, publishes a fresh named version, verifies selected versions and starts the selected map in an isolated temporary game process. Choose an earlier version for the next rollback launch. See [world publication](WORLD_PUBLICATION.md) and [publication verification](../06-development/WORLD_PUBLICATION_2026-11-20.md). The preceding recovery counts belong to that historical source; current checks are 116/116 SDL, 96/96 headless and 64/64 Python units per interpreter.
+
 ## Move existing NPC and enemy homes
 
 **Select / move** also moves existing NPC and monster spawn/home

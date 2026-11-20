@@ -22,7 +22,7 @@ Work on your own draft rather than a committed fixture. Current runtime-valid sc
 | Source read | Regular non-symlink file, at most 2 MiB |
 | Candidate | Canonical runtime-valid bytes, at most 2 MiB |
 
-Recovery replays cached original bytes and accepted commands in a private directory. Only its explicit new-copy export relaxes the sibling-directory restriction. This does not implement in-place overwrite, an immutable publication manifest or automatic game selection.
+Recovery replays cached original bytes and accepted commands in a private directory. Only its explicit new-copy export relaxes the sibling-directory restriction. This recovery export does not implement in-place overwrite or automatic game selection. The separate [fixed publication command](WORLD_PUBLICATION.md) now reuses this exclusive staged writer for world/manifest pairs and explicit fresh-session selection.
 
 ## Cooperative ownership
 

@@ -2,8 +2,8 @@
 
 **Current recovery extension:** The existing C++ session now supports explicit recover-copy to a fresh .json in a selected existing directory. It validates a privately replayed base, rechecks its hash and never replaces an existing file. Normal save remains sibling-only. See [editor recovery](EDITOR_RECOVERY.md); broader protocol proposals below are not implemented by this command.
 
-**Status:** Proposed full editing interface. Export, validation and a bounded dry-run resource/station move are implemented. A separate draft branch introduces raw-file SHA-256 inspection and create-only guarded draft writes; general revisions, undo and most command families remain planned. See [starter-world import](STARTER_WORLD_IMPORT.md) for current syntax.\
-**Updated:** 18 November 2026\
+**Status:** Proposed full editing interface. Current bounded tools implement export/runtime validation, shared edit/history commands, guarded drafts, private recovery and fixed publication/selection. General region/definition authoring, structured capabilities/diagnostics and in-place replacement remain planned. See [starter-world import](STARTER_WORLD_IMPORT.md) for current syntax.\
+**Updated:** 20 November 2026\
 **Goal:** Let a human and an AI agent inspect or change content through the same predictable operations.
 
 ## 1. Contract principles
@@ -124,6 +124,8 @@ A preview report records content hash, renderer/tool version, dimensions, overla
 A playtest command must select a content package explicitly and use a test save path. Its result should report the tested package hash and scenario/seed. “Launched successfully” is not proof that gathering, combat or persistence worked; smoke scenarios need their own observed outcomes.
 
 ## 9. Publication and optional integrations
+
+**Implemented starter commands:** EmbervaleWorldPublish --validate draft.json returns a version-1 receipt; --publish draft.json --receipt receipt.json --library directory --revision name commits a create-only canonical world and manifest; --inspect version/manifest.json verifies and revalidates the selected version. GameEngine --world-version version/manifest.json starts it explicitly. Exit outcomes, exact metadata and the manifest-last interruption contract are in [world publication](WORLD_PUBLICATION.md). The general package/protocol goals follow.
 
 Publication validates that the report belongs to the exact candidate, required profile and supported tool/schema version. It writes an immutable content package and returns its manifest location. Activation, GitHub push, public release and live-server rollout remain separately scoped actions.
 

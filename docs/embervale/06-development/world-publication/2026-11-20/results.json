@@ -1,0 +1,141 @@
+{
+  "task": "STUDIO-026",
+  "status": "complete",
+  "scope": "existing 100x100 starter-world schemas 1-4",
+  "date": "2026-11-20",
+  "code_commit": "d44c3cf061aed70a92b1f38adee3ca423ac72e9d",
+  "baseline_commit": "ff295ae467b4bd1fbce69b8fe47ef9b6aaab467d",
+  "tested_code_tree": "008a5ae709903ad1f6cfe54d81d38dee9c6e2a87",
+  "published_code_blobs_verified": 26,
+  "toolchain": {
+    "platform": "Linux",
+    "compiler": "GCC 14.2.0",
+    "cmake": "4.4.5",
+    "ninja": "1.13.2",
+    "sdl": "3.4.12 audio enabled; X11/Wayland disabled",
+    "python": [
+      "3.12.14",
+      "3.13.5"
+    ],
+    "native_tk": "8.6"
+  },
+  "checks": {
+    "client_ctest": {
+      "passed": 116,
+      "total": 116,
+      "headless": 96,
+      "client": 8,
+      "graphics": 12,
+      "video_driver": "dummy",
+      "render_driver": "software",
+      "audio_driver": "dummy"
+    },
+    "separate_headless_ctest": {
+      "passed": 96,
+      "total": 96
+    },
+    "python_units_per_interpreter": {
+      "passed": 64,
+      "total": 64
+    },
+    "publication_new_python_unit_cases": 11,
+    "publication_core_assertions": 31,
+    "launch_options_assertions": 34,
+    "publication_real_integration_cases": 10,
+    "publication_killed_children_per_integration_run": 4,
+    "real_game_version_startups": [
+      "v1",
+      "v2",
+      "v1"
+    ],
+    "private_player_fixtures_unchanged": true,
+    "existing_real_bridge_cases": 12,
+    "existing_real_recovery_cases": 10,
+    "production_archive_contains_crash_hook": false
+  },
+  "native_studio": {
+    "private_fixture": true,
+    "player_files_used": false,
+    "flow": [
+      "open saved draft",
+      "Versions",
+      "validate",
+      "publish village-draft-v1",
+      "reject repeated name",
+      "revalidate",
+      "publish village-draft-v2",
+      "select earlier village-draft-v1",
+      "attempt Play selected version",
+      "report game exit 1"
+    ],
+    "source_preserved_sha256": "72c9d565ad1db11fc4e27eb8e512ef0dd23b5a902ef18da6a486a3c2ed28297f",
+    "native_version_world_sha256": "72c9d565ad1db11fc4e27eb8e512ef0dd23b5a902ef18da6a486a3c2ed28297f",
+    "native_versions_same_saved_map": true,
+    "distinct_versions_tested_by_automation": true,
+    "native_game_rendering_accepted": false,
+    "native_game_exit": 1,
+    "direct_diagnosis": "Selected manifest/hash load succeeds before SDL reports No available video device; available SDL build has no desktop X11/Wayland drivers."
+  },
+  "sample": {
+    "manifest": "content/published/river-crossing-v1/manifest.json",
+    "manifest_version": 1,
+    "revision": "river-crossing-v1",
+    "world_file": "world.json",
+    "source_sha256": "72c9d565ad1db11fc4e27eb8e512ef0dd23b5a902ef18da6a486a3c2ed28297f",
+    "world_sha256": "72c9d565ad1db11fc4e27eb8e512ef0dd23b5a902ef18da6a486a3c2ed28297f",
+    "world_schema_version": 4,
+    "validator_profile": "starter-runtime-v1",
+    "validator_revision": "4f7a4cc5ab2b7e315c957396d16c11c23f9bce5031d667dbfd2c0681f2e316dd"
+  },
+  "policy": {
+    "metadata_version": 1,
+    "metadata_limit_bytes": 4096,
+    "world_limit_bytes": 2097152,
+    "revision_max_characters": 48,
+    "browser_max_entries": 256,
+    "publication_marker": "complete manifest.json committed after canonical world.json",
+    "incomplete_directory": "reserved, unselectable, never automatically taken over or deleted",
+    "existing_versions": "create-only; no overwrite or automatic pruning",
+    "source_lock": "cooperative OS lock with exact raw hash recheck; persistent lock inode retained",
+    "old_validator_revision": "same supported profile/schema plus current-runtime revalidation",
+    "new_publication_receipt": "current validator revision required",
+    "game_selection": "explicit manifest in a fresh process; no mutable current pointer",
+    "studio_progress": "--no-save in private disposable cwd",
+    "persistent_progress": "explicit --save outside the selected version library",
+    "player_save_version": 13
+  },
+  "environment_findings": {
+    "first_unconfigured_client_run_failed_graphics_entries": 7,
+    "reason": "SDL No available video device",
+    "full_configured_rerun_passed": true
+  },
+  "limitations": [
+    "No current Windows build/runtime verification",
+    "Native Studio controls verified; native game rendering not verified",
+    "No power-loss, physical-media durability or network-filesystem guarantee",
+    "Checksums/create-only application writes are not authentication or hostile-filesystem protection",
+    "No global activation pointer, hot reload, running-world/RNG snapshot or player-progress rollback",
+    "No binary/art/audio freeze, general asset package manifest or online deployment",
+    "Wider STUDIO-021 replacement and STUDIO-050/051 regions/exits/diagnostics remain in progress",
+    "Original Windows animation integration unavailable; REL-004 remains open and ART-005 owner-deferred"
+  ],
+  "log_sha256": {
+    "publication-client-build.log": "92b41f43891cf582087719e8013dd1ec834c30190d70f9250315b5c36f2a8fc8",
+    "publication-headless-build.log": "3c3b8691064259490c76532b29c5372b7777a64a4344dbfd13b3cfc2ac81d298",
+    "publication-focused.log": "7018d48079ca3fb0b89aaa77932b4ca76923cd1e62f7b053752e86350b2c48c5",
+    "publication-client-tests.log": "45776cdf6e521122a2d903da9f40c612ed4a5ebb33e2894fd96a2f9df263d73a",
+    "publication-client-tests-configured.log": "8e4b2438024161615d3b833d1fe376a5e931a557ca89beaf9413a0807d6c0497",
+    "publication-headless-tests.log": "83f004d217a40e20e22fecc5d7fb7b4c40587f2205f142e588f753003dd45e1c",
+    "publication-python-tests.log": "49b2b9260256995f5f6a9923c967d975b700d2a1778fac772c14b87c4e83e1e9",
+    "publication-python-system-tests.log": "1516c414d1fa0c55bcd3f213d99f6ae4a4e6a368aadb67a7e01870ad30fe8180",
+    "publication-unconfigured-launch.log": "ca50ac5fe94589299d232aaa35d5573b7426a600c7e9cd7ea6d57d0c67f21917"
+  },
+  "documentation_validation": {
+    "markdown_files": 102,
+    "links": 1307,
+    "matching_backlog_tasks": 96,
+    "acyclic_dependencies": true,
+    "legacy_studio_ids_retained": 45,
+    "external_links_fetched_by_checker": false
+  }
+}

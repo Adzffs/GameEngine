@@ -1,7 +1,7 @@
 # Authored content model and validation contract
 
 **Status:** Broader authoring schema and rules are proposed. The distinct [starter snapshot](../04-studio/STARTER_WORLD_EXPORT.md) now has a [bounded runtime loader](../04-studio/STARTER_WORLD_IMPORT.md) for its existing 100×100 identity registry. The small illustrative schema below remains unsupported.\
-**Updated:** 18 November 2026\
+**Updated:** 20 November 2026\
 **Purpose:** Give engine, editor and automation work one precise description of authored content.
 
 ## 1. What is being saved
@@ -114,6 +114,8 @@ A package manifest records hashes of its constituent files and the schema/tool v
 One-file atomic replacement does not make a multi-file package atomic. The first release should minimise transaction breadth. When a content edit must span several files, stage a complete package and activate one manifest only after every file is ready, or use a journaled package transaction with tested recovery.
 
 ## 7. Drafts and publications
+
+**Current starter implementation:** [World publication](../04-studio/WORLD_PUBLICATION.md) binds exact saved/canonical bytes and validation implementation inputs, creates canonical world.json plus a last-committed manifest.json under a fresh name, and explicitly selects a version for a fresh runtime process. Receipt/manifest schemas are version 1; world schemas 1–4 remain supported. Older recorded validator revisions must pass current runtime checks. Current accepted drafts still require runtime validity; the broader unfinished-draft and multi-file/asset model below remains proposed.
 
 Proposed content states are **Draft**, **Validated** and **Published**. A structurally valid draft may contain a disconnected road or unfinished building and must remain recoverable. Gameplay validation determines whether it can become a validated candidate. Publication creates an immutable revision selected explicitly by a development launch or release manifest. Any semantic edit invalidates the previous validation result.
 

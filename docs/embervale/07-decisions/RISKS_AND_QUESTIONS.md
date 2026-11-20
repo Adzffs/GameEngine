@@ -7,7 +7,7 @@ This register distinguishes observed findings from future design risks. Priority
 
 The [project review](../06-development/PROJECT_REVIEW_2026-11-20.md) fixed recovery-file loss (ENG-003), crafting escrow omission (GAME-009) and inventory/bank overflow (ENG-004). Current checks supersede older unexecuted notes. Earlier findings retain their ownership context below.
 
-Remaining priorities: integration (REL-004), fresh-player measurements (GAME-005/004), validated publication (STUDIO-026), packaging (STUDIO-063), usability (QA-003) and integer policy (ENG-005). GAME-010 [periodic player autosave](../06-development/PLAYER_AUTOSAVE_2026-11-20.md) is complete for its bounded acceptance; stronger physical-media durability is outside that guarantee. STUDIO-025 [private editor recovery](../06-development/EDITOR_RECOVERY_2026-11-20.md) is complete for accepted edits; current Windows/stronger durability remain unverified. Animation polish is owner-deferred (ART-005).
+Remaining priorities: integration (REL-004), fresh-player measurements (GAME-005/004), packaging (STUDIO-063), usability (QA-003) and integer policy (ENG-005). GAME-010 [periodic player autosave](../06-development/PLAYER_AUTOSAVE_2026-11-20.md) is complete for its bounded acceptance; stronger physical-media durability is outside that guarantee. STUDIO-025 [private editor recovery](../06-development/EDITOR_RECOVERY_2026-11-20.md) is complete for accepted edits; current Windows/stronger durability remain unverified. STUDIO-026 [fixed map publication](../06-development/WORLD_PUBLICATION_2026-11-20.md) is complete for the current starter contract; native gameplay/Windows and wider packaging remain open. Animation polish is owner-deferred (ART-005).
 
 ## 1. Immediate findings
 

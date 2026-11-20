@@ -1,10 +1,10 @@
 # Editor workflows, recovery and playtesting
 
-**20 November evidence:** The [project review](../06-development/PROJECT_REVIEW_2026-11-20.md) executes the current CLI/bridge and editor checks. Use [current status](../01-current-state/CURRENT_STATUS.md) to distinguish implemented workflows from proposed recovery/publication scope.
+**20 November evidence:** The [project review](../06-development/PROJECT_REVIEW_2026-11-20.md) executes the current CLI/bridge and editor checks. Use [current status](../01-current-state/CURRENT_STATUS.md) to distinguish implemented recovery/fixed publication from broader proposed authoring/release scope.
 
 
-**Status:** Bounded edit/history/draft/reopen/playtest and [private recovery](EDITOR_RECOVERY.md) exist; broader publication and invalid-gameplay draft workflows below remain targets.\
-**Updated:** 18 November 2026\
+**Status:** Bounded edit/history/draft/reopen/playtest and [private recovery](EDITOR_RECOVERY.md) exist. [Fixed world versions](WORLD_PUBLICATION.md) now implement saved-draft validation, named publication and selected-version launch/rollback; broader package and invalid-gameplay draft workflows below remain targets.\
+**Updated:** 20 November 2026\
 **Audience:** Designers, developers and AI agents changing Embervale content.
 
 ## 1. Start from a known revision
@@ -74,7 +74,7 @@ process restart and does not bypass guarded draft publication. See
 
 ## 7. Save, recover and resolve conflicts
 
-**Implemented recovery:** Open the same source path, select a closed session, review the changed-original warning and real change summary, then restore to a new filename. Three recent copies are retained, active owners are excluded and partial writes are ignored. The original revision is never silently rebased or replaced. See [policy, locations and limits](EDITOR_RECOVERY.md). Broader replacement/publication targets follow.
+**Implemented recovery:** Open the same source path, select a closed session, review the changed-original warning and real change summary, then restore to a new filename. Three recent copies are retained, active owners are excluded and partial writes are ignored. The original revision is never silently rebased or replaced. See [policy, locations and limits](EDITOR_RECOVERY.md). Broader replacement and package targets follow.
 
 ### Ordinary save
 
@@ -94,15 +94,17 @@ An inverse command applies to a known state. If that state has changed, validate
 
 ## 8. Validate and publish a candidate
 
+**Implemented starter workflow:** Save new draft → Versions… → Validate draft → Publish version → select a version → Play selected version. The receipt binds exact source/canonical bytes and the validator revision. Publishing commits a new manifest last and never replaces previous versions. Selecting an earlier version changes the next fresh launch. See [commands, interruption handling and metadata](WORLD_PUBLICATION.md). Wider review/evidence goals follow.
+
 Publication requires the exact candidate hash to pass the selected validation profile. Review structural checks, reference integrity, supported placement rules, mandatory routes and compatibility scenarios. Open the preview and inspect the semantic diff. Resolve any required errors before publishing an immutable content package.
 
 The publication record should identify its source commit or draft origin, content hash, schema, validator version, required test evidence and known limitations. A newly edited candidate cannot reuse an earlier report simply because the filename is the same.
 
-Publishing content in Studio does not automatically push to GitHub, release a build or deploy a public server. It creates the package that those separately scoped processes can consume. See [CLI contract](CLI_AND_AI_CONTRACT.md) for the proposed transaction and output rules.
+Publishing content in Studio does not automatically push to GitHub, release a build or deploy a public server. It creates the package that those separately scoped processes can consume. See [implemented publication](WORLD_PUBLICATION.md) and [broader CLI contract](CLI_AND_AI_CONTRACT.md) for their separate transaction and output rules.
 
 ## 9. Conduct an isolated playtest
 
-Use a synthetic or copied test save, explicitly selected content and a known starting state. The current application persistence path is relative to its process working directory, so careless launch locations can select the wrong save. The future test launcher must make the save path visible and isolate test state deliberately. [Source: DevelopmentPlayerPersistence.md](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/docs/DevelopmentPlayerPersistence.md).
+Studio launches the selected draft or published version in a new private working directory with --no-save and the chosen fresh/development profile. It prevents a second concurrent playtest and cleans the private directory after exit. An explicit CLI --save is separate opt-in; published-version saves must stay outside the version library. Use copied test saves and record the selected content when testing persistence. The normal application development save remains relative to its working directory. [Source: DevelopmentPlayerPersistence.md](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/docs/DevelopmentPlayerPersistence.md).
 
 Record the content hash, game commit, platform, scenario, route taken and result. For geography, observe where the player hesitates, gets blocked, retraces steps or misses an important service. For economy, record travel and interaction time separately from gathering/crafting time. For combat, record encounter location, escape space and recovery behaviour.
 

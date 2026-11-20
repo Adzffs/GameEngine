@@ -66,4 +66,4 @@ The normal save command remains sibling-only. The explicit recovery-export comma
 
 [Executed checks](../06-development/EDITOR_RECOVERY_2026-11-20.md) cover Linux process kills at lock/write/stage/publication boundaries, real command replay, corrupted generations, changed/missing originals, active owners and native restoration. Current Windows execution, network filesystem semantics and power-loss/physical-media durability remain unverified.
 
-STUDIO-021's broader in-place replacement work, STUDIO-026 validated publication and QA-003's broader accessibility/platform review remain open. This feature is independent of [periodic player saves](../06-development/PLAYER_AUTOSAVE_2026-11-20.md).
+STUDIO-026 [fixed world publication](WORLD_PUBLICATION.md) is now complete for the current starter contract. STUDIO-021's broader in-place replacement work and QA-003's broader accessibility/platform review remain open. Recovery remains separate from publication and [periodic player saves](../06-development/PLAYER_AUTOSAVE_2026-11-20.md).

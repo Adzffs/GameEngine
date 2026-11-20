@@ -1,6 +1,6 @@
 # Evidence ledger and review limits
 
-**Current evidence reconciliation, 20 November:** [Editor recovery](../06-development/EDITOR_RECOVERY_2026-11-20.md) pins current code 378092feab53698e4078400d1a9cfc936c39f4c3: Linux 113/113 SDL and 94/94 standalone headless CTest entries, 53/53 Python units on each of two interpreters, deterministic killed-process boundaries and one native Linux Tk restore with exact snapshot parity/original-byte preservation. Earlier Windows 102/87 results remain tied to their reviewed source. See [current status](CURRENT_STATUS.md); historical sections below retain their original scope.
+**Current evidence reconciliation, 20 November:** [World publication](../06-development/WORLD_PUBLICATION_2026-11-20.md) pins code d44c3cf061aed70a92b1f38adee3ca423ac72e9d: Linux 116/116 SDL and 96/96 standalone headless CTest entries, 64/64 Python units per interpreter, real-tool interruption/tamper/rollback and fresh game starts. Native Linux Tk publishing/selection passed; its desktop game launch failed due to missing SDL drivers, while dummy-driver launches pass. Earlier recovery and Windows results retain their own source pins. See [current status](CURRENT_STATUS.md); historical sections below retain their scope.
 
 
 **Original review:** 18 November 2026.\

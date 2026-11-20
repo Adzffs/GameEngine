@@ -1,7 +1,7 @@
 # Validate and play a starter-world snapshot
 
-**Status:** Runtime bridge, shared editing/history, guarded sibling drafts and the visual editor are integrated. Latest spawn-setting tests and visible acceptance are deferred by the owner. Durable publication/recovery remain open.\
-**Updated:** 19 November 2026\
+**Status:** Runtime bridge, shared editing/history, guarded drafts, private recovery, fixed publication manifests and selected-version game launches are integrated. Current automated checks pass; native gameplay/Windows and broader visible acceptance remain open.\
+**Updated:** 20 November 2026\
 **Format:** `embervale.starter-world-snapshot`, schema versions `1`, `2`, `3`, region `embervale.development_starter`.\
 **Related:** [Export guide](STARTER_WORLD_EXPORT.md), [runtime import decision](../07-decisions/ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md), [save compatibility](../03-engine/SAVE_COMPATIBILITY.md).
 
@@ -11,7 +11,7 @@ The game can load an explicitly selected JSON snapshot of its existing 100×100 
 
 `EmbervaleWorldValidate` reads a candidate and applies the same parser and runtime validation used by game startup. `GameEngine --world <path>` then constructs the world from the validated snapshot. A missing, malformed or unsafe file stops startup with a diagnostic; it does not silently select a different world.
 
-The game and validator do not write the selected world file. Shared typed editing commands produce validated private candidates for terrain, object placement, actor homes and supported spawn settings. The terminal session and visual editor share undo/redo and guarded creation of a **new** sibling draft; they never replace the source. A publication manifest, interruption recovery, general-purpose authoring and in-place publication remain unfinished. See the [visual editor guide](VISUAL_WORLD_EDITOR.md).
+The game and validator do not write the selected world file. Shared typed editing commands produce validated private candidates for terrain, object placement, actor homes and supported spawn settings. The terminal session and visual editor share undo/redo and guarded creation of a **new** sibling draft; they never replace the source. [Private recovery](EDITOR_RECOVERY.md) and [fixed publication manifests/selection](WORLD_PUBLICATION.md) are implemented. General-purpose authoring and in-place replacement remain unfinished. See the [visual editor guide](VISUAL_WORLD_EDITOR.md).
 
 ## 2. Build and validate without SDL
 
@@ -164,7 +164,7 @@ On 18 November 2026, this slice passed **77/77 headless tests**, **89/89 tests**
 
 Implementation and tests: [parser](../../../src/Content/Export/StarterWorldSnapshotInput.cpp), [runtime input](../../../src/Content/Import/StarterWorldRuntimeInput.cpp), [World](../../../src/World/World.cpp), [launch options](../../../src/Core/GameLaunchOptions.cpp), [parser tests](../../../tests/StarterWorldSnapshotInputTests.cpp), [input tests](../../../tests/StarterWorldRuntimeInputTests.cpp), [runtime tests](../../../tests/StarterWorldRuntimeTests.cpp), [launch tests](../../../tests/GameLaunchOptionsTests.cpp), [validator CLI tests](../../../tests/StarterWorldValidateCliTests.cmake), [real application startup tests](../../../tests/GameEngineStartupCliTests.cmake).
 
-Shared history, guarded sibling drafts, preview/editor and isolated launch are now available. Interruption recovery, durable in-place publication and broader release acceptance remain open. The latest [spawn-settings implementation](../06-development/STUDIO_SPAWN_SETTINGS_2026-11-19.md) builds successfully; runtime and visible checks were explicitly deferred. The earlier verification totals above describe their dated revisions, not the schema-3 change. R1, R2 and Studio Alpha 0.1 are not declared complete.
+Shared history, guarded drafts, preview/editor, isolated launch, private recovery and fixed world publication are available. Current [publication verification](../06-development/WORLD_PUBLICATION_2026-11-20.md) passes 116/116 Linux SDL and 96/96 standalone headless entries plus 64/64 Python units per interpreter. The earlier verification totals and deferred spawn-setting notes describe their dated revisions. In-place replacement, native gameplay/Windows, broader authoring and release acceptance remain open. R1, R2 and Studio Alpha 0.1 are not declared complete.
 
 
 ## Schema 4: static building shells

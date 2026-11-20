@@ -1,6 +1,6 @@
 # Embervale Studio product and workspace design
 
-**Current implementation:** Shared move/paint/place/remove/spawn settings, history, guarded new drafts, reopen, isolated playtests and overlays exist. See [current status](../01-current-state/CURRENT_STATUS.md), [visual editor](VISUAL_WORLD_EDITOR.md) and the [project review](../06-development/PROJECT_REVIEW_2026-11-20.md). Private [accepted-edit recovery](EDITOR_RECOVERY.md) is now implemented. Versioned/in-place publication and broader gameplay/asset workspaces remain open.
+**Current implementation:** Shared move/paint/place/remove/spawn settings, history, guarded new drafts, reopen, isolated playtests and overlays exist. See [current status](../01-current-state/CURRENT_STATUS.md), [visual editor](VISUAL_WORLD_EDITOR.md) and the [project review](../06-development/PROJECT_REVIEW_2026-11-20.md). Private [accepted-edit recovery](EDITOR_RECOVERY.md) is now implemented. [Fixed world publication and selection](WORLD_PUBLICATION.md) are also implemented. In-place replacement and broader gameplay/asset workspaces remain open.
 
 
 **Status:** A bounded world editor is implemented. The broader product/workspaces below remain a target design, not a completed release.\
@@ -85,7 +85,7 @@ Editing a validated draft returns it to Draft. Publication selects the exact val
 
 Autosaves should preserve a small documented recovery history in the editor workspace, using transactional writes. On reopening after interruption, show the original revision and the recovered candidate with a diff. Recovering must be a deliberate choice and must never overwrite the active published content or a player save as a side effect.
 
-**Current bounded recovery:** The [implemented recovery workflow](EDITOR_RECOVERY.md) journals accepted runtime-valid edits, previews a C++-validated candidate and restores to a fresh file. It handles interrupted writes and changed/missing originals without overwriting them. Recovery resets undo history while preserving authored ID reservations. The broader publication model and structurally valid but gameplay-invalid drafts remain proposed. The game's [periodic player autosave](../06-development/PLAYER_AUTOSAVE_2026-11-20.md) remains separate.
+**Current bounded recovery:** The [implemented recovery workflow](EDITOR_RECOVERY.md) journals accepted runtime-valid edits, previews a C++-validated candidate and restores to a fresh file. It handles interrupted writes and changed/missing originals without overwriting them. Recovery resets undo history while preserving authored ID reservations. The [publication workflow](WORLD_PUBLICATION.md) validates exact saved bytes, creates named fixed world/manifest pairs and selects a version for a fresh game process. Broader package/release activation and structurally valid but gameplay-invalid drafts remain proposed. The game's [periodic player autosave](../06-development/PLAYER_AUTOSAVE_2026-11-20.md) remains separate.
 
 ## 7. Human accessibility and discoverability
 

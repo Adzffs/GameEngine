@@ -2,8 +2,8 @@
 
 **20 November safety update:** The [project review](../06-development/PROJECT_REVIEW_2026-11-20.md) records current corrections. Failed primary loads retain recovery files until validation succeeds. Crafting cursor/grid items are projected into saved inventory without live mutation; insufficient capacity rejects before writing. Failed shutdown saving offers return to play or explicit unsaved exit. Save version 13 is unchanged. The [autosave policy and verification](../06-development/PLAYER_AUTOSAVE_2026-11-20.md) now checkpoints persistent players every 60 seconds, retries failures after 10 seconds and waits through death.
 
-**Status:** Current starter import preserves save version 13 and adds selected-map position handling. Broader versioned content/save migration mechanisms below remain proposed.\
-**Updated:** 18 November 2026\
+**Status:** Current starter import and selected fixed world versions preserve save version 13 and use the same selected-map position handling. Publication metadata is independently versioned at 1. Broader content/save migrations below remain proposed.\
+**Updated:** 20 November 2026\
 **Primary rule:** A geography edit must not silently discard a player's earned state.
 
 ## 1. Current persistence boundary
@@ -32,7 +32,7 @@ For the compiled world, the existing blocked/out-of-bounds player fallback remai
 
 This is a bounded compatibility rule for the same 100×100 starter region and `ground` surface. It does not add region identity to saves, perform an offline migration, or provide general versioned content migration manifests. The [runtime import guide](../04-studio/STARTER_WORLD_IMPORT.md) documents command selection and scope; [World](../../../src/World/World.cpp) and [runtime tests](../../../tests/StarterWorldRuntimeTests.cpp) contain the implementation and regression scenarios.
 
-Imported-world launches use no player save by default. An explicit `--save` opts into the existing persistence lifecycle, while the save target and its temporary/backup paths are checked against world-file aliases. Ordinary no-argument startup keeps the normal development save. Runtime content validation does not write player files.
+Imported-world launches use no player save by default. An explicit `--save` opts into the existing persistence lifecycle, while the save target and its temporary/backup paths are checked against world-file aliases. Published-version launches also default to temporary progress. Explicit --save primary/tmp/bak paths must stay outside the entire selected version library and must not alias its selected manifest/world files. Studio always uses --no-save. The loader verifies and currently revalidates the owned world before Engine/player loading. Selecting an older map does not roll back player items, quests or saves. Ordinary no-argument startup keeps the normal development save. Runtime content validation does not write player files. See [publication contract](../04-studio/WORLD_PUBLICATION.md).
 
 ### Location migration matrix
 

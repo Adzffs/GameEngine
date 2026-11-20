@@ -1,7 +1,7 @@
 # Testing, validation and evidence
 
 **Status date:** 20 November 2026
-**Current evidence:** [Editor recovery](EDITOR_RECOVERY_2026-11-20.md): Linux SDL 113/113 CTest entries (94 headless, 7 client, 12 graphics), separate headless 94/94 and Python editor 53/53 on each of 3.12.14 and 3.13.5. The new ten-case recovery suite is one CTest entry; the twelve-case editor bridge and five-case starter replay CLI retain their own entries. Seven children are killed at deterministic journal/C++ transaction boundaries per integration run. A native Linux Tk 8.6 changed-original restore passed. Current Windows, broader accessibility and power-loss durability remain separate.
+**Current evidence:** [World publication](WORLD_PUBLICATION_2026-11-20.md): Linux SDL 116/116 CTest entries (96 headless, 8 client, 12 graphics) using dummy video/software/audio, separate headless 96/96 and Python editor 64/64 on each of 3.12.14 and 3.13.5. The ten-case publication and ten-case recovery suites each occupy one entry; the twelve-case bridge retains one. Publication adds 31 core assertions, four killed children per integration run and actual v1/v2/v1 fresh game starts. Native Tk validation/publication/collision/selection passed; native game rendering is unverified because the available SDL build lacks desktop drivers. Current Windows, broader accessibility and power-loss durability remain separate.
 **Historical baseline:** e9d32932; earlier Linux results below retain their source dates.
 
 Select an actual installed interpreter with `-DPython3_EXECUTABLE=...` when needed. Windows Store shortcuts were inaccessible during this review; the executable enabled a previously omitted bridge entry. Confirm `ctest -N` contains `StarterWorldVisualBridgeIntegration`, and run `python -m unittest discover -s tests -p "test_*.py"` separately. A configuration omitting Python does not establish a full editor pass.
@@ -51,7 +51,7 @@ Preserve the test command’s exit status when piping output to a log. In Bash, 
 
 The [snapshot test](../../../tests/StarterWorldSnapshotTests.cpp) compares all 10,000 effective cells and collision results with a real World, checks ground under occupied tiles and staged actors, uses actual pathfinder endpoints, performs a furnace interaction, and verifies deterministic output and structural rejection. The [CLI test](../../../tests/StarterWorldExportCliTests.cmake) independently parses executable JSON, compares the reviewed fixture and exercises read-only invocation/argument behaviour.
 
-The following table states continuing coverage obligations. Bounded input, canonical round-trip, registry binding, starter occupancy/access, selected spawn authority and imported-world compatibility now have focused tests; the guarded editing/publication cases remain planned.
+The following table states continuing coverage obligations. Bounded input, canonical round-trip, registry binding, starter occupancy/access, selected spawn authority and imported-world compatibility now have focused tests; guarded draft/recovery and fixed publication now have executed cases. General authoring and broader platform acceptance remain separate.
 
 | Contract | Meaningful test |
 |---|---|

@@ -187,3 +187,17 @@ limits](STARTER_COMBAT_RECOVERY_2026-11-20.md).
 Studio checkpoints accepted dirty edits in a private user-local recovery store. Reopen the same source path and choose a closed session, or press **Recovery…**. Review the changed-original warning and C++-validated change summary, then choose a new .json filename. A missing/corrupt original can still recover from its cached base. Existing files and player progress are preserved.
 
 Use --recovery-dir /path/to/private-recovery to select another real writable store; use the same directory when reopening. Storage failures appear in the editor status so Save new draft remains available. See [locations, retention and legacy locks](../04-studio/EDITOR_RECOVERY.md) and [results](EDITOR_RECOVERY_2026-11-20.md).
+
+
+## 13. Publish and play a fixed map version
+
+Build the client and content tools, then open the saved map in Studio and press **Versions…**. Choose the version library and a new name, press **Validate draft**, then **Publish version**. Select it and press **Play selected version**. Unsaved edits need **Save new draft** first. Earlier versions stay available for rollback on the next launch.
+
+To launch the checked-in River Crossing version directly:
+
+```bash
+build-client/EmbervaleWorldPublish --inspect content/published/river-crossing-v1/manifest.json
+build-client/GameEngine --world-version content/published/river-crossing-v1/manifest.json --no-save --profile fresh
+```
+
+Use your actual build directory and `.exe` on Windows. Studio defaults the publisher beside EmbervaleWorldMove; use --publisher and --library-dir to choose other locations. Published-version play is temporary unless explicitly opted into a save outside the library. There is no automatic default-world switch. See [fixed world publication](../04-studio/WORLD_PUBLICATION.md) and [publication verification](../06-development/WORLD_PUBLICATION_2026-11-20.md) for the command-line receipt flow, incomplete publication handling and exact limits.

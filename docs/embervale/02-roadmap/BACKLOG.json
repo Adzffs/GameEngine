@@ -1,8 +1,8 @@
 {
   "version": 1,
   "reviewed_date": "2026-11-20",
-  "current_verified_master": "378092feab53698e4078400d1a9cfc936c39f4c3",
-  "verification_reconciliation": "Latest editor recovery code 378092feab53698e4078400d1a9cfc936c39f4c3: Linux 113/113 SDL CTest entries (94 headless, 7 client, 12 graphics), separate headless 94/94 and Python 53/53 on both 3.12.14 and 3.13.5. STUDIO-025 real replay/restore, source conflicts, live owners, corruption, quotas and deterministic killed-process boundaries pass; native Linux Tk 8.6 recovery to a separate draft passed with complete snapshot parity and original-byte preservation. Recovery suite's ten cases and existing bridge's twelve remain inside their respective CTest entries. Current Windows, physical-media durability, broader accessibility and original animation integration remain open. See docs/embervale/06-development/EDITOR_RECOVERY_2026-11-20.md.",
+  "current_verified_master": "d44c3cf061aed70a92b1f38adee3ca423ac72e9d",
+  "verification_reconciliation": "Latest publication code d44c3cf061aed70a92b1f38adee3ca423ac72e9d: Linux 116/116 SDL CTest entries (96 headless, 8 client, 12 graphics) using dummy video/software/audio, separate SDL-free 96/96 and Python 64/64 on each of 3.12.14 and 3.13.5. Publication core has 31 assertions, launch options 34, real-tool publication ten cases with four killed children per run, and actual v1/v2/v1 temporary game processes. Native Linux Tk validates/publishes two named copies, rejects a collision and selects the earlier version; native game startup fails because this SDL build lacks desktop drivers. Both native copies deliberately have the same map hash; distinct maps/rollback are covered by automation. Source/prior versions and private player fixtures are preserved. Existing bridge/recovery integration remains included. Current Windows, stronger durability, broader accessibility and original animation integration remain open. See docs/embervale/06-development/WORLD_PUBLICATION_2026-11-20.md.",
   "repository": "Adzffs/GameEngine",
   "baseline_commit": "e9d32932e8f9b27e96283313cca320058792a81f",
   "status_policy": "Complete means bounded stated acceptance has evidence and is published on the default branch. In_progress retains remaining scope/acceptance; planned is future work. Historical reports remain dated. Acceptance tasks can measure an implemented candidate before human signoff closes its parent feature.",
@@ -310,9 +310,10 @@
       "evidence": [
         "src/Content/Import/StarterWorldRuntimeInput.cpp",
         "tests/StarterWorldRuntimeInputTests.cpp",
-        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md",
+        "docs/embervale/06-development/WORLD_PUBLICATION_2026-11-20.md"
       ],
-      "notes": "Runtime validator rejects invalid dimensions, references, bounds, overlaps, water placements and occupied player spawn before world construction. Scope is the current 100x100 starter registry."
+      "notes": "Runtime validator rejects invalid dimensions, references, bounds, overlaps, water placements and occupied player spawn before world construction. Scope is the current 100x100 starter registry. STUDIO-026 publication and runtime loading reuse these current starter checks; forged matching payload hashes cannot bypass them. This does not close broader authoring/diagnostic scope."
     },
     {
       "id": "STUDIO-051",
@@ -328,9 +329,10 @@
       "evidence": [
         "src/Content/Import/StarterWorldRuntimeInput.cpp",
         "tests/StarterWorldRuntimeInputTests.cpp",
-        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md",
+        "docs/embervale/06-development/WORLD_PUBLICATION_2026-11-20.md"
       ],
-      "notes": "Runtime validation checks actor reachability and a reachable cardinal approach for every placement under current blocking/no-corner-cut semantics. General regions/exits and broader geography diagnostics remain unsupported."
+      "notes": "Runtime validation checks actor reachability and a reachable cardinal approach for every placement under current blocking/no-corner-cut semantics. General regions/exits and broader geography diagnostics remain unsupported. STUDIO-026 publication and runtime loading reuse these current starter checks; forged matching payload hashes cannot bypass them. This does not close broader authoring/diagnostic scope."
     },
     {
       "id": "STUDIO-053",
@@ -423,9 +425,10 @@
         "docs/embervale/04-studio/GUARDED_DRAFT_REVISIONS.md",
         "docs/embervale/06-development/GUARDED_DRAFT_VERIFICATION_2026-11-18.md",
         "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
-        "docs/embervale/06-development/EDITOR_RECOVERY_2026-11-20.md"
+        "docs/embervale/06-development/EDITOR_RECOVERY_2026-11-20.md",
+        "docs/embervale/06-development/WORLD_PUBLICATION_2026-11-20.md"
       ],
-      "notes": "Create-only sibling drafts retain raw SHA-256 and source recheck. Follow-up 378092feab53698e4078400d1a9cfc936c39f4c3 uses persistent OS-lock sidecars released on process death and fully stages Windows/POSIX outputs; unknown legacy locks are preserved. Deterministic lock/write/stage/published interruption tests pass on Linux. Explicit recovery export permits a fresh JSON in another existing directory. Broader in-place guarded replacement, physical durability and current Windows execution remain open."
+      "notes": "Create-only sibling drafts retain raw SHA-256 and source recheck. Follow-up 378092feab53698e4078400d1a9cfc936c39f4c3 uses persistent OS-lock sidecars released on process death and fully stages Windows/POSIX outputs; unknown legacy locks are preserved. Deterministic lock/write/stage/published interruption tests pass on Linux. Explicit recovery export permits a fresh JSON in another existing directory. Broader in-place guarded replacement, physical durability and current Windows execution remain open. STUDIO-026 now reuses the cooperative recheck/staged exclusive writer for create-only package payloads and commits the manifest last; it does not implement in-place source replacement."
     },
     {
       "id": "STUDIO-022",
@@ -513,7 +516,7 @@
       "milestone": "R2",
       "priority": "P1",
       "title": "Implement validated publication selection",
-      "status": "planned",
+      "status": "complete",
       "dependencies": [
         "STUDIO-013",
         "STUDIO-021",
@@ -523,9 +526,18 @@
       "acceptance": "Bind validation to exact content/validator versions; publish immutable manifest and load its selected version in a fresh session.",
       "github_issue": null,
       "evidence": [
-        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+        "src/Content/Publication/WorldPublication.cpp",
+        "src/Tools/WorldPublishMain.cpp",
+        "tools/embervale_publication.py",
+        "tools/embervale_publication_ui.py",
+        "tests/WorldPublicationTests.cpp",
+        "tests/WorldPublicationIntegration.py",
+        "tests/PublishedWorldClientLaunchTests.py",
+        "docs/embervale/04-studio/WORLD_PUBLICATION.md",
+        "docs/embervale/06-development/WORLD_PUBLICATION_2026-11-20.md",
+        "docs/embervale/06-development/world-publication/2026-11-20/results.json"
       ],
-      "notes": "Still open: create-only drafts/runtime validation do not implement immutable publication manifests, version-bound receipts or in-place package selection and rollback."
+      "notes": "Published in d44c3cf061aed70a92b1f38adee3ca423ac72e9d: exact raw/canonical SHA-256 and validator-input revision receipts; fresh named canonical world/manifest pairs; manifest committed last; current-runtime load validation; Studio Validate/Publish/list/selected-version play and explicit earlier-version selection for the next fresh process. Interrupted reservations remain unselectable and reserved, prior versions are never overwritten, stale receipts/files reject. A checked-in River Crossing v1 and real distinct v1/v2/v1 Worlds/game startups pass. Complete for existing 100x100 schemas 1-4 and bounded placement/access prerequisites; broader STUDIO-021 replacement and STUDIO-050/051 regions/exits/diagnostics remain in progress. No global current pointer, hot reload, player-state rollback, general asset freeze, online release, stronger durability or current Windows execution is claimed. Native publishing/selection passed; desktop SDL launch failed due to missing drivers and dummy-SDL launches passed."
     },
     {
       "id": "STUDIO-027",
@@ -583,9 +595,10 @@
         "tools/embervale_world_editor.py",
         "docs/embervale/06-development/MASTER_ACCEPTANCE_2026-11-19.md",
         "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
-        "docs/embervale/06-development/EDITOR_RECOVERY_2026-11-20.md"
+        "docs/embervale/06-development/EDITOR_RECOVERY_2026-11-20.md",
+        "docs/embervale/06-development/WORLD_PUBLICATION_2026-11-20.md"
       ],
-      "notes": "Dirty checkpoints, save/reopen and close/switch warnings remain implemented. STUDIO-025 now adds a Recovery chooser, real change preview, storage-failure status and explicit restore to a new file. The changed-original/native Linux restore flow passed; broader keyboard/focus/scale and Windows acceptance remain open."
+      "notes": "Dirty checkpoints, save/reopen and close/switch warnings remain implemented. STUDIO-025 now adds a Recovery chooser, real change preview, storage-failure status and explicit restore to a new file. The changed-original/native Linux restore flow passed; broader keyboard/focus/scale and Windows acceptance remain open. STUDIO-026 adds explicit saved-draft validation, publishing, version selection and collision/startup failure feedback; a native Linux flow passed through older-version selection. Native gameplay/Windows and broader usability acceptance remain open."
     },
     {
       "id": "STUDIO-033",
