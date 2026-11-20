@@ -135,10 +135,12 @@ namespace
             << " place <definition-id> <x> <y>, remove <id>,"
             << " spawn <id> <radius> <wander-ticks> <cap> <respawns:0|1> <respawn-ticks:0=type-default>,"
             << " paint <x> <y> <G|D|S|W>, undo, redo, status,"
-            << " save <fresh-sibling.json>, quit\n"
+            << " save <fresh-sibling.json>, recover-copy <new-file.json>, quit\n"
             << "All changes are private until save. A save creates a NEW sibling"
             << " draft only; it cannot overwrite source, existing drafts or"
-            << " player saves. No actions affect the running game.\n";
+            << " player saves. recover-copy explicitly exports a new .json file"
+            << " from a private recovery base to a selected directory."
+            << " No actions affect the running game.\n";
     }
 }
 
@@ -314,7 +316,7 @@ namespace EmbervaleStudioSession
                         (history.EntryCount() - history.AppliedCount())
                         << "; original SHA-256: " << expectedHash << '\n';
                 }
-                else if (command == "save")
+                else if (command == "save" || command == "recover-copy")
                 {
                     std::string destination;
                     if (!std::getline(args >> std::ws, destination) ||
@@ -328,8 +330,10 @@ namespace EmbervaleStudioSession
                         StarterWorldImport::ValidateForRuntime(current);
                     const std::string candidate =
                         StarterWorldExport::SerializeCanonical(validated);
-                    StarterWorldDraftFile::PublishNew(
-                        sourcePath, expectedHash, candidate, destination);
+                    if (command == "recover-copy")
+                        StarterWorldDraftFile::PublishRecoveryCopy(sourcePath, expectedHash, candidate, destination);
+                    else
+                        StarterWorldDraftFile::PublishNew(sourcePath, expectedHash, candidate, destination);
                     output << "Saved new draft: " << destination
                         << "\ndraft-sha256: " <<
                         StarterWorldDraftFile::Digest(candidate) << '\n';

@@ -17,6 +17,17 @@
 #define NOMINMAX
 #endif
 #include <windows.h>
+#else
+#include <fcntl.h>
+#include <sys/file.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
+
+#ifdef GAMEENGINE_DRAFT_CRASH_TEST
+// Only the standalone crash-test executable defines this symbol. Production
+// libraries contain no pause hooks, environment switches or fault injection.
+void GameEngineDraftTestPause(std::string_view phase);
 #endif
 
 namespace StarterWorldDraftFile
@@ -65,6 +76,59 @@ namespace StarterWorldDraftFile
             std::filesystem::path path_;
         };
 
+        class SourceLock
+        {
+        public:
+            explicit SourceLock(const std::filesystem::path &source)
+            {
+                auto legacy = source; legacy += ".embervale.lock";
+                std::error_code error;
+                if (std::filesystem::exists(legacy, error) || error)
+                    Fail("legacy save lock requires inspection; recovery can export a separate copy");
+                auto path = source; path += ".embervale.writer.lock";
+                const auto status = std::filesystem::symlink_status(path, error);
+                if ((!error && std::filesystem::exists(status) && !std::filesystem::is_regular_file(status)) ||
+                    (error && error != std::errc::no_such_file_or_directory))
+                    Fail("writer lock must be a regular non-symlink file");
+#ifdef _WIN32
+                handle = CreateFileW(path.c_str(), GENERIC_READ | GENERIC_WRITE, 0,
+                    nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OPEN_REPARSE_POINT, nullptr);
+                if (handle == INVALID_HANDLE_VALUE) Fail("writer is active or lock file is unavailable");
+                BY_HANDLE_FILE_INFORMATION info{};
+                if (!GetFileInformationByHandle(handle, &info) ||
+                    (info.dwFileAttributes & (FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY)))
+                { CloseHandle(handle); handle = INVALID_HANDLE_VALUE; Fail("invalid writer lock file"); }
+#else
+                descriptor = open(path.c_str(), O_RDWR | O_CREAT | O_CLOEXEC | O_NOFOLLOW, 0600);
+                struct stat info{};
+                if (descriptor < 0 || fstat(descriptor, &info) != 0 || !S_ISREG(info.st_mode) ||
+                    flock(descriptor, LOCK_EX | LOCK_NB) != 0)
+                {
+                    if (descriptor >= 0) close(descriptor);
+                    descriptor = -1;
+                    Fail("writer is active or lock file is unavailable");
+                }
+#endif
+            }
+            SourceLock(const SourceLock &) = delete;
+            SourceLock &operator=(const SourceLock &) = delete;
+            ~SourceLock()
+            {
+#ifdef _WIN32
+                if (handle != INVALID_HANDLE_VALUE) CloseHandle(handle);
+#else
+                if (descriptor >= 0) close(descriptor);
+#endif
+                // Keep this inode so cooperating waiters cannot split locks.
+            }
+        private:
+#ifdef _WIN32
+            HANDLE handle = INVALID_HANDLE_VALUE;
+#else
+            int descriptor = -1;
+#endif
+        };
+
         std::filesystem::path StagingDirectory(const std::filesystem::path &parent)
         {
             std::random_device random;
@@ -101,12 +165,18 @@ namespace StarterWorldDraftFile
             while (offset < candidateBytes.size())
             {
                 const auto remaining = candidateBytes.size() - offset;
-                const auto requested = static_cast<DWORD>(remaining);
+                auto requested = static_cast<DWORD>(remaining);
+#ifdef GAMEENGINE_DRAFT_CRASH_TEST
+                if (offset == 0) requested = static_cast<DWORD>((remaining + 1) / 2);
+#endif
                 DWORD written = 0;
                 if (!WriteFile(file, candidateBytes.data() + offset, requested,
                         &written, nullptr) || written == 0)
                     break;
                 offset += written;
+#ifdef GAMEENGINE_DRAFT_CRASH_TEST
+                if (offset < candidateBytes.size()) GameEngineDraftTestPause("writing");
+#endif
             }
             complete = offset == candidateBytes.size() && FlushFileBuffers(file);
             const bool closed = CloseHandle(file) != 0;
@@ -209,38 +279,35 @@ namespace StarterWorldDraftFile
         return bytes;
     }
 
-    void PublishNew(const std::filesystem::path &source,
+    static void Publish(const std::filesystem::path &source,
         std::string_view expectedHash, std::string_view candidateBytes,
-        const std::filesystem::path &destination)
+        const std::filesystem::path &destination, bool recoveryCopy)
     {
         if (!ValidDigest(expectedHash)) Fail("expected SHA-256 must be 64 lowercase hex characters");
         if (candidateBytes.empty() || candidateBytes.size() > MaximumBytes)
             Fail("candidate must be nonempty and no larger than 2 MiB");
         if (source.empty() || destination.empty() || destination.filename().empty())
             Fail("explicit source and output filename required");
-        // The initial contract permits only an output sibling of the input.
-        // Move the source into the intended draft directory first. This avoids
-        // turning an editing tool into an arbitrary-path file writer.
         std::error_code pathError;
         const auto sourceParent = std::filesystem::weakly_canonical(
             source.parent_path().empty() ? "." : source.parent_path(), pathError);
         if (pathError) Fail("cannot resolve source directory");
         const auto targetParent = std::filesystem::weakly_canonical(
             destination.parent_path().empty() ? "." : destination.parent_path(), pathError);
-        if (pathError || sourceParent != targetParent)
+        if (pathError || (!recoveryCopy && sourceParent != targetParent))
             Fail("new draft must be a sibling of the source file");
+        if (recoveryCopy && destination.extension() != ".json")
+            Fail("recovery copy requires a new .json filename");
         std::error_code error;
         if (!std::filesystem::is_directory(destination.parent_path().empty() ? "." :
             destination.parent_path(), error) || error)
             Fail("output parent directory must already exist");
         if (std::filesystem::exists(destination, error) || error)
             Fail("output already exists or cannot be checked");
-        // Reserve the source so cooperating editing commands cannot race.
-        // This is not an OS-wide mandatory lock; noncooperating writers are
-        // explicitly outside the supported concurrency contract.
-        auto lockPath = source;
-        lockPath += ".embervale.lock";
-        OwnedDirectory lock(lockPath);
+        SourceLock lock(source);
+#ifdef GAMEENGINE_DRAFT_CRASH_TEST
+        GameEngineDraftTestPause("locked");
+#endif
         const auto current = Read(source);
         if (Digest(current) != expectedHash)
             Fail("CONTENT_CONFLICT: source bytes no longer match expected SHA-256");
@@ -248,23 +315,38 @@ namespace StarterWorldDraftFile
             Fail("output already exists or cannot be checked");
         const auto directory = destination.parent_path().empty() ?
             std::filesystem::path{"."} : destination.parent_path();
-        // Windows supports an exclusive create directly. std::filesystem hard
-        // links are not reliably available there (including on otherwise
-        // writable volumes), so use CREATE_NEW to retain no-overwrite semantics.
-#ifdef _WIN32
-        PublishExclusiveWindows(destination, candidateBytes);
-#else
         OwnedDirectory stage(StagingDirectory(directory));
         const auto temporary = stage.Path() / "snapshot.json";
+#ifdef _WIN32
+        PublishExclusiveWindows(temporary, candidateBytes);
+#ifdef GAMEENGINE_DRAFT_CRASH_TEST
+        GameEngineDraftTestPause("staged");
+#endif
+        // Same-directory staging avoids a cross-volume copy. MoveFileW fails
+        // if the selected name exists; no partially written target is exposed.
+        if (!MoveFileW(temporary.c_str(), destination.c_str()))
+            Fail("cannot publish complete draft: Windows error " + std::to_string(GetLastError()));
+#else
         {
             std::ofstream out(temporary, std::ios::binary | std::ios::trunc);
             if (!out) Fail("cannot create temporary draft");
+#ifdef GAMEENGINE_DRAFT_CRASH_TEST
+            const auto half = candidateBytes.size() / 2;
+            out.write(candidateBytes.data(), static_cast<std::streamsize>(half));
+            out.flush();
+            GameEngineDraftTestPause("writing");
+            out.write(candidateBytes.data() + half, static_cast<std::streamsize>(candidateBytes.size() - half));
+#else
             out.write(candidateBytes.data(), static_cast<std::streamsize>(candidateBytes.size()));
+#endif
             out.flush();
             if (!out) Fail("temporary draft write failed");
             out.close();
             if (!out) Fail("temporary draft close failed");
         }
+#ifdef GAMEENGINE_DRAFT_CRASH_TEST
+        GameEngineDraftTestPause("staged");
+#endif
         // Create the final directory entry exclusively, in one filesystem
         // operation. A competing writer's output is never overwritten, even
         // if it appeared after the earlier existence check.
@@ -273,5 +355,16 @@ namespace StarterWorldDraftFile
             Fail("cannot create new draft (target may already exist or filesystem lacks hard links): " +
                 error.message());
 #endif
+#ifdef GAMEENGINE_DRAFT_CRASH_TEST
+        GameEngineDraftTestPause("published");
+#endif
     }
+
+    void PublishNew(const std::filesystem::path &source, std::string_view expectedHash,
+        std::string_view candidateBytes, const std::filesystem::path &destination)
+    { Publish(source, expectedHash, candidateBytes, destination, false); }
+
+    void PublishRecoveryCopy(const std::filesystem::path &source, std::string_view expectedHash,
+        std::string_view candidateBytes, const std::filesystem::path &destination)
+    { Publish(source, expectedHash, candidateBytes, destination, true); }
 }

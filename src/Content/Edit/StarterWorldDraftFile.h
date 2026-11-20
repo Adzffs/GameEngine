@@ -21,14 +21,20 @@ namespace StarterWorldDraftFile
     bool ValidDigest(std::string_view digest);
 
     // Requires: candidateBytes is the canonical, runtime-validated snapshot
-    // produced by the typed editor. Recheck the source *under a cooperative
-    // directory lock*, then publish to a fresh output file using an exclusive
-    // create on Windows or a same-filesystem hard link elsewhere. Existing
-    // output is never replaced.
+    // produced by the typed editor. Recheck source under a cooperative OS
+    // lock, then publish complete staged bytes to a fresh sibling. OS locks
+    // release on process death; .embervale.writer.lock files remain and must
+    // not be unlinked. Unknown legacy .embervale.lock directories are refused.
     // Concurrent noncooperating edits to source cannot be made fully atomic.
     // Failure leaves source/destination intact; power-loss durability is not
     // guaranteed. Throws runtime_error; does not remove another writer's lock.
     void PublishNew(const std::filesystem::path &source,
+        std::string_view expectedHash, std::string_view candidateBytes,
+        const std::filesystem::path &destination);
+
+    // Explicit recovery export from a privately replayed base. The selected
+    // new .json target may be in another existing directory; never overwrites.
+    void PublishRecoveryCopy(const std::filesystem::path &source,
         std::string_view expectedHash, std::string_view candidateBytes,
         const std::filesystem::path &destination);
 }

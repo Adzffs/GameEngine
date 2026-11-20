@@ -2,7 +2,8 @@
 
 All edits and saves are executed by EmbervaleWorldMove's validated --session
 command. This Python UI only renders a read-only terrain snapshot and replays
-bounded user commands; it never serializes gameplay content to disk.
+bounded user commands. Private recovery journals copy original bytes and
+accepted commands; C++ remains responsible for all new world snapshots.
 """
 
 from __future__ import annotations
@@ -364,6 +365,7 @@ class StudioBridge:
         self._accept(self._invoke([]))
         if self.hash != display_hash:
             raise StudioError("CONTENT_CONFLICT: source changed while opening; reopen the editor")
+        self.original_bytes = source_bytes
         if self.placements != self.source_placements:
             raise StudioError("The authoritative placements differ from the source snapshot")
         if self.terrain != display_terrain:
@@ -614,11 +616,15 @@ class DraftPlaytest:
         self.directory, self.process = directory, process
 
 
-def launch(bridge: StudioBridge, game: Path | None = None) -> None:
+def launch(bridge: StudioBridge, game: Path | None = None, recovery_root: Path | None = None) -> None:
     # Imported lazily: headless tests and command-line help do not need a display.
     import tkinter as tk
     from tkinter import filedialog, messagebox, ttk
+    from embervale_recovery import RecoveryStore, RecoveryError
+    from embervale_recovery_ui import choose_recovery
 
+    recovery_store = RecoveryStore(recovery_root)
+    recovery_writer = None
     root = tk.Tk()
     root.title("Embervale Studio | Starter World")
     root.geometry("1120x760")
@@ -635,6 +641,7 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
     show_reachability = tk.BooleanVar(value=False)
     saved: str | None = None
     caption = tk.StringVar()
+    recovery_status = tk.StringVar(value="Recovery ready")
     cursor_label = tk.StringVar(value="Tile: —")
     inspector = tk.StringVar(value="Select a placement, then click an empty destination tile")
     frame = ttk.Frame(root, padding=8)
@@ -643,6 +650,7 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
     toolbar.pack(fill="x")
     status_label = ttk.Label(frame, textvariable=caption)
     status_label.pack(fill="x", before=toolbar, pady=(0, 4))
+    ttk.Label(frame, textvariable=recovery_status, wraplength=1050).pack(fill="x", before=toolbar)
     body = ttk.Frame(frame)
     body.pack(fill="both", expand=True, pady=(8, 0))
     sidebar = ttk.Frame(body, width=260)
@@ -769,6 +777,34 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
         remove_button.configure(state="normal" if removable else "disabled")
         actor = selected in bridge.placements and bridge.placements[selected][0] in ("N", "M")
         spawn_button.configure(state="normal" if actor else "disabled")
+        checkpoint_recovery()
+
+    def checkpoint_recovery() -> None:
+        nonlocal recovery_writer
+        try:
+            if bridge.dirty:
+                if recovery_writer is None:
+                    recovery_writer = recovery_store.writer(bridge)
+                recovery_writer.checkpoint(bridge)
+                recovery_status.set("Recovery copy up to date. Save a new draft to keep these edits.")
+            else:
+                if recovery_writer is not None:
+                    recovery_writer.resolve()
+                    recovery_writer = None
+                recovery_status.set("No unsaved edits")
+        except (OSError, RecoveryError) as error:
+            recovery_status.set(f"Recovery copy could not be updated: {error}. Save a new draft to protect your edits.")
+
+    def settle_recovery() -> bool:
+        nonlocal recovery_writer
+        try:
+            if recovery_writer is not None:
+                recovery_writer.resolve()
+                recovery_writer = None
+            return True
+        except (OSError, RecoveryError) as error:
+            messagebox.showerror("Recovery copies kept", str(error), parent=root)
+            return False
 
     def zoom_to(requested_tile: int, anchor: tuple[int, int] | None = None) -> None:
         nonlocal tile
@@ -972,7 +1008,7 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
         if playtest.process is not None and playtest.poll() is None:
             messagebox.showinfo("Playtest running", "Close the game before closing Studio.", parent=root)
             return
-        if may_leave():
+        if may_leave() and settle_recovery():
             root.destroy()
 
     def play() -> None:
@@ -1010,10 +1046,29 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
             return
         if not may_leave():
             return
+        if not settle_recovery():
+            return
         bridge = replacement
         selected = None
         saved = None
         inspector.set("Select a placement, then click an empty destination tile")
+        fit_view()
+        root.after_idle(lambda: recover(quiet=True))
+
+    def recover(quiet: bool = False) -> None:
+        nonlocal bridge, selected, saved
+        try:
+            replacement = choose_recovery(recovery_store, Path(bridge.executable), bridge.source,
+                                          parent=root, quiet=quiet)
+        except (OSError, RecoveryError, StudioError) as error:
+            messagebox.showerror("Recovery unavailable", str(error), parent=root)
+            return
+        if replacement is None or not may_leave() or not settle_recovery():
+            return
+        bridge = replacement
+        selected = None
+        saved = str(replacement.source)
+        inspector.set("Recovered draft opened. Select an object or paint terrain to keep editing.")
         fit_view()
 
     root.protocol("WM_DELETE_WINDOW", close)
@@ -1031,6 +1086,7 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
                  values=tuple(PLAYTEST_PROFILES)).pack(side="right", padx=4)
     ttk.Label(filebar, text="Temporary progress").pack(side="right", padx=4)
     ttk.Button(filebar, text="Open draft…", command=open_world).pack(side="left")
+    ttk.Button(toolbar, text="Recovery…", command=recover).pack(side="right", padx=4)
     ttk.Button(filebar, text="Reopen last saved", command=lambda: open_world(bridge.last_saved)
         if bridge.last_saved else messagebox.showinfo("No saved draft", "Save a new draft first.", parent=root)).pack(side="left", padx=4)
 
@@ -1060,7 +1116,12 @@ def launch(bridge: StudioBridge, game: Path | None = None) -> None:
     choices.bind("<Delete>", remove_selected)
     canvas.bind("<Delete>", remove_selected)
     display()
+    root.update_idletasks()
+    root.lift()
+    root.after_idle(lambda: recover(quiet=True))
     root.mainloop()
+    if recovery_writer is not None:
+        recovery_writer.close()
 
 
 def main() -> int:
@@ -1069,10 +1130,23 @@ def main() -> int:
     parser.add_argument("--tool", type=Path, default=Path("EmbervaleWorldMove"),
                         help="Path to the built EmbervaleWorldMove executable")
     parser.add_argument("--game", type=Path, help="SDL GameEngine executable (defaults beside --tool)")
+    parser.add_argument("--recovery-dir", type=Path, help="Private recovery directory (defaults to user-local state)")
     args = parser.parse_args()
+    from embervale_recovery import RecoveryStore, RecoveryError
     try:
-        launch(StudioBridge(args.tool, args.snapshot), args.game)
-    except StudioError as error:
+        try:
+            bridge = StudioBridge(args.tool, args.snapshot)
+        except (OSError, StudioError):
+            # Damaged/missing originals must not prevent independent recovery.
+            store = RecoveryStore(args.recovery_dir)
+            if not store.candidates(args.snapshot):
+                raise
+            from embervale_recovery_ui import choose_recovery
+            bridge = choose_recovery(store, args.tool, args.snapshot)
+            if bridge is None:
+                return 0
+        launch(bridge, args.game, args.recovery_dir)
+    except (StudioError, RecoveryError, OSError) as error:
         parser.exit(1, f"Embervale Studio: {error}\n")
     return 0
 

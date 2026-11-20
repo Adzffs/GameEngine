@@ -55,6 +55,22 @@ int main()
     test.ExpectEqual(Read(target), std::string("new canonical JSON\n"), "published draft bytes are exact");
     test.Expect(!std::filesystem::exists(source.string() + ".embervale.lock"),
         "successful publication releases cooperative source lock");
+    const auto writerLock = std::filesystem::path(source.string() + ".embervale.writer.lock");
+    test.Expect(std::filesystem::is_regular_file(writerLock),
+        "OS writer-lock sidecar remains for stable lock identity");
+    Write(writerLock, "previous writer metadata");
+    PublishNew(source, baseline, "second draft", temp.path / "second.json");
+    test.ExpectEqual(Read(writerLock), std::string("previous writer metadata"),
+        "abandoned regular lock is reused without truncating its contents");
+    std::filesystem::create_directory(temp.path / "recovered");
+    PublishRecoveryCopy(source, baseline, "recovered bytes", temp.path / "recovered" / "world.json");
+    test.ExpectEqual(Read(temp.path / "recovered" / "world.json"), std::string("recovered bytes"),
+        "explicit recovery export creates a separate new JSON file");
+    test.Expect(Reject([&]{ PublishRecoveryCopy(source, baseline, "x", temp.path / "recovered" / "world.json"); }),
+        "recovery copy refuses occupied destinations");
+    test.Expect(Reject([&]{ PublishRecoveryCopy(source, baseline, "x", temp.path / "recovered" / "not-world.txt"); }),
+        "recovery export only accepts a JSON filename");
+    test.ExpectEqual(Read(source), std::string("hello world\n"), "recovery export leaves base bytes intact");
     test.Expect(Reject([&]{ PublishNew(source, baseline, "another", target); }),
         "cannot overwrite existing draft");
     test.ExpectEqual(Read(target), std::string("new canonical JSON\n"),

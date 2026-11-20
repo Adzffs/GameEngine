@@ -26,5 +26,6 @@ saves/
 
 # Python authoring cache
 __pycache__/
+*.embervale.writer.lock
 /build-review/
 /build-review-headless/

@@ -418,6 +418,17 @@ if(BUILD_TESTING)
             )
             set_tests_properties(StarterWorldVisualBridgeIntegration
                 PROPERTIES LABELS "headless;content;studio")
+            # Compile fault boundaries only into this standalone test probe,
+            # never into GameEngineCore or the editing/runtime executables.
+            add_executable(StarterWorldDraftCrashProbe tests/StarterWorldDraftCrashProbe.cpp
+                src/Content/Edit/StarterWorldDraftFile.cpp)
+            target_compile_definitions(StarterWorldDraftCrashProbe PRIVATE GAMEENGINE_DRAFT_CRASH_TEST)
+            add_test(NAME StudioRecoveryIntegration
+                COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/StudioRecoveryIntegration.py"
+                    --tool "$<TARGET_FILE:EmbervaleWorldMove>"
+                    --probe "$<TARGET_FILE:StarterWorldDraftCrashProbe>"
+                    --fixture "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/content/development-starter.snapshot.json")
+            set_tests_properties(StudioRecoveryIntegration PROPERTIES LABELS "headless;content;studio" TIMEOUT 90)
         endif()
     endif()
 
