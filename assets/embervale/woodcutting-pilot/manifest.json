@@ -1,0 +1,4086 @@
+{
+  "schema": "embervale.authoring-batch",
+  "version": 1,
+  "id": "woodcutting-pilot",
+  "native_tile_size": 32,
+  "editor": "LibreSprite 1.1-dev",
+  "palette_rgb": [
+    "222b2b",
+    "30211d",
+    "563727",
+    "7b4e2e",
+    "b27c48",
+    "935b3d",
+    "be8054",
+    "d99d69",
+    "edbd89",
+    "a69a7e",
+    "dbc79a",
+    "efe0b7",
+    "1f3345",
+    "294b62",
+    "37617d",
+    "5c8395",
+    "8da39c",
+    "20293e",
+    "293b55",
+    "415778",
+    "84622c",
+    "c8a653",
+    "e3c073",
+    "282d2c",
+    "404542",
+    "555d59",
+    "748057",
+    "aaad8b",
+    "9e3f21",
+    "d76f27",
+    "e6943b",
+    "f5c05b",
+    "ffe08a"
+  ],
+  "status": "Eight-way woodcutting action poses and three axe tiers",
+  "facing_order": [
+    "s",
+    "w",
+    "e",
+    "n",
+    "sw",
+    "se",
+    "nw",
+    "ne"
+  ],
+  "cycle_seconds": 1.2,
+  "poses_per_direction": 6,
+  "images": {
+    "player": {
+      "source": "source/player.ase",
+      "image": "textures/player.png",
+      "size": [
+        384,
+        640
+      ],
+      "editor_metadata": "textures/player.export.json",
+      "source_sha256": "234c341354cc0f33ee064757999a945e296fa11fdba9a037edcd8462e1df2289",
+      "image_sha256": "12eda528f60bbf3c06568357eaec635c6d4142481db7875b1e677ab40cdcf996"
+    },
+    "axes": {
+      "source": "source/axes.ase",
+      "image": "textures/axes.png",
+      "size": [
+        384,
+        1920
+      ],
+      "editor_metadata": "textures/axes.export.json",
+      "source_sha256": "b51aa4e107c7690bdf1d2b1db083c2bebaadfd61238032397a8d70bf2e2eb2ab",
+      "image_sha256": "365a27d7054f685196056ced213861290c03025c342490c3fe325cbe307d7264"
+    }
+  },
+  "assets": [
+    {
+      "id": "character.woodcutting.s.0",
+      "image": "player",
+      "rect": [
+        0,
+        0,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.s.0",
+      "image": "axes",
+      "rect": [
+        0,
+        0,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.s.0",
+      "image": "axes",
+      "rect": [
+        0,
+        640,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.s.0",
+      "image": "axes",
+      "rect": [
+        0,
+        1280,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.woodcutting.s.1",
+      "image": "player",
+      "rect": [
+        64,
+        0,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.s.1",
+      "image": "axes",
+      "rect": [
+        64,
+        0,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.s.1",
+      "image": "axes",
+      "rect": [
+        64,
+        640,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.s.1",
+      "image": "axes",
+      "rect": [
+        64,
+        1280,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.woodcutting.s.2",
+      "image": "player",
+      "rect": [
+        128,
+        0,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.s.2",
+      "image": "axes",
+      "rect": [
+        128,
+        0,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.s.2",
+      "image": "axes",
+      "rect": [
+        128,
+        640,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.s.2",
+      "image": "axes",
+      "rect": [
+        128,
+        1280,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.woodcutting.s.3",
+      "image": "player",
+      "rect": [
+        192,
+        0,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.s.3",
+      "image": "axes",
+      "rect": [
+        192,
+        0,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.s.3",
+      "image": "axes",
+      "rect": [
+        192,
+        640,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.s.3",
+      "image": "axes",
+      "rect": [
+        192,
+        1280,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.woodcutting.s.4",
+      "image": "player",
+      "rect": [
+        256,
+        0,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.s.4",
+      "image": "axes",
+      "rect": [
+        256,
+        0,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.s.4",
+      "image": "axes",
+      "rect": [
+        256,
+        640,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.s.4",
+      "image": "axes",
+      "rect": [
+        256,
+        1280,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.woodcutting.s.5",
+      "image": "player",
+      "rect": [
+        320,
+        0,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.s.5",
+      "image": "axes",
+      "rect": [
+        320,
+        0,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.s.5",
+      "image": "axes",
+      "rect": [
+        320,
+        640,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.s.5",
+      "image": "axes",
+      "rect": [
+        320,
+        1280,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.woodcutting.w.0",
+      "image": "player",
+      "rect": [
+        0,
+        80,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.w.0",
+      "image": "axes",
+      "rect": [
+        0,
+        80,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.w.0",
+      "image": "axes",
+      "rect": [
+        0,
+        720,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.w.0",
+      "image": "axes",
+      "rect": [
+        0,
+        1360,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.woodcutting.w.1",
+      "image": "player",
+      "rect": [
+        64,
+        80,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.w.1",
+      "image": "axes",
+      "rect": [
+        64,
+        80,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.w.1",
+      "image": "axes",
+      "rect": [
+        64,
+        720,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.w.1",
+      "image": "axes",
+      "rect": [
+        64,
+        1360,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.woodcutting.w.2",
+      "image": "player",
+      "rect": [
+        128,
+        80,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.w.2",
+      "image": "axes",
+      "rect": [
+        128,
+        80,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.w.2",
+      "image": "axes",
+      "rect": [
+        128,
+        720,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.w.2",
+      "image": "axes",
+      "rect": [
+        128,
+        1360,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.woodcutting.w.3",
+      "image": "player",
+      "rect": [
+        192,
+        80,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.w.3",
+      "image": "axes",
+      "rect": [
+        192,
+        80,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.w.3",
+      "image": "axes",
+      "rect": [
+        192,
+        720,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.w.3",
+      "image": "axes",
+      "rect": [
+        192,
+        1360,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.woodcutting.w.4",
+      "image": "player",
+      "rect": [
+        256,
+        80,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.w.4",
+      "image": "axes",
+      "rect": [
+        256,
+        80,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.w.4",
+      "image": "axes",
+      "rect": [
+        256,
+        720,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.w.4",
+      "image": "axes",
+      "rect": [
+        256,
+        1360,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.woodcutting.w.5",
+      "image": "player",
+      "rect": [
+        320,
+        80,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.w.5",
+      "image": "axes",
+      "rect": [
+        320,
+        80,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.w.5",
+      "image": "axes",
+      "rect": [
+        320,
+        720,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.w.5",
+      "image": "axes",
+      "rect": [
+        320,
+        1360,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.woodcutting.e.0",
+      "image": "player",
+      "rect": [
+        0,
+        160,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.e.0",
+      "image": "axes",
+      "rect": [
+        0,
+        160,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.e.0",
+      "image": "axes",
+      "rect": [
+        0,
+        800,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.e.0",
+      "image": "axes",
+      "rect": [
+        0,
+        1440,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.woodcutting.e.1",
+      "image": "player",
+      "rect": [
+        64,
+        160,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.e.1",
+      "image": "axes",
+      "rect": [
+        64,
+        160,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.e.1",
+      "image": "axes",
+      "rect": [
+        64,
+        800,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.e.1",
+      "image": "axes",
+      "rect": [
+        64,
+        1440,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.woodcutting.e.2",
+      "image": "player",
+      "rect": [
+        128,
+        160,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.e.2",
+      "image": "axes",
+      "rect": [
+        128,
+        160,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.e.2",
+      "image": "axes",
+      "rect": [
+        128,
+        800,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.e.2",
+      "image": "axes",
+      "rect": [
+        128,
+        1440,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.woodcutting.e.3",
+      "image": "player",
+      "rect": [
+        192,
+        160,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.e.3",
+      "image": "axes",
+      "rect": [
+        192,
+        160,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.e.3",
+      "image": "axes",
+      "rect": [
+        192,
+        800,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.e.3",
+      "image": "axes",
+      "rect": [
+        192,
+        1440,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.woodcutting.e.4",
+      "image": "player",
+      "rect": [
+        256,
+        160,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.e.4",
+      "image": "axes",
+      "rect": [
+        256,
+        160,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.e.4",
+      "image": "axes",
+      "rect": [
+        256,
+        800,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.e.4",
+      "image": "axes",
+      "rect": [
+        256,
+        1440,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.woodcutting.e.5",
+      "image": "player",
+      "rect": [
+        320,
+        160,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.e.5",
+      "image": "axes",
+      "rect": [
+        320,
+        160,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.e.5",
+      "image": "axes",
+      "rect": [
+        320,
+        800,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.e.5",
+      "image": "axes",
+      "rect": [
+        320,
+        1440,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.woodcutting.n.0",
+      "image": "player",
+      "rect": [
+        0,
+        240,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.n.0",
+      "image": "axes",
+      "rect": [
+        0,
+        240,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.n.0",
+      "image": "axes",
+      "rect": [
+        0,
+        880,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.n.0",
+      "image": "axes",
+      "rect": [
+        0,
+        1520,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.woodcutting.n.1",
+      "image": "player",
+      "rect": [
+        64,
+        240,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.n.1",
+      "image": "axes",
+      "rect": [
+        64,
+        240,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.n.1",
+      "image": "axes",
+      "rect": [
+        64,
+        880,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.n.1",
+      "image": "axes",
+      "rect": [
+        64,
+        1520,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.woodcutting.n.2",
+      "image": "player",
+      "rect": [
+        128,
+        240,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.n.2",
+      "image": "axes",
+      "rect": [
+        128,
+        240,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.n.2",
+      "image": "axes",
+      "rect": [
+        128,
+        880,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.n.2",
+      "image": "axes",
+      "rect": [
+        128,
+        1520,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.woodcutting.n.3",
+      "image": "player",
+      "rect": [
+        192,
+        240,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.n.3",
+      "image": "axes",
+      "rect": [
+        192,
+        240,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.n.3",
+      "image": "axes",
+      "rect": [
+        192,
+        880,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.n.3",
+      "image": "axes",
+      "rect": [
+        192,
+        1520,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.woodcutting.n.4",
+      "image": "player",
+      "rect": [
+        256,
+        240,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.n.4",
+      "image": "axes",
+      "rect": [
+        256,
+        240,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.n.4",
+      "image": "axes",
+      "rect": [
+        256,
+        880,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.n.4",
+      "image": "axes",
+      "rect": [
+        256,
+        1520,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.woodcutting.n.5",
+      "image": "player",
+      "rect": [
+        320,
+        240,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.n.5",
+      "image": "axes",
+      "rect": [
+        320,
+        240,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.n.5",
+      "image": "axes",
+      "rect": [
+        320,
+        880,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.n.5",
+      "image": "axes",
+      "rect": [
+        320,
+        1520,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.woodcutting.sw.0",
+      "image": "player",
+      "rect": [
+        0,
+        320,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.sw.0",
+      "image": "axes",
+      "rect": [
+        0,
+        320,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.sw.0",
+      "image": "axes",
+      "rect": [
+        0,
+        960,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.sw.0",
+      "image": "axes",
+      "rect": [
+        0,
+        1600,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.woodcutting.sw.1",
+      "image": "player",
+      "rect": [
+        64,
+        320,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.sw.1",
+      "image": "axes",
+      "rect": [
+        64,
+        320,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.sw.1",
+      "image": "axes",
+      "rect": [
+        64,
+        960,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.sw.1",
+      "image": "axes",
+      "rect": [
+        64,
+        1600,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.woodcutting.sw.2",
+      "image": "player",
+      "rect": [
+        128,
+        320,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.sw.2",
+      "image": "axes",
+      "rect": [
+        128,
+        320,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.sw.2",
+      "image": "axes",
+      "rect": [
+        128,
+        960,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.sw.2",
+      "image": "axes",
+      "rect": [
+        128,
+        1600,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.woodcutting.sw.3",
+      "image": "player",
+      "rect": [
+        192,
+        320,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.sw.3",
+      "image": "axes",
+      "rect": [
+        192,
+        320,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.sw.3",
+      "image": "axes",
+      "rect": [
+        192,
+        960,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.sw.3",
+      "image": "axes",
+      "rect": [
+        192,
+        1600,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.woodcutting.sw.4",
+      "image": "player",
+      "rect": [
+        256,
+        320,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.sw.4",
+      "image": "axes",
+      "rect": [
+        256,
+        320,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.sw.4",
+      "image": "axes",
+      "rect": [
+        256,
+        960,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.sw.4",
+      "image": "axes",
+      "rect": [
+        256,
+        1600,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.woodcutting.sw.5",
+      "image": "player",
+      "rect": [
+        320,
+        320,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.sw.5",
+      "image": "axes",
+      "rect": [
+        320,
+        320,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.sw.5",
+      "image": "axes",
+      "rect": [
+        320,
+        960,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.sw.5",
+      "image": "axes",
+      "rect": [
+        320,
+        1600,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.woodcutting.se.0",
+      "image": "player",
+      "rect": [
+        0,
+        400,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.se.0",
+      "image": "axes",
+      "rect": [
+        0,
+        400,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.se.0",
+      "image": "axes",
+      "rect": [
+        0,
+        1040,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.se.0",
+      "image": "axes",
+      "rect": [
+        0,
+        1680,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.woodcutting.se.1",
+      "image": "player",
+      "rect": [
+        64,
+        400,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.se.1",
+      "image": "axes",
+      "rect": [
+        64,
+        400,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.se.1",
+      "image": "axes",
+      "rect": [
+        64,
+        1040,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.se.1",
+      "image": "axes",
+      "rect": [
+        64,
+        1680,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.woodcutting.se.2",
+      "image": "player",
+      "rect": [
+        128,
+        400,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.se.2",
+      "image": "axes",
+      "rect": [
+        128,
+        400,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.se.2",
+      "image": "axes",
+      "rect": [
+        128,
+        1040,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.se.2",
+      "image": "axes",
+      "rect": [
+        128,
+        1680,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.woodcutting.se.3",
+      "image": "player",
+      "rect": [
+        192,
+        400,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.se.3",
+      "image": "axes",
+      "rect": [
+        192,
+        400,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.se.3",
+      "image": "axes",
+      "rect": [
+        192,
+        1040,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.se.3",
+      "image": "axes",
+      "rect": [
+        192,
+        1680,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.woodcutting.se.4",
+      "image": "player",
+      "rect": [
+        256,
+        400,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.se.4",
+      "image": "axes",
+      "rect": [
+        256,
+        400,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.se.4",
+      "image": "axes",
+      "rect": [
+        256,
+        1040,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.se.4",
+      "image": "axes",
+      "rect": [
+        256,
+        1680,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.woodcutting.se.5",
+      "image": "player",
+      "rect": [
+        320,
+        400,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.se.5",
+      "image": "axes",
+      "rect": [
+        320,
+        400,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.se.5",
+      "image": "axes",
+      "rect": [
+        320,
+        1040,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.se.5",
+      "image": "axes",
+      "rect": [
+        320,
+        1680,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.woodcutting.nw.0",
+      "image": "player",
+      "rect": [
+        0,
+        480,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.nw.0",
+      "image": "axes",
+      "rect": [
+        0,
+        480,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.nw.0",
+      "image": "axes",
+      "rect": [
+        0,
+        1120,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.nw.0",
+      "image": "axes",
+      "rect": [
+        0,
+        1760,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.woodcutting.nw.1",
+      "image": "player",
+      "rect": [
+        64,
+        480,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.nw.1",
+      "image": "axes",
+      "rect": [
+        64,
+        480,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.nw.1",
+      "image": "axes",
+      "rect": [
+        64,
+        1120,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.nw.1",
+      "image": "axes",
+      "rect": [
+        64,
+        1760,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.woodcutting.nw.2",
+      "image": "player",
+      "rect": [
+        128,
+        480,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.nw.2",
+      "image": "axes",
+      "rect": [
+        128,
+        480,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.nw.2",
+      "image": "axes",
+      "rect": [
+        128,
+        1120,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.nw.2",
+      "image": "axes",
+      "rect": [
+        128,
+        1760,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.woodcutting.nw.3",
+      "image": "player",
+      "rect": [
+        192,
+        480,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.nw.3",
+      "image": "axes",
+      "rect": [
+        192,
+        480,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.nw.3",
+      "image": "axes",
+      "rect": [
+        192,
+        1120,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.nw.3",
+      "image": "axes",
+      "rect": [
+        192,
+        1760,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.woodcutting.nw.4",
+      "image": "player",
+      "rect": [
+        256,
+        480,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.nw.4",
+      "image": "axes",
+      "rect": [
+        256,
+        480,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.nw.4",
+      "image": "axes",
+      "rect": [
+        256,
+        1120,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.nw.4",
+      "image": "axes",
+      "rect": [
+        256,
+        1760,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.woodcutting.nw.5",
+      "image": "player",
+      "rect": [
+        320,
+        480,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.nw.5",
+      "image": "axes",
+      "rect": [
+        320,
+        480,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.nw.5",
+      "image": "axes",
+      "rect": [
+        320,
+        1120,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.nw.5",
+      "image": "axes",
+      "rect": [
+        320,
+        1760,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.woodcutting.ne.0",
+      "image": "player",
+      "rect": [
+        0,
+        560,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.ne.0",
+      "image": "axes",
+      "rect": [
+        0,
+        560,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.ne.0",
+      "image": "axes",
+      "rect": [
+        0,
+        1200,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.ne.0",
+      "image": "axes",
+      "rect": [
+        0,
+        1840,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.woodcutting.ne.1",
+      "image": "player",
+      "rect": [
+        64,
+        560,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.ne.1",
+      "image": "axes",
+      "rect": [
+        64,
+        560,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.ne.1",
+      "image": "axes",
+      "rect": [
+        64,
+        1200,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.ne.1",
+      "image": "axes",
+      "rect": [
+        64,
+        1840,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.woodcutting.ne.2",
+      "image": "player",
+      "rect": [
+        128,
+        560,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.ne.2",
+      "image": "axes",
+      "rect": [
+        128,
+        560,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.ne.2",
+      "image": "axes",
+      "rect": [
+        128,
+        1200,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.ne.2",
+      "image": "axes",
+      "rect": [
+        128,
+        1840,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.woodcutting.ne.3",
+      "image": "player",
+      "rect": [
+        192,
+        560,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.ne.3",
+      "image": "axes",
+      "rect": [
+        192,
+        560,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.ne.3",
+      "image": "axes",
+      "rect": [
+        192,
+        1200,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.ne.3",
+      "image": "axes",
+      "rect": [
+        192,
+        1840,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.woodcutting.ne.4",
+      "image": "player",
+      "rect": [
+        256,
+        560,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.ne.4",
+      "image": "axes",
+      "rect": [
+        256,
+        560,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.ne.4",
+      "image": "axes",
+      "rect": [
+        256,
+        1200,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.ne.4",
+      "image": "axes",
+      "rect": [
+        256,
+        1840,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.woodcutting.ne.5",
+      "image": "player",
+      "rect": [
+        320,
+        560,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.bronze.woodcutting.ne.5",
+      "image": "axes",
+      "rect": [
+        320,
+        560,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.iron.woodcutting.ne.5",
+      "image": "axes",
+      "rect": [
+        320,
+        1200,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.axe.steel.woodcutting.ne.5",
+      "image": "axes",
+      "rect": [
+        320,
+        1840,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 5
+    }
+  ],
+  "provenance": {
+    "creator": "Codex-assisted LibreSprite authoring for Adam Holland",
+    "source": "../cast-pilot/source/player.ase",
+    "source_sha256": "ad124d64f500ecd0af1ab8d526f84447e2c2f888236014c90d2b67fc06df4241",
+    "notes": "Original player outfit retained; action poses, arms and axes authored in LibreSprite JavaScript.",
+    "licence": "No separate asset licence grant declared; repository distribution policy applies."
+  },
+  "previews": {
+    "chop-cycle.gif": {
+      "path": "previews/chop-cycle.gif",
+      "sha256": "69f76b5871912b168698391b4ede5fc23f6c717e164431ecb6ce8bfb944ca581"
+    },
+    "chop-contact.png": {
+      "path": "previews/chop-contact.png",
+      "sha256": "7fe7c1b0d42a96949dbcb1cebdf121d6fb9846086d11610258a9f2df03d1cb84"
+    },
+    "axe-tiers.png": {
+      "path": "previews/axe-tiers.png",
+      "sha256": "eeb497fa67f40f2fc62930a5c18c8c31508049277a870ce4994118edf700888d"
+    }
+  }
+}

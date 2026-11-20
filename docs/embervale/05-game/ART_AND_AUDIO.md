@@ -1,7 +1,7 @@
 # Art, animation and audio production guide
 
-**Status:** Six world-art batches render terrain, cast, resources, services, the workshop and contextual variation in the SDL client, with the accepted player walk cycle preserved. A general importer and the broader production workflow below remain proposed.\
-**Reviewed:** 19 November 2026.\
+**Status:** Seven world-art batches render terrain, cast, resources, services, buildings, contextual variation and woodcutting actions. The player has eight-way walking and chopping; the shared cache covers 983 frames in 28 textures. A general importer and the broader production workflow below remain proposed.\
+**Reviewed:** 20 November 2026.\
 **Purpose:** Replace placeholder presentation in manageable steps while preserving gameplay and making assets easy for humans and AI to work with.
 
 ## First editable batch
@@ -38,13 +38,20 @@ binding and PNGs rather than parsing a new JSON schema.
 ## 1. Current presentation and the recommended transition
 
 The next [cast pilot](../../../assets/embervale/cast-pilot/README.md) is now
-integrated: a four-direction player walk sheet, Mara's blue/gold warden sprite,
+integrated: an eight-direction player walk sheet, Mara's blue/gold warden sprite,
 and a stone furnace. The same cache and generated binding handle both batches.
 Walking follows visual travel distance and stops on a neutral frame. See the
 [cast integration record](../06-development/CAST_RENDERING_2026-11-19.md) for
 editable source/export details and actual River Crossing captures. Player/prop
 art is now present in this bounded pilot; the remaining cast, gear, animation
 states and visible acceptance remain open.
+
+The [woodcutting batch](../../../assets/embervale/woodcutting-pilot/README.md)
+adds six action poses in every direction and bronze/iron/steel axe overlays.
+The player faces the active tree, swings while gathering and stops cleanly on
+interruption. Contact chips are cosmetic; floating log/XP feedback consumes
+committed world rewards, including depletion. [Local checks and game captures](../06-development/WOODCUTTING_ANIMATION_2026-11-20.md).
+Mining, combat, remaining cast and other action states remain open.
 
 The current client uses SDL3 drawing code for the world and entities. `Graphics.h` defines a 32-pixel tile size and a 1280×720 window. The rendering code includes terrain colours, resource shapes, combat feedback and world labels. This does not establish an existing general-purpose sprite import pipeline. Sources: [Graphics.h](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Graphics/Graphics.h), [Graphics.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Graphics/Graphics.cpp).
 

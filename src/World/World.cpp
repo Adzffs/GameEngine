@@ -1989,6 +1989,7 @@ void World::Update()
     Logger::Debug("Updating World");
 
     entityDiedEvents.clear();
+    gatheringRewardEvents.clear();
     publishedActionLifecycleEvents.clear();
     publishedNpcTalkEvents.clear();
     publishedShopOpenedEvents.clear();
@@ -4384,6 +4385,11 @@ void World::ProcessCompletedActions(
             }
 
             resource->ConsumeUse();
+
+            gatheringRewardEvents.push_back({player->GetID(), resource->GetID(), currentTick,
+                resource->GetResourceType(), resource->GetX(), resource->GetY(),
+                player->GetPosition().GetX(), player->GetPosition().GetY(),
+                gatheringOutcome.rewardItem, gatheringOutcome.rewardAmount, gatheringOutcome.xpReward});
 
             Logger::Debug(
                 resourceDefinition.GetName() +

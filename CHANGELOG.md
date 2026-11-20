@@ -4,6 +4,15 @@ This file records reviewable project changes going forward. Historical work is d
 
 ## Unreleased
 
+### Woodcutting animation and reward feedback
+
+- Add eight-way chopping poses, bronze/iron/steel axe visuals and contact chips.
+- Face the active tree and stop the swing on movement, cancellation, depletion or death.
+- Show floating log/XP feedback from committed gathering results, including the final tree use.
+- Add editable action art, reproducible exports and focused state/renderer coverage.
+
+See the [woodcutting record](docs/embervale/06-development/WOODCUTTING_ANIMATION_2026-11-20.md).
+
 ### Eight-way default character animation
 
 - Add southwest, southeast, northwest and northeast player sprites and walk cycles.
