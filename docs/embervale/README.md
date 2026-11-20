@@ -31,6 +31,7 @@
 | How is the settlement arranged? | [River Crossing geography](05-game/RIVER_CROSSING.md) |
 | How should future animations be authored and reviewed? | [Animation guide](05-game/ANIMATION_GUIDE.md) |
 | What did the animation research and polish establish? | [Sources, measured findings and prototype status](06-development/ANIMATION_RESEARCH_2026-11-20.md) |
+| Which sounds and controls are implemented? | [Action audio and packaging results](06-development/ACTION_AUDIO_2026-11-20.md) |
 | What still needs resolving? | [Risk register](07-decisions/RISKS_AND_QUESTIONS.md) |
 
 Use [current status](01-current-state/CURRENT_STATUS.md) for the maintained implementation/evidence summary. Original baseline inventories remain dated references. The [project review](06-development/PROJECT_REVIEW_2026-11-20.md) reconciles editor/art work and the local animation branch, records the safety fixes and identifies work before audio. Milestone releases and visible starter/animation acceptance remain incomplete.
@@ -109,6 +110,7 @@ Use [current status](01-current-state/CURRENT_STATUS.md) for the maintained impl
 |---|---|
 | [PROJECT_REVIEW_2026-11-20.md](06-development/PROJECT_REVIEW_2026-11-20.md) | Full review, three integrity fixes, current evidence and remaining priorities |
 | [INTEGRATION_HANDOFF_2026-11-20.md](06-development/INTEGRATION_HANDOFF_2026-11-20.md) | Interrupted local Mining/melee integration, recovery details and pending starter/audio checks |
+| [ACTION_AUDIO_2026-11-20.md](06-development/ACTION_AUDIO_2026-11-20.md) | First sound pass, controls, runtime-copy fix, current Linux evidence and remaining acceptance |
 | [GETTING_STARTED.md](06-development/GETTING_STARTED.md) | Local CMake setup, Windows client, saves and editor guidance |
 | [FRESH_PLAYER_PROFILE_2026-11-19.md](06-development/FRESH_PLAYER_PROFILE_2026-11-19.md) | Fresh-profile implementation, successful builds and deferred acceptance |
 | [RIVER_CROSSING_BLOCKOUT_2026-11-19.md](06-development/RIVER_CROSSING_BLOCKOUT_2026-11-19.md) | Authored map, generation/build evidence, identity/lifecycle contract and remaining acceptance |

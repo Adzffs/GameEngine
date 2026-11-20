@@ -177,15 +177,15 @@ For each animated definition, record idle, movement, action and state-transition
 
 Include a static or reduced-motion presentation where necessary for readability. Avoid relying on repeated flashing to identify every important object. The animation review should include whether the player can see a target and understand an action while several effects overlap.
 
-## 8. Audio plan
+## 8. Action audio and remaining work
 
-This documentation does not verify a completed gameplay audio pipeline. Treat audio as a planned production area and first audit existing hooks before choosing a library or subsystem. The first useful sounds are action confirmations and warnings: movement context where useful, a successful gather, depletion, a hit or miss, low health, an interaction confirmation and a transaction error.
+The [first action-sound pass](../06-development/ACTION_AUDIO_2026-11-20.md) is implemented on the current published source. Its [batch](../../../assets/embervale/audio-pilot/README.md) contains 15 original generated PCM effects with source, manifest, exact regeneration and provenance. Local contact, swing, hit/miss/block, successful gather/craft, accepted equipment, food and inventory actions have bounded feedback.
 
-Every sound should have an event, priority, volume category and repetition policy. A gathering loop must not play uncontrolled overlapping sounds for every update. Ambient water, woodland and workshop loops can communicate districts, but they must not mask critical feedback. Keep gameplay facts available through visual or textual cues as well.
+Settings provides independent effects volume and mute; F8 toggles mute and F9/F10 adjust volume. Controls apply to the current session. Six streams, cooldowns and bounded event routing prevent delayed or uncontrolled overlap. Missing/invalid optional clips or an unavailable device leave gameplay usable. Core remains SDL-free.
 
-Provide separate master, music and effects controls when the pipeline is implemented; define an ambient category if it improves control. Record licence/provenance for audio exactly as for images. Avoid adding a large soundtrack before the event system, mixing and volume controls are reliable.
+ART-004 remains in progress: physical-device/Windows audible quality, balance/repetition in the complete starter journey and synchronization with the missing local melee implementation are open. The software/dummy checks do not establish those results. Preserve the new event and copy-owner boundaries when recovering REL-004.
 
-The [integration handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md#bounded-sound-pass-after-integration-and-route-checks) scopes ART-004's first pass to action/result feedback with effects volume and mute. It records committed-event boundaries, repetition limits, missing-device behavior and audible verification. Music/ambient controls belong with those later implemented categories. This remains a proposed implementation; the interrupted integration has not delivered audio.
+Music, ambient loops, footsteps, broader warnings and persistent client preferences can be considered after this pass is heard in real play. Add controls for those categories when they exist. Keep gameplay facts visible/textual as well as audible, and record source and distribution permission for any later third-party audio.
 
 ## 9. Acceptance checklist and maintenance
 

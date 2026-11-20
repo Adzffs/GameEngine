@@ -1,8 +1,8 @@
 {
   "version": 1,
   "reviewed_date": "2026-11-20",
-  "current_verified_master": "38552c255649c61060bf42931f17f3e524229d4b",
-  "verification_reconciliation": "The 20 November project review supersedes stale unbuilt/Windows-unverified and planned-only notes for implemented features. Published safety fixes: 102/102 Windows SDL, 87/87 standalone headless, 42/42 Python units, including 12 real bridge cases. Separate local animation line passes 101/101 and remains unintegrated. Starter replay is 454 simulation ticks, not human time. Manual/platform/recovery/quality acceptance remains open. See docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
+  "current_verified_master": "9b496c8e59556511c2e274394b6c8c071f09c63a",
+  "verification_reconciliation": "Latest published action-audio/packaging source 9b496c8: Linux 107/107 SDL configuration, 89/89 separate SDL-free headless, 42/42 Python units, including 12 real bridge cases. Fifteen original effects and independent volume/mute are implemented; audible/Windows/full starter acceptance remains open. Original Windows animation work is still unavailable and REL-004 remains in progress. The 20 November review retains its historical Windows 102/87 and separate local 101 results. See docs/embervale/06-development/ACTION_AUDIO_2026-11-20.md",
   "repository": "Adzffs/GameEngine",
   "baseline_commit": "e9d32932e8f9b27e96283313cca320058792a81f",
   "status_policy": "Complete means bounded stated acceptance has evidence and is published on the default branch. In_progress retains remaining scope/acceptance; planned is future work. Historical reports remain dated. Acceptance tasks can measure an implemented candidate before human signoff closes its parent feature.",
@@ -174,7 +174,7 @@
       "dependencies": [
         "ENG-002"
       ],
-      "acceptance": "Replay the source-derived Log→planks→shield chain; record actual net coins, constraints and stock behaviour; correct/test confirmed loops before balance signoff.",
+      "acceptance": "Replay the source-derived Log\u2192planks\u2192shield chain; record actual net coins, constraints and stock behaviour; correct/test confirmed loops before balance signoff.",
       "github_issue": null,
       "evidence": [
         "docs/embervale/06-development/STARTER_ECONOMY_2026-11-19.md",
@@ -241,7 +241,7 @@
         "STUDIO-011",
         "STUDIO-004"
       ],
-      "acceptance": "Export actual 100×100 definitions, pond, overlays, placements and lifecycle metadata; compare complete semantic baseline.",
+      "acceptance": "Export actual 100\u00d7100 definitions, pond, overlays, placements and lifecycle metadata; compare complete semantic baseline.",
       "github_issue": null,
       "evidence": [
         "src/Tools/WorldExportMain.cpp",
@@ -599,7 +599,7 @@
         "tests/test_world_editor_bridge.py",
         "docs/embervale/06-development/MASTER_ACCEPTANCE_2026-11-19.md"
       ],
-      "notes": "Merged PRs #21–#22 provide collision, spawn, static reachability and selected resource/station approach overlays with an approach count. Keyboard/accessibility audit and broader diagnostics remain open."
+      "notes": "Merged PRs #21\u2013#22 provide collision, spawn, static reachability and selected resource/station approach overlays with an approach count. Keyboard/accessibility audit and broader diagnostics remain open."
     },
     {
       "id": "STUDIO-090",
@@ -809,9 +809,10 @@
         "src/Graphics/Graphics.cpp",
         "src/World/World.cpp",
         "tests/ServerCommandQueueTests.cpp",
-        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
+        "docs/embervale/06-development/ACTION_AUDIO_2026-11-20.md"
       ],
-      "notes": "Current unfunded River Crossing replay equips shield at 245, sword at 376 and prepares the return at 454 simulation ticks (observed twice). It gathers 10 Logs/5 Copper/3 Tin in 31 attempts, banks 8 Logs, earns 20 quest coins, spends 16 on two meat and keeps 4. Older 451-tick evidence is historical. Regressions pass; uncoached navigation, combat/food/recovery pressure and the human 10-15 minute target remain unmeasured."
+      "notes": "Current unfunded River Crossing replay equips shield at 245, sword at 376 and prepares the return at 454 simulation ticks (observed twice). It gathers 10 Logs/5 Copper/3 Tin in 31 attempts, banks 8 Logs, earns 20 quest coins, spends 16 on two meat and keeps 4. Older 451-tick evidence is historical. Regressions pass; uncoached navigation, combat/food/recovery pressure and the human 10-15 minute target remain unmeasured. Replayed on Linux before and after action audio at 9b496c8e59556511c2e274394b6c8c071f09c63a: both starter and timber JSON outputs are byte-identical. This is software replay evidence, not a visible/uncoached playthrough."
     },
     {
       "id": "GAME-005",
@@ -891,9 +892,10 @@
       "github_issue": null,
       "evidence": [
         "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
-        "docs/embervale/06-development/INTEGRATION_HANDOFF_2026-11-20.md"
+        "docs/embervale/06-development/INTEGRATION_HANDOFF_2026-11-20.md",
+        "docs/embervale/06-development/ACTION_AUDIO_2026-11-20.md"
       ],
-      "notes": "Pilot exports/cache validate current geometry/fallback and renderer checks pass. Several POST_BUILD commands still copy to shared texture destinations. Give copying one owner or explicit serialization/dependencies, verify clean/incremental parallel builds and packaged hashes, then measure memory/resource limits. An earlier local refresh recorded a copy race; this review's full builds passed. The interrupted REL-004 candidate drafts a single GameEngineWorldArt copy owner; clean/incremental parallel-build and packaged-hash verification remain outstanding. See the integration handoff."
+      "notes": "Runtime copying now has one GameEngineWorldArt owner, including sounds. The baseline failed to repair three corrupted outputs; the fix repaired corruption and two deleted outputs without compiling C++. All 30 textures and 15 WAVs match source in Debug and a separate Ninja Multi-Config Release copy test with graphics-only first consumer and spaces in the output path. Linux tests pass at 9b496c8e59556511c2e274394b6c8c071f09c63a. Wider image/atlas memory/resource-limit acceptance and Windows packaging follow-up remain open."
     },
     {
       "id": "ART-001",
@@ -959,7 +961,7 @@
       "milestone": "R4",
       "priority": "P2",
       "title": "Introduce a restrained audio set",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "ART-001",
         "REL-004"
@@ -968,9 +970,10 @@
       "github_issue": null,
       "evidence": [
         "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
-        "docs/embervale/06-development/INTEGRATION_HANDOFF_2026-11-20.md"
+        "docs/embervale/06-development/INTEGRATION_HANDOFF_2026-11-20.md",
+        "docs/embervale/06-development/ACTION_AUDIO_2026-11-20.md"
       ],
-      "notes": "Start after the integrated build is published and the fresh route observed. Use action/result identities for swing/impact/success, bounded repetition/polyphony, independent effects volume/mute and missing-asset fallback. Record audio creation/licensing. This remains planned. The integration handoff records the proposed event/authority boundaries and verification cases; no audio implementation or audible acceptance is claimed."
+      "notes": "A bounded sound pass is published at 9b496c8e59556511c2e274394b6c8c071f09c63a against current Mining/shared-gathering source: 15 original generated PCM effects; committed result/command routing, contact edges, fatal melee events, six voices, cooldowns, effects volume/mute and F8/F9/F10. Linux SDL/headless/asset/UI tests pass. This independent work proceeded while the original Windows animation worktree was unavailable. Preserve it during REL-004. Dependencies and completion stay open for original animation reconciliation, full starter observation, physical-device/Windows audible quality and repetition/balance acceptance. Preferences currently apply per session."
     },
     {
       "id": "GAME-006",
@@ -1315,7 +1318,7 @@
         "STUDIO-080",
         "ENG-010"
       ],
-      "acceptance": "24×24 fixture proves stairs/cliffs/diagonals and NPC navigation with authoritative transition rules.",
+      "acceptance": "24\u00d724 fixture proves stairs/cliffs/diagonals and NPC navigation with authoritative transition rules.",
       "github_issue": null,
       "evidence": [],
       "notes": "Planning ID; not a GitHub issue number."
@@ -1632,9 +1635,10 @@
       "github_issue": null,
       "evidence": [
         "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
-        "docs/embervale/06-development/INTEGRATION_HANDOFF_2026-11-20.md"
+        "docs/embervale/06-development/INTEGRATION_HANDOFF_2026-11-20.md",
+        "docs/embervale/06-development/ACTION_AUDIO_2026-11-20.md"
       ],
-      "notes": "Local animation began at 688221b and includes safety fixes at 196a279. GitHub includes Mining and safety fixes at 38552c255649c61060bf42931f17f3e524229d4b. Synthetic local snapshot ancestry must not replace master. Visual quality remains ART-005. Integration started in local worktree GameEngine-next on feat/integrated-combat-audio. Shared gathering, six-pose Mining/eight-pose chopping and melee/atlas conflicts were resolved in working files; configure completed. The execution environment became unavailable before build/export results could be retrieved. Uncommitted implementation is not published or verified; recover the existing worktree and follow the dated integration handoff."
+      "notes": "Local animation began at 688221b and includes safety fixes at 196a279. GitHub includes Mining and safety fixes at 38552c255649c61060bf42931f17f3e524229d4b. Synthetic local snapshot ancestry must not replace master. Visual quality remains ART-005. Integration started in local worktree GameEngine-next on feat/integrated-combat-audio. Shared gathering, six-pose Mining/eight-pose chopping and melee/atlas conflicts were resolved in working files; configure completed. The execution environment became unavailable before build/export results could be retrieved. Uncommitted implementation is not published or verified; recover the existing worktree and follow the dated integration handoff. The replacement Linux workspace lacks the original Windows prototype. Independent audio/copy work is published at 9b496c8e59556511c2e274394b6c8c071f09c63a; preserve its single copy owner, gathering contact edges and per-tick fatal melee outcomes when recovering the original integration. It does not recover or publish the missing editable melee/polish assets."
     },
     {
       "id": "ART-005",

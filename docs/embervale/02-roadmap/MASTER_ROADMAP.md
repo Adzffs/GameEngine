@@ -18,11 +18,11 @@ The review fixed recovery-file deletion after failed loads (ENG-003), crafting c
 
 1. **REL-004:** reconcile/publish local melee/equipment with the newer Mining/shared-gathering implementation and matching editable sources/previews.
 2. **GAME-005 / GAME-004:** observe the integrated fresh route, including navigation, crafting, bank/shop, combat/food, death/recovery and save/reload. Current production replay is 454 simulation ticks; human time is unmeasured.
-3. **ART-004:** add the small sound set with event identity, effects volume/mute, repetition limits and provenance.
+3. **ART-004:** finish acceptance of the implemented first sound pass: audible/device balance, Windows and synchronization with the recovered animation candidate.
 
 The owner is not satisfied with the current animation appearance and deferred polish. Keep ART-005 open. Autosave, interrupted editor recovery, validated publication, asset-copy ownership and accessibility have explicit tasks.
 
-Integration was started in a separate local worktree, then the execution environment became unavailable before combined build/export results could be retrieved. REL-004 is **in progress**, with its implementation still unpublished and unverified. The [integration handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md) records the resolved boundaries, recovery position and pending checks. GAME-005 and ART-004 remain planned.
+The original Windows integration worktree remains unavailable, so REL-004 stays **in progress**. Independent work on the restored published source has delivered the first sound pass and fixed runtime asset copying; [results and limits](../06-development/ACTION_AUDIO_2026-11-20.md). ART-004 is **in progress** with audible/device and integration acceptance open. GAME-005 remains planned; the [original recovery handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md) still applies.
 
 ## 3. Roadmap at a glance
 
@@ -279,7 +279,7 @@ These are aspirations, not promised release dates. Keep features that reinforce 
 | Completed in this review | ENG-003, ENG-004, GAME-009, QA-004 | Reproduced integrity defects fixed; current checks and stale expectations reconciled |
 | Next | REL-004 | Combined published Mining/melee/equipment and matching assets/previews |
 | Then | GAME-005 and GAME-004 | Fresh route with real elapsed time, confusion, food/combat/recovery findings |
-| After blocking route fixes | ART-004 | Small sound set, independent effects controls and correct event routing |
+| During starter acceptance | ART-004 | First sound pass implemented; finish audible/device review and synchronization with the recovered animation candidate |
 | Reliability work | GAME-010, STUDIO-025/026, STUDIO-063, QA-003 | Autosave, recovery/publication, packaging and visible usability |
 | Owner-deferred | ART-005 | Posing, weight, timing/transitions and visual acceptance |
 | As concrete changes require | ENG-005/006 | Progression/health integer policy and targeted responsibility extraction |
@@ -298,4 +298,4 @@ Use one active implementation slice per contributor, with clear file ownership f
 
 Update a task status only with evidence. Preserve IDs when moving a task between milestones, record the reason and update dependencies. Archive obsolete decisions rather than silently losing them. When a release is complete, link the exact tag/commit, validation record, known issues and user documentation.
 
-This structure lets Embervale grow while keeping the next useful action clear: **protect progression, reconcile the builds, observe the fresh starter loop, then add the bounded sound pass.**
+This structure lets Embervale grow while keeping the next useful action clear: **protect progression, reconcile the builds, observe the fresh starter loop and finish audible acceptance of the implemented sound pass.**

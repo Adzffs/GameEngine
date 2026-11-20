@@ -7,6 +7,8 @@
 
 The [project review](PROJECT_REVIEW_2026-11-20.md) remains the source for completed safety fixes and executed baseline results. Do not attribute those results to this unfinished candidate. Animation quality remains owner-deferred under ART-005.
 
+**Subsequent follow-up:** The [action-audio and packaging report](ACTION_AUDIO_2026-11-20.md) records independently published sound/copy changes and newer Linux checks. It supersedes the planned-only audio/copy status in this historical record. The original Windows animation merge and full starter acceptance remain open.
+
 ## Source and recovery position
 
 | Source | Last recorded position | Meaning |

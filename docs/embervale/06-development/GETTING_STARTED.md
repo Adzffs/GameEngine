@@ -148,3 +148,15 @@ or Shelter after reporting back. Later tasks follow the journal's prerequisites.
 **Cinder Warden** is the final encounter name. Shield crafting and the final
 victory offer one reward choice each; crafting keeps the shield and victory
 reporting requires no inventory trophy. [Quest route and reward table](QUEST_CONTINUITY_2026-11-19.md).
+
+## 10. Sound effects
+
+The current client includes action effects. In Settings, use the effects volume
+buttons and mute. F8 toggles mute; F9 lowers volume and F10 raises it by ten
+percentage points. Controls apply for the current session; default volume is 65%.
+
+Use an audio-enabled SDL3 installation. An unavailable device or optional missing
+clip leaves the game playable. Automated playback tests use the dummy driver;
+launch normally without that selection to hear the actual device. No audio
+subsystem is required for the headless core build. See [source, verification and
+remaining acceptance](ACTION_AUDIO_2026-11-20.md).

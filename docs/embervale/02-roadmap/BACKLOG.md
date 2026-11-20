@@ -20,6 +20,7 @@ Completion refers to the stated bounded acceptance, with evidence and publicatio
 | Runtime content | Schema-1-4 bounded input, geography, identities and position/recovery checks | General publication/manifests/migrations |
 | Studio | Shared edits/history, guarded new drafts, reopen, playtests and overlays | Interruption/stale-lock recovery, in-place publication, accessibility and broader tools |
 | Art | Eight published batches, 1,175 frames/30 textures, walking/chopping/mining | Remaining cast/tiers/buildings, general importer, audio and visible acceptance |
+| Action audio and packaging | 15 original effects, controls, one copy owner; Linux 107/107 SDL and 89/89 standalone headless | Audible/Windows/full starter and original animation integration acceptance |
 | Starter progression | Fresh state and source-derived recipe/quest guidance; regressions pass | Uncoached navigation, combat/food/death/recovery and full quest-chain acceptance |
 | Starter measurements | Shield 245, sword 376, prepared return 454 ticks, observed twice | Human elapsed time and the 10-15 minute target remain unmeasured |
 | Timber exploit | Current two cycles: 60 -> 54 -> 48; regressions pass | Broader economy balance is GAME-004 |
@@ -28,10 +29,10 @@ Completion refers to the stated bounded acceptance, with evidence and publicatio
 
 1. REL-004: publish the reconciled Mining/melee/equipment build and sources/previews.
 2. GAME-005 / GAME-004: observe the exact fresh journey and resolve blocking failures.
-3. ART-004: implement the small sound pass.
+3. ART-004: review the implemented first sound pass on the recovered candidate and actual device.
 4. Continue explicit recovery/packaging/usability priorities; ART-005 polish stays deferred.
 
-Integration was started in a separate local worktree, then the execution environment became unavailable before combined build/export results could be retrieved. REL-004 is **in progress**, with its implementation still unpublished and unverified. The [integration handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md) records the resolved boundaries, recovery position and pending checks. GAME-005 and ART-004 remain planned.
+The original Windows integration worktree remains unavailable, so REL-004 stays **in progress**. Independent work on the restored published source has delivered the first sound pass and fixed runtime asset copying; [results and limits](../06-development/ACTION_AUDIO_2026-11-20.md). ART-004 is **in progress** with audible/device and integration acceptance open. GAME-005 remains planned; the [original recovery handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md) still applies.
 
 ## Complete work inventory
 

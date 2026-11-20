@@ -1,0 +1,99 @@
+{
+  "date": "2026-11-20",
+  "source_commit": "9b496c8e59556511c2e274394b6c8c071f09c63a",
+  "baseline_commit": "66576af8511d8fe6242831489913c09365ae79f6",
+  "environment": {
+    "os": "Linux",
+    "compiler": "GCC 14.2.0",
+    "cmake": "4.4.5",
+    "ninja": "1.13.2.git.kitware.jobserver-pipe-1",
+    "sdl": "3.4.12, audio enabled, dummy/disk drivers",
+    "python": "3.12.14"
+  },
+  "checks": {
+    "client_ctest": {
+      "passed": 107,
+      "total": 107,
+      "labels": {
+        "headless": 89,
+        "client": 7,
+        "graphics": 11
+      }
+    },
+    "standalone_headless_ctest": {
+      "passed": 89,
+      "total": 89,
+      "sdl_dependency": false
+    },
+    "python_editor_unit_tests": {
+      "passed": 42,
+      "total": 42
+    },
+    "real_editor_bridge_cases": {
+      "passed": 12,
+      "total": 12,
+      "included_in_ctest": true
+    },
+    "audio_feedback_assertions": 32,
+    "audio_playback_assertions": 21,
+    "audio_unavailable_assertions": 2,
+    "audio_graphics_assertions": 9,
+    "original_clips_verified": 15,
+    "packaged_files_byte_equal": 45,
+    "multi_configuration_release_packaging_only": true,
+    "starter_and_timber_outputs_identical_before_after_audio": true,
+    "documentation": {
+      "markdown_files": 96,
+      "links_checked": 1167,
+      "backlog_tasks": 96,
+      "acyclic_dependencies": true,
+      "legacy_studio_ids_retained": 45,
+      "external_urls_fetched": false
+    }
+  },
+  "limits": [
+    "No physical audio device or audible quality acceptance",
+    "Windows audio and new source not executed in this Linux follow-up",
+    "No combined local melee/polish build; original Windows worktree unavailable",
+    "No uncoached human/full visible starter playthrough",
+    "Multi-configuration Release exercised asset copying, not a Release gameplay build"
+  ],
+  "tested_published_blobs": {
+    "CMakeLists.txt": "6084de82696007456f5c4426c2a0f254c7b0b19c",
+    "assets/embervale/audio-pilot/README.md": "ba66e527cf5769fd4dc1dca896bc3dc2f50c7663",
+    "assets/embervale/audio-pilot/block-1.wav": "dd5c881fcfbd97589b21db16e297f7ed6bad1f4c",
+    "assets/embervale/audio-pilot/craft-1.wav": "72d602df3fd2518270642d39d7362a44267cee28",
+    "assets/embervale/audio-pilot/eat-1.wav": "6f38535a540ed1ab8180abf8d19d9d62dbf702a8",
+    "assets/embervale/audio-pilot/equip-1.wav": "951898b94cb8bc39eea68ba211f9a914298dfd1e",
+    "assets/embervale/audio-pilot/gather-1.wav": "bb51ca9c764342abbf37bc1e0ac7de54ac4c3d1a",
+    "assets/embervale/audio-pilot/heavy-swing-1.wav": "8d843d8f42756d7e54519a6bcb3e2e0399b98ce7",
+    "assets/embervale/audio-pilot/hit-1.wav": "9ffb35d23fd34898d3733c7f9f236a5703ebfd48",
+    "assets/embervale/audio-pilot/hit-2.wav": "27f2f8fb83a861a2dcb5b4fd8c3aa45f17a4e545",
+    "assets/embervale/audio-pilot/inventory-1.wav": "cac04699961d95abf5c5578a341e50a8c30aaa4e",
+    "assets/embervale/audio-pilot/manifest.json": "d3e8d85a88c83a4fbd81c86df23959396fed37af",
+    "assets/embervale/audio-pilot/miss-1.wav": "ee5e076d69bb66f9373fe0e77d0dbbd0a3b29b5c",
+    "assets/embervale/audio-pilot/stone-1.wav": "46ad1771db9c7fa988846560b3eeae2138e148de",
+    "assets/embervale/audio-pilot/stone-2.wav": "9f7883023eddbd4ef35c5e60db39638c3cf25570",
+    "assets/embervale/audio-pilot/swing-1.wav": "3bd4697531f9c026875081344e5beb841abfbe48",
+    "assets/embervale/audio-pilot/wood-1.wav": "21f8a342302ec12e843c91a23330a60e9c70aa4a",
+    "assets/embervale/audio-pilot/wood-2.wav": "3c7e27c14867dfd8bd93d2be362cab934c4b9305",
+    "src/Audio/AudioCue.h": "15c765cecce344ee225a69c729c8aaa4c06da617",
+    "src/Audio/AudioFeedbackState.cpp": "def4c85a166e2e0c1b6956576c7b070cb81d6777",
+    "src/Audio/AudioFeedbackState.h": "fe35b0f23bf7991d2c010363e85d9b5a5a45e79f",
+    "src/Audio/SdlAudioPlayer.cpp": "d0d03591b6e122680ad3906f879e91149dc3a9db",
+    "src/Audio/SdlAudioPlayer.h": "3d5d566ef4d68fdf2b9151d14a8b3f5ed031304a",
+    "src/Combat/MeleeCombatFeedback.h": "cc20ea104e8abfde56f00a5f71d4198f3015c755",
+    "src/Core/Engine.cpp": "146f5ae73c85d10f57b74760358f0e933fa79027",
+    "src/Core/Engine.h": "dcfefc6c8595c168b588046411c74b199d915317",
+    "src/Gathering/GatheringPresentationState.cpp": "012276fa017be5a56a2237d74063f779b90af9c3",
+    "src/Gathering/GatheringPresentationState.h": "283484abc0b3fce3a631a00c384d05e89168507b",
+    "src/Graphics/Graphics.cpp": "690d3a68ea796b0bce0ba5fac6e7780f2550c3c8",
+    "src/Graphics/Graphics.h": "b3fe8009a696febda90af652d819c9fe3cae499a",
+    "src/World/World.cpp": "3e2602426b6d897cb88c2083d547070d9f2b910d",
+    "src/World/World.h": "5dea31fb2ea65b9e4d6de4145c48e4c6c2aa8b86",
+    "tests/AudioFeedbackTests.cpp": "0ae661e35b795c1eecf96414c3ce23047dbb1420",
+    "tests/AudioGraphicsTests.cpp": "f16df67d9b544ab171debdc23ec1dd6127ab1f17",
+    "tests/AudioPlaybackTests.cpp": "7f107c58a439ede27ccd4f20450693bd5243f0b7",
+    "tools/audio/build_audio_pilot.py": "a3551b281d699c9d8eb9008edde0ec6b0f1d1436"
+  }
+}

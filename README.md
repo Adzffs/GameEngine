@@ -22,13 +22,14 @@ A C++20 and SDL3 tile-based RPG project, with an existing playable development w
 | See the workshop and building kit | [Building art, collision and roof visibility](docs/embervale/06-development/BUILDING_RENDERING_2026-11-19.md) |
 | Animate characters, weapons or actions | [Animation guide](docs/embervale/05-game/ANIMATION_GUIDE.md) |
 | Reuse animation research and measured findings | [Animation research, 20 November](docs/embervale/06-development/ANIMATION_RESEARCH_2026-11-20.md) |
+| Use sound effects and volume controls | [Action audio and packaging results](docs/embervale/06-development/ACTION_AUDIO_2026-11-20.md) |
 | Find every document | [Documentation index](docs/embervale/README.md) |
 
 ## Project status
 
 The project has an authoritative local RPG simulation, movement/running, gathering/crafting, melee/AI/loot, quests/dialogue, shops/banking and versioned saves. River Crossing is an authored flat starter candidate. The bounded Python/Tk editor supports shared edits/history, guarded new drafts, reopen, isolated playtests and overlays. Eight art batches and eight-way walking/chopping/mining use the shared cache.
 
-The [20 November review](docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md) fixed three player-data risks and verified 102/102 Windows SDL CTest entries, 87/87 standalone headless and 42/42 Python editor tests. Visible/manual acceptance and current other-platform runs remain separate. Recovery/in-place publication, general importing and measured starter acceptance remain open.
+The [20 November review](docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md) fixed three player-data risks and verified 102/102 Windows SDL CTest entries, 87/87 standalone headless and 42/42 Python editor tests. The later [action-audio follow-up](docs/embervale/06-development/ACTION_AUDIO_2026-11-20.md) implements 15 original effects and effects volume/mute, fixes shared asset copying and passes 107/107 Linux SDL entries, 89/89 standalone headless and 42/42 Python units. Audible/Windows/full starter acceptance remains separate. Recovery/in-place publication, general importing and measured starter acceptance remain open.
 
 Local melee/equipment still needs reconciliation with published Mining. Its visual quality is a first pass, with polish owner-deferred. See [current status](docs/embervale/01-current-state/CURRENT_STATUS.md) for the source distinction.
 
@@ -53,7 +54,7 @@ With an SDL3 client build, launch it using `./build-client/GameEngine --world de
 
 ## Development direction
 
-Reconcile and publish the working Mining/melee/equipment version, observe the fresh-player journey and resolve blocking navigation/combat/recovery issues, then add the bounded sound pass. The [roadmap](docs/embervale/02-roadmap/MASTER_ROADMAP.md) and [backlog](docs/embervale/02-roadmap/BACKLOG.md) retain reliability, presentation and authoring work.
+Reconcile and publish the working Mining/melee/equipment version, observe the fresh-player journey and resolve blocking navigation/combat/recovery issues, then finish audible acceptance of the implemented sound pass. The [roadmap](docs/embervale/02-roadmap/MASTER_ROADMAP.md) and [backlog](docs/embervale/02-roadmap/BACKLOG.md) retain reliability, presentation and authoring work.
 
 Elevation, connected regions, companions, bosses and multiplayer remain separate milestones. No complete Studio release or online MMO infrastructure is claimed.
 

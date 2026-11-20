@@ -4,6 +4,8 @@ Before choosing the next feature, read [current status](docs/embervale/01-curren
 
 REL-004 was subsequently started in a separate local worktree, then the execution environment became unavailable before combined build/export results could be retrieved. Read the [integration handoff](docs/embervale/06-development/INTEGRATION_HANDOFF_2026-11-20.md) before resuming. Recover existing uncommitted work before reapplying patches; it has not been published or verified as an integrated build.
 
+The later [action-audio/packaging follow-up](docs/embervale/06-development/ACTION_AUDIO_2026-11-20.md) is published independently. Preserve its copy owner, contact edges and committed fatal-melee events during recovery; its Linux results do not verify the missing combined animation candidate.
+
 For tasks that create or change animation, read:
 
 1. [Animation guide](docs/embervale/05-game/ANIMATION_GUIDE.md).
