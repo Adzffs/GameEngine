@@ -15,14 +15,14 @@ The corrected player walk sheet is unchanged.
 | water | 48 | Shallow/deep corner blends with three quiet ripple patterns |
 | stone | 12 | Clean, worn, repaired and rough mining ground, three variants each |
 | flora | 40 | Eight wildflower groups, eight grass clumps, four reeds, eight leaf beds, four debris groups, four moss patches and four sparse-leaf groups |
-| walls | 72 | Twelve original kit parts in new, weathered and repaired conditions; two panel variations |
+| walls | 96 | Sixteen directional kit parts, including interior cutaways, in new/weathered/repaired conditions; two panel variations |
 | roof | 72 | Twelve parts in three conditions and two materials: terracotta and slate |
 | floors | 9 | Three wooden surfaces in three conditions |
 | trees / stumps | 3 + 3 | Fixed-root normal-tree silhouette and stump variants |
 | rocks | 9 | Three copper, three tin and three depleted rubble silhouettes |
 
-Total: **634 frames in eleven editable masters/PNGs**. Together with the earlier
-five batches the renderer caches 747 frames in 26 PNGs. The manifest records
+Total: **658 frames in eleven editable masters/PNGs**. Together with the earlier
+five batches the renderer caches 775 frames in 26 PNGs. The manifest records
 geometry, IDs, source/export checksums and layout. Runtime uses the generated
 binding, not a new JSON importer.
 
@@ -81,6 +81,11 @@ authoring script. The default only exports saved masters and rebuilds metadata,
 the contact sheet, checksums and shared C++ binding. LibreSprite performs every
 pixel operation; Python supplies blank canvases and export orchestration.
 Original project masters are preserved.
+
+`--regenerate-walls` replaces only this batch's wall-condition master from the
+saved directional base kit. It preserves the other ten masters. See the
+[wall orientation correction](../../../docs/embervale/06-development/WALL_ORIENTATION_2026-11-19.md)
+for side-window alignment, corner joins and the interior front-wall view.
 
 CMake copies only the eleven runtime PNGs. Missing images fall back to earlier
 art independently; missing decoration disappears safely. F6 retains basic mode.

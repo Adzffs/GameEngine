@@ -15,7 +15,7 @@ SHEETS = {
     'water': (512, 96, 32, 32, 48, 16),
     'stone': (384, 32, 32, 32, 12, 12),
     'flora': (320, 128, 32, 32, 40, 10),
-    'walls': (384, 288, 32, 48, 72, 12),
+    'walls': (512, 288, 32, 48, 96, 16),
     'roof': (384, 192, 32, 32, 72, 12),
     'floors': (288, 32, 32, 32, 9, 9),
     'trees': (192, 96, 64, 96, 3, 3),
@@ -24,7 +24,7 @@ SHEETS = {
 }
 
 
-def build(editor, regenerate=False):
+def build(editor, regenerate=False, regenerate_walls=False):
     for folder in ['source', 'textures', 'previews']:
         (ART / folder).mkdir(parents=True, exist_ok=True)
     if not regenerate and any(not (ART / f'source/{name}.ase').is_file() for name in SHEETS):
@@ -46,7 +46,7 @@ def build(editor, regenerate=False):
             blank_png(path, *size)
             fixtures[name] = path.as_posix()
         cfg = {
-            'regenerate': regenerate, 'fixtures': fixtures,
+            'regenerate': regenerate, 'regenerateWalls': regenerate_walls, 'fixtures': fixtures,
             'sheets': {k: list(v) for k, v in SHEETS.items()},
             'sources': {name: (ART / f'source/{name}.ase').as_posix() for name in SHEETS},
             'old': {name: (REPO / path).as_posix() for name, path in {
@@ -89,7 +89,7 @@ def build(editor, regenerate=False):
                            'pivot': pivot,
                            'intended_ground_point_in_tile': [16, 24] if name in ['trees', 'stumps', 'rocks', 'walls'] else [0, 0]})
     manifest = {
-        'schema': 'embervale.authoring-batch', 'version': 1, 'id': 'variation-pilot',
+        'schema': 'embervale.authoring-batch', 'version': 2, 'id': 'variation-pilot',
         'native_tile_size': 32, 'editor': 'LibreSprite 1.1-dev JavaScript',
         'status': 'Runtime contextual landscape dressing and authored building condition',
         'lighting': 'upper left', 'images': images, 'assets': assets,
@@ -99,7 +99,7 @@ def build(editor, regenerate=False):
             'water': 'shared deep-water corner mask * 3 + ripple variant',
             'stone': 'clean 0..2, worn 3..5, repaired 6..8, mine ground 9..11',
             'flora': 'flowers 0..7, grass 8..15, reeds 16..19, leaf beds 20..27, debris 28..31, moss 32..35, sparse leaves 36..39',
-            'walls': 'condition * 24 + panel variant * 12 + original kit part',
+            'walls': 'condition * 32 + panel variant * 16 + directional kit part (including four interior cutaways)',
             'roof': 'material * 36 + condition * 12 + original kit part',
             'floors': 'condition * 3 + surface variant',
             'rocks': 'copper 0..2, tin 3..5, rubble 6..8',
@@ -121,6 +121,8 @@ def build(editor, regenerate=False):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--editor', required=True, type=Path)
-    parser.add_argument('--regenerate', action='store_true', help='Replace variation masters; default preserves and exports existing editor work')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--regenerate', action='store_true', help='Replace variation masters; default preserves and exports existing editor work')
+    mode.add_argument('--regenerate-walls', action='store_true', help='Replace only wall-condition variants from the saved base wall master')
     args = parser.parse_args()
-    build(args.editor.resolve(strict=True), args.regenerate)
+    build(args.editor.resolve(strict=True), args.regenerate, args.regenerate_walls)

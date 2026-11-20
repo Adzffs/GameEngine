@@ -86,13 +86,14 @@ void ForestSprites::Initialize(SDL_Renderer *target)
         if (frame.id == "station.furnace.idle") furnace = &frame;
         if (frame.id == "station.bank.idle") bank = &frame;
         if (frame.id == "station.crafting_table.idle") craftingTable = &frame;
-        constexpr std::array<std::string_view, 12> walls{"front", "back", "west", "east", "window-front", "window-west",
-            "window-east", "doorway", "corner-nw", "corner-ne", "corner-sw", "corner-se"};
+        constexpr std::array<std::string_view, 16> walls{"front", "back", "west", "east", "window-front", "window-west",
+            "window-east", "doorway", "corner-nw", "corner-ne", "corner-sw", "corner-se",
+            "cutaway-front", "cutaway-doorway", "cutaway-sw", "cutaway-se"};
         constexpr std::array<std::string_view, 12> roof{"nw", "n", "ne", "w", "center", "e", "sw", "s", "se", "ridge-w", "ridge", "ridge-e"};
         for (std::size_t i = 0; i < walls.size(); ++i)
         {
             if (frame.id.starts_with("building.wall.") && frame.id.substr(14) == walls[i]) buildingWalls[i] = &frame;
-            if (frame.id.starts_with("building.roof.") && frame.id.substr(14) == roof[i]) buildingRoof[i] = &frame;
+            if (i < roof.size() && frame.id.starts_with("building.roof.") && frame.id.substr(14) == roof[i]) buildingRoof[i] = &frame;
         }
         constexpr std::array<std::string_view, 3> floors{"building.floor.01", "building.floor.02", "building.floor.03"};
         for (std::size_t i = 0; i < floors.size(); ++i) if (frame.id == floors[i]) buildingFloors[i] = &frame;
@@ -227,13 +228,30 @@ bool ForestSprites::DrawGround(Map &map, int x, int y) const
     }
     if (type == TileType::STONE)
     {
-        if (building && !building->IsWall(x, y) && !building->IsDoor(x, y))
+        const Frame *floor = nullptr;
+        if (building)
         {
-            const auto *floor = variedFloors[Condition(*building) * 3 + variant];
-            if (Available(floor)) return Draw(floor, tile);
-            if (Available(buildingFloors[variant])) return Draw(buildingFloors[variant], tile);
+            floor = variedFloors[Condition(*building) * 3 + variant];
+            if (!Available(floor)) floor = buildingFloors[variant];
+            if (!building->IsWall(x, y) && !building->IsDoor(x, y) && Available(floor)) return Draw(floor, tile);
         }
         if (!Draw(Available(variedStone[cell.stone]) ? variedStone[cell.stone] : stone[variant], tile)) return false;
+        if (building && Available(floor))
+        {
+            // Extend planks up to the inner edges of the eight-pixel wall plan.
+            // This is presentation only: the authored wall cells remain blocked.
+            const SDL_FRect room{building->x * 32.0f + 20, building->y * 32.0f + 20,
+                (building->width - 1) * 32.0f - 8, (building->height - 1) * 32.0f - 8};
+            SDL_FRect coverage{};
+            if (building->IsDoor(x, y)) coverage = {tile.x, tile.y, 32, 20};
+            else SDL_GetRectIntersectionFloat(&tile, &room, &coverage);
+            if (coverage.w > 0 && coverage.h > 0)
+            {
+                const SDL_FRect source{floor->source.x + coverage.x - tile.x,
+                    floor->source.y + coverage.y - tile.y, coverage.w, coverage.h};
+                if (!Draw(floor, coverage, &source)) return false;
+            }
+        }
         DressGround(cell, tile);
         return true;
     }
@@ -354,9 +372,13 @@ bool ForestSprites::DrawBuildingWall(const Building &b, int x, int y, const SDL_
             column == 2 || column == b.width - 3 ? 4 : 0;
     else index = column == 0 ? (row == b.height / 2 ? 5 : 2) : (row == b.height / 2 ? 6 : 3);
     const int condition = Condition(b);
+    const int px = static_cast<int>(std::floor((player.x + player.w / 2) / 32));
+    const int py = static_cast<int>(std::floor((player.y + player.h) / 32));
+    if (b.Contains(px, py) && row == b.height - 1)
+        index = column == 0 ? 14 : column == b.width - 1 ? 15 : b.IsDoor(x, y) ? 13 : 12;
     const bool repair = row == b.height - 1 && (column == b.doorOffset + 1 || column == 1);
     const int panelCondition = condition == 2 ? (repair ? 2 : 1) : condition;
-    const auto *varied = variedWalls[panelCondition * 24 + WorldArtVariation::Hash(x, y, 6) % 2 * 12 + index];
+    const auto *varied = variedWalls[panelCondition * 32 + WorldArtVariation::Hash(x, y, 6) % 2 * 16 + index];
     const auto *frame = Available(varied) ? varied : buildingWalls[index];
     if (!Available(frame)) return false;
     const auto bounds = Bounds(*frame, static_cast<float>(x), static_cast<float>(y));
@@ -376,7 +398,8 @@ bool ForestSprites::DrawBuildingRoof(const Building &b, const SDL_FRect &player,
         return Available(frame) ? frame : buildingRoof[part];
     };
     for (int i = 0; i < 12; ++i) if (!Available(roofFrame(i, 0, 0))) return false;
-    const SDL_FRect bounds{b.x * 32.0f - 8.0f, b.y * 32.0f - 48.0f, b.width * 32.0f + 16.0f, b.height * 32.0f};
+    // The south eave meets the new wall cap instead of exposing a strip of floor.
+    const SDL_FRect bounds{b.x * 32.0f - 8.0f, b.y * 32.0f - 48.0f, b.width * 32.0f + 16.0f, b.height * 32.0f + 24.0f};
     const int px = static_cast<int>(std::floor((player.x + player.w / 2) / 32));
     const int py = static_cast<int>(std::floor((player.y + player.h) / 32));
     const float target = b.Contains(px, py) || SDL_HasRectIntersectionFloat(&bounds, &player) ? 25.0f : 255.0f;

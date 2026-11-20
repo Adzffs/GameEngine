@@ -1,0 +1,252 @@
+{
+  "session_date": "2026-11-19",
+  "base": "d71f93814d756a84e5a7beee031cf3d61e3ad5ff",
+  "environment": {
+    "platform": "Windows",
+    "SDL": "3.4.12",
+    "editor": "LibreSprite 1.1-dev"
+  },
+  "builds": {
+    "GameEngine_and_EmbervaleRenderPreview": "passed",
+    "Play-RiverCrossing.cmd --build-only": "passed; content tools/tests disabled"
+  },
+  "assets": {
+    "building_frames": 31,
+    "variation_frames": 658,
+    "total_frames": 775,
+    "cached_images": 26,
+    "directional_wall_parts": 16,
+    "wall_condition_frames": 96,
+    "saved_master_bytes_preserved_on_default_export": true,
+    "PNG_bytes_reproduced_on_default_export": true,
+    "unchanged_non_wall_sources_and_PNGs": [
+      "assets/embervale/building-pilot/source/floors.ase",
+      "assets/embervale/building-pilot/source/roof.ase",
+      "assets/embervale/variation-pilot/source/floors.ase",
+      "assets/embervale/variation-pilot/source/flora.ase",
+      "assets/embervale/variation-pilot/source/grass.ase",
+      "assets/embervale/variation-pilot/source/paths.ase",
+      "assets/embervale/variation-pilot/source/rocks.ase",
+      "assets/embervale/variation-pilot/source/roof.ase",
+      "assets/embervale/variation-pilot/source/stone.ase",
+      "assets/embervale/variation-pilot/source/stumps.ase",
+      "assets/embervale/variation-pilot/source/trees.ase",
+      "assets/embervale/variation-pilot/source/water.ase",
+      "assets/embervale/building-pilot/textures/floors.png",
+      "assets/embervale/building-pilot/textures/roof.png",
+      "assets/embervale/variation-pilot/textures/floors.png",
+      "assets/embervale/variation-pilot/textures/flora.png",
+      "assets/embervale/variation-pilot/textures/grass.png",
+      "assets/embervale/variation-pilot/textures/paths.png",
+      "assets/embervale/variation-pilot/textures/rocks.png",
+      "assets/embervale/variation-pilot/textures/roof.png",
+      "assets/embervale/variation-pilot/textures/stone.png",
+      "assets/embervale/variation-pilot/textures/stumps.png",
+      "assets/embervale/variation-pilot/textures/trees.png",
+      "assets/embervale/variation-pilot/textures/water.png"
+    ],
+    "source_sha256": {
+      "assets/embervale/building-pilot/source/floors.ase": "ed5d41c7bc7a5625a0dc408fa7d98aa437a7e6b2679c02f747ee774c15c520bb",
+      "assets/embervale/building-pilot/source/roof.ase": "1aa72f9e88ebae4e765b7addfaa63bbc501504a2caac42e6e3a27cfa36ff55da",
+      "assets/embervale/building-pilot/source/walls.ase": "e7e83c4310c3e9fa8649730e1b2aaae208fa79c8330cc87fdaf270d7c24f708c",
+      "assets/embervale/variation-pilot/source/floors.ase": "f978c8727052f950c50fc1dde49eab05b6b34bf14679df00fec490cdc571e8f0",
+      "assets/embervale/variation-pilot/source/flora.ase": "8b57d8b4cfad76d8f2f5bf35098838bbb38954bab611f4f9833155d67b8c38c6",
+      "assets/embervale/variation-pilot/source/grass.ase": "71baf2acfdfe8f973ebbe7c1c1841971e01b8e259c9b73c8ffbd067d421a95e7",
+      "assets/embervale/variation-pilot/source/paths.ase": "31df6b5b5cf9c9a4e5710f311fcd3114036565bf2961ba4b53461e3ee4460ae4",
+      "assets/embervale/variation-pilot/source/rocks.ase": "3055e180fb763c4f8c513e84ebebe1b50ab4a99597ab1e47a4bd2ef454cde1cc",
+      "assets/embervale/variation-pilot/source/roof.ase": "421696da2f93d31cfff1450a4b3141e0027b77606d298d5c16885998bf2cde5b",
+      "assets/embervale/variation-pilot/source/stone.ase": "2c9d0adee1336d915cc1ba02178b8914de2fdb0d6a522e30c5ae470fabea556a",
+      "assets/embervale/variation-pilot/source/stumps.ase": "145895c25bf7c483dff973a3c5b4af6dedced42e5a32d0ae99eba29ab276dec1",
+      "assets/embervale/variation-pilot/source/trees.ase": "0685b495d0d378b8ca9f5aea891d870dec8d0b3edbacf29cce62771d8cfc7700",
+      "assets/embervale/variation-pilot/source/walls.ase": "bcd216fde1b5c65b27222a8d2cc1e94a267a05cd59836e5dd8f0add0db4ead51",
+      "assets/embervale/variation-pilot/source/water.ase": "2973ae18c53ec42b76386f9bed12606d4f11619eda0ff6bb8e927874fc34ec61"
+    },
+    "PNG_sha256": {
+      "assets/embervale/building-pilot/textures/floors.png": "0ddf1d44668da431f2d4e69533cc16e17e9db8de06ac2764433f9d1abb585f39",
+      "assets/embervale/building-pilot/textures/roof.png": "210a2dbe03ec4c17dc6f9cfa92bbba5e4299fd2a1aa366e43cea92c0cc3f62b0",
+      "assets/embervale/building-pilot/textures/walls.png": "ec9daaa5b19107d215a17c06de11ba6f2a6e620ea7c6a52fbb9a5c8d064da081",
+      "assets/embervale/variation-pilot/textures/floors.png": "b33c3f7c9b7186cb7269c29e6ecd002920295a9f0963773e89b00151f5588181",
+      "assets/embervale/variation-pilot/textures/flora.png": "1466f185242148217811daa7821273a9e49fed685c6c278b70996ef5a68be9e5",
+      "assets/embervale/variation-pilot/textures/grass.png": "d09c0b6968ee3d489579dfb8f63544107fc63ed15353b72692ea93221072105b",
+      "assets/embervale/variation-pilot/textures/paths.png": "41e7f4054a00fcb9c7f1bca9bd13c08aa097cade50683dc430b477e45c1271e0",
+      "assets/embervale/variation-pilot/textures/rocks.png": "c3b3babe18e61c5def51935597038f8ef53a3db17785e79af66b2c58d4b85df3",
+      "assets/embervale/variation-pilot/textures/roof.png": "cb3275a0819a94286f3ba7f656378534b2d2e6742e384be8dae06d049578b907",
+      "assets/embervale/variation-pilot/textures/stone.png": "db226b3e3c3d66576a9c7539d235b8d04ebed291a6bf7aa457893b4bb0cc8959",
+      "assets/embervale/variation-pilot/textures/stumps.png": "b77b9f99c542d866380bf259e5ff776e3d00ff8d2c2bc91e415d847c1258d8b7",
+      "assets/embervale/variation-pilot/textures/trees.png": "446d1f6c1d1968f69aa5a71f01d9fa81747d7d4bc29f9309c9ff954a4a8059a4",
+      "assets/embervale/variation-pilot/textures/walls.png": "15d3b236faf0b5ca78bbd648d49b8e438ed4b5a59c2a3e6719da15897c838e6b",
+      "assets/embervale/variation-pilot/textures/water.png": "9c7a64a2272fe5421c00f4ea431ed0566d3b5197d2c2dd353147631365a9fc2a"
+    },
+    "packaged_PNG_sha256": {
+      "build-client": {
+        "assets/embervale/building-pilot/textures/floors.png": "0ddf1d44668da431f2d4e69533cc16e17e9db8de06ac2764433f9d1abb585f39",
+        "assets/embervale/building-pilot/textures/roof.png": "210a2dbe03ec4c17dc6f9cfa92bbba5e4299fd2a1aa366e43cea92c0cc3f62b0",
+        "assets/embervale/building-pilot/textures/walls.png": "ec9daaa5b19107d215a17c06de11ba6f2a6e620ea7c6a52fbb9a5c8d064da081",
+        "assets/embervale/variation-pilot/textures/floors.png": "b33c3f7c9b7186cb7269c29e6ecd002920295a9f0963773e89b00151f5588181",
+        "assets/embervale/variation-pilot/textures/flora.png": "1466f185242148217811daa7821273a9e49fed685c6c278b70996ef5a68be9e5",
+        "assets/embervale/variation-pilot/textures/grass.png": "d09c0b6968ee3d489579dfb8f63544107fc63ed15353b72692ea93221072105b",
+        "assets/embervale/variation-pilot/textures/paths.png": "41e7f4054a00fcb9c7f1bca9bd13c08aa097cade50683dc430b477e45c1271e0",
+        "assets/embervale/variation-pilot/textures/rocks.png": "c3b3babe18e61c5def51935597038f8ef53a3db17785e79af66b2c58d4b85df3",
+        "assets/embervale/variation-pilot/textures/roof.png": "cb3275a0819a94286f3ba7f656378534b2d2e6742e384be8dae06d049578b907",
+        "assets/embervale/variation-pilot/textures/stone.png": "db226b3e3c3d66576a9c7539d235b8d04ebed291a6bf7aa457893b4bb0cc8959",
+        "assets/embervale/variation-pilot/textures/stumps.png": "b77b9f99c542d866380bf259e5ff776e3d00ff8d2c2bc91e415d847c1258d8b7",
+        "assets/embervale/variation-pilot/textures/trees.png": "446d1f6c1d1968f69aa5a71f01d9fa81747d7d4bc29f9309c9ff954a4a8059a4",
+        "assets/embervale/variation-pilot/textures/walls.png": "15d3b236faf0b5ca78bbd648d49b8e438ed4b5a59c2a3e6719da15897c838e6b",
+        "assets/embervale/variation-pilot/textures/water.png": "9c7a64a2272fe5421c00f4ea431ed0566d3b5197d2c2dd353147631365a9fc2a"
+      },
+      "build-river-crossing": {
+        "assets/embervale/building-pilot/textures/floors.png": "0ddf1d44668da431f2d4e69533cc16e17e9db8de06ac2764433f9d1abb585f39",
+        "assets/embervale/building-pilot/textures/roof.png": "210a2dbe03ec4c17dc6f9cfa92bbba5e4299fd2a1aa366e43cea92c0cc3f62b0",
+        "assets/embervale/building-pilot/textures/walls.png": "ec9daaa5b19107d215a17c06de11ba6f2a6e620ea7c6a52fbb9a5c8d064da081",
+        "assets/embervale/variation-pilot/textures/floors.png": "b33c3f7c9b7186cb7269c29e6ecd002920295a9f0963773e89b00151f5588181",
+        "assets/embervale/variation-pilot/textures/flora.png": "1466f185242148217811daa7821273a9e49fed685c6c278b70996ef5a68be9e5",
+        "assets/embervale/variation-pilot/textures/grass.png": "d09c0b6968ee3d489579dfb8f63544107fc63ed15353b72692ea93221072105b",
+        "assets/embervale/variation-pilot/textures/paths.png": "41e7f4054a00fcb9c7f1bca9bd13c08aa097cade50683dc430b477e45c1271e0",
+        "assets/embervale/variation-pilot/textures/rocks.png": "c3b3babe18e61c5def51935597038f8ef53a3db17785e79af66b2c58d4b85df3",
+        "assets/embervale/variation-pilot/textures/roof.png": "cb3275a0819a94286f3ba7f656378534b2d2e6742e384be8dae06d049578b907",
+        "assets/embervale/variation-pilot/textures/stone.png": "db226b3e3c3d66576a9c7539d235b8d04ebed291a6bf7aa457893b4bb0cc8959",
+        "assets/embervale/variation-pilot/textures/stumps.png": "b77b9f99c542d866380bf259e5ff776e3d00ff8d2c2bc91e415d847c1258d8b7",
+        "assets/embervale/variation-pilot/textures/trees.png": "446d1f6c1d1968f69aa5a71f01d9fa81747d7d4bc29f9309c9ff954a4a8059a4",
+        "assets/embervale/variation-pilot/textures/walls.png": "15d3b236faf0b5ca78bbd648d49b8e438ed4b5a59c2a3e6719da15897c838e6b",
+        "assets/embervale/variation-pilot/textures/water.png": "9c7a64a2272fe5421c00f4ea431ed0566d3b5197d2c2dd353147631365a9fc2a"
+      }
+    }
+  },
+  "world_snapshot_unchanged": true,
+  "world_snapshot_sha256": "72c9d565ad1db11fc4e27eb8e512ef0dd23b5a902ef18da6a486a3c2ed28297f",
+  "captures": [
+    {
+      "name": "interior",
+      "options": [
+        "--focus",
+        69,
+        46,
+        "--zoom",
+        1.5
+      ],
+      "sha256": "3e3aa5bb9fb052451f725749612af8dabdba003c21d057132b425916429a7720",
+      "textures_cached": 26
+    },
+    {
+      "name": "interior-native",
+      "options": [
+        "--focus",
+        69,
+        46
+      ],
+      "sha256": "95f36a19e7cddf9d5331dc71517fa5ff8bb4f4d9b9626829ba4494e96af302fc",
+      "textures_cached": 26
+    },
+    {
+      "name": "west",
+      "options": [
+        "--focus",
+        66,
+        46,
+        "--zoom",
+        1.5
+      ],
+      "sha256": "bb56f0a75734766cfd269e62aabc198487e4c2c83c85abe2269bf876b730ef4c",
+      "textures_cached": 26
+    },
+    {
+      "name": "east",
+      "options": [
+        "--focus",
+        72,
+        46,
+        "--zoom",
+        1.5
+      ],
+      "sha256": "cd290a84ca896f8c622ed08398adc240f67348e211c60cf3e499f290d0934efb",
+      "textures_cached": 26
+    },
+    {
+      "name": "doorway",
+      "options": [
+        "--focus",
+        69,
+        48,
+        "--zoom",
+        1.5
+      ],
+      "sha256": "e36f909f24dca85a48a269e17375e090db4a0327772e64a3f002f698d48aa082",
+      "textures_cached": 26
+    },
+    {
+      "name": "exterior",
+      "options": [
+        "--focus",
+        66,
+        49,
+        "--zoom",
+        1.5
+      ],
+      "sha256": "9cc7533104fd9eaed7491f70f0e5ed05e36e04f920a0a443e4130fe365a494e9",
+      "textures_cached": 26
+    },
+    {
+      "name": "exit-restored",
+      "options": [
+        "--focus",
+        69,
+        46,
+        "--walk-to",
+        69,
+        51,
+        "--frames",
+        45,
+        "--zoom",
+        1.5
+      ],
+      "sha256": "51f537291f6b898f1e74e28a6473c3ab17909a9ced42ea23c9145bfb7eb7b870",
+      "textures_cached": 26
+    },
+    {
+      "name": "new",
+      "options": [
+        "--focus",
+        69,
+        46,
+        "--zoom",
+        1.5,
+        "--condition",
+        "new"
+      ],
+      "sha256": "0c98a1d3efb2b7b7e090a385410b7a2e9c2e4ed108d5234e103e1d365b4bc111",
+      "textures_cached": 26
+    },
+    {
+      "name": "weathered",
+      "options": [
+        "--focus",
+        69,
+        46,
+        "--zoom",
+        1.5,
+        "--condition",
+        "weathered"
+      ],
+      "sha256": "32b07b0fc8599c76156b0434d389916fcfaf5ac60bb29743a2e2f5d9b655f5ef",
+      "textures_cached": 26
+    },
+    {
+      "name": "basic",
+      "options": [
+        "--focus",
+        69,
+        46,
+        "--zoom",
+        1.5,
+        "--basic"
+      ],
+      "sha256": "1b353653f676fec720d08b5edc25edb462bccb9fd0e8cbb433705f3f795bf80b",
+      "textures_cached": 26
+    }
+  ],
+  "limits": [
+    "Software/dummy-video camera captures, not GPU performance or full interaction playthrough",
+    "World footprint, collision and open south doorway remain unchanged",
+    "Regression suites remain deferred at owner request"
+  ]
+}

@@ -63,24 +63,25 @@ bank and crafting-table sprites, editable masters and opaque-pixel targeting
 through their existing station actions. The first four batches share a generated
 layout and texture cache: 86 frames in twelve PNGs. See the
 [service integration record](../06-development/SERVICE_RENDERING_2026-11-19.md).
-The [building kit](../../../assets/embervale/building-pilot/README.md) adds 27
+The [building kit](../../../assets/embervale/building-pilot/README.md) adds 31
 overhead wall/window/door/corner, roof/ridge and floor pieces, assembled into the
 first workshop. Authored walls block movement; an open doorway preserves access,
-and the roof fades around the player. The five batches total 113 frames in
+and the roof fades around the player. The five batches total 117 frames in
 fifteen PNGs. See the [building integration record](../06-development/BUILDING_RENDERING_2026-11-19.md).
 Further building assemblies, other ore tiers, remaining cast and full starter
 visual acceptance remain open.
 
 The [variation kit](../../../assets/embervale/variation-pilot/README.md) adds
-634 native frames in eleven masters. Landscape fields use actual settlement,
+658 native frames in eleven masters. Landscape fields use actual settlement,
 path, water and tree positions to place coherent grass patches, varying dirt,
 shallow/deep water, stone conditions, meadow flower clusters, grass/reeds and
 leaf litter. Quiet woodland accumulates leaves beneath canopies and at stumps;
 maintained approaches stay clear. Building surfaces support new, weathered and
 repaired conditions and terracotta/slate roofing, with localized workshop repairs.
 Normal trees and copper/tin/rubble also have silhouette variants. All six batches
-total 747 frames in 26 cached PNGs. See the [contextual variation record](../06-development/WORLD_VARIATION_2026-11-19.md).
+total 775 frames in 26 cached PNGs. See the [contextual variation record](../06-development/WORLD_VARIATION_2026-11-19.md).
 These conditions are authored presentation, not simulated decay or seasons.
+The [wall orientation correction](../06-development/WALL_ORIENTATION_2026-11-19.md) replaces front-facing side panels with aligned wall caps/windows and corner joins, adds interior front cutaways and aligns the south roof eave.
 
 ## 2. Proposed visual direction
 
