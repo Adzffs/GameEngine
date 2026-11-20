@@ -1,0 +1,7 @@
+{
+  "baseline": "16f9697",
+  "oldMaxShoulderToWrist": 20.322647465327936,
+  "newMaxShoulderToWrist": 9.500000000000005,
+  "matchingIdleTransitions": 40,
+  "units": "native pixels before rasterisation"
+}

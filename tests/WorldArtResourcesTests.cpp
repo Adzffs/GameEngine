@@ -117,8 +117,8 @@ int main()
     test.Expect(Reject([&]{ ValidateCatalogue(images, badFrames); }), "Incomplete present action table rejects");
     std::vector<std::string> ids;
     std::vector<Frame> walking;
-    ids.reserve(33); walking.reserve(33);
-    for (int facing = 0; facing < 8; ++facing) for (int pose = 0; pose < 4; ++pose)
+    ids.reserve(65); walking.reserve(65);
+    for (int facing = 0; facing < 8; ++facing) for (int pose = 0; pose < 8; ++pose)
     {
         ids.push_back("character.player." + std::to_string(facing) + "." + std::to_string(pose));
         auto entry = frame; entry.id = ids.back(); entry.facing = facing; entry.pose = pose; walking.push_back(entry);

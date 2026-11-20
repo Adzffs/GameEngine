@@ -27,39 +27,14 @@ function playerDiagonalBase(atlas, direction) {
 }
 
 function playerWalkPose(base, direction, phase) {
-  if (phase === 0 || phase === 2) return crop(base, 0, 0, 32, 48);
-  var out = canvas(32, 48), sign = phase === 1 ? 1 : -1;
-  var legTop = 31;
-  if (direction === 1 || direction === 2) {
-    for (var layer = 0; layer < 2; layer++) for (var y = legTop; y < 40; y++) for (var x = 0; x < 32; x++) {
-      var c = base.pixels[y * 32 + x];
-      if (pc.rgbaA(c)) put(out, x + sign * (layer === 0 ? -2 : 2), y - (layer === 0 ? 1 : 0), c);
-    }
-  } else {
-    for (var y = legTop; y < 40; y++) for (var x = 0; x < 32; x++) {
-      var c = base.pixels[y * 32 + x], left = x < 16;
-      var lifted = (left && sign === 1) || (!left && sign === -1);
-      if (pc.rgbaA(c)) put(out, x + (left ? -sign : sign), y - (lifted ? 1 : 0), c);
-    }
-  }
-  // The torso includes the upper thighs, rather than ending above the legs.
-  for (var y = 0; y <= 32; y++) for (var x = 0; x < 32; x++) {
-    var c = base.pixels[y * 32 + x];
-    if (pc.rgbaA(c)) put(out, x, y - 1, c);
-  }
-  // Keep a continuous waist/pelvis while the chest bobs and the calves stride.
-  for (var y = 26; y <= 32; y++) for (var x = 0; x < 32; x++) {
-    var c = base.pixels[y * 32 + x];
-    if (pc.rgbaA(c)) put(out, x, y, c);
-  }
-  return out;
+  return rigWalk(base, direction, phase);
 }
 
 function inspectPlayerWalk(atlas) {
   var report = {frames:[], failedFrames:0};
   for (var direction = 0; direction < playerDirectionNames.length; direction++) {
     var neutral = crop(atlas, 0, direction * 48, 32, 48);
-    for (var phase = 0; phase < 4; phase++) {
+    for (var phase = 0; phase < 8; phase++) {
       var frame = crop(atlas, phase * 32, direction * 48, 32, 48);
       var labels = new Array(32 * 48).fill(-1), sizes = [];
       function solid(index) { return pc.rgbaA(frame.pixels[index]) >= 128; }
@@ -90,9 +65,13 @@ function inspectPlayerWalk(atlas) {
       }
       // Closed waist silhouette is an asset contract, independent of how a
       // pose is generated. Normal exports also check manually edited masters.
-      for (var y = 26; y <= 32; y++) for (var x = 0; x < 32; x++) {
-        var index = y * 32 + x;
-        if (pc.rgbaA(neutral.pixels[index]) >= 128 && !solid(index)) missingWaist++;
+      for (var y = 26; y <= 32; y++) {
+        var neutralInk=0,poseInk=0;
+        for(var x=0;x<32;x++) {
+          if(pc.rgbaA(neutral.pixels[y*32+x])>=128) neutralInk++;
+          if(solid(y*32+x)) poseInk++;
+        }
+        if(neutralInk&&!poseInk) missingWaist++;
       }
       var ok = largest > 0 && lower > 0 && detached === 0 && missingWaist === 0;
       report.frames.push({direction:playerDirectionNames[direction], pose:phase,

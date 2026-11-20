@@ -103,8 +103,8 @@ class WorldArtResourceTests(unittest.TestCase):
     def test_action_table_requires_complete_unique_slots(self):
         batch = copy.deepcopy(self.batch)
         batch['assets'] = [dict(self.batch['assets'][0], id=f'character.player.{facing}.{pose}',
-                                facing=facing, animation_frame=pose) for facing in range(8) for pose in range(4)]
-        self.assertEqual(self.validate(batch, files=False)['frames'], 32)
+                                facing=facing, animation_frame=pose) for facing in range(8) for pose in range(8)]
+        self.assertEqual(self.validate(batch, files=False)['frames'], 64)
         incomplete = copy.deepcopy(batch); incomplete['assets'].pop()
         with self.assertRaises(art.ArtError): self.validate(incomplete, files=False)
         batch['assets'].append(dict(batch['assets'][0], id='character.player.alias'))
@@ -168,10 +168,26 @@ class WorldArtResourceTests(unittest.TestCase):
         result = subprocess.run([sys.executable, str(ART_TOOLS / 'check_world_art.py'), '--check'],
                                 check=True, capture_output=True, text=True, timeout=20)
         report = json.loads(result.stdout)
-        self.assertEqual((report['batches'], report['images'], report['frames']), (8, 30, 1175))
-        self.assertEqual((report['rgba_texture_bytes'], report['alpha_bytes']), (11681792, 2920448))
+        self.assertEqual((report['batches'], report['images'], report['frames']), (9, 32, 3063))
+        self.assertEqual((report['rgba_texture_bytes'], report['alpha_bytes']), (23162880, 5790720))
         self.assertTrue(report['renderer_layout_matches'])
         self.assertEqual(before, hashes())
+
+    def test_distinct_gathering_and_equipment_tables_require_all_slots(self):
+        # The eight-pose actions must not enlarge Mining's six-pose table.
+        for prefix, variants, poses in [('character.woodcutting.', 1, 8), ('tool.axe.', 3, 8),
+                ('character.mining.', 1, 6), ('tool.pickaxe.', 3, 6),
+                ('character.melee.', 5, 16), ('equipment.melee.', 9, 16)]:
+            with self.subTest(prefix=prefix):
+                batch = copy.deepcopy(self.batch)
+                batch['assets'] = [dict(self.batch['assets'][0], id=f'{prefix}{tier}.{facing}.{pose}',
+                    variant=tier, facing=facing, animation_frame=pose)
+                    for tier in range(variants) for facing in range(8) for pose in range(poses)]
+                self.assertEqual(self.validate(batch, files=False)['frames'], variants * 8 * poses)
+                incomplete = copy.deepcopy(batch); incomplete['assets'].pop()
+                with self.assertRaises(art.ArtError): self.validate(incomplete, files=False)
+                out_of_bounds = copy.deepcopy(batch); out_of_bounds['assets'][-1]['animation_frame'] = poses
+                with self.assertRaises(art.ArtError): self.validate(out_of_bounds, files=False)
 
     def test_binding_newlines_are_portable_without_accepting_changed_geometry(self):
         path = self.root / 'binding.h'

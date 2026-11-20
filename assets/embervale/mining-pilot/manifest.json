@@ -52,6 +52,14 @@
   ],
   "cycle_seconds": 1.2,
   "poses_per_direction": 6,
+  "frame_milliseconds": [
+    200,
+    200,
+    200,
+    200,
+    200,
+    200
+  ],
   "images": {
     "player": {
       "source": "source/player.ase",
@@ -4065,14 +4073,14 @@
   "provenance": {
     "creator": "Codex-assisted LibreSprite authoring for Adam Holland",
     "source": "../cast-pilot/source/player.ase",
-    "source_sha256": "ad124d64f500ecd0af1ab8d526f84447e2c2f888236014c90d2b67fc06df4241",
+    "source_sha256": "3ff6cdfee8ba2e7dce4509f025c35eaafeb462103030c2e951beef20f7ac486f",
     "notes": "Original player outfit retained; action poses, arms and pickaxes authored in LibreSprite JavaScript.",
     "licence": "No separate asset licence grant declared; repository distribution policy applies."
   },
   "previews": {
     "mine-cycle.gif": {
       "path": "previews/mine-cycle.gif",
-      "sha256": "d64273bdcf6f421edd79f8405e89b903ba5d7a2d850a8471c2348feabb79508c"
+      "sha256": "2a6d6549d09f3006df0ac3f4cdc88142e81ece9e1d1fe55763d40c907abffbc1"
     },
     "mine-contact.png": {
       "path": "previews/mine-contact.png",

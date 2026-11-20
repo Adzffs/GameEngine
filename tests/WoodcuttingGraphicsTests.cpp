@@ -17,7 +17,7 @@ struct GraphicsTestAccess
 
 std::uint64_t Capture(SDL_Renderer *renderer)
 {
-    const SDL_Rect area{48,32,64,96};
+    const SDL_Rect area{32,24,96,96};
     SDL_Surface *surface = SDL_RenderReadPixels(renderer,&area);
     if (!surface) return 0;
     std::uint64_t hash = 14695981039346656037ULL;
@@ -55,10 +55,10 @@ int main()
             {
                 float edgeX=0,edgeY=0,shadowX=0,shadowY=0;
                 int edgeCount=0,shadowCount=0;
-                for (int y=0; y<80; ++y) for (int x=0; x<64; ++x)
+                for (int y=0; y<96; ++y) for (int x=0; x<96; ++x)
                 {
                     Uint8 r,g,b,a;
-                    SDL_ReadSurfacePixel(axePixels,pose*64+x,(tier*8+facing)*80+y,&r,&g,&b,&a);
+                    SDL_ReadSurfacePixel(axePixels,pose*96+x,(tier*8+facing)*96+y,&r,&g,&b,&a);
                     if (!a) continue;
                     const std::array<Uint8,3> rgb{r,g,b};
                     if (rgb==edges[tier]) { edgeX+=x; edgeY+=y; ++edgeCount; }
@@ -78,8 +78,8 @@ int main()
         std::set<std::uint64_t> tiers;
         for (int tier = 0; tier < 3; ++tier)
         {
-            std::array<std::uint64_t,6> poses{};
-            for (int pose = 0; pose < 6; ++pose)
+            std::array<std::uint64_t,PlayerAnimationTiming::ChoppingPoses> poses{};
+            for (int pose = 0; pose < PlayerAnimationTiming::ChoppingPoses; ++pose)
             {
                 SDL_SetRenderDrawColor(renderer,30,40,50,255); SDL_RenderClear(renderer);
                 test.Expect(sprites.DrawWoodcutting(2,2,facing,pose,tier),"Every action/tool cell renders through the cache");
@@ -91,11 +91,11 @@ int main()
             tiers.insert(poses[3]);
             if (tier == 0) directions.insert(poses[3]);
         }
-        test.ExpectEqual(tiers.size(),std::size_t{3},"Bronze, iron and steel blades are visually distinct");
+        test.ExpectEqual(tiers.size(),std::size_t{3},"Bronze, iron and steel blades are distinct in facing " + std::to_string(facing));
     }
     test.ExpectEqual(directions.size(),std::size_t{8},"All eight chopping directions have distinct sprites");
     test.Expect(!sprites.DrawWoodcutting(2,2,8,0,0),"Invalid action direction falls back safely");
-    test.Expect(!sprites.DrawWoodcutting(2,2,0,6,0),"Invalid action pose falls back safely");
+    test.Expect(!sprites.DrawWoodcutting(2,2,0,PlayerAnimationTiming::ChoppingPoses,0),"Invalid action pose falls back safely");
 #endif
     SDL_Texture *target = SDL_CreateTexture(renderer,SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_TARGET,1280,720);
     test.Expect(target && SDL_SetRenderTarget(renderer,target),"Full scene renders to a readable target");

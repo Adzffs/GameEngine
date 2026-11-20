@@ -53,9 +53,11 @@ namespace WorldArtResources
         }
         struct Binding { std::string_view prefix; int variants, poses; bool action; };
         constexpr std::array bindings{
-            Binding{"character.player.", 1, 4, true}, Binding{"character.woodcutting.", 1, 6, true},
-            Binding{"character.mining.", 1, 6, true}, Binding{"tool.axe.", 3, 6, true},
-            Binding{"tool.pickaxe.", 3, 6, true}, Binding{"variation.grass.", 162, 1, false},
+            Binding{"character.player.", 1, 8, true}, Binding{"character.woodcutting.", 1, 8, true},
+            Binding{"character.mining.", 1, 6, true}, Binding{"tool.axe.", 3, 8, true},
+            Binding{"tool.pickaxe.", 3, 6, true},
+            Binding{"character.melee.", 5, 16, true}, Binding{"equipment.melee.", 9, 16, true},
+            Binding{"character.melee.", 5, 16, true}, Binding{"equipment.melee.", 9, 16, true}, Binding{"variation.grass.", 162, 1, false},
             Binding{"variation.paths.", 204, 1, false}, Binding{"variation.water.", 48, 1, false},
             Binding{"variation.stone.", 12, 1, false}, Binding{"variation.flora.", 40, 1, false},
             Binding{"variation.walls.", 96, 1, false}, Binding{"variation.roof.", 72, 1, false},

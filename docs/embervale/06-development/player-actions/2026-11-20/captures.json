@@ -1,0 +1,153 @@
+[
+  {
+    "file": "sword-contact.png",
+    "options": [
+      "--focus",
+      "26",
+      "68",
+      "--melee",
+      "27",
+      "68",
+      "--weapon",
+      "bronze-sword",
+      "--shield",
+      "--zoom",
+      "1.5",
+      "--frames",
+      "32"
+    ],
+    "returncode": 0,
+    "loaded_textures": 32,
+    "sha256": "feafdef9cae47504daadfcaa5e1a9c1da44b811ad8ab7d82f7f861643d99230d",
+    "output": "Rendered 1280x720 through the game renderer; world art, melee preview. No player or world files written.\n",
+    "error": "World art: 32/32 textures cached; 23162880 RGBA estimate bytes, 5790720 alpha bytes, 7112398 peak image staging estimate bytes.\n"
+  },
+  {
+    "file": "heavy-contact.png",
+    "options": [
+      "--focus",
+      "26",
+      "68",
+      "--melee",
+      "27",
+      "68",
+      "--weapon",
+      "godsword",
+      "--shield",
+      "--zoom",
+      "1.5",
+      "--frames",
+      "32"
+    ],
+    "returncode": 0,
+    "loaded_textures": 32,
+    "sha256": "d6181ce8216c4f48fd1ac4ae6ab767e9a8b497d3c9709713b79ea4529061814a",
+    "output": "Rendered 1280x720 through the game renderer; world art, melee preview. No player or world files written.\n",
+    "error": "World art: 32/32 textures cached; 23162880 RGBA estimate bytes, 5790720 alpha bytes, 7112398 peak image staging estimate bytes.\n"
+  },
+  {
+    "file": "unarmed-contact.png",
+    "options": [
+      "--focus",
+      "26",
+      "68",
+      "--melee",
+      "27",
+      "68",
+      "--weapon",
+      "unarmed",
+      "--zoom",
+      "1.5",
+      "--frames",
+      "32"
+    ],
+    "returncode": 0,
+    "loaded_textures": 32,
+    "sha256": "4b820ff168bdf8521127b83d10ed76fa16a1c72921734e335ebccd05239a2286",
+    "output": "Rendered 1280x720 through the game renderer; world art, melee preview. No player or world files written.\n",
+    "error": "World art: 32/32 textures cached; 23162880 RGBA estimate bytes, 5790720 alpha bytes, 7112398 peak image staging estimate bytes.\n"
+  },
+  {
+    "file": "equipped-walk.png",
+    "options": [
+      "--focus",
+      "26",
+      "68",
+      "--walk-to",
+      "26",
+      "67",
+      "--weapon",
+      "bronze-sword",
+      "--shield",
+      "--zoom",
+      "1.5",
+      "--frames",
+      "8"
+    ],
+    "returncode": 0,
+    "loaded_textures": 32,
+    "sha256": "74af20d9a840f639f1835be703d9d58a364e0cb2fa099298c9675fc140974b20",
+    "output": "Rendered 1280x720 through the game renderer; world art, walking preview. No player or world files written.\n",
+    "error": "World art: 32/32 textures cached; 23162880 RGBA estimate bytes, 5790720 alpha bytes, 7112398 peak image staging estimate bytes.\n"
+  },
+  {
+    "file": "woodcutting-contact.png",
+    "options": [
+      "--focus",
+      "7",
+      "55",
+      "--chop",
+      "8",
+      "55",
+      "--zoom",
+      "1.5",
+      "--frames",
+      "18"
+    ],
+    "returncode": 0,
+    "loaded_textures": 32,
+    "sha256": "d3e016db48fd49ac950aca22461baee53f746d044ca295e1b5f4f3761b06c55a",
+    "output": "[GAME] Bronze axe equipped\nRendered 1280x720 through the game renderer; world art, woodcutting preview. No player or world files written.\n",
+    "error": "World art: 32/32 textures cached; 23162880 RGBA estimate bytes, 5790720 alpha bytes, 7112398 peak image staging estimate bytes.\n"
+  },
+  {
+    "file": "mining-contact.png",
+    "options": [
+      "--focus",
+      "83",
+      "60",
+      "--mine",
+      "84",
+      "60",
+      "--zoom",
+      "1.5",
+      "--frames",
+      "18"
+    ],
+    "returncode": 0,
+    "loaded_textures": 32,
+    "sha256": "ba6e750a4316ab3cc2595092b131d43b934f8ca435c701afd04e518d83aba265",
+    "output": "[GAME] Bronze pickaxe equipped\nRendered 1280x720 through the game renderer; world art, mining preview. No player or world files written.\n",
+    "error": "World art: 32/32 textures cached; 23162880 RGBA estimate bytes, 5790720 alpha bytes, 7112398 peak image staging estimate bytes.\n"
+  },
+  {
+    "file": "mining-reward.png",
+    "options": [
+      "--focus",
+      "83",
+      "60",
+      "--mine",
+      "84",
+      "60",
+      "--zoom",
+      "1.5",
+      "--frames",
+      "90"
+    ],
+    "returncode": 0,
+    "loaded_textures": 32,
+    "sha256": "ea9d1ce0dadca7db25b4a2f049f881814a539bdc7e77b60e63a577153d4b05a3",
+    "output": "[GAME] Bronze pickaxe equipped\n[GAME] Player 4 gathered from Copper rock | Received: 1 Copper ore | XP: 18 (Level 1)\n[GAME] Copper rock has been depleted\nRendered 1280x720 through the game renderer; world art, mining preview. No player or world files written.\n",
+    "error": "World art: 32/32 textures cached; 23162880 RGBA estimate bytes, 5790720 alpha bytes, 7112398 peak image staging estimate bytes.\n"
+  }
+]

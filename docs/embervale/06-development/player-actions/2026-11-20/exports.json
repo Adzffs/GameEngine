@@ -1,0 +1,73 @@
+{
+  "sources_preserved": true,
+  "editable_master_count": 32,
+  "master_sha256": {
+    "assets/embervale/woodcutting-pilot/source/axes.ase": "9415fc9d08ac60f2396c5a5b8d8e3d7bbaf02af25d1bcbfa1a82c76839093e06",
+    "assets/embervale/woodcutting-pilot/source/player.ase": "b82b900491e71ca4dc19059f0424f38d972c832821957da12fe8b8af8b294e24",
+    "assets/embervale/variation-pilot/source/floors.ase": "f978c8727052f950c50fc1dde49eab05b6b34bf14679df00fec490cdc571e8f0",
+    "assets/embervale/variation-pilot/source/flora.ase": "8b57d8b4cfad76d8f2f5bf35098838bbb38954bab611f4f9833155d67b8c38c6",
+    "assets/embervale/variation-pilot/source/grass.ase": "71baf2acfdfe8f973ebbe7c1c1841971e01b8e259c9b73c8ffbd067d421a95e7",
+    "assets/embervale/variation-pilot/source/paths.ase": "31df6b5b5cf9c9a4e5710f311fcd3114036565bf2961ba4b53461e3ee4460ae4",
+    "assets/embervale/variation-pilot/source/rocks.ase": "3055e180fb763c4f8c513e84ebebe1b50ab4a99597ab1e47a4bd2ef454cde1cc",
+    "assets/embervale/variation-pilot/source/roof.ase": "421696da2f93d31cfff1450a4b3141e0027b77606d298d5c16885998bf2cde5b",
+    "assets/embervale/variation-pilot/source/stone.ase": "2c9d0adee1336d915cc1ba02178b8914de2fdb0d6a522e30c5ae470fabea556a",
+    "assets/embervale/variation-pilot/source/stumps.ase": "145895c25bf7c483dff973a3c5b4af6dedced42e5a32d0ae99eba29ab276dec1",
+    "assets/embervale/variation-pilot/source/trees.ase": "0685b495d0d378b8ca9f5aea891d870dec8d0b3edbacf29cce62771d8cfc7700",
+    "assets/embervale/variation-pilot/source/walls.ase": "bcd216fde1b5c65b27222a8d2cc1e94a267a05cd59836e5dd8f0add0db4ead51",
+    "assets/embervale/variation-pilot/source/water.ase": "2973ae18c53ec42b76386f9bed12606d4f11619eda0ff6bb8e927874fc34ec61",
+    "assets/embervale/service-pilot/source/bank.ase": "3028cf14df7e756e822f24690739a7acad34edc21ae9c5294c8e36da0e97f137",
+    "assets/embervale/service-pilot/source/crafting-table.ase": "e173c5649f60886620a912dae7c201297732f39f7c88019cd6738467628309a1",
+    "assets/embervale/mining-pilot/source/pickaxes.ase": "48ad6a6e9f42ddae92956c849d68d697eb4abd4a349df3eb1c8c898f21aea1e0",
+    "assets/embervale/mining-pilot/source/player.ase": "bb313253f9971c250f5ee61d4452bb1604013c9447e9c8f33436952be9569548",
+    "assets/embervale/melee-pilot/source/equipment.ase": "4f6c6c0fc561002846b2060be3152b98389d7614af2b02a7ce565ecb63040283",
+    "assets/embervale/melee-pilot/source/player.ase": "6fc6bc52a4a86cc10e9167761112fcad8670d45d5249338fd3f6c87524322829",
+    "assets/embervale/forest-pilot/source/oak.ase": "71dd61166e05b69a085eb7cf2253a997f625d4dd3adcf10745edb4cbb95c3f97",
+    "assets/embervale/forest-pilot/source/stump.ase": "5528748700aa7542ab8a1ab32dd0c4e859546e6cba6c8719881bf2396acfc64f",
+    "assets/embervale/forest-pilot/source/terrain.ase": "59b55ab1645e363d4d583074e482f907e2de302e15a4e0f636b237abedfc292b",
+    "assets/embervale/environment-pilot/source/copper.ase": "53c478feeccfd4710437371ebcb108e6e47f30b6d994e630f2731abc9f75df7c",
+    "assets/embervale/environment-pilot/source/rubble.ase": "2df6b9d3fc8e5c4836028b72a7f517e7266f15136a5d3cf616ff1d15077c18ff",
+    "assets/embervale/environment-pilot/source/terrain.ase": "4aa5f743ca9b1eac37328e0c08024d9d8a3ad83b9344df3d9bc62a8d2a2e6ed1",
+    "assets/embervale/environment-pilot/source/tin.ase": "5ce3734e2e5219912f9d7c5c248935df3f9659ae324ca1c1c528dabce74a2740",
+    "assets/embervale/cast-pilot/source/furnace.ase": "6545113ce212270876cb1cf3d395786d73a6eda8abbb581cf41f3ecb42f57b3d",
+    "assets/embervale/cast-pilot/source/mara.ase": "f4c21fdf5ce0e80e7c0934c9331216113bf8738c3b19139d3bd4291968fd9b2e",
+    "assets/embervale/cast-pilot/source/player.ase": "3ff6cdfee8ba2e7dce4509f025c35eaafeb462103030c2e951beef20f7ac486f",
+    "assets/embervale/building-pilot/source/floors.ase": "ed5d41c7bc7a5625a0dc408fa7d98aa437a7e6b2679c02f747ee774c15c520bb",
+    "assets/embervale/building-pilot/source/roof.ase": "1aa72f9e88ebae4e765b7addfaa63bbc501504a2caac42e6e3a27cfa36ff55da",
+    "assets/embervale/building-pilot/source/walls.ase": "e7e83c4310c3e9fa8649730e1b2aaae208fa79c8330cc87fdaf270d7c24f708c"
+  },
+  "default_exports": [
+    {
+      "batch": "cast",
+      "returncode": 0,
+      "output": "CAST_PILOT_OK: eight player directions, eight walk poses, Mara and furnace; binary alpha; waist continuity checked.\n{\"assets\": 66, \"sources\": 3, \"gif_frames\": 8}\n",
+      "error": ""
+    },
+    {
+      "batch": "woodcutting",
+      "returncode": 0,
+      "output": "{\"body_frames\": 64, \"axe_frames\": 192, \"preview_frames\": 8, \"failed_frames\": 0}\n",
+      "error": ""
+    },
+    {
+      "batch": "mining",
+      "returncode": 0,
+      "output": "{\"body_frames\": 48, \"pickaxe_frames\": 144, \"preview_frames\": 6, \"failed_frames\": 0}\n",
+      "error": ""
+    },
+    {
+      "batch": "melee",
+      "returncode": 0,
+      "output": "{\"bodyFrames\": 640, \"equipmentFrames\": 1152, \"clippedFrames\": 0, \"emptyFrames\": 0, \"maxArmReach\": 9.5, \"packed_images\": {\"player\": [1024, 462], \"equipment\": [1024, 949]}}\n",
+      "error": ""
+    }
+  ],
+  "melee_pixel_comparison": {
+    "frames": 1792,
+    "source_cells": [
+      96,
+      96
+    ],
+    "pixels_checked": 16515072,
+    "alpha_and_visible_rgba_equal": true
+  }
+}

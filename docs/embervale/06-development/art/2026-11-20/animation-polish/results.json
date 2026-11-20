@@ -1,0 +1,246 @@
+{
+  "date": "2026-11-20",
+  "baseline": "16f9697",
+  "branch": "polish/player-animation",
+  "environment": {
+    "os": "Windows",
+    "compiler": "UCRT64 GCC 16.1.0",
+    "SDL": "3.4.12",
+    "generator": "Ninja",
+    "video": "dummy",
+    "renderer": "software"
+  },
+  "build": {
+    "client": true,
+    "render_preview": true,
+    "final_asset_refresh_parallelism": 1,
+    "note": "A parallel post-build texture-copy race was avoided by serialising the final refresh.",
+    "final_code_build_parallelism": 6
+  },
+  "tests": {
+    "passed": 12,
+    "failed": 0,
+    "suites": {
+      "MeleeAttackResolverTests": {
+        "passed": true,
+        "assertions": 137
+      },
+      "MeleeCombatActionTests": {
+        "passed": true,
+        "assertions": 92
+      },
+      "MeleeEngagementTests": {
+        "passed": true,
+        "assertions": 46
+      },
+      "EnginePlayerPersistenceLifecycleTests": {
+        "passed": true,
+        "assertions": 25
+      },
+      "WoodcuttingPresentationTests": {
+        "passed": true,
+        "assertions": 241
+      },
+      "MeleePresentationTests": {
+        "passed": true,
+        "assertions": 179
+      },
+      "PlayerAnimationTests": {
+        "passed": true,
+        "assertions": 366
+      },
+      "WoodcuttingGraphicsTests": {
+        "passed": true,
+        "assertions": 521
+      },
+      "MeleeGraphicsTests": {
+        "passed": true,
+        "assertions": 1891
+      },
+      "MeleeClickIntegrationTests": {
+        "passed": true,
+        "assertions": 26
+      },
+      "CombatFeedbackTests": {
+        "passed": true,
+        "assertions": 50
+      },
+      "CameraPresentationTests": {
+        "passed": true,
+        "assertions": 18
+      }
+    }
+  },
+  "rig_audit": {
+    "baseline": "16f9697",
+    "oldMaxShoulderToWrist": 20.322647465327936,
+    "newMaxShoulderToWrist": 9.500000000000005,
+    "matchingIdleTransitions": 40,
+    "units": "native pixels before rasterisation"
+  },
+  "neutral_sprites_preserved": 8,
+  "default_export_preserved_editable_masters": 7,
+  "packaged_texture_hashes": {
+    "assets/embervale/cast-pilot/textures/furnace.png": "e8e1f512a5d1bdc355dcd569ff5cb9ee5a7566725ed54eba27efc74859c1b2f2",
+    "assets/embervale/cast-pilot/textures/mara.png": "3f6ecc1b64e50ed4d49a413b1e0edd0aaf1d29bdb9acb5a6a9c3604efe8df885",
+    "assets/embervale/cast-pilot/textures/player.png": "9bd26e15c20984d18676a037e06eb1899bd2390123f67d18ad52fe57e0a0b02a",
+    "assets/embervale/melee-pilot/textures/equipment.png": "b0398ed75b47202efa35a3ecdbcab1ea0a8f7c781f6cdb25ae5d7e05b925e44d",
+    "assets/embervale/melee-pilot/textures/player.png": "8f9165548c2f7a39c537ddadb24984cd12795535f02a2e219ac4e36208a8843e",
+    "assets/embervale/woodcutting-pilot/textures/axes.png": "8dc287cb2847d2e85924fda5043727a2b75654c13ff52ce53c74a2da754198d4",
+    "assets/embervale/woodcutting-pilot/textures/player.png": "647005e1959e82d33732e4ba5d9fc25181997e794760ff9f313606bbfc18a9f2"
+  },
+  "gif_metadata": {
+    "walking": {
+      "frames": 8,
+      "durations_ms": [
+        110,
+        90,
+        100,
+        150,
+        110,
+        90,
+        100,
+        150
+      ],
+      "sha256": "de9e34e701f678e9f3af7d001a3f0f1f89f95395322d9fe3d3677a28be9c1289"
+    },
+    "melee": {
+      "frames": 8,
+      "durations_ms": [
+        300,
+        130,
+        90,
+        70,
+        40,
+        70,
+        50,
+        70
+      ],
+      "sha256": "6438d24a7e9f5b51eca058d8a3f40f7a4ffdcf318e0eb20db91f20a3044306d5"
+    },
+    "chopping": {
+      "frames": 8,
+      "durations_ms": [
+        260,
+        200,
+        200,
+        80,
+        80,
+        80,
+        100,
+        200
+      ],
+      "sha256": "8e5109c1b8cd0ff7dbb0b6c89b376a39dfc44e4d1d7fca0e073bc55c860cbc74"
+    },
+    "comparison": {
+      "frames": 75,
+      "durations_ms": [
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20
+      ],
+      "sha256": "16757862033410a4578a0018ac5a7e25260be31e07659c24d78d284546ba66f7"
+    }
+  },
+  "world_fixture": {
+    "path": "content/worlds/river-crossing.blockout.json",
+    "sha256": "72c9d565ad1db11fc4e27eb8e512ef0dd23b5a902ef18da6a486a3c2ed28297f",
+    "textures_cached": 30
+  },
+  "captures": {
+    "axe-contact.png": "752363b8cf14b1460471fc29e42b537aba45d29f7313c6d443134dfc343daf08",
+    "chopping.png": "638490fe99024440f993cb6fb66c6766dcbb82078286e7ebe5e59d509145efe2",
+    "equipped-walk.png": "d086b224bfdacc1d297f2410eff878febf06e2df6a49d63ed891104bbed8b6c4",
+    "godsword-contact.png": "ad31fc24920b4b11bd9c5dff81b58611ec28193d8b49e33f90721b191b5c2f47",
+    "sword-contact.png": "4ab3f1f8ff7e3d05a78ba17867ab3682f8a1a455970760118d89f96fa1a98acf"
+  },
+  "source_hashes": {
+    "src/Combat/MeleePresentationState.cpp": "f689e8af152eb76038a26ec916812085b77b0a1b2f9908ee5410b1847d2b3eb3",
+    "src/Gathering/WoodcuttingPresentationState.cpp": "24e0f7291271000421dfe9d7af22bb1f96fef8b3177e01ab7b16bb435b1388f7",
+    "src/Graphics/Graphics.cpp": "936ab130da1167dde29f97027a384f625e5b09e92b93168ed46cb261d54a6655",
+    "src/Graphics/ForestSprites.cpp": "bac875979858b8edcb36f38e3034486ed5e5395fa6073d633fd4102a516d425c",
+    "src/Animation/PlayerAnimationTiming.h": "405c4426528d44898d7d6ae541818c66ddcc463932ccc08c8bde99652214efbe",
+    "assets/embervale/player-animation.json": "361b88692b80f99c7fdd63bcff230c5e9faa2a054f83a62859610f66ef09ee9b",
+    "tools/art/player_rig.js": "e02a098e2afa3fc73f476da6e11d40c188fb54b5d5d740c13bc13481419149ed",
+    "tools/art/melee_pilot.js": "aa49310cc7c5da081b6b6f35bae4ac5b4143269f1558251ccfc110adeba7e780",
+    "tools/art/woodcutting_pilot.js": "1b4b06e5dcc412de3077b49f6d64f9336495cfc04f3f085720cd408f97d49c88",
+    "tools/art/player_walk.js": "0dfe203a5355fe58e9c8784db9da088fddbfd1f7e1417728afcc60074ccd10fe",
+    "tools/art/animation_common.py": "8ddae30384ae95aba8d373c25731158b7b24c1ddc5387bbe4dde616772871c5e",
+    "tools/art/build_cast_pilot.py": "f28e0857a0fc73d4f4c73a0885c0c5945d46e2343cfc7b9a051822cc1e821ab3",
+    "tools/art/build_melee_pilot.py": "6d930e2450c5a63560be9f3511d15c4b1f2784b29304413536e3337909702458",
+    "tools/art/build_woodcutting_pilot.py": "86c876664c94239d397685dbdd2fbb7518f97bc6e1f127797ef7bd6ead87324b"
+  },
+  "visible_gpu_playthrough": false
+}

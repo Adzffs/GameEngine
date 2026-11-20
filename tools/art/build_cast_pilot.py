@@ -8,6 +8,7 @@ import subprocess
 import tempfile
 
 from build_forest_pilot import REPO, blank_png, checksum, png_size, write_renderer_layout
+from animation_common import load_timing, write_timing_header, retime_gif
 
 ART = REPO / 'assets/embervale/cast-pilot'
 PALETTE = ['222b2b', '30211d', '563727', '7b4e2e', 'b27c48',
@@ -20,7 +21,9 @@ PALETTE = ['222b2b', '30211d', '563727', '7b4e2e', 'b27c48',
 def build(editor, regenerate=False, rebuild_walk=False, add_diagonals=False):
     for folder in ['source', 'textures', 'previews']:
         (ART / folder).mkdir(parents=True, exist_ok=True)
-    sizes = {'player': (128, 384), 'mara': (32, 48), 'furnace': (48, 64)}
+    sizes = {'player': (256, 384), 'mara': (32, 48), 'furnace': (48, 64)}
+    timing = load_timing()
+    write_timing_header()
     if not regenerate and any(not (ART / f'source/{name}.ase').is_file() for name in sizes):
         raise RuntimeError('Cast masters are missing; use --regenerate for initial authoring')
 
@@ -35,12 +38,12 @@ def build(editor, regenerate=False, rebuild_walk=False, add_diagonals=False):
     with tempfile.TemporaryDirectory(prefix='embervale-cast-') as scratch:
         temp = Path(scratch)
         fixtures = {}
-        for name, size in {**sizes, 'board': (640, 352), 'inspection': (640, 512), 'contacts': (640, 1792)}.items():
+        for name, size in {**sizes, 'board': (640, 352), 'inspection': (640, 512), 'contacts': (1280, 1792)}.items():
             path = temp / f'{name}.png'
             blank_png(path, *size)
             fixtures[name] = path.as_posix()
-        walk_frames = [(temp / f'walk-{i:02}.png').as_posix() for i in range(4)]
-        inspection_frames = [(temp / f'inspection-{i:02}.png').as_posix() for i in range(4)]
+        walk_frames = [(temp / f'walk-{i:02}.png').as_posix() for i in range(8)]
+        inspection_frames = [(temp / f'inspection-{i:02}.png').as_posix() for i in range(8)]
         cfg = {'regenerate': regenerate, 'rebuildWalk': rebuild_walk, 'addDiagonals': add_diagonals,
                'palette': PALETTE, 'fixtures': fixtures,
                'reference': (ART / 'reference/cast-reference.png').as_posix(),
@@ -52,7 +55,8 @@ def build(editor, regenerate=False, rebuild_walk=False, add_diagonals=False):
         script = temp / 'cast-pilot.js'
         template = Path(__file__).with_name('cast_pilot.js').read_text(encoding='utf-8')
         walk_module = Path(__file__).with_name('player_walk.js').read_text(encoding='utf-8')
-        script.write_bytes((walk_module + '\n' + template.replace('__CONFIG__', json.dumps(cfg))).encode('utf-8'))
+        rig = Path(__file__).with_name('player_rig.js').read_text(encoding='utf-8')
+        script.write_bytes((rig + '\n' + walk_module + '\n' + template.replace('__CONFIG__', json.dumps(cfg))).encode('utf-8'))
         output = run('--script', script)
         if 'CAST_PILOT_OK:' not in output:
             raise RuntimeError('Cast authoring did not complete')
@@ -65,8 +69,9 @@ def build(editor, regenerate=False, rebuild_walk=False, add_diagonals=False):
             run(sequence[0], '--save-as', ART / f'previews/{name}.gif',
                 '--data', temp / f'{name}.json', '--sheet', temp / f'{name}.png')
             frames = json.loads((temp / f'{name}.json').read_text(encoding='utf-8'))['frames']
-            if len(frames) != 4:
-                raise RuntimeError('Walk preview did not load all four PNG sequence frames')
+            if len(frames) != 8:
+                raise RuntimeError('Walk preview did not load all eight PNG sequence frames')
+            retime_gif(ART / f'previews/{name}.gif', timing['walk_preview_ms'])
 
     images = {}
     for name, size in sizes.items():
@@ -84,7 +89,7 @@ def build(editor, regenerate=False, rebuild_walk=False, add_diagonals=False):
                         'source_sha256': checksum(source), 'image_sha256': checksum(image)}
     assets = []
     for direction, name in enumerate(['s', 'w', 'e', 'n', 'sw', 'se', 'nw', 'ne']):
-        for phase in range(4):
+        for phase in range(8):
             assets.append({'id': f'character.player.{name}.' + ('idle' if phase == 0 else f'walk{phase}'),
                            'image': 'player', 'rect': [phase * 32, direction * 48, 32, 48],
                            'pivot': [16, 40], 'intended_ground_point_in_tile': [16, 24],
@@ -99,9 +104,9 @@ def build(editor, regenerate=False, rebuild_walk=False, add_diagonals=False):
                 'native_tile_size': 32, 'status': 'Player/Mara/furnace runtime pilot',
                 'editor': 'LibreSprite 1.1-dev', 'palette_rgb': PALETTE,
                 'facing_order': ['south', 'west', 'east', 'north', 'southwest', 'southeast', 'northwest', 'northeast'],
-                'walk': {'frames_per_direction': 4, 'cycle_distance_tiles': 1.0,
+                'walk': {'frames_per_direction': 8, 'cycle_distance_tiles': timing['walk_cycle_tiles'],
                          'idle_frame': 0, 'validation': 'previews/walk-validation.json',
-                         'notes': 'Two neutral and two alternating stride poses with a continuous pelvis; driven by visual travel distance.'},
+                         'notes': 'Eight articulated contact/passing poses, counter-swing and a retained pelvis; driven by travel distance.'},
                 'images': images, 'assets': assets,
                 'provenance': {'creator': 'OpenAI image generation and Codex-assisted LibreSprite authoring for Adam Holland',
                                'reference': 'reference/cast-reference.png',
@@ -113,7 +118,7 @@ def build(editor, regenerate=False, rebuild_walk=False, add_diagonals=False):
     (ART / 'manifest.json').write_bytes((json.dumps(manifest, indent=2) + '\n').encode('utf-8'))
     forest = json.loads((REPO / 'assets/embervale/forest-pilot/manifest.json').read_text(encoding='utf-8'))
     write_renderer_layout(forest)
-    print(json.dumps({'assets': len(assets), 'sources': len(images), 'gif_frames': 4}))
+    print(json.dumps({'assets': len(assets), 'sources': len(images), 'gif_frames': 8}))
 
 
 if __name__ == '__main__':

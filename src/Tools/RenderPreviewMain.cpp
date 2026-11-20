@@ -1,6 +1,7 @@
 #include "../Graphics/Graphics.h"
 #include "../World/World.h"
 #include "../Player/Player.h"
+#include "../Entity/Monster/Monster.h"
 #include "../Content/Import/StarterWorldRuntimeInput.h"
 #include <charconv>
 #include <filesystem>
@@ -27,7 +28,7 @@ int main(int argc, char **argv)
     try
     {
         if (argc < 3)
-            throw std::invalid_argument("Usage: EmbervaleRenderPreview WORLD.json OUTPUT.png [--basic] [--deplete-trees] [--deplete-rocks] [--focus X Y] [--zoom 1|1.5] [--condition new|weathered|repaired] [--walk-to X Y | --chop X Y | --mine X Y] [--frames N]");
+            throw std::invalid_argument("Usage: EmbervaleRenderPreview WORLD.json OUTPUT.png [--basic] [--deplete-trees] [--deplete-rocks] [--focus X Y] [--zoom 1|1.5] [--condition new|weathered|repaired] [--walk-to X Y | --chop X Y | --mine X Y | --melee X Y] [--weapon bronze-sword|godsword|bronze-axe|iron-axe|steel-axe|bronze-pickaxe|iron-pickaxe|steel-pickaxe|unarmed] [--shield] [--frames N]");
         const auto input = std::filesystem::path(reinterpret_cast<const char8_t *>(argv[1]));
         const auto output = std::filesystem::path(reinterpret_cast<const char8_t *>(argv[2]));
         std::error_code equivalentError;
@@ -40,6 +41,9 @@ int main(int argc, char **argv)
         std::optional<std::pair<int, int>> walkTo;
         std::optional<std::pair<int, int>> chop;
         std::optional<std::pair<int, int>> mine;
+        std::optional<std::pair<int, int>> melee;
+        std::optional<ItemType> weapon;
+        bool shield = false;
         float zoom = 1.0f;
         int frames = 0, condition = -1;
         for (int index = 3; index < argc; ++index)
@@ -74,6 +78,27 @@ int main(int argc, char **argv)
                 const int y = Coordinate(argv[++index]);
                 (option == "--chop" ? chop : mine) = std::pair{x, y};
             }
+            else if (option == "--melee" && index + 2 < argc)
+            {
+                const int x = Coordinate(argv[++index]);
+                const int y = Coordinate(argv[++index]);
+                melee = std::pair{x,y};
+            }
+            else if (option == "--shield") shield = true;
+            else if (option == "--weapon" && index + 1 < argc)
+            {
+                const std::string_view value = argv[++index];
+                if (value == "bronze-sword") weapon = ItemType::BRONZE_SWORD;
+                else if (value == "godsword") weapon = ItemType::DEVELOPER_GODSWORD;
+                else if (value == "bronze-axe") weapon = ItemType::BRONZE_AXE;
+                else if (value == "iron-axe") weapon = ItemType::IRON_AXE;
+                else if (value == "steel-axe") weapon = ItemType::STEEL_AXE;
+                else if (value == "bronze-pickaxe") weapon = ItemType::BRONZE_PICKAXE;
+                else if (value == "iron-pickaxe") weapon = ItemType::IRON_PICKAXE;
+                else if (value == "steel-pickaxe") weapon = ItemType::STEEL_PICKAXE;
+                else if (value == "unarmed") weapon = ItemType::NONE;
+                else throw std::invalid_argument("Unknown preview weapon");
+            }
             else if (option == "--zoom" && index + 1 < argc)
             {
                 const std::string_view value = argv[++index];
@@ -91,8 +116,13 @@ int main(int argc, char **argv)
         // Fixed, independent streams keep authored captures reproducible.
         // Production game launches retain their normal random sources.
         World world(StarterWorldImport::LoadFile(input), 1337U, 7331U, 1U);
-        if (chop && (mine || walkTo || deplete)) throw std::invalid_argument("Chopping preview requires an intact target and no walk-to fixture");
-        if (mine && (walkTo || depleteRocks)) throw std::invalid_argument("Mining preview requires an intact target and no walk-to fixture");
+        if (static_cast<int>(walkTo.has_value()) + static_cast<int>(chop.has_value()) +
+            static_cast<int>(mine.has_value()) + static_cast<int>(melee.has_value()) > 1)
+            throw std::invalid_argument("Select only one walk, chopping, mining or melee fixture");
+        if (chop && deplete) throw std::invalid_argument("Chopping requires an intact tree");
+        if (mine && depleteRocks) throw std::invalid_argument("Mining requires an intact rock");
+        if ((chop || mine) && (weapon || shield))
+            throw std::invalid_argument("Gathering previews select their own equipped tool");
         if (walkTo && !world.GetMap().IsValidPosition(walkTo->first, walkTo->second))
             throw std::invalid_argument("Walk preview destination must be walkable");
         const int playerID = world.CreatePlayer(PlayerInitializationMode::FRESH_START);
@@ -113,6 +143,21 @@ int main(int argc, char **argv)
                     auto *node = world.GetResourceAt(resource.GetX(), resource.GetY());
                     while (node->IsActive()) node->ConsumeUse();
                 }
+
+        // Equipment choices are isolated presentation fixtures, never saved.
+        if (weapon || melee)
+            player->GetEquipment().Equip(EquipmentSlotType::WEAPON,weapon.value_or(ItemType::BRONZE_SWORD));
+        if (shield) player->GetEquipment().Equip(EquipmentSlotType::SHIELD,ItemType::WOODEN_SHIELD);
+        int meleeTargetID = -1;
+        if (melee)
+        {
+            for (const auto &entity : world.GetEntities())
+                if (const auto *monster = dynamic_cast<const Monster *>(entity.get()); monster && monster->IsAlive() &&
+                    monster->GetPosition().GetX() == melee->first && monster->GetPosition().GetY() == melee->second)
+                    meleeTargetID = monster->GetID();
+            if (meleeTargetID < 0 || !world.TryStartMeleeAttack(playerID,meleeTargetID,2))
+                throw std::invalid_argument("Melee preview requires an adjacent living monster at the selected coordinates");
+        }
 
         const auto gatheringTarget = chop ? chop : mine;
         if (gatheringTarget)
@@ -143,6 +188,7 @@ int main(int argc, char **argv)
         Graphics graphics;
         if (!graphics.Initialize()) throw std::runtime_error("Preview renderer initialization failed");
         graphics.SynchronizeGatheringRewards(playerID, world.GetGatheringRewardEvents());
+        graphics.SynchronizeMeleeResults(playerID, world.GetMeleeCombatEvents());
         graphics.SetCompiledMapLabelsVisible(false);
         graphics.SetBuildingConditionPreview(condition);
         if (basic)
@@ -162,8 +208,8 @@ int main(int argc, char **argv)
         const auto draw = [&]
         {
             graphics.Render(world.GetMap(), world.GetEntities(), world.GetResources(), world.GetStations(),
-                world.GetGroundItems(), {}, player->GetPosition().GetX(), player->GetPosition().GetY(),
-                player->GetInventory(), player->GetEquipment(), *player, world.GetActionForEntity(playerID));
+                world.GetGroundItems(), world.GetMeleeCombatFeedbacks(), player->GetPosition().GetX(), player->GetPosition().GetY(),
+                player->GetInventory(), player->GetEquipment(), *player, world.GetActionForEntity(playerID), meleeTargetID);
         };
         // Initialize the real camera before applying the same anchored zoom
         // used by mouse-wheel input in the game.
@@ -174,7 +220,7 @@ int main(int argc, char **argv)
             graphics.AdjustCameraZoom(1, Graphics::WindowWidth * 0.5f, Graphics::WindowHeight * 0.5f);
             if (graphics.GetCameraZoom() == before) throw std::runtime_error("Requested preview zoom is unavailable");
         }
-        const int frameCount = frames > 0 ? frames : (gatheringTarget ? 18 : walkTo ? 2 : 1);
+        const int frameCount = frames > 0 ? frames : (melee ? 32 : gatheringTarget ? 18 : walkTo ? 2 : 1);
         for (int frame = 0; frame < frameCount; ++frame)
         {
             if (frame > 0)
@@ -186,6 +232,11 @@ int main(int argc, char **argv)
                 {
                     world.Update();
                     graphics.SynchronizeGatheringRewards(playerID, world.GetGatheringRewardEvents());
+                }
+                if (melee && frame % 15 == 0)
+                {
+                    world.Update();
+                    graphics.SynchronizeMeleeResults(playerID, world.GetMeleeCombatEvents());
                 }
                 SDL_Delay(40);
             }
@@ -199,7 +250,7 @@ int main(int argc, char **argv)
         SDL_SetRenderTarget(graphics.renderer, nullptr);
         std::cout << "Rendered " << pixels->w << 'x' << pixels->h
             << " through the game renderer; " << (basic ? "basic" : "world")
-            << " art, " << (mine ? "mining" : chop ? "woodcutting" : walkTo ? "walking" : "static")
+            << " art, " << (melee ? "melee" : mine ? "mining" : chop ? "woodcutting" : walkTo ? "walking" : "static")
             << " preview. No player or world files written.\n";
         return 0;
     }

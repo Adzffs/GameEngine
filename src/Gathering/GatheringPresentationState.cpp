@@ -1,11 +1,23 @@
 #include "GatheringPresentationState.h"
 #include "../Action/Action.h"
+#include "../Animation/PlayerAnimationTiming.h"
 #include "../Player/Player.h"
 #include "../Item/ItemDatabase.h"
 #include "../World/Object/Resource/ResourceNode.h"
 #include "../World/Object/Resource/ResourceDatabase.h"
 #include <algorithm>
 #include <cmath>
+#include <span>
+
+namespace
+{
+    std::span<const int> PoseDurations(SkillType skill)
+    {
+        if (skill == SkillType::WOODCUTTING)
+            return PlayerAnimationTiming::ChoppingMilliseconds;
+        return PlayerAnimationTiming::MiningMilliseconds;
+    }
+}
 
 int GatheringPresentationState::ToolTier(ItemType item, SkillType skill)
 {
@@ -101,11 +113,22 @@ void GatheringPresentationState::Update(const Player &player, const Action *acti
 
 int GatheringPresentationState::GetPose() const
 {
-    return animation ? std::min(PoseCount - 1, static_cast<int>(animation->elapsedSeconds / CycleSeconds * PoseCount)) : 0;
+    if (!animation) return 0;
+    const auto durations = PoseDurations(skillType);
+    const float milliseconds = animation->elapsedSeconds * 1000.0f;
+    int boundary = 0;
+    for (std::size_t pose = 0; pose < durations.size(); ++pose)
+    {
+        boundary += durations[pose];
+        if (milliseconds < boundary) return static_cast<int>(pose);
+    }
+    return static_cast<int>(durations.size()) - 1;
 }
 
 float GatheringPresentationState::GetImpact() const
 {
     if (!animation || GetPose() != 3) return 0.0f;
-    return std::clamp((animation->elapsedSeconds / CycleSeconds * PoseCount - 3.0f), 0.0f, 1.0f);
+    const auto durations = PoseDurations(skillType);
+    const int start = durations[0] + durations[1] + durations[2];
+    return std::clamp((animation->elapsedSeconds * 1000.0f - start) / durations[3], 0.0f, 1.0f);
 }

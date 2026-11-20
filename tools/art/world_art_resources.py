@@ -1,4 +1,4 @@
-"""Read-only resource validation for the current eight world-art batches."""
+"""Read-only resource validation for the current nine world-art batches."""
 from __future__ import annotations
 import hashlib
 import json
@@ -10,7 +10,7 @@ import zlib
 
 REPO = Path(__file__).resolve().parents[2]
 BATCH_NAMES = ('forest-pilot', 'cast-pilot', 'environment-pilot', 'service-pilot',
-               'building-pilot', 'variation-pilot', 'woodcutting-pilot', 'mining-pilot')
+               'building-pilot', 'variation-pilot', 'woodcutting-pilot', 'mining-pilot', 'melee-pilot')
 BATCH_VERSIONS = {name: (2 if name in ('building-pilot', 'variation-pilot') else 1) for name in BATCH_NAMES}
 LIMIT_KEYS = {'max_images', 'max_frames', 'max_image_edge', 'max_image_pixels', 'max_png_bytes',
               'max_manifest_bytes', 'max_catalogue_png_bytes', 'max_texture_bytes', 'max_alpha_bytes',
@@ -18,8 +18,9 @@ LIMIT_KEYS = {'max_images', 'max_frames', 'max_image_edge', 'max_image_pixels', 
 TOKEN = re.compile(r'[a-z0-9._-]{1,128}\Z')
 PNG_SCRATCH_BYTES = 65536
 BINDINGS = {
-    'character.player.': (1, 4, True), 'character.woodcutting.': (1, 6, True),
-    'character.mining.': (1, 6, True), 'tool.axe.': (3, 6, True), 'tool.pickaxe.': (3, 6, True),
+    'character.player.': (1, 8, True), 'character.woodcutting.': (1, 8, True),
+    'character.mining.': (1, 6, True), 'tool.axe.': (3, 8, True), 'tool.pickaxe.': (3, 6, True),
+    'character.melee.': (5, 16, True), 'equipment.melee.': (9, 16, True),
     **{f'variation.{name}.': (count, 1, False) for name, count in
        [('grass', 162), ('paths', 204), ('water', 48), ('stone', 12), ('flora', 40),
         ('walls', 96), ('roof', 72), ('floors', 9), ('trees', 3), ('stumps', 3), ('rocks', 9)]},

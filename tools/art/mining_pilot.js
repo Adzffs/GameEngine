@@ -33,7 +33,7 @@ function pickaxePose(direction,pose,tier) {
 var bodies, pickaxes;
 if (cfg.regenerate) {
   var player = read(cfg.player);
-  if (player.width !== 128 || player.height !== 384) throw new Error('Mining requires the eight-way player master');
+  if ((player.width !== 128 && player.width !== 256) || player.height !== 384) throw new Error('Mining requires the eight-way player master');
   bodies = canvas(384,640); pickaxes = canvas(384,1920);
   for (var d = 0; d < 8; d++) for (var p = 0; p < 6; p++) {
     blit(bodyPose(crop(player,0,d*48,32,48),d,p),bodies,p*64,d*80);

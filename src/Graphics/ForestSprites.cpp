@@ -20,6 +20,7 @@ void ForestSprites::Clear()
     encodedBytes = peakStagingBytes = 0;
     grass = {}; paths = {}; water = {}; stone = {}; banks = {};
     player = {}; chopping = {}; choppingAxes = {}; miningPlayer = {}; miningPickaxes = {};
+    meleeBodies = {}; meleeEquipment = {};
     variedGrass = {}; variedPaths = {}; variedWater = {}; variedStone = {}; flora = {};
     variedWalls = {}; variedRoof = {}; variedFloors = {}; variedTrees = {}; variedStumps = {}; variedRocks = {};
     buildingWalls = {}; buildingRoof = {}; buildingFloors = {};
@@ -131,16 +132,27 @@ void ForestSprites::InitializeCatalogue(SDL_Renderer *target,
         if (frame.id == "resource.rock.tin.intact") tin = &frame;
         if (frame.id == "resource.rock.depleted") rubble = &frame;
         if (frame.id.starts_with("character.player.") && frame.facing >= 0 && frame.facing < static_cast<int>(player.size()) &&
-            frame.animationFrame >= 0 && frame.animationFrame < 4)
+            frame.animationFrame >= 0 && frame.animationFrame < PlayerAnimationTiming::WalkPoses)
             player[frame.facing][frame.animationFrame] = &frame;
-        if (frame.facing >= 0 && frame.facing < 8 && frame.animationFrame >= 0 && frame.animationFrame < 6)
+        if (frame.facing >= 0 && frame.facing < 8 && frame.animationFrame >= 0 && frame.animationFrame < PlayerAnimationTiming::ChoppingPoses)
         {
             if (frame.id.starts_with("character.woodcutting.")) chopping[frame.facing][frame.animationFrame] = &frame;
+            if (frame.id.starts_with("tool.axe.") && frame.grassVariant >= 0 && frame.grassVariant < 3)
+                choppingAxes[frame.grassVariant][frame.facing][frame.animationFrame] = &frame;
+        }
+        if (frame.facing >= 0 && frame.facing < 8 && frame.animationFrame >= 0 &&
+            frame.animationFrame < PlayerAnimationTiming::MiningPoses)
+        {
             if (frame.id.starts_with("character.mining.")) miningPlayer[frame.facing][frame.animationFrame] = &frame;
             if (frame.id.starts_with("tool.pickaxe.") && frame.grassVariant >= 0 && frame.grassVariant < 3)
                 miningPickaxes[frame.grassVariant][frame.facing][frame.animationFrame] = &frame;
-            if (frame.id.starts_with("tool.axe.") && frame.grassVariant >= 0 && frame.grassVariant < 3)
-                choppingAxes[frame.grassVariant][frame.facing][frame.animationFrame] = &frame;
+        }
+        if (frame.facing >= 0 && frame.facing < 8 && frame.animationFrame >= 0 && frame.animationFrame < EquippedFrames)
+        {
+            if (frame.id.starts_with("character.melee.") && frame.grassVariant >= 0 && frame.grassVariant < 5)
+                meleeBodies[frame.grassVariant][frame.facing][frame.animationFrame] = &frame;
+            if (frame.id.starts_with("equipment.melee.") && frame.grassVariant >= 0 && frame.grassVariant < 9)
+                meleeEquipment[frame.grassVariant][frame.facing][frame.animationFrame] = &frame;
         }
     }
 #if SDL_VERSION_ATLEAST(3, 4, 0)
@@ -507,7 +519,7 @@ const ForestSprites::Frame *ForestSprites::TreeFrame(int x, int y, bool active) 
 
 bool ForestSprites::DrawPlayer(float tileX, float tileY, int facing, int pose) const
 {
-    const auto *frame = player[std::clamp(facing, 0, static_cast<int>(player.size()) - 1)][std::clamp(pose, 0, 3)];
+    const auto *frame = player[std::clamp(facing, 0, static_cast<int>(player.size()) - 1)][std::clamp(pose, 0, PlayerAnimationTiming::WalkPoses - 1)];
     return DrawCharacter(frame, tileX, tileY);
 }
 
@@ -518,7 +530,7 @@ bool ForestSprites::DrawMara(int tileX, int tileY) const
 
 bool ForestSprites::DrawWoodcutting(float tileX, float tileY, int facing, int pose, int axeTier) const
 {
-    if (facing < 0 || facing >= 8 || pose < 0 || pose >= 6 || axeTier < 0 || axeTier >= 3) return false;
+    if (facing < 0 || facing >= 8 || pose < 0 || pose >= PlayerAnimationTiming::ChoppingPoses || axeTier < 0 || axeTier >= 3) return false;
     const auto *body = chopping[facing][pose], *axe = choppingAxes[axeTier][facing][pose];
     if (!Available(body) || !Available(axe)) return false;
     const bool behind = facing == 3 || facing == 6 || facing == 7;
@@ -530,13 +542,50 @@ bool ForestSprites::DrawWoodcutting(float tileX, float tileY, int facing, int po
 
 bool ForestSprites::DrawMiningAction(float tileX, float tileY, int facing, int pose, int pickaxeTier) const
 {
-    if (facing < 0 || facing >= 8 || pose < 0 || pose >= 6 || pickaxeTier < 0 || pickaxeTier >= 3) return false;
+    if (facing < 0 || facing >= 8 || pose < 0 || pose >= PlayerAnimationTiming::MiningPoses || pickaxeTier < 0 || pickaxeTier >= 3) return false;
     const auto *body = miningPlayer[facing][pose], *pickaxe = miningPickaxes[pickaxeTier][facing][pose];
     if (!Available(body) || !Available(pickaxe)) return false;
     const bool behind = facing == 3 || facing == 6 || facing == 7;
     if (behind) Draw(pickaxe, Bounds(*pickaxe, tileX, tileY));
     DrawCharacter(body, tileX, tileY);
     if (!behind) Draw(pickaxe, Bounds(*pickaxe, tileX, tileY));
+    return true;
+}
+
+bool ForestSprites::DrawEquippedPlayer(float tileX, float tileY, int facing, int pose,
+    ItemType weapon, ItemType shield, bool attacking) const
+{
+    if (facing < 0 || facing >= 8 || pose < 0 || pose >= (attacking ? PlayerAnimationTiming::MeleePoses : PlayerAnimationTiming::WalkPoses)) return false;
+    const int slot = [&] {
+        switch (weapon)
+        {
+        case ItemType::BRONZE_SWORD: return 0;
+        case ItemType::DEVELOPER_GODSWORD: return 1;
+        case ItemType::BRONZE_AXE: return 2;
+        case ItemType::IRON_AXE: return 3;
+        case ItemType::STEEL_AXE: return 4;
+        case ItemType::BRONZE_PICKAXE: return 5;
+        case ItemType::IRON_PICKAXE: return 6;
+        case ItemType::STEEL_PICKAXE: return 7;
+        default: return -1;
+        }
+    }();
+    const bool hasShield = shield == ItemType::WOODEN_SHIELD;
+    if (!attacking && slot < 0 && !hasShield) return false;
+    const int style = slot == 1 ? 2 : slot < 0 ? 0 : slot >= 2 && slot <= 4 ? 3 : slot >= 5 ? 4 : 1;
+    const int frame = attacking ? pose + PlayerAnimationTiming::WalkPoses : pose;
+    const auto *body = meleeBodies[style][facing][frame];
+    const auto *held = slot >= 0 ? meleeEquipment[slot][facing][frame] : nullptr;
+    // A two-handed weapon carries the equipped shield across the back.
+    const auto *offhand = hasShield ? meleeEquipment[8][style == 2 ? 3 : facing][style == 2 ? 0 : frame] : nullptr;
+    if (!Available(body) || (slot >= 0 && !Available(held)) || (hasShield && !Available(offhand))) return false;
+    const bool weaponBehind = facing == 1 || facing == 3 || facing == 6;
+    const bool shieldBehind = style == 2 || facing == 2 || facing == 3 || facing == 7;
+    if (offhand && shieldBehind) Draw(offhand, Bounds(*offhand, tileX, tileY));
+    if (held && weaponBehind) Draw(held, Bounds(*held, tileX, tileY));
+    DrawCharacter(body, tileX, tileY);
+    if (held && !weaponBehind) Draw(held, Bounds(*held, tileX, tileY));
+    if (offhand && !shieldBehind) Draw(offhand, Bounds(*offhand, tileX, tileY));
     return true;
 }
 

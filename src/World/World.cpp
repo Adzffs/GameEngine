@@ -1980,9 +1980,22 @@ void World::RecordMeleeCombatFeedback(
         defenderEntityID,
         result.didHit,
         result.actualDamageApplied,
-        MeleeCombatFeedbackLifetimeTicks,
-        currentTick};
-    meleeCombatEvents.push_back(meleeCombatFeedbacks[defenderEntityID]);
+        MeleeCombatFeedbackLifetimeTicks};
+    auto &feedback = meleeCombatFeedbacks[defenderEntityID];
+    feedback.completionTick = currentTick;
+    if (const auto *attacker = entityManager.GetEntityByID(attackerEntityID))
+    {
+        feedback.attackerX = attacker->GetPosition().GetX();
+        feedback.attackerY = attacker->GetPosition().GetY();
+        if (const auto *player = dynamic_cast<const Player *>(attacker))
+            feedback.weapon = player->GetEquipment().GetEquippedItem(EquipmentSlotType::WEAPON);
+    }
+    if (const auto *defender = entityManager.GetEntityByID(defenderEntityID))
+    {
+        feedback.defenderX = defender->GetPosition().GetX();
+        feedback.defenderY = defender->GetPosition().GetY();
+    }
+    meleeCombatEvents.push_back(feedback);
 }
 
 void World::AwardMeleeStyleExperience(

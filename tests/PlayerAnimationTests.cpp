@@ -30,6 +30,18 @@ struct GraphicsTestAccess
     static float Distance(const Graphics &graphics) { return graphics.playerWalkDistance; }
     static SDL_Renderer *Renderer(Graphics &graphics) { return graphics.renderer; }
     static ForestSprites &Sprites(Graphics &graphics) { return graphics.forestSprites; }
+    static void BeginStep(Graphics &g)
+    {
+        g.visualPlayerInitialized = true; g.visualPlayerX = 2; g.visualPlayerY = 2;
+        g.visualMovementTargetInitialized = true;
+        g.visualMovementTargetX = 2; g.visualMovementTargetY = 2;
+    }
+    static SDL_FPoint Step(Graphics &g, int x, int y, float delta)
+    {
+        g.presentationDeltaSeconds = delta;
+        g.DrawPlayer(x,y);
+        return {g.visualPlayerX,g.visualPlayerY};
+    }
 };
 
 namespace
@@ -103,8 +115,8 @@ int main()
     std::set<std::uint64_t> idleDirections;
     for (int facing = 0; facing < 8; ++facing)
     {
-        std::array<std::uint64_t, 4> poses{};
-        for (int pose = 0; pose < 4; ++pose)
+        std::array<std::uint64_t, PlayerAnimationTiming::WalkPoses> poses{};
+        for (int pose = 0; pose < PlayerAnimationTiming::WalkPoses; ++pose)
         {
             SDL_SetRenderDrawColor(renderer, 30, 40, 50, 255);
             SDL_RenderClear(renderer);
@@ -115,7 +127,8 @@ int main()
         idleDirections.insert(poses[0]);
         test.Expect(poses[1] != poses[0] && poses[3] != poses[0] && poses[1] != poses[3],
             "Each direction has two distinct alternating strides");
-        test.ExpectEqual(poses[0], poses[2], "Both neutral walk poses align exactly");
+        const std::set<std::uint64_t> gait(poses.begin(),poses.end());
+        test.Expect(gait.size() >= 6, "Walking has distinct contact, passing and lift poses rather than repeated neutral cells");
         SDL_SetRenderDrawColor(renderer, 30, 40, 50, 255);
         SDL_RenderClear(renderer);
         GraphicsTestAccess::Travel(graphics, directions[facing].x * 0.3f, directions[facing].y * 0.3f);
@@ -130,5 +143,23 @@ int main()
     test.ExpectEqual(idleDirections.size(), std::size_t{8},
         "The eight compass directions use visually distinct sprites");
 #endif
+    for (const auto destination : std::array<SDL_Point,3>{{{3,2},{3,3},{4,2}}})
+        for (const float delta : {1.0f/30.0f,1.0f/60.0f})
+        {
+            GraphicsTestAccess::BeginStep(graphics);
+            auto previous = SDL_FPoint{2,2};
+            float expectedStep = 0;
+            const int frames = static_cast<int>(std::round(0.6f/delta));
+            for (int frame = 0; frame < frames; ++frame)
+            {
+                const auto next = GraphicsTestAccess::Step(graphics,destination.x,destination.y,delta);
+                const float distance = std::hypot(next.x-previous.x,next.y-previous.y);
+                if (frame == 0) expectedStep = distance;
+                else test.ExpectNear(distance,expectedStep,0.0001f,"Walking and running retain steady visual speed throughout a step");
+                previous = next;
+            }
+            test.ExpectNear(previous.x,static_cast<float>(destination.x),0.0001f,"Visual step reaches its authoritative X without overshoot");
+            test.ExpectNear(previous.y,static_cast<float>(destination.y),0.0001f,"Visual step reaches its authoritative Y without overshoot");
+        }
     return test.Finish();
 }

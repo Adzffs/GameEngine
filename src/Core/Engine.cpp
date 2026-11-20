@@ -397,6 +397,9 @@ bool Engine::Run()
             if (graphics.ConsumeGatheringContact(contactSkill))
                 audio.Play(contactSkill == SkillType::MINING
                     ? AudioCue::STONE_IMPACT : AudioCue::WOOD_IMPACT);
+            if (const auto weapon = graphics.ConsumeMeleeSwing())
+                audio.Play(*weapon == ItemType::DEVELOPER_GODSWORD
+                    ? AudioCue::HEAVY_SWING : AudioCue::SWING);
         }
     }
 }
@@ -748,16 +751,14 @@ void Engine::Update(Clock::TimePoint now)
 
     world.Update();
     SynchronizeDialoguePresentation();
-    const Player *audioActor = dynamic_cast<Player *>(world.GetEntityByID(playerID));
-    const auto weapon = audioActor ? audioActor->GetEquipment().GetEquippedItem(
-        EquipmentSlotType::WEAPON) : ItemType::NONE;
     for (const auto cue : audioFeedback.ConsumeTick(playerID, world.GetCurrentTick(),
              world.GetActionLifecycleEvents(), world.GetGatheringRewardEvents(),
-             world.GetMeleeCombatEvents(), world.GetCommandProcessingResults(), weapon))
+             world.GetMeleeCombatEvents(), world.GetCommandProcessingResults()))
         audio.Play(cue);
 
     // Consume before another catch-up tick can replace the published events.
     graphics.SynchronizeGatheringRewards(playerID, world.GetGatheringRewardEvents());
+    graphics.SynchronizeMeleeResults(playerID, world.GetMeleeCombatEvents());
 
     if (playerPersistenceLifecycle)
     {
