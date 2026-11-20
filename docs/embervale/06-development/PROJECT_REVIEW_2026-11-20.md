@@ -8,6 +8,8 @@
 
 **Subsequent follow-up:** The [action-audio and packaging report](ACTION_AUDIO_2026-11-20.md) records independently published sound/copy changes and newer Linux checks. It supersedes the planned-only audio/copy status in this historical record. The original Windows animation merge and full starter acceptance remain open.
 
+The later [starter combat/recovery verification](STARTER_COMBAT_RECOVERY_2026-11-20.md) extends the software journey, fixes a reproduced post-combat tutorial skip and records newer 109/91 Linux results. This does not close the original Windows animation or human acceptance gaps.
+
 ## Overall assessment
 
 The project has a useful gameplay foundation and a working bounded editor. The largest immediate risks were losing player state and confusing separate source versions or historical evidence with current acceptance. Three data-integrity defects were reproduced and fixed. The roadmap also needed factual reconciliation: working editor/art features were still described as unavailable, completed bounded work remained awaiting review, and several tests still expected behavior from before later features were introduced.

@@ -160,3 +160,23 @@ clip leaves the game playable. Automated playback tests use the dummy driver;
 launch normally without that selection to hear the actual device. No audio
 subsystem is required for the headless core build. See [source, verification and
 remaining acceptance](ACTION_AUDIO_2026-11-20.md).
+
+## 11. Replay combat, food and recovery
+
+Build the content tools and run:
+
+~~~bash
+./build-headless/EmbervaleEconomyReport --replay-starter-journey \
+  --world content/worlds/river-crossing.blockout.json
+~~~
+
+Use the .exe path on Windows. This new mode requires an explicit world, continues
+the unfunded equipment route through the normal tutorial, then deliberately tests
+death, respawn, a persisted recovery pile and save/reload. It uses and cleans only
+new private disposable saves. It does not select an existing player profile.
+
+The normal tutorial finishes at tick 741 in the recorded source; the full
+2,370-tick run includes the deliberate death exercise. These are simulation
+measurements, not human completion time. Existing upgrade-only mode retains its
+454-tick preparation report and creates no saves. See [results, source and scope
+limits](STARTER_COMBAT_RECOVERY_2026-11-20.md).

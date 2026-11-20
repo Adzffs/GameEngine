@@ -1,0 +1,104 @@
+{
+  "date": "2026-11-20",
+  "source_commit": "0a866280849aaca3c907cfcd77ba90883636d8a2",
+  "baseline_commit": "f879b88aa39f90670f64fdb9bc70c29471cf94e8",
+  "environment": {
+    "os": "Linux",
+    "compiler": "GCC 14.2.0",
+    "cmake": "4.4.5",
+    "ninja": "1.13.2.git.kitware.jobserver-pipe-1",
+    "sdl": "3.4.12",
+    "python": "3.12.14",
+    "presentation": "dummy/software"
+  },
+  "checks": {
+    "client_ctest": {
+      "passed": 109,
+      "total": 109,
+      "labels": {
+        "headless": 91,
+        "client": 7,
+        "graphics": 11
+      }
+    },
+    "separate_headless_ctest": {
+      "passed": 91,
+      "total": 91
+    },
+    "python_editor_units": {
+      "passed": 42,
+      "total": 42
+    },
+    "real_editor_bridge_cases": {
+      "passed": 12,
+      "total": 12,
+      "included_in_ctest": true
+    },
+    "tutorial_checkpoint_assertions": 18,
+    "server_command_assertions": 51,
+    "new_replay_cli_tests": {
+      "passed": 5,
+      "total": 5,
+      "included_in_ctest": true
+    },
+    "save_roundtrip_checkpoints": 6,
+    "loaded_pending_checkpoint_idle_checks": 2,
+    "repeat_process_outputs_identical": true,
+    "client_headless_replay_outputs_identical": true,
+    "upgrade_only_output_unchanged": true,
+    "existing_player_save_bytes_preserved": true,
+    "temporary_save_cleanup_verified": true,
+    "original_world_failure_reproduced": true,
+    "documentation": {
+      "markdown_files": 97,
+      "links_checked": 1190,
+      "backlog_tasks": 96,
+      "acyclic_dependencies": true,
+      "legacy_studio_ids_retained": 45,
+      "external_urls_fetched": false
+    }
+  },
+  "measurements": {
+    "prepared_tick": 454,
+    "first_kill_tick": 677,
+    "normal_tutorial_complete_tick": 741,
+    "deliberate_death_tick": 2211,
+    "respawn_tick": 2215,
+    "persisted_pile_reclaimed_tick": 2293,
+    "final_safe_return_tick": 2370,
+    "nominal_tick_milliseconds": 600,
+    "normal_tutorial_nominal_seconds": 444.6,
+    "human_elapsed_time_measured": false,
+    "first_combat_damage_dealt": 20,
+    "first_combat_damage_taken": 7,
+    "first_combat_minimum_health": 100,
+    "equipped_maximum_health": 105,
+    "food_consumed": 2,
+    "food_healing_total": 10,
+    "equipment_health_gap_healed": 5,
+    "combat_injury_healed": 5,
+    "protected_pile_units": 9,
+    "protected_pile_item_types": 5
+  },
+  "limits": [
+    "Software simulation, not a visible/uncoached human run",
+    "Current Linux source; Windows execution and native save-failure interaction remain unverified for this follow-up",
+    "Total 2370 ticks includes intentional death and recovery; normal tutorial completes at 741",
+    "Player save/reload restarts the world and its random streams; whole-world persistence is not claimed",
+    "Original local melee/polish implementation is not recovered or integrated",
+    "Balance, story-chain, animation quality and audible/device acceptance remain open"
+  ],
+  "tested_published_blobs": {
+    "CMakeLists.txt": "f096f29395beebb6684394fe5856fd5cb741d1e0",
+    "src/Tools/AuthoritativeReplay.h": "406128ac2d7c2114ae1b5f0258ba030a2fe7eab2",
+    "src/Tools/EconomyReportMain.cpp": "36230776f582aa4ed9f4f9a6fec75f5e52d92d9e",
+    "src/Tools/StarterJourneyReplay.cpp": "b06ef93d4d475ed452435ae4af95529dae841ad8",
+    "src/Tools/StarterJourneyReplay.h": "600d16d43e5663812deb5452a04f4f64bd37190f",
+    "src/Tutorial/StarterJourney.cpp": "c66cf8e70f2540f1ff60f8807b381ec8f88d7858",
+    "src/World/World.cpp": "74652b27f719e51cdf16608874d7e5092a308229",
+    "src/World/World.h": "ab61e48371db37f85da385b33cfd98cd07c41cce",
+    "tests/ServerCommandQueueTests.cpp": "2abfc3bb6d7f81e6cfbb680bde43af3d2ad7179c",
+    "tests/StarterJourneyReplayCliTests.py": "62e8f993a9f4b971ae9b92916d0fd184e4b614c7",
+    "tests/StarterTutorialCheckpointTests.cpp": "dfcce0b944141ecdf63a76e47be2621c8e4eb17c"
+  }
+}

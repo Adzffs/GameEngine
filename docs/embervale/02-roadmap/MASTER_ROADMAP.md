@@ -17,12 +17,12 @@ The original engine baseline e9d32932 remains historical context. Read [current 
 The review fixed recovery-file deletion after failed loads (ENG-003), crafting cursor/grid omission from saves (GAME-009) and inventory/bank stack overflow (ENG-004). Windows checks pass 102/102 SDL, 87/87 standalone headless and 42/42 Python editor tests. Automated results do not establish human playthrough or visual approval.
 
 1. **REL-004:** reconcile/publish local melee/equipment with the newer Mining/shared-gathering implementation and matching editable sources/previews.
-2. **GAME-005 / GAME-004:** observe the integrated fresh route, including navigation, crafting, bank/shop, combat/food, death/recovery and save/reload. Current production replay is 454 simulation ticks; human time is unmeasured.
+2. **GAME-005 / GAME-004:** automated combat/food, death/recovery and six save/reload checkpoints now pass, with the tutorial skip fixed. Preparation remains 454 ticks; actual tutorial return is 741 and the deliberate death/recovery exercise totals 2370. Finish visible/uncoached navigation, input/confusion, balance and real-time acceptance on the recovered candidate.
 3. **ART-004:** finish acceptance of the implemented first sound pass: audible/device balance, Windows and synchronization with the recovered animation candidate.
 
 The owner is not satisfied with the current animation appearance and deferred polish. Keep ART-005 open. Autosave, interrupted editor recovery, validated publication, asset-copy ownership and accessibility have explicit tasks.
 
-The original Windows integration worktree remains unavailable, so REL-004 stays **in progress**. Independent work on the restored published source has delivered the first sound pass and fixed runtime asset copying; [results and limits](../06-development/ACTION_AUDIO_2026-11-20.md). ART-004 is **in progress** with audible/device and integration acceptance open. GAME-005 remains planned; the [original recovery handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md) still applies.
+The original Windows integration worktree remains unavailable, so REL-004 stays **in progress**. Independent work on the restored published source has delivered the first sound pass and fixed runtime asset copying; [results and limits](../06-development/ACTION_AUDIO_2026-11-20.md). ART-004 is **in progress** with audible/device and integration acceptance open. GAME-005 is **in progress** with the [automated starter continuation](../06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) passing; human/visible acceptance remains open. The [original recovery handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md) still applies.
 
 ## 3. Roadmap at a glance
 

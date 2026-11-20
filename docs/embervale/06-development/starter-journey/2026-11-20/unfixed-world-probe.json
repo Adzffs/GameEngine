@@ -1,0 +1,8 @@
+{
+  "world_implementation_commit": "f879b88aa39f90670f64fdb9bc70c29471cf94e8",
+  "world_implementation_blob": "3e2602426b6d897cb88c2083d547070d9f2b910d",
+  "method": "Final replay harness and current compatible headers/core objects, with only the original World.cpp implementation substituted in an isolated copied archive. This is a focused causal probe, not a full baseline build.",
+  "exit_code": 1,
+  "stderr": "Economy report failed: starter journey: loaded tutorial checkpoint advanced without its required action",
+  "expected_checkpoint_failure_observed": true
+}

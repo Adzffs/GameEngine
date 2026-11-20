@@ -6,6 +6,8 @@ REL-004 was subsequently started in a separate local worktree, then the executio
 
 The later [action-audio/packaging follow-up](docs/embervale/06-development/ACTION_AUDIO_2026-11-20.md) is published independently. Preserve its copy owner, contact edges and committed fatal-melee events during recovery; its Linux results do not verify the missing combined animation candidate.
 
+The later [starter combat/recovery verification](docs/embervale/06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) fixes tutorial bank/return predicates and verifies the software journey. Preserve current-tick committed-deposit and live-Mara-dialogue requirements; saved bank contents or previously claimed rewards must not bypass those checkpoints.
+
 For tasks that create or change animation, read:
 
 1. [Animation guide](docs/embervale/05-game/ANIMATION_GUIDE.md).

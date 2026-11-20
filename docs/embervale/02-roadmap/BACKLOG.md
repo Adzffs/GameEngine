@@ -14,25 +14,25 @@ Completion refers to the stated bounded acceptance, with evidence and publicatio
 | Work | Current bounded result | Remaining acceptance |
 |---|---|---|
 | Player integrity | ENG-003/004 and GAME-009 fixed and regression verified | Visible native save-failure choices remain QA-003 |
-| Current verification | 102/102 SDL, 87/87 standalone headless and 42/42 Python units; real bridge includes 12 cases | Other current platforms and human playthrough are separate |
+| Current verification | 109/109 Linux SDL, 91/91 standalone headless and 42/42 Python units; real bridge includes 12 cases | Other current platforms and human playthrough are separate |
 | Local animation line | Same safety fixes pass 101/101 on local 196a279 | REL-004 combines/publishes Mining and melee; ART-005 quality is deferred |
 | Ownership/architecture/export | Published bounded foundation and deterministic export | General regions/catalogue authoring remain separate |
 | Runtime content | Schema-1-4 bounded input, geography, identities and position/recovery checks | General publication/manifests/migrations |
 | Studio | Shared edits/history, guarded new drafts, reopen, playtests and overlays | Interruption/stale-lock recovery, in-place publication, accessibility and broader tools |
-| Art | Eight published batches, 1,175 frames/30 textures, walking/chopping/mining | Remaining cast/tiers/buildings, general importer, audio and visible acceptance |
-| Action audio and packaging | 15 original effects, controls, one copy owner; Linux 107/107 SDL and 89/89 standalone headless | Audible/Windows/full starter and original animation integration acceptance |
-| Starter progression | Fresh state and source-derived recipe/quest guidance; regressions pass | Uncoached navigation, combat/food/death/recovery and full quest-chain acceptance |
-| Starter measurements | Shield 245, sword 376, prepared return 454 ticks, observed twice | Human elapsed time and the 10-15 minute target remain unmeasured |
+| Art | Eight published batches, 1,175 frames/30 textures, walking/chopping/mining | Remaining cast/tiers/buildings, general importer, audible/device review and visible acceptance |
+| Action audio and packaging | 15 original effects, controls, one copy owner; included in the current 109/91 Linux verification | Audible/Windows/full starter and original animation integration acceptance |
+| Starter progression | Fresh tutorial plus combat, food, death, persisted recovery and six round trips pass; skipped checkpoints fixed | Uncoached navigation, combat/food/death/recovery and full quest-chain acceptance |
+| Starter measurements | Shield 245, sword 376, prepared 454, first kill 677 and actual tutorial return 741 ticks; death/recovery exercise 2370 | Human elapsed time and the 10-15 minute target remain unmeasured |
 | Timber exploit | Current two cycles: 60 -> 54 -> 48; regressions pass | Broader economy balance is GAME-004 |
 
 ## Next work
 
 1. REL-004: publish the reconciled Mining/melee/equipment build and sources/previews.
-2. GAME-005 / GAME-004: observe the exact fresh journey and resolve blocking failures.
+2. GAME-005 / GAME-004: the automated full tutorial/recovery route passes; finish visible/uncoached observation and tuning.
 3. ART-004: review the implemented first sound pass on the recovered candidate and actual device.
 4. Continue explicit recovery/packaging/usability priorities; ART-005 polish stays deferred.
 
-The original Windows integration worktree remains unavailable, so REL-004 stays **in progress**. Independent work on the restored published source has delivered the first sound pass and fixed runtime asset copying; [results and limits](../06-development/ACTION_AUDIO_2026-11-20.md). ART-004 is **in progress** with audible/device and integration acceptance open. GAME-005 remains planned; the [original recovery handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md) still applies.
+The original Windows integration worktree remains unavailable, so REL-004 stays **in progress**. Independent work on the restored published source has delivered the first sound pass and fixed runtime asset copying; [results and limits](../06-development/ACTION_AUDIO_2026-11-20.md). ART-004 is **in progress** with audible/device and integration acceptance open. GAME-005 is **in progress** with the [automated starter continuation](../06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) passing; human/visible acceptance remains open. The [original recovery handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md) still applies.
 
 ## Complete work inventory
 

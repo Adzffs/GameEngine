@@ -1,7 +1,7 @@
 # Testing, validation and evidence
 
 **Status date:** 20 November 2026
-**Current evidence:** [Project review](PROJECT_REVIEW_2026-11-20.md): Windows SDL 102/102 CTest entries, standalone headless 87/87 and Python editor 42/42. The 12-case bridge is included in one CTest entry. Other current-platform and visible/manual acceptance remain separate.
+**Current evidence:** [Starter combat/recovery follow-up](STARTER_COMBAT_RECOVERY_2026-11-20.md): Linux SDL 109/109 CTest entries, separate headless 91/91 and Python editor 42/42. The new five-test replay CLI suite and 12-case editor bridge are each included in one CTest entry. The [project review](PROJECT_REVIEW_2026-11-20.md) retains its earlier Windows 102/87 results. Visible/uncoached and current Windows acceptance remain separate.
 **Historical baseline:** e9d32932; earlier Linux results below retain their source dates.
 
 Select an actual installed interpreter with `-DPython3_EXECUTABLE=...` when needed. Windows Store shortcuts were inaccessible during this review; the executable enabled a previously omitted bridge entry. Confirm `ctest -N` contains `StarterWorldVisualBridgeIntegration`, and run `python -m unittest discover -s tests -p "test_*.py"` separately. A configuration omitting Python does not establish a full editor pass.

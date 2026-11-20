@@ -1,7 +1,7 @@
 # Current project status
 
 **Reviewed:** 20 November 2026.\
-**Published code:** [9b496c8](https://github.com/Adzffs/GameEngine/commit/9b496c8e59556511c2e274394b6c8c071f09c63a).\
+**Published code:** [0a86628](https://github.com/Adzffs/GameEngine/commit/0a866280849aaca3c907cfcd77ba90883636d8a2).\
 **Source of truth:** Current code and the [project review](../06-development/PROJECT_REVIEW_2026-11-20.md). The older [engine inventory](IMPLEMENTED_SYSTEMS.md) retains its explicitly dated baseline.
 
 Embervale is a playable local C++20/SDL3 RPG prototype with a bounded world editor and an authored River Crossing starter region. It has substantial gameplay systems. It is not yet a completed starter vertical slice, a released Studio product or an implemented online MMO.
@@ -12,7 +12,7 @@ Embervale is a playable local C++20/SDL3 RPG prototype with a bounded world edit
 |---|---|---|
 | Simulation | Authoritative world updates, 600-ms ticks, catch-up limits, separate render timing and deterministic gameplay RNG streams | Multiplayer command/identity/transport work remains a later milestone |
 | Movement | Eight-direction pathfinding, corner safety, queued destinations, walking/running and camera presentation | Uncoached route quality and map pacing |
-| Gameplay | Gathering, processing/crafting, inventory/equipment, shops, banking, melee, monster AI/leash/respawn, loot, food and recovery | Full starter journey, combat/food pressure and economy balance acceptance |
+| Gameplay | Gathering, processing/crafting, inventory/equipment, shops, banking, melee, monster AI/leash/respawn, loot, food and recovery | Visible/full story journey, combat/food feel and economy balance acceptance |
 | Progression | Five persisted skills, six starter quests, tutorial guidance, dialogue choices and recipe discovery | Observe first-time players completing the whole chain without coaching |
 | Persistence | Save version 13, historical migration, bounded loading, transactional file handling and controlled shutdown saving | Periodic autosave and stronger interruption/durability policy |
 | Data-safety corrections | Failed loads preserve backups; saves include crafting escrow; overflowing inventory additions reject; failed shutdown saves offer return to game or explicit exit without saving | Native save-failure dialog interaction still needs visible Windows acceptance |
@@ -32,12 +32,14 @@ The owner is not satisfied with the animation quality and explicitly deferred fu
 
 **Integration update:** The original GameEngine-next worktree remains unavailable. Its melee/polish merge is unpublished and unverified. An independent Linux follow-up restored the current published source, fixed shared runtime copying and delivered the first sound pass. See the [action-audio results](../06-development/ACTION_AUDIO_2026-11-20.md) and retain the [original integration handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md) for recovery. ART-004 is in progress; REL-004, full starter and owner visual acceptance remain open.
 
+The [starter combat/recovery follow-up](../06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) completes the automated tutorial and deliberate recovery exercise. It fixes skipped post-combat bank/Mara steps and misleading loot/reward hints. Six save/reload checkpoints and single persisted recovery pass; full human/visible acceptance remains open.
+
 ## Executed checks
 
 | Source/configuration | Executed result | Scope |
 |---|---:|---|
-| Current action-audio source, Linux SDL configuration | 107/107 CTest entries | 89 headless, 7 client, 11 graphics; software/dummy playback and controls |
-| Same current source, Linux with client/graphics disabled | 89/89 CTest entries | SDL-free core, including new audio routing tests |
+| Current starter combat/recovery source, Linux SDL configuration | 109/109 CTest entries | 91 headless, 7 client, 11 graphics; includes new tutorial and CLI checks |
+| Same current source, Linux with client/graphics disabled | 91/91 CTest entries | SDL-free core and full starter replay |
 | Current Python editor unit suite | 42/42 tests | Python 3.12.14; real bridge still 12 cases within one CTest entry |
 | Earlier published source plus critical fixes, Windows SDL client configuration | 102/102 CTest entries | Includes 87 headless, 5 client and 10 graphics labels; SDL dummy/software presentation |
 | Same source, separate Windows build with client and graphics disabled | 87/87 CTest entries | Confirms the changed core builds without SDL |
@@ -47,13 +49,13 @@ The owner is not satisfied with the animation quality and explicitly deferred fu
 
 The current follow-up uses Linux GCC 14.2.0, CMake 4.4.5, Ninja 1.13.2, audio-enabled SDL 3.4.12 and Python 3.12.14. Its published source blobs match the tested files. Earlier Windows review results use UCRT64 GCC 16.1.0/CMake 4.4.3 and their own recorded source. The new sound pass has not been accepted on a physical device or Windows, and no uncoached human/full visible starter playthrough is claimed.
 
-The current production replay equips the shield at tick 245, equips the sword at tick 376 and prepares the return with food at tick 454. These are simulation measurements, not human elapsed time. The older 451-tick record belongs to its earlier source. The timber replay still loses six coins per complete cycle.
+The unchanged preparation replay equips the shield at tick 245, equips the sword at 376 and buys food by 454. The extended route defeats Mossling at 677 and completes the tutorial by returning to Mara at 741. A separate intentional death/recovery segment ends at cumulative tick 2370 across two primary sessions, with six save/reload checks. These simulation measurements do not establish human elapsed time; the older 451-tick preparation belongs to its historical source. The timber replay still loses six coins per complete cycle.
 
 ## Current work order
 
 1. **Completed in this review:** ENG-003, ENG-004 and GAME-009 protect saves/items; QA-004 reconciles current automated evidence.
 2. **REL-004:** combine the published Mining work and local melee/equipment first pass; publish the matching sources, outputs and previews.
-3. **GAME-005 / GAME-004:** run the fresh-player route visibly; record navigation, food, death/recovery, confusion and real upgrade time.
+3. **GAME-005 / GAME-004:** automated combat, food, death/recovery and save/reload now pass; finish the visible/uncoached route, input/confusion, balance and real elapsed-time acceptance.
 4. **ART-004:** the bounded sound pass is implemented against published source; finish original animation synchronization and audible/device/Windows acceptance after recovery.
 5. Continue the separately prioritized recovery, asset packaging, autosave and accessibility tasks. Animation quality remains ART-005, deferred by the owner.
 
