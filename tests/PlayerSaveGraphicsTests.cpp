@@ -2,11 +2,35 @@
 #include "../src/Graphics/Graphics.h"
 #include "../src/Player/Player.h"
 #include "../src/Tutorial/StarterJourney.h"
+#include <cstring>
 
 struct GraphicsTestAccess
 {
     static Graphics::PlayerSaveNotice Notice(const Graphics &graphics) { return graphics.playerSaveNotice; }
     static Uint64 Until(const Graphics &graphics) { return graphics.playerSaveNoticeUntil; }
+    static bool BankRemainsVisible(Graphics &graphics)
+    {
+        graphics.OpenStationMenu(StationType::BANK);
+        graphics.displayedBankEntries = {{ItemType::BRONZE_AXE, 1}};
+        graphics.DrawBankPanel();
+        SDL_Surface *before = SDL_RenderReadPixels(graphics.renderer, nullptr);
+        graphics.DrawPlayerSaveNotice(1000000);
+        SDL_Surface *after = SDL_RenderReadPixels(graphics.renderer, nullptr);
+        bool unchanged = before && after && before->format == after->format;
+        if (unchanged)
+        {
+            const auto bytes = SDL_BYTESPERPIXEL(before->format);
+            for (int y = 54; unchanged && y < 666; ++y)
+                unchanged = std::memcmp(
+                    static_cast<const Uint8 *>(before->pixels) + y * before->pitch + 220 * bytes,
+                    static_cast<const Uint8 *>(after->pixels) + y * after->pitch + 220 * bytes,
+                    840 * bytes) == 0;
+        }
+        SDL_DestroySurface(before);
+        SDL_DestroySurface(after);
+        graphics.DismissStationMenu(false);
+        return unchanged;
+    }
     static bool Draw(Graphics &graphics, Uint64 now, const char *capture = nullptr)
     {
         SDL_SetRenderDrawColor(graphics.renderer, 45, 65, 45, 255);
@@ -29,6 +53,8 @@ int main(int argc, char **argv)
     Graphics graphics;
     test.Expect(graphics.Initialize(), "Save notice uses the real SDL renderer");
     graphics.SetPlayerSaveNotice(Graphics::PlayerSaveNotice::RETRYING);
+    test.Expect(GraphicsTestAccess::BankRemainsVisible(graphics),
+        "Persistent save warning preserves every bank-panel pixel, including withdrawal slots");
     test.Expect(GraphicsTestAccess::Draw(graphics, 1000000, argc > 1 ? argv[1] : nullptr) &&
         GraphicsTestAccess::Notice(graphics) == Graphics::PlayerSaveNotice::RETRYING,
         "Filesystem warning remains visible until a successful save");

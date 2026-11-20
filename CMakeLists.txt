@@ -631,6 +631,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(ShopInteractionTests tests/ShopInteractionTests.cpp)
 
     if(GAMEENGINE_BUILD_GRAPHICS_TESTS)
+        add_gameengine_graphics_test(UsabilityGraphicsTests tests/UsabilityGraphicsTests.cpp)
         add_gameengine_graphics_test(PlayerAnimationTests tests/PlayerAnimationTests.cpp)
         add_gameengine_graphics_test(WoodcuttingGraphicsTests tests/WoodcuttingGraphicsTests.cpp)
         add_gameengine_graphics_test(MiningGraphicsTests tests/MiningGraphicsTests.cpp)

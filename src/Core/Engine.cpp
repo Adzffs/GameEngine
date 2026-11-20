@@ -3,7 +3,6 @@
 #include <memory>
 #include <string>
 #include <thread>
-#include <SDL3/SDL_messagebox.h>
 #include "Core/Logger.h"
 #include "../Command/ServerCommand.h"
 #include "../Equipment/EquipmentSlotType.h"
@@ -17,26 +16,6 @@
 
 namespace
 {
-    bool ConfirmExitWithoutSaving()
-    {
-        const SDL_MessageBoxButtonData buttons[]{
-            {SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT | SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT,
-             0, "Return to game"},
-            {0, 1, "Exit without saving"}};
-        const SDL_MessageBoxData message{
-            SDL_MESSAGEBOX_ERROR, nullptr, "Progress could not be saved",
-            "Your progress could not be saved. Return to the game to finish crafting "
-            "or try saving again. Exiting now discards progress since the last successful save.",
-            2, buttons, nullptr};
-        int selected = 0;
-        if (!SDL_ShowMessageBox(&message, &selected))
-        {
-            Logger::Error(std::string("Could not display save-failure choices: ") + SDL_GetError());
-            return false;
-        }
-        return selected == 1;
-    }
-
     int FindInventorySlot(
         const Inventory &inventory,
         ItemType itemType)
@@ -161,7 +140,7 @@ bool Engine::Run()
         if (!running)
         {
             const bool finalized = FinalizeWorldAfterRun();
-            if (finalized || ConfirmExitWithoutSaving())
+            if (finalized || graphics.ConfirmExitWithoutSaving())
             {
                 Logger::Info("Server stopped");
                 return finalized;
@@ -175,7 +154,7 @@ bool Engine::Run()
         graphics.SynchronizeCraftingSession(
             world.GetCraftingSession(playerID));
         SynchronizeCraftingInteraction();
-        graphics.ProcessEvents(running);
+        graphics.ProcessEvents(running, &world);
         audio.ApplySettings(graphics.GetAudioSettings());
 
         if (!running)
@@ -424,17 +403,42 @@ bool Engine::Run()
 
 void Engine::SynchronizeDialoguePresentation()
 {
+    // Results are consumed after every committed tick, including catch-up ticks.
+    for (const auto &result : world.GetCommandProcessingResults())
+        if (pendingDialogueCommand &&
+            result.commandID == pendingDialogueCommand->commandID &&
+            result.actorEntityID == pendingDialogueCommand->actorEntityID)
+        {
+            pendingDialogueCommand.reset();
+            graphics.SetDialogueCommandInFlight(false);
+            break;
+        }
     graphics.SynchronizeDialogue(
-        playerID,
-        world.GetNpcTalkEvents(),
-        world.GetActiveDialogueSession(playerID));
+        playerID, world.GetNpcTalkEvents(), world.GetActiveDialogueSession(playerID));
+    const auto *displayed = graphics.GetDialoguePresentationState().GetEvent();
+    const auto *active = world.GetActiveDialogueSession(playerID);
+    if (pendingDialogueCommand &&
+        (!displayed || !active ||
+         displayed->sessionId != pendingDialogueCommand->sessionID ||
+         displayed->nodeId != pendingDialogueCommand->nodeID ||
+         active->sessionId != pendingDialogueCommand->sessionID ||
+         active->currentNodeId != pendingDialogueCommand->nodeID))
+    {
+        pendingDialogueCommand.reset();
+        graphics.SetDialogueCommandInFlight(false);
+    }
 }
 
 bool Engine::EnqueuePendingDialogueCommand()
 {
-    std::optional<ServerCommandData> command = graphics.ConsumeDialogueCommand();
-    if (!command.has_value()) return false;
-    world.EnqueueCommand(std::move(*command));
+    if (pendingDialogueCommand) return false;
+    auto command = graphics.ConsumeDialogueCommand();
+    const auto *displayed = graphics.GetDialoguePresentationState().GetEvent();
+    if (!command || !displayed) return false;
+    pendingDialogueCommand = PendingDialogueCommand{
+        world.EnqueueCommand(std::move(*command)), displayed->actorEntityID,
+        displayed->sessionId, displayed->nodeId};
+    graphics.SetDialogueCommandInFlight(true);
     return true;
 }
 
@@ -743,6 +747,7 @@ void Engine::Update(Clock::TimePoint now)
         Clock::ClockType::now();
 
     world.Update();
+    SynchronizeDialoguePresentation();
     const Player *audioActor = dynamic_cast<Player *>(world.GetEntityByID(playerID));
     const auto weapon = audioActor ? audioActor->GetEquipment().GetEquippedItem(
         EquipmentSlotType::WEAPON) : ItemType::NONE;

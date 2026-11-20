@@ -51,6 +51,14 @@ private:
     void AddDevelopmentEquipment();
     void SynchronizeDialoguePresentation();
     bool EnqueuePendingDialogueCommand();
+    struct PendingDialogueCommand
+    {
+        std::uint64_t commandID;
+        int actorEntityID;
+        DialogueSessionId sessionID;
+        DialogueNodeId nodeID;
+    };
+    std::optional<PendingDialogueCommand> pendingDialogueCommand;
     void SynchronizeShopPresentation();
     bool EnqueuePendingShopCommand();
     void SynchronizeBankPresentation();

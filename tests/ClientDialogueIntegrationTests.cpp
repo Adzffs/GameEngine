@@ -52,6 +52,20 @@ struct GraphicsTestAccess
     {
         return graphics.pendingDialogueCommand.has_value();
     }
+    static bool RightClickTarget(Graphics &graphics, const World &world, float x, float y, int expectedID)
+    {
+        if ((SDL_WasInit(SDL_INIT_EVENTS) & SDL_INIT_EVENTS) == 0 &&
+            !SDL_InitSubSystem(SDL_INIT_EVENTS)) return false;
+        SDL_Event event{}; event.type = SDL_EVENT_MOUSE_BUTTON_DOWN;
+        event.button.button = SDL_BUTTON_RIGHT; event.button.x = x; event.button.y = y;
+        if (!SDL_PushEvent(&event)) return false;
+        bool running = true; graphics.ProcessEvents(running, &world);
+        const bool matches = graphics.worldContextMenu.target.id == expectedID;
+        graphics.worldContextMenu.open = false;
+        return matches;
+    }
+    static void QueueInvalidQuest(Graphics &graphics, int actor, int npc, DialogueSessionId session)
+    { graphics.pendingDialogueCommand = QuestAcceptCommand{actor, npc, session, QuestId::NONE}; }
     static bool IsStationMenuOpen(const Graphics &graphics)
     {
         return graphics.stationMenuOpen;
@@ -71,6 +85,8 @@ struct EngineTestAccess
     {
         engine.SynchronizeDialoguePresentation();
     }
+    static void Tick(Engine &engine) { engine.Update(); }
+    static bool DialoguePending(const Engine &engine) { return engine.pendingDialogueCommand.has_value(); }
     static bool EnqueueDialogue(Engine &engine)
     {
         return engine.EnqueuePendingDialogueCommand();
@@ -230,6 +246,11 @@ int main()
 
         const SDL_FRect guideRectangle =
             graphics.GetFriendlyNpcScreenRectangle(*guide);
+        test.Expect(GraphicsTestAccess::RightClickTarget(graphics, world,
+                        guideRectangle.x + 1.0f, guideRectangle.y + 1.0f, guide->GetID()),
+                    "Right-click resolves the live NPC without a preceding hover frame");
+        test.Expect(GraphicsTestAccess::RightClickTarget(graphics, world, 1200.0f, 700.0f, -1),
+                    "Right-clicking empty ground cannot reuse the previously hovered NPC");
         EngineClickRouting::HandleWorldClick(
             graphics, world, playerID,
             guide->GetPosition().GetX(), guide->GetPosition().GetY(),
@@ -358,11 +379,33 @@ int main()
         ClickCenter(graphics, graphics.GetDialogueContinueButtonRectangle());
         test.Expect(EngineTestAccess::EnqueueDialogue(engine),
                     "Engine enqueues continue through the normal command queue");
-        world.Update();
+        ClickCenter(graphics, graphics.GetDialogueContinueButtonRectangle());
+        test.Expect(!EngineTestAccess::EnqueueDialogue(engine) &&
+                        !GraphicsTestAccess::HasDialogueCommand(graphics),
+                    "A second frame cannot enqueue another Continue before the tick");
+        EngineTestAccess::Tick(engine);
+        test.Expect(!EngineTestAccess::DialoguePending(engine),
+                    "Committed tick consumes the exact dialogue acknowledgement");
+        EngineTestAccess::Tick(engine);
         EngineTestAccess::Synchronize(engine);
+        test.Expect(!EngineTestAccess::DialoguePending(engine),
+                    "A catch-up tick cannot lose the acknowledgement and leave input locked");
         test.Expect(graphics.GetDialoguePresentationState().GetEvent()->nodeId ==
                         DialogueNodeId::DEVELOPMENT_GUIDE_EXPLANATION,
                     "First continue publishes the explanation");
+
+        const auto *displayed = graphics.GetDialoguePresentationState().GetEvent();
+        const auto sessionId = displayed->sessionId;
+        // Supply a stale quest request through the normal queue; the server rejects
+        // NONE while the originating dialogue session/node remains unchanged.
+        GraphicsTestAccess::QueueInvalidQuest(graphics, playerID, guide->GetID(), sessionId);
+        test.Expect(EngineTestAccess::EnqueueDialogue(engine), "Invalid quest request enters the real queue");
+        EngineTestAccess::Tick(engine);
+        test.Expect(!EngineTestAccess::DialoguePending(engine) &&
+                        world.GetCommandProcessingResults().back().resultCode != CommandResultCode::ACCEPTED &&
+                        graphics.GetDialoguePresentationState().GetEvent()->nodeId ==
+                            DialogueNodeId::DEVELOPMENT_GUIDE_EXPLANATION,
+                    "A rejected command unlocks the unchanged authoritative dialogue node");
 
         ClickCenter(graphics, graphics.GetDialogueContinueButtonRectangle());
         EngineTestAccess::EnqueueDialogue(engine);

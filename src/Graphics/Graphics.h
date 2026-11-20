@@ -39,6 +39,7 @@ class Player;
 class Monster;
 class NPC;
 struct ActiveDialogueSession;
+class World;
 struct GraphicsTestAccess;
 namespace StarterJourney { struct Guidance; }
 
@@ -49,6 +50,7 @@ public:
     ~Graphics();
 
     bool Initialize();
+    bool ConfirmExitWithoutSaving();
     enum class PlayerSaveNotice { NONE, SAVED, RETRYING, CRAFTING_BLOCKED };
     void SetPlayerSaveNotice(PlayerSaveNotice notice);
     const AudioSettings &GetAudioSettings() const { return audioSettings; }
@@ -67,7 +69,7 @@ public:
     void SetCompiledMapLabelsVisible(bool visible) { compiledMapLabelsVisible = visible; }
     // Authoring inspection only; normal play uses each building's stable profile.
     void SetBuildingConditionPreview(int condition) { forestSprites.SetBuildingConditionPreview(condition); }
-    void ProcessEvents(bool &running);
+    void ProcessEvents(bool &running, const World *world = nullptr);
     bool ConsumeClickedTile(int &tileX, int &tileY);
     bool ConsumeClickedTile(
         int &tileX,
@@ -109,6 +111,7 @@ public:
     void SetCraftingInteractionInFlight(bool inFlight);
     void ReconcileCraftingInteractionResult(CommandResultCode result);
     std::optional<ServerCommandData> ConsumeDialogueCommand();
+    void SetDialogueCommandInFlight(bool inFlight);
     std::optional<ServerCommandData> ConsumeShopCommand();
     void SynchronizeBank(int actorEntityID, const ActiveBankSession *session,
                          const Bank &bank);
@@ -615,6 +618,10 @@ private:
     bool stationMenuClosePending;
     DialoguePresentationState dialoguePresentationState;
     std::optional<ServerCommandData> pendingDialogueCommand;
+    bool dialogueCommandInFlight = false;
+    std::size_t dialogueFocusIndex = 0;
+    void ResetDialogueFocus();
+    SDL_MessageBoxData GetSaveFailureMessage() const;
     ShopPresentationState shopPresentationState;
     std::optional<ServerCommandData> pendingShopCommand;
     std::optional<ServerCommandData> pendingBankCommand;
@@ -662,7 +669,7 @@ private:
         const Player &player,
         const Inventory &inventory);
     void DrawProgressionFeedback();
-    void OpenWorldContextMenu(float screenX, float screenY);
+    void OpenWorldContextMenu(float screenX, float screenY, const World *world = nullptr);
     bool HandleWorldContextMenuClick(float screenX, float screenY);
     void DrawWorldContextMenu();
     void DrawBankPanel();
