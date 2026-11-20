@@ -2,7 +2,7 @@
 
 **Date:** 20 November 2026.  
 **Work package:** QA-003, in progress.  
-**Status:** Recovered draft candidate; final build/verification and merge remain open.  
+**Historical status:** Recovered draft at interruption. The [Windows follow-up](WINDOWS_USABILITY_2026-11-20.md) subsequently verifies the corrected candidate and records current scope.\
 **Candidate code:** [f9c45e0](https://github.com/Adzffs/GameEngine/commit/f9c45e0a1e8ad744d9859c15ca32a11a60908a95).  
 **Base:** [b0ab668](https://github.com/Adzffs/GameEngine/commit/b0ab668e0b4d09899c135e08c8211456d5f999e7).  
 **Branch:** [feat/river-crossing-usability-recovery](https://github.com/Adzffs/GameEngine/tree/feat/river-crossing-usability-recovery).

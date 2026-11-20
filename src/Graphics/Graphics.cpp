@@ -1,6 +1,7 @@
 #include "Graphics.h"
 #include <iostream>
 #include "../World/Map.h"
+#include "../World/World.h"
 #include "../Player/Player.h"
 #include "../Entity/Monster/Monster.h"
 #include "../NPC/NPC.h"
@@ -21,6 +22,7 @@
 #include <map>
 #include <cmath>
 #include <cctype>
+#include "../Core/Logger.h"
 
 namespace
 {
@@ -244,7 +246,10 @@ void Graphics::DrawPlayerSaveNotice(Uint64 now)
         playerSaveNotice == PlayerSaveNotice::CRAFTING_BLOCKED ?
         "Progress not saved. Free bag space or finish crafting." :
         "Progress not saved. Check save folder / disk space.";
-    const SDL_FRect bounds{18.0f, 200.0f, saved ? 144.0f : 448.0f, saved ? 30.0f : 48.0f};
+    // Leave bank slots, station controls and guide text visible during recovery.
+    const bool overMenu = stationMenuOpen || shopPresentationState.IsOpen() || gameGuideVisible;
+    const SDL_FRect bounds{18.0f, overMenu ? 2.0f : 200.0f,
+        saved ? 144.0f : 448.0f, saved ? 30.0f : 48.0f};
     SDL_SetRenderDrawColor(renderer, 20, 24, 28, 245);
     SDL_RenderFillRect(renderer, &bounds);
     SDL_SetRenderDrawColor(renderer, saved ? 115 : 245, saved ? 205 : 190, saved ? 130 : 74, 255);
@@ -647,7 +652,9 @@ void Graphics::HandleStationMenuClick(
     bool shiftHeld,
     bool doubleClick)
 {
-    if (!stationMenuOpen || recipeCommandInFlight || craftingInteractionInFlight)
+    if (!stationMenuOpen || recipeCommandInFlight || craftingInteractionInFlight ||
+        recipeRequestPending || craftingGridRequestPending ||
+        (craftingSessionSnapshot.has_value() && pendingCraftingInteraction))
     {
         return;
     }
@@ -722,6 +729,7 @@ void Graphics::HandleStationMenuClick(
     if (IsPointInsideRectangle(
             mouseX, mouseY, layout.closeButton))
     {
+        if (pendingCraftingInteraction) return;
         DismissStationMenu(true);
         return;
     }
@@ -1269,6 +1277,9 @@ void Graphics::DrawBankPanel()
     SDL_RenderDebugText(renderer, panel.x + 470.0f, panel.y + 112.0f, "INVENTORY");
     const std::string search = "SEARCH: " + (bankSearch.empty() ? std::string("type to filter") : bankSearch);
     SDL_RenderDebugText(renderer, panel.x + 280.0f, panel.y + 72.0f, search.c_str());
+    SDL_SetRenderDrawColor(renderer, 205, 205, 190, 255);
+    SDL_RenderDebugText(renderer, panel.x + 280.0f, panel.y + 94.0f,
+        "Type to filter | Backspace: delete | Esc: close");
     const std::array<const char *, 4> labels{"1", "5", "10", "ALL"};
     const std::array<int, 4> quantities{1, 5, 10, -1};
     for (std::size_t index = 0; index < labels.size(); ++index)
@@ -1736,12 +1747,45 @@ bool Graphics::HandleSidePanelClick(
     // Consume other panel clicks so they do not move the player.
     return true;
 }
-void Graphics::ProcessEvents(bool &running)
+SDL_MessageBoxData Graphics::GetSaveFailureMessage() const
+{
+    static const SDL_MessageBoxButtonData buttons[]{
+        {SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT | SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT,
+         0, "Return to game"},
+        {0, 1, "Exit without saving"}};
+    return {SDL_MESSAGEBOX_ERROR, window, "Progress could not be saved",
+        "Your progress could not be saved.\n\n"
+        "Return to the game to finish crafting or retry saving.\n"
+        "Exit without saving discards progress since your last successful save.",
+        2, buttons, nullptr};
+}
+
+bool Graphics::ConfirmExitWithoutSaving()
+{
+    const auto message = GetSaveFailureMessage();
+    int selected = 0;
+    if (!SDL_ShowMessageBox(&message, &selected))
+    {
+        Logger::Error(std::string("Could not display save-failure choices: ") + SDL_GetError());
+        return false;
+    }
+    return selected == 1;
+}
+
+void Graphics::ProcessEvents(bool &running, const World *world)
 {
     SDL_Event event;
 
     while (SDL_PollEvent(&event))
     {
+        if (event.type == SDL_EVENT_WINDOW_FOCUS_LOST)
+        {
+            // A release in another window must never commit an old drag here.
+            craftingDragActive = false;
+            craftingDragSlotIndices.clear();
+            worldContextMenu.open = false;
+            continue;
+        }
         if (event.type == SDL_EVENT_MOUSE_MOTION)
         {
             if (renderer != nullptr)
@@ -1775,7 +1819,8 @@ void Graphics::ProcessEvents(bool &running)
                 }
             continue;
         }
-        if (craftingDragActive && event.type == SDL_EVENT_MOUSE_BUTTON_UP)
+        if (craftingDragActive && event.type == SDL_EVENT_MOUSE_BUTTON_UP &&
+            event.button.button == (craftingDragRightClick ? SDL_BUTTON_RIGHT : SDL_BUTTON_LEFT))
         {
             pendingCraftingInteraction = CraftingInteractionRequest{
                 craftingDragSlotIndices.empty() ? -1 : craftingDragSlotIndices.front(),
@@ -1829,53 +1874,90 @@ void Graphics::ProcessEvents(bool &running)
                 worldHoverTarget = {};
                 continue;
             }
-            if (event.key.scancode == SDL_SCANCODE_R && !stationMenuOpen &&
-                !shopPresentationState.IsOpen() &&
-                !dialoguePresentationState.IsOpen())
+            if (event.key.scancode == SDL_SCANCODE_Q &&
+                (event.key.mod & SDL_KMOD_CTRL) != 0)
             {
-                runTogglePending = !runTogglePending;
+                running = false;
                 continue;
             }
-            if (stationMenuOpen && openStationType == StationType::BANK &&
-                event.key.scancode == SDL_SCANCODE_BACKSPACE &&
-                !bankSearch.empty())
+            if (gameGuideVisible)
             {
-                bankSearch.pop_back();
+                if (event.key.scancode == SDL_SCANCODE_ESCAPE ||
+                    event.key.scancode == SDL_SCANCODE_RETURN ||
+                    event.key.scancode == SDL_SCANCODE_SPACE ||
+                    event.key.scancode == SDL_SCANCODE_H)
+                    gameGuideVisible = false;
+                continue;
+            }
+            if (event.key.scancode == SDL_SCANCODE_ESCAPE)
+            {
+                if (worldContextMenu.open)
+                    worldContextMenu.open = false;
+                else if (shopPresentationState.IsOpen())
+                {
+                    if (!pendingShopCommand && !shopCommandInFlight)
+                        pendingShopCommand = shopPresentationState.MakeClose();
+                }
+                else if (dialoguePresentationState.IsOpen())
+                {
+                    const auto close = GetDialogueCloseButtonRectangle();
+                    HandleDialogueClick(close.x + 1.0f, close.y + 1.0f);
+                }
+                else if (stationMenuOpen)
+                {
+                    if (!recipeCommandInFlight && !craftingInteractionInFlight &&
+                        !pendingCraftingInteraction && !pendingBankCommand && !recipeRequestPending &&
+                        !craftingGridRequestPending)
+                        DismissStationMenu(true);
+                }
+                else
+                    sidePanelOpen = false;
+                continue;
+            }
+            if (dialoguePresentationState.IsOpen())
+            {
+                const auto layout = GetDialoguePanelLayout();
+                if (!pendingDialogueCommand && !dialogueCommandInFlight && !layout.controls.empty())
+                {
+                    const auto code = event.key.scancode;
+                    if (code == SDL_SCANCODE_TAB || code == SDL_SCANCODE_DOWN ||
+                        code == SDL_SCANCODE_UP)
+                    {
+                        const bool previous = code == SDL_SCANCODE_UP ||
+                            (code == SDL_SCANCODE_TAB && (event.key.mod & SDL_KMOD_SHIFT) != 0);
+                        dialogueFocusIndex = previous
+                            ? (dialogueFocusIndex + layout.controls.size() - 1) % layout.controls.size()
+                            : (dialogueFocusIndex + 1) % layout.controls.size();
+                    }
+                    else if (code == SDL_SCANCODE_RETURN || code == SDL_SCANCODE_SPACE)
+                    {
+                        const auto &button = layout.controls[dialogueFocusIndex % layout.controls.size()].bounds;
+                        HandleDialogueClick(button.x + 1.0f, button.y + 1.0f);
+                    }
+                }
+                continue;
+            }
+            // Bank search owns text keys, including H. Global audio and quit
+            // shortcuts above remain available without changing its query.
+            if (stationMenuOpen && openStationType == StationType::BANK)
+            {
+                if (event.key.scancode == SDL_SCANCODE_BACKSPACE && !bankSearch.empty())
+                    bankSearch.pop_back();
                 continue;
             }
             if (event.key.scancode == SDL_SCANCODE_H)
             {
-                gameGuideVisible = !gameGuideVisible;
+                gameGuideVisible = true;
                 continue;
             }
-            if (event.key.scancode ==
-                SDL_SCANCODE_ESCAPE)
-            {
-                if (worldContextMenu.open)
-                {
-                    worldContextMenu.open = false;
-                    continue;
-                }
-                if (shopPresentationState.IsOpen())
-                {
-                    if (!pendingShopCommand)
-                        pendingShopCommand = shopPresentationState.MakeClose();
-                    continue;
-                }
-                if (stationMenuOpen)
-                {
-                    if (!recipeCommandInFlight)
-                    {
-                        DismissStationMenu(true);
-                    }
-                }
-
-                continue;
-            }
+            if (event.key.scancode == SDL_SCANCODE_R && !stationMenuOpen &&
+                !shopPresentationState.IsOpen())
+                runTogglePending = !runTogglePending;
         }
 
-        if (event.type == SDL_EVENT_TEXT_INPUT && stationMenuOpen &&
-            openStationType == StationType::BANK && bankSearch.size() < 24)
+        if (event.type == SDL_EVENT_TEXT_INPUT && !gameGuideVisible &&
+            !dialoguePresentationState.IsOpen() && !shopPresentationState.IsOpen() &&
+            stationMenuOpen && openStationType == StationType::BANK && bankSearch.size() < 24)
         {
             for (const char *cursor = event.text.text;
                  *cursor != '\0' && bankSearch.size() < 24; ++cursor)
@@ -1963,7 +2045,7 @@ void Graphics::ProcessEvents(bool &running)
 
             if (event.button.button == SDL_BUTTON_RIGHT)
             {
-                OpenWorldContextMenu(mouseX, mouseY);
+                OpenWorldContextMenu(mouseX, mouseY, world);
                 continue;
             }
 
@@ -1992,6 +2074,8 @@ void Graphics::SynchronizeDialogue(
             ? InvalidDialogueSessionId
             : dialoguePresentationState.GetEvent()->sessionId;
 
+    const auto previousNode = dialoguePresentationState.GetEvent() == nullptr
+        ? DialogueNodeId{} : dialoguePresentationState.GetEvent()->nodeId;
     dialoguePresentationState.Synchronize(
         localActorEntityID,
         publishedEvents,
@@ -2003,10 +2087,11 @@ void Graphics::SynchronizeDialogue(
         DismissStationMenu(false);
     }
 
-    if (pendingDialogueCommand.has_value() &&
-        (current == nullptr || current->sessionId != previousSession))
+    if (current == nullptr || current->sessionId != previousSession ||
+        current->nodeId != previousNode)
     {
         pendingDialogueCommand.reset();
+        ResetDialogueFocus();
     }
 }
 
@@ -2021,6 +2106,26 @@ void Graphics::SynchronizeShop(int actor,const std::vector<ShopOpenedEvent>& eve
     }
     const auto* current=shopPresentationState.GetEvent();
     if(pendingShopCommand && (!current || current->sessionId!=old)) pendingShopCommand.reset();
+}
+
+void Graphics::ResetDialogueFocus()
+{
+    dialogueFocusIndex = 0;
+    const auto layout = GetDialoguePanelLayout();
+    for (std::size_t index = 0; index < layout.controls.size(); ++index)
+        if (layout.controls[index].type == DialogueControlType::PRIMARY ||
+            layout.controls[index].type == DialogueControlType::AUTHORED_CHOICE)
+        {
+            dialogueFocusIndex = index;
+            break;
+        }
+}
+
+void Graphics::SetDialogueCommandInFlight(bool inFlight)
+{
+    dialogueCommandInFlight = inFlight;
+    if (inFlight) pendingDialogueCommand.reset();
+    else ResetDialogueFocus();
 }
 
 std::optional<ServerCommandData> Graphics::ConsumeDialogueCommand()
@@ -2165,7 +2270,7 @@ bool Graphics::HandleShopClick(float x,float y)
 bool Graphics::HandleDialogueClick(float mouseX, float mouseY)
 {
     if (!dialoguePresentationState.IsOpen()) return false;
-    if (pendingDialogueCommand.has_value()) return true;
+    if (pendingDialogueCommand || dialogueCommandInFlight) return true;
     const NpcTalkEvent *event = dialoguePresentationState.GetEvent();
     const DialoguePanelLayout layout = GetDialoguePanelLayout();
     for (const DialogueControlLayout &control : layout.controls)
@@ -3455,11 +3560,22 @@ void Graphics::DrawWorldHoverFeedback()
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 }
 
-void Graphics::OpenWorldContextMenu(float screenX, float screenY)
+void Graphics::OpenWorldContextMenu(float screenX, float screenY, const World *world)
 {
     const SDL_FPoint worldPoint = ScreenToWorldPoint(screenX, screenY);
-    const auto spriteTarget = PickSpriteObject(worldPoint.x, worldPoint.y);
-    if (spriteTarget.HasTarget()) worldHoverTarget = spriteTarget;
+    if (world != nullptr)
+    {
+        // A click may arrive before a hover frame (or after the world changed).
+        // Resolve its actual position now; only value commands leave Graphics.
+        UpdateSpritePicking(world->GetResources(), world->GetStations(), world->GetGroundItems());
+        worldHoverTarget = ResolveWorldHoverTarget(worldPoint.x, worldPoint.y,
+            world->GetEntities(), world->GetResources(), world->GetStations(), world->GetGroundItems());
+    }
+    else
+    {
+        const auto spriteTarget = PickSpriteObject(worldPoint.x, worldPoint.y);
+        if (spriteTarget.HasTarget()) worldHoverTarget = spriteTarget;
+    }
     constexpr float rowHeight = 24.0f;
     constexpr float menuWidth = 210.0f;
     const int rowCount = worldHoverTarget.HasTarget() ? 4 : 2;
@@ -5163,8 +5279,8 @@ void Graphics::DrawGameGuide(const StarterJourney::Guidance &guidance, const std
     SDL_SetRenderDrawColor(renderer, 230, 192, 112, 255);
     SDL_RenderRect(renderer, &button);
     SDL_SetRenderDrawColor(renderer, 255, 244, 214, 255);
-    SDL_RenderDebugText(renderer, 547.0f, 531.0f,
-                        "CLICK ANYWHERE TO RETURN");
+    SDL_RenderDebugText(renderer, 528.0f, 531.0f,
+                        "ENTER / ESC / CLICK TO RETURN");
 }
 
 void Graphics::DrawAxeIcon(
@@ -6200,16 +6316,18 @@ void Graphics::DrawDialoguePanel()
     SDL_RenderDebugText(renderer, 240.0f, 468.0f,
                         dialoguePresentationState.GetNpcName().c_str());
 
-    std::string firstLine = event->text.substr(0, 92);
-    SDL_RenderDebugText(renderer, 240.0f, 510.0f, firstLine.c_str());
-    if (event->text.size() > firstLine.size())
-    {
-        std::string secondLine = event->text.substr(firstLine.size(), 92);
-        SDL_RenderDebugText(renderer, 240.0f, 528.0f, secondLine.c_str());
-    }
+    SDL_SetRenderDrawColor(renderer, 200, 205, 190, 255);
+    SDL_RenderDebugText(renderer, 240.0f, 490.0f,
+        dialogueCommandInFlight ? "Waiting for server..." :
+        "Tab / Arrows: choose | Enter / Space: activate | Esc: close");
+    const auto lines = WrapGuideLines({event->text}, 98);
+    SDL_SetRenderDrawColor(renderer, 255, 244, 210, 255);
+    for (std::size_t index = 0; index < std::min<std::size_t>(lines.size(), 2); ++index)
+        SDL_RenderDebugText(renderer, 240.0f, 510.0f + index * 18.0f, lines[index].c_str());
 
-    for (const DialogueControlLayout &control : layout.controls)
+    for (std::size_t controlIndex = 0; controlIndex < layout.controls.size(); ++controlIndex)
     {
+        const auto &control = layout.controls[controlIndex];
         std::string label;
         switch (control.type)
         {
@@ -6248,8 +6366,10 @@ void Graphics::DrawDialoguePanel()
             label = event->isTerminal ? "CLOSE" : "CONTINUE";
             break;
         }
+        const bool focused = controlIndex == dialogueFocusIndex && !dialogueCommandInFlight;
+        if (focused) label = "> " + label;
         const SDL_FRect button = control.bounds;
-        SDL_SetRenderDrawColor(renderer, 55, 50, 45, 255);
+        SDL_SetRenderDrawColor(renderer, focused ? 80 : 55, focused ? 70 : 50, 45, 255);
         SDL_RenderFillRect(renderer, &button);
         SDL_SetRenderDrawColor(renderer, 190, 170, 130, 255);
         SDL_RenderRect(renderer, &button);

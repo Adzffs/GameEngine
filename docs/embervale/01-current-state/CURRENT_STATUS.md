@@ -1,7 +1,7 @@
 # Current project status
 
 **Reviewed:** 20 November 2026.\
-**Published code:** [4d7d01c](https://github.com/Adzffs/GameEngine/commit/4d7d01cb16ce5025687d2f1e0f2bb87513475f58).\
+**Published code:** [4454067](https://github.com/Adzffs/GameEngine/commit/44540678bfa682870f2c9efb8907a1d36891910a).\
 **Source of truth:** Current code and the [project review](../06-development/PROJECT_REVIEW_2026-11-20.md). The older [engine inventory](IMPLEMENTED_SYSTEMS.md) retains its explicitly dated baseline.
 
 Embervale is a playable local C++20/SDL3 RPG prototype with a bounded world editor and an authored River Crossing starter region. It has substantial gameplay systems. It is not yet a completed starter vertical slice, a released Studio product or an implemented online MMO.
@@ -30,7 +30,7 @@ These histories must be reconciled without replacing one snapshot with the other
 
 The owner is not satisfied with the animation quality and explicitly deferred further polish. Treat it as a working first pass, with **ART-005** still planned and visual acceptance outstanding. See the [animation guide](../05-game/ANIMATION_GUIDE.md) and [dated research](../06-development/ANIMATION_RESEARCH_2026-11-20.md).
 
-**Integration update:** The original GameEngine-next worktree remains unavailable. Its melee/polish merge is unpublished and unverified. An independent Linux follow-up restored the current published source, fixed shared runtime copying and delivered the first sound pass. See the [action-audio results](../06-development/ACTION_AUDIO_2026-11-20.md) and retain the [original integration handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md) for recovery. ART-004 is in progress; REL-004, full starter and owner visual acceptance remain open.
+**Integration update:** The original GameEngine-next worktree has been recovered on Windows and checkpointed with its conflict stages, editable files and history. Its melee/polish merge is still unpublished and unverified; see [the recovery position](../06-development/WINDOWS_USABILITY_2026-11-20.md). An independent Linux follow-up restored the current published source, fixed shared runtime copying and delivered the first sound pass. See the [action-audio results](../06-development/ACTION_AUDIO_2026-11-20.md) and retain the [original integration handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md) for recovery. ART-004 is in progress; REL-004, full starter and owner visual acceptance remain open.
 
 The [starter combat/recovery follow-up](../06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) completes the automated tutorial and deliberate recovery exercise. It fixes skipped post-combat bank/Mara steps and misleading loot/reward hints. Six save/reload checkpoints and single persisted recovery pass; full human/visible acceptance remains open.
 
@@ -42,24 +42,27 @@ The [publication verification](../06-development/WORLD_PUBLICATION_2026-11-20.md
 
 The [asset validation results](../06-development/ASSET_RESOURCE_VALIDATION_2026-11-20.md) completes bounded STUDIO-063: shared numeric budgets, frame/binding validation, CRC and bounded PNG inflation before SDL decode, owned decoder bytes, cache accounting and read-only pre-copy validation. The current art requires 11,681,792 logical RGBA bytes plus 2,920,448 transparency bytes. Private corrupt-source, preserved-output, no-relink repair and spaced multi-config Release checks pass. Art/animation sources and generated geometry are unchanged. See [asset resource limits](../05-game/ASSET_RESOURCE_LIMITS.md); core builds now require zlib development headers/library.
 
-## Usability candidate awaiting verification
+## Usability verification
 
-QA-003 is now **in progress**. The [focused review and recovery handoff](../06-development/USABILITY_REVIEW_2026-11-20.md) records Escape/modal, bank typing, context targeting, dialogue acknowledgement/keyboard and save-error readability fixes. Assisted native Linux Return/Exit/retry and bank-warning observations passed before the workspace failed. The eight code/test changes are preserved on a GitHub draft branch and **are not merged into master**. Earlier 121/121 candidate tests and later focused checks do not establish a newly tested reconstructed commit. Rebuild, verify and merge that candidate before describing these controls as implemented on master. Wider keyboard access, UI scaling, ordinary desktop/Windows focus and uncoached full starter acceptance stay open.
+QA-003 remains **in progress** for broader acceptance. The [Windows verification](../06-development/WINDOWS_USABILITY_2026-11-20.md) completes the recovered candidate's build/full regression checks and fixes queued station closure, bank transfer replacement, CRLF art bindings and Windows path/test portability. Dialogue keyboard/acknowledgement, help/Escape priority, focus-loss cancellation and readable save recovery are implemented. Bank deposit/withdraw is verified through real SDL, Engine and World paths. Wider keyboard operation, scalable UI text, ordinary focus/high-DPI, manual native Windows save choices and an uncoached full starter journey remain open.
 
 ## Executed checks
 
 | Source/configuration | Executed result | Scope |
 |---|---:|---|
-| Current asset-validation source, Linux SDL configuration | 120/120 CTest entries | 98 headless, 9 client, 13 graphics; dummy video/software/audio and real private packaging checks |
+| Current verified Windows source, Debug SDL configuration | 122/122 CTest entries | 98 headless, 10 client, 14 graphics; dummy/software/audio and private packaging checks |
+| Same current source, separate Windows SDL-free build | 98/98 CTest entries | Core, replay, saves, recovery, publication and resource checks |
+| Current Python 3.14.6 suite | 80 run: 78 pass, two skips | Symlink creation unavailable; no other skipped checks |
+| Asset-validation source, Linux SDL configuration | 120/120 CTest entries | 98 headless, 9 client, 13 graphics; dummy video/software/audio and real private packaging checks |
 | Same current source, Linux with client/graphics disabled | 98/98 CTest entries | SDL-free/zlib-linked core, starter replay, autosave, editor recovery, publication and asset checks |
-| Current Python authoring/editor unit suite | 79/79 tests per interpreter | Python 3.12.14 and 3.13.5; includes 15 new resource cases; separate integration suites remain included in CTest totals |
+| Asset-validation Python authoring/editor unit suite | 79/79 tests per interpreter | Python 3.12.14 and 3.13.5; includes 15 new resource cases; separate integration suites remain included in CTest totals |
 | Earlier published source plus critical fixes, Windows SDL client configuration | 102/102 CTest entries | Includes 87 headless, 5 client and 10 graphics labels; SDL dummy/software presentation |
 | Same source, separate Windows build with client and graphics disabled | 87/87 CTest entries | Confirms the changed core builds without SDL |
 | Python editor unit tests | 42/42 tests | Run directly with Python 3.14.6 |
 | Real executable-backed editor bridge | 12/12 cases | Included in the CTest bridge entry above, not 12 additional CTest entries |
 | Local animation line after the same safety fixes | 101/101 CTest entries | Different source snapshot; does not establish combined Mining/melee acceptance |
 
-The current follow-up uses Linux GCC 14.2.0, CMake 4.4.5, Ninja 1.13.2, audio-enabled SDL 3.4.12, zlib 1.3.1 and Python 3.12.14. Its published source blobs match the tested files. Earlier Windows review results use UCRT64 GCC 16.1.0/CMake 4.4.3 and their own recorded source. The new sound pass has not been accepted on a physical device or Windows, and no uncoached human/full visible starter playthrough is claimed.
+The current Windows follow-up uses UCRT64 GCC 16.1.0, CMake 4.4.3, Ninja 1.13.2, SDL 3.4.12, zlib 1.3.2 and Python 3.14.6. The preceding Linux asset-validation line used GCC 14.2.0, CMake 4.4.5, SDL 3.4.12, zlib 1.3.1 and Python 3.12.14. Its published source blobs match the tested files. Earlier Windows review results use UCRT64 GCC 16.1.0/CMake 4.4.3 and their own recorded source. The new sound pass has not been accepted on a physical device or Windows, and no uncoached human/full visible starter playthrough is claimed.
 
 The unchanged preparation replay equips the shield at tick 245, equips the sword at 376 and buys food by 454. The extended route defeats Mossling at 677 and completes the tutorial by returning to Mara at 741. A separate intentional death/recovery segment ends at cumulative tick 2370 across two primary sessions, with six save/reload checks. These simulation measurements do not establish human elapsed time; the older 451-tick preparation belongs to its historical source. The timber replay still loses six coins per complete cycle.
 
@@ -69,6 +72,6 @@ The unchanged preparation replay equips the shield at tick 245, equips the sword
 2. **REL-004:** combine the published Mining work and local melee/equipment first pass; publish the matching sources, outputs and previews.
 3. **GAME-005 / GAME-004:** automated combat, food, death/recovery and save/reload now pass; finish the visible/uncoached route, input/confusion, balance and real elapsed-time acceptance.
 4. **ART-004:** the bounded sound pass is implemented against published source; finish original animation synchronization and audible/device/Windows acceptance after recovery.
-5. Resume the recovered QA-003 candidate's final verification and merge, then wider usability and REL-002 distribution/installation work. GAME-010, bounded STUDIO-025 recovery, STUDIO-026 fixed publishing and STUDIO-063 current-art resource validation are complete for their stated scopes. Animation quality remains ART-005, deferred by the owner.
+5. Continue QA-003 UI readability/keyboard/manual acceptance and REL-002 distribution/installation work after the verified usability fixes. GAME-010, bounded STUDIO-025 recovery, STUDIO-026 fixed publishing and STUDIO-063 current-art resource validation are complete for their stated scopes. Animation quality remains ART-005, deferred by the owner.
 
 R0-R4 remain partial milestones. Optional editor expansion, elevation, multiple regions, companions, bosses and multiplayer do not need to be completed before the existing flat starter experience improves. Use the [roadmap](../02-roadmap/MASTER_ROADMAP.md) and synchronized [backlog](../02-roadmap/BACKLOG.md) for exact tasks and dependencies.

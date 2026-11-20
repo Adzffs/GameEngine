@@ -173,5 +173,19 @@ class WorldArtResourceTests(unittest.TestCase):
         self.assertTrue(report['renderer_layout_matches'])
         self.assertEqual(before, hashes())
 
+    def test_binding_newlines_are_portable_without_accepting_changed_geometry(self):
+        path = self.root / 'binding.h'
+        expected = '// generated\nstatic const int FrameWidth = 32;\n'
+        for data in (expected.encode(), expected.replace('\n', '\r\n').encode()):
+            path.write_bytes(data)
+            art.validate_renderer_layout(path, expected, 1024)
+            self.assertEqual(path.read_bytes(), data)
+        for data in (expected.replace('32', '64').encode(),
+                     expected.replace('\n', '\r').encode(), b'\xef\xbb\xbf' + expected.encode()):
+            path.write_bytes(data)
+            with self.assertRaises(art.ArtError):
+                art.validate_renderer_layout(path, expected, 1024)
+            self.assertEqual(path.read_bytes(), data)
+
 if __name__ == '__main__':
     unittest.main()

@@ -36,7 +36,7 @@
 | Can I recover interrupted map edits? | [Private journals, validated preview and new-file restore](04-studio/EDITOR_RECOVERY.md) |
 | How do I publish or roll back a map? | [Fixed versions, validation receipts and selected game launch](04-studio/WORLD_PUBLICATION.md) |
 | Which sounds and controls are implemented? | [Action audio and packaging results](06-development/ACTION_AUDIO_2026-11-20.md) |
-| Which control fixes are awaiting verification? | [Usability review, recovered draft and remaining checks](06-development/USABILITY_REVIEW_2026-11-20.md) |
+| Which control and recovery fixes were verified? | [Windows results and recovered animation checkpoint](06-development/WINDOWS_USABILITY_2026-11-20.md) |
 | Are sprite resources and memory bounded? | [Asset checks, measured costs and runtime budgets](05-game/ASSET_RESOURCE_LIMITS.md) |
 | What still needs resolving? | [Risk register](07-decisions/RISKS_AND_QUESTIONS.md) |
 
@@ -106,7 +106,7 @@ Use [current status](01-current-state/CURRENT_STATUS.md) for the maintained impl
 | Document | What it contains |
 |---|---|
 | [GAME_DESIGN.md](05-game/GAME_DESIGN.md) | Game pillars, progression, starter journey and expansion boundaries |
-| [CONTROLS_AND_RECOVERY.md](05-game/CONTROLS_AND_RECOVERY.md) | Candidate keyboard/modal/save controls; not yet merged master |
+| [CONTROLS_AND_RECOVERY.md](05-game/CONTROLS_AND_RECOVERY.md) | Implemented keyboard/modal/save controls and remaining acceptance |
 | [FRESH_PLAYER_PROFILE.md](05-game/FRESH_PLAYER_PROFILE.md) | Normal starting skills/tools/tutorial, launch profiles and save isolation |
 | [RIVER_CROSSING.md](05-game/RIVER_CROSSING.md) | First authored flat candidate, roads, reservations, placements and remaining acceptance |
 | [CONTENT_CATALOGUE.md](05-game/CONTENT_CATALOGUE.md) | Current items, recipes, skills, NPCs, quests, stations and resources |
@@ -121,6 +121,7 @@ Use [current status](01-current-state/CURRENT_STATUS.md) for the maintained impl
 | [PROJECT_REVIEW_2026-11-20.md](06-development/PROJECT_REVIEW_2026-11-20.md) | Full review, three integrity fixes, current evidence and remaining priorities |
 | [INTEGRATION_HANDOFF_2026-11-20.md](06-development/INTEGRATION_HANDOFF_2026-11-20.md) | Interrupted local Mining/melee integration, recovery details and pending starter/audio checks |
 | [STARTER_COMBAT_RECOVERY_2026-11-20.md](06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) | Full automated tutorial, food, death/persisted recovery, six round trips, checkpoint fixes and remaining human acceptance |
+| [WINDOWS_USABILITY_2026-11-20.md](06-development/WINDOWS_USABILITY_2026-11-20.md) | Verified Windows source, bank/queued-action fixes, portability and original integration recovery |
 | [USABILITY_REVIEW_2026-11-20.md](06-development/USABILITY_REVIEW_2026-11-20.md) | Input/save-recovery findings, native observations, recovered draft hashes and pending final verification |
 | [ASSET_RESOURCE_VALIDATION_2026-11-20.md](06-development/ASSET_RESOURCE_VALIDATION_2026-11-20.md) | Source-pinned resource budgets, PNG-stream checks, SDL fallback, memory costs and package refusal/repair |
 | [WORLD_PUBLICATION_2026-11-20.md](06-development/WORLD_PUBLICATION_2026-11-20.md) | Source-pinned fixed publishing, forced interruption, rollback/game starts and native/platform limits |

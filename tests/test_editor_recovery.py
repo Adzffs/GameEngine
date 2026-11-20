@@ -38,9 +38,15 @@ class RecoveryJournalTests(unittest.TestCase):
         self.assertFalse(self.store.root.exists())
         writer = self.writer()
         self.edit(writer, 1)
-        before = {p.name: p.read_bytes() for p in writer.folder.iterdir()}
+        def contents():
+            # Windows byte-range locks also exclude readers. Inspect the live
+            # lock's identity/metadata without opening its locked byte range.
+            return {p.name: (p.stat().st_ino, p.stat().st_size, p.stat().st_mtime_ns,
+                             None if p.name == "owner.lock" else p.read_bytes())
+                    for p in writer.folder.iterdir()}
+        before = contents()
         writer.checkpoint(self.bridge)
-        self.assertEqual(before, {p.name: p.read_bytes() for p in writer.folder.iterdir()})
+        self.assertEqual(before, contents())
 
     def test_three_generations_and_live_window_isolation(self):
         first = self.writer()

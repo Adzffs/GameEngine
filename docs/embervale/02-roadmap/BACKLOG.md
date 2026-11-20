@@ -13,7 +13,7 @@ Completion refers to the stated bounded acceptance, with evidence and publicatio
 
 | Work | Current bounded result | Remaining acceptance |
 |---|---|---|
-| Player integrity | ENG-003/004 and GAME-009 fixed and regression verified | QA-003 candidate's Linux Return/Exit/retry was observed; final verification/merge and Windows acceptance remain |
+| Player integrity | ENG-003/004 and GAME-009 fixed and regression verified | Windows regression verification and Linux Return/Exit/retry are recorded; broader manual acceptance remains |
 | Current verification | 120/120 Linux SDL, 98/98 standalone headless and 79/79 Python units per interpreter; resource/packaging/publication/recovery/bridge suites included | Other current platforms and human playthrough are separate |
 | Local animation line | Same safety fixes pass 101/101 on local 196a279 | REL-004 combines/publishes Mining and melee; ART-005 quality is deferred |
 | Ownership/architecture/export | Published bounded foundation and deterministic export | General regions/catalogue authoring remain separate |
@@ -31,7 +31,7 @@ Completion refers to the stated bounded acceptance, with evidence and publicatio
 1. REL-004: publish the reconciled Mining/melee/equipment build and sources/previews.
 2. GAME-005 / GAME-004: the automated full tutorial/recovery route passes; finish visible/uncoached observation and tuning.
 3. ART-004: review the implemented first sound pass on the recovered candidate and actual device.
-4. Resume the [QA-003 recovery candidate](../06-development/USABILITY_REVIEW_2026-11-20.md): verify the reconstructed code, finish interrupted native checks and merge. Wider usability/REL-002 and deferred ART-005 remain separate.
+4. Continue QA-003 text readability, keyboard and manual acceptance after the [verified Windows usability fixes](../06-development/WINDOWS_USABILITY_2026-11-20.md). REL-004 source is recovered/checkpointed; its integration and deferred ART-005 remain separate.
 
 The original Windows integration worktree remains unavailable, so REL-004 stays **in progress**. Independent work on the restored published source has delivered the first sound pass and fixed runtime asset copying; [results and limits](../06-development/ACTION_AUDIO_2026-11-20.md). ART-004 is **in progress** with audible/device and integration acceptance open. GAME-005 is **in progress** with the [automated starter continuation](../06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) passing; human/visible acceptance remains open. The [original recovery handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md) still applies.
 
@@ -124,7 +124,7 @@ STUDIO-063 is now **complete** for the current eight-batch resource contract: sh
 | ART-004 | P2 | Introduce a restrained audio set | ART-001; REL-004 | Add meaningful feedback and independent volume controls; document audio rights, formats and missing-asset behaviour. |
 | GAME-006 | P1 | Deliver starter vertical slice | GAME-005; ART-002; ART-003; GAME-007 | New tester completes intended gathering/crafting/combat/quest loop; record recovery, pacing and confusion results. |
 | GAME-007 | P1 | Reconcile narrative and progression text | DOC-002; GAME-003 | Current quest text, NPC names, objective targets, rewards and environmental cues agree on the tested journey. |
-| QA-003 | P1 | Verify accessibility and usability | None | In progress: recovered control/save-recovery draft and native Linux findings; verify final tree and merge, then wider keyboard, focus, colour-independent state, readable scale and platform acceptance. |
+| QA-003 | P1 | Verify accessibility and usability | None | Record keyboard, focus, colour-independent state, readable scale and error recovery results with fixes. |
 | GAME-009 | P0 | Preserve crafting escrow across saves and failed exits | ENG-004 | Open cursor/grid saves restore every owned item once without live mutation; capacity failure preserves the old save/items; failed shutdown offers retry or explicit unsaved exit. |
 | QA-004 | P1 | Reconcile current review and regression evidence | ENG-003; ENG-004; GAME-009 | Record exact source/configuration and passed client/headless/Python checks; correct stale expectations while retaining rejection, no-write and isolation assertions. |
 | REL-004 | P1 | Reconcile and publish the working animation implementation | QA-004 | Combine published Mining/shared gathering with local melee/equipment without losing either; publish editable sources, manifests, outputs, previews and report; verify combined gameplay/render/packaging. |

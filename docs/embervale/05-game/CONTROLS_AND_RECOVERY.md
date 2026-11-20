@@ -1,10 +1,10 @@
-# Candidate controls and save recovery
+# Controls and save recovery
 
 **Updated:** 20 November 2026.  
-**Status:** These controls describe the recovered QA-003 draft candidate, not merged master.  
+**Status:** Implemented and Windows regression verified in [4454067](https://github.com/Adzffs/GameEngine/commit/44540678bfa682870f2c9efb8907a1d36891910a). Wider keyboard/scale/manual acceptance remains open.\
 [Candidate and verification handoff](../06-development/USABILITY_REVIEW_2026-11-20.md).
 
-| Context | Control | Candidate behavior |
+| Context | Control | Behavior |
 |---|---|---|
 | World | Left click | Move or interact |
 | World | Right click | Resolve the current object and open its actions |
@@ -23,7 +23,7 @@
 Dialogue stays locked while its command awaits the server; **Waiting for server...**
 explains the 600-ms tick delay. Rejection unlocks the same node safely. Escape
 preserves queued/in-flight crafting work; shop closure respects its in-flight guard.
-Wider same-frame mouse-close handling remains in the verification handoff.
+Queued station mouse-close and bank Escape cases now pass the [Windows verification](../06-development/WINDOWS_USABILITY_2026-11-20.md).
 
 Losing focus cancels an unfinished crafting drag/context menu. It does not pause
 the authoritative world or discard accepted commands. Inventory, crafting and

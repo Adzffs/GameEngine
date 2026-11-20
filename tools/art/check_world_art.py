@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import sys
 
-from world_art_resources import REPO, ArtError, load_limits, load_manifests, read_regular, renderer_layout, validate_manifests
+from world_art_resources import REPO, ArtError, load_limits, load_manifests, renderer_layout, validate_manifests, validate_renderer_layout
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -17,10 +17,8 @@ def main():
         limits = load_limits(root)
         manifests = load_manifests(root, limits)
         report = validate_manifests(root, manifests, limits)
-        expected = renderer_layout(manifests).encode('utf-8')
-        actual = read_regular(root / 'src/Graphics/ForestPilotLayout.h', limits['max_manifest_bytes'] * 8)
-        if actual != expected:
-            raise ArtError('Generated renderer layout is stale; validate/export the intended manifests before building')
+        validate_renderer_layout(root / 'src/Graphics/ForestPilotLayout.h',
+                                 renderer_layout(manifests), limits['max_manifest_bytes'] * 8)
         report.update(policy=limits, renderer_layout_matches=True,
                       accounting='Logical RGBA8 textures + alpha cache + one encoded/decoded image. Excludes driver, allocator and decoder internals.')
         if args.summary:
