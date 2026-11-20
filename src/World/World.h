@@ -40,6 +40,7 @@
 #include "../AI/MonsterAIIntent.h"
 #include "../Interaction/InteractionSystem.h"
 #include "../Gathering/GatheringSystem.h"
+#include "../Gathering/GatheringRewardEvent.h"
 #include "../Recipe/RecipeActionSystem.h"
 #include "../Recipe/CraftingSessionSystem.h"
 #include "../Dialogue/DialogueSystem.h"
@@ -254,6 +255,7 @@ public:
 
     const std::vector<ActionLifecycleEvent> &
     GetActionLifecycleEvents() const;
+    const std::vector<GatheringRewardEvent> &GetGatheringRewardEvents() const { return gatheringRewardEvents; }
 
     int GetScheduledMonsterRespawnCount() const;
     bool HasScheduledMonsterRespawn(
@@ -464,6 +466,7 @@ private:
     std::vector<ShopTransactionEvent> publishedShopTransactionEvents;
 
     int currentTick = 0;
+    std::vector<GatheringRewardEvent> gatheringRewardEvents;
 
     std::map<int, MeleeCombatFeedback>
         meleeCombatFeedbacks;

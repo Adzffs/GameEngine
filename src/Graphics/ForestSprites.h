@@ -39,6 +39,7 @@ public:
     bool HasPlayer() const;
     bool HasMara() const;
     bool DrawPlayer(float tileX, float tileY, int facing, int pose) const;
+    bool DrawWoodcutting(float tileX, float tileY, int facing, int pose, int axeTier) const;
     bool DrawMara(int tileX, int tileY) const;
     bool DrawStation(StationType type, int tileX, int tileY) const;
     bool HitMara(int tileX, int tileY, float worldX, float worldY) const;
@@ -66,6 +67,8 @@ private:
     const Frame *stump = nullptr;
     // South, west, east, north, southwest, southeast, northwest, northeast.
     std::array<std::array<const Frame *, 4>, 8> player{};
+    std::array<std::array<const Frame *, 6>, 8> chopping{};
+    std::array<std::array<std::array<const Frame *, 6>, 8>, 3> choppingAxes{};
     const Frame *mara = nullptr;
     const Frame *furnace = nullptr;
     const Frame *bank = nullptr, *craftingTable = nullptr;

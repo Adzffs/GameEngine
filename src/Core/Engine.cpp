@@ -696,6 +696,9 @@ void Engine::Update()
 
     world.Update();
 
+    // Consume before another catch-up tick can replace the published events.
+    graphics.SynchronizeGatheringRewards(playerID, world.GetGatheringRewardEvents());
+
     const Clock::TimePoint updateEnd =
         Clock::ClockType::now();
 

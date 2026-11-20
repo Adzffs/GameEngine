@@ -3019,6 +3019,13 @@ void Graphics::DrawPlayer(
     visualPlayerY = position.y;
     visualPlayerInitialized = true;
 
+    if (const auto &chop = woodcuttingPresentation.GetAnimation(); chop)
+    {
+        playerFacing = chop->facing;
+        walkPose = 0;
+        if (worldArtEnabled && forestSprites.DrawWoodcutting(visualPlayerX, visualPlayerY,
+            playerFacing, woodcuttingPresentation.GetPose(), chop->axeTier)) return;
+    }
     if (worldArtEnabled && forestSprites.DrawPlayer(visualPlayerX, visualPlayerY, playerFacing, walkPose)) return;
 
     SDL_FRect playerRectangle =
@@ -3053,6 +3060,47 @@ void Graphics::DrawPlayer(
                          playerRectangle.y + 3.0f,
                          playerRectangle.w * 0.30f, 3.0f};
     SDL_RenderFillRect(renderer, &facingMark);
+}
+
+void Graphics::DrawWoodcuttingFeedback()
+{
+    SDL_BlendMode previous;
+    SDL_GetRenderDrawBlendMode(renderer, &previous);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    constexpr std::array<SDL_FPoint, 8> directions{{{0,1},{-1,0},{1,0},{0,-1},
+        {-0.707f,0.707f},{0.707f,0.707f},{-0.707f,-0.707f},{0.707f,-0.707f}}};
+    if (const auto &chop = woodcuttingPresentation.GetAnimation(); chop && woodcuttingPresentation.GetPose() == 3)
+    {
+        const auto direction = directions[chop->facing];
+        const float phase = woodcuttingPresentation.GetImpact();
+        const float x = visualPlayerX * TileSize + 16 + direction.x * 24;
+        const float y = visualPlayerY * TileSize + 10 + direction.y * 24;
+        SDL_SetRenderDrawColor(renderer, 221, 173, 107, static_cast<Uint8>(220 * (1.0f - phase)));
+        for (int i = 0; i < 4; ++i)
+        {
+            const SDL_FRect chip{x + (i % 2 ? -1 : 1) * (2 + phase * (5 + i)),
+                y - phase * (4 + i * 2), 2, 2};
+            SDL_RenderFillRect(renderer, &chip);
+        }
+    }
+    for (const auto &notice : woodcuttingPresentation.GetRewards())
+    {
+        const auto &event = notice.event;
+        const float age = 1.4f - notice.remainingSeconds;
+        const float x = event.actorX * TileSize + 16.0f;
+        const float y = event.actorY * TileSize - 36.0f - age * 12.0f;
+        const auto alpha = static_cast<Uint8>(255 * std::min(1.0f, notice.remainingSeconds / 0.3f));
+        const std::string item = "+" + std::to_string(event.amount) + " " + ItemDatabase::Get(event.itemType).GetName();
+        const std::string xp = "+" + std::to_string(event.xp) + " Woodcutting XP";
+        SDL_SetRenderDrawColor(renderer, 13, 22, 18, alpha);
+        SDL_RenderDebugText(renderer, x - item.size() * 4 + 1, y + 1, item.c_str());
+        SDL_RenderDebugText(renderer, x - xp.size() * 4 + 1, y + 12, xp.c_str());
+        SDL_SetRenderDrawColor(renderer, 223, 222, 154, alpha);
+        SDL_RenderDebugText(renderer, x - item.size() * 4, y, item.c_str());
+        SDL_SetRenderDrawColor(renderer, 132, 212, 228, alpha);
+        SDL_RenderDebugText(renderer, x - xp.size() * 4, y + 11, xp.c_str());
+    }
+    SDL_SetRenderDrawBlendMode(renderer, previous);
 }
 
 void Graphics::DrawPlayerHealthBar(
@@ -6410,6 +6458,9 @@ void Graphics::Render(
     UpdateCamera(playerX, playerY, map);
     UpdateSpritePicking(resources, stations, groundItems);
     UpdateProgressionFeedback(player, inventory);
+    const auto nextPosition = NextPlayerPosition(playerX, playerY);
+    woodcuttingPresentation.Update(player, activeAction, resources, presentationDeltaSeconds,
+        std::hypot(nextPosition.x - playerX, nextPosition.y - playerY) <= 0.04f);
     displayedCurrency = inventory.GetItemAmount(ItemType::COINS);
     displayedLogCount = inventory.GetItemAmount(ItemType::LOG);
     displayedOakLogCount = inventory.GetItemAmount(ItemType::OAK_LOG);
@@ -6493,6 +6544,7 @@ void Graphics::Render(
     DrawGroundItems(groundItems);
     DrawWorldObjects(map, entities, resources, stations, playerX, playerY,
         selectedCombatTargetID, player.GetID());
+    DrawWoodcuttingFeedback();
     if (worldArtEnabled)
         for (const auto &building : map.GetBuildings())
             forestSprites.DrawBuildingRoof(building, visualPlayerRectangle, presentationDeltaSeconds);

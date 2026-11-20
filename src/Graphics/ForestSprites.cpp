@@ -118,6 +118,12 @@ void ForestSprites::Initialize(SDL_Renderer *target)
         if (frame.id.starts_with("character.player.") && frame.facing >= 0 && frame.facing < static_cast<int>(player.size()) &&
             frame.animationFrame >= 0 && frame.animationFrame < 4)
             player[frame.facing][frame.animationFrame] = &frame;
+        if (frame.facing >= 0 && frame.facing < 8 && frame.animationFrame >= 0 && frame.animationFrame < 6)
+        {
+            if (frame.id.starts_with("character.woodcutting.")) chopping[frame.facing][frame.animationFrame] = &frame;
+            if (frame.id.starts_with("tool.axe.") && frame.grassVariant >= 0 && frame.grassVariant < 3)
+                choppingAxes[frame.grassVariant][frame.facing][frame.animationFrame] = &frame;
+        }
     }
 #if SDL_VERSION_ATLEAST(3, 4, 0)
     if (!renderer) return;
@@ -464,6 +470,18 @@ bool ForestSprites::DrawPlayer(float tileX, float tileY, int facing, int pose) c
 bool ForestSprites::DrawMara(int tileX, int tileY) const
 {
     return DrawCharacter(mara, static_cast<float>(tileX), static_cast<float>(tileY));
+}
+
+bool ForestSprites::DrawWoodcutting(float tileX, float tileY, int facing, int pose, int axeTier) const
+{
+    if (facing < 0 || facing >= 8 || pose < 0 || pose >= 6 || axeTier < 0 || axeTier >= 3) return false;
+    const auto *body = chopping[facing][pose], *axe = choppingAxes[axeTier][facing][pose];
+    if (!Available(body) || !Available(axe)) return false;
+    const bool behind = facing == 3 || facing == 6 || facing == 7;
+    if (behind) Draw(axe, Bounds(*axe, tileX, tileY));
+    DrawCharacter(body, tileX, tileY);
+    if (!behind) Draw(axe, Bounds(*axe, tileX, tileY));
+    return true;
 }
 
 bool ForestSprites::DrawCharacter(const Frame *frame, float tileX, float tileY) const

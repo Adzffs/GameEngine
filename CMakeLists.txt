@@ -86,6 +86,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/Combat/CombatService.cpp
     src/Combat/MeleeEngagementSystem.cpp
     src/Gathering/GatheringSystem.cpp
+    src/Gathering/WoodcuttingPresentationState.cpp
     src/Quest/QuestDefinitionDatabase.cpp
     src/Quest/QuestJournal.cpp
     src/Quest/QuestSystem.cpp
@@ -184,11 +185,15 @@ function(configure_gameengine_world_art target)
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/building-pilot/textures/floors.png"
     )
     set(variation_images)
+    set(woodcutting_images
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/woodcutting-pilot/textures/player.png"
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/woodcutting-pilot/textures/axes.png"
+    )
     foreach(name grass paths water stone flora walls roof floors trees stumps rocks)
         list(APPEND variation_images "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/variation-pilot/textures/${name}.png")
     endforeach()
     # Refresh packaged art when the images change, even if no C++ changed.
-    set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS ${forest_images} ${cast_images} ${environment_images} ${service_images} ${building_images} ${variation_images})
+    set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS ${forest_images} ${cast_images} ${environment_images} ${service_images} ${building_images} ${variation_images} ${woodcutting_images})
     add_custom_command(TARGET ${target} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
             "$<TARGET_FILE_DIR:${target}>/assets/embervale/forest-pilot/textures"
@@ -214,6 +219,10 @@ function(configure_gameengine_world_art target)
             "$<TARGET_FILE_DIR:${target}>/assets/embervale/variation-pilot/textures"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${variation_images}
             "$<TARGET_FILE_DIR:${target}>/assets/embervale/variation-pilot/textures"
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            "$<TARGET_FILE_DIR:${target}>/assets/embervale/woodcutting-pilot/textures"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${woodcutting_images}
+            "$<TARGET_FILE_DIR:${target}>/assets/embervale/woodcutting-pilot/textures"
         VERBATIM
     )
 endfunction()
@@ -418,6 +427,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(ClockPacingTests tests/ClockPacingTests.cpp)
     add_gameengine_headless_test(GatheringRandomTests tests/GatheringRandomTests.cpp)
     add_gameengine_headless_test(GatheringSystemTests tests/GatheringSystemTests.cpp)
+    add_gameengine_headless_test(WoodcuttingPresentationTests tests/WoodcuttingPresentationTests.cpp)
     add_gameengine_headless_test(QuestSystemTests tests/QuestSystemTests.cpp)
     add_gameengine_headless_test(QuestDefinitionTests tests/QuestDefinitionTests.cpp)
     add_gameengine_headless_test(QuestWorldIntegrationTests tests/QuestWorldIntegrationTests.cpp)
@@ -455,6 +465,7 @@ if(BUILD_TESTING)
 
     if(GAMEENGINE_BUILD_GRAPHICS_TESTS)
         add_gameengine_graphics_test(PlayerAnimationTests tests/PlayerAnimationTests.cpp)
+        add_gameengine_graphics_test(WoodcuttingGraphicsTests tests/WoodcuttingGraphicsTests.cpp)
         add_gameengine_graphics_test(MonsterGraphicsTests tests/MonsterGraphicsTests.cpp)
         add_gameengine_graphics_test(MeleeClickIntegrationTests tests/MeleeClickIntegrationTests.cpp)
         add_gameengine_graphics_test(CombatFeedbackTests tests/CombatFeedbackTests.cpp)
