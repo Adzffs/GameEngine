@@ -1,5 +1,7 @@
 # CLI and AI editing contract
 
+**Current recovery extension:** The existing C++ session now supports explicit recover-copy to a fresh .json in a selected existing directory. It validates a privately replayed base, rechecks its hash and never replaces an existing file. Normal save remains sibling-only. See [editor recovery](EDITOR_RECOVERY.md); broader protocol proposals below are not implemented by this command.
+
 **Status:** Proposed full editing interface. Export, validation and a bounded dry-run resource/station move are implemented. A separate draft branch introduces raw-file SHA-256 inspection and create-only guarded draft writes; general revisions, undo and most command families remain planned. See [starter-world import](STARTER_WORLD_IMPORT.md) for current syntax.\
 **Updated:** 18 November 2026\
 **Goal:** Let a human and an AI agent inspect or change content through the same predictable operations.

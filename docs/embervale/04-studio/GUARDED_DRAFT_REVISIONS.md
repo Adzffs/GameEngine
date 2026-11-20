@@ -1,42 +1,51 @@
-# Guarded draft revisions — bounded first write (STUDIO-021)
+# Guarded draft revisions
 
-**Status:** Development-branch experiment, not the completed Studio authoring workflow.
-**Scope:** Save a *new*, validated sibling snapshot after a supported resource or station move.
-**Parent:** Stable-ID move-preview PR #9, itself awaiting a full repository build.
-**Data:** Starter-world schema 1 only; all 20 compiled placements remain required.
+**Current policy, 20 November 2026:** STUDIO-021 remains in progress for its broader in-place replacement/durability scope. Create-only drafts, process-lifetime locks and interrupted-write recovery are implemented. See [recovery guide](EDITOR_RECOVERY.md) and [executed verification](../06-development/EDITOR_RECOVERY_2026-11-20.md). Historical first-write results remain in the [18 November record](../06-development/GUARDED_DRAFT_VERIFICATION_2026-11-18.md).
 
-## Usage
+## Current commands and boundaries
 
-Work on a **separate draft copy** of the starter snapshot, not the committed test fixture or a player save.
-
-```sh
+~~~bash
 EmbervaleWorldMove --hash content/drafts/starter-v1.json
 EmbervaleWorldMove content/drafts/starter-v1.json resource.normal_tree.001 30 30
 EmbervaleWorldMove content/drafts/starter-v1.json resource.normal_tree.001 30 30 \
   --expected-hash HASH_FROM_FIRST_COMMAND --write-draft content/drafts/starter-v2.json
-EmbervaleWorldValidate content/drafts/starter-v2.json
-```
+~~~
 
-`--hash` validates and fingerprints the **exact original file bytes**, including whitespace. Do not use the canonicalized content hash from a different copy. `--write-draft` parses and gameplay-validates the exact input, applies the normal stable-ID move command to an owned candidate, then serializes and revalidates that candidate. It requires a fresh filename in the same directory as the input. It cannot overwrite input, existing draft files, or a player save through an in-place operation. An unchanged-position move can create a new copy, so consumers should not assume every successful write moves an object.
+Work on your own draft rather than a committed fixture. Current runtime-valid schemas 1-4, typed move/paint/place/remove/spawn settings and bounded undo/redo share the C++ validator. The default operation is a read-only dry run. --hash fingerprints exact original bytes, including whitespace.
 
-Output includes the original and new SHA-256 digests. The new file is a regular validated snapshot that can be passed to `GameEngine --world` for an isolated playtest. No live world is mutated by the editing command.
+| Operation | Output rule |
+|---|---|
+| Ordinary save / --write-draft | Fresh sibling file, source hash rechecked |
+| Explicit recover-copy session command | Fresh .json in a selected existing directory, private base rechecked |
+| Existing destination | Refuse without replacing it |
+| Changed source | CONTENT_CONFLICT, no candidate publication |
+| Source read | Regular non-symlink file, at most 2 MiB |
+| Candidate | Canonical runtime-valid bytes, at most 2 MiB |
 
-## Concurrency and file boundaries
+Recovery replays cached original bytes and accepted commands in a private directory. Only its explicit new-copy export relaxes the sibling-directory restriction. This does not implement in-place overwrite, an immutable publication manifest or automatic game selection.
 
-The writer obtains a `<source>.embervale.lock` directory using an exclusive filesystem directory creation operation, and rereads the input under that **cooperative** lock. A mismatching expected SHA-256 is a conflict and writes no candidate. It stages complete bytes in a uniquely named directory under the output parent, and uses an exclusive same-filesystem hard link to publish to a new filename; the link operation fails if a file already occupies the name. Temporary and lock directories are removed on the normal error/success paths.
+## Cooperative ownership
 
-This first slice deliberately **does not** perform in-place atomic replacement. It requires filesystem hard-link support and refuses to silently fall back to destructive copying. A crash may leave a lock or staging directory requiring manual inspection before cleanup. The lock is not mandatory for independent text editors; a noncooperating writer can still edit the source. Output visibility is all-or-nothing under normal supported local filesystem semantics, but data is not explicitly fsynced, so no power-loss durability claim is made. The source file is read only.
+The C++ writer holds an OS lock in source.embervale.writer.lock while rereading the source and publishing. Linux uses flock; Windows opens the lock without sharing. The OS releases ownership when the process closes/exits, including abrupt death. The small sidecar remains intentionally; unlinking it during another writer's lifetime could split lock identity.
 
-Source input is limited to 2 MiB and must be a regular non-symlink file. Output parent must already exist. Paths outside the source file's canonical parent are rejected by the current restricted workflow. Other possible editing actions (actor spawn relocation, arbitrary object authoring and changing terrain) remain unavailable.
+A live owner causes a refusal. A leftover regular lock file can be reused once its owner dies. Neither age nor a reused PID proves a lock is stale. Locks coordinate supported writers; they do not stop independent text editors from changing the source.
 
-## Exit statuses
+Legacy source.embervale.lock directories have no reliable owner evidence. They are refused and retained without deletion. The [private recovery path](EDITOR_RECOVERY.md) can export a separate new draft despite such a lock.
 
-- `0` — successful hash, dry-run or new draft publication.
-- `2` — invalid command arguments, flags or hash shape.
-- `3` — input fails the game schema/geography checks, or move is invalid.
-- `4` — source revision conflict or output already exists.
-- `5` — source/read/lock/write failure.
+## Complete staging and failure handling
 
-## Before integration
+A unique directory under the destination parent holds staged bytes. Linux publishes by exclusive same-filesystem hard link. Windows now exclusively creates/flushes/closes the staging file, then uses MoveFileW to a name that must not exist. The final filename is not written incrementally.
 
-Reconcile with the parent move PR and build the exact stacked tree; run `StarterWorldDraftFileTests`, `StarterWorldMoveCliTests`, all existing starter-world tests and the game smoke test with a newly saved draft. Verify Windows filesystem behaviour and failure cleanup. No new player-save wire format has been introduced. After that, the remaining STUDIO-021 work is a general guarded revision API with durability and OS-specific compatibility; then STUDIO-023 undo/redo, followed by preview/editor UI.
+Handled failures clean only owned stages. A killed process may leave an unknown staging directory; future writes ignore it and do not promote or delete its contents. A stop before publication leaves the final name absent. A stop after publication leaves a complete final file, as exercised on Linux. Source and prior drafts remain intact in the tested boundaries.
+
+No current Windows execution or power-loss/physical-media durability guarantee is claimed. Local Linux process-kill tests are distinct from filesystem/power-failure tests. The previous Windows direct-to-final creation path has been replaced in source; its new runtime behaviour still needs Windows acceptance.
+
+## Exit status
+
+- 0: successful dry run, hash or draft publication.
+- 2: invalid arguments/hash shape.
+- 3: invalid input or typed operation.
+- 4: revision conflict or occupied output.
+- 5: source/lock/write failure.
+
+Session errors are reported on stderr; the Python bridge refuses the result before accepting state or a save receipt. See [CLI contract](CLI_AND_AI_CONTRACT.md) and [visual editor](VISUAL_WORLD_EDITOR.md).

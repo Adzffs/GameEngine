@@ -1,6 +1,6 @@
 # Evidence ledger and review limits
 
-**Current evidence reconciliation, 20 November:** [Periodic autosave](../06-development/PLAYER_AUTOSAVE_2026-11-20.md) pins current code fa5e0e93efa71ac60519287cfd9a35b328ec6270 and Linux results: 112/112 SDL, 93/93 separate headless and 42/42 Python units, including killed-process reload after a completed checkpoint. The earlier [project review](../06-development/PROJECT_REVIEW_2026-11-20.md) retains Windows 102/87 results for its source. See [current status](CURRENT_STATUS.md) for scope. Chronological descriptions below retain their original source/method limits.
+**Current evidence reconciliation, 20 November:** [Editor recovery](../06-development/EDITOR_RECOVERY_2026-11-20.md) pins current code 378092feab53698e4078400d1a9cfc936c39f4c3: Linux 113/113 SDL and 94/94 standalone headless CTest entries, 53/53 Python units on each of two interpreters, deterministic killed-process boundaries and one native Linux Tk restore with exact snapshot parity/original-byte preservation. Earlier Windows 102/87 results remain tied to their reviewed source. See [current status](CURRENT_STATUS.md); historical sections below retain their original scope.
 
 
 **Original review:** 18 November 2026.\

@@ -1,7 +1,7 @@
 # Current project status
 
 **Reviewed:** 20 November 2026.\
-**Published code:** [fa5e0e9](https://github.com/Adzffs/GameEngine/commit/fa5e0e93efa71ac60519287cfd9a35b328ec6270).\
+**Published code:** [378092f](https://github.com/Adzffs/GameEngine/commit/378092feab53698e4078400d1a9cfc936c39f4c3).\
 **Source of truth:** Current code and the [project review](../06-development/PROJECT_REVIEW_2026-11-20.md). The older [engine inventory](IMPLEMENTED_SYSTEMS.md) retains its explicitly dated baseline.
 
 Embervale is a playable local C++20/SDL3 RPG prototype with a bounded world editor and an authored River Crossing starter region. It has substantial gameplay systems. It is not yet a completed starter vertical slice, a released Studio product or an implemented online MMO.
@@ -18,7 +18,7 @@ Embervale is a playable local C++20/SDL3 RPG prototype with a bounded world edit
 | Data-safety corrections | Failed loads preserve backups; saves include crafting escrow; overflowing inventory additions reject; failed shutdown saves offer return to game or explicit exit without saving | Native save-failure dialog interaction still needs visible Windows acceptance |
 | Authored world | Flat 100x100 River Crossing candidate, distributed services, existing actor homes and static workshop buildings | Visible encounter/escape/recovery and human pacing acceptance; more building assemblies |
 | World format | Schemas 1-4, bounded parser/runtime validation, stable placements, retained allocation IDs and staged spawn semantics | General region/definition authoring and versioned publication manifests |
-| Studio | Shared move/paint/place/remove/spawn-setting commands, history, guarded new sibling drafts, dirty-state protection, reopen, isolated playtests and navigation/validation overlays | Interruption recovery, in-place publication, richer diagnostics, brushes and accessibility acceptance |
+| Studio | Shared edits/history, guarded sibling drafts, private recovery generations, conflict-aware restore, reopen, isolated playtests and overlays | Validated/in-place publication, richer diagnostics, brushes and broader accessibility/platform acceptance |
 | Published art | Eight bounded batches, 1,175 frames in 30 textures, eight-way walking/chopping/mining, editable masters, cache and fallback | Remaining cast/resource tiers, equipment/melee integration, general importer, UI/accessibility and visible quality acceptance |
 | Audio | First sound pass: 15 original effects, committed-result routing, bounded playback, effects volume/mute and keyboard controls | Audible/device/Windows review, original melee integration and full starter acceptance |
 
@@ -36,13 +36,15 @@ The [starter combat/recovery follow-up](../06-development/STARTER_COMBAT_RECOVER
 
 The [autosave policy and verification](../06-development/PLAYER_AUTOSAVE_2026-11-20.md) completes GAME-010: persistent players checkpoint after committed ticks every 60 seconds, retry failures after 10 seconds and defer due saves through respawn. Crafting ownership and temporary-play isolation remain intact; a killed process reloads its completed checkpoint. This does not guarantee power-loss durability.
 
+The [editor recovery follow-up](../06-development/EDITOR_RECOVERY_2026-11-20.md) completes STUDIO-025: private accepted-edit journals, separate validated restore, active-owner exclusion, safe legacy-lock handling and staged world writes. Forced termination at journal/C++ write boundaries passes. One real Linux/Tk restore through a changed-original warning and new-file picker also passed; broader Windows/accessibility acceptance remains open.
+
 ## Executed checks
 
 | Source/configuration | Executed result | Scope |
 |---|---:|---|
-| Current autosave source, Linux SDL configuration | 112/112 CTest entries | 93 headless, 7 client, 12 graphics; includes killed-process reload and status rendering |
-| Same current source, Linux with client/graphics disabled | 93/93 CTest entries | SDL-free core, starter replay and periodic-save/interruption checks |
-| Current Python editor unit suite | 42/42 tests | Python 3.12.14; real bridge still 12 cases within one CTest entry |
+| Current editor recovery source, Linux SDL configuration | 113/113 CTest entries | 94 headless, 7 client, 12 graphics; includes deterministic interrupted editor writes/replay |
+| Same current source, Linux with client/graphics disabled | 94/94 CTest entries | SDL-free core, starter replay, player autosave and editor recovery |
+| Current Python editor unit suite | 53/53 tests per interpreter | Python 3.12.14 and 3.13.5; recovery integration has ten cases inside one CTest entry |
 | Earlier published source plus critical fixes, Windows SDL client configuration | 102/102 CTest entries | Includes 87 headless, 5 client and 10 graphics labels; SDL dummy/software presentation |
 | Same source, separate Windows build with client and graphics disabled | 87/87 CTest entries | Confirms the changed core builds without SDL |
 | Python editor unit tests | 42/42 tests | Run directly with Python 3.14.6 |
@@ -55,10 +57,10 @@ The unchanged preparation replay equips the shield at tick 245, equips the sword
 
 ## Current work order
 
-1. **Completed in this review:** ENG-003, ENG-004 and GAME-009 protect saves/items; QA-004 reconciles current automated evidence; GAME-010 now adds bounded periodic saves.
+1. **Completed in this review:** ENG-003, ENG-004 and GAME-009 protect saves/items; QA-004 reconciles current automated evidence; GAME-010 and STUDIO-025 now protect periodic player progress and accepted editor work.
 2. **REL-004:** combine the published Mining work and local melee/equipment first pass; publish the matching sources, outputs and previews.
 3. **GAME-005 / GAME-004:** automated combat, food, death/recovery and save/reload now pass; finish the visible/uncoached route, input/confusion, balance and real elapsed-time acceptance.
 4. **ART-004:** the bounded sound pass is implemented against published source; finish original animation synchronization and audible/device/Windows acceptance after recovery.
-5. Continue the separately prioritized editor recovery, asset packaging and accessibility tasks. GAME-010 autosave is complete for its stated scope. Animation quality remains ART-005, deferred by the owner.
+5. Continue the separately prioritized validated publication, asset packaging and accessibility tasks. GAME-010 and bounded STUDIO-025 recovery are complete for their stated scopes. Animation quality remains ART-005, deferred by the owner.
 
 R0-R4 remain partial milestones. Optional editor expansion, elevation, multiple regions, companions, bosses and multiplayer do not need to be completed before the existing flat starter experience improves. Use the [roadmap](../02-roadmap/MASTER_ROADMAP.md) and synchronized [backlog](../02-roadmap/BACKLOG.md) for exact tasks and dependencies.

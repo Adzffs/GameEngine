@@ -1,0 +1,85 @@
+{
+  "task": "STUDIO-025",
+  "status": "complete",
+  "date": "2026-11-20",
+  "code_commit": "378092feab53698e4078400d1a9cfc936c39f4c3",
+  "baseline_commit": "4dae1ccf23d20c49c6dc6eebca43e09eda404f5f",
+  "tested_code_tree": "f4350905cc631f4bb4a545f4482bdf959322038b",
+  "toolchain": {
+    "platform": "Linux",
+    "compiler": "GCC 14.2.0",
+    "cmake": "4.4.5",
+    "ninja": "1.13.2",
+    "sdl": "3.4.12 audio enabled",
+    "python": [
+      "3.12.14",
+      "3.13.5"
+    ],
+    "native_tk": "8.6"
+  },
+  "checks": {
+    "client_ctest": {
+      "passed": 113,
+      "total": 113,
+      "headless": 94,
+      "client": 7,
+      "graphics": 12
+    },
+    "separate_headless_ctest": {
+      "passed": 94,
+      "total": 94
+    },
+    "python_units_per_interpreter": {
+      "passed": 53,
+      "total": 53
+    },
+    "recovery_unit_cases": 11,
+    "recovery_real_integration_cases": 10,
+    "killed_children_per_integration_run": 7,
+    "draft_file_assertions": 24,
+    "existing_real_bridge_cases": 12,
+    "production_archive_contains_crash_hook": false
+  },
+  "native_restore": {
+    "flow": "native desktop chooser, changed-original warning, preview, save picker, reopened saved draft",
+    "restored_snapshot_sha256": "06685ca19f7e097dfc1bacb0d811e22d26df3a431f5ba4e3f55f67f40d52aafa",
+    "source_preserved_sha256": "f0bf630df1da778c74d309eef2c2fe5ed26dac1e6964b6d36e88f634f0100812",
+    "undo_redo_on_reopen": "0/0",
+    "restored_filename": "village-draft-recovered.json",
+    "source_filename": "village-draft.json",
+    "private_fixture": true,
+    "player_files_used": false,
+    "dialog_visibility_fix_verified": true,
+    "copy_is_new": true,
+    "authoritative_parity": true
+  },
+  "policy": {
+    "base_limit_bytes": 2097152,
+    "journal_limit_bytes": 3145728,
+    "command_limit": 256,
+    "retained_generations": 3,
+    "possible_generations_before_pruning_after_crash": 4,
+    "checkpoint_storage_budget_bytes": 33554432,
+    "session_limit": 128,
+    "source_conflict": "independent cached-base replay; explicit fresh JSON output",
+    "live_sessions": "excluded by OS owner lock",
+    "legacy_directory_locks": "preserve and refuse source writes; separate recovery works",
+    "undo_history_after_restore": "reset; authored allocation reservations retained"
+  },
+  "limitations": [
+    "No current Windows build/runtime verification",
+    "No power-loss or physical-media durability guarantee",
+    "No network-filesystem verification",
+    "No recovery of arbitrary invalid edits or portable moved recovery groups",
+    "No immutable publication manifests or in-place source replacement",
+    "Native walkthrough covers one Linux flow, not full accessibility acceptance"
+  ],
+  "documentation_validation": {
+    "markdown_files": 100,
+    "links": 1262,
+    "matching_backlog_tasks": 96,
+    "acyclic_dependencies": true,
+    "legacy_studio_ids_retained": 45,
+    "external_links_fetched_by_checker": false
+  }
+}

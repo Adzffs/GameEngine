@@ -33,6 +33,7 @@
 | What did the animation research and polish establish? | [Sources, measured findings and prototype status](06-development/ANIMATION_RESEARCH_2026-11-20.md) |
 | Have combat, food, death and recovery been checked? | [Starter continuation, fixed checkpoints and save/reload evidence](06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) |
 | When is player progress saved? | [Periodic checkpoints, retries and interruption/reload](06-development/PLAYER_AUTOSAVE_2026-11-20.md) |
+| Can I recover interrupted map edits? | [Private journals, validated preview and new-file restore](04-studio/EDITOR_RECOVERY.md) |
 | Which sounds and controls are implemented? | [Action audio and packaging results](06-development/ACTION_AUDIO_2026-11-20.md) |
 | What still needs resolving? | [Risk register](07-decisions/RISKS_AND_QUESTIONS.md) |
 
@@ -94,6 +95,7 @@ Use [current status](01-current-state/CURRENT_STATUS.md) for the maintained impl
 | [STARTER_WORLD_IMPORT.md](04-studio/STARTER_WORLD_IMPORT.md) | Current runtime input limits, validator, game launch, save isolation and compatibility |
 | [CLI_AND_AI_CONTRACT.md](04-studio/CLI_AND_AI_CONTRACT.md) | Proposed command interface, transactions, diagnostics and automation safeguards |
 | [EDITOR_WORKFLOWS.md](04-studio/EDITOR_WORKFLOWS.md) | Practical authoring, recovery, conflict and playtest journeys |
+| [EDITOR_RECOVERY.md](04-studio/EDITOR_RECOVERY.md) | Private recovery, retention, source conflicts, new-copy restore and legacy/OS locks |
 
 ### The player experience
 
@@ -113,6 +115,7 @@ Use [current status](01-current-state/CURRENT_STATUS.md) for the maintained impl
 | [PROJECT_REVIEW_2026-11-20.md](06-development/PROJECT_REVIEW_2026-11-20.md) | Full review, three integrity fixes, current evidence and remaining priorities |
 | [INTEGRATION_HANDOFF_2026-11-20.md](06-development/INTEGRATION_HANDOFF_2026-11-20.md) | Interrupted local Mining/melee integration, recovery details and pending starter/audio checks |
 | [STARTER_COMBAT_RECOVERY_2026-11-20.md](06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) | Full automated tutorial, food, death/persisted recovery, six round trips, checkpoint fixes and remaining human acceptance |
+| [EDITOR_RECOVERY_2026-11-20.md](06-development/EDITOR_RECOVERY_2026-11-20.md) | Interrupted writer/journal tests, source preservation, native restore and source-pinned results |
 | [PLAYER_AUTOSAVE_2026-11-20.md](06-development/PLAYER_AUTOSAVE_2026-11-20.md) | 60-second player saves, ten-second retries, crafting/death safety, killed-process reload and visible status |
 | [ACTION_AUDIO_2026-11-20.md](06-development/ACTION_AUDIO_2026-11-20.md) | First sound pass, controls, runtime-copy fix, current Linux evidence and remaining acceptance |
 | [GETTING_STARTED.md](06-development/GETTING_STARTED.md) | Local CMake setup, Windows client, saves and editor guidance |

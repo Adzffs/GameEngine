@@ -1,8 +1,8 @@
 {
   "version": 1,
   "reviewed_date": "2026-11-20",
-  "current_verified_master": "fa5e0e93efa71ac60519287cfd9a35b328ec6270",
-  "verification_reconciliation": "Latest autosave code fa5e0e93efa71ac60519287cfd9a35b328ec6270: Linux SDL 112/112 CTest entries (93 headless, 7 client, 12 graphics), separate headless 93/93 and Python editor 42/42. GAME-010 passes interval/retry, crafting/escrow, real death/respawn, Engine committed-tick and killed-process reload checks. Starter replay/bridge suites remain included. Current Windows, human, physical-media durability and original combined local animation acceptance remain open. See docs/embervale/06-development/PLAYER_AUTOSAVE_2026-11-20.md.",
+  "current_verified_master": "378092feab53698e4078400d1a9cfc936c39f4c3",
+  "verification_reconciliation": "Latest editor recovery code 378092feab53698e4078400d1a9cfc936c39f4c3: Linux 113/113 SDL CTest entries (94 headless, 7 client, 12 graphics), separate headless 94/94 and Python 53/53 on both 3.12.14 and 3.13.5. STUDIO-025 real replay/restore, source conflicts, live owners, corruption, quotas and deterministic killed-process boundaries pass; native Linux Tk 8.6 recovery to a separate draft passed with complete snapshot parity and original-byte preservation. Recovery suite's ten cases and existing bridge's twelve remain inside their respective CTest entries. Current Windows, physical-media durability, broader accessibility and original animation integration remain open. See docs/embervale/06-development/EDITOR_RECOVERY_2026-11-20.md.",
   "repository": "Adzffs/GameEngine",
   "baseline_commit": "e9d32932e8f9b27e96283313cca320058792a81f",
   "status_policy": "Complete means bounded stated acceptance has evidence and is published on the default branch. In_progress retains remaining scope/acceptance; planned is future work. Historical reports remain dated. Acceptance tasks can measure an implemented candidate before human signoff closes its parent feature.",
@@ -422,9 +422,10 @@
         "tests/StarterWorldMoveCliTests.cmake",
         "docs/embervale/04-studio/GUARDED_DRAFT_REVISIONS.md",
         "docs/embervale/06-development/GUARDED_DRAFT_VERIFICATION_2026-11-18.md",
-        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
+        "docs/embervale/06-development/EDITOR_RECOVERY_2026-11-20.md"
       ],
-      "notes": "Create-only sibling drafts use raw-byte SHA-256, a source recheck and a cooperating directory lock. Windows uses CREATE_NEW, not the older hard-link-only path. Draft/bridge checks pass. In-place atomic replacement, interruption/stale-lock recovery and physical durability remain open."
+      "notes": "Create-only sibling drafts retain raw SHA-256 and source recheck. Follow-up 378092feab53698e4078400d1a9cfc936c39f4c3 uses persistent OS-lock sidecars released on process death and fully stages Windows/POSIX outputs; unknown legacy locks are preserved. Deterministic lock/write/stage/published interruption tests pass on Linux. Explicit recovery export permits a fresh JSON in another existing directory. Broader in-place guarded replacement, physical durability and current Windows execution remain open."
     },
     {
       "id": "STUDIO-022",
@@ -493,7 +494,7 @@
       "milestone": "R2",
       "priority": "P1",
       "title": "Recover separately stored drafts",
-      "status": "planned",
+      "status": "complete",
       "dependencies": [
         "STUDIO-021",
         "STUDIO-023"
@@ -501,9 +502,11 @@
       "acceptance": "Recover last valid draft after interruption; distinguish draft/base/published states and handle conflicts without overwriting publication.",
       "github_issue": null,
       "evidence": [
-        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+        "docs/embervale/06-development/EDITOR_RECOVERY_2026-11-20.md",
+        "docs/embervale/04-studio/EDITOR_RECOVERY.md",
+        "docs/embervale/06-development/editor-recovery/2026-11-20/results.json"
       ],
-      "notes": "Still open: exercise termination during new-draft writes and recovery with stale .embervale.lock directories. Define recoverable draft/base/publication identity without deleting another writer's data or trusting partial output."
+      "notes": "Published in 378092feab53698e4078400d1a9cfc936c39f4c3: three recent private accepted-edit generations, bounded checksummed base/command journals, OS owner locks, C++ replay/fingerprint validation and explicit new-copy restore. Changed/missing/corrupt originals, legacy locks, occupied outputs, preserved authored allocation/spawn state and seven killed children per integration run pass. Native Linux chooser/preview/file-picker/reopen passed; snapshot and original bytes verified. New writer OS locks release on death; unknown legacy directories are retained. In-place publication, invalid unfinished gameplay drafts, stronger durability and current Windows execution remain outside this bounded task."
     },
     {
       "id": "STUDIO-026",
@@ -579,9 +582,10 @@
       "evidence": [
         "tools/embervale_world_editor.py",
         "docs/embervale/06-development/MASTER_ACCEPTANCE_2026-11-19.md",
-        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
+        "docs/embervale/06-development/EDITOR_RECOVERY_2026-11-20.md"
       ],
-      "notes": "Dirty checkpoints, save/reopen and close/switch warnings are implemented and exercised. Prior visible evidence is retained; automatic interruption recovery remains STUDIO-025."
+      "notes": "Dirty checkpoints, save/reopen and close/switch warnings remain implemented. STUDIO-025 now adds a Recovery chooser, real change preview, storage-failure status and explicit restore to a new file. The changed-original/native Linux restore flow passed; broader keyboard/focus/scale and Windows acceptance remain open."
     },
     {
       "id": "STUDIO-033",

@@ -3,7 +3,7 @@
 **20 November evidence:** The [project review](../06-development/PROJECT_REVIEW_2026-11-20.md) executes the current CLI/bridge and editor checks. Use [current status](../01-current-state/CURRENT_STATUS.md) to distinguish implemented workflows from proposed recovery/publication scope.
 
 
-**Status:** Bounded edit/history/draft/reopen/playtest workflows exist; broader recovery/publication workflows below remain targets.\
+**Status:** Bounded edit/history/draft/reopen/playtest and [private recovery](EDITOR_RECOVERY.md) exist; broader publication and invalid-gameplay draft workflows below remain targets.\
 **Updated:** 18 November 2026\
 **Audience:** Designers, developers and AI agents changing Embervale content.
 
@@ -73,6 +73,8 @@ process restart and does not bypass guarded draft publication. See
 [bounded undo/redo](BOUNDED_UNDO_REDO.md).
 
 ## 7. Save, recover and resolve conflicts
+
+**Implemented recovery:** Open the same source path, select a closed session, review the changed-original warning and real change summary, then restore to a new filename. Three recent copies are retained, active owners are excluded and partial writes are ignored. The original revision is never silently rebased or replaced. See [policy, locations and limits](EDITOR_RECOVERY.md). Broader replacement/publication targets follow.
 
 ### Ordinary save
 

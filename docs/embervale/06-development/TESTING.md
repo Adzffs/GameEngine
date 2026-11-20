@@ -1,7 +1,7 @@
 # Testing, validation and evidence
 
 **Status date:** 20 November 2026
-**Current evidence:** [Periodic autosave](PLAYER_AUTOSAVE_2026-11-20.md): Linux SDL 112/112 CTest entries (93 headless, 7 client, 12 graphics), separate headless 93/93 and Python editor 42/42. New policy, killed-process reload and real-renderer save-notice entries pass. The starter replay CLI's five cases and editor bridge's twelve cases remain included in their respective single CTest entries. Historical Windows/earlier source counts retain their dated reports; current Windows/human acceptance remains separate.
+**Current evidence:** [Editor recovery](EDITOR_RECOVERY_2026-11-20.md): Linux SDL 113/113 CTest entries (94 headless, 7 client, 12 graphics), separate headless 94/94 and Python editor 53/53 on each of 3.12.14 and 3.13.5. The new ten-case recovery suite is one CTest entry; the twelve-case editor bridge and five-case starter replay CLI retain their own entries. Seven children are killed at deterministic journal/C++ transaction boundaries per integration run. A native Linux Tk 8.6 changed-original restore passed. Current Windows, broader accessibility and power-loss durability remain separate.
 **Historical baseline:** e9d32932; earlier Linux results below retain their source dates.
 
 Select an actual installed interpreter with `-DPython3_EXECUTABLE=...` when needed. Windows Store shortcuts were inaccessible during this review; the executable enabled a previously omitted bridge entry. Confirm `ctest -N` contains `StarterWorldVisualBridgeIntegration`, and run `python -m unittest discover -s tests -p "test_*.py"` separately. A configuration omitting Python does not establish a full editor pass.

@@ -10,6 +10,8 @@ The later [starter combat/recovery verification](docs/embervale/06-development/S
 
 The [periodic autosave follow-up](docs/embervale/06-development/PLAYER_AUTOSAVE_2026-11-20.md) completes GAME-010. Preserve explicit persistent-session opt-in, monotonic 60-second checkpoints after committed ticks, ten-second failure retries, crafting projection and due-death deferral until respawn. Never arm autosave for temporary playtests or failed startup. Player save format remains 13; editor draft recovery is separate.
 
+The [editor recovery follow-up](docs/embervale/06-development/EDITOR_RECOVERY_2026-11-20.md) completes bounded STUDIO-025. Preserve private per-window journals, cached-base/C++ replay fingerprints, explicit new-copy restoration and authored allocation reservations. Do not promote partial writes, take over live sessions, delete unknown legacy locks or unlink active writer-lock inodes. Normal saves stay sibling-only; recover-copy is explicit create-only JSON export. Crash-probe pauses compile only into the standalone test probe, never GameEngineCore/runtime tools.
+
 For tasks that create or change animation, read:
 
 1. [Animation guide](docs/embervale/05-game/ANIMATION_GUIDE.md).

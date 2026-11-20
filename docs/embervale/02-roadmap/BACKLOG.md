@@ -14,13 +14,13 @@ Completion refers to the stated bounded acceptance, with evidence and publicatio
 | Work | Current bounded result | Remaining acceptance |
 |---|---|---|
 | Player integrity | ENG-003/004 and GAME-009 fixed and regression verified | Visible native save-failure choices remain QA-003 |
-| Current verification | 112/112 Linux SDL, 93/93 standalone headless and 42/42 Python units; real bridge includes 12 cases | Other current platforms and human playthrough are separate |
+| Current verification | 113/113 Linux SDL, 94/94 standalone headless and 53/53 Python units per interpreter; ten-case recovery and twelve-case bridge suites included | Other current platforms and human playthrough are separate |
 | Local animation line | Same safety fixes pass 101/101 on local 196a279 | REL-004 combines/publishes Mining and melee; ART-005 quality is deferred |
 | Ownership/architecture/export | Published bounded foundation and deterministic export | General regions/catalogue authoring remain separate |
 | Runtime content | Schema-1-4 bounded input, geography, identities and position/recovery checks | General publication/manifests/migrations |
-| Studio | Shared edits/history, guarded new drafts, reopen, playtests and overlays | Interruption/stale-lock recovery, in-place publication, accessibility and broader tools |
+| Studio | Shared edits/history, guarded new drafts, private recovery and separate restore, reopen, playtests and overlays | In-place/versioned publication, broader accessibility/platform acceptance and tools |
 | Art | Eight published batches, 1,175 frames/30 textures, walking/chopping/mining | Remaining cast/tiers/buildings, general importer, audible/device review and visible acceptance |
-| Action audio and packaging | 15 original effects, controls, one copy owner; included in the current 112/93 Linux verification | Audible/Windows/full starter and original animation integration acceptance |
+| Action audio and packaging | 15 original effects, controls, one copy owner; included in the current 113/94 Linux verification | Audible/Windows/full starter and original animation integration acceptance |
 | Player autosave | GAME-010 complete: 60-second saves, 10-second retries, crafting/death and killed-process reload checks | Windows/human notice review and stronger durability remain separate |
 | Starter progression | Fresh tutorial plus combat, food, death, persisted recovery and six round trips pass; skipped checkpoints fixed | Uncoached navigation, combat/food/death/recovery and full quest-chain acceptance |
 | Starter measurements | Shield 245, sword 376, prepared 454, first kill 677 and actual tutorial return 741 ticks; death/recovery exercise 2370 | Human elapsed time and the 10-15 minute target remain unmeasured |
@@ -31,11 +31,13 @@ Completion refers to the stated bounded acceptance, with evidence and publicatio
 1. REL-004: publish the reconciled Mining/melee/equipment build and sources/previews.
 2. GAME-005 / GAME-004: the automated full tutorial/recovery route passes; finish visible/uncoached observation and tuning.
 3. ART-004: review the implemented first sound pass on the recovered candidate and actual device.
-4. Continue explicit recovery/packaging/usability priorities; ART-005 polish stays deferred.
+4. Continue explicit validated-publication/packaging/usability priorities; ART-005 polish stays deferred.
 
 The original Windows integration worktree remains unavailable, so REL-004 stays **in progress**. Independent work on the restored published source has delivered the first sound pass and fixed runtime asset copying; [results and limits](../06-development/ACTION_AUDIO_2026-11-20.md). ART-004 is **in progress** with audible/device and integration acceptance open. GAME-005 is **in progress** with the [automated starter continuation](../06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) passing; human/visible acceptance remains open. The [original recovery handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md) still applies.
 
-GAME-010 is now **complete** for bounded periodic player persistence: 60-second checkpoints, 10-second retries, crafting/death safety, temporary-save isolation and killed-process reload. See the [autosave policy and verification](../06-development/PLAYER_AUTOSAVE_2026-11-20.md). Current Linux checks pass 112/112 SDL and 93/93 standalone headless entries, plus 42/42 Python units; current Windows/human acceptance stays open.
+GAME-010 is now **complete** for bounded periodic player persistence: 60-second checkpoints, 10-second retries, crafting/death safety, temporary-save isolation and killed-process reload. See the [autosave policy and verification](../06-development/PLAYER_AUTOSAVE_2026-11-20.md). The autosave follow-up passed 112/112 SDL, 93/93 standalone headless and 42/42 Python units for its recorded source; the newer editor recovery results follow. Current Windows/human acceptance stays open.
+
+STUDIO-025 is now **complete** for private accepted-edit recovery: three generations, authoritative replay/preview, new-file restore and safe owner/legacy-lock handling. See the [editor recovery results](../06-development/EDITOR_RECOVERY_2026-11-20.md) and [recovery guide](../04-studio/EDITOR_RECOVERY.md). Current verification is 113/113 Linux SDL, 94/94 standalone headless and 53/53 Python tests on each of two interpreters. Broader STUDIO-021 replacement, STUDIO-026 publication and platform/accessibility acceptance stay open.
 
 ## Complete work inventory
 

@@ -180,3 +180,10 @@ The normal tutorial finishes at tick 741 in the recorded source; the full
 measurements, not human completion time. Existing upgrade-only mode retains its
 454-tick preparation report and creates no saves. See [results, source and scope
 limits](STARTER_COMBAT_RECOVERY_2026-11-20.md).
+
+
+## 12. Recover interrupted editor work
+
+Studio checkpoints accepted dirty edits in a private user-local recovery store. Reopen the same source path and choose a closed session, or press **Recovery…**. Review the changed-original warning and C++-validated change summary, then choose a new .json filename. A missing/corrupt original can still recover from its cached base. Existing files and player progress are preserved.
+
+Use --recovery-dir /path/to/private-recovery to select another real writable store; use the same directory when reopening. Storage failures appear in the editor status so Save new draft remains available. See [locations, retention and legacy locks](../04-studio/EDITOR_RECOVERY.md) and [results](EDITOR_RECOVERY_2026-11-20.md).

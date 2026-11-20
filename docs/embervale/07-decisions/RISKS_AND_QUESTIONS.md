@@ -7,7 +7,7 @@ This register distinguishes observed findings from future design risks. Priority
 
 The [project review](../06-development/PROJECT_REVIEW_2026-11-20.md) fixed recovery-file loss (ENG-003), crafting escrow omission (GAME-009) and inventory/bank overflow (ENG-004). Current checks supersede older unexecuted notes. Earlier findings retain their ownership context below.
 
-Remaining priorities: integration (REL-004), fresh-player measurements (GAME-005/004), editor recovery/publication (STUDIO-025/026), packaging (STUDIO-063), usability (QA-003) and integer policy (ENG-005). GAME-010 [periodic player autosave](../06-development/PLAYER_AUTOSAVE_2026-11-20.md) is complete for its bounded acceptance; stronger physical-media durability is outside that guarantee. Animation polish is owner-deferred (ART-005).
+Remaining priorities: integration (REL-004), fresh-player measurements (GAME-005/004), validated publication (STUDIO-026), packaging (STUDIO-063), usability (QA-003) and integer policy (ENG-005). GAME-010 [periodic player autosave](../06-development/PLAYER_AUTOSAVE_2026-11-20.md) is complete for its bounded acceptance; stronger physical-media durability is outside that guarantee. STUDIO-025 [private editor recovery](../06-development/EDITOR_RECOVERY_2026-11-20.md) is complete for accepted edits; current Windows/stronger durability remain unverified. Animation polish is owner-deferred (ART-005).
 
 ## 1. Immediate findings
 
@@ -58,7 +58,7 @@ Owner roles describe responsibilities; they do not assert that additional team m
 - Which preview backend can be reproduced locally while sharing presentation semantics?
 - What lock/recheck and replace guarantees are supported on each target filesystem?
 - What exact fields are included in content hashes, manifests and validation provenance?
-- How are autosaved drafts discovered, retained, recovered and discarded visibly?
+- Accepted-edit recovery is now defined in [the recovery guide](../04-studio/EDITOR_RECOVERY.md). What broader policy is needed for invalid unfinished drafts and recovery groups whose source paths move?
 
 ### Before starter balance signoff
 
