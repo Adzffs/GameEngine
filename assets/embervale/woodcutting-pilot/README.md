@@ -50,6 +50,10 @@ binary alpha, all 48 body cells, connected lower bodies, all 144 axe cells and
 tool clipping. [Contact sheet](previews/chop-contact.png) and
 [validation report](previews/validation.json).
 
+`--rebuild-axes` explicitly replaces only the tool overlays while preserving
+the player action master. The cutting edge follows the tree-facing direction;
+contact and follow-through tilt the shaft so the blade meets the bark.
+
 ## Runtime behavior
 
 The live action must belong to the player, be running, target an active nearby

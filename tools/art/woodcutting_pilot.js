@@ -24,6 +24,13 @@ function geometry(direction, pose) {
     [32+dx*11,38+dy*10],[32+dx*13,39+dy*12],[32+dx*8,34+dy*8]];
   var heads = [[32+dx*17,26+dy*9],[32-dx*8,12],[32-dx*12,9],
     [32+dx*24,38+dy*24],[32+dx*26,39+dy*26],[32+dx*18,25+dy*18]];
+  if (pose === 3 || pose === 4) {
+    // Tilt the shaft across the cut so its blade, rather than its handle tip,
+    // reaches the bark. Mirrored side views keep the head above the hands.
+    var side = dx < 0 ? -1 : 1;
+    heads[pose] = [grips[pose][0]+14*(0.6*dx+0.8*side*dy),
+      grips[pose][1]+14*(0.6*dy-0.8*side*dx)];
+  }
   return {grip:grips[pose], head:heads[pose]};
 }
 function arm(out, shoulder, grip, near) {
@@ -49,6 +56,11 @@ function bodyPose(base, direction, pose) {
 function axePose(direction,pose,tier) {
   var out = canvas(64,80), g = geometry(direction,pose), dx = g.head[0]-g.grip[0], dy = g.head[1]-g.grip[1];
   var length = Math.sqrt(dx*dx+dy*dy), u = [dx/length,dy/length], v = [-dy/length,dx/length];
+  var cut = vectors[direction], toward = v[0]*cut[0]+v[1]*cut[1];
+  // The old fixed perpendicular put the cutting edge on the wrong side for
+  // half the facings. Choose the side toward the target for every pose.
+  if (toward < -0.001 || (Math.abs(toward) <= 0.001 && (cut[0] < 0 || (cut[0] === 0 && cut[1] < 0))))
+    v = [-v[0],-v[1]];
   line(out,[g.grip[0]-u[0]*3,g.grip[1]-u[1]*3],g.head,'30211d',3);
   line(out,g.grip,g.head,'b27c48',1);
   function point(a,b) { return [g.head[0]+u[0]*a+v[0]*b,g.head[1]+u[1]*a+v[1]*b]; }
@@ -69,6 +81,11 @@ if (cfg.regenerate) {
     for (var tier = 0; tier < 3; tier++) blit(axePose(d,p,tier),axes,p*64,(tier*8+d)*80);
   }
 } else { bodies = read(cfg.sources.player); axes = read(cfg.sources.axes); }
+if (cfg.rebuildAxes) {
+  axes = canvas(384,1920);
+  for (var d = 0; d < 8; d++) for (var p = 0; p < 6; p++)
+    for (var tier = 0; tier < 3; tier++) blit(axePose(d,p,tier),axes,p*64,(tier*8+d)*80);
+}
 if (bodies.width !== 384 || bodies.height !== 640 || axes.width !== 384 || axes.height !== 1920) throw new Error('Incorrect woodcutting master geometry');
 [bodies,axes].forEach(function(image) { image.pixels.forEach(function(c) {
   if (pc.rgbaA(c) !== 0 && pc.rgbaA(c) !== 255) throw new Error('Woodcutting requires binary alpha');
@@ -103,8 +120,9 @@ for (var d = 0; d < 8; d++) for (var p = 0; p < 6; p++) {
   }
 }
 if (cfg.regenerate) {
-  save(bodies,cfg.fixtures.player,cfg.sources.player); save(axes,cfg.fixtures.axes,cfg.sources.axes);
+  save(bodies,cfg.fixtures.player,cfg.sources.player);
 }
+if (cfg.regenerate || cfg.rebuildAxes) save(axes,cfg.fixtures.axes,cfg.sources.axes);
 function combined(d,p,tier) {
   var out = canvas(64,80), body = crop(bodies,p*64,d*80,64,80), tool = crop(axes,p*64,(tier*8+d)*80,64,80);
   var behind = d===3||d===6||d===7;

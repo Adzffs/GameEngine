@@ -72,8 +72,8 @@
         1920
       ],
       "editor_metadata": "textures/axes.export.json",
-      "source_sha256": "b51aa4e107c7690bdf1d2b1db083c2bebaadfd61238032397a8d70bf2e2eb2ab",
-      "image_sha256": "365a27d7054f685196056ced213861290c03025c342490c3fe325cbe307d7264"
+      "source_sha256": "94ca612fd20f4f3b7b4860d025804f52c3c74477074f56a3180861979061f3af",
+      "image_sha256": "5c1f56f94253424cfa5e0d5c9ea39dd03a162ba9106ea346925aa7e5dd52ae46"
     }
   },
   "assets": [
@@ -4072,15 +4072,15 @@
   "previews": {
     "chop-cycle.gif": {
       "path": "previews/chop-cycle.gif",
-      "sha256": "69f76b5871912b168698391b4ede5fc23f6c717e164431ecb6ce8bfb944ca581"
+      "sha256": "e5d4cf99db34d3caefbcf3fa1a05054423cd7c28004d8168f2084e8756548f8d"
     },
     "chop-contact.png": {
       "path": "previews/chop-contact.png",
-      "sha256": "7fe7c1b0d42a96949dbcb1cebdf121d6fb9846086d11610258a9f2df03d1cb84"
+      "sha256": "37ed1ea3138d38ce91fda8cec6526c025c168b037e9d85f23cdeea0015154e17"
     },
     "axe-tiers.png": {
       "path": "previews/axe-tiers.png",
-      "sha256": "eeb497fa67f40f2fc62930a5c18c8c31508049277a870ce4994118edf700888d"
+      "sha256": "778f6cae87e6b216d23b2faca02ab9717a2a9b78aa0d9c704c8ef8f1d5341fc9"
     }
   }
 }

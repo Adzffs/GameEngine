@@ -90,3 +90,14 @@ fixtures cannot be combined with it.
 These checks and captures use dummy video/software rendering. A visible GPU
 playthrough was not performed. The change does not alter save formats, resource
 rates or progression. Mining and combat action art are subsequent slices.
+
+## Axe-blade orientation correction
+
+The first axe overlays used a fixed perpendicular side for the blade, which
+made the cutting edge face away from the tree in some views. The corrected
+overlays select the outward blade side per facing and angle the contact shaft
+so the cutting edge leads into the tree. All three tool tiers are corrected.
+`--rebuild-axes` preserves the player action master while replacing the tools.
+The renderer test now checks the actual edge/head pixels in all 48 combinations
+of direction, tier and contact/follow-through pose; it reproduces the original
+orientation fault and guards the corrected exports.
