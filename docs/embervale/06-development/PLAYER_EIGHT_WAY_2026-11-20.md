@@ -1,7 +1,7 @@
 # Eight-way default character animation
 
-**Date:** 20 November 2026  
-**Source baseline:** master `9de07844e5d4b7e1bf1d79de11117b6daf8387c4`  
+**Date:** 20 November 2026\
+**Source baseline:** master `9de07844e5d4b7e1bf1d79de11117b6daf8387c4`\
 **Scope:** default player outfit, directional walking, asset export and focused verification.
 
 Diagonal movement previously selected a cardinal sprite because both the

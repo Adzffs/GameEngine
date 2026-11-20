@@ -39,4 +39,3 @@ See [export usage](docs/embervale/04-studio/STARTER_WORLD_EXPORT.md) and the [ve
 - Starter pacing requires a genuine fresh-player profile rather than the current boosted development defaults.
 
 The documentation and organisation portion was delivered through [PR #3](https://github.com/Adzffs/GameEngine/pull/3). It does not claim a Studio release, geographic implementation or engine fix.
-
