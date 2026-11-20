@@ -32,6 +32,9 @@ which now covers 39 frames and six images across the two batches.
 The later [walk continuity correction](WALK_CYCLE_CONTINUITY_2026-11-19.md)
 repairs the waist separation in the first stride sheet. Its enlarged previews
 and per-frame checks supersede the original walk art in this record.
+The [20 November eight-way update](PLAYER_EIGHT_WAY_2026-11-20.md) extends the
+player to eight facings and 32 poses; it supersedes the four-way direction and
+atlas descriptions below while preserving the original cardinal artwork.
 
 - The local player uses four facings and a four-pose walk cycle. Facing follows
   the dominant visual movement axis. Cycle phase advances by actual interpolated

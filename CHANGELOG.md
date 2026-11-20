@@ -4,6 +4,14 @@ This file records reviewable project changes going forward. Historical work is d
 
 ## Unreleased
 
+### Eight-way default character animation
+
+- Add southwest, southeast, northwest and northeast player sprites and walk cycles.
+- Keep diagonal facing when stopping, with distance-based steps and stable cardinal turns.
+- Extend the editable atlas and export workflow, with renderer and asset checks.
+
+See the [animation record](docs/embervale/06-development/PLAYER_EIGHT_WAY_2026-11-20.md).
+
 ### Read-only starter-world foundation
 
 - Add an optional SDL-free `EmbervaleWorldExport` executable and typed snapshot library.

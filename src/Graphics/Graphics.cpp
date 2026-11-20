@@ -2998,7 +2998,20 @@ void Graphics::DrawPlayer(
     int walkPose = 0;
     if (travelled > 0.002f)
     {
-        playerFacing = std::abs(dx) > std::abs(dy) ? (dx < 0.0f ? 1 : 2) : (dy < 0.0f ? 3 : 0);
+        // Keep the facing through the last pixel of arrival: per-axis position
+        // snapping can otherwise turn diagonal idle into a cardinal pose.
+        if (std::hypot(playerX - visualPlayerX, playerY - visualPlayerY) > 0.04f)
+        {
+            // Eight 45-degree sectors also ignore small perpendicular tails
+            // when turning onto a cardinal route.
+            constexpr float diagonalBoundary = 0.41421356f; // tan(22.5 degrees)
+            if (std::abs(dy) <= std::abs(dx) * diagonalBoundary)
+                playerFacing = dx < 0.0f ? 1 : 2;
+            else if (std::abs(dx) <= std::abs(dy) * diagonalBoundary)
+                playerFacing = dy < 0.0f ? 3 : 0;
+            else
+                playerFacing = dy > 0.0f ? (dx < 0.0f ? 4 : 5) : (dx < 0.0f ? 6 : 7);
+        }
         playerWalkDistance = std::fmod(playerWalkDistance + travelled, ForestPilotLayout::PlayerWalkCycleTiles);
         walkPose = static_cast<int>(playerWalkDistance * 4.0f / ForestPilotLayout::PlayerWalkCycleTiles) % 4;
     }

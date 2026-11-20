@@ -64,7 +64,8 @@ private:
     const Frame *copper = nullptr, *tin = nullptr, *rubble = nullptr;
     const Frame *tree = nullptr;
     const Frame *stump = nullptr;
-    std::array<std::array<const Frame *, 4>, 4> player{};
+    // South, west, east, north, southwest, southeast, northwest, northeast.
+    std::array<std::array<const Frame *, 4>, 8> player{};
     const Frame *mara = nullptr;
     const Frame *furnace = nullptr;
     const Frame *bank = nullptr, *craftingTable = nullptr;
