@@ -1,5 +1,14 @@
 # Changelog
 
+## 20 November 2026 - Project review and player-data safety
+
+- Preserve recovery files when primary save validation fails.
+- Include crafting cursor/grid ownership in persisted snapshots; reject unsafe saves before writing and offer a retry/explicit unsaved exit.
+- Reject overflowing or unknown direct inventory additions, protecting bank withdrawals.
+- Reconcile current tests, current-state guides and roadmap records; publish the [full review](docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md).
+- Verify 102/102 Windows SDL CTest entries, 87/87 standalone headless entries and 42/42 Python editor tests. Animation integration/quality and human starter acceptance remain open.
+
+
 This file records reviewable project changes going forward. Historical work is documented in the [development history](docs/embervale/01-current-state/DEVELOPMENT_HISTORY.md); it is not retroactively presented as a set of releases.
 
 ## Unreleased
@@ -45,7 +54,7 @@ See [export usage](docs/embervale/04-studio/STARTER_WORLD_EXPORT.md) and the [ve
 
 - Add a root project entry point and categorised Embervale documentation index.
 - Document source-verified implementation, development history, proposed game/tool design and known verification limits.
-- Establish the R0–R10 roadmap, 87 planning tasks, release gates, decisions, risk register and contributor templates.
+- Establish the R0–R10 roadmap, an original inventory of 87 tasks, release gates, decisions, risk register and contributor templates.
 - Add a precise proposed River Crossing tile diagram with a reproducible source script.
 - Reconcile the economy ledger while preserving its balance targets and useful item inventory.
 - Replace stale tracked local editor settings with portable onboarding and narrow ignore-rule corrections.

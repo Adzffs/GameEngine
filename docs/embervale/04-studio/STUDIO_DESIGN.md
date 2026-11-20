@@ -1,7 +1,10 @@
 # Embervale Studio product and workspace design
 
-**Status:** Planned product; the workspaces and behaviours described here are not implemented.  
-**Updated:** 18 November 2026  
+**Current implementation:** Shared move/paint/place/remove/spawn settings, history, guarded new drafts, reopen, isolated playtests and overlays exist. See [current status](../01-current-state/CURRENT_STATUS.md), [visual editor](VISUAL_WORLD_EDITOR.md) and the [project review](../06-development/PROJECT_REVIEW_2026-11-20.md). Interruption recovery, versioned/in-place publication and broader gameplay/asset workspaces remain open.
+
+
+**Status:** A bounded world editor is implemented. The broader product/workspaces below remain a target design, not a completed release.\
+**Updated:** 20 November 2026\
 **Purpose:** Define a practical editor that Adam and AI agents can use through the same reliable operations.
 
 ## 1. Product outcome

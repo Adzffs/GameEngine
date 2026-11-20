@@ -1,6 +1,9 @@
 # Engine and authoring architecture
 
-**Document status:** Runtime behaviour is source verified at `e9d32932e8f9b27e96283313cca320058792a81f`. The [original export boundary](../07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md) is extended by [bounded runtime import](../07-decisions/ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md). Broader Studio editing/publication architecture remains proposed.\
+**Current implementation, 20 November:** Shared commands/history, schemas 1-4 and the Python/Tk bridge extend the original pinned architecture. See [current status](../01-current-state/CURRENT_STATUS.md) and [reviewed evidence](../06-development/PROJECT_REVIEW_2026-11-20.md). Keep the proposed broader capability diagram separate from delivered bounded code.
+
+
+**Document status:** Runtime behaviour is source verified at `e9d32932e8f9b27e96283313cca320058792a81f`. The [original export boundary](../07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md) is extended by [bounded runtime import](../07-decisions/ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md). Bounded shared editing is implemented; broader publication and gameplay-authoring architecture remain proposed.\
 **Updated:** 18 November 2026\
 **Audience:** Engine developers, Studio developers, coding agents and technical reviewers.
 

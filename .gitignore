@@ -26,3 +26,5 @@ saves/
 
 # Python authoring cache
 __pycache__/
+/build-review/
+/build-review-headless/

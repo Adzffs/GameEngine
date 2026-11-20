@@ -1,5 +1,10 @@
 # Repository guide and developer orientation
 
+**Current orientation, 20 November:** This document retains the original source-baseline tour. Read [current status](CURRENT_STATUS.md) and the [review](../06-development/PROJECT_REVIEW_2026-11-20.md) for current implementation/results. The earlier tracked editor configuration cleanup has already been delivered.
+
+Current authoring entry points are [shared edits](../../../src/Content/Edit/StarterWorldEdit.cpp), [history](../../../src/Content/Edit/StarterWorldHistory.cpp), [guarded drafts](../../../src/Content/Edit/StarterWorldDraftFile.cpp), [CLI session](../../../src/Tools/WorldEditSession.cpp) and [Python/Tk editor](../../../tools/embervale_world_editor.py).
+
+
 **Status:** SOURCE VERIFIED orientation to `e9d32932e8f9b27e96283313cca320058792a81f`; proposed integration notes are labelled separately.\
 **Reviewed:** 18 November 2026.
 

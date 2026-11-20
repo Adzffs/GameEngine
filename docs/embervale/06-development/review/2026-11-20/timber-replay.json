@@ -1,0 +1,37 @@
+{
+  "kind": "authoritative-timber-replay",
+  "profile": "fresh",
+  "uses_imported_world": true,
+  "starting_coins": 60,
+  "log_buy_price": 10,
+  "shield_sell_price": 12,
+  "cycles": [
+    {
+      "cycle": 1,
+      "coins_before": 60,
+      "spent": 30,
+      "received": 24,
+      "coins_after": 54,
+      "net": -6,
+      "remaining_logs_planks_shields": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "cycle": 2,
+      "coins_before": 54,
+      "spent": 30,
+      "received": 24,
+      "coins_after": 48,
+      "net": -6,
+      "remaining_logs_planks_shields": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "simulation_ticks": 282
+}

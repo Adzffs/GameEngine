@@ -1,0 +1,121 @@
+{
+  "review_date": "2026-11-20",
+  "repository": "Adzffs/GameEngine",
+  "scope": "Risk-based full project and roadmap review before audio",
+  "source": {
+    "github_baseline": "ffd1899f9a57800153c4e94430c282339e582477",
+    "published_code": "38552c255649c61060bf42931f17f3e524229d4b",
+    "tested_local_review_commit": "579197348c91dc0e781e8e47f9eb9d87277d5968",
+    "local_animation_baseline": "688221b",
+    "local_animation_with_safety_fixes": "196a2790374994e1420df4d15569680902992026",
+    "critical_source_blobs_verified_equal_to_tested_commit": 12,
+    "runtime_texture_blobs_matched": 30,
+    "historical_media": "Referenced against the recursive GitHub tree; unneeded historical images were not downloaded",
+    "published_animation_integration": false,
+    "owner_animation_visual_acceptance": false,
+    "animation_polish": "Deferred by owner"
+  },
+  "environment": {
+    "os": "Windows",
+    "compiler": "MSYS2 UCRT64 GCC 16.1.0",
+    "cmake": "4.4.3",
+    "ninja": "1.13.2",
+    "sdl": "3.4.12",
+    "python": "3.14.6",
+    "video": "SDL dummy/software",
+    "visible_gpu_playthrough": false,
+    "native_save_failure_buttons_manually_exercised": false,
+    "current_linux_run": false
+  },
+  "checks": {
+    "windows_sdl_ctest": {
+      "passed": 102,
+      "total": 102,
+      "headless_label": 87,
+      "client_label": 5,
+      "graphics_label": 10
+    },
+    "windows_no_client_no_graphics_ctest": {
+      "passed": 87,
+      "total": 87
+    },
+    "python_editor_unit": {
+      "passed": 42,
+      "total": 42
+    },
+    "real_bridge_cases": {
+      "passed": 12,
+      "total": 12,
+      "included_in_ctest_entry": true
+    },
+    "local_animation_ctest": {
+      "passed": 101,
+      "total": 101,
+      "python_bridge_entry_included": false,
+      "initial_passed": 99,
+      "initial_total": 101
+    },
+    "focused_assertions": {
+      "save_file_store": 110,
+      "inventory_transactions": 101,
+      "world_player_persistence": 152
+    },
+    "before_fix_reproductions": {
+      "save_file_store_failures": 7,
+      "inventory_transaction_failures": 4,
+      "world_persistence_failures": 1
+    },
+    "runtime_texture_hashes": {
+      "matched": 30,
+      "total": 30
+    },
+    "documentation": {
+      "status": "passed",
+      "markdown_files": 94,
+      "links": 1133,
+      "matching_backlog_tasks": 96,
+      "balanced_fences_and_valid_json_examples": true,
+      "acyclic_dependencies": true,
+      "legacy_studio_ids_retained": 45,
+      "baseline_only_historical_targets": 57,
+      "uninspectable_local_anchor_count": 0,
+      "external_urls_fetched": false
+    }
+  },
+  "compatibility": {
+    "save_version": 13,
+    "save_schema_changed": false,
+    "gathering_combat_rewards_changed": false,
+    "world_content_changed": false
+  },
+  "roadmap": {
+    "original_tasks": 87,
+    "current_tasks": 96
+  },
+  "commands": [
+    "cmake -S . -B build-review -G Ninja -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DGAMEENGINE_BUILD_CLIENT=ON -DGAMEENGINE_BUILD_GRAPHICS_TESTS=ON -DPython3_EXECUTABLE=<installed-python>",
+    "cmake --build build-review --parallel 6",
+    "SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy ctest --test-dir build-review --output-on-failure --parallel 4",
+    "cmake -S . -B build-review-headless -G Ninja -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DGAMEENGINE_BUILD_CLIENT=OFF -DGAMEENGINE_BUILD_GRAPHICS_TESTS=OFF -DPython3_EXECUTABLE=<installed-python>",
+    "cmake --build build-review-headless --parallel 6",
+    "ctest --test-dir build-review-headless --output-on-failure --parallel 4",
+    "python -m unittest discover -s tests -p test_*.py",
+    "python tools/check_documentation.py --baseline-tree <github-recursive-tree.json>",
+    "EmbervaleEconomyReport --replay-timber-cycle 60 2 --world content/worlds/river-crossing.blockout.json",
+    "EmbervaleEconomyReport --replay-starter-upgrade --world content/worlds/river-crossing.blockout.json"
+  ],
+  "critical_blob_shas": {
+    "src/Core/Engine.cpp": "b385abfcd3aecc18bdd5a31c15bd63978f9fe31f",
+    "src/Inventory/Inventory.cpp": "5bccde0f8d773c1bb3e00876a6972f4bd17afb07",
+    "src/Persistence/PlayerSaveFileStore.cpp": "1ecee898fa141ee6e942e7bd021f9172ebaa72a4",
+    "src/Persistence/WorldPlayerPersistenceResult.h": "e52417addb76c338b8645c7dce7af9d580d0e755",
+    "src/World/World.cpp": "99ae2e8bee3fae56d8b9e87dadf541fd194da9b9",
+    "tests/DialogueChoiceTests.cpp": "3b8d458400237f1eeac477e0c02db966d5db4859",
+    "tests/InventoryTransactionTests.cpp": "cfc6473189fed0998a971dd2d20a6c55a9f958ca",
+    "tests/PlayerSaveFileStoreTests.cpp": "db890145fe8ac62ceb97f1d5250edd86bda029c7",
+    "tests/StarterWorldMoveCliTests.cmake": "fea14177da81e073de8ea558a5adfc5352dfc77d",
+    "tests/StarterWorldVisualBridgeIntegration.py": "e980fb4273da1c59d7a138127acbb595f5e2aee9",
+    "tests/WorldPlayerPersistenceTests.cpp": "d7989e6801553efbc71258e85d9d21171154a5de",
+    "tests/test_world_editor_bridge.py": "30db4c854058c4ecb635c4ba26da4034e8967b58"
+  }
+}

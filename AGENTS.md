@@ -1,4 +1,6 @@
-# Animation work reference
+# Project work reference
+
+Before choosing the next feature, read [current status](docs/embervale/01-current-state/CURRENT_STATUS.md), the [project review](docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md) and the current roadmap/backlog. Local animation and published Mining remain separate until REL-004. ART-005 polish is owner-deferred; do not describe it as visually accepted.
 
 For tasks that create or change animation, read:
 

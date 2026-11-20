@@ -7,7 +7,7 @@
 
 Record the exact source commit, content hash/version, build configuration, tool versions, platform, commands, results and known limitations. Keep automated results separate from manual observations. A screenshot establishes appearance; it does not establish collision, reachability or save compatibility. An exported file establishes output; it does not establish successful runtime loading.
 
-A fresh local Linux baseline passes, and the export slice has its own regression evidence. Windows remains unverified; the local Linux run does not establish a cross-platform result. See the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md).
+The [20 November review](../06-development/PROJECT_REVIEW_2026-11-20.md) records current Windows SDL/headless/editor checks. Earlier [Linux results](../06-development/BASELINE_VERIFICATION_2026-11-18.md) remain historical. Automated checks do not establish uncoached usability, animation approval or a current cross-platform release.
 
 ## 2. Baseline gate
 

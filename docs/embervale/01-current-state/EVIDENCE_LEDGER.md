@@ -1,6 +1,9 @@
 # Evidence ledger and review limits
 
-**Reviewed:** 18 November 2026.\
+**Current evidence reconciliation, 20 November:** The [project review](../06-development/PROJECT_REVIEW_2026-11-20.md) and [current status](CURRENT_STATUS.md) record current Windows builds, 102/102 SDL and 87/87 headless CTest entries, 42/42 Python units and the published safety fixes. The chronological sections below retain earlier source/method limits; their unbuilt/Windows-unverified/awaiting-integration descriptions are historical.
+
+
+**Original review:** 18 November 2026.\
 **Game-code baseline:** `e9d32932e8f9b27e96283313cca320058792a81f`.\
 **Original review method:** Read-only GitHub metadata, pinned source reads, recursive tree/history inventory, PR inspection and source-derived counts. That initial documentation review did not build the game.
 **Subsequent verification:** A clean local build of documentation merge `c697386382845f17ce02027e6bade24591a9eb36` passed all 81 existing tests. The exporter change passed all 83 CTest entries. The [dated record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) preserves those baseline/export results. Later parser/runtime changes require evidence for their own source revision.

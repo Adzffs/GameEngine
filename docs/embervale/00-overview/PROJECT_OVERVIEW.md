@@ -1,12 +1,12 @@
 # Project overview
 
-**Document version:** 1.0 · **Reviewed:** 18 November 2026\
+**Document version:** 1.1 · **Reviewed:** 20 November 2026\
 **Purpose:** Explain the whole project, preserve the user's decisions and show where to begin.\
 **Status:** Current project summary plus explicitly labelled future direction.
 
 ## 1. What we are building
 
-Embervale is a tile-based RPG being developed in a custom C++20 / SDL3 GameEngine. The present source already supports a substantial collection of RPG systems. The next major improvement is to make its world and content easier to design, understand and change.
+Embervale is a tile-based RPG being developed in a custom C++20 / SDL3 GameEngine. The present source already supports a substantial collection of RPG systems. A bounded world editor is now implemented. Current work is to reconcile the playable source versions and measure the starter journey; broader authoring remains planned.
 
 The project has three connected parts:
 
@@ -41,13 +41,13 @@ This is a **development RPG foundation**. It is not yet a completed starter regi
 
 The current baseline contains seven resource placements, three workstations and ten NPC/monster spawn definitions. These counts describe authored records; delayed creation rules mean the number of live entities varies by lifecycle stage. The [current content catalogue](../05-game/CONTENT_CATALOGUE.md) records the differences.
 
-## 4. Current verification and first tooling step
+## 4. Current verification and work order
 
-The original documentation review used engine commit `e9d32932e8f9b27e96283313cca320058792a81f`. The documentation pack was subsequently merged through [PR #3](https://github.com/Adzffs/GameEngine/pull/3) at `c697386382845f17ce02027e6bade24591a9eb36`, without changing the runtime. The superseded documentation PR #1 was closed.
+The [current status](../01-current-state/CURRENT_STATUS.md) and [20 November review](../06-development/PROJECT_REVIEW_2026-11-20.md) supersede old statements that shared editing, history and the visual editor are not implemented. Export/import, schemas 1-4, guarded drafts, dirty-state/reopen, isolated playtests and overlays are implemented in bounded form.
 
-A fresh local build of that unchanged baseline passed all **81 existing tests** on Linux with SDL’s dummy display driver. This result does not establish a Windows result. See the [verification record](../06-development/BASELINE_VERIFICATION_2026-11-18.md).
+The current code includes three player-data corrections and passes 102/102 Windows SDL CTest entries, 87/87 standalone headless and 42/42 Python editor tests. Earlier Linux results remain dated evidence. Full visible starter and animation acceptance are still open.
 
-The first implemented Studio step is [read-only export](../04-studio/STARTER_WORLD_EXPORT.md): a complete starter-world JSON snapshot, stable placement identities, ground beneath objects and explicit actor lifecycle metadata. Two new CTest checks compare it with the actual world and verify executable output. The following implementation adds [bounded snapshot validation and explicit runtime loading](../04-studio/STARTER_WORLD_IMPORT.md), including selected spawn authority and isolated playtest saves. Shared map-editing commands, guarded saving, preview, undo and a visual editor remain future work.
+Next reconcile local melee/equipment with published Mining (REL-004), observe the fresh route (GAME-005/004), then add the small sound pass (ART-004). Further animation polish is owner-deferred (ART-005).
 
 ## 5. The first valuable release
 

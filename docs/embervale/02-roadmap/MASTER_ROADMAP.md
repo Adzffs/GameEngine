@@ -10,16 +10,17 @@ Build a coherent, expandable RPG whose world can be authored through dependable 
 
 Longer-term work includes richer assets and content, multiple regions, elevation, repeatable encounters, companions and multiplayer research. Each is a separately scoped investment. None is a prerequisite for proving that the current game can support an enjoyable starter experience.
 
-## 2. Starting point and immediate priorities
+## 2. Current starting point and immediate priorities
 
-The baseline is commit [e9d32932e8f9b27e96283313cca320058792a81f](https://github.com/Adzffs/GameEngine/commit/e9d32932e8f9b27e96283313cca320058792a81f). Source inspection confirms substantial RPG systems, a flat 100×100 development world, placeholder rendering and hardcoded content placement. Starter-world export, strict input validation and an explicit runtime adapter establish the current Studio foundation; shared editing and publication remain planned. See [Implemented systems](../01-current-state/IMPLEMENTED_SYSTEMS.md).
+The original engine baseline e9d32932 remains historical context. Read [current status](../01-current-state/CURRENT_STATUS.md) and the [20 November review](../06-development/PROJECT_REVIEW_2026-11-20.md). Published source now includes schemas 1-4, shared editing/history, a Python/Tk editor, guarded new drafts, River Crossing, eight art batches and walking/chopping/mining.
 
-Three findings change the implementation order:
+The review fixed recovery-file deletion after failed loads (ENG-003), crafting cursor/grid omission from saves (GAME-009) and inventory/bank stack overflow (ENG-004). Windows checks pass 102/102 SDL, 87/87 standalone headless and 42/42 Python editor tests. Automated results do not establish human playthrough or visual approval.
 
-1. The development player receives boosted XP under the current configuration. Starter pacing must be measured using a deliberately defined fresh-player profile. See [DevelopmentConfig](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Core/DevelopmentConfig.h).
-2. The ledger and starter quest descriptions now reflect current mechanics. GAME-007 adopts Cinder Warden consistently, explains event-based progress and reward choices, and adds live quest guidance after the tutorial. [Continuity record](../06-development/QUEST_CONTINUITY_2026-11-19.md). Full journey and visible acceptance remain deferred.
+1. **REL-004:** reconcile/publish local melee/equipment with the newer Mining/shared-gathering implementation and matching editable sources/previews.
+2. **GAME-005 / GAME-004:** observe the integrated fresh route, including navigation, crafting, bank/shop, combat/food, death/recovery and save/reload. Current production replay is 454 simulation ticks; human time is unmeasured.
+3. **ART-004:** add the small sound set with event identity, effects volume/mute, repetition limits and provenance.
 
-3. GAME-008 reproduced the log/plank/shield trade twice on River Crossing: 3 -> 24 -> 45 coins. The corrected Log price makes each complete cycle lose six coins; the first shield now costs twenty, matching the two basic quest rewards combined. Production replay and builds passed; regression suites and complete starter timings remain deferred. See the [economy record](../06-development/STARTER_ECONOMY_2026-11-19.md) and [ledger](../../EconomyLedger.md).
+The owner is not satisfied with the current animation appearance and deferred polish. Keep ART-005 open. Autosave, interrupted editor recovery, validated publication, asset-copy ownership and accessibility have explicit tasks.
 
 ## 3. Roadmap at a glance
 
@@ -94,6 +95,8 @@ An exported baseline is deterministic, validated and complete. Its semantics can
 **Work packages:** STUDIO-010–012, STUDIO-014–015, STUDIO-050–051, STUDIO-053.
 
 ## 7. R2 — First complete editing slice: Studio Alpha 0.1
+
+**Historical implementation notes:** The [20 November review](../06-development/PROJECT_REVIEW_2026-11-20.md) supersedes the unexecuted-test notes below; manual acceptance remains open.
 
 **19 November 2026 reconciliation:** PRs #18–#22 are merged through master
 `2e3da94`. The bounded starter editor now supports move/paint, shared history,
@@ -267,20 +270,21 @@ Choose protocol, transport, persistence backend and identity/security requiremen
 
 These are aspirations, not promised release dates. Keep features that reinforce the proven game loop; reconsider those that only enlarge maintenance cost.
 
-## 16. First ten executable work packages
+## 16. Current executable work order
 
-1. ENG-002: reproduce baseline builds and record environment/results.
-2. DOC-001: integrate this pack and narrowly scoped cleanup. **Documentation delivered through [PR #3](https://github.com/Adzffs/GameEngine/pull/3).**
-3. DOC-002: reconcile old documentation and objective/ledger drift.
-4. STUDIO-001: complete placement ownership inventory.
-5. STUDIO-002: trace save, respawn and position compatibility.
-6. GAME-001: define a genuine fresh-player profile.
-7. GAME-008: production cycle reproduced and corrected; execute deferred regressions before balance signoff, then continue GAME-004 starter pacing.
-8. STUDIO-003: record model/parser/target-boundary decisions.
-9. STUDIO-004: capture baseline world observations and meaningful parity fixtures.
-10. STUDIO-010: implement the minimal authored model after the preceding inputs are clear.
+| Order | Work | Observable result |
+|---|---|---|
+| Completed in this review | ENG-003, ENG-004, GAME-009, QA-004 | Reproduced integrity defects fixed; current checks and stale expectations reconciled |
+| Next | REL-004 | Combined published Mining/melee/equipment and matching assets/previews |
+| Then | GAME-005 and GAME-004 | Fresh route with real elapsed time, confusion, food/combat/recovery findings |
+| After blocking route fixes | ART-004 | Small sound set, independent effects controls and correct event routing |
+| Reliability work | GAME-010, STUDIO-025/026, STUDIO-063, QA-003 | Autosave, recovery/publication, packaging and visible usability |
+| Owner-deferred | ART-005 | Posing, weight, timing/transitions and visual acceptance |
+| As concrete changes require | ENG-005/006 | Progression/health integer policy and targeted responsibility extraction |
 
-Documentation integration can proceed alongside the read-only baseline investigation. Runtime changes wait for relevant evidence. Do not begin every editor workspace in parallel.
+GAME-005 supplies acceptance evidence to the progression/map tasks. Requiring their human pacing acceptance before measuring the journey would make that workflow circular. QA-001/DOC-003 apply to each slice and do not wait for R6 packaging.
+
+The 10-15 minute goal remains a hypothesis. Earlier 451-tick data stays in its dated report; current prepared return is tick 454. Neither is an uncoached player time.
 
 ## 17. Scheduling and scope control
 
@@ -292,4 +296,4 @@ Use one active implementation slice per contributor, with clear file ownership f
 
 Update a task status only with evidence. Preserve IDs when moving a task between milestones, record the reason and update dependencies. Archive obsolete decisions rather than silently losing them. When a release is complete, link the exact tag/commit, validation record, known issues and user documentation.
 
-This structure lets Embervale grow while keeping the next useful action clear: **establish the baseline, then prove one safe content edit in the real game.**
+This structure lets Embervale grow while keeping the next useful action clear: **protect progression, reconcile the builds, observe the fresh starter loop, then add the bounded sound pass.**

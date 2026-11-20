@@ -1,7 +1,10 @@
 # Content catalogue and expansion register
 
-**Status:** Source inventory at commit `e9d32932e8f9b27e96283313cca320058792a81f`, with explicitly proposed follow-up work.  
-**Reviewed:** 18 November 2026.  
+**20 November context:** Definition/placement counts below retain their pinned original baseline. Current River Crossing placements come from the [authored candidate](../../../content/worlds/README.md). Use [current status](../01-current-state/CURRENT_STATUS.md) and the [project review](../06-development/PROJECT_REVIEW_2026-11-20.md) for implementation/evidence.
+
+
+**Status:** Source inventory at commit `e9d32932e8f9b27e96283313cca320058792a81f`, with explicitly proposed follow-up work.\
+**Reviewed:** 18 November 2026.\
 **Scope:** Authored definitions and current development placements. This is not a fresh runtime or balance test.
 
 ## 1. How to read the catalogue
@@ -130,7 +133,7 @@ Future quest specifications should include initial state, prerequisites, objecti
 
 Sources: [EconomyLedger.md](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/docs/EconomyLedger.md), [RecipeDatabase.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Recipe/RecipeDatabase.cpp), [QuestDefinitionDatabase.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Quest/QuestDefinitionDatabase.cpp). These findings describe the reviewed baseline. The corrected [economy ledger](../../EconomyLedger.md) included in this documentation pack reconciles its prose with current source; the later GAME-007 revision resolves the quest naming decision and reward wording. Earlier source-review findings remain historical; current gameplay text is linked above.
 
-The ledger also records a source-derived multi-stage profit cycle: three purchased Logs can yield twelve planks, two shields and 24 coins of sale value for three coins of input. This is a calculation from the current definitions, not a completed runtime reproduction. See the [ledger](../../EconomyLedger.md) and planned `GAME-008` investigation.
+The original baseline had a +21-coin timber cycle. GAME-008 reproduced and corrected it: three purchased Logs now cost 30 coins and the resulting shields sell for 24, net -6. The current production replay again records 60 -> 54 -> 48 across two cycles, and regressions pass. See the [current review](../06-development/PROJECT_REVIEW_2026-11-20.md) and [ledger](../../EconomyLedger.md); broader starter balance remains GAME-004.
 
 ## 8. Expansion register
 
@@ -148,6 +151,6 @@ Do not treat this register as automatic scope for the first Studio release. Each
 
 ## 9. Maintaining an authoritative catalogue
 
-The first version is a manually reviewed inventory. Once Studio has a read-only exporter, generate IDs, counts, positions and references from the same definitions the game uses. Keep design intent and balance rationale as prose beside that generated data. Avoid two hand-maintained numerical catalogues that inevitably disagree.
+The first version is a manually reviewed inventory. The starter exporter and economy report now expose current IDs, positions and selected source-derived budgets. Use those tools for factual updates while keeping unsupported general catalogue authoring separate. Keep design intent and balance rationale as prose beside that generated data. Avoid two hand-maintained numerical catalogues that inevitably disagree.
 
 For every update, record the source commit, schema/content version where available, additions, removals, ID migrations and the validation report. Do not reset quest or item IDs to make the table look tidy. Keep retired IDs visible in the migration registry and link them to the replacement or explicit removal policy.

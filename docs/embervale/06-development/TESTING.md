@@ -1,8 +1,10 @@
 # Testing, validation and evidence
 
-**Status date:** 18 November 2026\
-**Baseline:** `e9d32932e8f9b27e96283313cca320058792a81f`\
-**Fresh evidence:** [Runtime-import verification](RUNTIME_IMPORT_VERIFICATION_2026-11-18.md) records 77/77 headless and 89/89 Linux SDL tests. The [earlier record](BASELINE_VERIFICATION_2026-11-18.md) preserves baseline/export results. Windows and visible manual playtesting remain unverified.
+**Status date:** 20 November 2026
+**Current evidence:** [Project review](PROJECT_REVIEW_2026-11-20.md): Windows SDL 102/102 CTest entries, standalone headless 87/87 and Python editor 42/42. The 12-case bridge is included in one CTest entry. Other current-platform and visible/manual acceptance remain separate.
+**Historical baseline:** e9d32932; earlier Linux results below retain their source dates.
+
+Select an actual installed interpreter with `-DPython3_EXECUTABLE=...` when needed. Windows Store shortcuts were inaccessible during this review; the executable enabled a previously omitted bridge entry. Confirm `ctest -N` contains `StarterWorldVisualBridgeIntegration`, and run `python -m unittest discover -s tests -p "test_*.py"` separately. A configuration omitting Python does not establish a full editor pass.
 
 ## 1. Recorded baseline/export counts and executed results
 
@@ -12,7 +14,7 @@ At the exporter milestone, with `GAMEENGINE_BUILD_CONTENT_TOOLS=ON`, the exporte
 
 Local Linux success does not establish a Windows result. Platform claims must match the configurations actually exercised.
 
-### Current runtime-input suites
+### Historical runtime-input verification
 
 Use `ctest --test-dir build-headless --output-on-failure -R 'StarterWorld|GameLaunchOptions'` for the relevant current entries. The suites cover bounded parsing, runtime input/file rejection, compiled-versus-imported World parity, edited geography and selected positions, launch/save defaults and aliases, and the actual validation executable. See [Starter-world import](../04-studio/STARTER_WORLD_IMPORT.md) for the commands, source links and supported contract. The executed runtime-import counts are **77/77 headless** and **89/89 Linux SDL** (77 headless, 5 client, 7 graphics), with **2/2 selected runtime/launch tests** in the content-tools-disabled build. A real edited-world process also passed a bounded dummy-video startup/shutdown smoke. See the [runtime verification record](RUNTIME_IMPORT_VERIFICATION_2026-11-18.md).
 

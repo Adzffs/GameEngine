@@ -7,7 +7,9 @@ A C++20 and SDL3 tile-based RPG project, with an existing playable development w
 | I want to… | Read |
 |---|---|
 | Understand the project in five minutes | [Project overview](docs/embervale/00-overview/PROJECT_OVERVIEW.md) |
-| See what is implemented | [Implemented systems](docs/embervale/01-current-state/IMPLEMENTED_SYSTEMS.md) |
+| See the current reviewed state | [Current status](docs/embervale/01-current-state/CURRENT_STATUS.md) |
+| Read the full project review | [Findings, fixes and remaining work](docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md) |
+| Read the original engine inventory | [Dated implemented systems](docs/embervale/01-current-state/IMPLEMENTED_SYSTEMS.md) |
 | See what happens next | [Master roadmap](docs/embervale/02-roadmap/MASTER_ROADMAP.md) |
 | Build and run the existing game | [Getting started](docs/embervale/06-development/GETTING_STARTED.md) |
 | Work on a specific task | [Implementation backlog](docs/embervale/02-roadmap/BACKLOG.md) |
@@ -24,9 +26,11 @@ A C++20 and SDL3 tile-based RPG project, with an existing playable development w
 
 ## Project status
 
-The source includes authoritative world updates, movement and running, gathering, crafting, melee combat, NPCs, quests, dialogue, shops, banking, progression, development-player persistence and an SDL3 client. The current development map is flat and uses a first grass/path/tree art kit alongside placeholder visuals. The Studio foundation now includes [starter-world export](docs/embervale/04-studio/STARTER_WORLD_EXPORT.md), bounded validation and [explicit runtime loading](docs/embervale/04-studio/STARTER_WORLD_IMPORT.md) of the existing starter region. The game can consume supported terrain and coordinate changes while preserving placement identities and creation stages. Shared editing, guarded saving, undo, a visual editor and elevation remain planned.
+The project has an authoritative local RPG simulation, movement/running, gathering/crafting, melee/AI/loot, quests/dialogue, shops/banking and versioned saves. River Crossing is an authored flat starter candidate. The bounded Python/Tk editor supports shared edits/history, guarded new drafts, reopen, isolated playtests and overlays. Eight art batches and eight-way walking/chopping/mining use the shared cache.
 
-On **18 November 2026**, the runtime-import slice passed **77/77 headless tests** and **89/89 tests** in the Linux SDL client configuration. A real game process also loaded an edited tree placement, ran with temporary progress and stopped cleanly without creating files. This used SDL’s dummy video/software rendering, not a visible manual playthrough. See the [runtime verification record](docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md) for exact source/environment evidence and platform limits; [earlier baseline/export results](docs/embervale/06-development/BASELINE_VERIFICATION_2026-11-18.md) remain separately recorded.
+The [20 November review](docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md) fixed three player-data risks and verified 102/102 Windows SDL CTest entries, 87/87 standalone headless and 42/42 Python editor tests. Visible/manual acceptance and current other-platform runs remain separate. Recovery/in-place publication, general importing and measured starter acceptance remain open.
+
+Local melee/equipment still needs reconciliation with published Mining. Its visual quality is a first pass, with polish owner-deferred. See [current status](docs/embervale/01-current-state/CURRENT_STATUS.md) for the source distinction.
 
 ## Quick headless build
 
@@ -49,9 +53,9 @@ With an SDL3 client build, launch it using `./build-client/GameEngine --world de
 
 ## Development direction
 
-The export, bounded input and runtime adapter establish the content-loading foundation. Next implement a shared move operation and guarded saving, then complete the editor workflow: **move a real tree, validate it, preview it, undo it, save it and play the edited map**. Expand into a flat River Crossing starter area, coherent artwork and additional content editors after that foundation works.
+Reconcile and publish the working Mining/melee/equipment version, observe the fresh-player journey and resolve blocking navigation/combat/recovery issues, then add the bounded sound pass. The [roadmap](docs/embervale/02-roadmap/MASTER_ROADMAP.md) and [backlog](docs/embervale/02-roadmap/BACKLOG.md) retain reliability, presentation and authoring work.
 
-The longer-term direction includes richer regions, elevation, encounters, companions and multiplayer investigation. These are separately gated milestones, not claims of implemented MMO infrastructure.
+Elevation, connected regions, companions, bosses and multiplayer remain separate milestones. No complete Studio release or online MMO infrastructure is claimed.
 
 ## Contributing
 

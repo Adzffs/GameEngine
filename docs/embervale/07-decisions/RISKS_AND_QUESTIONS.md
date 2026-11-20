@@ -1,7 +1,13 @@
 # Risk register and open questions
 
-**Reviewed:** 18 November 2026. **Status:** Open items unless evidence below says otherwise.\
+**Reviewed:** 20 November 2026. **Status:** Open items unless evidence below says otherwise.\
 This register distinguishes observed findings from future design risks. Priority is a planning judgement, not a measured probability or a security severity score.
+
+## 20 November review disposition
+
+The [project review](../06-development/PROJECT_REVIEW_2026-11-20.md) fixed recovery-file loss (ENG-003), crafting escrow omission (GAME-009) and inventory/bank overflow (ENG-004). Current checks supersede older unexecuted notes. Earlier findings retain their ownership context below.
+
+Remaining priorities: integration (REL-004), fresh-player measurements (GAME-005/004), autosave (GAME-010), editor recovery/publication (STUDIO-025/026), packaging (STUDIO-063), usability (QA-003) and integer policy (ENG-005). Animation polish is owner-deferred (ART-005).
 
 ## 1. Immediate findings
 

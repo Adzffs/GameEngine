@@ -1,12 +1,15 @@
 # Editor workflows, recovery and playtesting
 
-**Status:** Target workflows for the planned Studio toolkit.  
-**Updated:** 18 November 2026  
+**20 November evidence:** The [project review](../06-development/PROJECT_REVIEW_2026-11-20.md) executes the current CLI/bridge and editor checks. Use [current status](../01-current-state/CURRENT_STATUS.md) to distinguish implemented workflows from proposed recovery/publication scope.
+
+
+**Status:** Bounded edit/history/draft/reopen/playtest workflows exist; broader recovery/publication workflows below remain targets.\
+**Updated:** 18 November 2026\
 **Audience:** Designers, developers and AI agents changing Embervale content.
 
 ## 1. Start from a known revision
 
-Open a specific region or published content revision and create an editable draft. The editor should display the source revision, current semantic hash, schema version and dirty/validation state. Confirm the map's purpose before editing: the exported development baseline exists to prove compatibility; River Crossing is a later design candidate.
+Open a specific region or published content revision and create an editable draft. The editor should display the source revision, current semantic hash, schema version and dirty/validation state. Confirm the map's purpose before editing: the exported development baseline exists to prove compatibility; River Crossing is the current authored starter candidate.
 
 A draft is not selected automatically by the game. A preview is not a publication. A playtest uses a selected candidate and isolated test state. Keeping these steps visible makes it possible to experiment without accidentally changing the world used by normal development saves.
 

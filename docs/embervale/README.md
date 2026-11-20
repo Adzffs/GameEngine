@@ -1,6 +1,6 @@
 # Embervale documentation
 
-**Documentation version:** 1.1 · **Review date:** 18 November 2026\
+**Documentation version:** 1.2 · **Review date:** 20 November 2026\
 **Original source-review baseline:** [e9d32932e8f9b27e96283313cca320058792a81f](https://github.com/Adzffs/GameEngine/commit/e9d32932e8f9b27e96283313cca320058792a81f)
 
 ## Start with the question you have
@@ -8,7 +8,8 @@
 | Your question | Best starting point |
 |---|---|
 | What is this project? | [Project overview](00-overview/PROJECT_OVERVIEW.md) |
-| What has actually been implemented? | [Implemented systems](01-current-state/IMPLEMENTED_SYSTEMS.md) |
+| What has actually been implemented? | [Current reviewed status](01-current-state/CURRENT_STATUS.md) |
+| What did the full project review find? | [Critical fixes and roadmap reconciliation](06-development/PROJECT_REVIEW_2026-11-20.md) |
 | What should we do next? | [Master roadmap](02-roadmap/MASTER_ROADMAP.md) |
 | What task can I pick up? | [Backlog](02-roadmap/BACKLOG.md) |
 | How do I run the game? | [Getting started](06-development/GETTING_STARTED.md) |
@@ -31,7 +32,7 @@
 | What did the animation research and polish establish? | [Sources, measured findings and prototype status](06-development/ANIMATION_RESEARCH_2026-11-20.md) |
 | What still needs resolving? | [Risk register](07-decisions/RISKS_AND_QUESTIONS.md) |
 
-The source contains substantial RPG systems, starter-world export, bounded validation and explicit runtime loading of supported starter snapshots. Shared editing, guarded sibling saving, undo/redo and the visual editor are implemented in bounded slices. The [fresh-player profile](05-game/FRESH_PLAYER_PROFILE.md) is now available for normal starting progression, with its runtime/visible acceptance deferred at the owner's request. The [first River Crossing candidate](../../content/worlds/README.md) now provides authored terrain, two crossings, routes and all current placement roles; production content validation/builds passed and gameplay/pacing acceptance remains deferred. Follow the [current backlog](02-roadmap/BACKLOG.md) for implementation status. The runtime-import slice passed 77/77 headless and 89/89 Linux SDL tests; see the [runtime verification record](06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md) for executed source/environment evidence. The [earlier baseline/export results](06-development/BASELINE_VERIFICATION_2026-11-18.md) remain separately recorded.
+Use [current status](01-current-state/CURRENT_STATUS.md) for the maintained implementation/evidence summary. Original baseline inventories remain dated references. The [project review](06-development/PROJECT_REVIEW_2026-11-20.md) reconciles editor/art work and the local animation branch, records the safety fixes and identifies work before audio. Milestone releases and visible starter/animation acceptance remain incomplete.
 
 ## Suggested reading paths
 
@@ -56,6 +57,7 @@ The source contains substantial RPG systems, starter-world export, bounded valid
 
 | Document | What it contains |
 |---|---|
+| [CURRENT_STATUS.md](01-current-state/CURRENT_STATUS.md) | Current source versions, implementation, results, outstanding acceptance and next work |
 | [IMPLEMENTED_SYSTEMS.md](01-current-state/IMPLEMENTED_SYSTEMS.md) | Source-backed feature inventory, counts, limitations and integration risks |
 | [DEVELOPMENT_HISTORY.md](01-current-state/DEVELOPMENT_HISTORY.md) | Development chapters and all 234 returned default-branch commits |
 | [REPOSITORY_GUIDE.md](01-current-state/REPOSITORY_GUIDE.md) | Code responsibilities, build entry points, integration seams and old-document reconciliation |
@@ -66,7 +68,7 @@ The source contains substantial RPG systems, starter-world export, bounded valid
 | Document | What it contains |
 |---|---|
 | [MASTER_ROADMAP.md](02-roadmap/MASTER_ROADMAP.md) | R0–R10 milestones, dependencies, outcomes and implementation order |
-| [BACKLOG.md](02-roadmap/BACKLOG.md) | 87 work packages with priorities, dependencies and acceptance results |
+| [BACKLOG.md](02-roadmap/BACKLOG.md) | 96 work packages with priorities, dependencies and acceptance results |
 | [BACKLOG.json](02-roadmap/BACKLOG.json) | The same work-package records in a machine-readable form |
 | [RELEASE_GATES.md](02-roadmap/RELEASE_GATES.md) | Observable acceptance criteria for foundations, Alpha releases, beta and experiments |
 
@@ -104,6 +106,7 @@ The source contains substantial RPG systems, starter-world export, bounded valid
 
 | Document | What it contains |
 |---|---|
+| [PROJECT_REVIEW_2026-11-20.md](06-development/PROJECT_REVIEW_2026-11-20.md) | Full review, three integrity fixes, current evidence and remaining priorities |
 | [GETTING_STARTED.md](06-development/GETTING_STARTED.md) | Local CMake setup, Windows client, saves and editor guidance |
 | [FRESH_PLAYER_PROFILE_2026-11-19.md](06-development/FRESH_PLAYER_PROFILE_2026-11-19.md) | Fresh-profile implementation, successful builds and deferred acceptance |
 | [RIVER_CROSSING_BLOCKOUT_2026-11-19.md](06-development/RIVER_CROSSING_BLOCKOUT_2026-11-19.md) | Authored map, generation/build evidence, identity/lifecycle contract and remaining acceptance |

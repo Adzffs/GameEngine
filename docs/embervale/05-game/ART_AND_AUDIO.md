@@ -167,6 +167,8 @@ Measure texture memory, asset load time, visible entity counts and frame time on
 
 ## 7. Animation contract
 
+**Owner acceptance, 20 November:** Animation is a working first pass. The owner is not satisfied with its appearance and deferred polish (ART-005). Local melee/equipment must be reconciled with Mining (REL-004). Automated correctness and research do not imply visual approval.
+
 Start animation work with the [animation guide](ANIMATION_GUIDE.md) and [20 November research and findings](../06-development/ANIMATION_RESEARCH_2026-11-20.md). They record directional consistency, weapon attachments, pose/timing review, interruption rules and measured local polish results. The dated research distinguishes its separate local melee/polish prototype from published integrations; check the current source before reusing its helper paths or timing assumptions.
 
 Animation communicates a simulated event; it must not become an alternative authority for its result. Combat damage, resource depletion and item production remain governed by gameplay rules. A presentation can begin, interpolate or finish between simulation updates without granting an extra hit or gathered item.

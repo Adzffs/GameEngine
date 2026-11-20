@@ -1,5 +1,7 @@
 # Getting started with GameEngine and Embervale
 
+**Current verification:** See the [20 November review](PROJECT_REVIEW_2026-11-20.md). Select a working Python executable and pass `-DPython3_EXECUTABLE=C:/Path/To/Python/python.exe` if default discovery uses an inaccessible shortcut. Confirm the Studio bridge entry appears in `ctest -N`; run separate Python units as documented in [Testing](TESTING.md).
+
 **Status:** Linux headless and dummy-driver client/test builds have been reproduced. See the [dated verification record](BASELINE_VERIFICATION_2026-11-18.md); Windows and visible playtesting remain unverified.\
 **Baseline:** `e9d32932e8f9b27e96283313cca320058792a81f` · **Updated:** 18 November 2026
 

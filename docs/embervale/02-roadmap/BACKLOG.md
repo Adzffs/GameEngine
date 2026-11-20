@@ -1,67 +1,35 @@
 # Implementation backlog
 
-**Version:** 1.1 · **Reviewed:** 19 November 2026\
-**Purpose:** Turn the roadmap into clear, expandable work packages. These are planning records, not automatically created GitHub issues.
+**Version:** 1.2 · **Reviewed:** 20 November 2026
+**Purpose:** Maintained records synchronized with BACKLOG.json; planning IDs are not GitHub issue numbers.
 
 ## How to use this backlog
 
-P0 means a prerequisite or integrity risk that needs early resolution; P1 is required for the named release; P2 is a valuable subsequent improvement; P3 is optional or longer-term work. These are planning priorities rather than security severity ratings. Current implementation progress is recorded below; unlisted tasks remain planned. DOC-001 is complete for delivery of this documentation pack and focused cleanup through [PR #3](https://github.com/Adzffs/GameEngine/pull/3); it does not complete the engine/editor milestones. GitHub records the PR merge state.
+P0 is an integrity/prerequisite priority; P1 is required for its slice; P2 is subsequent improvement; P3 is longer-term work. Read [current status](../01-current-state/CURRENT_STATUS.md) and the [project review](../06-development/PROJECT_REVIEW_2026-11-20.md) before selecting work.
 
-The acceptance column states what must be demonstrated. When opening a GitHub issue, copy the task into the [feature template](../08-templates/FEATURE_SPEC.md), add exact source and test references, estimate only that bounded task, and record the actual issue URL. Split a task if the acceptance result cannot be reviewed in a focused change. Keep the ID stable even if its milestone moves.
-
-Each dependency below is a direct prerequisite, not a suggestion that every earlier milestone must finish. The machine-readable [BACKLOG.json](BACKLOG.json) contains the same task records for future automation; it does not execute work or create issues.
+Completion refers to the stated bounded acceptance, with evidence and publication. It does not finish the entire milestone or imply visible approval. GAME-005 and QA-003 provide acceptance feedback while their associated features remain in progress. The JSON file carries the same inventory plus status, evidence and detailed notes. Older reports remain historical.
 
 ## Current progress
 
-**Prior master acceptance:** `2e3da94` (PRs #18–#22); placement work starts from
-`77dc749` (PR #23). Current placement acceptance is recorded below. The historical
-progress entries describe the earlier implementation sequence; this
-reconciliation supersedes their unexecuted/stacked verification limitations.
-
 | Work | Current bounded result | Remaining acceptance |
 |---|---|---|
-| Art pilots (ART-001/002) | Eight editable batches cover terrain, cast/services, resources, modular buildings, contextual variation and eight-way walking/chopping/mining; 1,175 frames in 30 PNGs; builds, source-preserving exports and focused renderer/state checks passed | Further building assemblies, remaining cast/tiers, combat action art, general importing and full visible starter acceptance remain open; [current record](../06-development/MINING_ANIMATION_2026-11-20.md) |
-| Baseline (ENG-002) | Windows headless/client builds and complete regression sets executed | Other platforms and fresh-player measurements remain separate |
-| Commands (STUDIO-020–024) | Shared validated move/paint/place/remove, history, complete snapshot inspection and guarded create-only drafts | Structured diagnostics, persistent history and in-place publication |
-| Editor (STUDIO-030) | Open/select/inspect/move/paint, zoom, undo/redo, save/reopen and play integrated | Broader editor/platform acceptance |
-| File state (STUDIO-032) | Dirty-state indicator, close/switch warnings and draft reopening integrated | Interruption recovery and durable publication |
-| Overlays (STUDIO-033) | Grid, collision, spawn, static reachability and selected approach overlays integrated | Keyboard/accessibility audit and richer diagnostics |
-| Placement (STUDIO-040) | Complete for current single-tile resources/stations: move/place/remove, retained IDs, undo/redo, save/reopen and live gathering | NPC/enemy editing remains STUDIO-041; larger footprints remain STUDIO-044 |
-| Starter geography (GAME-002/003) | First River Crossing candidate authored: two crossings, road loops, 18 resources, 3 stations and 10 actor homes; production content validation, game/tool builds and actual-data overview completed | Visible/dynamic AI, route and pacing acceptance deferred at the owner's request |
-| Starter economy (GAME-008/004) | Timber profit reproduced and corrected; Log buy 10, shield buy 20; production replay, catalogue validation and game/report builds passed | Economy regressions and human starter pacing remain deferred; [evidence](../06-development/STARTER_ECONOMY_2026-11-19.md) |
-| Starter journey (GAME-004) | Recipe-derived ore/bar/sword goals, live destination/tool hints and H/click material plan; unfunded gather/craft/equip/bank/reward/food replay passed in 451 simulation ticks | Human pacing, combat food pressure, visible interaction and regression suites remain deferred; [evidence](../06-development/STARTER_UPGRADE_JOURNEY_2026-11-19.md) |
-| Quest continuity (GAME-007 / DOC-002) | Canonical Cinder Warden, event/reward rules, post-tutorial quest guidance and live contacts implemented; content validation and builds passed | Full quest-chain, visible interaction and regression suites remain deferred; [evidence](../06-development/QUEST_CONTINUITY_2026-11-19.md) |
-| Fresh player (GAME-001) | Normal initial skills, bronze tools, tutorial/quest/recipe defaults and no developer weapon; CLI/Studio selectors implemented; builds, Python syntax and the later unfunded upgrade route passed | Full profile/persistence and visible acceptance remain deferred; human starter pacing remains unmeasured |
-| Actor spawns (STUDIO-041) | Home movement and bounded monster wander/cap/respawn settings implemented through shared commands, history, inspector/dialog and schema-3 save/reopen; game/tool builds and Python syntax compilation passed | Runtime/visible acceptance remains deferred at the owner's request; named NPC behaviour retains current runtime limits |
+| Player integrity | ENG-003/004 and GAME-009 fixed and regression verified | Visible native save-failure choices remain QA-003 |
+| Current verification | 102/102 SDL, 87/87 standalone headless and 42/42 Python units; real bridge includes 12 cases | Other current platforms and human playthrough are separate |
+| Local animation line | Same safety fixes pass 101/101 on local 196a279 | REL-004 combines/publishes Mining and melee; ART-005 quality is deferred |
+| Ownership/architecture/export | Published bounded foundation and deterministic export | General regions/catalogue authoring remain separate |
+| Runtime content | Schema-1-4 bounded input, geography, identities and position/recovery checks | General publication/manifests/migrations |
+| Studio | Shared edits/history, guarded new drafts, reopen, playtests and overlays | Interruption/stale-lock recovery, in-place publication, accessibility and broader tools |
+| Art | Eight published batches, 1,175 frames/30 textures, walking/chopping/mining | Remaining cast/tiers/buildings, general importer, audio and visible acceptance |
+| Starter progression | Fresh state and source-derived recipe/quest guidance; regressions pass | Uncoached navigation, combat/food/death/recovery and full quest-chain acceptance |
+| Starter measurements | Shield 245, sword 376, prepared return 454 ticks, observed twice | Human elapsed time and the 10-15 minute target remain unmeasured |
+| Timber exploit | Current two cycles: 60 -> 54 -> 48; regressions pass | Broader economy balance is GAME-004 |
 
-The broader editor tasks remain `in_progress` where acceptance is outstanding. STUDIO-040 is complete for its bounded current-definition scope; [placement acceptance](../06-development/STUDIO_PLACEMENT_VERIFICATION_2026-11-19.md) records 97/97 CTest, 39/39 Python checks and visible editor/game gathering.
-[Actor-home implementation and deferred verification](../06-development/STUDIO_SPAWN_MOVE_REVIEW_2026-11-19.md) record the owner's decision to integrate this slice without testing for now. [Spawn-settings implementation](../06-development/STUDIO_SPAWN_SETTINGS_2026-11-19.md) adds the remaining supported fields; acceptance checks remain deferred.
-R2/Alpha 0.1 is not declared complete. [Current master acceptance](../06-development/MASTER_ACCEPTANCE_2026-11-19.md).
+## Next work
 
-The export foundation is followed by bounded parsing, geographic validation and explicit runtime import of the existing starter region. `in_progress` retains larger acceptance obligations; implementation below is not a claim that R1, R2 or Studio Alpha 0.1 is complete. [Runtime import](../04-studio/STARTER_WORLD_IMPORT.md) and [ADR-017](../07-decisions/ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md) document the current scope. The [runtime verification record](../06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md) records 77/77 headless tests, 89/89 Linux SDL tests, a content-tools-disabled check and a real dummy-video game launch. The earlier [baseline/export record](../06-development/BASELINE_VERIFICATION_2026-11-18.md) remains separately dated.
-
-| Work | Planning IDs | Status | Evidence and remaining work |
-|---|---|---|---|
-| Reproducible baseline | ENG-002 | in_progress | Linux runtime slice 77/77 headless and 89/89 SDL; Windows execution and visible playtesting remain unverified |
-| Ownership and saved-location inventory | STUDIO-001, STUDIO-002 | ready_for_review | Full placement/lifecycle and save-position paths documented; general migration remains separate |
-| Minimal architecture | STUDIO-003 | in_progress | Bounded parser, shared core, explicit input and world-local spawn decisions recorded; preview/backend remains open |
-| Semantic baseline fixtures | STUDIO-004 | ready_for_review | Existing full-grid export fixture extended by imported-world construction, stages and interaction tests |
-| Authored starter model | STUDIO-010 | in_progress | Terrain, coordinates and selected player spawn can vary within the exact starter registry; arbitrary identity/region authoring remains unsupported |
-| Bounded codec | STUDIO-011 | in_progress | Strict ASCII schema-1 parser, canonical writer, resource budgets and round-trip/rejection tests implemented; broader schema evolution remains open |
-| Read-only current-world export | STUDIO-012 | ready_for_review | Complete compiled baseline export is retained; input/runtime additions do not change its output contract |
-| Selected content authority | STUDIO-014 | in_progress | Per-world validated spawn catalogue preserves existing type/capacity/lifecycle checks; other definition catalogues remain compiled |
-| Identity/migration registry | STUDIO-015 | in_progress | Historical v1 bindings retained; v2 object allocation/removal implemented with persisted non-reuse reservations; aliases, general migrations and collaborative allocation remain open |
-| Static geography and access | STUDIO-050, STUDIO-051 | in_progress | Bounds, overlaps, water, clear player spawn, reachable actors and cardinal approaches validated; general regions/exits remain unsupported |
-| Position compatibility | STUDIO-053 | in_progress | Selected safe spawn and saved-player/recovery handling are integrated for this region; broader content/save migration remains open |
-| Runtime compatibility adapter | STUDIO-013 | in_progress | Opt-in snapshot loading preserves ground, occupancy and staged creation; explicit compiled mode, temporary playtests and save-path guards are implemented |
-| Headless command surface | STUDIO-022 | in_progress | Export, validation and resource/station move dry-run commands exist; guarded writes and structured machine diagnostics remain planned |
-| Create-only guarded draft writer | STUDIO-021 | in_progress | Source-byte SHA-256, exclusive source lock, read/recheck, same-directory new-file publication; limited isolated verification only, not in-place replacement or full platform acceptance |
-| Shared placement move and terrain paint | STUDIO-020 | in_progress | Existing resources/stations can move by stable ID; a new single-tile G/D/S/W terrain paint command validates the entire candidate and supports guarded draft output; the stacked terminal session now includes terrain paint within the same undo/redo history as moves. Full stacked build, authoritative viewport integration and broader content edits remain open |
-| Bounded command undo/redo | STUDIO-023 | in_progress | In-memory resource/station move batches have inverse replay and semantic conflict detection; full project verification, persistence and UI remain open |
-| Interactive map-preview/session | STUDIO-022, STUDIO-024 | in_progress | Terminal map/list session now includes typed movement, painting, undo/redo, authoritative terrain rows and create-only guarded saves; complete integration verification still open |
-| Mouse-driven visual editor | STUDIO-030 | in_progress | Stacked Python/Tk viewport supports stable-ID selection/movement, terrain brush, zoom, history and protected draft saves. C++ supplies the authoritative map and placement state; the bridge fails closed on source placement kind/coordinate drift, illegal post-edit placement types/positions and changed read-only actor spawn positions. Additional source-verified bridge transition and observed-state history checkpoint guards now reject incorrect undo/redo replies and stale redo branches; three new mocked regressions are committed. Six earlier isolated history checks and eight receipt-validator checks passed; backend save acknowledgements must now identify the requested draft and match its on-disk SHA-256. Four additional committed regressions check that correctly hashed saved drafts match terrain, placements and unchanged spawn/metadata; the eight standalone parity-helper cases passed. The new committed bridge regressions and real C++/Tk integration are not yet executed |
-
-The replay bridge on draft PR #18 also rejects arbitrary terminal commands in its history path (especially `save`, which must use verified publication). On 19 November 2026 the consolidated stack built on Windows and passed the complete **84/84** registered headless/content set, including **6/6** real executable-backed bridge cases; the mocked bridge/viewport suite passed **35/35**. The run corrected Windows create-only draft publication and platform path/script handling without changing player-save behavior. The guarded draft writer only publishes fresh sibling files; a visible Tk interaction, SDL client playtest, in-place replacement, durable recovery and full platform acceptance remain open. Fresh-player and economy work also remain separate. [Evidence](../06-development/STUDIO_WINDOWS_INTEGRATION_VERIFICATION_2026-11-19.md).
+1. REL-004: publish the reconciled Mining/melee/equipment build and sources/previews.
+2. GAME-005 / GAME-004: observe the exact fresh journey and resolve blocking failures.
+3. ART-004: implement the small sound pass.
+4. Continue explicit recovery/packaging/usability priorities; ART-005 polish stays deferred.
 
 ## Complete work inventory
 
@@ -78,6 +46,10 @@ The replay bridge on draft PR #18 also rejects arbitrary terminal commands in it
 | STUDIO-004 | P0 | Capture semantic baseline fixtures | STUDIO-001; STUDIO-002 | Snapshot terrain/occupancy and lifecycle stages; define deterministic behavioural checks without overfitting transient IDs. |
 | GAME-001 | P0 | Define a genuine fresh-player profile | ENG-002 | Specify non-boosted skills/items/tutorial state and disposable saves; distinguish it from current development defaults. |
 | GAME-008 | P0 | Reproduce multi-step shop arbitrage | ENG-002 | Replay the source-derived Log→planks→shield chain; record actual net coins, constraints and stock behaviour; correct/test confirmed loops before balance signoff. |
+| DOC-003 | P1 | Keep documentation synchronized | DOC-001 | Update affected inventory/decisions/user workflows with code changes; check links and archive superseded plans. |
+| ENG-003 | P0 | Preserve recovery artifacts when a primary save fails | None | Malformed, truncated and oversized primaries fail without changing primary/tmp/bak bytes; valid-primary cleanup and missing-primary recovery still pass. |
+| ENG-004 | P0 | Reject overflowing and unknown direct inventory additions | None | Capacity queries and additions agree at INT_MAX; rejected additions and bank withdrawals preserve quantities; unknown IDs cannot enter inventory. |
+| ENG-005 | P2 | Define safe integer limits for progression and health | None | XP/healing and related aggregation reject or saturate before signed overflow; maximum-value save data cannot become negative after ordinary updates; preserve intended balance. |
 
 ### R1
 
@@ -124,7 +96,7 @@ The replay bridge on draft PR #18 also rejects arbitrary terminal commands in it
 | GAME-002 | P1 | Build flat River Crossing geography | STUDIO-040; GAME-001 | Create a named candidate with distributed routes, safe onboarding, legal crossings and no compulsory central core. |
 | GAME-003 | P1 | Place services and NPCs deliberately | GAME-002; STUDIO-041 | Place current NPC/station roles and monster records along appropriate routes; validate required approaches, actual wander/aggression/leash behaviour and safe escape routes; align lore/location references. |
 | GAME-004 | P1 | Tune first resource and upgrade loop | GAME-001; GAME-008; GAME-003 | Measure gathering, inventory, travel, bank/shop and crafting costs; compare actual fresh-player outcomes with stated targets. |
-| GAME-005 | P1 | Run structured starter blockout playtests | GAME-002; GAME-003; GAME-004 | Capture uncoached navigation/task results, confusion and failure points; implement and retest priority fixes. |
+| GAME-005 | P1 | Run structured starter blockout playtests | REL-004 | Capture uncoached navigation/task results, confusion and failure points; implement and retest priority fixes. |
 
 ### R4
 
@@ -137,9 +109,16 @@ The replay bridge on draft PR #18 also rejects arbitrary terminal commands in it
 | ART-001 | P1 | Choose a small coherent art pilot | GAME-005; STUDIO-060 | Compare style at real game scale using grass/tree/player/prop examples; record palette and readability decisions. |
 | ART-002 | P2 | Produce starter visual kit | ART-001; STUDIO-061 | Complete only the terrain, cast, resources and props needed by the measured starter slice with provenance. |
 | ART-003 | P2 | Improve readable UI and animation | ART-001; GAME-005 | Confirm selection, hit feedback, names, objectives and UI scale using real tasks and accessibility checks. |
-| ART-004 | P2 | Introduce a restrained audio set | ART-001 | Add meaningful feedback and independent volume controls; document audio rights, formats and missing-asset behaviour. |
+| ART-004 | P2 | Introduce a restrained audio set | ART-001; REL-004 | Add meaningful feedback and independent volume controls; document audio rights, formats and missing-asset behaviour. |
 | GAME-006 | P1 | Deliver starter vertical slice | GAME-005; ART-002; ART-003; GAME-007 | New tester completes intended gathering/crafting/combat/quest loop; record recovery, pacing and confusion results. |
 | GAME-007 | P1 | Reconcile narrative and progression text | DOC-002; GAME-003 | Current quest text, NPC names, objective targets, rewards and environmental cues agree on the tested journey. |
+| QA-003 | P1 | Verify accessibility and usability | None | Record keyboard, focus, colour-independent state, readable scale and error recovery results with fixes. |
+| GAME-009 | P0 | Preserve crafting escrow across saves and failed exits | ENG-004 | Open cursor/grid saves restore every owned item once without live mutation; capacity failure preserves the old save/items; failed shutdown offers retry or explicit unsaved exit. |
+| QA-004 | P1 | Reconcile current review and regression evidence | ENG-003; ENG-004; GAME-009 | Record exact source/configuration and passed client/headless/Python checks; correct stale expectations while retaining rejection, no-write and isolation assertions. |
+| REL-004 | P1 | Reconcile and publish the working animation implementation | QA-004 | Combine published Mining/shared gathering with local melee/equipment without losing either; publish editable sources, manifests, outputs, previews and report; verify combined gameplay/render/packaging. |
+| ART-005 | P2 | Polish and obtain acceptance of character animation | REL-004 | Compare consistent eight-way fixtures at gameplay scale; improve pose, attachment, weight, timing and transitions; record owner visual acceptance separately from automated correctness. |
+| GAME-010 | P1 | Add bounded periodic player autosave | ENG-003; GAME-009 | Checkpoint only explicitly persistent players at safe intervals/events; keep no-save/fresh playtests temporary, preserve valid data on failure, handle crafting/death and test interruption/reload. |
+| ENG-006 | P2 | Extract World and Graphics responsibilities as needed | None | A concrete feature extracts one tested responsibility behind a stable boundary without changing authority, draw order, public behavior or unrelated subsystems. |
 
 ### R5
 
@@ -160,13 +139,11 @@ The replay bridge on draft PR #18 also rejects arbitrary terminal commands in it
 | STUDIO-092 | P2 | Improve Git-aware review and conflict workflow | STUDIO-021; STUDIO-027; DOC-003 | Show changed identities and dependencies; resolve Git conflicts through revalidation rather than coordinate-only auto-merging. |
 | STUDIO-093 | P1 | Version content packages and migrations | STUDIO-026; STUDIO-015 | Publish engine/schema/asset/save compatibility matrix, migration tests and reversible package selection. |
 | STUDIO-094 | P2 | Profile representative scale and contention | STUDIO-054; GAME-006 | Measure tick/route/validation/render/memory workloads before selecting chunking; document local simulation limits. |
-| QA-001 | P1 | Maintain local regression and content checks | STUDIO-052; STUDIO-093 | Run meaningful local tests and content checks at the release commit; preserve failure logs and report skipped groups. |
-| QA-002 | P2 | Exercise malformed content and failure recovery | STUDIO-011; STUDIO-021; STUDIO-093 | Bounded negative/fuzz/fault scenarios demonstrate safe failure and preserved previous content/player data. |
-| QA-003 | P2 | Verify accessibility and usability | ART-003; STUDIO-033; GAME-006 | Record keyboard, focus, colour-independent state, readable scale and error recovery results with fixes. |
+| QA-001 | P1 | Maintain local regression and content checks | None | Run meaningful local tests and content checks at the release commit; preserve failure logs and report skipped groups. |
+| QA-002 | P2 | Exercise malformed content and failure recovery | STUDIO-011; STUDIO-021 | Bounded negative/fuzz/fault scenarios demonstrate safe failure and preserved previous content/player data. |
 | REL-001 | P1 | Define versioned release metadata | STUDIO-093 | Tie engine/content/schema/assets/save compatibility and known issues to a reproducible release commit. |
 | REL-002 | P1 | Package and verify clean installation | REL-001; QA-001 | Install/run on supported clean environments, verify dependencies, first launch, save location, update and rollback. |
 | REL-003 | P1 | Establish release and maintenance ownership | REL-001; DOC-003 | Release checklist, issue triage, rollback decision and documentation freshness have named maintainers or explicit unassigned roles. |
-| DOC-003 | P2 | Keep documentation synchronized | DOC-001 | Update affected inventory/decisions/user workflows with code changes; check links and archive superseded plans. |
 
 ### R7
 
@@ -215,7 +192,7 @@ The first release retains a bounded GUI and the actual-tree demonstration. Broad
 
 ## Handling partial work and new findings
 
-A task with code written but no acceptance evidence stays in progress or ready for review. If an implementation reveals a new risk, link a new issue or dependency rather than quietly weakening the gate. A bug discovered in this documentation review is not automatically fixed by describing it. GAME-008 still needs runtime reproduction.
+A task with code written but no acceptance evidence stays in progress or ready for review. If an implementation reveals a new risk, link a new issue or dependency rather than quietly weakening the gate. A bug discovered in this documentation review is not automatically fixed by describing it. GAME-008's confirmed exploit is reproduced, corrected and regression verified; GAME-004/005 retain human pacing and balance acceptance.
 
 For FUT-003, WORLD-002 and WORLD-003 become required dependencies when the selected expansion adds connected regions.
 

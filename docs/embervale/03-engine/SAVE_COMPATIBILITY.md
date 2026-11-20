@@ -1,7 +1,9 @@
 # Save compatibility and content migration
 
+**20 November safety update:** The [project review](../06-development/PROJECT_REVIEW_2026-11-20.md) records current corrections. Failed primary loads retain recovery files until validation succeeds. Crafting cursor/grid items are projected into saved inventory without live mutation; insufficient capacity rejects before writing. Failed shutdown saving offers return to play or explicit unsaved exit. Save version 13 is unchanged; autosave is planned.
+
 **Status:** Current starter import preserves save version 13 and adds selected-map position handling. Broader versioned content/save migration mechanisms below remain proposed.\
-**Updated:** 18 November 2026  
+**Updated:** 18 November 2026\
 **Primary rule:** A geography edit must not silently discard a player's earned state.
 
 ## 1. Current persistence boundary

@@ -1,8 +1,11 @@
 # Embervale game design
 
-**Document status:** Living design specification. Existing mechanics are identified explicitly; future designs remain proposals.  
-**Reviewed:** 18 November 2026.  
-**Source baseline:** `e9d32932e8f9b27e96283313cca320058792a81f`.  
+**Current implementation/evidence:** See [current status](../01-current-state/CURRENT_STATUS.md) and the [20 November review](../06-development/PROJECT_REVIEW_2026-11-20.md). Current starter replay reaches the prepared return at tick 454, while human timing and full combat/recovery acceptance remain open. Planned design goals below are not claims of measured completion.
+
+
+**Document status:** Living design specification. Existing mechanics are identified explicitly; future designs remain proposals.\
+**Reviewed:** 18 November 2026.\
+**Original source baseline:** `e9d32932e8f9b27e96283313cca320058792a81f`.\
 **Purpose:** Explain the experience the engine and tools are being built to support.
 
 ## 1. The intended experience

@@ -1,5 +1,7 @@
 # Development Player persistence
 
+**20 November safety update:** The [project review](embervale/06-development/PROJECT_REVIEW_2026-11-20.md) records current corrections. Failed primary loads retain recovery files until validation succeeds. Crafting cursor/grid items are projected into saved inventory without live mutation; insufficient capacity rejects before writing. Failed shutdown saving offers return to play or explicit unsaved exit. Save version 13 is unchanged; autosave is planned.
+
 **Current application policy:** Source-backed lifecycle documentation. See the [save compatibility guide](embervale/03-engine/SAVE_COMPATIBILITY.md) for planned content migration and [Getting started](embervale/06-development/GETTING_STARTED.md) for launch-directory guidance.
 
 The development application opts into Player persistence at

@@ -1,11 +1,11 @@
 {
   "version": 1,
-  "reviewed_date": "2026-11-19",
-  "current_verified_master": "2e3da94cf6bfaefc0b341824069b8af0472ff0e2",
-  "verification_reconciliation": "PRs #18–#22 merged. Master passes 84/84 headless, 96/96 SDL configuration and 37 Python tests. Earlier task notes describing stacked/unexecuted checks are historical and superseded by docs/embervale/06-development/MASTER_ACCEPTANCE_2026-11-19.md. Integrated features include move/paint/history, guarded sibling saves, dirty-state protection, reopen, isolated playtests and collision/spawn/reachability/approach overlays. R2 remains incomplete: interruption recovery, in-place atomic publication, manifests, machine-readable capabilities and accessibility acceptance remain open. STUDIO-040 completes bounded current resource/station placement with schema-2 retained allocation IDs, full snapshot protocol checks, 97/97 CTest checks, 39/39 Python checks and visible new-tree gathering; see STUDIO_PLACEMENT_VERIFICATION_2026-11-19.md.",
+  "reviewed_date": "2026-11-20",
+  "current_verified_master": "38552c255649c61060bf42931f17f3e524229d4b",
+  "verification_reconciliation": "The 20 November project review supersedes stale unbuilt/Windows-unverified and planned-only notes for implemented features. Published safety fixes: 102/102 Windows SDL, 87/87 standalone headless, 42/42 Python units, including 12 real bridge cases. Separate local animation line passes 101/101 and remains unintegrated. Starter replay is 454 simulation ticks, not human time. Manual/platform/recovery/quality acceptance remains open. See docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
   "repository": "Adzffs/GameEngine",
   "baseline_commit": "e9d32932e8f9b27e96283313cca320058792a81f",
-  "status_policy": "Implementation tasks require acceptance evidence and merge before complete; ready_for_review records verified branch work; in_progress and blocked preserve outstanding scope. Planning IDs are not issue numbers.",
+  "status_policy": "Complete means bounded stated acceptance has evidence and is published on the default branch. In_progress retains remaining scope/acceptance; planned is future work. Historical reports remain dated. Acceptance tasks can measure an implemented candidate before human signoff closes its parent feature.",
   "tasks": [
     {
       "id": "ENG-002",
@@ -19,9 +19,10 @@
       "evidence": [
         "docs/embervale/06-development/BASELINE_VERIFICATION_2026-11-18.md",
         "docs/embervale/06-development/verification/2026-11-18/results.json",
-        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Linux baseline/export results preserved; runtime import passes headless 77/77 and full SDL 89/89, with selected tools-disabled tests 2/2 and a dummy-video live process smoke. Windows/UCRT64 and visible playtesting remain unverified."
+      "notes": "Current published code plus safety fixes passes Windows UCRT64 GCC 16.1.0 builds: 87/87 standalone headless and 102/102 SDL CTest entries, including the real editor bridge; Python 3.14.6 editor units pass 42/42. Older Linux records remain historical and were not rerun on this source. Visible GPU/user acceptance and the final advertised platform matrix remain separate."
     },
     {
       "id": "DOC-001",
@@ -56,32 +57,34 @@
         "docs/embervale/05-game/CONTENT_CATALOGUE.md",
         "docs/embervale/05-game/GAME_DESIGN.md",
         "docs/StarterCharacters.md",
-        "docs/embervale/07-decisions/RISKS_AND_QUESTIONS.md"
+        "docs/embervale/07-decisions/RISKS_AND_QUESTIONS.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Current ledger already records the corrected timber trade and starter budget. The canonical Cinder Warden decision is now applied to objectives, dialogue and current docs. Quest recipient/trophy wording is reconciled with recorded-progress rewards and no item consumption. Historical baseline discrepancy tables and earlier verification records remain dated; resolved naming/economy findings are labelled with current evidence rather than repeated as open current bugs. Broader legacy documentation and deferred full journey acceptance remain separate from this bounded source/text review."
+      "notes": "Canonical Cinder Warden naming, quest reward semantics, ledger and current source/text drift are reconciled. This review removes obsolete current-status/next-step claims while preserving old reports as historical. Human quest-chain acceptance remains GAME-007/005."
     },
     {
       "id": "STUDIO-001",
       "milestone": "R0",
       "priority": "P0",
       "title": "Inventory all placement ownership",
-      "status": "ready_for_review",
+      "status": "complete",
       "dependencies": [
         "ENG-002"
       ],
       "acceptance": "Trace ground, object, station, NPC, monster, label, quest and initialization ownership with source links.",
       "github_issue": null,
       "evidence": [
-        "docs/embervale/03-engine/STARTER_WORLD_BASELINE.md"
+        "docs/embervale/03-engine/STARTER_WORLD_BASELINE.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "All source placement owners, ordered terrain, objects, labels, quests and actor initialization traced. Inventory delivered for review; baseline platform work remains open."
+      "notes": "Published bounded foundation work is integrated, not awaiting a branch merge. Ownership/save/architecture/export evidence is retained in baseline/ADR/import records and current source/CLI checks pass. Broader content, recovery and migration work remains in separate tasks."
     },
     {
       "id": "STUDIO-002",
       "milestone": "R0",
       "priority": "P0",
       "title": "Audit position and save compatibility",
-      "status": "ready_for_review",
+      "status": "complete",
       "dependencies": [
         "STUDIO-001"
       ],
@@ -89,16 +92,17 @@
       "github_issue": null,
       "evidence": [
         "docs/embervale/03-engine/STARTER_WORLD_BASELINE.md",
-        "docs/embervale/03-engine/SAVE_COMPATIBILITY.md"
+        "docs/embervale/03-engine/SAVE_COMPATIBILITY.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Inventory covers direct/loaded player positions, respawn, recovery piles, spawn equality, approaches and wire versions 1–13. No edited-world migration acceptance claimed."
+      "notes": "Published bounded foundation work is integrated, not awaiting a branch merge. Ownership/save/architecture/export evidence is retained in baseline/ADR/import records and current source/CLI checks pass. Broader content, recovery and migration work remains in separate tasks."
     },
     {
       "id": "STUDIO-003",
       "milestone": "R0",
       "priority": "P1",
       "title": "Decide minimal content architecture",
-      "status": "in_progress",
+      "status": "complete",
       "dependencies": [
         "STUDIO-001",
         "STUDIO-002"
@@ -108,16 +112,17 @@
       "evidence": [
         "docs/embervale/07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md",
         "docs/embervale/07-decisions/ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md",
-        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Bounded ASCII parser, snapshot representation, shared core ownership and selected runtime input decided in ADR-017. Preview/backend remains open."
+      "notes": "Published bounded foundation work is integrated, not awaiting a branch merge. Ownership/save/architecture/export evidence is retained in baseline/ADR/import records and current source/CLI checks pass. Broader content, recovery and migration work remains in separate tasks."
     },
     {
       "id": "STUDIO-004",
       "milestone": "R0",
       "priority": "P0",
       "title": "Capture semantic baseline fixtures",
-      "status": "ready_for_review",
+      "status": "complete",
       "dependencies": [
         "STUDIO-001",
         "STUDIO-002"
@@ -130,9 +135,10 @@
         "tests/fixtures/content/development-starter.snapshot.json",
         "docs/embervale/06-development/verification/2026-11-18/results.json",
         "tests/StarterWorldRuntimeTests.cpp",
-        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Existing export grid/actor/path fixtures are supplemented by compiled-versus-imported runtime construction and lifecycle tests. Importer execution is recorded separately from the original exporter baseline."
+      "notes": "Published semantic export/runtime fixtures cover terrain/occupancy, pre-player/post-player lifecycle and retained bindings. Current snapshot/runtime suites pass; broader future content scope is separate."
     },
     {
       "id": "GAME-001",
@@ -154,16 +160,17 @@
         "src/World/World.cpp",
         "src/Persistence/WorldPlayerPersistenceLifecycle.cpp",
         "tools/embervale_world_editor.py",
-        "docs/embervale/06-development/STARTER_UPGRADE_JOURNEY_2026-11-19.md"
+        "docs/embervale/06-development/STARTER_UPGRADE_JOURNEY_2026-11-19.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Fresh-start initialization and --profile fresh|development are implemented through CLI/engine/world/entity creation and the missing-save lifecycle. Fresh characters start all skills at level 1/0 XP with bronze gathering tools, normal tutorial/quest/recipe defaults and no developer godsword. Fresh launches have no implicit save; explicit existing saves restore their own progress. Studio defaults to fresh temporary play with an optional development selector. Game/core/tool builds and editor Python syntax check passed. The later GAME-004 replay exercises unfunded fresh gathering/crafting, equipment, banking and quest rewards. Full profile/persistence and visible acceptance remain deferred; human pacing is not established."
+      "notes": "Fresh starts use level-1/zero-XP skills, bronze tools and ordinary tutorial/quest/recipe state without developer equipment. Explicit saves retain progress; temporary profiles create no implicit save. Current launch/lifecycle checks and unfunded replay pass; human onboarding/visible acceptance remains open."
     },
     {
       "id": "GAME-008",
       "milestone": "R0",
       "priority": "P0",
       "title": "Reproduce multi-step shop arbitrage",
-      "status": "in_progress",
+      "status": "complete",
       "dependencies": [
         "ENG-002"
       ],
@@ -177,9 +184,10 @@
         "src/Economy/EconomyBalanceModel.h",
         "src/Content/ContentValidator.cpp",
         "src/Shop/ShopDefinitionDatabase.cpp",
-        "tests/ShopDefinitionTests.cpp"
+        "tests/ShopDefinitionTests.cpp",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Production World replay on River Crossing confirms two material-complete cycles: old prices 3->24->45 coins (+21 each). Log buy is now 10; corrected replay with an explicit 60-coin isolated budget records 60->54->48 (-6 each). Normal shop approaches, sessions and station actions ran without a finite stock gate. Shared intermediate material-cost analysis and startup shop validation reject nonnegative shop-funded crafting margins. Current catalogue validation/convergence and game/report builds passed. Old-price and break-even regressions are added but suites remain deferred at the owner's request. Replay uses the supported inventory-backed craft command, not cursor-driven UI. Balance signoff remains open."
+      "notes": "The earlier +21-coin timber cycle was reproduced and corrected. Current authoritative replay again completes 60->54->48 coins, net -6 per cycle; content/economy regressions pass. This closes the bounded exploit, not broader balance/pacing signoff."
     },
     {
       "id": "STUDIO-010",
@@ -197,9 +205,10 @@
         "src/Content/Export/StarterWorldSnapshot.h",
         "docs/embervale/04-studio/STARTER_WORLD_EXPORT.md",
         "docs/embervale/04-studio/STARTER_WORLD_IMPORT.md",
-        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "The exact current 100x100 starter model supports terrain, placement coordinates and player spawn as input while retaining definitions/lifecycle. General region/identity authoring remains unsupported."
+      "notes": "The bounded 100x100 starter model now supports terrain, resource/station placements, actor homes/spawn settings and schema-4 static buildings. General region/gameplay-definition authoring remains unsupported."
     },
     {
       "id": "STUDIO-011",
@@ -217,16 +226,17 @@
         "tests/StarterWorldSnapshotTests.cpp",
         "src/Content/Export/StarterWorldSnapshotInput.cpp",
         "tests/StarterWorldSnapshotInputTests.cpp",
-        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Strict schema-1 ASCII parser and canonical writer implement input/depth/value/string/container budgets, complete binding checks and round-trip/rejection coverage. Broader schema evolution remains open."
+      "notes": "Strict parser/canonical writer support historical schemas 1-3 and current schema 4, with byte/depth/value/string/container budgets, stable bindings, allocation reservations and building/spawn restrictions. Current malformed-input and round-trip suites pass; future schema widening needs its own contract."
     },
     {
       "id": "STUDIO-012",
       "milestone": "R1",
       "priority": "P1",
       "title": "Export current world read-only",
-      "status": "ready_for_review",
+      "status": "complete",
       "dependencies": [
         "STUDIO-011",
         "STUDIO-004"
@@ -239,9 +249,10 @@
         "docs/embervale/04-studio/STARTER_WORLD_EXPORT.md",
         "docs/embervale/06-development/verification/2026-11-18/results.json",
         "docs/embervale/04-studio/STARTER_WORLD_IMPORT.md",
-        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Compiled baseline export remains deterministic and read-only. Existing local exporter evidence is retained; later input/runtime behaviour has separate verification."
+      "notes": "Published bounded foundation work is integrated, not awaiting a branch merge. Ownership/save/architecture/export evidence is retained in baseline/ADR/import records and current source/CLI checks pass. Broader content, recovery and migration work remains in separate tasks."
     },
     {
       "id": "STUDIO-014",
@@ -278,9 +289,10 @@
         "docs/embervale/07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md",
         "src/Content/Export/StarterWorldSnapshotInput.cpp",
         "tests/StarterWorldSnapshotInputTests.cpp",
-        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Parser binds the complete 20-placement registry to existing enum/type/config/lifecycle identities. Coordinates may change; ID allocation, aliases/removals and general migrations remain future work."
+      "notes": "Current schema retains canonical bindings and allocated resource/station IDs without silent reuse. Actor membership/lifecycle stays bounded; schema-4 buildings are explicit. General region identities, aliases/removals and package migrations remain open."
     },
     {
       "id": "STUDIO-050",
@@ -344,7 +356,7 @@
       "milestone": "R2",
       "priority": "P1",
       "title": "Load content through compatibility adapter",
-      "status": "in_progress",
+      "status": "complete",
       "dependencies": [
         "STUDIO-012",
         "STUDIO-014",
@@ -359,9 +371,10 @@
         "src/main.cpp",
         "tests/StarterWorldRuntimeTests.cpp",
         "docs/embervale/04-studio/STARTER_WORLD_IMPORT.md",
-        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "World constructs a validated snapshot with retained terrain/occupancy and staged IDs. CLI explicitly selects input or compiled content; bad input fails and imported playtests default to no save. General publication/rollback packages remain planned."
+      "notes": "Published bounded schema-1-4 starter import preserves terrain/occupancy, identities and staged lifecycle. Explicit --world/--compiled-world selection, malformed-input failure, save isolation and position/recovery fallback pass runtime/CLI checks. General package publication is STUDIO-026/093."
     },
     {
       "id": "STUDIO-020",
@@ -383,9 +396,10 @@
         "tests/StarterWorldMoveCliTests.cmake",
         "tests/StarterWorldPaintCliTests.cmake",
         "docs/embervale/06-development/STUDIO_TERRAIN_PAINT_EXPERIMENT_2026-11-18.md",
-        "docs/embervale/06-development/STUDIO_MOVE_PREVIEW_2026-11-18.md"
+        "docs/embervale/06-development/STUDIO_MOVE_PREVIEW_2026-11-18.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "The stacked edit operations now include pure runtime-validated stable-ID resource/station moves and one-tile G/D/S/W ground painting; the terminal history supports undo and redo across both kinds, and the Tk bridge can issue mouse paint. The C++ validation authority is shared. Broader placement creation/removal, structured diagnostics, full project compilation and real editor/game verification remain open."
+      "notes": "Shared operations cover inspect, move, one-tile paint, resource/station place/remove and supported actor spawn settings, with runtime validation/history. Code is built and exercised. General diff/structured diagnostics and broader transactions remain follow-up work."
     },
     {
       "id": "STUDIO-021",
@@ -406,9 +420,10 @@
         "tests/StarterWorldDraftFileTests.cpp",
         "tests/StarterWorldMoveCliTests.cmake",
         "docs/embervale/04-studio/GUARDED_DRAFT_REVISIONS.md",
-        "docs/embervale/06-development/GUARDED_DRAFT_VERIFICATION_2026-11-18.md"
+        "docs/embervale/06-development/GUARDED_DRAFT_VERIFICATION_2026-11-18.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Experimental create-only sibling draft publication with raw-byte SHA-256 expected hash, source recheck under cooperating-directory lock, private staging and exclusive hard-link commit. Original source and save files never overwritten. No in-place atomic replacement, crash-durability guarantee or general editor yet. Full repository build/tests and Windows are unverified; isolated C++ storage tests and mock CLI/CMake checks only."
+      "notes": "Create-only sibling drafts use raw-byte SHA-256, a source recheck and a cooperating directory lock. Windows uses CREATE_NEW, not the older hard-link-only path. Draft/bridge checks pass. In-place atomic replacement, interruption/stale-lock recovery and physical durability remain open."
     },
     {
       "id": "STUDIO-022",
@@ -427,16 +442,17 @@
         "src/Core/GameLaunchOptions.cpp",
         "tests/StarterWorldValidateCliTests.cmake",
         "docs/embervale/04-studio/STARTER_WORLD_IMPORT.md",
-        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md"
+        "docs/embervale/06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Headless export, snapshot validation, dry-run moves and terrain paint, guarded draft publication and an interactive terminal map/list/move/paint/undo/redo/save session are staged. Structured machine diagnostics, full project compilation and real command execution have not been verified on the stacked editor branch."
+      "notes": "Headless export/validate/move/paint and interactive inspect/edit/history/guarded-save commands pass actual Windows CLI/bridge checks. Structured machine diagnostics/capabilities and broader authoring remain open."
     },
     {
       "id": "STUDIO-023",
       "milestone": "R2",
       "priority": "P1",
       "title": "Add undo and redo",
-      "status": "in_progress",
+      "status": "complete",
       "dependencies": [
         "STUDIO-020"
       ],
@@ -447,9 +463,10 @@
         "src/Content/Edit/StarterWorldHistory.cpp",
         "tests/StarterWorldHistoryTests.cpp",
         "docs/embervale/04-studio/BOUNDED_UNDO_REDO.md",
-        "docs/embervale/06-development/STUDIO_HISTORY_VERIFICATION_2026-11-18.md"
+        "docs/embervale/06-development/STUDIO_HISTORY_VERIFICATION_2026-11-18.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "C++ history stages bounded stable-ID move batches and one-tile terrain paint with a shared cursor, semantic conflict check and reversible undo/redo. Both text and Tk editing sessions use the shared engine history. Unit/regression sources are committed, but a complete C++ build, real runtime tests and persisted history acceptance remain open."
+      "notes": "Bounded move/paint/place/remove/spawn-setting history is shared by CLI/editor. Current history/edit/bridge tests demonstrate undo/redo, branch invalidation, conflict rejection and retained identity. Durable interruption recovery is STUDIO-025."
     },
     {
       "id": "STUDIO-024",
@@ -465,9 +482,10 @@
       "evidence": [
         "src/Tools/WorldEditSession.cpp",
         "tests/StarterWorldInteractiveSessionTests.cmake",
-        "docs/embervale/06-development/STUDIO_SESSION_VERIFICATION_2026-11-18.md"
+        "docs/embervale/06-development/STUDIO_SESSION_VERIFICATION_2026-11-18.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "A bounded terminal 21x21 terrain-and-occupancy preview now accompanies in-memory shared-history move/undo/redo and guarded new-draft saving. This is not a graphical editor, complete renderer, preview-artifact format or verified publication. New code passed isolated GCC C++20 syntax and mock-backed session smoke checks; full project tests remain unrun."
+      "notes": "Terminal, Python/Tk and SDL snapshot previews use authoritative world/placement information and selected source data. Real bridge/renderer tests pass. General versioned preview artifacts and full editor/render parity acceptance remain open."
     },
     {
       "id": "STUDIO-025",
@@ -481,8 +499,10 @@
       ],
       "acceptance": "Recover last valid draft after interruption; distinguish draft/base/published states and handle conflicts without overwriting publication.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Still open: exercise termination during new-draft writes and recovery with stale .embervale.lock directories. Define recoverable draft/base/publication identity without deleting another writer's data or trusting partial output."
     },
     {
       "id": "STUDIO-026",
@@ -498,8 +518,10 @@
       ],
       "acceptance": "Bind validation to exact content/validator versions; publish immutable manifest and load its selected version in a fresh session.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Still open: create-only drafts/runtime validation do not implement immutable publication manifests, version-bound receipts or in-place package selection and rollback."
     },
     {
       "id": "STUDIO-027",
@@ -536,9 +558,10 @@
         "docs/embervale/06-development/STUDIO_AUTHORITATIVE_TERRAIN_VIEW_2026-11-18.md",
         "tests/StarterWorldVisualBridgeIntegration.py",
         "docs/embervale/06-development/STUDIO_REAL_BRIDGE_INTEGRATION_GATE_2026-11-18.md",
-        "docs/embervale/06-development/STUDIO_WINDOWS_INTEGRATION_VERIFICATION_2026-11-19.md"
+        "docs/embervale/06-development/STUDIO_WINDOWS_INTEGRATION_VERIFICATION_2026-11-19.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "First mouse-driven Python/Tk editor stages zoom, selection, stable-ID resource/station moves, G/D/S/W painting, shared C++ undo/redo and guarded create-only draft saving. C++ returns authoritative terrain and placement state; the bridge validates exact command deltas, verified history checkpoints, source revision, publication receipt and saved-world semantic parity. It rejects actor drift and arbitrary terminal commands in the replay path. On 19 November 2026 the consolidated PR #18 stack built on Windows and passed 84/84 registered headless/content tests, including 6/6 real executable-backed bridge cases; the mocked bridge and viewport suite passed 35/35. Windows create-only publication and platform path/script handling were corrected without changing player-save behavior. Visible Tk interaction and an SDL client playtest of a saved draft remain outstanding."
+      "notes": "The Python/Tk editor supports selection, move/paint/place/remove, spawn settings, shared history, verified new drafts, reopen, isolated playtests, zoom and overlays. Current real CLI bridge passes 12 cases; editor units pass 42 tests. Current evidence supersedes unexecuted-stack notes; full visible usability remains open."
     },
     {
       "id": "STUDIO-032",
@@ -554,9 +577,10 @@
       "github_issue": null,
       "evidence": [
         "tools/embervale_world_editor.py",
-        "docs/embervale/06-development/MASTER_ACCEPTANCE_2026-11-19.md"
+        "docs/embervale/06-development/MASTER_ACCEPTANCE_2026-11-19.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Merged PR #19 provides dirty-state checkpoints, close/switch warnings, verified saves and draft reopening. Visible Windows checks passed. Automatic interruption recovery remains open."
+      "notes": "Dirty checkpoints, save/reopen and close/switch warnings are implemented and exercised. Prior visible evidence is retained; automatic interruption recovery remains STUDIO-025."
     },
     {
       "id": "STUDIO-033",
@@ -647,9 +671,10 @@
         "tests/StarterWorldRuntimeTests.cpp",
         "tests/StarterWorldVisualBridgeIntegration.py",
         "docs/embervale/06-development/STUDIO_SPAWN_SETTINGS_2026-11-19.md",
-        "docs/embervale/07-decisions/ADR_019_BOUNDED_SPAWN_SETTINGS.md"
+        "docs/embervale/07-decisions/ADR_019_BOUNDED_SPAWN_SETTINGS.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Home movement was delivered in PR #25. Current-runtime spawn-settings implementation now adds monster wander radius/interval, active cap, respawn enablement and per-spawn timing through shared C++ commands/history, the terminal session and the visual inspector/dialog. Schema 3 preserves historical schema-1/2 restrictions; named NPCs retain supported stationary/unique settings. The cap remains a creation limit, not automatic population filling. C++ game/core/tool builds and Python syntax compilation passed. Tests and visible acceptance remain deferred at the owner's request; acceptance status stays in_progress."
+      "notes": "Home movement and supported monster wander/cap/respawn settings are implemented through commands/history, inspector and schema-3/4 data. Current full runs execute the committed regressions. The cap limits creation, not automatic population filling; exact-map behavior and visible inspector acceptance remain open."
     },
     {
       "id": "STUDIO-042",
@@ -687,15 +712,17 @@
       "milestone": "R3",
       "priority": "P1",
       "title": "Automate edited-world smoke scenarios",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-013",
         "STUDIO-022"
       ],
       "acceptance": "Exercise gathering, crafting, NPC interactions, banking, combat and save/reload on the exact content version; Alpha 0.1 uses its relevant subset.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Current integration suites and River Crossing replays exercise gathering/crafting/equipment/bank/shop/quest and save boundaries. Full uncoached combat/food/death/recovery and visible exact-map acceptance remain GAME-005/006."
     },
     {
       "id": "STUDIO-054",
@@ -781,9 +808,10 @@
         "src/Tutorial/StarterJourney.h",
         "src/Graphics/Graphics.cpp",
         "src/World/World.cpp",
-        "tests/ServerCommandQueueTests.cpp"
+        "tests/ServerCommandQueueTests.cpp",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Starter prices remain Log buy 10 and shield buy 20, with recipes/rewards unchanged. Tutorial now derives sword requirements from recipes: three ore pairs, three bars and the Bronze sword equipment requirement. Shared holdings recognise processed, banked, equipped and crafting cursor/grid items. Live-map destination hints, tool/withdrawal instructions and the H/click material/quest plan are implemented. Unfunded fresh production replay on River Crossing gathers 10 normal Logs, 5 Copper and 3 Tin in 31 attempts, equips sword and shield, banks 8 Logs, earns 20 quest coins and buys two meat for 16, leaving 4 coins. Shield at tick 245, sword at 376, prepared return at 451; these are simulation ticks, not human playthrough times. Core/game/report and launcher builds passed. Deferred regression source covers one-pair/one-bar premature progress and an equipped axe. Regression suites, visible interaction, combat food pressure and uncoached 10-15 minute target acceptance remain deferred; GAME-004 is not signed off."
+      "notes": "Current unfunded River Crossing replay equips shield at 245, sword at 376 and prepares the return at 454 simulation ticks (observed twice). It gathers 10 Logs/5 Copper/3 Tin in 31 attempts, banks 8 Logs, earns 20 quest coins, spends 16 on two meat and keeps 4. Older 451-tick evidence is historical. Regressions pass; uncoached navigation, combat/food/recovery pressure and the human 10-15 minute target remain unmeasured."
     },
     {
       "id": "GAME-005",
@@ -792,71 +820,79 @@
       "title": "Run structured starter blockout playtests",
       "status": "planned",
       "dependencies": [
-        "GAME-002",
-        "GAME-003",
-        "GAME-004"
+        "REL-004"
       ],
       "acceptance": "Capture uncoached navigation/task results, confusion and failure points; implement and retest priority fixes.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Run on the integrated candidate after REL-004. This task supplies acceptance evidence to GAME-001-004; it must not wait for their human pacing/route acceptance to finish before measurement begins. Record route, elapsed upgrade time, confusion, combat, food, death/recovery and save/reload."
     },
     {
       "id": "STUDIO-060",
       "milestone": "R4",
       "priority": "P1",
       "title": "Introduce asset identity and provenance",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-015"
       ],
       "acceptance": "Manifest names source/licence/author/path/version and stable IDs; missing references are diagnosed.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Eight published batches have stable authoring IDs, .ase sources, checksums, provenance and generated bindings. The general asset importer and distribution/licensing decision remain open; the pilot is implemented, not an untouched proposal."
     },
     {
       "id": "STUDIO-061",
       "milestone": "R4",
       "priority": "P1",
       "title": "Render sprites with cache and fallback",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-060"
       ],
       "acceptance": "One tile/tree appear in game and preview with correct pivot/scale/transparency; retain debug primitive mode.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "The shared cache renders eight published batches: 1,175 frames in 30 PNGs with fixed pivots, nearest-neighbor scaling, primitive mode and image fallback. Current renderer/state checks pass. Full Studio parity, broader art and visible starter acceptance remain open."
     },
     {
       "id": "STUDIO-062",
       "milestone": "R4",
       "priority": "P2",
       "title": "Import and preview sprite metadata",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-061",
         "STUDIO-030"
       ],
       "acceptance": "Author animations/variants through validated metadata; verify atlas coordinates and render ordering.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Pilot builders/manifests author metadata and generated geometry for current sprites/animations. This is not a general Studio animation/asset-import workspace; keep the implemented pilot distinct from richer importer scope."
     },
     {
       "id": "STUDIO-063",
       "milestone": "R4",
       "priority": "P1",
       "title": "Validate image and atlas resources",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-060"
       ],
       "acceptance": "Reject invalid dimensions/rectangles/frames and excessive resource usage; record memory costs.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Pilot exports/cache validate current geometry/fallback and renderer checks pass. Several POST_BUILD commands still copy to shared texture destinations. Give copying one owner or explicit serialization/dependencies, verify clean/incremental parallel builds and packaged hashes, then measure memory/resource limits. An earlier local refresh recorded a copy race; this review's full builds passed."
     },
     {
       "id": "ART-001",
@@ -874,9 +910,10 @@
         "docs/embervale/05-game/ART_AND_AUDIO.md",
         "docs/embervale/06-development/BUILDING_RENDERING_2026-11-19.md",
         "docs/embervale/06-development/WORLD_VARIATION_2026-11-19.md",
-        "docs/embervale/06-development/WALL_ORIENTATION_2026-11-19.md"
+        "docs/embervale/06-development/WALL_ORIENTATION_2026-11-19.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Six bounded LibreSprite batches establish palette, overhead 32-pixel scale, fixed object pivots and binary alpha. The contextual pass adds grass/path/water/stone variation, flower clusters, grass/reeds, tree leaf beds and building conditions. Client/launcher builds, source-preserving exports, actual camera captures and production-data dressing inspection passed. Full readability, editor preview parity and visible starter acceptance remain open. Directional wall caps/windows, corner joins, interior front cutaways and aligned eaves replace the front-facing side-wall panels; default exports preserve all non-wall masters."
+      "notes": "Eight bounded batches establish the 32-pixel overhead palette/style and original editable sources. Published walking/chopping/mining and the 1,175-frame/30-texture cache are verified. Complete readability and owner acceptance remain open."
     },
     {
       "id": "ART-002",
@@ -894,24 +931,27 @@
         "docs/embervale/05-game/ART_AND_AUDIO.md",
         "docs/embervale/06-development/BUILDING_RENDERING_2026-11-19.md",
         "docs/embervale/06-development/WORLD_VARIATION_2026-11-19.md",
-        "docs/embervale/06-development/WALL_ORIENTATION_2026-11-19.md"
+        "docs/embervale/06-development/WALL_ORIENTATION_2026-11-19.md",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Starter art remains in progress across forest, cast, environment, service, building and contextual variation batches. There are 775 frames in 26 PNGs with editable masters, reproducible exports and packaged hashes. Real tree canopy positions seed leaf litter, maintained areas suppress vegetation, suitable meadows cluster flower variants, and the workshop has localized repairs; the kit also includes new/weathered conditions and slate. Builds and software-renderer captures passed. Further building assemblies, remaining cast/ore tiers, general importing, audio and full starter acceptance remain open; regression suites and visible interaction remain deferred at owner request. Directional wall caps/windows, corner joins, interior front cutaways and aligned eaves replace the front-facing side-wall panels; default exports preserve all non-wall masters."
+      "notes": "Eight published batches cover terrain, forest, cast, environment, services, buildings, variation and gathering. Remaining cast/ore tiers, bank/shop assemblies, general importing and full starter acceptance remain. Local melee/equipment belongs to REL-004."
     },
     {
       "id": "ART-003",
       "milestone": "R4",
       "priority": "P2",
       "title": "Improve readable UI and animation",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "ART-001",
         "GAME-005"
       ],
       "acceptance": "Confirm selection, hit feedback, names, objectives and UI scale using real tasks and accessibility checks.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Selection, hit/miss feedback, names, objectives, tutorial guidance and gathering rewards are implemented in bounded form. Local melee/equipment is REL-004. UI scale/accessibility and animation quality acceptance remain open; ART-005 polish is owner-deferred."
     },
     {
       "id": "ART-004",
@@ -920,12 +960,15 @@
       "title": "Introduce a restrained audio set",
       "status": "planned",
       "dependencies": [
-        "ART-001"
+        "ART-001",
+        "REL-004"
       ],
       "acceptance": "Add meaningful feedback and independent volume controls; document audio rights, formats and missing-asset behaviour.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Start after the integrated build is published and the fresh route observed. Use action/result identities for swing/impact/success, bounded repetition/polyphony, independent effects volume/mute and missing-asset fallback. Record audio creation/licensing. This remains planned."
     },
     {
       "id": "GAME-006",
@@ -965,9 +1008,10 @@
         "src/Quest/QuestPresentationState.h",
         "src/Tutorial/StarterJourney.cpp",
         "src/Graphics/Graphics.cpp",
-        "tests/QuestPresentationStateTests.cpp"
+        "tests/QuestPresentationStateTests.cpp",
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Starter continuity implementation delivered: Cinder Warden is canonical; all six named/objective and reward descriptions match current quest events. Dialogue explains acceptance, actual bank/station use, kept equipment and one reward choice without a trophy inventory requirement. Post-tutorial recommendations prioritise ready/active work, then unstarted story leads; live map hints identify targets and both reward contacts. H/current quest details, wrapped journal previews and NPC-specific reward buttons are implemented. Compiled content validation passed with zero errors; named Sera/Ashfang/Cinder Warden goals match NPC names; authored dialogue fits 154/184 characters. River Crossing validation and game/report/validator/launcher builds passed. Regression source is updated; suites and full quest-chain/visible acceptance remain deferred at the owner's request. Quest mechanics, amounts, rewards, IDs and persistence formats are retained."
+      "notes": "Canonical names, event objectives, reward contacts/choices and tutorial guidance agree with source. Current quest/dialogue/content checks pass; the stale combat dialogue assertion is refreshed. Human quest-chain comprehension and visible acceptance remain open."
     },
     {
       "id": "STUDIO-070",
@@ -1129,47 +1173,45 @@
       "milestone": "R6",
       "priority": "P1",
       "title": "Maintain local regression and content checks",
-      "status": "planned",
-      "dependencies": [
-        "STUDIO-052",
-        "STUDIO-093"
-      ],
+      "status": "in_progress",
+      "dependencies": [],
       "acceptance": "Run meaningful local tests and content checks at the release commit; preserve failure logs and report skipped groups.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Ongoing local regression/content checking applies to each slice and does not wait for R6 manifests. Current Windows SDL/headless, real bridge and Python checks are recorded. Select a working interpreter and verify the bridge entry is present; final package acceptance additionally exercises STUDIO-093 through REL-002."
     },
     {
       "id": "QA-002",
       "milestone": "R6",
       "priority": "P2",
       "title": "Exercise malformed content and failure recovery",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "STUDIO-011",
-        "STUDIO-021",
-        "STUDIO-093"
+        "STUDIO-021"
       ],
       "acceptance": "Bounded negative/fuzz/fault scenarios demonstrate safe failure and preserved previous content/player data.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Codec/content malformed-input and save-recovery regressions pass. Forced termination, editor stale-lock recovery and broader filesystem fault injection remain open; rejection testing starts before package work."
     },
     {
       "id": "QA-003",
-      "milestone": "R6",
-      "priority": "P2",
+      "milestone": "R4",
+      "priority": "P1",
       "title": "Verify accessibility and usability",
       "status": "planned",
-      "dependencies": [
-        "ART-003",
-        "STUDIO-033",
-        "GAME-006"
-      ],
+      "dependencies": [],
       "acceptance": "Record keyboard, focus, colour-independent state, readable scale and error recovery results with fixes.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Usability/accessibility feedback feeds ART-003, STUDIO-033 and GAME-005 during R4. Do not require the finished starter slice before testing it. Include keyboard/focus/text scale, non-color-only feedback and visible save-failure Return/Exit choices; the new dialog was not manually exercised."
     },
     {
       "id": "REL-001",
@@ -1217,17 +1259,19 @@
     },
     {
       "id": "DOC-003",
-      "milestone": "R6",
-      "priority": "P2",
+      "milestone": "R0",
+      "priority": "P1",
       "title": "Keep documentation synchronized",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "DOC-001"
       ],
       "acceptance": "Update affected inventory/decisions/user workflows with code changes; check links and archive superseded plans.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Maintain current status, dated review, synchronized backlog Markdown/JSON, source/evidence links and local-versus-published animation status with each slice. Preserve dated historical reports; one review does not end ongoing maintenance."
     },
     {
       "id": "ENG-010",
@@ -1510,6 +1554,145 @@
       "github_issue": null,
       "evidence": [],
       "notes": "Planning ID; not a GitHub issue number."
+    },
+    {
+      "id": "ENG-003",
+      "milestone": "R0",
+      "priority": "P0",
+      "title": "Preserve recovery artifacts when a primary save fails",
+      "status": "complete",
+      "dependencies": [],
+      "acceptance": "Malformed, truncated and oversized primaries fail without changing primary/tmp/bak bytes; valid-primary cleanup and missing-primary recovery still pass.",
+      "github_issue": null,
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Fixed in 38552c255649c61060bf42931f17f3e524229d4b; all 110 save-file assertions pass after reproducing seven failures with the prior policy."
+    },
+    {
+      "id": "ENG-004",
+      "milestone": "R0",
+      "priority": "P0",
+      "title": "Reject overflowing and unknown direct inventory additions",
+      "status": "complete",
+      "dependencies": [],
+      "acceptance": "Capacity queries and additions agree at INT_MAX; rejected additions and bank withdrawals preserve quantities; unknown IDs cannot enter inventory.",
+      "github_issue": null,
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Fixed in 38552c255649c61060bf42931f17f3e524229d4b; 101 inventory assertions pass after four new boundary checks failed on the old implementation."
+    },
+    {
+      "id": "GAME-009",
+      "milestone": "R4",
+      "priority": "P0",
+      "title": "Preserve crafting escrow across saves and failed exits",
+      "status": "complete",
+      "dependencies": [
+        "ENG-004"
+      ],
+      "acceptance": "Open cursor/grid saves restore every owned item once without live mutation; capacity failure preserves the old save/items; failed shutdown offers retry or explicit unsaved exit.",
+      "github_issue": null,
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Fixed in 38552c255649c61060bf42931f17f3e524229d4b; 152 World persistence assertions and engine retry checks pass. Visible native dialog acceptance remains QA-003."
+    },
+    {
+      "id": "QA-004",
+      "milestone": "R4",
+      "priority": "P1",
+      "title": "Reconcile current review and regression evidence",
+      "status": "complete",
+      "dependencies": [
+        "ENG-003",
+        "ENG-004",
+        "GAME-009"
+      ],
+      "acceptance": "Record exact source/configuration and passed client/headless/Python checks; correct stale expectations while retaining rejection, no-write and isolation assertions.",
+      "github_issue": null,
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Published source passes 102/102 SDL, 87/87 standalone headless and 42/42 Python units; real bridge covers 12 cases. Separate local animation line passes 101/101."
+    },
+    {
+      "id": "REL-004",
+      "milestone": "R4",
+      "priority": "P1",
+      "title": "Reconcile and publish the working animation implementation",
+      "status": "planned",
+      "dependencies": [
+        "QA-004"
+      ],
+      "acceptance": "Combine published Mining/shared gathering with local melee/equipment without losing either; publish editable sources, manifests, outputs, previews and report; verify combined gameplay/render/packaging.",
+      "github_issue": null,
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Local animation began at 688221b and includes safety fixes at 196a279. GitHub includes Mining and safety fixes at 38552c255649c61060bf42931f17f3e524229d4b. Synthetic local snapshot ancestry must not replace master. Visual quality remains ART-005."
+    },
+    {
+      "id": "ART-005",
+      "milestone": "R4",
+      "priority": "P2",
+      "title": "Polish and obtain acceptance of character animation",
+      "status": "planned",
+      "dependencies": [
+        "REL-004"
+      ],
+      "acceptance": "Compare consistent eight-way fixtures at gameplay scale; improve pose, attachment, weight, timing and transitions; record owner visual acceptance separately from automated correctness.",
+      "github_issue": null,
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Explicitly owner-deferred on 20 November: working first pass, not accepted finished animation. Use ANIMATION_GUIDE and the dated research."
+    },
+    {
+      "id": "GAME-010",
+      "milestone": "R4",
+      "priority": "P1",
+      "title": "Add bounded periodic player autosave",
+      "status": "planned",
+      "dependencies": [
+        "ENG-003",
+        "GAME-009"
+      ],
+      "acceptance": "Checkpoint only explicitly persistent players at safe intervals/events; keep no-save/fresh playtests temporary, preserve valid data on failure, handle crafting/death and test interruption/reload.",
+      "github_issue": null,
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Only controlled shutdown and explicit SaveNow exist. Define policy/interval before coding; never silently persist temporary world/profile launches."
+    },
+    {
+      "id": "ENG-005",
+      "milestone": "R0",
+      "priority": "P2",
+      "title": "Define safe integer limits for progression and health",
+      "status": "planned",
+      "dependencies": [],
+      "acceptance": "XP/healing and related aggregation reject or saturate before signed overflow; maximum-value save data cannot become negative after ordinary updates; preserve intended balance.",
+      "github_issue": null,
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "Skill::AddXP and HealthPool::Heal still add signed ints unchecked. Inventory overflow is fixed separately; select explicit cap/saturation policy and boundary regressions."
+    },
+    {
+      "id": "ENG-006",
+      "milestone": "R4",
+      "priority": "P2",
+      "title": "Extract World and Graphics responsibilities as needed",
+      "status": "planned",
+      "dependencies": [],
+      "acceptance": "A concrete feature extracts one tested responsibility behind a stable boundary without changing authority, draw order, public behavior or unrelated subsystems.",
+      "github_issue": null,
+      "evidence": [
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+      ],
+      "notes": "World.cpp/Graphics.cpp concentrate commands, sessions, persistence, UI and presentation. This is maintenance debt; avoid a speculative engine rewrite."
     }
   ]
 }

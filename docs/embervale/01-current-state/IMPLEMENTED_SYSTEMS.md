@@ -1,9 +1,13 @@
-# Implemented systems and current project state
+# Original engine inventory and current-state reference
 
-**Review date:** 18 November 2026\
+**Original inventory date:** 18 November 2026\
 **Repository:** Adzffs/GameEngine\
 **Reviewed baseline:** `e9d32932e8f9b27e96283313cca320058792a81f` on `master`\
 **Purpose:** Explain what is already present, what it does, and what still needs evidence or development.
+
+## Current state after the 20 November review
+
+Read [CURRENT_STATUS.md](CURRENT_STATUS.md) for current implementation, source versions, checks and next work. The inventory below is pinned to the original baseline. It does not imply that later editor, sprites or gathering animation are unimplemented. The [project review](../06-development/PROJECT_REVIEW_2026-11-20.md) records current fixes and limits.
 
 ## How to read this inventory
 
@@ -135,7 +139,7 @@ Tutorial state advances through meeting the guide, gathering, planks, mining, sm
 
 The map is flat and tile-based. Grass, dirt, and stone are traversable tile types; water, tree, wall, and station tile types block movement. Resource creation writes `TREE` to the map even for mining rocks. Station creation writes `STATION`. These names currently serve occupancy as well as appearance. Consequently, removing or moving an object requires reconstruction of the underlying ground; exporting the final occupied tile grid as pure terrain would lose that distinction. [Map][IS-MAP] · [Tile][IS-TILE] · [World][IS-WORLD]
 
-The client draws procedural shapes and text through SDL. The reviewed tree contains no imported asset directory or Studio asset-manifest pipeline. A large `Graphics.cpp` contains world drawing, panels, minimap, hover feedback, combat presentation, dialogue, quest, bank, crafting, settings, and camera handling. The source defines a 32-pixel tile size. Future sprite work should introduce a reusable asset/render interface in small steps while retaining readable fallback graphics. [Graphics implementation][IS-GRAPHICS] · [Graphics interface][IS-GRAPHICS-H] · [Tree][IS-TREE]
+At the original baseline the client drew procedural shapes/text without imported sprites. Later work adds eight editable batches, a renderer-owned cache, generated geometry, primitive fallback and eight-way walking/chopping/mining. A general asset importer remains open. Graphics still owns many responsibilities; targeted extraction is ENG-006. Read [current status](CURRENT_STATUS.md) and [Art and audio](../05-game/ART_AND_AUDIO.md) for current integration. [Graphics implementation][IS-GRAPHICS] · [Graphics interface][IS-GRAPHICS-H] · [Tree][IS-TREE]
 
 The client already has camera smoothing, zoom-related transforms, a local minimap, an adjustable/collapsible side-panel presentation, contextual interaction feedback, and combat and progression feedback. These are source features, not a guarantee of visual quality on every screen size. There is no implemented higher/lower-ground topology, walk-under bridge system, or multi-floor building system in the reviewed representation. [Graphics][IS-GRAPHICS] · [World interface][IS-WORLD-H]
 
@@ -157,11 +161,11 @@ Local CMake builds support headless and SDL3 client configurations. CTest labels
 
 **Executed result:** the runtime-import slice passed 77/77 headless and 89/89 Linux SDL tests; see the [runtime verification record](../06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md). Earlier 81-test baseline and 83-entry exporter results remain in the [baseline record](../06-development/BASELINE_VERIFICATION_2026-11-18.md). Windows execution and visible manual playtesting remain unverified.
 
-## 9. What should remain marked as future work
+## 9. Implemented bounded tools and remaining future work
 
-The initial reviewed tree had no Studio implementation. Later work adds [read-only starter-world export](../04-studio/STARTER_WORLD_EXPORT.md), a typed snapshot and canonical writer, followed by [bounded validation and runtime loading](../04-studio/STARTER_WORLD_IMPORT.md). The default game still selects compiled content; `--world` explicitly loads the validated 100×100 starter snapshot with its existing identities and lifecycle. General region loading, a map-editing GUI, shared edit API, guarded publication, asset editor, AI/MCP editing interface, elevation and production online service remain planned.
+Export/import, schemas 1-4, move/paint/place/remove/spawn settings, history, Python/Tk editing, guarded new drafts, dirty-state/reopen behavior, isolated playtests and overlays are implemented. Current checks pass; see [current status](CURRENT_STATUS.md).
 
-The next implementation goal is narrow: move one authored tree through a shared command path and prove that guarded save/reopen, collision, interactions, undo, preview and runtime agree. That proves the editing foundation on the existing game before the content library expands.
+General region/definition authoring, interruption recovery, versioned/in-place publication, general asset importing/editing, richer brushes, elevation and an online service remain future work. Next is REL-004 integration and fresh-player acceptance, not reimplementing the delivered tree move/editor slice.
 
 ## Related documents
 
