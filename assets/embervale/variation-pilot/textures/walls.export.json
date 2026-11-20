@@ -4,7 +4,7 @@
       "frame": {
         "x": 0,
         "y": 0,
-        "w": 384,
+        "w": 512,
         "h": 288
       },
       "rotated": false,
@@ -12,11 +12,11 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 384,
+        "w": 512,
         "h": 288
       },
       "sourceSize": {
-        "w": 384,
+        "w": 512,
         "h": 288
       },
       "duration": 100
@@ -28,7 +28,7 @@
     "image": "walls.png",
     "format": "RGBA8888",
     "size": {
-      "w": 384,
+      "w": 512,
       "h": 288
     },
     "scale": "1"

@@ -26,35 +26,61 @@ function blit(src,dst,dx,dy,sx,sy,w,h,alpha) {
 }
 function scale(src,f) {var o=canvas(src.width*f,src.height*f);for(var y=0;y<o.height;y++)for(var x=0;x<o.width;x++)o.pixels[y*o.width+x]=src.pixels[Math.floor(y/f)*src.width+Math.floor(x/f)];return o;}
 function wall(mode) {
- var o=canvas(32,48);
- box(o,0,6,32,34,'302b26');box(o,2,9,28,20,mode===1?'ab9f83':'c5b795');
- box(o,3,10,26,1,'d5c7a4');
- // Masonry foundation, staggered two rows, quiet stone highlights.
- for(var y=29;y<39;y++)for(var x=0;x<32;x++) {
-  var py=(y-29)%5,px=(x+(Math.floor((y-29)/5)%2)*4)%8;
-  put(o,x,y,colour(py===0||px===0?'40483f':py===1||px===1?'858d7a':'677165'));
+ var o=canvas(32,48),low=mode>=12;
+ if(mode===7||mode===13) {
+  var top=low?24:12;
+  // Open south entrance: short jambs in cutaway, overhead lintel outside.
+  for(var j=0;j<2;j++) {
+   var x=j?26:0;box(o,x,top,6,36-top,'603e2b');box(o,x+1,top,1,36-top,'b97c43');
+   box(o,x,top,6,2,'d59b5a');box(o,x,34,6,2,'677165');
+  }
+  if(!low){box(o,0,12,32,8,'7b4e2e');box(o,0,12,32,1,'d59b5a');box(o,0,19,32,3,'463026');}
+  box(o,6,36,20,2,'858d7a');box(o,6,37,20,1,'4b554d');return o;
  }
- box(o,0,5,32,4,'603e2b');box(o,0,5,32,1,'b97c43');
- box(o,0,26,32,3,'603e2b');box(o,0,26,32,1,'985f35');
- box(o,0,6,4,33,'603e2b');box(o,1,7,1,30,'b97c43');
- box(o,28,6,4,33,'463026');box(o,28,7,1,30,'985f35');
- if(mode<2)for(var i=0;i<16;i++)box(o,mode===0?6+i:24-i,24-i,3,2,'7b4e2e');
- if(mode===2||mode===5) {box(o,4,9,5,17,'985f35');box(o,9,9,2,17,'603e2b');}
- if(mode===3||mode===6) {box(o,22,9,5,17,'7b4e2e');box(o,20,9,2,17,'463026');}
- if(mode>=4&&mode<=6) {
-  var wx=mode===5?12:mode===6?9:9,ww=mode===4?14:11;
-  box(o,wx-2,10,ww+4,17,'603e2b');box(o,wx,12,ww,12,'334d56');
-  box(o,wx+1,13,ww-2,10,'55767b');box(o,wx+2,13,2,4,'8da39c');
-  box(o,wx+Math.floor(ww/2),12,1,12,'463026');box(o,wx,17,ww,1,'463026');
-  box(o,wx-2,25,ww+4,2,'b97c43');
+ // Ground-plan arms: N1/E2/S4/W8. Caps follow the actual wall axis.
+ var masks=[10,10,5,5,10,5,5,10,6,12,3,9,10,10,3,9],mask=masks[mode];
+ function footprint(x,y) {
+  if(x<0)return !!(mask&8)&&y>=12&&y<20;
+  if(x>=32)return !!(mask&2)&&y>=12&&y<20;
+  if(y<0)return !!(mask&1)&&x>=12&&x<20;
+  if(y>=32)return !!(mask&4)&&x>=12&&x<20;
+  return (x>=12&&x<20&&y>=12&&y<20)||
+   ((mask&1)&&x>=12&&x<20&&y<12)||((mask&4)&&x>=12&&x<20&&y>=20)||
+   ((mask&8)&&y>=12&&y<20&&x<12)||((mask&2)&&y>=12&&y<20&&x>=20);
  }
- if(mode===7) {
-  for(var y=10;y<40;y++)for(var x=4;x<28;x++)put(o,x,y,0);
-  box(o,0,6,4,34,'603e2b');box(o,1,8,1,31,'b97c43');box(o,28,6,4,34,'463026');
-  box(o,28,8,1,31,'985f35');box(o,0,5,32,5,'7b4e2e');box(o,0,5,32,1,'d59b5a');
-  box(o,4,38,24,2,'858d7a');box(o,4,39,24,1,'4b554d');
+ for(var x=0;x<32;x++) {
+  var last=-1;
+  for(var y=0;y<32;y++)if(footprint(x,y))last=y;
+  if(last<0)continue;
+  // Retain the tall side return where the low front joins a corner post.
+  var height=low&&!(mode>=14&&x>=12&&x<20)?4:16,shift=16-height;
+  var panel=mode===0||mode===1||mode===4||((mode>=8&&mode<=11)&&(x<12||x>=20));
+  for(var y=last+1+shift;y<=last+16;y++) {
+   var fromTop=y-last-shift;
+   var c=panel?(mode===1?'bdb094':'c5b795'):'603e2b';
+   if(fromTop===1)c='463026';else if(fromTop===2)c='d5c7a4';
+   if(y>=last+14)c=x%8===0?'40483f':y===last+14?'858d7a':'677165';
+   else if(x%32<3||x%32>28||!panel)c=x%2?'7b4e2e':'603e2b';
+   put(o,x,y,colour(c));
+  }
+  for(var y=0;y<32;y++)if(footprint(x,y)) {
+   var c='7b4e2e';
+   if(!footprint(x,y-1))c='d59b5a';else if(!footprint(x-1,y))c='b97c43';
+   else if(!footprint(x+1,y)||!footprint(x,y+1))c='463026';
+   else if((mask===5&&x===15)||(mask===10&&y===15))c='985f35';
+   put(o,x,y+shift,colour(c));
+  }
  }
- if(mode>=8) {var east=mode%2===1;box(o,east?24:4,8,4,30,'7b4e2e');box(o,east?24:4,8,1,30,'b97c43');}
+ if(mode===0)for(var i=0;i<12;i++)box(o,6+i,31-Math.floor(i/2),2,1,'7b4e2e');
+ if(mode===4) {
+  box(o,8,22,16,10,'603e2b');box(o,10,23,12,7,'334d56');box(o,11,24,10,5,'55767b');
+  box(o,11,24,2,2,'8da39c');box(o,15,23,1,7,'463026');box(o,10,26,12,1,'463026');box(o,8,31,16,1,'b97c43');
+ }
+ if(mode===5||mode===6) {
+  // Side windows are narrow vertical recesses along the wall, not front panels.
+  box(o,12,9,8,16,'463026');box(o,13,10,6,14,'334d56');box(o,14,11,4,12,'55767b');
+  box(o,14,11,1,11,'8da39c');box(o,13,16,6,1,'463026');box(o,12,9,8,1,'b97c43');
+ }
  return o;
 }
 function roofTile(i) {
@@ -89,13 +115,17 @@ function floorTile(v) {
  }return o;
 }
 var walls,roof,floors;
+if(cfg.regenerate||cfg.regenerateWalls) {
+ walls=canvas(256,96);
+ for(var i=0;i<16;i++)blit(wall(i),walls,i%8*32,Math.floor(i/8)*48);
+ save(walls,cfg.fixtures.walls,cfg.sources.walls);
+}else walls=read(cfg.sources.walls);
 if(cfg.regenerate) {
- walls=canvas(256,96);roof=canvas(96,128);floors=canvas(96,32);
- for(var i=0;i<12;i++)blit(wall(i),walls,i%8*32,Math.floor(i/8)*48);
+ roof=canvas(96,128);floors=canvas(96,32);
  for(var i=0;i<12;i++)blit(roofTile(i),roof,i%3*32,Math.floor(i/3)*32);
  for(var i=0;i<3;i++)blit(floorTile(i),floors,i*32,0);
- save(walls,cfg.fixtures.walls,cfg.sources.walls);save(roof,cfg.fixtures.roof,cfg.sources.roof);save(floors,cfg.fixtures.floors,cfg.sources.floors);
-} else {walls=read(cfg.sources.walls);roof=read(cfg.sources.roof);floors=read(cfg.sources.floors);}
+ save(roof,cfg.fixtures.roof,cfg.sources.roof);save(floors,cfg.fixtures.floors,cfg.sources.floors);
+} else {roof=read(cfg.sources.roof);floors=read(cfg.sources.floors);}
 [[walls,256,96],[roof,96,128],[floors,96,32]].forEach(function(t) {
  if(t[0].width!==t[1]||t[0].height!==t[2])throw new Error('Building master geometry changed');
  t[0].pixels.forEach(function(c) {if(pc.rgbaA(c)!==0&&pc.rgbaA(c)!==255)throw new Error('Building tiles require binary alpha');});
@@ -116,14 +146,21 @@ for(var b=0;b<2;b++) {
  for(var ty=0;ty<5;ty++)for(var tx=0;tx<9;tx++) {
   var edge=ty===0||ty===4||tx===0||tx===8;
   blit(edge?stone:floors,board,bx+tx*32,by+ty*32,edge?96:((tx+ty)%3)*32,0,32,32);
+  if(edge) {
+   var left=Math.max(0,20-tx*32),right=Math.min(32,268-tx*32);
+   var top=Math.max(0,20-ty*32),bottom=Math.min(32,140-ty*32);
+   if(tx===4&&ty===4){left=0;right=32;top=0;bottom=20;}
+   if(right>left&&bottom>top)blit(floors,board,bx+tx*32+left,by+ty*32+top,((tx+ty)%3)*32+left,top,right-left,bottom-top);
+  }
   if(!edge)continue;
   var index=ty===0?(tx===0?8:tx===8?9:1):ty===4?(tx===0?10:tx===8?11:tx===4?7:tx===2||tx===6?4:0):tx===0?(ty===2?5:2):(ty===2?6:3);
+  if(b===1&&ty===4)index=tx===0?14:tx===8?15:tx===4?13:12;
   blit(walls,board,bx+tx*32,by+ty*32-16,index%8*32,Math.floor(index/8)*48,32,48);
  }
- roofPatch(board,bx-8,by-48,304,160,b===0?255:25);
+ roofPatch(board,bx-8,by-48,304,184,b===0?255:25);
 }
 save(scale(board,2),cfg.fixtures['building-pilot-2x.png'],cfg.previews['building-pilot-2x.png']);
 var inspect=canvas(256,96);
 for(var y=0;y<96;y++)for(var x=0;x<256;x++)put(inspect,x,y,colour(((x>>3)+(y>>3))%2?'b4c5cf':'e5ded0'));
 blit(walls,inspect,0,0);save(scale(inspect,3),cfg.fixtures['walls-inspection-3x.png'],cfg.previews['walls-inspection-3x.png']);
-console.log('BUILDING_PILOT_OK: 12 wall/window/door/corner cells, 12 roof/ridge cells, 3 matching floors; overhead grid; binary alpha.');
+console.log('BUILDING_PILOT_OK: 16 directional wall/window/door/corner/cutaway cells, 12 roof/ridge cells, 3 matching floors; binary alpha.');

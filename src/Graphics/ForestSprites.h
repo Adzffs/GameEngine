@@ -68,7 +68,8 @@ private:
     const Frame *mara = nullptr;
     const Frame *furnace = nullptr;
     const Frame *bank = nullptr, *craftingTable = nullptr;
-    std::array<const Frame *, 12> buildingWalls{}, buildingRoof{};
+    std::array<const Frame *, 16> buildingWalls{};
+    std::array<const Frame *, 12> buildingRoof{};
     std::array<const Frame *, 3> buildingFloors{};
     std::map<std::string, float> roofAlphas;
     WorldArtVariation variation;
@@ -77,7 +78,8 @@ private:
     std::array<const Frame *, 48> variedWater{};
     std::array<const Frame *, 12> variedStone{};
     std::array<const Frame *, 40> flora{};
-    std::array<const Frame *, 72> variedWalls{}, variedRoof{};
+    std::array<const Frame *, 96> variedWalls{};
+    std::array<const Frame *, 72> variedRoof{};
     std::array<const Frame *, 9> variedFloors{}, variedRocks{};
     std::array<const Frame *, 3> variedTrees{}, variedStumps{};
     int buildingConditionPreview = -1;

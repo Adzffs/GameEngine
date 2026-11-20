@@ -1,6 +1,6 @@
 {
   "schema": "embervale.authoring-batch",
-  "version": 1,
+  "version": 2,
   "id": "variation-pilot",
   "native_tile_size": 32,
   "editor": "LibreSprite 1.1-dev JavaScript",
@@ -66,12 +66,12 @@
       "source": "source/walls.ase",
       "image": "textures/walls.png",
       "size": [
-        384,
+        512,
         288
       ],
       "editor_metadata": "textures/walls.export.json",
-      "source_sha256": "773c499c6e858f86d8ae673e3270788a1b589db91c371541b8e547a6ce70f458",
-      "image_sha256": "8c0f223e8cc6737d8e471935be364ffcafd0c503b3059bda73c15a6856ede2f4"
+      "source_sha256": "bcd216fde1b5c65b27222a8d2cc1e94a267a05cd59836e5dd8f0add0db4ead51",
+      "image_sha256": "15d3b236faf0b5ca78bbd648d49b8e438ed4b5a59c2a3e6719da15897c838e6b"
     },
     "roof": {
       "source": "source/roof.ase",
@@ -9217,8 +9217,8 @@
       "image": "walls",
       "variant": 12,
       "rect": [
+        384,
         0,
-        48,
         32,
         48
       ],
@@ -9236,8 +9236,8 @@
       "image": "walls",
       "variant": 13,
       "rect": [
-        32,
-        48,
+        416,
+        0,
         32,
         48
       ],
@@ -9255,8 +9255,8 @@
       "image": "walls",
       "variant": 14,
       "rect": [
-        64,
-        48,
+        448,
+        0,
         32,
         48
       ],
@@ -9274,8 +9274,8 @@
       "image": "walls",
       "variant": 15,
       "rect": [
-        96,
-        48,
+        480,
+        0,
         32,
         48
       ],
@@ -9293,7 +9293,7 @@
       "image": "walls",
       "variant": 16,
       "rect": [
-        128,
+        0,
         48,
         32,
         48
@@ -9312,7 +9312,7 @@
       "image": "walls",
       "variant": 17,
       "rect": [
-        160,
+        32,
         48,
         32,
         48
@@ -9331,7 +9331,7 @@
       "image": "walls",
       "variant": 18,
       "rect": [
-        192,
+        64,
         48,
         32,
         48
@@ -9350,7 +9350,7 @@
       "image": "walls",
       "variant": 19,
       "rect": [
-        224,
+        96,
         48,
         32,
         48
@@ -9369,7 +9369,7 @@
       "image": "walls",
       "variant": 20,
       "rect": [
-        256,
+        128,
         48,
         32,
         48
@@ -9388,7 +9388,7 @@
       "image": "walls",
       "variant": 21,
       "rect": [
-        288,
+        160,
         48,
         32,
         48
@@ -9407,7 +9407,7 @@
       "image": "walls",
       "variant": 22,
       "rect": [
-        320,
+        192,
         48,
         32,
         48
@@ -9426,7 +9426,7 @@
       "image": "walls",
       "variant": 23,
       "rect": [
-        352,
+        224,
         48,
         32,
         48
@@ -9445,8 +9445,8 @@
       "image": "walls",
       "variant": 24,
       "rect": [
-        0,
-        96,
+        256,
+        48,
         32,
         48
       ],
@@ -9464,8 +9464,8 @@
       "image": "walls",
       "variant": 25,
       "rect": [
-        32,
-        96,
+        288,
+        48,
         32,
         48
       ],
@@ -9483,8 +9483,8 @@
       "image": "walls",
       "variant": 26,
       "rect": [
-        64,
-        96,
+        320,
+        48,
         32,
         48
       ],
@@ -9502,8 +9502,8 @@
       "image": "walls",
       "variant": 27,
       "rect": [
-        96,
-        96,
+        352,
+        48,
         32,
         48
       ],
@@ -9521,8 +9521,8 @@
       "image": "walls",
       "variant": 28,
       "rect": [
-        128,
-        96,
+        384,
+        48,
         32,
         48
       ],
@@ -9540,8 +9540,8 @@
       "image": "walls",
       "variant": 29,
       "rect": [
-        160,
-        96,
+        416,
+        48,
         32,
         48
       ],
@@ -9559,8 +9559,8 @@
       "image": "walls",
       "variant": 30,
       "rect": [
-        192,
-        96,
+        448,
+        48,
         32,
         48
       ],
@@ -9578,8 +9578,8 @@
       "image": "walls",
       "variant": 31,
       "rect": [
-        224,
-        96,
+        480,
+        48,
         32,
         48
       ],
@@ -9597,7 +9597,7 @@
       "image": "walls",
       "variant": 32,
       "rect": [
-        256,
+        0,
         96,
         32,
         48
@@ -9616,7 +9616,7 @@
       "image": "walls",
       "variant": 33,
       "rect": [
-        288,
+        32,
         96,
         32,
         48
@@ -9635,7 +9635,7 @@
       "image": "walls",
       "variant": 34,
       "rect": [
-        320,
+        64,
         96,
         32,
         48
@@ -9654,7 +9654,7 @@
       "image": "walls",
       "variant": 35,
       "rect": [
-        352,
+        96,
         96,
         32,
         48
@@ -9673,8 +9673,8 @@
       "image": "walls",
       "variant": 36,
       "rect": [
-        0,
-        144,
+        128,
+        96,
         32,
         48
       ],
@@ -9692,8 +9692,8 @@
       "image": "walls",
       "variant": 37,
       "rect": [
-        32,
-        144,
+        160,
+        96,
         32,
         48
       ],
@@ -9711,8 +9711,8 @@
       "image": "walls",
       "variant": 38,
       "rect": [
-        64,
-        144,
+        192,
+        96,
         32,
         48
       ],
@@ -9730,8 +9730,8 @@
       "image": "walls",
       "variant": 39,
       "rect": [
+        224,
         96,
-        144,
         32,
         48
       ],
@@ -9749,8 +9749,8 @@
       "image": "walls",
       "variant": 40,
       "rect": [
-        128,
-        144,
+        256,
+        96,
         32,
         48
       ],
@@ -9768,8 +9768,8 @@
       "image": "walls",
       "variant": 41,
       "rect": [
-        160,
-        144,
+        288,
+        96,
         32,
         48
       ],
@@ -9787,8 +9787,8 @@
       "image": "walls",
       "variant": 42,
       "rect": [
-        192,
-        144,
+        320,
+        96,
         32,
         48
       ],
@@ -9806,8 +9806,8 @@
       "image": "walls",
       "variant": 43,
       "rect": [
-        224,
-        144,
+        352,
+        96,
         32,
         48
       ],
@@ -9825,8 +9825,8 @@
       "image": "walls",
       "variant": 44,
       "rect": [
-        256,
-        144,
+        384,
+        96,
         32,
         48
       ],
@@ -9844,8 +9844,8 @@
       "image": "walls",
       "variant": 45,
       "rect": [
-        288,
-        144,
+        416,
+        96,
         32,
         48
       ],
@@ -9863,8 +9863,8 @@
       "image": "walls",
       "variant": 46,
       "rect": [
-        320,
-        144,
+        448,
+        96,
         32,
         48
       ],
@@ -9882,8 +9882,8 @@
       "image": "walls",
       "variant": 47,
       "rect": [
-        352,
-        144,
+        480,
+        96,
         32,
         48
       ],
@@ -9902,7 +9902,7 @@
       "variant": 48,
       "rect": [
         0,
-        192,
+        144,
         32,
         48
       ],
@@ -9921,7 +9921,7 @@
       "variant": 49,
       "rect": [
         32,
-        192,
+        144,
         32,
         48
       ],
@@ -9940,7 +9940,7 @@
       "variant": 50,
       "rect": [
         64,
-        192,
+        144,
         32,
         48
       ],
@@ -9959,7 +9959,7 @@
       "variant": 51,
       "rect": [
         96,
-        192,
+        144,
         32,
         48
       ],
@@ -9978,7 +9978,7 @@
       "variant": 52,
       "rect": [
         128,
-        192,
+        144,
         32,
         48
       ],
@@ -9997,7 +9997,7 @@
       "variant": 53,
       "rect": [
         160,
-        192,
+        144,
         32,
         48
       ],
@@ -10016,7 +10016,7 @@
       "variant": 54,
       "rect": [
         192,
-        192,
+        144,
         32,
         48
       ],
@@ -10035,7 +10035,7 @@
       "variant": 55,
       "rect": [
         224,
-        192,
+        144,
         32,
         48
       ],
@@ -10054,7 +10054,7 @@
       "variant": 56,
       "rect": [
         256,
-        192,
+        144,
         32,
         48
       ],
@@ -10073,7 +10073,7 @@
       "variant": 57,
       "rect": [
         288,
-        192,
+        144,
         32,
         48
       ],
@@ -10092,7 +10092,7 @@
       "variant": 58,
       "rect": [
         320,
-        192,
+        144,
         32,
         48
       ],
@@ -10111,7 +10111,7 @@
       "variant": 59,
       "rect": [
         352,
-        192,
+        144,
         32,
         48
       ],
@@ -10129,8 +10129,8 @@
       "image": "walls",
       "variant": 60,
       "rect": [
-        0,
-        240,
+        384,
+        144,
         32,
         48
       ],
@@ -10148,8 +10148,8 @@
       "image": "walls",
       "variant": 61,
       "rect": [
-        32,
-        240,
+        416,
+        144,
         32,
         48
       ],
@@ -10167,8 +10167,8 @@
       "image": "walls",
       "variant": 62,
       "rect": [
-        64,
-        240,
+        448,
+        144,
         32,
         48
       ],
@@ -10186,8 +10186,8 @@
       "image": "walls",
       "variant": 63,
       "rect": [
-        96,
-        240,
+        480,
+        144,
         32,
         48
       ],
@@ -10205,8 +10205,8 @@
       "image": "walls",
       "variant": 64,
       "rect": [
-        128,
-        240,
+        0,
+        192,
         32,
         48
       ],
@@ -10224,8 +10224,8 @@
       "image": "walls",
       "variant": 65,
       "rect": [
-        160,
-        240,
+        32,
+        192,
         32,
         48
       ],
@@ -10243,8 +10243,8 @@
       "image": "walls",
       "variant": 66,
       "rect": [
+        64,
         192,
-        240,
         32,
         48
       ],
@@ -10262,8 +10262,8 @@
       "image": "walls",
       "variant": 67,
       "rect": [
-        224,
-        240,
+        96,
+        192,
         32,
         48
       ],
@@ -10281,8 +10281,8 @@
       "image": "walls",
       "variant": 68,
       "rect": [
-        256,
-        240,
+        128,
+        192,
         32,
         48
       ],
@@ -10300,8 +10300,8 @@
       "image": "walls",
       "variant": 69,
       "rect": [
-        288,
-        240,
+        160,
+        192,
         32,
         48
       ],
@@ -10319,8 +10319,8 @@
       "image": "walls",
       "variant": 70,
       "rect": [
-        320,
-        240,
+        192,
+        192,
         32,
         48
       ],
@@ -10338,7 +10338,463 @@
       "image": "walls",
       "variant": 71,
       "rect": [
+        224,
+        192,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.072",
+      "image": "walls",
+      "variant": 72,
+      "rect": [
+        256,
+        192,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.073",
+      "image": "walls",
+      "variant": 73,
+      "rect": [
+        288,
+        192,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.074",
+      "image": "walls",
+      "variant": 74,
+      "rect": [
+        320,
+        192,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.075",
+      "image": "walls",
+      "variant": 75,
+      "rect": [
         352,
+        192,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.076",
+      "image": "walls",
+      "variant": 76,
+      "rect": [
+        384,
+        192,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.077",
+      "image": "walls",
+      "variant": 77,
+      "rect": [
+        416,
+        192,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.078",
+      "image": "walls",
+      "variant": 78,
+      "rect": [
+        448,
+        192,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.079",
+      "image": "walls",
+      "variant": 79,
+      "rect": [
+        480,
+        192,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.080",
+      "image": "walls",
+      "variant": 80,
+      "rect": [
+        0,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.081",
+      "image": "walls",
+      "variant": 81,
+      "rect": [
+        32,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.082",
+      "image": "walls",
+      "variant": 82,
+      "rect": [
+        64,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.083",
+      "image": "walls",
+      "variant": 83,
+      "rect": [
+        96,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.084",
+      "image": "walls",
+      "variant": 84,
+      "rect": [
+        128,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.085",
+      "image": "walls",
+      "variant": 85,
+      "rect": [
+        160,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.086",
+      "image": "walls",
+      "variant": 86,
+      "rect": [
+        192,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.087",
+      "image": "walls",
+      "variant": 87,
+      "rect": [
+        224,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.088",
+      "image": "walls",
+      "variant": 88,
+      "rect": [
+        256,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.089",
+      "image": "walls",
+      "variant": 89,
+      "rect": [
+        288,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.090",
+      "image": "walls",
+      "variant": 90,
+      "rect": [
+        320,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.091",
+      "image": "walls",
+      "variant": 91,
+      "rect": [
+        352,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.092",
+      "image": "walls",
+      "variant": 92,
+      "rect": [
+        384,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.093",
+      "image": "walls",
+      "variant": 93,
+      "rect": [
+        416,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.094",
+      "image": "walls",
+      "variant": 94,
+      "rect": [
+        448,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ]
+    },
+    {
+      "id": "variation.walls.095",
+      "image": "walls",
+      "variant": 95,
+      "rect": [
+        480,
         240,
         32,
         48
@@ -12183,7 +12639,7 @@
     "water": "shared deep-water corner mask * 3 + ripple variant",
     "stone": "clean 0..2, worn 3..5, repaired 6..8, mine ground 9..11",
     "flora": "flowers 0..7, grass 8..15, reeds 16..19, leaf beds 20..27, debris 28..31, moss 32..35, sparse leaves 36..39",
-    "walls": "condition * 24 + panel variant * 12 + original kit part",
+    "walls": "condition * 32 + panel variant * 16 + directional kit part (including four interior cutaways)",
     "roof": "material * 36 + condition * 12 + original kit part",
     "floors": "condition * 3 + surface variant",
     "rocks": "copper 0..2, tin 3..5, rubble 6..8"
@@ -12216,7 +12672,7 @@
         1280,
         768
       ],
-      "sha256": "099ea898e3eb0bd94c72fe83344f23e16b602a8fb66a2c8d1fd5050b97c9438a"
+      "sha256": "5e1e4edfa4c3e5e19b3513179e8ddfd67b01df091fc5f3fd3bb08864eea9b0f1"
     }
   }
 }

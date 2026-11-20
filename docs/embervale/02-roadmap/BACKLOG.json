@@ -873,9 +873,10 @@
       "evidence": [
         "docs/embervale/05-game/ART_AND_AUDIO.md",
         "docs/embervale/06-development/BUILDING_RENDERING_2026-11-19.md",
-        "docs/embervale/06-development/WORLD_VARIATION_2026-11-19.md"
+        "docs/embervale/06-development/WORLD_VARIATION_2026-11-19.md",
+        "docs/embervale/06-development/WALL_ORIENTATION_2026-11-19.md"
       ],
-      "notes": "Six bounded LibreSprite batches establish palette, overhead 32-pixel scale, fixed object pivots and binary alpha. The contextual pass adds grass/path/water/stone variation, flower clusters, grass/reeds, tree leaf beds and building conditions. Client/launcher builds, source-preserving exports, actual camera captures and production-data dressing inspection passed. Full readability, editor preview parity and visible starter acceptance remain open."
+      "notes": "Six bounded LibreSprite batches establish palette, overhead 32-pixel scale, fixed object pivots and binary alpha. The contextual pass adds grass/path/water/stone variation, flower clusters, grass/reeds, tree leaf beds and building conditions. Client/launcher builds, source-preserving exports, actual camera captures and production-data dressing inspection passed. Full readability, editor preview parity and visible starter acceptance remain open. Directional wall caps/windows, corner joins, interior front cutaways and aligned eaves replace the front-facing side-wall panels; default exports preserve all non-wall masters."
     },
     {
       "id": "ART-002",
@@ -892,9 +893,10 @@
       "evidence": [
         "docs/embervale/05-game/ART_AND_AUDIO.md",
         "docs/embervale/06-development/BUILDING_RENDERING_2026-11-19.md",
-        "docs/embervale/06-development/WORLD_VARIATION_2026-11-19.md"
+        "docs/embervale/06-development/WORLD_VARIATION_2026-11-19.md",
+        "docs/embervale/06-development/WALL_ORIENTATION_2026-11-19.md"
       ],
-      "notes": "Starter art remains in progress across forest, cast, environment, service, building and contextual variation batches. There are 747 frames in 26 PNGs with editable masters, reproducible exports and packaged hashes. Real tree canopy positions seed leaf litter, maintained areas suppress vegetation, suitable meadows cluster flower variants, and the workshop has localized repairs; the kit also includes new/weathered conditions and slate. Builds and software-renderer captures passed. Further building assemblies, remaining cast/ore tiers, general importing, audio and full starter acceptance remain open; regression suites and visible interaction remain deferred at owner request."
+      "notes": "Starter art remains in progress across forest, cast, environment, service, building and contextual variation batches. There are 775 frames in 26 PNGs with editable masters, reproducible exports and packaged hashes. Real tree canopy positions seed leaf litter, maintained areas suppress vegetation, suitable meadows cluster flower variants, and the workshop has localized repairs; the kit also includes new/weathered conditions and slate. Builds and software-renderer captures passed. Further building assemblies, remaining cast/ore tiers, general importing, audio and full starter acceptance remain open; regression suites and visible interaction remain deferred at owner request. Directional wall caps/windows, corner joins, interior front cutaways and aligned eaves replace the front-facing side-wall panels; default exports preserve all non-wall masters."
     },
     {
       "id": "ART-003",

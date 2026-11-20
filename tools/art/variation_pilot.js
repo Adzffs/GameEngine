@@ -98,14 +98,22 @@ function tint(src,condition,material){var o=canvas(src.width,src.height);
   put(o,x,y,c);
  }return o;}
 function wallTile(part,condition,v,old){var o=tint(crop(old,part%8*32,Math.floor(part/8)*48,32,48),condition,0);
- if(condition>0){if(part!==7){var x=10+v*7;for(var k=0;k<7;k++){var xx=x+(k<3?0:1),yy=11+k;var c=o.pixels[yy*32+xx];if(pc.rgbaA(c)&&pc.rgbaR(c)>110)put(o,xx,yy,colour('8d896c'));}}
-  if(part!==7){for(var x=5;x<27;x++)if(noise(x,part,v)%5<2)box(o,x,37,1,1,'536347');
-   if(v===1)box(o,5,32,5,2,'65744f');}
+ // Age marks stay within the saved directional silhouette, including cutaways.
+ function mark(x,y,c){if(x>=0&&y>=0&&x<32&&y<48&&pc.rgbaA(o.pixels[y*32+x]))put(o,x,y,colour(c));}
+ function patch(x,y,w,h,c){for(var yy=y;yy<y+h;yy++)for(var xx=x;xx<x+w;xx++)mark(xx,yy,c);}
+ var side=part===2||part===3||part===5||part===6;
+ if(condition>0){
+  var x=side?15:8+v*9,start=side?4:23;
+  for(var k=0;k<5;k++){var xx=x+(k>2?1:0),yy=start+k,c=o.pixels[yy*32+xx];
+   if(pc.rgbaA(c)&&pc.rgbaR(c)>pc.rgbaB(c)+20)mark(xx,yy,'8d896c');}
+  var base=side?46:34;
+  for(var x=1;x<31;x++)if(noise(x,part,v)%7===0)mark(x,base,'536347');
  }
- if(condition===2&&part!==7){var left=part===3||part===6?12:5;
-  if(part!==4&&part!==5&&part!==6){box(o,left,13,9,8,'d5c6a2');box(o,left+1,13,7,1,'e4d5af');box(o,left+2,20,7,1,'b1a789');}
-  box(o,v?28:0,8,4,29,'855432');box(o,v?28:0,8,1,29,'c49152');
-  put(o,v?29:1,13,colour('3f372b'));put(o,v?29:1,29,colour('3f372b'));
+ if(condition===2){
+  if(part===0||part===1){patch(5+v*10,23,7,6,'d5c6a2');patch(6+v*10,23,5,1,'e4d5af');}
+  if(side){patch(14,3+v*3,4,4,'a57740');patch(14,3+v*3,1,4,'d59b5a');}
+  else if(part>=12){patch(v?22:2,25,7,5,'a57740');patch(v?22:2,25,7,1,'d59b5a');}
+  else {patch(v?29:1,21,2,12,'855432');patch(v?29:1,21,1,12,'c49152');}
  }return o;}
 function roofTile(part,condition,material,old){var o=tint(crop(old,part%3*32,Math.floor(part/3)*32,32,32),condition,material);
  if(condition===1&&part<9){
@@ -139,16 +147,17 @@ function rockTile(old,v){var o=canvas(32,40);
   if(v===2&&x>26&&y<19)continue;put(o,x,y,c);
  }return o;}
 var sheets={};
-if(cfg.regenerate){
+if(cfg.regenerate||cfg.regenerateWalls){
  var old={};Object.keys(cfg.old).forEach(function(k){old[k]=read(cfg.old[k]);});
  Object.keys(cfg.sheets).forEach(function(name){var d=cfg.sheets[name],out=canvas(d[0],d[1]);
+  if(!cfg.regenerate&&name!=='walls'){sheets[name]=read(cfg.sources[name]);return;}
   for(var i=0;i<d[4];i++){var tile;
    if(name==='grass')tile=grass(Math.floor(i/2),i%2);
    if(name==='paths')tile=path(i%17,Math.floor(i/68),Math.floor(i/17)%4);
    if(name==='water')tile=water(Math.floor(i/3),i%3);
    if(name==='stone')tile=stone(Math.floor(i/3),i%3);
    if(name==='flora')tile=flora(i);
-   if(name==='walls')tile=wallTile(i%12,Math.floor(i/24),Math.floor(i/12)%2,old.walls);
+   if(name==='walls')tile=wallTile(i%16,Math.floor(i/32),Math.floor(i/16)%2,old.walls);
    if(name==='roof')tile=roofTile(i%12,Math.floor(i/12)%3,Math.floor(i/36),old.roof);
    if(name==='floors'){tile=tint(crop(old.floors,i%3*32,0,32,32),Math.floor(i/3),0);
     if(i>=3){box(tile,5+i%3*5,12,9,1,'493d2e');if(i>=6){box(tile,4+i%3*5,17,13,4,'967247');box(tile,5+i%3*5,17,11,1,'b58e56');}}}
@@ -170,7 +179,7 @@ for(var i=0;i<12;i++)show('water',i%3+Math.floor(i/4)*15,i*32,80);
 for(var i=0;i<40;i++)show('flora',i,i%20*32,120+Math.floor(i/20)*40);
 for(var i=0;i<3;i++){show('trees',i,8+i*72,220);show('stumps',i,240+i*64,220);}
 for(var condition=0;condition<3;condition++){
- for(var part=0;part<3;part++)show('walls',condition*24+[4,7,0][part],400+part*32,208+condition*52);
+ for(var part=0;part<3;part++)show('walls',condition*32+[4,7,2][part],400+part*32,208+condition*52);
  for(var part=0;part<3;part++)show('roof',condition*12+[6,7,8][part],512+part*32,208+condition*52);
 }
 for(var i=0;i<9;i++)show('rocks',i,8+i*40,336);
