@@ -56,8 +56,10 @@ atlas descriptions below while preserving the original cardinal artwork.
 
 These are presentation changes. Player movement, resource/quest outcomes,
 dialogue sessions, station access, collision, equipment bonuses, world content
-and save formats are unchanged. The new player image is a base outfit; weapon
-layers, attack/death poses and character customisation remain future work.
+and save formats are unchanged. The later
+[20 November melee update](MELEE_RENDERING_2026-11-20.md) adds equipped weapon
+layers and player attack poses; death poses and character customisation remain
+future work.
 
 ## Reproduce
 

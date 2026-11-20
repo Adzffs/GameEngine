@@ -1,6 +1,6 @@
 # Art, animation and audio production guide
 
-**Status:** Eight world-art batches render terrain, cast, resources, services, buildings, contextual variation and gathering actions. The player has eight-way walking, chopping and mining; the shared cache covers 1,175 frames in 30 textures. [Current asset resource limits](ASSET_RESOURCE_LIMITS.md) now validate metadata, PNG streams, cache costs and pre-copy resources. The eight-batch set uses about 11.14 MiB of logical RGBA pixels and 2.79 MiB of retained alpha; driver/allocator/decoder overhead is separate. A general importer and the broader production workflow below remain proposed.\
+**Status:** Nine world-art batches render terrain, cast, resources, services, buildings, contextual variation and gathering actions. The player has eight-way walking, chopping and mining; the shared cache covers 3,063 frames in 32 textures. [Current asset resource limits](ASSET_RESOURCE_LIMITS.md) now validate metadata, PNG streams, cache costs and pre-copy resources. The nine-batch set uses about 22.09 MiB of logical RGBA pixels and 5.52 MiB of retained alpha; driver/allocator/decoder overhead is separate. A general importer and the broader production workflow below remain proposed.\
 **Reviewed:** 20 November 2026.\
 **Purpose:** Replace placeholder presentation in manageable steps while preserving gameplay and making assets easy for humans and AI to work with.
 
@@ -47,7 +47,7 @@ art is now present in this bounded pilot; the remaining cast, gear, animation
 states and visible acceptance remain open.
 
 The [woodcutting batch](../../../assets/embervale/woodcutting-pilot/README.md)
-adds six action poses in every direction and bronze/iron/steel axe overlays.
+adds eight weighted action poses in every direction and bronze/iron/steel axe overlays.
 The player faces the active tree, swings while gathering and stops cleanly on
 interruption. Contact chips are cosmetic; floating log/XP feedback consumes
 committed world rewards, including depletion. [Local checks and game captures](../06-development/WOODCUTTING_ANIMATION_2026-11-20.md).
@@ -56,7 +56,7 @@ rock strikes and bronze/iron/steel pickaxe overlays in all eight directions.
 It shares the gathering presentation and interruption rules with woodcutting.
 Rock chips mark contact; actual ore and Mining XP notices come from committed
 world rewards. [Local checks and game captures](../06-development/MINING_ANIMATION_2026-11-20.md).
-Combat, remaining cast and other action states remain open.
+The [recovered melee/equipment batch](../../../assets/embervale/melee-pilot/README.md) now supplies equipped walking and eight-way melee with matching sound edges; see [integration and verification](../06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md). Remaining cast and wider action states stay open.
 
 The current client uses SDL3 drawing code for the world and entities. `Graphics.h` defines a 32-pixel tile size and a 1280×720 window. The rendering code includes terrain colours, resource shapes, combat feedback and world labels. This does not establish an existing general-purpose sprite import pipeline. Sources: [Graphics.h](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Graphics/Graphics.h), [Graphics.cpp](https://github.com/Adzffs/GameEngine/blob/e9d32932e8f9b27e96283313cca320058792a81f/src/Graphics/Graphics.cpp).
 
@@ -167,7 +167,7 @@ Measure texture memory, asset load time, visible entity counts and frame time on
 
 ## 7. Animation contract
 
-**Owner acceptance, 20 November:** Animation is a working first pass. The owner is not satisfied with its appearance and deferred polish (ART-005). Local melee/equipment must be reconciled with Mining (REL-004). Automated correctness and research do not imply visual approval.
+**Owner acceptance, 20 November:** Animation is a working first pass. The owner is not satisfied with its appearance and deferred polish (ART-005). Melee/equipment and Mining are now reconciled and published (REL-004 complete). Automated correctness and research do not imply visual approval.
 
 Start animation work with the [animation guide](ANIMATION_GUIDE.md) and [20 November research and findings](../06-development/ANIMATION_RESEARCH_2026-11-20.md). They record directional consistency, weapon attachments, pose/timing review, interruption rules and measured local polish results. The dated research distinguishes its separate local melee/polish prototype from published integrations; check the current source before reusing its helper paths or timing assumptions.
 
@@ -183,7 +183,7 @@ The [first action-sound pass](../06-development/ACTION_AUDIO_2026-11-20.md) is i
 
 Settings provides independent effects volume and mute; F8 toggles mute and F9/F10 adjust volume. Controls apply to the current session. Six streams, cooldowns and bounded event routing prevent delayed or uncontrolled overlap. Missing/invalid optional clips or an unavailable device leave gameplay usable. Core remains SDL-free.
 
-ART-004 remains in progress: physical-device/Windows audible quality, balance/repetition in the complete starter journey and synchronization with the missing local melee implementation are open. The software/dummy checks do not establish those results. Preserve the new event and copy-owner boundaries when recovering REL-004.
+ART-004 remains in progress for physical-device audible quality and balance/repetition during the complete starter journey. Synchronization with the recovered melee implementation now passes Windows automated checks. Software/dummy checks do not establish audible quality. Preserve the committed-event, consumable contact/swing-edge and single copy-owner boundaries.
 
 Music, ambient loops, footsteps, broader warnings and persistent client preferences can be considered after this pass is heard in real play. Add controls for those categories when they exist. Keep gameplay facts visible/textual as well as audible, and record source and distribution permission for any later third-party audio.
 

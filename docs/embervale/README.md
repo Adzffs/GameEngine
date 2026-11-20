@@ -10,7 +10,7 @@
 | What is this project? | [Project overview](00-overview/PROJECT_OVERVIEW.md) |
 | What has actually been implemented? | [Current reviewed status](01-current-state/CURRENT_STATUS.md) |
 | What did the full project review find? | [Critical fixes and roadmap reconciliation](06-development/PROJECT_REVIEW_2026-11-20.md) |
-| Where did the current integration stop? | [Local work, recovery and pending starter/audio checks](06-development/INTEGRATION_HANDOFF_2026-11-20.md) |
+| Are Mining, melee, equipment and sound now combined? | [Recovered player actions and current verification](06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md) |
 | What should we do next? | [Master roadmap](02-roadmap/MASTER_ROADMAP.md) |
 | What task can I pick up? | [Backlog](02-roadmap/BACKLOG.md) |
 | How do I run the game? | [Getting started](06-development/GETTING_STARTED.md) |
@@ -119,6 +119,7 @@ Use [current status](01-current-state/CURRENT_STATUS.md) for the maintained impl
 | Document | What it contains |
 |---|---|
 | [PROJECT_REVIEW_2026-11-20.md](06-development/PROJECT_REVIEW_2026-11-20.md) | Full review, three integrity fixes, current evidence and remaining priorities |
+| [PLAYER_ACTION_INTEGRATION_2026-11-20.md](06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md) | Verified combined Windows player actions, lossless packing, current results and remaining acceptance |
 | [INTEGRATION_HANDOFF_2026-11-20.md](06-development/INTEGRATION_HANDOFF_2026-11-20.md) | Interrupted local Mining/melee integration, recovery details and pending starter/audio checks |
 | [STARTER_COMBAT_RECOVERY_2026-11-20.md](06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) | Full automated tutorial, food, death/persisted recovery, six round trips, checkpoint fixes and remaining human acceptance |
 | [WINDOWS_USABILITY_2026-11-20.md](06-development/WINDOWS_USABILITY_2026-11-20.md) | Verified Windows source, bank/queued-action fixes, portability and original integration recovery |

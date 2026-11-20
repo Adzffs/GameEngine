@@ -4,6 +4,7 @@
 #include "ForestSprites.h"
 #include "../Audio/AudioCue.h"
 #include "../Gathering/WoodcuttingPresentationState.h"
+#include "../Combat/MeleePresentationState.h"
 #include <array>
 #include <memory>
 #include <map>
@@ -65,6 +66,9 @@ public:
         woodcuttingPresentation.SynchronizeRewards(actorID, events);
         miningPresentation.SynchronizeRewards(actorID, events);
     }
+    void SynchronizeMeleeResults(int actorID, const std::vector<MeleeCombatFeedback> &events)
+    { meleePresentation.SynchronizeResults(actorID, events); }
+    std::optional<ItemType> ConsumeMeleeSwing() { return meleePresentation.ConsumeSwing(); }
     void ShowGameGuide() { gameGuideVisible = true; }
     void SetCompiledMapLabelsVisible(bool visible) { compiledMapLabelsVisible = visible; }
     // Authoring inspection only; normal play uses each building's stable profile.
@@ -526,6 +530,7 @@ private:
     void UpdateSpritePicking(const std::vector<ResourceNode> &resources,
         const std::vector<CraftingStation> &stations, const std::vector<GroundItem> &items);
     SDL_FPoint NextPlayerPosition(int playerX, int playerY) const;
+    void PreparePlayerMovement(int playerX, int playerY);
     void DrawResource(const ResourceNode &resource);
     void DrawStation(const CraftingStation &station);
     void DrawNpc(const Entity &entity);
@@ -575,10 +580,16 @@ private:
     float visualPlayerX = 0.0f;
     float visualPlayerY = 0.0f;
     bool visualPlayerInitialized = false;
+    bool visualMovementTargetInitialized = false;
+    int visualMovementTargetX = 0, visualMovementTargetY = 0;
+    float visualMovementSpeed = 1.0f / 0.6f;
     int playerFacing = 0;
     float playerWalkDistance = 0.0f;
     WoodcuttingPresentationState woodcuttingPresentation;
     GatheringPresentationState miningPresentation{SkillType::MINING};
+    MeleePresentationState meleePresentation;
+    ItemType displayedWeapon = ItemType::NONE;
+    ItemType displayedShield = ItemType::NONE;
     float cameraPixelX = 0.0f;
     float cameraPixelY = 0.0f;
     float cameraZoom = 1.0f;

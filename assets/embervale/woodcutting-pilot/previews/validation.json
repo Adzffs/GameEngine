@@ -1,5 +1,6 @@
 {
-  "bodyFrames": 48,
-  "axeFrames": 144,
-  "failedFrames": 0
+  "bodyFrames": 64,
+  "axeFrames": 192,
+  "failedFrames": 0,
+  "maxArmReach": 9.5
 }

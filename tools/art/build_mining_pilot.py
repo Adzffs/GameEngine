@@ -6,6 +6,7 @@ from pathlib import Path
 import re
 import subprocess
 import tempfile
+from animation_common import load_timing, write_timing_header, retime_gif
 
 from build_forest_pilot import REPO, blank_png, checksum, png_size, write_renderer_layout
 from build_cast_pilot import PALETTE
@@ -15,6 +16,8 @@ DIRECTIONS = ['s', 'w', 'e', 'n', 'sw', 'se', 'nw', 'ne']
 
 
 def build(editor, regenerate=False, rebuild_pickaxes=False):
+    timing = load_timing()
+    write_timing_header()
     sizes = {'player': (384, 640), 'pickaxes': (384, 1920)}
     for folder in ['source', 'textures', 'previews']:
         (ART / folder).mkdir(parents=True, exist_ok=True)
@@ -43,7 +46,7 @@ def build(editor, regenerate=False, rebuild_pickaxes=False):
                'contact': (ART / 'previews/mine-contact.png').as_posix(),
                'tiers': (ART / 'previews/pickaxe-tiers.png').as_posix()}
         helpers = Path(__file__).with_name('cast_pilot.js').read_text(encoding='utf-8').split('var player, mara, furnace;')[0]
-        action_helpers = Path(__file__).with_name('woodcutting_pilot.js').read_text(encoding='utf-8').split('function axePose(')[0]
+        action_helpers = Path(__file__).with_name('mining_geometry.js').read_text(encoding='utf-8').split('function axePose(')[0]
         script = temp / 'mining.js'
         script.write_text((helpers + '\n' + action_helpers + '\n' + Path(__file__).with_name('mining_pilot.js').read_text(encoding='utf-8'))
                           .replace('__CONFIG__', json.dumps(cfg)), encoding='utf-8')
@@ -55,6 +58,7 @@ def build(editor, regenerate=False, rebuild_pickaxes=False):
         (ART / 'previews/validation.json').write_bytes((json.dumps(report, indent=2) + '\n').encode('utf-8'))
         run(cfg['frames'][0], '--save-as', ART / 'previews/mine-cycle.gif',
             '--data', temp / 'preview.json', '--sheet', temp / 'preview.png')
+        retime_gif(ART / 'previews/mine-cycle.gif', timing['mining_ms'])
         if len(json.loads((temp / 'preview.json').read_text(encoding='utf-8'))['frames']) != 6:
             raise RuntimeError('Preview must contain all six poses')
     images = {}
@@ -83,7 +87,7 @@ def build(editor, regenerate=False, rebuild_pickaxes=False):
     manifest = {'schema': 'embervale.authoring-batch', 'version': 1, 'id': 'mining-pilot',
                 'native_tile_size': 32, 'editor': 'LibreSprite 1.1-dev', 'palette_rgb': PALETTE,
                 'status': 'Eight-way mining action poses and three pickaxe tiers',
-                'facing_order': DIRECTIONS, 'cycle_seconds': 1.2, 'poses_per_direction': 6,
+                'facing_order': DIRECTIONS, 'cycle_seconds': 1.2, 'poses_per_direction': 6, 'frame_milliseconds': timing['mining_ms'],
                 'images': images, 'assets': assets,
                 'provenance': {'creator': 'Codex-assisted LibreSprite authoring for Adam Holland',
                                'source': '../cast-pilot/source/player.ase',

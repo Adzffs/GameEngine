@@ -2884,16 +2884,31 @@ void Graphics::DrawMinimap(
     drawMarker(playerX, playerY, 110, 215, 255, 6.0f);
 }
 
+void Graphics::PreparePlayerMovement(int playerX, int playerY)
+{
+    if (visualMovementTargetInitialized && playerX == visualMovementTargetX && playerY == visualMovementTargetY)
+        return;
+    const float step = visualMovementTargetInitialized
+        ? static_cast<float>(std::max(std::abs(playerX - visualMovementTargetX), std::abs(playerY - visualMovementTargetY)))
+        : std::max(std::abs(playerX - visualPlayerX), std::abs(playerY - visualPlayerY));
+    if (step > 0.0f) visualMovementSpeed = step / 0.6f;
+    visualMovementTargetX = playerX;
+    visualMovementTargetY = playerY;
+    visualMovementTargetInitialized = true;
+}
+
 SDL_FPoint Graphics::NextPlayerPosition(int playerX, int playerY) const
 {
     if (!visualPlayerInitialized)
         return {static_cast<float>(playerX), static_cast<float>(playerY)};
-    const float smoothing = 1.0f - std::exp(-14.0f * presentationDeltaSeconds);
-    SDL_FPoint position{visualPlayerX + (playerX - visualPlayerX) * smoothing,
-        visualPlayerY + (playerY - visualPlayerY) * smoothing};
-    if (std::abs(playerX - position.x) < 0.01f) position.x = static_cast<float>(playerX);
-    if (std::abs(playerY - position.y) < 0.01f) position.y = static_cast<float>(playerY);
-    return position;
+    const float distance = std::max(std::abs(playerX - visualPlayerX), std::abs(playerY - visualPlayerY));
+    if (distance <= 0.0001f) return {static_cast<float>(playerX), static_cast<float>(playerY)};
+    const float delta = std::isfinite(presentationDeltaSeconds) ? std::max(0.0f, presentationDeltaSeconds) : 0.0f;
+    // Constant traversal over the authoritative step period keeps the feet
+    // moving at the same rate as the body; running retains its two-tile speed.
+    const float fraction = std::min(1.0f, visualMovementSpeed * delta / distance);
+    return {visualPlayerX + (playerX - visualPlayerX) * fraction,
+        visualPlayerY + (playerY - visualPlayerY) * fraction};
 }
 
 void Graphics::UpdateSpritePicking(const std::vector<ResourceNode> &resources,
@@ -3153,6 +3168,7 @@ void Graphics::DrawPlayer(
     int playerX,
     int playerY)
 {
+    PreparePlayerMovement(playerX, playerY);
     const auto position = NextPlayerPosition(playerX, playerY);
     const float dx = visualPlayerInitialized ? position.x - visualPlayerX : 0.0f;
     const float dy = visualPlayerInitialized ? position.y - visualPlayerY : 0.0f;
@@ -3175,12 +3191,26 @@ void Graphics::DrawPlayer(
                 playerFacing = dy > 0.0f ? (dx < 0.0f ? 4 : 5) : (dx < 0.0f ? 6 : 7);
         }
         playerWalkDistance = std::fmod(playerWalkDistance + travelled, ForestPilotLayout::PlayerWalkCycleTiles);
-        walkPose = static_cast<int>(playerWalkDistance * 4.0f / ForestPilotLayout::PlayerWalkCycleTiles) % 4;
+        const float phase = playerWalkDistance / ForestPilotLayout::PlayerWalkCycleTiles *
+            PlayerAnimationTiming::WalkCycleMilliseconds;
+        int boundary = 0;
+        for (int pose = 0; pose < PlayerAnimationTiming::WalkPoses; ++pose)
+        {
+            boundary += PlayerAnimationTiming::WalkMilliseconds[pose];
+            if (phase < boundary) { walkPose = pose; break; }
+        }
     }
     visualPlayerX = position.x;
     visualPlayerY = position.y;
     visualPlayerInitialized = true;
 
+    if (const auto &melee = meleePresentation.GetAnimation(); melee)
+    {
+        playerFacing = melee->facing;
+        walkPose = 0;
+        if (worldArtEnabled && forestSprites.DrawEquippedPlayer(visualPlayerX, visualPlayerY,
+            playerFacing, meleePresentation.GetPose(), melee->weapon, displayedShield, true)) return;
+    }
     const auto &chop = woodcuttingPresentation.GetAnimation();
     const auto &mine = miningPresentation.GetAnimation();
     const auto *work = chop ? &*chop : mine ? &*mine : nullptr;
@@ -3192,6 +3222,9 @@ void Graphics::DrawPlayer(
             ? forestSprites.DrawWoodcutting(visualPlayerX, visualPlayerY, playerFacing, woodcuttingPresentation.GetPose(), work->toolTier)
             : forestSprites.DrawMiningAction(visualPlayerX, visualPlayerY, playerFacing, miningPresentation.GetPose(), work->toolTier))) return;
     }
+    if (worldArtEnabled && !woodcuttingPresentation.GetAnimation() &&
+        forestSprites.DrawEquippedPlayer(visualPlayerX, visualPlayerY,
+            playerFacing, walkPose, displayedWeapon, displayedShield)) return;
     if (worldArtEnabled && forestSprites.DrawPlayer(visualPlayerX, visualPlayerY, playerFacing, walkPose)) return;
 
     SDL_FRect playerRectangle =
@@ -4172,6 +4205,7 @@ void Graphics::DrawMeleeAttackPresentations(
         Entity *attacker = GetEntityByID(entities, presentation.attackerEntityID);
         Entity *defender = GetEntityByID(entities, presentation.defenderEntityID);
         if (attacker == nullptr || defender == nullptr) continue;
+        if (worldArtEnabled && dynamic_cast<const Player *>(attacker)) continue;
 
         const float progress = presentation.totalTicks <= 0
             ? 1.0f
@@ -6648,6 +6682,7 @@ void Graphics::Render(
             0.05f);
     }
     lastPresentationTick = presentationTick;
+    PreparePlayerMovement(playerX, playerY);
     UpdateCamera(playerX, playerY, map);
     UpdateSpritePicking(resources, stations, groundItems);
     UpdateProgressionFeedback(player, inventory);
@@ -6656,6 +6691,10 @@ void Graphics::Render(
         std::hypot(nextPosition.x - playerX, nextPosition.y - playerY) <= 0.04f);
     miningPresentation.Update(player, activeAction, resources, presentationDeltaSeconds,
         std::hypot(nextPosition.x - playerX, nextPosition.y - playerY) <= 0.04f);
+    meleePresentation.Update(player, activeAction, entities, combatFeedbacks, presentationDeltaSeconds,
+        std::hypot(nextPosition.x - playerX, nextPosition.y - playerY) <= 0.04f);
+    displayedWeapon = equipment.GetEquippedItem(EquipmentSlotType::WEAPON);
+    displayedShield = equipment.GetEquippedItem(EquipmentSlotType::SHIELD);
     displayedCurrency = inventory.GetItemAmount(ItemType::COINS);
     displayedLogCount = inventory.GetItemAmount(ItemType::LOG);
     displayedOakLogCount = inventory.GetItemAmount(ItemType::OAK_LOG);

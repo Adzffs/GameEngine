@@ -87,6 +87,7 @@ set(GAMEENGINE_CORE_SOURCES
     src/Combat/MeleeAttackResolver.cpp
     src/Combat/CombatService.cpp
     src/Combat/MeleeEngagementSystem.cpp
+    src/Combat/MeleePresentationState.cpp
     src/Gathering/GatheringSystem.cpp
     src/Gathering/WoodcuttingPresentationState.cpp
     src/Gathering/GatheringPresentationState.cpp
@@ -254,6 +255,10 @@ function(configure_gameengine_world_art target)
     foreach(name grass paths water stone flora walls roof floors trees stumps rocks)
         list(APPEND variation_images "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/variation-pilot/textures/${name}.png")
     endforeach()
+    set(melee_images
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/melee-pilot/textures/player.png"
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/melee-pilot/textures/equipment.png"
+    )
     set(audio_files)
     foreach(name wood-1 wood-2 stone-1 stone-2 swing-1 heavy-swing-1
             hit-1 hit-2 block-1 miss-1 gather-1 craft-1 equip-1 inventory-1 eat-1)
@@ -302,12 +307,16 @@ function(configure_gameengine_world_art target)
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${mining_images}
                 "$<TARGET_FILE_DIR:${target}>/assets/embervale/mining-pilot/textures"
             COMMAND ${CMAKE_COMMAND} -E make_directory
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/melee-pilot/textures"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${melee_images}
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/melee-pilot/textures"
+            COMMAND ${CMAKE_COMMAND} -E make_directory
                 "$<TARGET_FILE_DIR:${target}>/assets/embervale/audio-pilot"
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${audio_files}
                 "$<TARGET_FILE_DIR:${target}>/assets/embervale/audio-pilot"
             DEPENDS ${forest_images} ${cast_images} ${environment_images}
                 ${service_images} ${building_images} ${variation_images}
-                ${woodcutting_images} ${mining_images} ${audio_files}
+                ${woodcutting_images} ${mining_images} ${melee_images} ${audio_files}
             VERBATIM
         )
         if(TARGET GameEngineWorldArtCheck)
@@ -596,6 +605,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(GatheringSystemTests tests/GatheringSystemTests.cpp)
     add_gameengine_headless_test(WoodcuttingPresentationTests tests/WoodcuttingPresentationTests.cpp)
     add_gameengine_headless_test(MiningPresentationTests tests/MiningPresentationTests.cpp)
+    add_gameengine_headless_test(MeleePresentationTests tests/MeleePresentationTests.cpp)
     add_gameengine_headless_test(QuestSystemTests tests/QuestSystemTests.cpp)
     add_gameengine_headless_test(QuestDefinitionTests tests/QuestDefinitionTests.cpp)
     add_gameengine_headless_test(QuestWorldIntegrationTests tests/QuestWorldIntegrationTests.cpp)
@@ -638,6 +648,7 @@ if(BUILD_TESTING)
         add_gameengine_graphics_test(WoodcuttingGraphicsTests tests/WoodcuttingGraphicsTests.cpp)
         add_gameengine_graphics_test(MiningGraphicsTests tests/MiningGraphicsTests.cpp)
         add_gameengine_graphics_test(WorldArtResourceGraphicsTests tests/WorldArtResourceGraphicsTests.cpp)
+        add_gameengine_graphics_test(MeleeGraphicsTests tests/MeleeGraphicsTests.cpp)
         add_gameengine_graphics_test(MonsterGraphicsTests tests/MonsterGraphicsTests.cpp)
         add_gameengine_graphics_test(MeleeClickIntegrationTests tests/MeleeClickIntegrationTests.cpp)
         add_gameengine_graphics_test(CombatFeedbackTests tests/CombatFeedbackTests.cpp)

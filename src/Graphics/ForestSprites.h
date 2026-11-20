@@ -3,6 +3,8 @@
 #include "ForestPilotLayout.h"
 #include "WorldArtVariation.h"
 #include "../Content/Assets/WorldArtResources.h"
+#include "../Inventory/ItemType.h"
+#include "../Animation/PlayerAnimationTiming.h"
 #include <array>
 #include <map>
 #include <string>
@@ -42,6 +44,8 @@ public:
     bool DrawPlayer(float tileX, float tileY, int facing, int pose) const;
     bool DrawWoodcutting(float tileX, float tileY, int facing, int pose, int axeTier) const;
     bool DrawMiningAction(float tileX, float tileY, int facing, int pose, int pickaxeTier) const;
+    bool DrawEquippedPlayer(float tileX, float tileY, int facing, int pose,
+        ItemType weapon, ItemType shield, bool attacking = false) const;
     bool DrawMara(int tileX, int tileY) const;
     bool DrawStation(StationType type, int tileX, int tileY) const;
     bool HitMara(int tileX, int tileY, float worldX, float worldY) const;
@@ -75,11 +79,15 @@ private:
     const Frame *tree = nullptr;
     const Frame *stump = nullptr;
     // South, west, east, north, southwest, southeast, northwest, northeast.
-    std::array<std::array<const Frame *, 4>, 8> player{};
-    std::array<std::array<const Frame *, 6>, 8> chopping{};
-    std::array<std::array<std::array<const Frame *, 6>, 8>, 3> choppingAxes{};
-    std::array<std::array<const Frame *, 6>, 8> miningPlayer{};
-    std::array<std::array<std::array<const Frame *, 6>, 8>, 3> miningPickaxes{};
+    std::array<std::array<const Frame *, PlayerAnimationTiming::WalkPoses>, 8> player{};
+    std::array<std::array<const Frame *, PlayerAnimationTiming::ChoppingPoses>, 8> chopping{};
+    std::array<std::array<std::array<const Frame *, PlayerAnimationTiming::ChoppingPoses>, 8>, 3> choppingAxes{};
+    // Unarmed, sword, two-handed, axe, pickaxe; eight walk and eight attack poses.
+    static constexpr int EquippedFrames = PlayerAnimationTiming::WalkPoses + PlayerAnimationTiming::MeleePoses;
+    std::array<std::array<std::array<const Frame *, EquippedFrames>, 8>, 5> meleeBodies{};
+    std::array<std::array<std::array<const Frame *, EquippedFrames>, 8>, 9> meleeEquipment{};
+    std::array<std::array<const Frame *, PlayerAnimationTiming::MiningPoses>, 8> miningPlayer{};
+    std::array<std::array<std::array<const Frame *, PlayerAnimationTiming::MiningPoses>, 8>, 3> miningPickaxes{};
     const Frame *mara = nullptr;
     const Frame *furnace = nullptr;
     const Frame *bank = nullptr, *craftingTable = nullptr;

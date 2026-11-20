@@ -4,6 +4,10 @@
 **Source baseline:** master `6d4b7058616fb1a0af33685eab19b015b9544591`\
 **Scope:** one complete woodcutting presentation slice, following the eight-way walk update.
 
+The subsequent [animation polish pass](ANIMATION_RESEARCH_2026-11-20.md) replaces
+the six-pose artwork and uniform timing below. The reward/event authority
+described here remains in use; this record preserves the first implementation.
+
 The player now faces the selected tree, raises and swings the equipped axe,
 shows contact chips and returns to standing when the action ends. Confirmed
 gathers display the actual item and Woodcutting XP above the player, including

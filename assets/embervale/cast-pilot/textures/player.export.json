@@ -4,7 +4,7 @@
       "frame": {
         "x": 0,
         "y": 0,
-        "w": 128,
+        "w": 256,
         "h": 384
       },
       "rotated": false,
@@ -12,11 +12,11 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 128,
+        "w": 256,
         "h": 384
       },
       "sourceSize": {
-        "w": 128,
+        "w": 256,
         "h": 384
       },
       "duration": 100
@@ -28,7 +28,7 @@
     "image": "player.png",
     "format": "RGBA8888",
     "size": {
-      "w": 128,
+      "w": 256,
       "h": 384
     },
     "scale": "1"

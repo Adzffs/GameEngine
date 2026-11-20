@@ -1,0 +1,83 @@
+{
+  "schema": "embervale.player-animation-timing",
+  "version": 1,
+  "walk_poses": 8,
+  "melee_poses": 8,
+  "chopping_poses": 8,
+  "walk_cycle_tiles": 1.5,
+  "walk_preview_ms": [
+    110,
+    90,
+    100,
+    150,
+    110,
+    90,
+    100,
+    150
+  ],
+  "chopping_ms": [
+    260,
+    200,
+    200,
+    80,
+    80,
+    80,
+    100,
+    200
+  ],
+  "profiles": [
+    {
+      "name": "unarmed",
+      "windup_ms": 150,
+      "recovery_ms": [
+        50,
+        40,
+        50,
+        50,
+        60
+      ]
+    },
+    {
+      "name": "sword",
+      "windup_ms": 220,
+      "recovery_ms": [
+        70,
+        40,
+        70,
+        50,
+        70
+      ]
+    },
+    {
+      "name": "heavy",
+      "windup_ms": 320,
+      "recovery_ms": [
+        90,
+        60,
+        110,
+        80,
+        100
+      ]
+    },
+    {
+      "name": "tool",
+      "windup_ms": 280,
+      "recovery_ms": [
+        80,
+        50,
+        90,
+        60,
+        80
+      ]
+    }
+  ],
+  "mining_poses": 6,
+  "mining_ms": [
+    200,
+    200,
+    200,
+    200,
+    200,
+    200
+  ]
+}

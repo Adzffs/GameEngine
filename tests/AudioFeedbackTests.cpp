@@ -49,14 +49,14 @@ int main()
         {8, 7, true, 4, 2, 9}};
     const std::vector<GatheringRewardEvent> rewards{
         {7, 2, 10, ResourceType::NORMAL_TREE, 1, 1, 0, 1, ItemType::LOG, 1, 25}};
-    const auto cues = state.ConsumeTick(7, 10, actions, rewards, combat, commands,
-        ItemType::DEVELOPER_GODSWORD);
-    test.ExpectEqual(cues.size(), std::size_t{7}, "Only local current committed facts produce cues");
+    const auto cues = state.ConsumeTick(7, 10, actions, rewards, combat, commands);
+    test.ExpectEqual(cues.size(), std::size_t{6}, "Only local current committed facts produce cues");
     test.Expect(Contains(cues, AudioCue::HIT) && Contains(cues, AudioCue::BLOCK) &&
         Contains(cues, AudioCue::MISS), "Hit, zero damage and miss differ");
     test.Expect(Contains(cues, AudioCue::CRAFT) && Contains(cues, AudioCue::GATHER),
         "Actual crafting and gathering completions confirm success");
-    test.Expect(Contains(cues, AudioCue::HEAVY_SWING), "Heavy weapon has a distinct swing");
+    test.Expect(!Contains(cues, AudioCue::HEAVY_SWING) && !Contains(cues, AudioCue::SWING),
+        "Starting an action does not sound a swing before its visible wind-up");
     test.ExpectEqual(std::count(cues.begin(), cues.end(), AudioCue::EQUIP),
         std::ptrdiff_t{1}, "Accepted command confirms only once");
     test.Expect(!Contains(cues, AudioCue::EAT), "Rejected food command never confirms");
@@ -65,8 +65,8 @@ int main()
     test.Expect(state.ConsumeTick(7, 11, {}, {}, {}, commands).empty(),
         "Confirmed and rejected command identities are retired");
     test.Expect(Contains(state.ConsumeTick(7, 12,
-        {{ActionStartedEvent{7, 8, ActionType::MELEE_ATTACK, 12, 13}}}, {}, {}, {}),
-        AudioCue::SWING), "Next catch-up tick delivers its independent event");
+        {{ActionCompletedEvent{7, 8, ActionType::RECIPE, 12}}}, {}, {}, {}),
+        AudioCue::CRAFT), "Next catch-up tick delivers its independent event");
     std::vector<ActionLifecycleEvent> many;
     for (int i = 0; i < 50; ++i)
         many.push_back({ActionCompletedEvent{7, i, ActionType::RECIPE, 13}});

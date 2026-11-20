@@ -1,6 +1,6 @@
 # Animation guide
 
-**Resource guard follow-up, 20 November:** Validate/export against [asset resource limits](ASSET_RESOURCE_LIMITS.md). The current published runtime has four walking and six chopping/Mining poses per direction. A different authored pose count requires matching runtime arrays and both validation tables, followed by complete binding/render checks; do not bypass guards to fit the unrecovered local prototype. The read-only check preserves masters and geometry; further animation polish remains owner-deferred.
+**Resource guard follow-up, 20 November:** Validate/export against [asset resource limits](ASSET_RESOURCE_LIMITS.md). The [completed player action integration](../06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md) now has eight walking/chopping poses, six Mining poses and sixteen equipped walking/attack frames per direction. Both resource validators and runtime arrays agree. A different authored pose count requires matching runtime arrays and both validation tables, followed by complete binding/render checks; retain the lossless packed output instead of loosening budgets for the original oversized editable canvases. The read-only check preserves masters and geometry; further animation polish remains owner-deferred.
 
 **Purpose:** Reusable production reference for player, equipment, gathering and future creature animation.  
 **Updated:** 20 November 2026.  
@@ -17,7 +17,7 @@ Read this before animating. The [research and measured findings](../06-developme
 5. Validate body and equipment together, then the real renderer and relevant gameplay transitions.
 6. Save the editable masters, authored timing, generated outputs and evidence together; update the owning report.
 
-The 20 November polish report describes local prototype `688221b`, following local melee baseline `16f9697`. Those are local revision identifiers, not published GitHub commit links. The GitHub source inspected for that report was `a6d7d44a934212cef052f0a4ee7e06a9ea7d91a7`, which already includes newer shared Mining/Woodcutting presentation. Publishing these documents does not integrate that separate melee/polish prototype. Inspect the current checkout before attempting its reproduction commands.
+The 20 November polish report describes local prototype `688221b`, following local melee baseline `16f9697`. Those are local revision identifiers, not published GitHub commit links. The later [player action integration](../06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md) recovers those helpers and reconciles them with current shared Mining/Woodcutting, audio and resource guards. Inspect the current checkout before reusing historical commands or counts.
 
 ## Make the action readable before adding frames
 
@@ -47,7 +47,7 @@ Treat equipment as attached to a joint. Body and overlay must consume the same w
 
 ## Keep feet, movement and equipment coherent
 
-Use the established ground pivot through every frame. The player base uses 32×48 cells; the local action prototype uses 96×96 cells with pivot `(48, 64)`, corresponding to base ground point `(16, 24)`. Check the actual manifest/binding before changing geometry.
+Use the established ground pivot through every frame. The player base uses 32×48 cells; the editable action masters use 96×96 cells with pivot `(48, 64)`, corresponding to base ground point `(16, 24)`. Melee runtime output is losslessly cropped/packed with adjusted per-frame pivots. Check the actual manifest/binding before changing geometry; editable cell size is not the packed rectangle size.
 
 Walking phase should follow visual distance travelled, stop on a neutral pose and remain consistent across render rates. Coordinate the two legs, preserve the waist, use restrained torso/head motion and counter-swing the arms. Test walking with a sword, shield and two-handed equipment as well as an empty body.
 
@@ -97,7 +97,7 @@ The current [Mining integration](../06-development/MINING_ANIMATION_2026-11-20.m
 
 Use the existing LibreSprite `.ase` masters and export scripts. Normal export must preserve manual source edits. Use explicit regeneration flags only when intentionally rebuilding the authored source.
 
-Inspect the relevant batch README before running its builder. Current entry points include [cast](../../../assets/embervale/cast-pilot/README.md), [woodcutting](../../../assets/embervale/woodcutting-pilot/README.md) and [mining](../../../assets/embervale/mining-pilot/README.md). Local polish helper files listed in the dated report need recovery/integration before their commands are available in GitHub.
+Inspect the relevant batch README before running its builder. Current entry points include [cast](../../../assets/embervale/cast-pilot/README.md), [woodcutting](../../../assets/embervale/woodcutting-pilot/README.md), [mining](../../../assets/embervale/mining-pilot/README.md) and [melee/equipment](../../../assets/embervale/melee-pilot/README.md). The recovered shared rig and timing helpers are published with the combined integration.
 
 Keep nearest-neighbour scaling, transparent backgrounds, consistent palette and pivot alignment. Repack the atlas only with the matching generated geometry and packaging changes. Never fix a source defect only in an exported PNG. Do not use blur or arbitrary interpolation to hide inconsistent native pixels.
 

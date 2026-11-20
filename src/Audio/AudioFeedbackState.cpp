@@ -20,7 +20,7 @@ std::vector<AudioCue> AudioFeedbackState::ConsumeTick(int actorEntityID, int tic
     const std::vector<ActionLifecycleEvent> &actions,
     const std::vector<GatheringRewardEvent> &rewards,
     const std::vector<MeleeCombatFeedback> &combat,
-    const std::vector<CommandProcessingResult> &commands, ItemType equippedWeapon)
+    const std::vector<CommandProcessingResult> &commands)
 {
     if (actorID != actorEntityID) Reset(actorEntityID);
     if (tick <= lastTick || actorID < 0) return {};
@@ -41,11 +41,7 @@ std::vector<AudioCue> AudioFeedbackState::ConsumeTick(int actorEntityID, int tic
     }
     for (const auto &event : actions)
     {
-        if (const auto *started = std::get_if<ActionStartedEvent>(&event.data);
-            started && started->ownerEntityID == actorID &&
-            started->actionType == ActionType::MELEE_ATTACK)
-            add(equippedWeapon == ItemType::DEVELOPER_GODSWORD
-                ? AudioCue::HEAVY_SWING : AudioCue::SWING);
+        // Swing audio follows the visible authored wind-up, not action creation.
         // World publishes RECIPE completion only after TryCreateRecipe succeeds.
         if (const auto *completed = std::get_if<ActionCompletedEvent>(&event.data);
             completed && completed->ownerEntityID == actorID &&

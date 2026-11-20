@@ -9,6 +9,8 @@ The [project review](PROJECT_REVIEW_2026-11-20.md) remains the source for comple
 
 **Subsequent follow-up:** The [action-audio and packaging report](ACTION_AUDIO_2026-11-20.md) records independently published sound/copy changes and newer Linux checks. It supersedes the planned-only audio/copy status in this historical record. The original Windows animation merge and full starter acceptance remain open.
 
+**Completed follow-up:** The [player action integration](PLAYER_ACTION_INTEGRATION_2026-11-20.md) recovers and verifies this work against current master. The interrupted status and proposed counts below are historical. REL-004 is now complete; human/audio/owner quality acceptance remains separate.
+
 ## Source and recovery position
 
 | Source | Last recorded position | Meaning |

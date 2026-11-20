@@ -1,6 +1,6 @@
 # Project work reference
 
-Before choosing the next feature, read [current status](docs/embervale/01-current-state/CURRENT_STATUS.md), the [project review](docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md) and the current roadmap/backlog. Local animation and published Mining remain separate until REL-004. ART-005 polish is owner-deferred; do not describe it as visually accepted.
+Before choosing the next feature, read [current status](docs/embervale/01-current-state/CURRENT_STATUS.md), the [project review](docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md) and the current roadmap/backlog. REL-004 is now complete; read the [player action integration](docs/embervale/06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md). Preserve its distinct eight-pose walking/chopping, six-pose Mining and sixteen equipped-frame bindings, lossless runtime packing, once-only swing edges and per-tick fatal/catch-up snapshots. Older recovery notes below are historical. ART-005 polish is owner-deferred; do not describe it as visually accepted.
 
 REL-004 was subsequently started in a separate local worktree, then the execution environment became unavailable before combined build/export results could be retrieved. Read the [integration handoff](docs/embervale/06-development/INTEGRATION_HANDOFF_2026-11-20.md) before resuming. Recover existing uncommitted work before reapplying patches; it has not been published or verified as an integrated build.
 

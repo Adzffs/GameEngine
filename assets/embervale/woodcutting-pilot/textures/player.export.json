@@ -4,20 +4,20 @@
       "frame": {
         "x": 0,
         "y": 0,
-        "w": 384,
-        "h": 640
+        "w": 768,
+        "h": 768
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 384,
-        "h": 640
+        "w": 768,
+        "h": 768
       },
       "sourceSize": {
-        "w": 384,
-        "h": 640
+        "w": 768,
+        "h": 768
       },
       "duration": 100
     }
@@ -28,8 +28,8 @@
     "image": "player.png",
     "format": "RGBA8888",
     "size": {
-      "w": 384,
-      "h": 640
+      "w": 768,
+      "h": 768
     },
     "scale": "1"
   }

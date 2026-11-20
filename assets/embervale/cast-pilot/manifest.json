@@ -51,23 +51,23 @@
     "northeast"
   ],
   "walk": {
-    "frames_per_direction": 4,
-    "cycle_distance_tiles": 1.0,
+    "frames_per_direction": 8,
+    "cycle_distance_tiles": 1.5,
     "idle_frame": 0,
     "validation": "previews/walk-validation.json",
-    "notes": "Two neutral and two alternating stride poses with a continuous pelvis; driven by visual travel distance."
+    "notes": "Eight articulated contact/passing poses, counter-swing and a retained pelvis; driven by travel distance."
   },
   "images": {
     "player": {
       "source": "source/player.ase",
       "image": "textures/player.png",
       "size": [
-        128,
+        256,
         384
       ],
       "editor_metadata": "textures/player.export.json",
-      "source_sha256": "ad124d64f500ecd0af1ab8d526f84447e2c2f888236014c90d2b67fc06df4241",
-      "image_sha256": "b871688617cf3267ea2393cd4739ddc8a8e862a66acd8af23a9ff4377a4724a7"
+      "source_sha256": "3ff6cdfee8ba2e7dce4509f025c35eaafeb462103030c2e951beef20f7ac486f",
+      "image_sha256": "9bd26e15c20984d18676a037e06eb1899bd2390123f67d18ad52fe57e0a0b02a"
     },
     "mara": {
       "source": "source/mara.ase",
@@ -174,6 +174,86 @@
       "animation_frame": 3
     },
     {
+      "id": "character.player.s.walk4",
+      "image": "player",
+      "rect": [
+        128,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.player.s.walk5",
+      "image": "player",
+      "rect": [
+        160,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.player.s.walk6",
+      "image": "player",
+      "rect": [
+        192,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 6
+    },
+    {
+      "id": "character.player.s.walk7",
+      "image": "player",
+      "rect": [
+        224,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 7
+    },
+    {
       "id": "character.player.w.idle",
       "image": "player",
       "rect": [
@@ -252,6 +332,86 @@
       ],
       "facing": 1,
       "animation_frame": 3
+    },
+    {
+      "id": "character.player.w.walk4",
+      "image": "player",
+      "rect": [
+        128,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.player.w.walk5",
+      "image": "player",
+      "rect": [
+        160,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.player.w.walk6",
+      "image": "player",
+      "rect": [
+        192,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 6
+    },
+    {
+      "id": "character.player.w.walk7",
+      "image": "player",
+      "rect": [
+        224,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 7
     },
     {
       "id": "character.player.e.idle",
@@ -334,6 +494,86 @@
       "animation_frame": 3
     },
     {
+      "id": "character.player.e.walk4",
+      "image": "player",
+      "rect": [
+        128,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.player.e.walk5",
+      "image": "player",
+      "rect": [
+        160,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.player.e.walk6",
+      "image": "player",
+      "rect": [
+        192,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 6
+    },
+    {
+      "id": "character.player.e.walk7",
+      "image": "player",
+      "rect": [
+        224,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 7
+    },
+    {
       "id": "character.player.n.idle",
       "image": "player",
       "rect": [
@@ -412,6 +652,86 @@
       ],
       "facing": 3,
       "animation_frame": 3
+    },
+    {
+      "id": "character.player.n.walk4",
+      "image": "player",
+      "rect": [
+        128,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.player.n.walk5",
+      "image": "player",
+      "rect": [
+        160,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.player.n.walk6",
+      "image": "player",
+      "rect": [
+        192,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 6
+    },
+    {
+      "id": "character.player.n.walk7",
+      "image": "player",
+      "rect": [
+        224,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 7
     },
     {
       "id": "character.player.sw.idle",
@@ -494,6 +814,86 @@
       "animation_frame": 3
     },
     {
+      "id": "character.player.sw.walk4",
+      "image": "player",
+      "rect": [
+        128,
+        192,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.player.sw.walk5",
+      "image": "player",
+      "rect": [
+        160,
+        192,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.player.sw.walk6",
+      "image": "player",
+      "rect": [
+        192,
+        192,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 6
+    },
+    {
+      "id": "character.player.sw.walk7",
+      "image": "player",
+      "rect": [
+        224,
+        192,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 7
+    },
+    {
       "id": "character.player.se.idle",
       "image": "player",
       "rect": [
@@ -572,6 +972,86 @@
       ],
       "facing": 5,
       "animation_frame": 3
+    },
+    {
+      "id": "character.player.se.walk4",
+      "image": "player",
+      "rect": [
+        128,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.player.se.walk5",
+      "image": "player",
+      "rect": [
+        160,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.player.se.walk6",
+      "image": "player",
+      "rect": [
+        192,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 6
+    },
+    {
+      "id": "character.player.se.walk7",
+      "image": "player",
+      "rect": [
+        224,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 7
     },
     {
       "id": "character.player.nw.idle",
@@ -654,6 +1134,86 @@
       "animation_frame": 3
     },
     {
+      "id": "character.player.nw.walk4",
+      "image": "player",
+      "rect": [
+        128,
+        288,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.player.nw.walk5",
+      "image": "player",
+      "rect": [
+        160,
+        288,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.player.nw.walk6",
+      "image": "player",
+      "rect": [
+        192,
+        288,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 6
+    },
+    {
+      "id": "character.player.nw.walk7",
+      "image": "player",
+      "rect": [
+        224,
+        288,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 7
+    },
+    {
       "id": "character.player.ne.idle",
       "image": "player",
       "rect": [
@@ -734,6 +1294,86 @@
       "animation_frame": 3
     },
     {
+      "id": "character.player.ne.walk4",
+      "image": "player",
+      "rect": [
+        128,
+        336,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.player.ne.walk5",
+      "image": "player",
+      "rect": [
+        160,
+        336,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.player.ne.walk6",
+      "image": "player",
+      "rect": [
+        192,
+        336,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 6
+    },
+    {
+      "id": "character.player.ne.walk7",
+      "image": "player",
+      "rect": [
+        224,
+        336,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 7
+    },
+    {
       "id": "character.mara.idle",
       "image": "mara",
       "rect": [
@@ -784,15 +1424,15 @@
     },
     "walk-cycle.gif": {
       "path": "previews/walk-cycle.gif",
-      "sha256": "b6614f53a866ed158e95f9114c85dda4e77b9e027ed9d8443c8851896dd07290"
+      "sha256": "53b8054aa2217872810b70bf748875fed4f1c5e17e4a2944050780291dfa5003"
     },
     "walk-inspection.gif": {
       "path": "previews/walk-inspection.gif",
-      "sha256": "d7adff85b5ff55972a06652297980f75d7881e4255b8ff44a29551da3929f516"
+      "sha256": "de9e34e701f678e9f3af7d001a3f0f1f89f95395322d9fe3d3677a28be9c1289"
     },
     "walk-contact-sheet.png": {
       "path": "previews/walk-contact-sheet.png",
-      "sha256": "9ebcf5dc213cccbe0f35257c6adf587f9472b66cc5976fe9575e941953089e08"
+      "sha256": "f2da3b16e173b8edcd8fdfb0b076d3df3fd321307ef972ea9c171178e22e78c9"
     }
   }
 }

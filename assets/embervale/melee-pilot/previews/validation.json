@@ -1,0 +1,17 @@
+{
+  "bodyFrames": 640,
+  "equipmentFrames": 1152,
+  "clippedFrames": 0,
+  "emptyFrames": 0,
+  "maxArmReach": 9.5,
+  "packed_images": {
+    "player": [
+      1024,
+      462
+    ],
+    "equipment": [
+      1024,
+      949
+    ]
+  }
+}

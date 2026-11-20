@@ -21,8 +21,7 @@ public:
         const std::vector<ActionLifecycleEvent> &actions,
         const std::vector<GatheringRewardEvent> &rewards,
         const std::vector<MeleeCombatFeedback> &combat,
-        const std::vector<CommandProcessingResult> &commands,
-        ItemType equippedWeapon = ItemType::NONE);
+        const std::vector<CommandProcessingResult> &commands);
 
 private:
     int actorID = -1;
