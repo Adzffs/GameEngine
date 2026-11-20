@@ -1,7 +1,7 @@
 # Melee attack animations and visible equipment
 
-**Date:** 20 November 2026  
-**Source baseline:** `6bde02b` (`fix/axe-blade-orientation`)  
+**Date:** 20 November 2026\
+**Source baseline:** `6bde02b` (`fix/axe-blade-orientation`)\
 **Scope:** local-player combat presentation and equipped standing/walking.
 
 The subsequent [research and polish pass](ANIMATION_RESEARCH_2026-11-20.md)

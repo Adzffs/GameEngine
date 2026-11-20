@@ -9,7 +9,9 @@ and melee swings. Its editable LibreSprite masters export through
 | `source/player.ase` | 1536 x 3840 | Unarmed, sword, two-handed, axe and pickaxe bodies; eight directions; eight standing/walk and eight attack poses |
 | `source/equipment.ase` | 1536 x 6912 | Bronze sword, developer godsword, three axe tiers, three pickaxe tiers and wooden shield; matching directions/poses |
 
-Every cell is 96 x 96 native pixels with pivot `(48,64)` and ground point
+The runtime PNGs are losslessly packed to 1024x462 (body) and 1024x949 (equipment), within the unchanged image/cache budgets. Generated per-frame rectangles and adjusted pivots preserve all visible pixels and world anchors. Export reopens the PNGs and compares every original cell. Editable master dimensions above stay unchanged.
+
+Every editable cell is 96 x 96 native pixels with pivot `(48,64)` and ground point
 `(16,24)` in a 32-pixel world tile. The manifest records frame rectangles,
 provenance and checksums. The current manifest
 contains 640 body cells and 1,152 equipment cells. The shared `player_rig.js`
@@ -25,7 +27,7 @@ python tools/art/build_melee_pilot.py --editor "C:\Program Files\Asprite\libresp
 ```
 
 Validation rejects incorrect dimensions, nonbinary alpha, incomplete upper/lower
-bodies, empty cells and clipped artwork. Default export reproduces runtime PNGs,
+bodies, empty cells and clipped artwork. The [combined integration record](../../../docs/embervale/06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md) owns current verification; owner polish remains deferred. Default export reproduces runtime PNGs,
 metadata, the manifest, the renderer binding and previews:
 
 - `previews/melee-cycle.gif`: eight attack poses across all eight directions,

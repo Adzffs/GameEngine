@@ -14,13 +14,13 @@ Completion refers to the stated bounded acceptance, with evidence and publicatio
 | Work | Current bounded result | Remaining acceptance |
 |---|---|---|
 | Player integrity | ENG-003/004 and GAME-009 fixed and regression verified | Windows regression verification and Linux Return/Exit/retry are recorded; broader manual acceptance remains |
-| Current verification | 120/120 Linux SDL, 98/98 standalone headless and 79/79 Python units per interpreter; resource/packaging/publication/recovery/bridge suites included | Other current platforms and human playthrough are separate |
-| Local animation line | Same safety fixes pass 101/101 on local 196a279 | REL-004 combines/publishes Mining and melee; ART-005 quality is deferred |
+| Current verification | 124/124 Windows SDL, 99/99 standalone headless and 81 Python tests (79 pass/two skips); resource/packaging/publication/recovery/bridge included | Other current platforms and human playthrough are separate |
+| Player actions | REL-004 complete: original melee/equipment plus current Mining/audio are combined | ART-005 quality remains deferred; human/device acceptance stays open |
 | Ownership/architecture/export | Published bounded foundation and deterministic export | General regions/catalogue authoring remain separate |
 | Runtime content | Schema-1-4 input, geography/position checks and selected fixed publication manifests | General region/asset packages and content/save migrations |
 | Studio | Shared edits/history, guarded drafts, recovery, overlays, version publishing and selected-version play/rollback | In-place replacement, broader accessibility/platform acceptance and tools |
-| Art | Eight published batches, 1,175 frames/30 textures, walking/chopping/mining, validated frames/PNG streams and resource budgets | Remaining cast/tiers/buildings, general importer, audible/device review and visible acceptance |
-| Action audio and packaging | 15 original effects, controls, one copy owner; included in the current 120/98 Linux verification | Audible/Windows/full starter and original animation integration acceptance |
+| Art | Nine published batches, 3,063 frames/32 textures, walking/chopping/mining/melee and visible equipment, validated frames/PNG streams and resource budgets | Remaining cast/tiers/buildings, general importer, audible/device review and visible acceptance |
+| Action audio and packaging | 15 original effects, synchronized action edges, controls and one copy owner; current Windows suites pass | Physical-device audible quality, balance and full starter acceptance |
 | Player autosave | GAME-010 complete: 60-second saves, 10-second retries, crafting/death and killed-process reload checks | Windows/human notice review and stronger durability remain separate |
 | Starter progression | Fresh tutorial plus combat, food, death, persisted recovery and six round trips pass; skipped checkpoints fixed | Uncoached navigation, combat/food/death/recovery and full quest-chain acceptance |
 | Starter measurements | Shield 245, sword 376, prepared 454, first kill 677 and actual tutorial return 741 ticks; death/recovery exercise 2370 | Human elapsed time and the 10-15 minute target remain unmeasured |
@@ -28,12 +28,12 @@ Completion refers to the stated bounded acceptance, with evidence and publicatio
 
 ## Next work
 
-1. REL-004: publish the reconciled Mining/melee/equipment build and sources/previews.
+1. REL-004 is complete; use the verified combined build for the remaining starter and audio acceptance.
 2. GAME-005 / GAME-004: the automated full tutorial/recovery route passes; finish visible/uncoached observation and tuning.
 3. ART-004: review the implemented first sound pass on the recovered candidate and actual device.
-4. Continue QA-003 text readability, keyboard and manual acceptance after the [verified Windows usability fixes](../06-development/WINDOWS_USABILITY_2026-11-20.md). REL-004 source is recovered/checkpointed; its integration and deferred ART-005 remain separate.
+4. Continue QA-003 text readability, keyboard and manual acceptance after the [verified Windows usability fixes](../06-development/WINDOWS_USABILITY_2026-11-20.md). REL-004 is complete; deferred ART-005 remains separate.
 
-The original Windows integration worktree remains unavailable, so REL-004 stays **in progress**. Independent work on the restored published source has delivered the first sound pass and fixed runtime asset copying; [results and limits](../06-development/ACTION_AUDIO_2026-11-20.md). ART-004 is **in progress** with audible/device and integration acceptance open. GAME-005 is **in progress** with the [automated starter continuation](../06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) passing; human/visible acceptance remains open. The [original recovery handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md) still applies.
+REL-004 is **complete**: recovered melee/equipment, eight-pose walking/chopping and the original six-pose Mining now share the current verified Windows build and audio/editor code. The [player action integration](../06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md) records 124/124 SDL, 99/99 standalone headless and 81 Python tests (79 passed/two unavailable-symlink skips), 32 preserved masters and 47 matching packaged files. ART-004 remains **in progress** for physical-device sound quality and balance; GAME-005 remains **in progress** for visible/uncoached observation. ART-005 remains owner-deferred. The original recovery handoff is historical and superseded for integration status.
 
 GAME-010 is now **complete** for bounded periodic player persistence: 60-second checkpoints, 10-second retries, crafting/death safety, temporary-save isolation and killed-process reload. See the [autosave policy and verification](../06-development/PLAYER_AUTOSAVE_2026-11-20.md). The autosave follow-up passed 112/112 SDL, 93/93 standalone headless and 42/42 Python units for its recorded source; the newer editor recovery results follow. Current Windows/human acceptance stays open.
 
