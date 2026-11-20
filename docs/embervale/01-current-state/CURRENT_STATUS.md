@@ -42,6 +42,10 @@ The [publication verification](../06-development/WORLD_PUBLICATION_2026-11-20.md
 
 The [asset validation results](../06-development/ASSET_RESOURCE_VALIDATION_2026-11-20.md) completes bounded STUDIO-063: shared numeric budgets, frame/binding validation, CRC and bounded PNG inflation before SDL decode, owned decoder bytes, cache accounting and read-only pre-copy validation. The current art requires 11,681,792 logical RGBA bytes plus 2,920,448 transparency bytes. Private corrupt-source, preserved-output, no-relink repair and spaced multi-config Release checks pass. Art/animation sources and generated geometry are unchanged. See [asset resource limits](../05-game/ASSET_RESOURCE_LIMITS.md); core builds now require zlib development headers/library.
 
+## Usability candidate awaiting verification
+
+QA-003 is now **in progress**. The [focused review and recovery handoff](../06-development/USABILITY_REVIEW_2026-11-20.md) records Escape/modal, bank typing, context targeting, dialogue acknowledgement/keyboard and save-error readability fixes. Assisted native Linux Return/Exit/retry and bank-warning observations passed before the workspace failed. The eight code/test changes are preserved on a GitHub draft branch and **are not merged into master**. Earlier 121/121 candidate tests and later focused checks do not establish a newly tested reconstructed commit. Rebuild, verify and merge that candidate before describing these controls as implemented on master. Wider keyboard access, UI scaling, ordinary desktop/Windows focus and uncoached full starter acceptance stay open.
+
 ## Executed checks
 
 | Source/configuration | Executed result | Scope |
@@ -65,6 +69,6 @@ The unchanged preparation replay equips the shield at tick 245, equips the sword
 2. **REL-004:** combine the published Mining work and local melee/equipment first pass; publish the matching sources, outputs and previews.
 3. **GAME-005 / GAME-004:** automated combat, food, death/recovery and save/reload now pass; finish the visible/uncoached route, input/confusion, balance and real elapsed-time acceptance.
 4. **ART-004:** the bounded sound pass is implemented against published source; finish original animation synchronization and audible/device/Windows acceptance after recovery.
-5. Continue QA-003 usability and broader REL-002 distribution/installation work. GAME-010, bounded STUDIO-025 recovery, STUDIO-026 fixed publishing and STUDIO-063 current-art resource validation are complete for their stated scopes. Animation quality remains ART-005, deferred by the owner.
+5. Resume the recovered QA-003 candidate's final verification and merge, then wider usability and REL-002 distribution/installation work. GAME-010, bounded STUDIO-025 recovery, STUDIO-026 fixed publishing and STUDIO-063 current-art resource validation are complete for their stated scopes. Animation quality remains ART-005, deferred by the owner.
 
 R0-R4 remain partial milestones. Optional editor expansion, elevation, multiple regions, companions, bosses and multiplayer do not need to be completed before the existing flat starter experience improves. Use the [roadmap](../02-roadmap/MASTER_ROADMAP.md) and synchronized [backlog](../02-roadmap/BACKLOG.md) for exact tasks and dependencies.
