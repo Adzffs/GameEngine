@@ -20,7 +20,7 @@ reconciliation supersedes their unexecuted/stacked verification limitations.
 
 | Work | Current bounded result | Remaining acceptance |
 |---|---|---|
-| Art pilots (ART-001/002) | Seven editable batches cover terrain, cast/services, resources, modular buildings, contextual variation and eight-way walking/chopping; 983 frames in 28 PNGs; builds, source-preserving exports and focused renderer/state checks passed | Further building assemblies, remaining cast/tiers, mining/combat action art, general importing and full visible starter acceptance remain open; [current record](../06-development/WOODCUTTING_ANIMATION_2026-11-20.md) |
+| Art pilots (ART-001/002) | Eight editable batches cover terrain, cast/services, resources, modular buildings, contextual variation and eight-way walking/chopping/mining; 1,175 frames in 30 PNGs; builds, source-preserving exports and focused renderer/state checks passed | Further building assemblies, remaining cast/tiers, combat action art, general importing and full visible starter acceptance remain open; [current record](../06-development/MINING_ANIMATION_2026-11-20.md) |
 | Baseline (ENG-002) | Windows headless/client builds and complete regression sets executed | Other platforms and fresh-player measurements remain separate |
 | Commands (STUDIO-020–024) | Shared validated move/paint/place/remove, history, complete snapshot inspection and guarded create-only drafts | Structured diagnostics, persistent history and in-place publication |
 | Editor (STUDIO-030) | Open/select/inspect/move/paint, zoom, undo/redo, save/reopen and play integrated | Broader editor/platform acceptance |

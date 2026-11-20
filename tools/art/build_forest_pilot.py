@@ -45,7 +45,7 @@ def png_size(path):
 def write_renderer_layout(manifest):
     """Compile this small authoring record into a checked, dependency-free binding."""
     manifests = [manifest]
-    for name in ['cast-pilot', 'environment-pilot', 'service-pilot', 'building-pilot', 'variation-pilot', 'woodcutting-pilot']:
+    for name in ['cast-pilot', 'environment-pilot', 'service-pilot', 'building-pilot', 'variation-pilot', 'woodcutting-pilot', 'mining-pilot']:
         batch_path = REPO / f'assets/embervale/{name}/manifest.json'
         if batch_path.exists():
             manifests.append(json.loads(batch_path.read_text(encoding='utf-8')))

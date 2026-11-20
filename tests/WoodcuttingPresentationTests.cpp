@@ -105,7 +105,7 @@ int main()
             test.Expect(state.GetAnimation().has_value(), "Valid active tree gathering animates");
             if (!state.GetAnimation()) continue;
             test.ExpectEqual(state.GetAnimation()->facing,facing,"Chopping faces its actual target in every direction");
-            test.ExpectEqual(state.GetAnimation()->axeTier,tier,"Presentation uses the equipped axe tier");
+            test.ExpectEqual(state.GetAnimation()->toolTier,tier,"Presentation uses the equipped axe tier");
             for (int frame = 0; frame < 7; ++frame) state.Update(player,&action,resources,0.1f);
             test.ExpectEqual(state.GetPose(),3,"Wind-up reaches the contact pose");
             const float elapsed = state.GetAnimation()->elapsedSeconds;

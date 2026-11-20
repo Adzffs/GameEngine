@@ -4,6 +4,15 @@ This file records reviewable project changes going forward. Historical work is d
 
 ## Unreleased
 
+### Mining animation and ore feedback
+
+- Add eight-way pickaxe swings, bronze/iron/steel visuals and rock-chip contact effects.
+- Face the active rock and show committed ore/Mining XP rewards, including depletion.
+- Share gathering presentation and interruption handling with woodcutting.
+- Add editable mining art, exports, preview replay and focused state/render checks.
+
+See the [mining record](docs/embervale/06-development/MINING_ANIMATION_2026-11-20.md).
+
 ### Woodcutting animation and reward feedback
 
 - Add eight-way chopping poses, bronze/iron/steel axe visuals and contact chips.

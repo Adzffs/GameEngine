@@ -1,0 +1,4086 @@
+{
+  "schema": "embervale.authoring-batch",
+  "version": 1,
+  "id": "mining-pilot",
+  "native_tile_size": 32,
+  "editor": "LibreSprite 1.1-dev",
+  "palette_rgb": [
+    "222b2b",
+    "30211d",
+    "563727",
+    "7b4e2e",
+    "b27c48",
+    "935b3d",
+    "be8054",
+    "d99d69",
+    "edbd89",
+    "a69a7e",
+    "dbc79a",
+    "efe0b7",
+    "1f3345",
+    "294b62",
+    "37617d",
+    "5c8395",
+    "8da39c",
+    "20293e",
+    "293b55",
+    "415778",
+    "84622c",
+    "c8a653",
+    "e3c073",
+    "282d2c",
+    "404542",
+    "555d59",
+    "748057",
+    "aaad8b",
+    "9e3f21",
+    "d76f27",
+    "e6943b",
+    "f5c05b",
+    "ffe08a"
+  ],
+  "status": "Eight-way mining action poses and three pickaxe tiers",
+  "facing_order": [
+    "s",
+    "w",
+    "e",
+    "n",
+    "sw",
+    "se",
+    "nw",
+    "ne"
+  ],
+  "cycle_seconds": 1.2,
+  "poses_per_direction": 6,
+  "images": {
+    "player": {
+      "source": "source/player.ase",
+      "image": "textures/player.png",
+      "size": [
+        384,
+        640
+      ],
+      "editor_metadata": "textures/player.export.json",
+      "source_sha256": "bb313253f9971c250f5ee61d4452bb1604013c9447e9c8f33436952be9569548",
+      "image_sha256": "48dc7c52b3783779e4ef6d76ee39bf7b4fad96da4f078ebe46b7da01a54d5df4"
+    },
+    "pickaxes": {
+      "source": "source/pickaxes.ase",
+      "image": "textures/pickaxes.png",
+      "size": [
+        384,
+        1920
+      ],
+      "editor_metadata": "textures/pickaxes.export.json",
+      "source_sha256": "48ad6a6e9f42ddae92956c849d68d697eb4abd4a349df3eb1c8c898f21aea1e0",
+      "image_sha256": "9b182c066f45a53a3ed00f7cb68cf18500e5b46504d2e22d5bb4a5bcc8d66bd5"
+    }
+  },
+  "assets": [
+    {
+      "id": "character.mining.s.0",
+      "image": "player",
+      "rect": [
+        0,
+        0,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.s.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        0,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.s.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        640,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.s.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        1280,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.mining.s.1",
+      "image": "player",
+      "rect": [
+        64,
+        0,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.s.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        0,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.s.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        640,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.s.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        1280,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.mining.s.2",
+      "image": "player",
+      "rect": [
+        128,
+        0,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.s.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        0,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.s.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        640,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.s.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        1280,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.mining.s.3",
+      "image": "player",
+      "rect": [
+        192,
+        0,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.s.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        0,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.s.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        640,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.s.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        1280,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.mining.s.4",
+      "image": "player",
+      "rect": [
+        256,
+        0,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.s.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        0,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.s.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        640,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.s.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        1280,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.mining.s.5",
+      "image": "player",
+      "rect": [
+        320,
+        0,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.s.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        0,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.s.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        640,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.s.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        1280,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.mining.w.0",
+      "image": "player",
+      "rect": [
+        0,
+        80,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.w.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        80,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.w.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        720,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.w.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        1360,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.mining.w.1",
+      "image": "player",
+      "rect": [
+        64,
+        80,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.w.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        80,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.w.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        720,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.w.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        1360,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.mining.w.2",
+      "image": "player",
+      "rect": [
+        128,
+        80,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.w.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        80,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.w.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        720,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.w.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        1360,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.mining.w.3",
+      "image": "player",
+      "rect": [
+        192,
+        80,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.w.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        80,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.w.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        720,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.w.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        1360,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.mining.w.4",
+      "image": "player",
+      "rect": [
+        256,
+        80,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.w.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        80,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.w.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        720,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.w.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        1360,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.mining.w.5",
+      "image": "player",
+      "rect": [
+        320,
+        80,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.w.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        80,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.w.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        720,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.w.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        1360,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.mining.e.0",
+      "image": "player",
+      "rect": [
+        0,
+        160,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.e.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        160,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.e.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        800,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.e.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        1440,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.mining.e.1",
+      "image": "player",
+      "rect": [
+        64,
+        160,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.e.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        160,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.e.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        800,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.e.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        1440,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.mining.e.2",
+      "image": "player",
+      "rect": [
+        128,
+        160,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.e.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        160,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.e.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        800,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.e.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        1440,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.mining.e.3",
+      "image": "player",
+      "rect": [
+        192,
+        160,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.e.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        160,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.e.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        800,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.e.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        1440,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.mining.e.4",
+      "image": "player",
+      "rect": [
+        256,
+        160,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.e.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        160,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.e.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        800,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.e.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        1440,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.mining.e.5",
+      "image": "player",
+      "rect": [
+        320,
+        160,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.e.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        160,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.e.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        800,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.e.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        1440,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.mining.n.0",
+      "image": "player",
+      "rect": [
+        0,
+        240,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.n.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        240,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.n.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        880,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.n.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        1520,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.mining.n.1",
+      "image": "player",
+      "rect": [
+        64,
+        240,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.n.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        240,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.n.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        880,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.n.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        1520,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.mining.n.2",
+      "image": "player",
+      "rect": [
+        128,
+        240,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.n.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        240,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.n.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        880,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.n.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        1520,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.mining.n.3",
+      "image": "player",
+      "rect": [
+        192,
+        240,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.n.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        240,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.n.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        880,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.n.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        1520,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.mining.n.4",
+      "image": "player",
+      "rect": [
+        256,
+        240,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.n.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        240,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.n.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        880,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.n.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        1520,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.mining.n.5",
+      "image": "player",
+      "rect": [
+        320,
+        240,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.n.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        240,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.n.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        880,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.n.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        1520,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.mining.sw.0",
+      "image": "player",
+      "rect": [
+        0,
+        320,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.sw.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        320,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.sw.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        960,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.sw.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        1600,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.mining.sw.1",
+      "image": "player",
+      "rect": [
+        64,
+        320,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.sw.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        320,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.sw.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        960,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.sw.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        1600,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.mining.sw.2",
+      "image": "player",
+      "rect": [
+        128,
+        320,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.sw.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        320,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.sw.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        960,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.sw.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        1600,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.mining.sw.3",
+      "image": "player",
+      "rect": [
+        192,
+        320,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.sw.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        320,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.sw.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        960,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.sw.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        1600,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.mining.sw.4",
+      "image": "player",
+      "rect": [
+        256,
+        320,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.sw.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        320,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.sw.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        960,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.sw.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        1600,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.mining.sw.5",
+      "image": "player",
+      "rect": [
+        320,
+        320,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.sw.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        320,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.sw.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        960,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.sw.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        1600,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.mining.se.0",
+      "image": "player",
+      "rect": [
+        0,
+        400,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.se.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        400,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.se.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        1040,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.se.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        1680,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.mining.se.1",
+      "image": "player",
+      "rect": [
+        64,
+        400,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.se.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        400,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.se.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        1040,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.se.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        1680,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.mining.se.2",
+      "image": "player",
+      "rect": [
+        128,
+        400,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.se.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        400,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.se.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        1040,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.se.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        1680,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.mining.se.3",
+      "image": "player",
+      "rect": [
+        192,
+        400,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.se.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        400,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.se.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        1040,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.se.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        1680,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.mining.se.4",
+      "image": "player",
+      "rect": [
+        256,
+        400,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.se.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        400,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.se.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        1040,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.se.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        1680,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.mining.se.5",
+      "image": "player",
+      "rect": [
+        320,
+        400,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.se.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        400,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.se.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        1040,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.se.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        1680,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.mining.nw.0",
+      "image": "player",
+      "rect": [
+        0,
+        480,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.nw.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        480,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.nw.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        1120,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.nw.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        1760,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.mining.nw.1",
+      "image": "player",
+      "rect": [
+        64,
+        480,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.nw.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        480,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.nw.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        1120,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.nw.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        1760,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.mining.nw.2",
+      "image": "player",
+      "rect": [
+        128,
+        480,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.nw.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        480,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.nw.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        1120,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.nw.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        1760,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.mining.nw.3",
+      "image": "player",
+      "rect": [
+        192,
+        480,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.nw.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        480,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.nw.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        1120,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.nw.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        1760,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.mining.nw.4",
+      "image": "player",
+      "rect": [
+        256,
+        480,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.nw.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        480,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.nw.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        1120,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.nw.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        1760,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.mining.nw.5",
+      "image": "player",
+      "rect": [
+        320,
+        480,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.nw.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        480,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.nw.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        1120,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.nw.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        1760,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.mining.ne.0",
+      "image": "player",
+      "rect": [
+        0,
+        560,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.ne.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        560,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.ne.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        1200,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 0
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.ne.0",
+      "image": "pickaxes",
+      "rect": [
+        0,
+        1840,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.mining.ne.1",
+      "image": "player",
+      "rect": [
+        64,
+        560,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.ne.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        560,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.ne.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        1200,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 1
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.ne.1",
+      "image": "pickaxes",
+      "rect": [
+        64,
+        1840,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.mining.ne.2",
+      "image": "player",
+      "rect": [
+        128,
+        560,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.ne.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        560,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.ne.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        1200,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 2
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.ne.2",
+      "image": "pickaxes",
+      "rect": [
+        128,
+        1840,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.mining.ne.3",
+      "image": "player",
+      "rect": [
+        192,
+        560,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.ne.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        560,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.ne.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        1200,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 3
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.ne.3",
+      "image": "pickaxes",
+      "rect": [
+        192,
+        1840,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.mining.ne.4",
+      "image": "player",
+      "rect": [
+        256,
+        560,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.ne.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        560,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.ne.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        1200,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 4
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.ne.4",
+      "image": "pickaxes",
+      "rect": [
+        256,
+        1840,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.mining.ne.5",
+      "image": "player",
+      "rect": [
+        320,
+        560,
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.bronze.mining.ne.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        560,
+        64,
+        80
+      ],
+      "variant": 0,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.iron.mining.ne.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        1200,
+        64,
+        80
+      ],
+      "variant": 1,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 5
+    },
+    {
+      "id": "tool.pickaxe.steel.mining.ne.5",
+      "image": "pickaxes",
+      "rect": [
+        320,
+        1840,
+        64,
+        80
+      ],
+      "variant": 2,
+      "pivot": [
+        32,
+        52
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 5
+    }
+  ],
+  "provenance": {
+    "creator": "Codex-assisted LibreSprite authoring for Adam Holland",
+    "source": "../cast-pilot/source/player.ase",
+    "source_sha256": "ad124d64f500ecd0af1ab8d526f84447e2c2f888236014c90d2b67fc06df4241",
+    "notes": "Original player outfit retained; action poses, arms and pickaxes authored in LibreSprite JavaScript.",
+    "licence": "No separate asset licence grant declared; repository distribution policy applies."
+  },
+  "previews": {
+    "mine-cycle.gif": {
+      "path": "previews/mine-cycle.gif",
+      "sha256": "d64273bdcf6f421edd79f8405e89b903ba5d7a2d850a8471c2348feabb79508c"
+    },
+    "mine-contact.png": {
+      "path": "previews/mine-contact.png",
+      "sha256": "7b505c456955ce494d625587a6793ae9f0e4d98b54a27824ac315184ec3b5bb6"
+    },
+    "pickaxe-tiers.png": {
+      "path": "previews/pickaxe-tiers.png",
+      "sha256": "9c4c53ec363ab70b12234e3c81ed903fbbaeaee45ded252080803e78af12db21"
+    }
+  }
+}
