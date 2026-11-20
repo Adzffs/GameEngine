@@ -652,7 +652,9 @@ void Graphics::HandleStationMenuClick(
     bool shiftHeld,
     bool doubleClick)
 {
-    if (!stationMenuOpen || recipeCommandInFlight || craftingInteractionInFlight)
+    if (!stationMenuOpen || recipeCommandInFlight || craftingInteractionInFlight ||
+        recipeRequestPending || craftingGridRequestPending ||
+        (craftingSessionSnapshot.has_value() && pendingCraftingInteraction))
     {
         return;
     }
@@ -727,6 +729,7 @@ void Graphics::HandleStationMenuClick(
     if (IsPointInsideRectangle(
             mouseX, mouseY, layout.closeButton))
     {
+        if (pendingCraftingInteraction) return;
         DismissStationMenu(true);
         return;
     }
@@ -1903,7 +1906,7 @@ void Graphics::ProcessEvents(bool &running, const World *world)
                 else if (stationMenuOpen)
                 {
                     if (!recipeCommandInFlight && !craftingInteractionInFlight &&
-                        !pendingCraftingInteraction && !recipeRequestPending &&
+                        !pendingCraftingInteraction && !pendingBankCommand && !recipeRequestPending &&
                         !craftingGridRequestPending)
                         DismissStationMenu(true);
                 }

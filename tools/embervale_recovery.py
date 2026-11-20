@@ -251,7 +251,9 @@ class RecoveryStore:
                     raise RecoveryError("Unsupported recovery format or session identity")
                 if type(payload["sequence"]) is not int or payload["sequence"] != int(path.name[:6]):
                     raise RecoveryError("Recovery generation identity mismatch")
-                if payload["source"] != str(source.resolve()) or source_key(source) != folder.name[:64]:
+                if (not isinstance(payload["source"], str) or
+                        Path(payload["source"]) != source.resolve() or
+                        source_key(source) != folder.name[:64]):
                     raise RecoveryError("Recovery source identity mismatch")
                 for name in ("base_sha256", "snapshot_sha256"):
                     if not isinstance(payload[name], str) or not DIGEST.fullmatch(payload[name]):

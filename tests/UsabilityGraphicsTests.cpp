@@ -16,6 +16,9 @@ struct GraphicsTestAccess
     static auto Window(const Graphics &g) { return g.window; }
     static void PendingCraft(Graphics &g) { g.pendingCraftingInteraction = Graphics::CraftingInteractionRequest{}; }
     static void ClearCraft(Graphics &g) { g.pendingCraftingInteraction.reset(); }
+    static void QueueGrid(Graphics &g) { g.requestedCraftingGrid.fill(ItemType::NONE); g.requestedCraftingGrid[4] = ItemType::LOG; g.craftingGridRequestPending = true; }
+    static bool HasGrid(const Graphics &g) { return g.craftingGridRequestPending && g.requestedCraftingGrid[4] == ItemType::LOG; }
+    static void ClearGrid(Graphics &g) { g.craftingGridRequestPending = false; }
     static bool SidePanel(const Graphics &g) { return g.sidePanelOpen; }
     static void OpenSidePanel(Graphics &g) { g.sidePanelOpen = true; }
     static std::size_t Focus(const Graphics &g) { return g.dialogueFocusIndex; }
@@ -44,6 +47,13 @@ namespace
         ActiveDialogueSession session{sessionId, 4, 1, NpcType::DEVELOPMENT_GUIDE,
             DialogueId::DEVELOPMENT_GUIDE_INTRO, DialogueNodeId::DEVELOPMENT_GUIDE_WELCOME, 1};
         graphics.SynchronizeDialogue(4, {event}, terminal ? nullptr : &session);
+    }
+    void Click(Graphics &graphics, const SDL_FRect &rect)
+    {
+        SDL_Event event{}; event.type = SDL_EVENT_MOUSE_BUTTON_DOWN;
+        event.button.button = SDL_BUTTON_LEFT;
+        event.button.x = rect.x + rect.w * 0.5f; event.button.y = rect.y + rect.h * 0.5f;
+        Push(graphics, event);
     }
 }
 
@@ -75,7 +85,17 @@ int main()
     GraphicsTestAccess::PendingCraft(graphics); Key(graphics, SDL_SCANCODE_ESCAPE);
     test.Expect(graphics.IsStationMenuOpen() && GraphicsTestAccess::CraftRequest(graphics),
         "Escape preserves a crafting request queued in the same frame");
+    Click(graphics, graphics.GetCraftingTableLayout().closeButton);
+    test.Expect(graphics.IsStationMenuOpen() && GraphicsTestAccess::CraftRequest(graphics),
+        "Mouse Close also preserves the crafting request queued in the same frame");
     GraphicsTestAccess::ClearCraft(graphics);
+    if (!graphics.IsStationMenuOpen()) graphics.OpenStationMenu(StationType::CRAFTING_TABLE);
+    GraphicsTestAccess::QueueGrid(graphics);
+    Click(graphics, graphics.GetCraftingTableLayout().closeButton);
+    test.Expect(graphics.IsStationMenuOpen() && GraphicsTestAccess::HasGrid(graphics),
+        "Mouse Close cannot discard an unconsumed crafting-grid recipe");
+    GraphicsTestAccess::ClearGrid(graphics);
+    if (!graphics.IsStationMenuOpen()) graphics.OpenStationMenu(StationType::CRAFTING_TABLE);
     GraphicsTestAccess::Drag(graphics);
     SDL_Event lost{}; lost.type = SDL_EVENT_WINDOW_FOCUS_LOST; Push(graphics, lost);
     test.Expect(!GraphicsTestAccess::DragActive(graphics) && !GraphicsTestAccess::Context(graphics),

@@ -13,6 +13,8 @@ parser.add_argument('--cmake', type=Path, required=True)
 parser.add_argument('--make-program', type=Path, required=True)
 parser.add_argument('--sdl-dir', type=Path, required=True)
 parser.add_argument('--python', type=Path, required=True)
+parser.add_argument('--compiler', type=Path)
+parser.add_argument('--prefix-path', default='')
 args = parser.parse_args()
 repo = args.source.resolve()
 
@@ -52,10 +54,13 @@ with tempfile.TemporaryDirectory(prefix='embervale art package ') as directory:
     original = {p: digest(repo / p) for p in files}
 
     def configure(build, generator):
+        toolchain = ['-DCMAKE_PREFIX_PATH=' + args.prefix_path]
+        if args.compiler:
+            toolchain.append('-DCMAKE_CXX_COMPILER=' + str(args.compiler))
         run(args.cmake, '-S', source, '-B', build, '-G', generator,
             '-DBUILD_TESTING=OFF', '-DGAMEENGINE_BUILD_GRAPHICS_TESTS=OFF', '-DGAMEENGINE_BUILD_CLIENT=ON',
             '-DCMAKE_BUILD_TYPE=Debug', '-DCMAKE_MAKE_PROGRAM=' + str(args.make_program),
-            '-DSDL3_DIR=' + str(args.sdl_dir), '-DPython3_EXECUTABLE=' + str(args.python))
+            '-DSDL3_DIR=' + str(args.sdl_dir), '-DPython3_EXECUTABLE=' + str(args.python), *toolchain)
     def build_art(build, success=True):
         return run(args.cmake, '--build', build, '--target', 'GameEngineWorldArt', '--config', 'Release', '-j4', success=success)
     def hashes(folder):return {p: digest(folder / p) for p in expected}
@@ -74,7 +79,7 @@ with tempfile.TemporaryDirectory(prefix='embervale art package ') as directory:
     (build / textures[-1]).unlink()
     build_art(build)
     assert hashes(build) == expected, 'No-relink copy did not repair corrupt/deleted outputs'
-    assert not list(build.rglob('*.o')), 'Art-only copy unexpectedly compiled C++'
+    assert not list(build.rglob('*.o')) and not list(build.rglob('*.obj')), 'Art-only copy unexpectedly compiled C++'
     multi = root / 'multi config output'
     configure(multi, 'Ninja Multi-Config')
     build_art(multi)

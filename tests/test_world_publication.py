@@ -88,7 +88,7 @@ class PublicationContractTests(unittest.TestCase):
             player=DraftPlaytest()
             with patch("embervale_world_editor.subprocess.Popen",return_value=process) as spawn:
                 player.start_version(publisher,manifest,game)
-                self.assertEqual(spawn.call_args.args[0],[str(game),"--world-version",str(manifest),"--no-save","--profile","fresh"])
+                self.assertEqual(spawn.call_args.args[0],[str(game.resolve()),"--world-version",str(manifest),"--no-save","--profile","fresh"])
                 work=Path(spawn.call_args.kwargs["cwd"])
                 self.assertTrue(work.is_dir());self.assertNotEqual(work,manifest.parent)
                 with self.assertRaisesRegex(StudioError,"already running"):

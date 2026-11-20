@@ -28,6 +28,14 @@ BINDINGS = {
 class ArtError(ValueError):
     pass
 
+
+def validate_renderer_layout(path, expected, limit):
+    # Git may check text bindings out as CRLF on Windows. Only newline spelling
+    # is canonicalized; geometry, identifiers and all binary checks stay exact.
+    actual = read_regular(path, limit)
+    require(actual.replace(b'\r\n', b'\n') == expected.encode('utf-8'),
+            'Generated renderer layout is stale; validate/export the intended manifests before building')
+
 def require(condition, message):
     if not condition:
         raise ArtError(message)

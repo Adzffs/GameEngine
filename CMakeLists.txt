@@ -513,7 +513,9 @@ if(BUILD_TESTING)
                         "${CMAKE_CURRENT_SOURCE_DIR}/tests/WorldArtPackagingIntegration.py"
                         --source "${CMAKE_CURRENT_SOURCE_DIR}" --cmake "${CMAKE_COMMAND}"
                         --make-program "${CMAKE_MAKE_PROGRAM}" --sdl-dir "${SDL3_DIR}"
-                        --python "${Python3_EXECUTABLE}")
+                        --python "${Python3_EXECUTABLE}"
+                        --compiler "${CMAKE_CXX_COMPILER}"
+                        --prefix-path "${CMAKE_PREFIX_PATH}")
                     set_tests_properties(WorldArtPackagingIntegration PROPERTIES LABELS "client;content;art" TIMEOUT 180)
                 endif()
             endif()
@@ -673,5 +675,15 @@ if(BUILD_TESTING)
         configure_gameengine_world_art(ClientCraftingIntegrationTests)
         add_test(NAME ClientCraftingIntegrationTests COMMAND ClientCraftingIntegrationTests)
         set_tests_properties(ClientCraftingIntegrationTests PROPERTIES LABELS "client")
+
+        add_executable(ClientBankIntegrationTests
+            tests/ClientBankIntegrationTests.cpp
+            src/Core/Engine.cpp
+            src/Input/InputManager.cpp
+            src/Graphics/Graphics.cpp)
+        target_link_libraries(ClientBankIntegrationTests PRIVATE GameEngineCore SDL3::SDL3)
+        configure_gameengine_world_art(ClientBankIntegrationTests)
+        add_test(NAME ClientBankIntegrationTests COMMAND ClientBankIntegrationTests)
+        set_tests_properties(ClientBankIntegrationTests PROPERTIES LABELS "client")
     endif()
 endif()

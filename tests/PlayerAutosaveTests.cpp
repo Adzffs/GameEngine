@@ -142,7 +142,7 @@ int main(int argc, char **argv)
         const auto corrupt = fixture.path / "corrupt.save";
         std::ofstream(corrupt) << "not a save";
         auto backup = corrupt; backup += ".bak";
-        std::ofstream(backup) << original;
+        std::ofstream(backup, std::ios::binary) << original;
         Lifecycle rejected(corrupt);
         World invalid;
         test.Expect(!rejected.Start(invalid, start).IsSuccess() &&
