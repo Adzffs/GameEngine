@@ -14,6 +14,8 @@ The [editor recovery follow-up](docs/embervale/06-development/EDITOR_RECOVERY_20
 
 The [world publication follow-up](docs/embervale/06-development/WORLD_PUBLICATION_2026-11-20.md) completes bounded STUDIO-026. Preserve exact raw/canonical/validator receipts, create-only named versions and manifest-last commit. Incomplete directories stay reserved/unselectable; never promote or take over unknown leftovers. Revalidate selected manifests with current runtime rules and load into a fresh process. Studio uses --no-save; explicit saves stay outside the selected library. No mutable current pointer, player-state rollback or binary/asset freezing is implemented. Test-only publication pauses remain excluded from GameEngineCore/runtime tools. Wider replacement/regions/accessibility and current Windows acceptance remain separate.
 
+The [asset resource follow-up](docs/embervale/06-development/ASSET_RESOURCE_VALIDATION_2026-11-20.md) completes current-art STUDIO-063. Preserve shared numeric budgets, metadata/binding validation, CRC/bounded PNG inflation and owned decoder input. Core now links zlib; headless must stay SDL-free. Keep the read-only asset gate before the single copy owner and preserve per-image primitive fallback/cache accounting. Art/masters/generated geometry are unchanged by this task. Future pose-count changes must update runtime arrays and both validation tables with matching tests; the missing eight-pose prototype must not silently bypass the current six-pose gathering boundary. Current Windows/native GPU and broader installation remain open.
+
 For tasks that create or change animation, read:
 
 1. [Animation guide](docs/embervale/05-game/ANIMATION_GUIDE.md).

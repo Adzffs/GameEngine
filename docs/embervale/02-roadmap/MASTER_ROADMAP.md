@@ -20,7 +20,7 @@ The review fixed recovery-file deletion after failed loads (ENG-003), crafting c
 2. **GAME-005 / GAME-004:** automated combat/food, death/recovery and six save/reload checkpoints now pass, with the tutorial skip fixed. Preparation remains 454 ticks; actual tutorial return is 741 and the deliberate death/recovery exercise totals 2370. Finish visible/uncoached navigation, input/confusion, balance and real-time acceptance on the recovered candidate.
 3. **ART-004:** finish acceptance of the implemented first sound pass: audible/device balance, Windows and synchronization with the recovered animation candidate.
 
-The owner is not satisfied with the current animation appearance and deferred polish. Keep ART-005 open. GAME-010 periodic autosave is complete. STUDIO-025 editor recovery is also complete for accepted work. STUDIO-026 fixed map publication is also complete for the current starter contract. Asset packaging and broader accessibility remain separately scoped tasks.
+The owner is not satisfied with the current animation appearance and deferred polish. Keep ART-005 open. GAME-010 periodic autosave is complete. STUDIO-025 editor recovery is also complete for accepted work. STUDIO-026 fixed map publication is also complete for the current starter contract. STUDIO-063 current-art resource validation is also complete. Broader REL-002 distribution and accessibility remain separately scoped tasks.
 
 The original Windows integration worktree remains unavailable, so REL-004 stays **in progress**. Independent work on the restored published source has delivered the first sound pass and fixed runtime asset copying; [results and limits](../06-development/ACTION_AUDIO_2026-11-20.md). ART-004 is **in progress** with audible/device and integration acceptance open. GAME-005 is **in progress** with the [automated starter continuation](../06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) passing; human/visible acceptance remains open. The [original recovery handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md) still applies.
 
@@ -28,7 +28,9 @@ GAME-010 is now **complete** for bounded periodic player persistence: 60-second 
 
 STUDIO-025 is now **complete** for private accepted-edit recovery: three generations, authoritative replay/preview, new-file restore and safe owner/legacy-lock handling. See the [editor recovery results](../06-development/EDITOR_RECOVERY_2026-11-20.md) and [recovery guide](../04-studio/EDITOR_RECOVERY.md). That recovery source passed 113/113 Linux SDL, 94/94 standalone headless and 53/53 Python tests per interpreter; the newer publication evidence follows. Broader STUDIO-021 replacement and platform/accessibility acceptance stay open.
 
-STUDIO-026 is now **complete** for the current starter-world publication contract: validate exact saved bytes and validator revision, publish a fresh fixed world/manifest, select it in Studio and launch a fresh temporary session. Selecting an older version rolls back the next map launch. See [fixed world publication](../04-studio/WORLD_PUBLICATION.md) and [publication verification](../06-development/WORLD_PUBLICATION_2026-11-20.md). Current checks pass 116/116 Linux SDL, 96/96 standalone headless and 64/64 Python units on each of two interpreters. Native Tk publishing/selection passed; native gameplay/Windows and broader R2 acceptance remain open. The completed task uses bounded current safety/access/write prerequisites; their wider replacement/regions/diagnostics scope remains in progress.
+STUDIO-026 is now **complete** for the current starter-world publication contract: validate exact saved bytes and validator revision, publish a fresh fixed world/manifest, select it in Studio and launch a fresh temporary session. Selecting an older version rolls back the next map launch. See [fixed world publication](../04-studio/WORLD_PUBLICATION.md) and [publication verification](../06-development/WORLD_PUBLICATION_2026-11-20.md). That publication source passed 116/116 Linux SDL, 96/96 standalone headless and 64/64 Python units per interpreter; newer asset-validation evidence follows. Native Tk publishing/selection passed; native gameplay/Windows and broader R2 acceptance remain open. The completed task uses bounded current safety/access/write prerequisites; their wider replacement/regions/diagnostics scope remains in progress.
+
+STUDIO-063 is now **complete** for the current eight-batch resource contract: shared budgets, image/frame/binding checks, bounded compressed streams before SDL decode, owned decoder bytes and read-only pre-copy validation. See [asset resource limits](../05-game/ASSET_RESOURCE_LIMITS.md) and [asset validation results](../06-development/ASSET_RESOURCE_VALIDATION_2026-11-20.md). Current checks pass 120/120 Linux SDL, 98/98 standalone headless and 79/79 Python units per interpreter, including private invalid-source refusal, output preservation/repair and multi-config Release. General importing, actual hardware memory profiling, Windows/native GPU and broader REL-002 installation remain open.
 
 ## 3. Roadmap at a glance
 
@@ -282,11 +284,11 @@ These are aspirations, not promised release dates. Keep features that reinforce 
 
 | Order | Work | Observable result |
 |---|---|---|
-| Completed in this review/follow-ups | ENG-003, ENG-004, GAME-009, GAME-010, STUDIO-025/026, QA-004 | Integrity fixes, player/editor recovery, fixed map publishing and current verification published |
+| Completed in this review/follow-ups | ENG-003, ENG-004, GAME-009, GAME-010, STUDIO-025/026, STUDIO-063, QA-004 | Integrity fixes, player/editor recovery, fixed map publishing, art resource budgets and current verification published |
 | Next | REL-004 | Combined published Mining/melee/equipment and matching assets/previews |
 | Then | GAME-005 and GAME-004 | Fresh route with real elapsed time, confusion, food/combat/recovery findings |
 | During starter acceptance | ART-004 | First sound pass implemented; finish audible/device review and synchronization with the recovered animation candidate |
-| Reliability work | STUDIO-063, QA-003 | Asset packaging and broader visible usability |
+| Reliability work | QA-003, REL-002 | Native usability and broader clean installation/distribution |
 | Owner-deferred | ART-005 | Posing, weight, timing/transitions and visual acceptance |
 | As concrete changes require | ENG-005/006 | Progression/health integer policy and targeted responsibility extraction |
 

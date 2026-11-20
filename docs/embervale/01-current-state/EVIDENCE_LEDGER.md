@@ -1,6 +1,6 @@
 # Evidence ledger and review limits
 
-**Current evidence reconciliation, 20 November:** [World publication](../06-development/WORLD_PUBLICATION_2026-11-20.md) pins code d44c3cf061aed70a92b1f38adee3ca423ac72e9d: Linux 116/116 SDL and 96/96 standalone headless CTest entries, 64/64 Python units per interpreter, real-tool interruption/tamper/rollback and fresh game starts. Native Linux Tk publishing/selection passed; its desktop game launch failed due to missing SDL drivers, while dummy-driver launches pass. Earlier recovery and Windows results retain their own source pins. See [current status](CURRENT_STATUS.md); historical sections below retain their scope.
+**Current evidence reconciliation, 20 November:** [Asset resource validation](../06-development/ASSET_RESOURCE_VALIDATION_2026-11-20.md) pins code 4d7d01cb16ce5025687d2f1e0f2bb87513475f58: Linux 120/120 SDL and 98/98 standalone headless CTest entries, 79/79 Python units per interpreter, bounded PNG/metadata/budget rejection, real SDL fallback/accounting and private package refusal/repair with spaced Multi-Config Release. Current source art/masters/bindings remain unchanged. Texture memory is a recorded RGBA estimate, not measured VRAM. Earlier publication/recovery/Windows results retain their source pins. See [current status](CURRENT_STATUS.md); historical sections below retain their scope.
 
 
 **Original review:** 18 November 2026.\

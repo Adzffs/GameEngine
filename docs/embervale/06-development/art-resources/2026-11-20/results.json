@@ -1,0 +1,121 @@
+{
+  "task": "STUDIO-063",
+  "status": "complete",
+  "date": "2026-11-20",
+  "scope": "current eight-batch world art and recorded runtime bindings",
+  "baseline_commit": "b7b06368709bd8833ddd1293628ce900dec6e5a0",
+  "code_commit": "4d7d01cb16ce5025687d2f1e0f2bb87513475f58",
+  "tested_code_tree": "5321148492900fe0878af080c6743bbd1d8f2697",
+  "published_code_blobs_verified": 16,
+  "toolchain": {
+    "platform": "Linux",
+    "compiler": "GCC 14.2.0",
+    "cmake": "4.4.5",
+    "ninja": "1.13.2",
+    "sdl": "3.4.12 audio enabled; dummy video/software/audio tests",
+    "zlib": "1.3.1",
+    "python": [
+      "3.12.14",
+      "3.13.5"
+    ]
+  },
+  "checks": {
+    "client_ctest": {
+      "passed": 120,
+      "total": 120,
+      "headless": 98,
+      "client": 9,
+      "graphics": 13
+    },
+    "separate_headless_ctest": {
+      "passed": 98,
+      "total": 98
+    },
+    "python_units_per_interpreter": {
+      "passed": 79,
+      "total": 79
+    },
+    "new_python_resource_cases": 15,
+    "resource_core_assertions": 46,
+    "resource_sdl_assertions": 12,
+    "resource_asset_check": "pass",
+    "package_integration": "pass",
+    "package_texture_count": 30,
+    "package_sound_count": 15,
+    "package_configurations": [
+      "Ninja Debug",
+      "Ninja Multi-Config Release art target only"
+    ],
+    "private_invalid_source_refused": true,
+    "previous_package_preserved": true,
+    "corrupt_deleted_outputs_repaired_without_relink": true,
+    "private_spaced_paths": true,
+    "read_only_source_and_generated_header_preserved": true,
+    "older_checked_in_world_version_still_loads": true
+  },
+  "art_inventory": {
+    "batches": 8,
+    "textures": 30,
+    "frames": 1175,
+    "tracked_existing_art_master_manifest_preview_geometry_changed": false
+  },
+  "memory": {
+    "png_bytes": 281049,
+    "rgba_texture_bytes": 11681792,
+    "alpha_bytes": 2920448,
+    "retained_pixel_bytes": 14602240,
+    "peak_image_staging_bytes": 2980364,
+    "logical_pixel_and_staging_upper_bound_bytes": 17582604
+  },
+  "memory_report": "memory-report.json",
+  "memory_report_sha256": "cf8d6daa7c4949870e3fa17eeb294eb4f6d2e44d887e1d1f0407042a192bc2f0",
+  "memory_accounting": "Logical RGBA8 pixels + one-byte alpha cache + largest of one RGBA decode or 64-KiB preflight scratch, plus owned encoded image. Excludes allocator capacity/overhead, zlib/SDL internals, driver storage, render targets and other game systems; not measured VRAM/process RAM.",
+  "policy": {
+    "version": 1,
+    "max_images": 64,
+    "max_frames": 16384,
+    "max_image_edge": 4096,
+    "max_image_pixels": 4194304,
+    "max_png_bytes": 4194304,
+    "max_manifest_bytes": 2097152,
+    "max_catalogue_png_bytes": 33554432,
+    "max_texture_bytes": 67108864,
+    "max_alpha_bytes": 16777216,
+    "max_staging_bytes": 20971520
+  },
+  "preflight_scratch_bytes": 65536,
+  "source_references": [
+    "https://wiki.libsdl.org/SDL3/SDL_LoadPNG_IO",
+    "https://zlib.net/manual.html",
+    "https://packages.msys2.org/packages/mingw-w64-ucrt-x86_64-zlib"
+  ],
+  "limitations": [
+    "No current Windows/native GPU execution",
+    "No actual process/VRAM profiling or whole-game RAM cap",
+    "No general third-party importer or hardened untrusted-image sandbox",
+    "Current PNG contract requires RGBA8 non-interlaced IHDR/IDAT/IEND only",
+    "Current four-pose walking and six-pose gathering bindings remain unchanged; original Windows melee/polish integration unavailable",
+    "Offline pre-copy gate requires working Python; C++ runtime guards remain active without it",
+    "Multi-config Release proof covers art copy/check only, not an optimized game build",
+    "General clean-install/distribution/runtime-DLL acceptance remains REL-002; broader usability remains QA-003",
+    "Pre-copy validation is not a multi-file transaction or lock against concurrent source/header exports; exports and builds must remain sequential."
+  ],
+  "log_sha256": {
+    "art-resources-client-build.log": "c640d308e77072bcbd414d9bf13f8e2461895e648c1fd0fd63513994be7bf5bd",
+    "art-resources-headless-build.log": "8c0e7a335e5b58de7e11828ad4fc15f2d10560fc4ba11b059eec5f625cff3fcf",
+    "art-resources-stream-focused.log": "ba2d519af150ca66255fbc77916d88ecf41a1c87ac4341ca7071c1d2d1777570",
+    "art-resources-packaging-focused.log": "a348713149ff3cfd0aeea7e924e30527156bd87b3c61dbd4dc6fd62f8aaa8f6a",
+    "art-resources-client-tests.log": "e8fa4395142eb00f49b37201a90a3ce891f0022ea562ad5a9d89efb54f6ad3ff",
+    "art-resources-headless-tests.log": "a5c45cbb074e2d21d0c533757d8a22bd3d7c0795b21d8001f81f6ca278912f7c",
+    "art-resources-python-tests.log": "6220740cb03118b5732cef20a48adb64814be1cabb68c7e3cc14f4f05d82a614",
+    "art-resources-python-system-tests.log": "e6c60b405c95dae18913d87cc6ad3cadfb12b59999c8b4bacefeeed9c3c220fd"
+  },
+  "documentation_validation": {
+    "markdown_files": 104,
+    "links": 1352,
+    "matching_backlog_tasks": 96,
+    "acyclic_dependencies": true,
+    "legacy_studio_ids_retained": 45,
+    "external_links_fetched_by_checker": false
+  }
+}

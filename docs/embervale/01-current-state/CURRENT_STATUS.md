@@ -1,7 +1,7 @@
 # Current project status
 
 **Reviewed:** 20 November 2026.\
-**Published code:** [d44c3cf](https://github.com/Adzffs/GameEngine/commit/d44c3cf061aed70a92b1f38adee3ca423ac72e9d).\
+**Published code:** [4d7d01c](https://github.com/Adzffs/GameEngine/commit/4d7d01cb16ce5025687d2f1e0f2bb87513475f58).\
 **Source of truth:** Current code and the [project review](../06-development/PROJECT_REVIEW_2026-11-20.md). The older [engine inventory](IMPLEMENTED_SYSTEMS.md) retains its explicitly dated baseline.
 
 Embervale is a playable local C++20/SDL3 RPG prototype with a bounded world editor and an authored River Crossing starter region. It has substantial gameplay systems. It is not yet a completed starter vertical slice, a released Studio product or an implemented online MMO.
@@ -19,7 +19,7 @@ Embervale is a playable local C++20/SDL3 RPG prototype with a bounded world edit
 | Authored world | Flat 100x100 River Crossing candidate, distributed services, existing actor homes and static workshop buildings | Visible encounter/escape/recovery and human pacing acceptance; more building assemblies |
 | World format | Schemas 1-4, bounded runtime validation, stable placements/allocation IDs, staged spawns and fixed version manifests | General region/definition authoring, content/save migrations and asset packages |
 | Studio | Shared edits/history, guarded drafts, private recovery, reopen, overlays, exact-byte validation, create-only version publishing and selected-version play/rollback | In-place replacement, richer diagnostics, brushes and broader accessibility/platform acceptance |
-| Published art | Eight bounded batches, 1,175 frames in 30 textures, eight-way walking/chopping/mining, editable masters, cache and fallback | Remaining cast/resource tiers, equipment/melee integration, general importer, UI/accessibility and visible quality acceptance |
+| Published art | Eight batches, 1,175 frames/30 textures, eight-way walking/chopping/mining, editable masters, guarded cache/fallback, bounded PNG streams and explicit resource budgets | Remaining cast/resource tiers, equipment/melee integration, general importer, UI/accessibility and visible quality acceptance |
 | Audio | First sound pass: 15 original effects, committed-result routing, bounded playback, effects volume/mute and keyboard controls | Audible/device/Windows review, original melee integration and full starter acceptance |
 
 ## Published and local animation work
@@ -40,29 +40,31 @@ The [editor recovery follow-up](../06-development/EDITOR_RECOVERY_2026-11-20.md)
 
 The [publication verification](../06-development/WORLD_PUBLICATION_2026-11-20.md) completes bounded STUDIO-026: exact-source/validator receipts, canonical create-only versions, manifest-last commit, current-runtime revalidation and explicit fresh-session selection/rollback. Studio validates, publishes and lists earlier versions. Linux process-kill, stale-content, tamper and v1/v2/v1 game-start tests pass. Native Tk publishing/selection passed; its game launch reports the missing desktop SDL driver. Dummy-SDL game launches pass. See [fixed world publication](../04-studio/WORLD_PUBLICATION.md).
 
+The [asset validation results](../06-development/ASSET_RESOURCE_VALIDATION_2026-11-20.md) completes bounded STUDIO-063: shared numeric budgets, frame/binding validation, CRC and bounded PNG inflation before SDL decode, owned decoder bytes, cache accounting and read-only pre-copy validation. The current art requires 11,681,792 logical RGBA bytes plus 2,920,448 transparency bytes. Private corrupt-source, preserved-output, no-relink repair and spaced multi-config Release checks pass. Art/animation sources and generated geometry are unchanged. See [asset resource limits](../05-game/ASSET_RESOURCE_LIMITS.md); core builds now require zlib development headers/library.
+
 ## Executed checks
 
 | Source/configuration | Executed result | Scope |
 |---|---:|---|
-| Current publication source, Linux SDL configuration | 116/116 CTest entries | 96 headless, 8 client, 12 graphics; configured dummy video/software/audio drivers |
-| Same current source, Linux with client/graphics disabled | 96/96 CTest entries | SDL-free core, starter replay, autosave, editor recovery and publication interruption |
-| Current Python editor unit suite | 64/64 tests per interpreter | Python 3.12.14 and 3.13.5; each ten-case recovery/publication integration suite remains one CTest entry |
+| Current asset-validation source, Linux SDL configuration | 120/120 CTest entries | 98 headless, 9 client, 13 graphics; dummy video/software/audio and real private packaging checks |
+| Same current source, Linux with client/graphics disabled | 98/98 CTest entries | SDL-free/zlib-linked core, starter replay, autosave, editor recovery, publication and asset checks |
+| Current Python authoring/editor unit suite | 79/79 tests per interpreter | Python 3.12.14 and 3.13.5; includes 15 new resource cases; separate integration suites remain included in CTest totals |
 | Earlier published source plus critical fixes, Windows SDL client configuration | 102/102 CTest entries | Includes 87 headless, 5 client and 10 graphics labels; SDL dummy/software presentation |
 | Same source, separate Windows build with client and graphics disabled | 87/87 CTest entries | Confirms the changed core builds without SDL |
 | Python editor unit tests | 42/42 tests | Run directly with Python 3.14.6 |
 | Real executable-backed editor bridge | 12/12 cases | Included in the CTest bridge entry above, not 12 additional CTest entries |
 | Local animation line after the same safety fixes | 101/101 CTest entries | Different source snapshot; does not establish combined Mining/melee acceptance |
 
-The current follow-up uses Linux GCC 14.2.0, CMake 4.4.5, Ninja 1.13.2, audio-enabled SDL 3.4.12 and Python 3.12.14. Its published source blobs match the tested files. Earlier Windows review results use UCRT64 GCC 16.1.0/CMake 4.4.3 and their own recorded source. The new sound pass has not been accepted on a physical device or Windows, and no uncoached human/full visible starter playthrough is claimed.
+The current follow-up uses Linux GCC 14.2.0, CMake 4.4.5, Ninja 1.13.2, audio-enabled SDL 3.4.12, zlib 1.3.1 and Python 3.12.14. Its published source blobs match the tested files. Earlier Windows review results use UCRT64 GCC 16.1.0/CMake 4.4.3 and their own recorded source. The new sound pass has not been accepted on a physical device or Windows, and no uncoached human/full visible starter playthrough is claimed.
 
 The unchanged preparation replay equips the shield at tick 245, equips the sword at 376 and buys food by 454. The extended route defeats Mossling at 677 and completes the tutorial by returning to Mara at 741. A separate intentional death/recovery segment ends at cumulative tick 2370 across two primary sessions, with six save/reload checks. These simulation measurements do not establish human elapsed time; the older 451-tick preparation belongs to its historical source. The timber replay still loses six coins per complete cycle.
 
 ## Current work order
 
-1. **Completed in this review:** ENG-003, ENG-004 and GAME-009 protect saves/items; QA-004 reconciles current automated evidence; GAME-010 and STUDIO-025 protect player progress/editor work; bounded STUDIO-026 now publishes and selects validated fixed maps.
+1. **Completed in this review:** ENG-003, ENG-004 and GAME-009 protect saves/items; QA-004 reconciles current automated evidence; GAME-010 and STUDIO-025 protect player progress/editor work; bounded STUDIO-026 publishes/selects fixed maps and STUDIO-063 now validates current art resources and memory budgets.
 2. **REL-004:** combine the published Mining work and local melee/equipment first pass; publish the matching sources, outputs and previews.
 3. **GAME-005 / GAME-004:** automated combat, food, death/recovery and save/reload now pass; finish the visible/uncoached route, input/confusion, balance and real elapsed-time acceptance.
 4. **ART-004:** the bounded sound pass is implemented against published source; finish original animation synchronization and audible/device/Windows acceptance after recovery.
-5. Continue separately prioritized asset packaging and accessibility tasks. GAME-010, bounded STUDIO-025 recovery and STUDIO-026 fixed map publishing are complete for their stated scopes. Animation quality remains ART-005, deferred by the owner.
+5. Continue QA-003 usability and broader REL-002 distribution/installation work. GAME-010, bounded STUDIO-025 recovery, STUDIO-026 fixed publishing and STUDIO-063 current-art resource validation are complete for their stated scopes. Animation quality remains ART-005, deferred by the owner.
 
 R0-R4 remain partial milestones. Optional editor expansion, elevation, multiple regions, companions, bosses and multiplayer do not need to be completed before the existing flat starter experience improves. Use the [roadmap](../02-roadmap/MASTER_ROADMAP.md) and synchronized [backlog](../02-roadmap/BACKLOG.md) for exact tasks and dependencies.

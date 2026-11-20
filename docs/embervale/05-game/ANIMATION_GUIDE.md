@@ -1,5 +1,7 @@
 # Animation guide
 
+**Resource guard follow-up, 20 November:** Validate/export against [asset resource limits](ASSET_RESOURCE_LIMITS.md). The current published runtime has four walking and six chopping/Mining poses per direction. A different authored pose count requires matching runtime arrays and both validation tables, followed by complete binding/render checks; do not bypass guards to fit the unrecovered local prototype. The read-only check preserves masters and geometry; further animation polish remains owner-deferred.
+
 **Purpose:** Reusable production reference for player, equipment, gathering and future creature animation.  
 **Updated:** 20 November 2026.  
 **Status:** Adopted working guidance; exact frame counts and timings remain specific to each authored action.

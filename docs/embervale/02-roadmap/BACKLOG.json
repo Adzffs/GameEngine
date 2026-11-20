@@ -1,8 +1,8 @@
 {
   "version": 1,
   "reviewed_date": "2026-11-20",
-  "current_verified_master": "d44c3cf061aed70a92b1f38adee3ca423ac72e9d",
-  "verification_reconciliation": "Latest publication code d44c3cf061aed70a92b1f38adee3ca423ac72e9d: Linux 116/116 SDL CTest entries (96 headless, 8 client, 12 graphics) using dummy video/software/audio, separate SDL-free 96/96 and Python 64/64 on each of 3.12.14 and 3.13.5. Publication core has 31 assertions, launch options 34, real-tool publication ten cases with four killed children per run, and actual v1/v2/v1 temporary game processes. Native Linux Tk validates/publishes two named copies, rejects a collision and selects the earlier version; native game startup fails because this SDL build lacks desktop drivers. Both native copies deliberately have the same map hash; distinct maps/rollback are covered by automation. Source/prior versions and private player fixtures are preserved. Existing bridge/recovery integration remains included. Current Windows, stronger durability, broader accessibility and original animation integration remain open. See docs/embervale/06-development/WORLD_PUBLICATION_2026-11-20.md.",
+  "current_verified_master": "4d7d01cb16ce5025687d2f1e0f2bb87513475f58",
+  "verification_reconciliation": "Latest resource-validation code 4d7d01cb16ce5025687d2f1e0f2bb87513475f58: Linux 120/120 SDL CTest entries (98 headless, 9 client, 13 graphics), separate SDL-free/zlib-linked 98/98 and Python 79/79 on each of 3.12.14 and 3.13.5. Resource core has 46 assertions; real SDL guard/cache tests have 12; 15 new Python cases cover bounds, metadata, checksums, compressed streams and unchanged files. Private packaging checks reject bad source before copy, retain old outputs, repair corrupted/deleted outputs without relinking and verify 30 textures/15 sounds in spaced single-config and multi-config Release paths. Existing world-publication/recovery/starter suites remain included. Current 30 textures require 11681792 logical RGBA bytes plus 2920448 alpha bytes; driver/allocator/decoder overhead is excluded. Artwork/masters/bindings are unchanged. Current Windows/native GPU, full human starter acceptance and original animation integration remain open. See docs/embervale/06-development/ASSET_RESOURCE_VALIDATION_2026-11-20.md.",
   "repository": "Adzffs/GameEngine",
   "baseline_commit": "e9d32932e8f9b27e96283313cca320058792a81f",
   "status_policy": "Complete means bounded stated acceptance has evidence and is published on the default branch. In_progress retains remaining scope/acceptance; planned is future work. Historical reports remain dated. Acceptance tasks can measure an implemented candidate before human signoff closes its parent feature.",
@@ -863,9 +863,10 @@
       "acceptance": "Manifest names source/licence/author/path/version and stable IDs; missing references are diagnosed.",
       "github_issue": null,
       "evidence": [
-        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
+        "docs/embervale/06-development/ASSET_RESOURCE_VALIDATION_2026-11-20.md"
       ],
-      "notes": "Eight published batches have stable authoring IDs, .ase sources, checksums, provenance and generated bindings. The general asset importer and distribution/licensing decision remain open; the pilot is implemented, not an untouched proposal."
+      "notes": "Eight published batches have stable authoring IDs, .ase sources, checksums, provenance and generated bindings. The general asset importer and distribution/licensing decision remain open; the pilot is implemented, not an untouched proposal. STUDIO-063 now validates the current manifests/checksums, generated bindings and runtime resources under explicit budgets; broader importer/Studio/visible scope remains open."
     },
     {
       "id": "STUDIO-061",
@@ -879,9 +880,10 @@
       "acceptance": "One tile/tree appear in game and preview with correct pivot/scale/transparency; retain debug primitive mode.",
       "github_issue": null,
       "evidence": [
-        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
+        "docs/embervale/06-development/ASSET_RESOURCE_VALIDATION_2026-11-20.md"
       ],
-      "notes": "The shared cache renders eight published batches: 1,175 frames in 30 PNGs with fixed pivots, nearest-neighbor scaling, primitive mode and image fallback. Current renderer/state checks pass. Full Studio parity, broader art and visible starter acceptance remain open."
+      "notes": "The shared cache renders eight published batches: 1,175 frames in 30 PNGs with fixed pivots, nearest-neighbor scaling, primitive mode and image fallback. Current renderer/state checks pass. Full Studio parity, broader art and visible starter acceptance remain open. STUDIO-063 now validates the current manifests/checksums, generated bindings and runtime resources under explicit budgets; broader importer/Studio/visible scope remains open."
     },
     {
       "id": "STUDIO-062",
@@ -896,16 +898,17 @@
       "acceptance": "Author animations/variants through validated metadata; verify atlas coordinates and render ordering.",
       "github_issue": null,
       "evidence": [
-        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
+        "docs/embervale/06-development/ASSET_RESOURCE_VALIDATION_2026-11-20.md"
       ],
-      "notes": "Pilot builders/manifests author metadata and generated geometry for current sprites/animations. This is not a general Studio animation/asset-import workspace; keep the implemented pilot distinct from richer importer scope."
+      "notes": "Pilot builders/manifests author metadata and generated geometry for current sprites/animations. This is not a general Studio animation/asset-import workspace; keep the implemented pilot distinct from richer importer scope. STUDIO-063 now validates the current manifests/checksums, generated bindings and runtime resources under explicit budgets; broader importer/Studio/visible scope remains open."
     },
     {
       "id": "STUDIO-063",
       "milestone": "R4",
       "priority": "P1",
       "title": "Validate image and atlas resources",
-      "status": "in_progress",
+      "status": "complete",
       "dependencies": [
         "STUDIO-060"
       ],
@@ -914,9 +917,21 @@
       "evidence": [
         "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
         "docs/embervale/06-development/INTEGRATION_HANDOFF_2026-11-20.md",
-        "docs/embervale/06-development/ACTION_AUDIO_2026-11-20.md"
+        "docs/embervale/06-development/ACTION_AUDIO_2026-11-20.md",
+        "src/Content/Assets/WorldArtResources.cpp",
+        "assets/embervale/world-art-limits.json",
+        "tools/art/check_world_art.py",
+        "tools/art/world_art_resources.py",
+        "tests/WorldArtResourcesTests.cpp",
+        "tests/WorldArtResourceGraphicsTests.cpp",
+        "tests/WorldArtPackagingIntegration.py",
+        "tests/test_world_art_resources.py",
+        "docs/embervale/05-game/ASSET_RESOURCE_LIMITS.md",
+        "docs/embervale/06-development/ASSET_RESOURCE_VALIDATION_2026-11-20.md",
+        "docs/embervale/06-development/art-resources/2026-11-20/memory-report.json",
+        "docs/embervale/06-development/art-resources/2026-11-20/results.json"
       ],
-      "notes": "Runtime copying now has one GameEngineWorldArt owner, including sounds. The baseline failed to repair three corrupted outputs; the fix repaired corruption and two deleted outputs without compiling C++. All 30 textures and 15 WAVs match source in Debug and a separate Ninja Multi-Config Release copy test with graphics-only first consumer and spaces in the output path. Linux tests pass at 9b496c8e59556511c2e274394b6c8c071f09c63a. Wider image/atlas memory/resource-limit acceptance and Windows packaging follow-up remain open."
+      "notes": "Published in 4d7d01cb16ce5025687d2f1e0f2bb87513475f58: complete for existing eight world-art batches, 1175 frames/30 textures. Shared version-1 policy bounds dimensions/pixels/counts/encoded/texture/alpha/staging costs; metadata rejects invalid geometry, duplicate IDs/slots and incomplete present tables. C++/Python verify RGBA8 PNG chunks/CRCs and bounded inflation; SDL consumes owned validated bytes. Invalid catalogues/optional PNGs use primitive fallback; stale bindings and cache allocations clear on reinitialize. Read-only Python pre-copy validation preserves last valid package, and exporters validate before replacing bindings. Current logical texture/alpha costs are 11681792/2920448 bytes, with a 17582604-byte final-cache-plus-staging estimate excluding allocator/decoder/driver overhead. Private Debug repair/refusal and spaced Ninja Multi-Config Release match all 30 textures/15 WAVs without changing source art. Core now links zlib 1.3.1 in the tested Linux run. General importer/licensing, actual VRAM/process profiling, native GPU/Windows and broader REL-002 installation remain separate; this does not close R4 or original REL-004."
     },
     {
       "id": "ART-001",
@@ -1265,8 +1280,10 @@
       ],
       "acceptance": "Install/run on supported clean environments, verify dependencies, first launch, save location, update and rollback.",
       "github_issue": null,
-      "evidence": [],
-      "notes": "Planning ID; not a GitHub issue number."
+      "evidence": [
+        "docs/embervale/06-development/ASSET_RESOURCE_VALIDATION_2026-11-20.md"
+      ],
+      "notes": "Planning ID; not a GitHub issue number. Current-art copy checks now reject bad sources and preserve/repair outputs in private Ninja Debug and Multi-Config Release paths with spaces. This is not a distributable installer or a clean Windows installation test; include the newly linked zlib runtime when applicable."
     },
     {
       "id": "REL-003",

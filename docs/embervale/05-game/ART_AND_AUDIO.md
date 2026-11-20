@@ -1,6 +1,6 @@
 # Art, animation and audio production guide
 
-**Status:** Eight world-art batches render terrain, cast, resources, services, buildings, contextual variation and gathering actions. The player has eight-way walking, chopping and mining; the shared cache covers 1,175 frames in 30 textures. A general importer and the broader production workflow below remain proposed.\
+**Status:** Eight world-art batches render terrain, cast, resources, services, buildings, contextual variation and gathering actions. The player has eight-way walking, chopping and mining; the shared cache covers 1,175 frames in 30 textures. [Current asset resource limits](ASSET_RESOURCE_LIMITS.md) now validate metadata, PNG streams, cache costs and pre-copy resources. The eight-batch set uses about 11.14 MiB of logical RGBA pixels and 2.79 MiB of retained alpha; driver/allocator/decoder overhead is separate. A general importer and the broader production workflow below remain proposed.\
 **Reviewed:** 20 November 2026.\
 **Purpose:** Replace placeholder presentation in manageable steps while preserving gameplay and making assets easy for humans and AI to work with.
 
@@ -29,7 +29,7 @@ basic mode, plus a reusable snapshot preview command. SDL 3.4+ enables the PNG
 pilot; builds with earlier SDL headers retain basic shapes. Assets are copied
 beside the executable by CMake and loaded once, outside the render loop.
 
-This is the first part of ART-001 and STUDIO-060/061/063, not a general
+The original forest pilot began ART-001 and STUDIO-060/061/063. Bounded STUDIO-063 resource validation is now complete for the full current set; see [verification](../06-development/ASSET_RESOURCE_VALIDATION_2026-11-20.md). This remains a pilot rather than a general
 game/Studio importer or finished starter kit. The remaining cast/prop kit, Studio asset
 editing, visible interaction and wider acceptance remain. The pilot's
 `manifest.json` is an authoring record; the runtime consumes the generated
