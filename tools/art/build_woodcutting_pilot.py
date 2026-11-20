@@ -14,7 +14,7 @@ ART = REPO / 'assets/embervale/woodcutting-pilot'
 DIRECTIONS = ['s', 'w', 'e', 'n', 'sw', 'se', 'nw', 'ne']
 
 
-def build(editor, regenerate=False):
+def build(editor, regenerate=False, rebuild_axes=False):
     sizes = {'player': (384, 640), 'axes': (384, 1920)}
     for folder in ['source', 'textures', 'previews']:
         (ART / folder).mkdir(parents=True, exist_ok=True)
@@ -36,7 +36,7 @@ def build(editor, regenerate=False):
             target = temp / f'{name}.png'
             blank_png(target, *size)
             fixtures[name] = target.as_posix()
-        cfg = {'regenerate': regenerate, 'palette': PALETTE, 'fixtures': fixtures,
+        cfg = {'regenerate': regenerate, 'rebuildAxes': rebuild_axes, 'palette': PALETTE, 'fixtures': fixtures,
                'player': (REPO / 'assets/embervale/cast-pilot/source/player.ase').as_posix(),
                'sources': {name: (ART / f'source/{name}.ase').as_posix() for name in sizes},
                'frames': [(temp / f'chop-{i:02}.png').as_posix() for i in range(6)],
@@ -99,6 +99,8 @@ def build(editor, regenerate=False):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--editor', required=True, type=Path)
-    parser.add_argument('--regenerate', action='store_true', help='Explicitly recreate action masters from the current player outfit')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--regenerate', action='store_true', help='Explicitly recreate action masters from the current player outfit')
+    mode.add_argument('--rebuild-axes', action='store_true', help='Rebuild only axe overlays; preserve the saved player action master')
     args = parser.parse_args()
-    build(args.editor.resolve(strict=True), args.regenerate)
+    build(args.editor.resolve(strict=True), args.regenerate, args.rebuild_axes)

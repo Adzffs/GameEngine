@@ -4,6 +4,7 @@
 #include "../src/World/Map.h"
 #include <array>
 #include <cstdint>
+#include <filesystem>
 #include <set>
 
 struct GraphicsTestAccess
@@ -38,6 +39,39 @@ int main()
     auto *renderer = GraphicsTestAccess::Renderer(graphics);
     auto &sprites = GraphicsTestAccess::Sprites(graphics);
 #if SDL_VERSION_ATLEAST(3,4,0)
+    const auto axePath = std::filesystem::path(reinterpret_cast<const char8_t *>(SDL_GetBasePath())) /
+        "assets/embervale/woodcutting-pilot/textures/axes.png";
+    const auto axeUtf8 = axePath.u8string();
+    SDL_Surface *axePixels = SDL_LoadPNG(reinterpret_cast<const char *>(axeUtf8.c_str()));
+    test.Expect(axePixels != nullptr,"Packaged axe pixels are available for blade-orientation checks");
+    if (axePixels)
+    {
+        const std::array<SDL_FPoint,8> cuts{{{0,1},{-1,0},{1,0},{0,-1},
+            {-0.707f,0.707f},{0.707f,0.707f},{-0.707f,-0.707f},{0.707f,-0.707f}}};
+        const std::array<std::array<Uint8,3>,3> shadows{{{132,98,44},{64,69,66},{55,97,125}}};
+        const std::array<std::array<Uint8,3>,3> edges{{{227,192,115},{166,154,126},{239,224,183}}};
+        for (int tier = 0; tier < 3; ++tier) for (int facing = 0; facing < 8; ++facing)
+            for (int pose : {3,4})
+            {
+                float edgeX=0,edgeY=0,shadowX=0,shadowY=0;
+                int edgeCount=0,shadowCount=0;
+                for (int y=0; y<80; ++y) for (int x=0; x<64; ++x)
+                {
+                    Uint8 r,g,b,a;
+                    SDL_ReadSurfacePixel(axePixels,pose*64+x,(tier*8+facing)*80+y,&r,&g,&b,&a);
+                    if (!a) continue;
+                    const std::array<Uint8,3> rgb{r,g,b};
+                    if (rgb==edges[tier]) { edgeX+=x; edgeY+=y; ++edgeCount; }
+                    if (rgb==shadows[tier]) { shadowX+=x; shadowY+=y; ++shadowCount; }
+                }
+                test.Expect(edgeCount>0 && shadowCount>0,"Each striking axe has a readable head and cutting edge");
+                if (!edgeCount || !shadowCount) continue;
+                const float towardTree=(edgeX/edgeCount-shadowX/shadowCount)*cuts[facing].x+
+                    (edgeY/edgeCount-shadowY/shadowCount)*cuts[facing].y;
+                test.Expect(towardTree>0.35f,"The cutting edge leads toward the tree on contact and follow-through");
+            }
+        SDL_DestroySurface(axePixels);
+    }
     std::set<std::uint64_t> directions;
     for (int facing = 0; facing < 8; ++facing)
     {
