@@ -10,6 +10,7 @@
 | What is this project? | [Project overview](00-overview/PROJECT_OVERVIEW.md) |
 | What has actually been implemented? | [Current reviewed status](01-current-state/CURRENT_STATUS.md) |
 | What did the full project review find? | [Critical fixes and roadmap reconciliation](06-development/PROJECT_REVIEW_2026-11-20.md) |
+| Where did the current integration stop? | [Local work, recovery and pending starter/audio checks](06-development/INTEGRATION_HANDOFF_2026-11-20.md) |
 | What should we do next? | [Master roadmap](02-roadmap/MASTER_ROADMAP.md) |
 | What task can I pick up? | [Backlog](02-roadmap/BACKLOG.md) |
 | How do I run the game? | [Getting started](06-development/GETTING_STARTED.md) |
@@ -107,6 +108,7 @@ Use [current status](01-current-state/CURRENT_STATUS.md) for the maintained impl
 | Document | What it contains |
 |---|---|
 | [PROJECT_REVIEW_2026-11-20.md](06-development/PROJECT_REVIEW_2026-11-20.md) | Full review, three integrity fixes, current evidence and remaining priorities |
+| [INTEGRATION_HANDOFF_2026-11-20.md](06-development/INTEGRATION_HANDOFF_2026-11-20.md) | Interrupted local Mining/melee integration, recovery details and pending starter/audio checks |
 | [GETTING_STARTED.md](06-development/GETTING_STARTED.md) | Local CMake setup, Windows client, saves and editor guidance |
 | [FRESH_PLAYER_PROFILE_2026-11-19.md](06-development/FRESH_PLAYER_PROFILE_2026-11-19.md) | Fresh-profile implementation, successful builds and deferred acceptance |
 | [RIVER_CROSSING_BLOCKOUT_2026-11-19.md](06-development/RIVER_CROSSING_BLOCKOUT_2026-11-19.md) | Authored map, generation/build evidence, identity/lifecycle contract and remaining acceptance |

@@ -30,6 +30,8 @@ These histories must be reconciled without replacing one snapshot with the other
 
 The owner is not satisfied with the animation quality and explicitly deferred further polish. Treat it as a working first pass, with **ART-005** still planned and visual acceptance outstanding. See the [animation guide](../05-game/ANIMATION_GUIDE.md) and [dated research](../06-development/ANIMATION_RESEARCH_2026-11-20.md).
 
+**Integration update:** REL-004 has started in the separate local GameEngine-next worktree. The Windows execution environment became unavailable before its combined build/export results could be retrieved. The implementation remains unpublished and unverified; the baseline results below have not changed. See the [integration handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md) for recovery details, Mining/woodcutting compatibility findings and pending starter/audio checks.
+
 ## Executed checks
 
 | Source/configuration | Executed result | Scope |

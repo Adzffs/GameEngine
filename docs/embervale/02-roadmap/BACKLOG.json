@@ -890,9 +890,10 @@
       "acceptance": "Reject invalid dimensions/rectangles/frames and excessive resource usage; record memory costs.",
       "github_issue": null,
       "evidence": [
-        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
+        "docs/embervale/06-development/INTEGRATION_HANDOFF_2026-11-20.md"
       ],
-      "notes": "Pilot exports/cache validate current geometry/fallback and renderer checks pass. Several POST_BUILD commands still copy to shared texture destinations. Give copying one owner or explicit serialization/dependencies, verify clean/incremental parallel builds and packaged hashes, then measure memory/resource limits. An earlier local refresh recorded a copy race; this review's full builds passed."
+      "notes": "Pilot exports/cache validate current geometry/fallback and renderer checks pass. Several POST_BUILD commands still copy to shared texture destinations. Give copying one owner or explicit serialization/dependencies, verify clean/incremental parallel builds and packaged hashes, then measure memory/resource limits. An earlier local refresh recorded a copy race; this review's full builds passed. The interrupted REL-004 candidate drafts a single GameEngineWorldArt copy owner; clean/incremental parallel-build and packaged-hash verification remain outstanding. See the integration handoff."
     },
     {
       "id": "ART-001",
@@ -966,9 +967,10 @@
       "acceptance": "Add meaningful feedback and independent volume controls; document audio rights, formats and missing-asset behaviour.",
       "github_issue": null,
       "evidence": [
-        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
+        "docs/embervale/06-development/INTEGRATION_HANDOFF_2026-11-20.md"
       ],
-      "notes": "Start after the integrated build is published and the fresh route observed. Use action/result identities for swing/impact/success, bounded repetition/polyphony, independent effects volume/mute and missing-asset fallback. Record audio creation/licensing. This remains planned."
+      "notes": "Start after the integrated build is published and the fresh route observed. Use action/result identities for swing/impact/success, bounded repetition/polyphony, independent effects volume/mute and missing-asset fallback. Record audio creation/licensing. This remains planned. The integration handoff records the proposed event/authority boundaries and verification cases; no audio implementation or audible acceptance is claimed."
     },
     {
       "id": "GAME-006",
@@ -1622,16 +1624,17 @@
       "milestone": "R4",
       "priority": "P1",
       "title": "Reconcile and publish the working animation implementation",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "QA-004"
       ],
       "acceptance": "Combine published Mining/shared gathering with local melee/equipment without losing either; publish editable sources, manifests, outputs, previews and report; verify combined gameplay/render/packaging.",
       "github_issue": null,
       "evidence": [
-        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
+        "docs/embervale/06-development/INTEGRATION_HANDOFF_2026-11-20.md"
       ],
-      "notes": "Local animation began at 688221b and includes safety fixes at 196a279. GitHub includes Mining and safety fixes at 38552c255649c61060bf42931f17f3e524229d4b. Synthetic local snapshot ancestry must not replace master. Visual quality remains ART-005."
+      "notes": "Local animation began at 688221b and includes safety fixes at 196a279. GitHub includes Mining and safety fixes at 38552c255649c61060bf42931f17f3e524229d4b. Synthetic local snapshot ancestry must not replace master. Visual quality remains ART-005. Integration started in local worktree GameEngine-next on feat/integrated-combat-audio. Shared gathering, six-pose Mining/eight-pose chopping and melee/atlas conflicts were resolved in working files; configure completed. The execution environment became unavailable before build/export results could be retrieved. Uncommitted implementation is not published or verified; recover the existing worktree and follow the dated integration handoff."
     },
     {
       "id": "ART-005",

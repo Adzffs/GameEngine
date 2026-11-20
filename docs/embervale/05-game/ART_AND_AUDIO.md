@@ -185,6 +185,8 @@ Every sound should have an event, priority, volume category and repetition polic
 
 Provide separate master, music and effects controls when the pipeline is implemented; define an ambient category if it improves control. Record licence/provenance for audio exactly as for images. Avoid adding a large soundtrack before the event system, mixing and volume controls are reliable.
 
+The [integration handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md#bounded-sound-pass-after-integration-and-route-checks) scopes ART-004's first pass to action/result feedback with effects volume and mute. It records committed-event boundaries, repetition limits, missing-device behavior and audible verification. Music/ambient controls belong with those later implemented categories. This remains a proposed implementation; the interrupted integration has not delivered audio.
+
 ## 9. Acceptance checklist and maintenance
 
 A new required visual asset is ready when it has a stable ID, valid metadata, traceable source, supported dimensions, correct pivot, appropriate state coverage, readable gameplay-scale presentation and no unintended collision change. Its preview must identify the game/content version used. If it changes a selection or interaction cue, include a short gameplay test.

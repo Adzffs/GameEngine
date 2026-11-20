@@ -31,6 +31,8 @@ Completion refers to the stated bounded acceptance, with evidence and publicatio
 3. ART-004: implement the small sound pass.
 4. Continue explicit recovery/packaging/usability priorities; ART-005 polish stays deferred.
 
+Integration was started in a separate local worktree, then the execution environment became unavailable before combined build/export results could be retrieved. REL-004 is **in progress**, with its implementation still unpublished and unverified. The [integration handoff](../06-development/INTEGRATION_HANDOFF_2026-11-20.md) records the resolved boundaries, recovery position and pending checks. GAME-005 and ART-004 remain planned.
+
 ## Complete work inventory
 
 ### R0
