@@ -288,11 +288,11 @@ These are aspirations, not promised release dates. Keep features that reinforce 
 | Next | REL-004 | Combined published Mining/melee/equipment and matching assets/previews |
 | Then | GAME-005 and GAME-004 | Fresh route with real elapsed time, confusion, food/combat/recovery findings |
 | During starter acceptance | ART-004 | First sound pass implemented; finish audible/device review and synchronization with the recovered animation candidate |
-| Reliability work | QA-003, REL-002 | Recovered usability candidate needs final verification/merge; wider keyboard/scale/platform and clean installation remain |
+| Reliability work | QA-003, REL-002 | Windows usability regressions pass; wider keyboard/scale/manual/platform and clean installation remain |
 | Owner-deferred | ART-005 | Posing, weight, timing/transitions and visual acceptance |
 | As concrete changes require | ENG-005/006 | Progression/health integer policy and targeted responsibility extraction |
 
-The [QA-003 usability recovery handoff](../06-development/USABILITY_REVIEW_2026-11-20.md) records the draft control/save-recovery fixes and native Linux observations. Its execution environment failed before final reconstructed-tree checks; recover the published candidate, verify it and merge before marking that bounded pass complete.
+The [QA-003 usability recovery handoff](../06-development/USABILITY_REVIEW_2026-11-20.md) records the draft control/save-recovery fixes and native Linux observations. The [Windows follow-up](../06-development/WINDOWS_USABILITY_2026-11-20.md) completes corrected-candidate regression verification and records the recovered original animation worktree. Wider accessibility and human acceptance remain open.
 
 GAME-005 supplies acceptance evidence to the progression/map tasks. Requiring their human pacing acceptance before measuring the journey would make that workflow circular. QA-001/DOC-003 apply to each slice and do not wait for R6 packaging.
 

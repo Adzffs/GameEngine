@@ -2,7 +2,7 @@
   "version": 1,
   "date": "2026-11-20",
   "work_package": "QA-003",
-  "status": "draft_recovered_requires_verification",
+  "status": "superseded_by_verified_windows_followup",
   "base_commit": "b0ab668e0b4d09899c135e08c8211456d5f999e7",
   "candidate_code_commit": "f9c45e0a1e8ad744d9859c15ca32a11a60908a95",
   "candidate_code_tree": "a7b540d33b7da531f9be53abdc9c39b3f8517e9b",
@@ -96,12 +96,41 @@
     "retained_checkpoint_sha256": "c2e49941d7fe450e5eeaa595adace828dd02b5662f0e996eb4f74258cd2d0898",
     "final_withdrawal_recheck": "interrupted_not_observed"
   },
-  "current_reconstructed_commit_checks": {
+  "broader_qa003": "in_progress",
+  "animation_polish": "owner_deferred",
+  "original_reconstructed_commit_checks": {
     "compile": "pending",
     "full_suites": "pending",
     "native_acceptance": "pending",
     "documentation_checker": "pending"
   },
-  "broader_qa003": "in_progress",
-  "animation_polish": "owner_deferred"
+  "windows_followup": {
+    "verified_code": "44540678bfa682870f2c9efb8907a1d36891910a",
+    "report": "docs/embervale/06-development/WINDOWS_USABILITY_2026-11-20.md",
+    "client_ctest": {
+      "passed": 122,
+      "total": 122,
+      "headless": 98,
+      "client": 10,
+      "graphics": 14
+    },
+    "standalone_headless_ctest": {
+      "passed": 98,
+      "total": 98
+    },
+    "python": {
+      "run": 80,
+      "passed": 78,
+      "skipped": 2,
+      "reason": "symlink creation unavailable"
+    },
+    "usability_assertions": 22,
+    "bank_roundtrip_assertions": 12,
+    "manual_native_windows": "remaining acceptance",
+    "rel004_checkpoint": {
+      "files": 79,
+      "index_blobs": 94,
+      "history_bundle_bytes": 9342301
+    }
+  }
 }
