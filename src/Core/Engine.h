@@ -5,6 +5,8 @@
 #include "../World/World.h"
 #include "../Input/InputManager.h"
 #include "../Graphics/Graphics.h"
+#include "../Audio/AudioFeedbackState.h"
+#include "../Audio/SdlAudioPlayer.h"
 #include "EngineConfiguration.h"
 #include "../Persistence/WorldPlayerPersistenceLifecycle.h"
 
@@ -30,6 +32,9 @@ private:
     World world;
     InputManager inputManager;
     Graphics graphics;
+    // Destroy audio before Graphics shuts SDL down.
+    SdlAudioPlayer audio;
+    AudioFeedbackState audioFeedback;
     TickPerformanceStats tickPerformanceStats;
 
     int playerID = -1;

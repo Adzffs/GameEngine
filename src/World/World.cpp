@@ -1980,7 +1980,9 @@ void World::RecordMeleeCombatFeedback(
         defenderEntityID,
         result.didHit,
         result.actualDamageApplied,
-        MeleeCombatFeedbackLifetimeTicks};
+        MeleeCombatFeedbackLifetimeTicks,
+        currentTick};
+    meleeCombatEvents.push_back(meleeCombatFeedbacks[defenderEntityID]);
 }
 
 void World::AwardMeleeStyleExperience(
@@ -2013,6 +2015,7 @@ void World::Update()
     Logger::Debug("Updating World");
 
     entityDiedEvents.clear();
+    meleeCombatEvents.clear();
     gatheringRewardEvents.clear();
     publishedActionLifecycleEvents.clear();
     publishedNpcTalkEvents.clear();

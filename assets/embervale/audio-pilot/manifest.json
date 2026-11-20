@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "generator": "tools/audio/build_audio_pilot.py",
+  "format": {
+    "sample_rate": 48000,
+    "channels": 1,
+    "bits": 16,
+    "encoding": "PCM little endian"
+  },
+  "provenance": "Original mathematical synthesis created for Adzffs/GameEngine with AI assistance; no sampled or third-party audio input. No separate licence grant; repository distribution policy applies.",
+  "clips": [
+    {
+      "file": "wood-1.wav",
+      "sha256": "0d6c759ac46daa88adebfbcd16a61ef2ac5afe89d2e54af393223637c27ccc34",
+      "frames": 10560,
+      "seconds": 0.22,
+      "peak": 0.279998779296875,
+      "rms": 0.03981459076557227
+    },
+    {
+      "file": "wood-2.wav",
+      "sha256": "6f3f07f7f8ee8da694a37ee7b3ffb58422bbb04e3ea25a1ba4a159eae0e74ae1",
+      "frames": 10560,
+      "seconds": 0.22,
+      "peak": 0.279998779296875,
+      "rms": 0.03560478765707532
+    },
+    {
+      "file": "stone-1.wav",
+      "sha256": "91b238c0b1036ba1f8d906e6ca57336351b149c0cc4c83e849aa2fb4923441a3",
+      "frames": 12000,
+      "seconds": 0.25,
+      "peak": 0.279998779296875,
+      "rms": 0.042682306812268464
+    },
+    {
+      "file": "stone-2.wav",
+      "sha256": "10d1f3f2b1e31cf247544a1ebad8aba762e7a3d11be6df272aa9cbfc0aa33d45",
+      "frames": 12000,
+      "seconds": 0.25,
+      "peak": 0.279998779296875,
+      "rms": 0.04332202553371916
+    },
+    {
+      "file": "swing-1.wav",
+      "sha256": "7f8b7e7fc01481b95a2044e11008c7e83828dba3822b4d703d6345cf89c0a0eb",
+      "frames": 8640,
+      "seconds": 0.18,
+      "peak": 0.279998779296875,
+      "rms": 0.07056889533597828
+    },
+    {
+      "file": "heavy-swing-1.wav",
+      "sha256": "a2fd12448b08edc54fa8dc10b3753095abcc8e12e13a0cbe6d2d9692d6168140",
+      "frames": 13440,
+      "seconds": 0.28,
+      "peak": 0.279998779296875,
+      "rms": 0.07442841014986355
+    },
+    {
+      "file": "hit-1.wav",
+      "sha256": "f0294ce132f2851fdc1bcb2bea223a03ae79bf9d1f5a56f1e4fdd06f032ff8cf",
+      "frames": 8640,
+      "seconds": 0.18,
+      "peak": 0.279998779296875,
+      "rms": 0.03912961058922316
+    },
+    {
+      "file": "hit-2.wav",
+      "sha256": "e06738b0d39ec00a21ea64ee84817f6498a11798b9811093100aac855b990d53",
+      "frames": 8640,
+      "seconds": 0.18,
+      "peak": 0.279998779296875,
+      "rms": 0.03824368096905235
+    },
+    {
+      "file": "block-1.wav",
+      "sha256": "c9c8590e9d5cb28c3bed0ccc881f29d64df6eadc6cfb07f174a469c4c116ac45",
+      "frames": 13440,
+      "seconds": 0.28,
+      "peak": 0.279998779296875,
+      "rms": 0.05443466742599992
+    },
+    {
+      "file": "miss-1.wav",
+      "sha256": "109a0be6c4241714ba11b19821e522a5713960cd2c33de36ab122ac92286b451",
+      "frames": 5760,
+      "seconds": 0.12,
+      "peak": 0.279998779296875,
+      "rms": 0.0718869165089357
+    },
+    {
+      "file": "gather-1.wav",
+      "sha256": "9253544c085ed18e417bbab47fde1c7a437527bd599d640deb563ae65e760c65",
+      "frames": 7680,
+      "seconds": 0.16,
+      "peak": 0.279998779296875,
+      "rms": 0.07069346873443243
+    },
+    {
+      "file": "craft-1.wav",
+      "sha256": "28765a6831e2cd693e4a6c387ba8fa2113fe23143835495982f78975a3477c76",
+      "frames": 12000,
+      "seconds": 0.25,
+      "peak": 0.279998779296875,
+      "rms": 0.05750138482476417
+    },
+    {
+      "file": "equip-1.wav",
+      "sha256": "49999822a824d10ec56726c7a748b5279bcf072e34927c3974a3a3acb77415e3",
+      "frames": 6720,
+      "seconds": 0.14,
+      "peak": 0.279998779296875,
+      "rms": 0.05963234472377821
+    },
+    {
+      "file": "inventory-1.wav",
+      "sha256": "9b7416459a09243af295c0c91c59b802b406063ad21997a60b159c9f62534299",
+      "frames": 3600,
+      "seconds": 0.075,
+      "peak": 0.279998779296875,
+      "rms": 0.06728810542818901
+    },
+    {
+      "file": "eat-1.wav",
+      "sha256": "293e8759edc814280f5b7bbad387b7165e7ce2d4d702751430d003f259f1fb3e",
+      "frames": 8640,
+      "seconds": 0.18,
+      "peak": 0.279998779296875,
+      "rms": 0.053050847442410634
+    }
+  ]
+}

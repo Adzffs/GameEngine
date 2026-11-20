@@ -235,6 +235,8 @@ public:
 
     const std::map<int, MeleeCombatFeedback> &
     GetMeleeCombatFeedbacks() const;
+    // Per-tick committed outcomes survive display cleanup on a fatal hit.
+    const std::vector<MeleeCombatFeedback> &GetMeleeCombatEvents() const { return meleeCombatEvents; }
     const std::map<int, MeleeAttackPresentation> &
     GetMeleeAttackPresentations() const;
 
@@ -270,6 +272,7 @@ public:
     const std::vector<ShopTransactionEvent> &GetShopTransactionEvents() const;
 
 private:
+    std::vector<MeleeCombatFeedback> meleeCombatEvents;
     friend struct WorldTestAccess;
 
     World(

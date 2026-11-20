@@ -7,4 +7,5 @@ struct MeleeCombatFeedback
     bool hit = false;
     int actualDamageApplied = 0;
     int remainingTicks = 0;
+    int completionTick = -1;
 };

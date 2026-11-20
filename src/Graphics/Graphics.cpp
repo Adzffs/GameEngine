@@ -1552,6 +1552,26 @@ bool Graphics::HandleSidePanelClick(
 
     if (selectedTab == SidePanelTab::SETTINGS)
     {
+        const float soundY = layout.contentBounds.y + 220.0f;
+        const SDL_FRect quieter{layout.contentBounds.x, soundY, 44.0f, 28.0f};
+        const SDL_FRect louder{layout.contentBounds.x + 50.0f, soundY, 44.0f, 28.0f};
+        const SDL_FRect mute{layout.contentBounds.x + 100.0f, soundY,
+            layout.contentBounds.w - 100.0f, 28.0f};
+        if (IsPointInsideRectangle(mouseX, mouseY, quieter))
+        {
+            audioSettings.SetEffectsVolume(audioSettings.GetEffectsVolume() - 10);
+            return true;
+        }
+        if (IsPointInsideRectangle(mouseX, mouseY, louder))
+        {
+            audioSettings.SetEffectsVolume(audioSettings.GetEffectsVolume() + 10);
+            return true;
+        }
+        if (IsPointInsideRectangle(mouseX, mouseY, mute))
+        {
+            audioSettings.ToggleMute();
+            return true;
+        }
         const SDL_FRect gridToggle{
             layout.contentBounds.x,
             layout.contentBounds.y + 54.0f,
@@ -1765,6 +1785,18 @@ void Graphics::ProcessEvents(bool &running)
         if (event.type == SDL_EVENT_KEY_DOWN &&
             !event.key.repeat)
         {
+            if (event.key.scancode == SDL_SCANCODE_F8)
+            {
+                audioSettings.ToggleMute();
+                continue;
+            }
+            if (event.key.scancode == SDL_SCANCODE_F9 ||
+                event.key.scancode == SDL_SCANCODE_F10)
+            {
+                audioSettings.SetEffectsVolume(audioSettings.GetEffectsVolume() +
+                    (event.key.scancode == SDL_SCANCODE_F9 ? -10 : 10));
+                continue;
+            }
             if (event.key.scancode == SDL_SCANCODE_F6)
             {
                 worldArtEnabled = !worldArtEnabled;
@@ -4857,24 +4889,35 @@ void Graphics::DrawSettings()
     SDL_RenderDebugText(renderer, buttons[2].x + 12.0f,
                         buttons[2].y + 15.0f, "SKIP TUTORIAL");
 
+    const std::string soundLabel = "SOUND EFFECTS: " +
+        std::to_string(audioSettings.GetEffectsVolume()) + "%";
     SDL_SetRenderDrawColor(renderer, 190, 195, 195, 255);
     SDL_RenderDebugText(renderer, layout.contentBounds.x,
-                        layout.contentBounds.y + 214.0f, "CONTROLS");
-    SDL_RenderDebugText(renderer, layout.contentBounds.x,
-                        layout.contentBounds.y + 239.0f,
-                        "Left click  Move / interact");
-    SDL_RenderDebugText(renderer, layout.contentBounds.x,
-                        layout.contentBounds.y + 261.0f,
-                        "Right click Split item stacks");
-    SDL_RenderDebugText(renderer, layout.contentBounds.x,
-                        layout.contentBounds.y + 283.0f,
-                        "Shift       Quick transfer");
-    SDL_RenderDebugText(renderer, layout.contentBounds.x,
-                        layout.contentBounds.y + 305.0f,
-                        "H           Toggle guide");
-    SDL_RenderDebugText(renderer, layout.contentBounds.x,
-                        layout.contentBounds.y + 327.0f,
-                        "Esc         Close window");
+        layout.contentBounds.y + 200.0f, soundLabel.c_str());
+    const std::array<SDL_FRect, 3> soundButtons{{
+        {layout.contentBounds.x, layout.contentBounds.y + 220.0f, 44.0f, 28.0f},
+        {layout.contentBounds.x + 50.0f, layout.contentBounds.y + 220.0f, 44.0f, 28.0f},
+        {layout.contentBounds.x + 100.0f, layout.contentBounds.y + 220.0f,
+         layout.contentBounds.w - 100.0f, 28.0f}}};
+    const std::array<const char *, 3> labels{
+        "-10", "+10", audioSettings.IsMuted() ? "UNMUTE (F8)" : "MUTE (F8)"};
+    for (std::size_t i = 0; i < soundButtons.size(); ++i)
+    {
+        SDL_SetRenderDrawColor(renderer, 42, 47, 52, 255);
+        SDL_RenderFillRect(renderer, &soundButtons[i]);
+        SDL_SetRenderDrawColor(renderer, 164, 139, 87, 255);
+        SDL_RenderRect(renderer, &soundButtons[i]);
+        SDL_SetRenderDrawColor(renderer, 235, 225, 202, 255);
+        SDL_RenderDebugText(renderer, soundButtons[i].x + 8,
+            soundButtons[i].y + 10, labels[i]);
+    }
+    SDL_SetRenderDrawColor(renderer, 190, 195, 195, 255);
+    SDL_RenderDebugText(renderer, layout.contentBounds.x, layout.contentBounds.y + 270,
+        "Left click  Move / interact");
+    SDL_RenderDebugText(renderer, layout.contentBounds.x, layout.contentBounds.y + 290,
+        "Right Split | Shift Transfer");
+    SDL_RenderDebugText(renderer, layout.contentBounds.x, layout.contentBounds.y + 310,
+        "F9/F10 Volume | H Guide | Esc Close");
 }
 void Graphics::DrawSidePanelTabs()
 {

@@ -38,6 +38,7 @@ void GatheringPresentationState::SynchronizeRewards(int localActorID,
         lastRewardTick = -1;
         rewards.clear();
         animation.reset();
+        contactPending = false;
     }
     for (const auto &event : events)
     {
@@ -53,6 +54,8 @@ void GatheringPresentationState::SynchronizeRewards(int localActorID,
 void GatheringPresentationState::Update(const Player &player, const Action *action,
     const std::vector<ResourceNode> &resources, float deltaSeconds, bool settled)
 {
+    contactPending = false;
+    const int previousPose = GetPose();
     const float delta = std::isfinite(deltaSeconds) ? std::clamp(deltaSeconds, 0.0f, 0.1f) : 0.0f;
     for (auto &notice : rewards) notice.remainingSeconds -= delta;
     std::erase_if(rewards, [](const auto &notice) { return notice.remainingSeconds <= 0.0f; });
@@ -89,7 +92,11 @@ void GatheringPresentationState::Update(const Player &player, const Action *acti
     if (!animation || animation->resourceID != resource->GetID() || animation->toolTier != tier || animation->facing != facing ||
         animation->actorX != x || animation->actorY != y)
         animation = GatheringAnimation{resource->GetID(), facing, tier, x, y};
-    else animation->elapsedSeconds = std::fmod(animation->elapsedSeconds + delta, CycleSeconds);
+    else
+    {
+        animation->elapsedSeconds = std::fmod(animation->elapsedSeconds + delta, CycleSeconds);
+        contactPending = previousPose < 3 && GetPose() >= 3;
+    }
 }
 
 int GatheringPresentationState::GetPose() const

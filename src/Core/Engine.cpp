@@ -9,6 +9,7 @@
 #include "../Equipment/EquipmentSlotType.h"
 #include "../Inventory/ItemType.h"
 #include "../Player/Player.h"
+#include "../Item/ItemDatabase.h"
 #include "../Skills/SkillType.h"
 #include "../Recipe/RecipeType.h"
 #include "../Recipe/CraftingInteractionModel.h"
@@ -149,6 +150,9 @@ bool Engine::Run()
     if (!graphics.Initialize()) return false;
     graphics.ShowGameGuide();
     if (!InitializeWorldForRun()) return false;
+    audioFeedback.Reset(playerID);
+    audio.Initialize(); // Optional presentation: device failure never blocks play.
+    audio.ApplySettings(graphics.GetAudioSettings());
 
     Logger::Info("Server Started");
 
@@ -172,6 +176,7 @@ bool Engine::Run()
             world.GetCraftingSession(playerID));
         SynchronizeCraftingInteraction();
         graphics.ProcessEvents(running);
+        audio.ApplySettings(graphics.GetAudioSettings());
 
         if (!running)
         {
@@ -195,18 +200,29 @@ bool Engine::Run()
         if (graphics.ConsumeInventorySlotClick(
                 clickedInventorySlot))
         {
-            world.EnqueueCommand(
+            const auto commandID = world.EnqueueCommand(
                 UseInventoryItemCommand{
                     playerID,
                     clickedInventorySlot});
+            const Player *actor = dynamic_cast<Player *>(world.GetEntityByID(playerID));
+            if (actor && clickedInventorySlot >= 0 &&
+                clickedInventorySlot < static_cast<int>(actor->GetInventory().GetSlots().size()))
+            {
+                const auto &definition = ItemDatabase::Get(
+                    actor->GetInventory().GetSlots()[clickedInventorySlot].GetItemType());
+                if (definition.IsEquippable())
+                    audioFeedback.TrackCommand(commandID, AudioCue::EQUIP);
+                else if (definition.IsFood())
+                    audioFeedback.TrackCommand(commandID, AudioCue::EAT);
+            }
         }
 
         int dropAmount = 0;
         if (graphics.ConsumeInventoryDropRequest(
                 clickedInventorySlot, dropAmount))
         {
-            world.EnqueueCommand(DropInventoryItemCommand{
-                playerID, clickedInventorySlot, dropAmount});
+            audioFeedback.TrackCommand(world.EnqueueCommand(DropInventoryItemCommand{
+                playerID, clickedInventorySlot, dropAmount}), AudioCue::INVENTORY);
         }
 
         if (graphics.ConsumeTutorialSkipRequest())
@@ -223,10 +239,10 @@ bool Engine::Run()
 
         if (graphics.ConsumeWeaponSlotClick())
         {
-            world.EnqueueCommand(
+            audioFeedback.TrackCommand(world.EnqueueCommand(
                 UnequipItemCommand{
                     playerID,
-                    EquipmentSlotType::WEAPON});
+                    EquipmentSlotType::WEAPON}), AudioCue::EQUIP);
         }
 
         int clickedTileX;
@@ -398,6 +414,10 @@ bool Engine::Run()
                     ? -1
                     : recoveryPile->position.GetY(),
                 &world.GetMeleeAttackPresentations());
+            SkillType contactSkill = SkillType::NONE;
+            if (graphics.ConsumeGatheringContact(contactSkill))
+                audio.Play(contactSkill == SkillType::MINING
+                    ? AudioCue::STONE_IMPACT : AudioCue::WOOD_IMPACT);
         }
     }
 }
@@ -640,6 +660,7 @@ bool Engine::EnqueuePendingCraftingInteraction()
         world.EnqueueCommand(command), command.actorEntityID,
         command.sessionId, command.expectedRevision, std::nullopt};
     graphics.SetCraftingInteractionInFlight(true);
+    audioFeedback.TrackCommand(pendingCraftingInteraction->commandID, AudioCue::INVENTORY);
     return true;
 }
 
@@ -722,6 +743,13 @@ void Engine::Update()
         Clock::ClockType::now();
 
     world.Update();
+    const Player *audioActor = dynamic_cast<Player *>(world.GetEntityByID(playerID));
+    const auto weapon = audioActor ? audioActor->GetEquipment().GetEquippedItem(
+        EquipmentSlotType::WEAPON) : ItemType::NONE;
+    for (const auto cue : audioFeedback.ConsumeTick(playerID, world.GetCurrentTick(),
+             world.GetActionLifecycleEvents(), world.GetGatheringRewardEvents(),
+             world.GetMeleeCombatEvents(), world.GetCommandProcessingResults(), weapon))
+        audio.Play(cue);
 
     // Consume before another catch-up tick can replace the published events.
     graphics.SynchronizeGatheringRewards(playerID, world.GetGatheringRewardEvents());

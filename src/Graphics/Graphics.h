@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL.h>
 #include "ForestSprites.h"
+#include "../Audio/AudioCue.h"
 #include "../Gathering/WoodcuttingPresentationState.h"
 #include <array>
 #include <memory>
@@ -48,6 +49,13 @@ public:
     ~Graphics();
 
     bool Initialize();
+    const AudioSettings &GetAudioSettings() const { return audioSettings; }
+    bool ConsumeGatheringContact(SkillType &skill)
+    {
+        if (woodcuttingPresentation.ConsumeContact()) { skill = SkillType::WOODCUTTING; return true; }
+        if (miningPresentation.ConsumeContact()) { skill = SkillType::MINING; return true; }
+        return false;
+    }
     void SynchronizeGatheringRewards(int actorID, const std::vector<GatheringRewardEvent> &events)
     {
         woodcuttingPresentation.SynchronizeRewards(actorID, events);
@@ -495,6 +503,7 @@ public:
     bool sidePanelOpen;
 
 private:
+    AudioSettings audioSettings;
     friend struct GraphicsTestAccess;
 
     ForestSprites forestSprites;

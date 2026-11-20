@@ -32,6 +32,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(GAMEENGINE_CORE_SOURCES
+    src/Audio/AudioFeedbackState.cpp
     src/Tutorial/StarterJourney.cpp
     src/Dialogue/DialogueDefinitionDatabase.cpp
     src/Dialogue/DialogueSystem.cpp
@@ -132,6 +133,11 @@ add_library(GameEngineCore
 
 target_include_directories(GameEngineCore PUBLIC src)
 
+if(GAMEENGINE_BUILD_CLIENT OR GAMEENGINE_BUILD_GRAPHICS_TESTS)
+    add_library(GameEngineAudio src/Audio/SdlAudioPlayer.cpp)
+    target_link_libraries(GameEngineAudio PUBLIC GameEngineCore SDL3::SDL3)
+endif()
+
 # Compatibility target: runtime input is SDL-free core functionality, so it is
 # available even when the standalone content tools are omitted.
 add_library(EmbervaleWorldSnapshot INTERFACE)
@@ -159,6 +165,7 @@ if(GAMEENGINE_BUILD_CONTENT_TOOLS)
 endif()
 
 function(configure_gameengine_world_art target)
+    target_link_libraries(${target} PRIVATE GameEngineAudio)
     target_sources(${target} PRIVATE src/Graphics/ForestSprites.cpp src/Graphics/WorldArtVariation.cpp)
     set(forest_images
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/forest-pilot/textures/terrain.png"
@@ -197,43 +204,59 @@ function(configure_gameengine_world_art target)
     foreach(name grass paths water stone flora walls roof floors trees stumps rocks)
         list(APPEND variation_images "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/variation-pilot/textures/${name}.png")
     endforeach()
-    # Refresh packaged art when the images change, even if no C++ changed.
-    set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS ${forest_images} ${cast_images} ${environment_images} ${service_images} ${building_images} ${variation_images} ${woodcutting_images} ${mining_images})
-    add_custom_command(TARGET ${target} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_FILE_DIR:${target}>/assets/embervale/forest-pilot/textures"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${forest_images}
-            "$<TARGET_FILE_DIR:${target}>/assets/embervale/forest-pilot/textures"
-        COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_FILE_DIR:${target}>/assets/embervale/cast-pilot/textures"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${cast_images}
-            "$<TARGET_FILE_DIR:${target}>/assets/embervale/cast-pilot/textures"
-        COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_FILE_DIR:${target}>/assets/embervale/environment-pilot/textures"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${environment_images}
-            "$<TARGET_FILE_DIR:${target}>/assets/embervale/environment-pilot/textures"
-        COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_FILE_DIR:${target}>/assets/embervale/service-pilot/textures"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${service_images}
-            "$<TARGET_FILE_DIR:${target}>/assets/embervale/service-pilot/textures"
-        COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_FILE_DIR:${target}>/assets/embervale/building-pilot/textures"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${building_images}
-            "$<TARGET_FILE_DIR:${target}>/assets/embervale/building-pilot/textures"
-        COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_FILE_DIR:${target}>/assets/embervale/variation-pilot/textures"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${variation_images}
-            "$<TARGET_FILE_DIR:${target}>/assets/embervale/variation-pilot/textures"
-        COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_FILE_DIR:${target}>/assets/embervale/woodcutting-pilot/textures"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${woodcutting_images}
-            "$<TARGET_FILE_DIR:${target}>/assets/embervale/woodcutting-pilot/textures"
-        COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_FILE_DIR:${target}>/assets/embervale/mining-pilot/textures"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${mining_images}
-            "$<TARGET_FILE_DIR:${target}>/assets/embervale/mining-pilot/textures"
-        VERBATIM
-    )
+    set(audio_files)
+    foreach(name wood-1 wood-2 stone-1 stone-2 swing-1 heavy-swing-1
+            hit-1 hit-2 block-1 miss-1 gather-1 craft-1 equip-1 inventory-1 eat-1)
+        list(APPEND audio_files "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/audio-pilot/${name}.wav")
+    endforeach()
+    # All SDL executables share their runtime output directory. One owner avoids
+    # concurrent writes, and checks the package even when no executable relinks.
+    # TARGET_FILE_DIR does not add an executable dependency under CMP0112 NEW.
+    if(NOT TARGET GameEngineWorldArt)
+        add_custom_target(GameEngineWorldArt
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/forest-pilot/textures"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${forest_images}
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/forest-pilot/textures"
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/cast-pilot/textures"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${cast_images}
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/cast-pilot/textures"
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/environment-pilot/textures"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${environment_images}
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/environment-pilot/textures"
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/service-pilot/textures"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${service_images}
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/service-pilot/textures"
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/building-pilot/textures"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${building_images}
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/building-pilot/textures"
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/variation-pilot/textures"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${variation_images}
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/variation-pilot/textures"
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/woodcutting-pilot/textures"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${woodcutting_images}
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/woodcutting-pilot/textures"
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/mining-pilot/textures"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${mining_images}
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/mining-pilot/textures"
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/audio-pilot"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${audio_files}
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/audio-pilot"
+            DEPENDS ${forest_images} ${cast_images} ${environment_images}
+                ${service_images} ${building_images} ${variation_images}
+                ${woodcutting_images} ${mining_images} ${audio_files}
+            VERBATIM
+        )
+    endif()
+    add_dependencies(${target} GameEngineWorldArt)
 endfunction()
 
 if(GAMEENGINE_BUILD_CLIENT)
@@ -375,6 +398,9 @@ if(BUILD_TESTING)
         # Python is optional; absence means no integration test registered.
         find_package(Python3 COMPONENTS Interpreter QUIET)
         if(Python3_Interpreter_FOUND)
+            add_test(NAME AudioAssetChecks
+                COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tools/audio/build_audio_pilot.py" --check)
+            set_tests_properties(AudioAssetChecks PROPERTIES LABELS "headless;audio")
             add_test(
                 NAME StarterWorldVisualBridgeIntegration
                 COMMAND "${Python3_EXECUTABLE}"
@@ -388,6 +414,21 @@ if(BUILD_TESTING)
     endif()
 
     add_gameengine_headless_test(ActionFrameworkTests tests/ActionFrameworkTests.cpp)
+    add_gameengine_headless_test(AudioFeedbackTests tests/AudioFeedbackTests.cpp)
+    if(GAMEENGINE_BUILD_CLIENT OR GAMEENGINE_BUILD_GRAPHICS_TESTS)
+        add_executable(AudioPlaybackTests tests/AudioPlaybackTests.cpp)
+        target_link_libraries(AudioPlaybackTests PRIVATE GameEngineAudio)
+        add_test(NAME AudioPlaybackTests COMMAND AudioPlaybackTests
+            "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/audio-pilot")
+        set_tests_properties(AudioPlaybackTests PROPERTIES LABELS "client;audio"
+            ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+        add_test(NAME AudioUnavailableTests COMMAND AudioPlaybackTests --unavailable)
+        set_tests_properties(AudioUnavailableTests PROPERTIES LABELS "client;audio"
+            ENVIRONMENT "SDL_AUDIODRIVER=nonexistent-test-driver")
+        if(GAMEENGINE_BUILD_GRAPHICS_TESTS)
+            add_gameengine_graphics_test(AudioGraphicsTests tests/AudioGraphicsTests.cpp)
+        endif()
+    endif()
     add_gameengine_headless_test(GameplayActionIntegrationTests tests/GameplayActionIntegrationTests.cpp)
     add_gameengine_headless_test(EquipmentStatsTests tests/EquipmentStatsTests.cpp)
     add_gameengine_headless_test(PlayerHealthTests tests/PlayerHealthTests.cpp)

@@ -41,9 +41,11 @@ public:
     const std::vector<GatheringRewardNotice> &GetRewards() const { return rewards; }
     int GetPose() const;
     float GetImpact() const;
+    bool ConsumeContact() { const bool result = contactPending; contactPending = false; return result; }
 
 private:
     SkillType skillType;
+    bool contactPending = false;
     int actorID = -1;
     int lastRewardTick = -1;
     std::optional<GatheringAnimation> animation;
