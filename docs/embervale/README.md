@@ -27,6 +27,8 @@
 | How will the editor work? | [Studio design](04-studio/STUDIO_DESIGN.md) |
 | Play or edit River Crossing? | [Candidate, map overview and launch guide](../../content/worlds/README.md) |
 | How is the settlement arranged? | [River Crossing geography](05-game/RIVER_CROSSING.md) |
+| How should future animations be authored and reviewed? | [Animation guide](05-game/ANIMATION_GUIDE.md) |
+| What did the animation research and polish establish? | [Sources, measured findings and prototype status](06-development/ANIMATION_RESEARCH_2026-11-20.md) |
 | What still needs resolving? | [Risk register](07-decisions/RISKS_AND_QUESTIONS.md) |
 
 The source contains substantial RPG systems, starter-world export, bounded validation and explicit runtime loading of supported starter snapshots. Shared editing, guarded sibling saving, undo/redo and the visual editor are implemented in bounded slices. The [fresh-player profile](05-game/FRESH_PLAYER_PROFILE.md) is now available for normal starting progression, with its runtime/visible acceptance deferred at the owner's request. The [first River Crossing candidate](../../content/worlds/README.md) now provides authored terrain, two crossings, routes and all current placement roles; production content validation/builds passed and gameplay/pacing acceptance remains deferred. Follow the [current backlog](02-roadmap/BACKLOG.md) for implementation status. The runtime-import slice passed 77/77 headless and 89/89 Linux SDL tests; see the [runtime verification record](06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md) for executed source/environment evidence. The [earlier baseline/export results](06-development/BASELINE_VERIFICATION_2026-11-18.md) remain separately recorded.
@@ -37,6 +39,8 @@ The source contains substantial RPG systems, starter-world export, bounded valid
 **Engine contributor:** Getting started → repository guide → architecture → content model → save compatibility → relevant backlog task.\
 **World/content designer:** Game design → catalogue → River Crossing → editor workflows → playtest template.\
 **AI contributor:** Overview → source baseline → task and dependencies → CLI contract → contribution rules → evidence/hand-off template.
+
+**Animation contributor:** [Animation guide](05-game/ANIMATION_GUIDE.md) → [research and findings](06-development/ANIMATION_RESEARCH_2026-11-20.md) → current action implementation and dated integration report. Verify the checkout: the research labels local prototype results separately from published code.
 
 ## Complete document catalogue
 
@@ -94,6 +98,7 @@ The source contains substantial RPG systems, starter-world export, bounded valid
 | [RIVER_CROSSING.md](05-game/RIVER_CROSSING.md) | First authored flat candidate, roads, reservations, placements and remaining acceptance |
 | [CONTENT_CATALOGUE.md](05-game/CONTENT_CATALOGUE.md) | Current items, recipes, skills, NPCs, quests, stations and resources |
 | [ART_AND_AUDIO.md](05-game/ART_AND_AUDIO.md) | Small art pilot, asset pipeline, animation, sound, readability and provenance |
+| [ANIMATION_GUIDE.md](05-game/ANIMATION_GUIDE.md) | Reusable pose, timing, equipment, authority, export, review and handoff guidance |
 
 ### Repeatable development
 
@@ -112,6 +117,7 @@ The source contains substantial RPG systems, starter-world export, bounded valid
 | [BUILDING_RENDERING_2026-11-19.md](06-development/BUILDING_RENDERING_2026-11-19.md) | Modular overhead building kit, schema-4 workshop, collision, editor preservation and roof cutaway |
 | [WORLD_VARIATION_2026-11-19.md](06-development/WORLD_VARIATION_2026-11-19.md) | Contextual terrain/plants/leaves, tree/rock variants, building age/material kit and actual game-camera evidence |
 | [WALL_ORIENTATION_2026-11-19.md](06-development/WALL_ORIENTATION_2026-11-19.md) | Directional wall/window/corner art, interior front cutaway, floor/eave alignment and camera captures |
+| [ANIMATION_RESEARCH_2026-11-20.md](06-development/ANIMATION_RESEARCH_2026-11-20.md) | Seven primary sources, measured defects, local polish decisions, timing tables, verification and evidence limits |
 | [CONTRIBUTING.md](06-development/CONTRIBUTING.md) | Focused work, evidence, review, compatibility and parallel-agent handoff |
 | [TESTING.md](06-development/TESTING.md) | Current registrations, meaningful future tests and result records |
 | [RUNTIME_IMPORT_VERIFICATION_2026-11-18.md](06-development/RUNTIME_IMPORT_VERIFICATION_2026-11-18.md) | Runtime-input build/test results, real dummy-video launch and precise platform limits |

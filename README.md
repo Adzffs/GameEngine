@@ -18,6 +18,8 @@ A C++20 and SDL3 tile-based RPG project, with an existing playable development w
 | See river, stone and mining art | [Environment art and captures](docs/embervale/06-development/ENVIRONMENT_RENDERING_2026-11-19.md) |
 | See bank and crafting table art | [Service art and captures](docs/embervale/06-development/SERVICE_RENDERING_2026-11-19.md) |
 | See the workshop and building kit | [Building art, collision and roof visibility](docs/embervale/06-development/BUILDING_RENDERING_2026-11-19.md) |
+| Animate characters, weapons or actions | [Animation guide](docs/embervale/05-game/ANIMATION_GUIDE.md) |
+| Reuse animation research and measured findings | [Animation research, 20 November](docs/embervale/06-development/ANIMATION_RESEARCH_2026-11-20.md) |
 | Find every document | [Documentation index](docs/embervale/README.md) |
 
 ## Project status

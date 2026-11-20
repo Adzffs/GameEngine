@@ -167,6 +167,8 @@ Measure texture memory, asset load time, visible entity counts and frame time on
 
 ## 7. Animation contract
 
+Start animation work with the [animation guide](ANIMATION_GUIDE.md) and [20 November research and findings](../06-development/ANIMATION_RESEARCH_2026-11-20.md). They record directional consistency, weapon attachments, pose/timing review, interruption rules and measured local polish results. The dated research distinguishes its separate local melee/polish prototype from published integrations; check the current source before reusing its helper paths or timing assumptions.
+
 Animation communicates a simulated event; it must not become an alternative authority for its result. Combat damage, resource depletion and item production remain governed by gameplay rules. A presentation can begin, interpolate or finish between simulation updates without granting an extra hit or gathered item.
 
 For each animated definition, record idle, movement, action and state-transition needs. Implement only the states the current game uses. Test interruption: movement during an interaction, a target disappearing, a player dying, a resource depleting and a camera zoom during the action. Select an explicit fallback frame for missing optional directions.
