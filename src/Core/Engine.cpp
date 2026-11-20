@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <thread>
+#include <SDL3/SDL_messagebox.h>
 #include "Core/Logger.h"
 #include "../Command/ServerCommand.h"
 #include "../Equipment/EquipmentSlotType.h"
@@ -15,6 +16,26 @@
 
 namespace
 {
+    bool ConfirmExitWithoutSaving()
+    {
+        const SDL_MessageBoxButtonData buttons[]{
+            {SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT | SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT,
+             0, "Return to game"},
+            {0, 1, "Exit without saving"}};
+        const SDL_MessageBoxData message{
+            SDL_MESSAGEBOX_ERROR, nullptr, "Progress could not be saved",
+            "Your progress could not be saved. Return to the game to finish crafting "
+            "or try saving again. Exiting now discards progress since the last successful save.",
+            2, buttons, nullptr};
+        int selected = 0;
+        if (!SDL_ShowMessageBox(&message, &selected))
+        {
+            Logger::Error(std::string("Could not display save-failure choices: ") + SDL_GetError());
+            return false;
+        }
+        return selected == 1;
+    }
+
     int FindInventorySlot(
         const Inventory &inventory,
         ItemType itemType)
@@ -131,8 +152,18 @@ bool Engine::Run()
 
     Logger::Info("Server Started");
 
-    while (running)
+    while (true)
     {
+        if (!running)
+        {
+            const bool finalized = FinalizeWorldAfterRun();
+            if (finalized || ConfirmExitWithoutSaving())
+            {
+                Logger::Info("Server stopped");
+                return finalized;
+            }
+            running = true;
+        }
         SynchronizeDialoguePresentation();
         SynchronizeShopPresentation();
         SynchronizeBankPresentation();
@@ -144,7 +175,7 @@ bool Engine::Run()
 
         if (!running)
         {
-            break;
+            continue;
         }
 
         EnqueuePendingDialogueCommand();
@@ -369,10 +400,6 @@ bool Engine::Run()
                 &world.GetMeleeAttackPresentations());
         }
     }
-
-    const bool finalized = FinalizeWorldAfterRun();
-    Logger::Info("Server stopped");
-    return finalized;
 }
 
 void Engine::SynchronizeDialoguePresentation()

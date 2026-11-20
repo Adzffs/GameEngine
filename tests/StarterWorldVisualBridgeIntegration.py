@@ -154,7 +154,7 @@ class RealWorldBridgeTests(unittest.TestCase):
             arguments = launched[0]
             self.assertEqual(arguments[0], str(TOOL))
             self.assertEqual(arguments[1], "--world")
-            self.assertEqual(arguments[3:], ["--no-save"])
+            self.assertEqual(arguments[3:], ["--no-save", "--profile", "fresh"])
             private = Path(arguments[2])
             self.assertNotEqual(private, draft)
             self.assertEqual(private.read_bytes(), draft.read_bytes())
@@ -257,7 +257,7 @@ class RealWorldBridgeTests(unittest.TestCase):
         draft = self.source.with_name('unverified writer bypass.json')
         for command in (f'save {draft}', 'status', 'list', 'terrain', 'quit'):
             with self.subTest(command=command):
-                with self.assertRaisesRegex(StudioError, 'Only move, paint, place, remove, undo and redo'):
+                with self.assertRaisesRegex(StudioError, 'Only move, paint, place, remove, spawn, undo and redo'):
                     self.bridge.perform(command)
         self.assertFalse(draft.exists())
         self.assertEqual(self.bridge.commands, [])

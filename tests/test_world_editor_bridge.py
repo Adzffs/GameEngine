@@ -340,7 +340,7 @@ class BridgeTests(unittest.TestCase):
                         'help', 'map 0 0', 'quit', 'exit',
                         'move resource.tree.001 3 1 extra', 'paint 1 0 X'):
             with self.subTest(command=command):
-                with self.assertRaisesRegex(StudioError, 'Only move, paint, place, remove, undo and redo'):
+                with self.assertRaisesRegex(StudioError, 'Only move, paint, place, remove, spawn, undo and redo'):
                     self.bridge.perform(command)
         self.assertFalse(draft.exists())
         self.assertEqual(self.bridge.commands, [])

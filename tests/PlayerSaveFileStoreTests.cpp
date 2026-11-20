@@ -289,7 +289,7 @@ int main()
     WriteBytes(corrupt, unsupportedVersion);
     test.Expect(PlayerSaveFileStore::Load(corrupt).Contains(PlayerSaveFileIssueCode::DECODE_FAILED), "unsupported file version fails through codec");
 
-    // Existing target is authoritative over both transaction artifacts.
+    // A validated target is authoritative over both transaction artifacts.
     WriteBytes(target, canonical); WriteBytes(temporary, replacementText);
     loadResult = PlayerSaveFileStore::Load(target);
     test.Expect(loadResult.IsSuccess() && SameSave(*loadResult.GetSaveData(), original) && !std::filesystem::exists(temporary),
@@ -305,7 +305,27 @@ int main()
     WriteBytes(target, "corrupt"); WriteBytes(backup, canonical);
     loadResult = PlayerSaveFileStore::Load(target);
     test.Expect(loadResult.Contains(PlayerSaveFileIssueCode::DECODE_FAILED), "corrupt existing target does not fall back to backup");
-    test.Expect(!std::filesystem::exists(backup), "stale backup is discarded when target exists");
+    test.ExpectEqual(ReadBytes(backup), canonical, "failed load preserves the committed backup for recovery");
+
+    const std::array<std::string, 3> unreadableSaves{
+        "not-a-player-save\n",
+        canonical.substr(0, canonical.size() / 2),
+        std::string(MAX_PLAYER_SAVE_TEXT_BYTES + 1, 'x')};
+    for (const auto &invalidBytes : unreadableSaves)
+    {
+        WriteBytes(target, invalidBytes);
+        WriteBytes(backup, canonical);
+        WriteBytes(temporary, replacementText);
+        loadResult = PlayerSaveFileStore::Load(target);
+        test.Expect(!loadResult.IsSuccess() && !loadResult.IsNotFound(),
+                    "invalid primary reports failure without selecting a different save");
+        test.ExpectEqual(ReadBytes(target), invalidBytes,
+                         "failed load leaves the primary byte-identical");
+        test.ExpectEqual(ReadBytes(backup), canonical,
+                         "failed load leaves the backup byte-identical");
+        test.ExpectEqual(ReadBytes(temporary), replacementText,
+                         "failed load leaves the temporary byte-identical");
+    }
 
     std::filesystem::remove(target); WriteBytes(backup, canonical);
     loadResult = PlayerSaveFileStore::Load(target);

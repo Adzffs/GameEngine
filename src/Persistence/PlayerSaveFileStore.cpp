@@ -213,15 +213,16 @@ namespace
 
         if (targetExists)
         {
-            const auto tempSeverity = forSave ? PlayerSaveFileIssueSeverity::ERROR : PlayerSaveFileIssueSeverity::WARNING;
+            // A present primary must pass the bounded read and decoder before
+            // Load can discard its recovery artifacts. Preserve them on failure.
+            if (!forSave) return true;
             if (temporaryExists && !RemoveArtifact(temporary, result,
-                    PlayerSaveFileIssueCode::STALE_TEMP_CLEANUP_FAILED, tempSeverity,
+                    PlayerSaveFileIssueCode::STALE_TEMP_CLEANUP_FAILED, PlayerSaveFileIssueSeverity::ERROR,
                     "Could not remove stale temporary save")) return false;
             if (backupExists)
             {
-                const auto backupSeverity = forSave ? PlayerSaveFileIssueSeverity::ERROR : PlayerSaveFileIssueSeverity::WARNING;
                 if (!RemoveArtifact(backup, result,
-                        PlayerSaveFileIssueCode::STALE_BACKUP_CLEANUP_FAILED, backupSeverity,
+                        PlayerSaveFileIssueCode::STALE_BACKUP_CLEANUP_FAILED, PlayerSaveFileIssueSeverity::ERROR,
                         "Could not remove stale backup save")) return false;
             }
             return true;
@@ -499,6 +500,14 @@ PlayerSaveFileLoadResult PlayerSaveFileStore::Load(const std::filesystem::path &
         return result;
     }
     PlayerSaveData save = *decoded.GetSaveData();
+    RemoveArtifact(Sidecar(targetPath, ".tmp"), result,
+                   PlayerSaveFileIssueCode::STALE_TEMP_CLEANUP_FAILED,
+                   PlayerSaveFileIssueSeverity::WARNING,
+                   "Could not remove stale temporary save");
+    RemoveArtifact(Sidecar(targetPath, ".bak"), result,
+                   PlayerSaveFileIssueCode::STALE_BACKUP_CLEANUP_FAILED,
+                   PlayerSaveFileIssueSeverity::WARNING,
+                   "Could not remove stale backup save");
     result.SetLoaded(std::move(save), std::move(decoded));
     return result;
 }

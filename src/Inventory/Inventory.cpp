@@ -18,6 +18,11 @@ bool Inventory::AddItem(
     const ItemDefinition &definition =
         ItemDatabase::Get(itemType);
 
+    if (definition.GetItemType() != itemType)
+    {
+        return false;
+    }
+
     if (definition.IsStackable())
     {
         for (InventorySlot &slot : slots)
@@ -25,6 +30,10 @@ bool Inventory::AddItem(
             if (!slot.IsEmpty() &&
                 slot.GetItemType() == itemType)
             {
+                if (slot.GetAmount() > std::numeric_limits<int>::max() - amount)
+                {
+                    return false;
+                }
                 slot.AddAmount(amount);
                 return true;
             }
@@ -97,6 +106,11 @@ bool Inventory::CanAddItem(
     const ItemDefinition &definition =
         ItemDatabase::Get(itemType);
 
+    if (definition.GetItemType() != itemType)
+    {
+        return false;
+    }
+
     if (definition.IsStackable())
     {
         for (const InventorySlot &slot : slots)
@@ -104,7 +118,7 @@ bool Inventory::CanAddItem(
             if (!slot.IsEmpty() &&
                 slot.GetItemType() == itemType)
             {
-                return true;
+                return slot.GetAmount() <= std::numeric_limits<int>::max() - amount;
             }
         }
 

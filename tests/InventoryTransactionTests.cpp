@@ -64,6 +64,31 @@ int main()
     TestContext test;
 
     {
+        Inventory inventory;
+        test.Expect(inventory.AddItem(ItemType::COINS, INT_MAX - 2),
+                    "Direct-add overflow fixture starts below the coin cap");
+        test.Expect(inventory.CanAddItem(ItemType::COINS, 2) &&
+                        inventory.AddItem(ItemType::COINS, 2),
+                    "Direct add accepts the exact remaining stack capacity");
+        const Inventory before = inventory;
+        test.Expect(!inventory.CanAddItem(ItemType::COINS, 1),
+                    "Capacity query rejects stack overflow");
+        test.Expect(!inventory.AddItem(ItemType::COINS, 1) && SameSlots(inventory, before),
+                    "Direct add rejects overflow without changing any slot");
+        Bank bank;
+        test.Expect(bank.TryRestore({{ItemType::COINS, 1}}),
+                    "Bank overflow fixture contains a withdrawable coin");
+        test.Expect(!bank.TryWithdraw(inventory, ItemType::COINS, 1) &&
+                        bank.GetItemAmount(ItemType::COINS) == 1 &&
+                        SameSlots(inventory, before),
+                    "Overflowing withdrawal preserves both bank and inventory");
+        const auto unknown = static_cast<ItemType>(99999);
+        test.Expect(!inventory.CanAddItem(unknown, 1) &&
+                        !inventory.AddItem(unknown, 1) && SameSlots(inventory, before),
+                    "Unknown item types cannot enter inventory through direct add");
+    }
+
+    {
         test.Expect(
             !ItemDatabase::Get(ItemType::COAL).IsStackable(),
             "Coal is non-stackable");

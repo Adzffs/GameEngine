@@ -22,8 +22,8 @@ if(NOT bad EQUAL 3 OR NOT error MATCHES "walkable ground")
 endif()
 execute_process(COMMAND "${MOVER}" "${INPUT}" npc.development_guide.001 30 30
     RESULT_VARIABLE actor OUTPUT_VARIABLE output ERROR_VARIABLE error)
-if(NOT actor EQUAL 3 OR NOT error MATCHES "not yet supported")
-    message(FATAL_ERROR "unsupported spawn move was not rejected: ${actor}: ${output} ${error}")
+if(NOT actor EQUAL 0 OR NOT output MATCHES "Valid move:" OR NOT output MATCHES "no files written")
+    message(FATAL_ERROR "supported actor dry-run move failed: ${actor}: ${output} ${error}")
 endif()
 execute_process(COMMAND "${MOVER}" "${INPUT}" resource.normal_tree.001 hello 30
     RESULT_VARIABLE usage OUTPUT_VARIABLE output ERROR_VARIABLE error)

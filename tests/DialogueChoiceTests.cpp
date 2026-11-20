@@ -268,7 +268,7 @@ int main()
                     adjacentCombat.GetNpcTalkEvents()[0].nodeId ==
                         DialogueNodeId::DEVELOPMENT_GUIDE_COMBAT_RESPONSE &&
                     adjacentCombat.GetNpcTalkEvents()[0].text ==
-                        "Choose your stance before a fight, carry food, and never mistake an Ashfang for a Mossling." &&
+                        "Mosslings are passive. Ashfangs attack on sight, and the Cinder Warden is tougher. Equip your gear and carry food before seeking a fight." &&
                     adjacentCombat.GetNpcTalkEvents()[0].choices.empty() &&
                     !adjacentCombat.GetNpcTalkEvents()[0].isTerminal,
                 "Adjacent combat branch publishes exact response on tick four");

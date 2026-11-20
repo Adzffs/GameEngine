@@ -682,6 +682,30 @@ WorldPlayerSaveResult World::SavePlayerToFile(
     }
 
     PlayerSaveData saveData = PlayerSaveState::Capture(*player);
+    if (const CraftingSessionSnapshot *session = craftingSessionSystem.Get(playerEntityID))
+    {
+        std::vector<ItemAmount> pendingItems;
+        if (!session->cursor.IsEmpty())
+            pendingItems.push_back({session->cursor.GetItemType(), session->cursor.GetAmount()});
+        for (const InventorySlot &slot : session->inputSlots)
+            if (!slot.IsEmpty())
+                pendingItems.push_back({slot.GetItemType(), slot.GetAmount()});
+
+        // Session ownership is transient. Project it into the saved inventory
+        // without moving live items or changing the historical save schema.
+        Inventory savedInventory = player->GetInventory();
+        if (!savedInventory.TryAddItemsAtomically(pendingItems))
+        {
+            result.AddIssue(WorldPlayerPersistenceIssueSeverity::ERROR,
+                            WorldPlayerPersistenceIssueCode::CRAFTING_ITEMS_NOT_SAVED,
+                            playerEntityID,
+                            "Return crafting items to your inventory before saving");
+            return result;
+        }
+        const auto &slots = savedInventory.GetSlots();
+        for (int index = 0; index < Inventory::SlotCount; ++index)
+            saveData.inventorySlots[index] = {slots[index].GetItemType(), slots[index].GetAmount()};
+    }
     const auto pile = playerRecoveryPiles.find(playerEntityID);
     if (pile != playerRecoveryPiles.end())
     {

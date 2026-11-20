@@ -118,6 +118,60 @@ int main()
     TemporaryDirectory fixture;
 
     {
+        World world;
+        const int playerID = world.CreatePlayer(PlayerInitializationMode::EMPTY);
+        Player *player = dynamic_cast<Player *>(world.GetEntityByID(playerID));
+        player->GetPosition().SetPosition(16, 9);
+        CraftingStation *table = world.GetStationAt(17, 9);
+        world.QueueStationInteraction(playerID, table->GetID());
+        world.Update();
+        const CraftingSessionSnapshot *session = world.GetCraftingSession(playerID);
+        test.Expect(session != nullptr, "Persistence fixture opens an authoritative crafting session");
+        if (session != nullptr)
+        {
+            player->GetInventory().AddItem(ItemType::COINS, 7);
+            player->GetInventory().AddItem(ItemType::LOG, 1);
+            ReplaceCraftingSessionStateCommand move{};
+            move.actorEntityID = playerID;
+            move.sessionId = session->sessionId;
+            move.expectedRevision = session->revision;
+            move.cursor.SetItem(ItemType::COINS, 5);
+            move.inputSlots[4].SetItem(ItemType::LOG, 1);
+            world.EnqueueCommand(move);
+            world.Update();
+            const auto path = fixture.path / "open-crafting.save";
+            test.Expect(world.SavePlayerToFile(playerID, path).IsSuccess(),
+                        "Saving an open crafting session succeeds");
+            World restored;
+            const auto loaded = restored.LoadOrCreatePlayerFromFile(path);
+            const Player *loadedPlayer = dynamic_cast<const Player *>(
+                restored.GetEntityByID(loaded.GetPlayerEntityID()));
+            test.Expect(loaded.IsSuccess() && loadedPlayer != nullptr &&
+                            loadedPlayer->GetInventory().GetItemAmount(ItemType::COINS) == 7 &&
+                            loadedPlayer->GetInventory().GetItemAmount(ItemType::LOG) == 1,
+                        "Save/reload retains inventory, cursor and crafting-grid items exactly once");
+            test.Expect(player->GetInventory().GetItemAmount(ItemType::COINS) == 2 &&
+                            player->GetInventory().GetItemAmount(ItemType::LOG) == 0 &&
+                            world.GetCraftingSession(playerID)->cursor.GetAmount() == 5 &&
+                            world.GetCraftingSession(playerID)->inputSlots[4].GetAmount() == 1,
+                        "Taking a persistence snapshot does not mutate live crafting ownership");
+            test.Expect(world.SavePlayerToFile(playerID, path).IsSuccess(),
+                        "Repeated open-session save succeeds without consuming live escrow");
+            const std::string savedBytes = ReadBytes(path);
+            test.Expect(player->GetInventory().AddItem(ItemType::LOG, 27),
+                        "Capacity failure fixture fills the live inventory");
+            const auto rejected = world.SavePlayerToFile(playerID, path);
+            test.Expect(rejected.Contains(WorldPlayerPersistenceIssueCode::CRAFTING_ITEMS_NOT_SAVED) &&
+                            !rejected.IsSuccess() && ReadBytes(path) == savedBytes,
+                        "Unreturnable crafting items reject saving and preserve the previous save");
+            test.Expect(player->GetInventory().GetItemAmount(ItemType::LOG) == 27 &&
+                            world.GetCraftingSession(playerID)->inputSlots[4].GetAmount() == 1 &&
+                            world.GetCraftingSession(playerID)->cursor.GetAmount() == 5,
+                        "Rejected snapshot retains all inventory and session ownership");
+        }
+    }
+
+    {
         World world(1U, 2U, 3U);
         const auto missing = fixture.path / "missing" / "player.save";
         WorldPlayerLoadResult first = world.LoadOrCreatePlayerFromFile(missing);
