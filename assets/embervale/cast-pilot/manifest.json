@@ -44,7 +44,11 @@
     "south",
     "west",
     "east",
-    "north"
+    "north",
+    "southwest",
+    "southeast",
+    "northwest",
+    "northeast"
   ],
   "walk": {
     "frames_per_direction": 4,
@@ -59,11 +63,11 @@
       "image": "textures/player.png",
       "size": [
         128,
-        192
+        384
       ],
       "editor_metadata": "textures/player.export.json",
-      "source_sha256": "9f6e275f96bcfdf3e1f043e63b5c86b95fa237f1bc1d6c7e798f080348cad0c1",
-      "image_sha256": "9dcfdfec59ff7ad184c763b8846b98516495ae0a75fc4f83fbfe1e27176f9164"
+      "source_sha256": "ad124d64f500ecd0af1ab8d526f84447e2c2f888236014c90d2b67fc06df4241",
+      "image_sha256": "b871688617cf3267ea2393cd4739ddc8a8e862a66acd8af23a9ff4377a4724a7"
     },
     "mara": {
       "source": "source/mara.ase",
@@ -410,6 +414,326 @@
       "animation_frame": 3
     },
     {
+      "id": "character.player.sw.idle",
+      "image": "player",
+      "rect": [
+        0,
+        192,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.player.sw.walk1",
+      "image": "player",
+      "rect": [
+        32,
+        192,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.player.sw.walk2",
+      "image": "player",
+      "rect": [
+        64,
+        192,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.player.sw.walk3",
+      "image": "player",
+      "rect": [
+        96,
+        192,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.player.se.idle",
+      "image": "player",
+      "rect": [
+        0,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.player.se.walk1",
+      "image": "player",
+      "rect": [
+        32,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.player.se.walk2",
+      "image": "player",
+      "rect": [
+        64,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.player.se.walk3",
+      "image": "player",
+      "rect": [
+        96,
+        240,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.player.nw.idle",
+      "image": "player",
+      "rect": [
+        0,
+        288,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.player.nw.walk1",
+      "image": "player",
+      "rect": [
+        32,
+        288,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.player.nw.walk2",
+      "image": "player",
+      "rect": [
+        64,
+        288,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.player.nw.walk3",
+      "image": "player",
+      "rect": [
+        96,
+        288,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.player.ne.idle",
+      "image": "player",
+      "rect": [
+        0,
+        336,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.player.ne.walk1",
+      "image": "player",
+      "rect": [
+        32,
+        336,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.player.ne.walk2",
+      "image": "player",
+      "rect": [
+        64,
+        336,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.player.ne.walk3",
+      "image": "player",
+      "rect": [
+        96,
+        336,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        40
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 3
+    },
+    {
       "id": "character.mara.idle",
       "image": "mara",
       "rect": [
@@ -450,25 +774,25 @@
     "creator": "OpenAI image generation and Codex-assisted LibreSprite authoring for Adam Holland",
     "reference": "reference/cast-reference.png",
     "reference_sha256": "f21b9fae0b37fe0feb3bbcafa81758e4855c9c39001de5e67dc415e110956d93",
-    "notes": "Original six-panel reference; no third-party image input. LibreSprite performs native-size sampling, palette cleanup, binary-alpha cleanup and stride authoring.",
+    "notes": "Original six-panel reference; no third-party image input. LibreSprite performs native-size sampling, palette cleanup, binary-alpha cleanup, three-quarter diagonal authoring and stride authoring.",
     "licence": "No separate asset licence grant declared; repository distribution policy applies."
   },
   "previews": {
     "cast-pilot-2x.png": {
       "path": "previews/cast-pilot-2x.png",
-      "sha256": "e795e98b888b8e488fe94083f5db97a321b49d606d9240edc1b9ae39df690fb3"
+      "sha256": "9d3fff2b7ea8dee3a89670fed276e8f82074e64f9758c7057a1c28e59b35a8cc"
     },
     "walk-cycle.gif": {
       "path": "previews/walk-cycle.gif",
-      "sha256": "14ace8b3cd5738af319f4e88f2706d3163cbe81fb11dff993d433bdbb1c2b55e"
+      "sha256": "b6614f53a866ed158e95f9114c85dda4e77b9e027ed9d8443c8851896dd07290"
     },
     "walk-inspection.gif": {
       "path": "previews/walk-inspection.gif",
-      "sha256": "293eae80a0b34f2b944e02121b3a89091fcb8b846faec6095e8dd1e3675995ed"
+      "sha256": "d7adff85b5ff55972a06652297980f75d7881e4255b8ff44a29551da3929f516"
     },
     "walk-contact-sheet.png": {
       "path": "previews/walk-contact-sheet.png",
-      "sha256": "9c3b301a79e7b59788cb618a468bd49b7aa49d6bf2f3509bf2c48af164b033a9"
+      "sha256": "9ebcf5dc213cccbe0f35257c6adf587f9472b66cc5976fe9575e941953089e08"
     }
   }
 }

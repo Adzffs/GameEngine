@@ -115,7 +115,7 @@ void ForestSprites::Initialize(SDL_Renderer *target)
         if (frame.id == "resource.rock.copper.intact") copper = &frame;
         if (frame.id == "resource.rock.tin.intact") tin = &frame;
         if (frame.id == "resource.rock.depleted") rubble = &frame;
-        if (frame.id.starts_with("character.player.") && frame.facing >= 0 && frame.facing < 4 &&
+        if (frame.id.starts_with("character.player.") && frame.facing >= 0 && frame.facing < static_cast<int>(player.size()) &&
             frame.animationFrame >= 0 && frame.animationFrame < 4)
             player[frame.facing][frame.animationFrame] = &frame;
     }
@@ -457,7 +457,7 @@ const ForestSprites::Frame *ForestSprites::TreeFrame(int x, int y, bool active) 
 
 bool ForestSprites::DrawPlayer(float tileX, float tileY, int facing, int pose) const
 {
-    const auto *frame = player[std::clamp(facing, 0, 3)][std::clamp(pose, 0, 3)];
+    const auto *frame = player[std::clamp(facing, 0, static_cast<int>(player.size()) - 1)][std::clamp(pose, 0, 3)];
     return DrawCharacter(frame, tileX, tileY);
 }
 

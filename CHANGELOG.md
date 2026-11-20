@@ -4,6 +4,14 @@ This file records reviewable project changes going forward. Historical work is d
 
 ## Unreleased
 
+### Eight-way default character animation
+
+- Add southwest, southeast, northwest and northeast player sprites and walk cycles.
+- Keep diagonal facing when stopping, with distance-based steps and stable cardinal turns.
+- Extend the editable atlas and export workflow, with renderer and asset checks.
+
+See the [animation record](docs/embervale/06-development/PLAYER_EIGHT_WAY_2026-11-20.md).
+
 ### Read-only starter-world foundation
 
 - Add an optional SDL-free `EmbervaleWorldExport` executable and typed snapshot library.
@@ -31,4 +39,3 @@ See [export usage](docs/embervale/04-studio/STARTER_WORLD_EXPORT.md) and the [ve
 - Starter pacing requires a genuine fresh-player profile rather than the current boosted development defaults.
 
 The documentation and organisation portion was delivered through [PR #3](https://github.com/Adzffs/GameEngine/pull/3). It does not claim a Studio release, geographic implementation or engine fix.
-

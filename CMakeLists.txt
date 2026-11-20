@@ -454,6 +454,7 @@ if(BUILD_TESTING)
     add_gameengine_headless_test(ShopInteractionTests tests/ShopInteractionTests.cpp)
 
     if(GAMEENGINE_BUILD_GRAPHICS_TESTS)
+        add_gameengine_graphics_test(PlayerAnimationTests tests/PlayerAnimationTests.cpp)
         add_gameengine_graphics_test(MonsterGraphicsTests tests/MonsterGraphicsTests.cpp)
         add_gameengine_graphics_test(MeleeClickIntegrationTests tests/MeleeClickIntegrationTests.cpp)
         add_gameengine_graphics_test(CombatFeedbackTests tests/CombatFeedbackTests.cpp)

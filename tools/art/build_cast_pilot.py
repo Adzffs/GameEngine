@@ -17,10 +17,10 @@ PALETTE = ['222b2b', '30211d', '563727', '7b4e2e', 'b27c48',
            '9e3f21', 'd76f27', 'e6943b', 'f5c05b', 'ffe08a']
 
 
-def build(editor, regenerate=False, rebuild_walk=False):
+def build(editor, regenerate=False, rebuild_walk=False, add_diagonals=False):
     for folder in ['source', 'textures', 'previews']:
         (ART / folder).mkdir(parents=True, exist_ok=True)
-    sizes = {'player': (128, 192), 'mara': (32, 48), 'furnace': (48, 64)}
+    sizes = {'player': (128, 384), 'mara': (32, 48), 'furnace': (48, 64)}
     if not regenerate and any(not (ART / f'source/{name}.ase').is_file() for name in sizes):
         raise RuntimeError('Cast masters are missing; use --regenerate for initial authoring')
 
@@ -35,13 +35,14 @@ def build(editor, regenerate=False, rebuild_walk=False):
     with tempfile.TemporaryDirectory(prefix='embervale-cast-') as scratch:
         temp = Path(scratch)
         fixtures = {}
-        for name, size in {**sizes, 'board': (640, 224), 'inspection': (640, 256), 'contacts': (640, 896)}.items():
+        for name, size in {**sizes, 'board': (640, 352), 'inspection': (640, 512), 'contacts': (640, 1792)}.items():
             path = temp / f'{name}.png'
             blank_png(path, *size)
             fixtures[name] = path.as_posix()
         walk_frames = [(temp / f'walk-{i:02}.png').as_posix() for i in range(4)]
         inspection_frames = [(temp / f'inspection-{i:02}.png').as_posix() for i in range(4)]
-        cfg = {'regenerate': regenerate, 'rebuildWalk': rebuild_walk, 'palette': PALETTE, 'fixtures': fixtures,
+        cfg = {'regenerate': regenerate, 'rebuildWalk': rebuild_walk, 'addDiagonals': add_diagonals,
+               'palette': PALETTE, 'fixtures': fixtures,
                'reference': (ART / 'reference/cast-reference.png').as_posix(),
                'terrain': (REPO / 'assets/embervale/forest-pilot/textures/terrain.png').as_posix(),
                'sources': {name: (ART / f'source/{name}.ase').as_posix() for name in sizes},
@@ -82,7 +83,7 @@ def build(editor, regenerate=False, rebuild_walk=False):
                         'size': list(size), 'editor_metadata': f'textures/{name}.export.json',
                         'source_sha256': checksum(source), 'image_sha256': checksum(image)}
     assets = []
-    for direction, name in enumerate(['s', 'w', 'e', 'n']):
+    for direction, name in enumerate(['s', 'w', 'e', 'n', 'sw', 'se', 'nw', 'ne']):
         for phase in range(4):
             assets.append({'id': f'character.player.{name}.' + ('idle' if phase == 0 else f'walk{phase}'),
                            'image': 'player', 'rect': [phase * 32, direction * 48, 32, 48],
@@ -97,7 +98,7 @@ def build(editor, regenerate=False, rebuild_walk=False):
     manifest = {'schema': 'embervale.authoring-batch', 'version': 1, 'id': 'cast-pilot',
                 'native_tile_size': 32, 'status': 'Player/Mara/furnace runtime pilot',
                 'editor': 'LibreSprite 1.1-dev', 'palette_rgb': PALETTE,
-                'facing_order': ['south', 'west', 'east', 'north'],
+                'facing_order': ['south', 'west', 'east', 'north', 'southwest', 'southeast', 'northwest', 'northeast'],
                 'walk': {'frames_per_direction': 4, 'cycle_distance_tiles': 1.0,
                          'idle_frame': 0, 'validation': 'previews/walk-validation.json',
                          'notes': 'Two neutral and two alternating stride poses with a continuous pelvis; driven by visual travel distance.'},
@@ -105,7 +106,7 @@ def build(editor, regenerate=False, rebuild_walk=False):
                 'provenance': {'creator': 'OpenAI image generation and Codex-assisted LibreSprite authoring for Adam Holland',
                                'reference': 'reference/cast-reference.png',
                                'reference_sha256': checksum(ART / 'reference/cast-reference.png'),
-                               'notes': 'Original six-panel reference; no third-party image input. LibreSprite performs native-size sampling, palette cleanup, binary-alpha cleanup and stride authoring.',
+                               'notes': 'Original six-panel reference; no third-party image input. LibreSprite performs native-size sampling, palette cleanup, binary-alpha cleanup, three-quarter diagonal authoring and stride authoring.',
                                'licence': 'No separate asset licence grant declared; repository distribution policy applies.'},
                 'previews': {name: {'path': 'previews/' + name, 'sha256': checksum(ART / 'previews' / name)}
                              for name in ['cast-pilot-2x.png', 'walk-cycle.gif', 'walk-inspection.gif', 'walk-contact-sheet.png']}}
@@ -122,5 +123,7 @@ if __name__ == '__main__':
     mode.add_argument('--regenerate', action='store_true', help='Replace editable masters with the authored originals')
     mode.add_argument('--rebuild-walk', action='store_true',
                       help='Repair only stride cells from the saved neutral frames; preserve other artwork')
+    mode.add_argument('--add-diagonals', action='store_true',
+                      help='Extend a four-direction player master with diagonal poses; preserve the original cells')
     args = parser.parse_args()
-    build(args.editor.resolve(strict=True), args.regenerate, args.rebuild_walk)
+    build(args.editor.resolve(strict=True), args.regenerate, args.rebuild_walk, args.add_diagonals)
