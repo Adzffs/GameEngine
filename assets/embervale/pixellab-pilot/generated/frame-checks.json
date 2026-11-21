@@ -1,0 +1,106 @@
+[
+  {
+    "file": "walk-east-00.png",
+    "size": [
+      64,
+      64
+    ],
+    "alpha_values": [
+      0,
+      255
+    ],
+    "visible_pixels": 417,
+    "transparent_corner": true
+  },
+  {
+    "file": "walk-east-01.png",
+    "size": [
+      64,
+      64
+    ],
+    "alpha_values": [
+      0,
+      255
+    ],
+    "visible_pixels": 376,
+    "transparent_corner": true
+  },
+  {
+    "file": "walk-east-02.png",
+    "size": [
+      64,
+      64
+    ],
+    "alpha_values": [
+      0,
+      255
+    ],
+    "visible_pixels": 359,
+    "transparent_corner": true
+  },
+  {
+    "file": "walk-east-03.png",
+    "size": [
+      64,
+      64
+    ],
+    "alpha_values": [
+      0,
+      255
+    ],
+    "visible_pixels": 422,
+    "transparent_corner": true
+  },
+  {
+    "file": "walk-east-04.png",
+    "size": [
+      64,
+      64
+    ],
+    "alpha_values": [
+      0,
+      255
+    ],
+    "visible_pixels": 448,
+    "transparent_corner": true
+  },
+  {
+    "file": "walk-east-05.png",
+    "size": [
+      64,
+      64
+    ],
+    "alpha_values": [
+      0,
+      255
+    ],
+    "visible_pixels": 423,
+    "transparent_corner": true
+  },
+  {
+    "file": "walk-east-06.png",
+    "size": [
+      64,
+      64
+    ],
+    "alpha_values": [
+      0,
+      255
+    ],
+    "visible_pixels": 374,
+    "transparent_corner": true
+  },
+  {
+    "file": "walk-east-07.png",
+    "size": [
+      64,
+      64
+    ],
+    "alpha_values": [
+      0,
+      255
+    ],
+    "visible_pixels": 384,
+    "transparent_corner": true
+  }
+]

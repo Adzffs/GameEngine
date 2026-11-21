@@ -9,13 +9,15 @@ P0 is an integrity/prerequisite priority; P1 is required for its slice; P2 is su
 
 Completion refers to the stated bounded acceptance, with evidence and publication. It does not finish the entire milestone or imply visible approval. GAME-005 and QA-003 provide acceptance feedback while their associated features remain in progress. The JSON file carries the same inventory plus status, evidence and detailed notes. Older reports remain historical.
 
+ART-005 resumed on 21 November with the [PixelLab walking candidate](../06-development/PIXELLAB_WALKING_2026-11-21.md). The owner liked the east-only trial; full eight-way native review and equipped/action art remain open.
+
 ## Current progress
 
 | Work | Current bounded result | Remaining acceptance |
 |---|---|---|
 | Player integrity | ENG-003/004 and GAME-009 fixed and regression verified | Windows regression verification and Linux Return/Exit/retry are recorded; broader manual acceptance remains |
 | Current verification | 124/124 Windows SDL, 99/99 standalone headless and 81 Python tests (79 pass/two skips); resource/packaging/publication/recovery/bridge included | Other current platforms and human playthrough are separate |
-| Player actions | REL-004 complete: original melee/equipment plus current Mining/audio are combined | ART-005 quality remains deferred; human/device acceptance stays open |
+| Player actions | REL-004 complete: original melee/equipment plus current Mining/audio are combined | ART-005 now has a PixelLab walking candidate; human/device acceptance stays open |
 | Ownership/architecture/export | Published bounded foundation and deterministic export | General regions/catalogue authoring remain separate |
 | Runtime content | Schema-1-4 input, geography/position checks and selected fixed publication manifests | General region/asset packages and content/save migrations |
 | Studio | Shared edits/history, guarded drafts, recovery, overlays, version publishing and selected-version play/rollback | In-place replacement, broader accessibility/platform acceptance and tools |

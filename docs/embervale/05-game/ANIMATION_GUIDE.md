@@ -1,6 +1,6 @@
 # Animation guide
 
-**Resource guard follow-up, 20 November:** Validate/export against [asset resource limits](ASSET_RESOURCE_LIMITS.md). The [completed player action integration](../06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md) now has eight walking/chopping poses, six Mining poses and sixteen equipped walking/attack frames per direction. Both resource validators and runtime arrays agree. A different authored pose count requires matching runtime arrays and both validation tables, followed by complete binding/render checks; retain the lossless packed output instead of loosening budgets for the original oversized editable canvases. The read-only check preserves masters and geometry; further animation polish remains owner-deferred.
+**Resource guard follow-up, 20 November:** Validate/export against [asset resource limits](ASSET_RESOURCE_LIMITS.md). The [completed player action integration](../06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md) now has eight walking/chopping poses, six Mining poses and sixteen equipped walking/attack frames per direction. Both resource validators and runtime arrays agree. A different authored pose count requires matching runtime arrays and both validation tables, followed by complete binding/render checks; retain the lossless packed output instead of loosening budgets for the original oversized editable canvases. The read-only check preserves masters and geometry; ART-005 has resumed with the [PixelLab walking candidate](../06-development/PIXELLAB_WALKING_2026-11-21.md); full visual acceptance stays open.
 
 **Purpose:** Reusable production reference for player, equipment, gathering and future creature animation.  
 **Updated:** 20 November 2026.  
@@ -34,6 +34,12 @@ Prioritize silhouette, weight, ground contact and rhythm. More evenly spaced fra
 | Effects | Reserve short smears or arcs for the fast strike | The return does not look like another attack |
 
 Use longer readable telegraphs for a future enemy attack when its gameplay design requires reaction time. Player preparation must fit the existing input/result contract. Hitstop, camera shake, displacement and new attack delays require their own concrete design and verification; they are not automatic polish.
+
+## AI-generated walking
+
+Import the service PNG frames without redrawing their poses. Keep the supplied neutral views separate from the moving loop, record the actual preset/model and preserve the raw export. Review one direction before expanding the set. Normal exports preserve the editable master. A new body gait needs matching equipment poses; retain a complete existing equipped/action batch until that matching art is ready. Do not attach its old wrist overlays to an unrelated generated body.
+
+PixelLab locomotion uses its own nine-slot binding: idle 0, moving 1–8. The earlier cast, chopping, Mining and melee counts remain independent. Its 600-ms loop is shared between the manifest-generated runtime timing and preview; historical east-only inspection GIFs have different labelled timing.
 
 ## Preserve the character across eight directions
 

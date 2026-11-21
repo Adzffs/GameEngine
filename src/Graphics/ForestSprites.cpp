@@ -19,7 +19,7 @@ void ForestSprites::Clear()
     renderer = nullptr;
     encodedBytes = peakStagingBytes = 0;
     grass = {}; paths = {}; water = {}; stone = {}; banks = {};
-    player = {}; chopping = {}; choppingAxes = {}; miningPlayer = {}; miningPickaxes = {};
+    player = {}; locomotion = {}; chopping = {}; choppingAxes = {}; miningPlayer = {}; miningPickaxes = {};
     meleeBodies = {}; meleeEquipment = {};
     variedGrass = {}; variedPaths = {}; variedWater = {}; variedStone = {}; flora = {};
     variedWalls = {}; variedRoof = {}; variedFloors = {}; variedTrees = {}; variedStumps = {}; variedRocks = {};
@@ -134,6 +134,9 @@ void ForestSprites::InitializeCatalogue(SDL_Renderer *target,
         if (frame.id.starts_with("character.player.") && frame.facing >= 0 && frame.facing < static_cast<int>(player.size()) &&
             frame.animationFrame >= 0 && frame.animationFrame < PlayerAnimationTiming::WalkPoses)
             player[frame.facing][frame.animationFrame] = &frame;
+        if (frame.id.starts_with("character.locomotion.") && frame.facing >= 0 && frame.facing < 8 &&
+            frame.animationFrame >= 0 && frame.animationFrame < ForestPilotLayout::PlayerLocomotionFrames)
+            locomotion[frame.facing][frame.animationFrame] = &frame;
         if (frame.facing >= 0 && frame.facing < 8 && frame.animationFrame >= 0 && frame.animationFrame < PlayerAnimationTiming::ChoppingPoses)
         {
             if (frame.id.starts_with("character.woodcutting.")) chopping[frame.facing][frame.animationFrame] = &frame;
@@ -249,7 +252,8 @@ bool ForestSprites::Available(const Frame *frame) const
 }
 
 bool ForestSprites::HasTree() const { return Available(tree) || Available(variedTrees[0]); }
-bool ForestSprites::HasPlayer() const { return Available(player[0][0]); }
+bool ForestSprites::HasPlayer() const { return HasPlayerLocomotion() || Available(player[0][0]); }
+bool ForestSprites::HasPlayerLocomotion() const { return Available(locomotion[0][0]); }
 bool ForestSprites::HasMara() const { return Available(mara); }
 
 SDL_FRect ForestSprites::Bounds(const Frame &frame, float tileX, float tileY) const
@@ -515,6 +519,14 @@ const ForestSprites::Frame *ForestSprites::TreeFrame(int x, int y, bool active) 
     const auto index = WorldArtVariation::Hash(x, y, 20) % 3;
     const auto *frame = active ? variedTrees[index] : variedStumps[index];
     return Available(frame) ? frame : active ? tree : stump;
+}
+
+bool ForestSprites::DrawPlayerLocomotion(float tileX, float tileY, int facing, int pose) const
+{
+    facing = std::clamp(facing, 0, 7);
+    pose = std::clamp(pose, 0, ForestPilotLayout::PlayerLocomotionFrames - 1);
+    if (DrawCharacter(locomotion[facing][pose], tileX, tileY)) return true;
+    return DrawPlayer(tileX, tileY, facing, pose > 0 ? pose - 1 : 0);
 }
 
 bool ForestSprites::DrawPlayer(float tileX, float tileY, int facing, int pose) const

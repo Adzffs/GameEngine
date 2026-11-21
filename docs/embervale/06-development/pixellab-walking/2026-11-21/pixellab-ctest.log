@@ -1,0 +1,262 @@
+Test project C:/Users/dohnu/Documents/Codex/2026-11-20/new-chat-6/work/GameEngine-pixellab/build-client
+        Start   1: GameEngineStartupCliTests
+        Start   2: GameLaunchOptionsTests
+        Start   3: StarterWorldRuntimeInputTests
+        Start   4: StarterWorldEditTests
+        Start   5: StarterWorldDraftFileTests
+        Start   6: WorldPublicationTests
+        Start   7: WorldArtResourcesTests
+        Start   8: StarterWorldHistoryTests
+  1/124 Test   #1: GameEngineStartupCliTests ...............   Passed    0.96 sec
+  2/124 Test   #2: GameLaunchOptionsTests ..................   Passed    0.95 sec
+  3/124 Test   #5: StarterWorldDraftFileTests ..............   Passed    0.43 sec
+  4/124 Test   #3: StarterWorldRuntimeInputTests ...........   Passed    0.84 sec
+        Start   9: StarterWorldPlacementTests
+        Start  10: StarterWorldRuntimeTests
+        Start  11: StarterWorldSnapshotTests
+        Start  12: StarterWorldSnapshotInputTests
+  5/124 Test   #7: WorldArtResourcesTests ..................   Passed    0.62 sec
+        Start  13: StarterWorldExportCliTests
+  6/124 Test   #6: WorldPublicationTests ...................   Passed    0.67 sec
+        Start  14: StarterWorldValidateCliTests
+  7/124 Test  #11: StarterWorldSnapshotTests ...............   Passed    0.25 sec
+        Start  15: StarterWorldMoveCliTests
+  8/124 Test   #4: StarterWorldEditTests ...................   Passed    0.99 sec
+        Start  16: StarterWorldPaintCliTests
+  9/124 Test  #10: StarterWorldRuntimeTests ................   Passed    0.36 sec
+        Start  17: StarterWorldInteractiveSessionTests
+ 10/124 Test  #12: StarterWorldSnapshotInputTests ..........   Passed    0.42 sec
+        Start  18: StarterJourneyReplayCliTests
+ 11/124 Test  #14: StarterWorldValidateCliTests ............   Passed    0.49 sec
+        Start  19: AudioAssetChecks
+ 12/124 Test  #13: StarterWorldExportCliTests ..............   Passed    0.52 sec
+        Start  20: WorldArtAssetChecks
+ 13/124 Test  #15: StarterWorldMoveCliTests ................   Passed    0.96 sec
+        Start  21: StarterWorldVisualBridgeIntegration
+ 14/124 Test  #16: StarterWorldPaintCliTests ...............   Passed    1.07 sec
+        Start  22: StudioRecoveryIntegration
+ 15/124 Test   #9: StarterWorldPlacementTests ..............   Passed    1.44 sec
+        Start  23: WorldPublicationIntegration
+ 16/124 Test  #17: StarterWorldInteractiveSessionTests .....   Passed    1.16 sec
+        Start  24: PublishedWorldClientLaunchTests
+ 17/124 Test  #20: WorldArtAssetChecks .....................   Passed    0.93 sec
+        Start  25: WorldArtPackagingIntegration
+ 18/124 Test  #19: AudioAssetChecks ........................   Passed    1.01 sec
+        Start  26: ActionFrameworkTests
+ 19/124 Test  #26: ActionFrameworkTests ....................   Passed    0.11 sec
+        Start  27: AudioFeedbackTests
+ 20/124 Test   #8: StarterWorldHistoryTests ................   Passed    2.23 sec
+        Start  28: AudioPlaybackTests
+ 21/124 Test  #27: AudioFeedbackTests ......................   Passed    0.17 sec
+        Start  29: AudioUnavailableTests
+ 22/124 Test  #29: AudioUnavailableTests ...................   Passed    0.04 sec
+        Start  30: AudioGraphicsTests
+ 23/124 Test  #28: AudioPlaybackTests ......................   Passed    0.29 sec
+        Start  31: PlayerSaveGraphicsTests
+ 24/124 Test  #30: AudioGraphicsTests ......................   Passed    1.28 sec
+        Start  32: GameplayActionIntegrationTests
+ 25/124 Test  #32: GameplayActionIntegrationTests ..........   Passed    0.14 sec
+        Start  33: EquipmentStatsTests
+ 26/124 Test  #33: EquipmentStatsTests .....................   Passed    0.15 sec
+        Start  34: PlayerHealthTests
+ 27/124 Test  #34: PlayerHealthTests .......................   Passed    0.11 sec
+        Start  35: CombatFormulaTests
+ 28/124 Test  #31: PlayerSaveGraphicsTests .................   Passed    2.17 sec
+        Start  36: MeleeAttackResolverTests
+ 29/124 Test  #35: CombatFormulaTests ......................   Passed    1.13 sec
+        Start  37: CombatServiceTests
+ 30/124 Test  #36: MeleeAttackResolverTests ................   Passed    0.66 sec
+        Start  38: MeleeCombatActionTests
+ 31/124 Test  #37: CombatServiceTests ......................   Passed    0.22 sec
+        Start  39: PendingMeleeInteractionTests
+ 32/124 Test  #38: MeleeCombatActionTests ..................   Passed    0.15 sec
+        Start  40: MeleeEngagementTests
+ 33/124 Test  #39: PendingMeleeInteractionTests ............   Passed    0.15 sec
+        Start  41: MeleeEngagementSystemTests
+ 34/124 Test  #24: PublishedWorldClientLaunchTests .........   Passed    4.32 sec
+        Start  42: InteractionSystemTests
+ 35/124 Test  #40: MeleeEngagementTests ....................   Passed    1.13 sec
+        Start  43: CombatantMonsterTests
+ 36/124 Test  #41: MeleeEngagementSystemTests ..............   Passed    1.11 sec
+        Start  44: EntityDeathEventTests
+ 37/124 Test  #42: InteractionSystemTests ..................   Passed    0.65 sec
+        Start  45: RewardTableTests
+ 38/124 Test  #43: CombatantMonsterTests ...................   Passed    0.23 sec
+        Start  46: InventoryTransactionTests
+ 39/124 Test  #44: EntityDeathEventTests ...................   Passed    0.29 sec
+        Start  47: InventoryStackOperationsTests
+ 40/124 Test  #45: RewardTableTests ........................   Passed    0.34 sec
+        Start  48: PlayerSaveStateTests
+ 41/124 Test  #46: InventoryTransactionTests ...............   Passed    0.69 sec
+        Start  49: PlayerSaveTextCodecTests
+ 42/124 Test  #47: InventoryStackOperationsTests ...........   Passed    0.95 sec
+        Start  50: PlayerSaveFileStoreTests
+ 43/124 Test  #48: PlayerSaveStateTests ....................   Passed    1.25 sec
+        Start  51: WorldPlayerPersistenceTests
+ 44/124 Test  #49: PlayerSaveTextCodecTests ................   Passed    0.83 sec
+        Start  52: WorldPlayerPersistenceLifecycleTests
+ 45/124 Test  #23: WorldPublicationIntegration .............   Passed    6.82 sec
+        Start  53: PlayerAutosaveTests
+ 46/124 Test  #52: WorldPlayerPersistenceLifecycleTests ....   Passed    0.31 sec
+        Start  54: PlayerAutosaveInterruptionTests
+ 47/124 Test  #53: PlayerAutosaveTests .....................   Passed    0.34 sec
+        Start  55: EnginePlayerPersistenceLifecycleTests
+ 48/124 Test  #50: PlayerSaveFileStoreTests ................   Passed    0.95 sec
+        Start  56: MonsterLootIntegrationTests
+ 49/124 Test  #51: WorldPlayerPersistenceTests .............   Passed    0.69 sec
+        Start  57: MonsterRespawnTests
+ 50/124 Test  #56: MonsterLootIntegrationTests .............   Passed    0.23 sec
+        Start  58: EquipmentUnequipTests
+ 51/124 Test  #57: MonsterRespawnTests .....................   Passed    0.15 sec
+        Start  59: RequirementSystemTests
+ 52/124 Test  #55: EnginePlayerPersistenceLifecycleTests ...   Passed    0.45 sec
+        Start  60: ActionLifecycleEventTests
+ 53/124 Test  #58: EquipmentUnequipTests ...................   Passed    0.20 sec
+        Start  61: ContentValidationTests
+ 54/124 Test  #59: RequirementSystemTests ..................   Passed    0.65 sec
+        Start  62: StatusEffectTests
+ 55/124 Test  #54: PlayerAutosaveInterruptionTests .........   Passed    1.24 sec
+ 56/124 Test  #60: ActionLifecycleEventTests ...............   Passed    0.71 sec
+        Start  63: FoodHealingTests
+        Start  64: AggressiveMonsterTests
+ 57/124 Test  #61: ContentValidationTests ..................   Passed    0.82 sec
+        Start  65: MonsterAISystemTests
+ 58/124 Test  #62: StatusEffectTests .......................   Passed    0.35 sec
+ 59/124 Test  #63: FoodHealingTests ........................   Passed    0.23 sec
+        Start  66: WorldTickAuthorityTests
+        Start  67: ClockPacingTests
+ 60/124 Test  #64: AggressiveMonsterTests ..................   Passed    0.27 sec
+        Start  68: GatheringRandomTests
+ 61/124 Test  #66: WorldTickAuthorityTests .................   Passed    0.20 sec
+ 62/124 Test  #65: MonsterAISystemTests ....................   Passed    0.26 sec
+        Start  69: GatheringSystemTests
+        Start  70: WoodcuttingPresentationTests
+ 63/124 Test  #67: ClockPacingTests ........................   Passed    0.82 sec
+        Start  71: MiningPresentationTests
+ 64/124 Test  #68: GatheringRandomTests ....................   Passed    0.79 sec
+ 65/124 Test  #69: GatheringSystemTests ....................   Passed    0.73 sec
+        Start  72: MeleePresentationTests
+        Start  73: QuestSystemTests
+ 66/124 Test  #70: WoodcuttingPresentationTests ............   Passed    0.28 sec
+        Start  74: QuestDefinitionTests
+ 67/124 Test  #71: MiningPresentationTests .................   Passed    0.66 sec
+ 68/124 Test  #72: MeleePresentationTests ..................   Passed    0.61 sec
+        Start  75: QuestWorldIntegrationTests
+        Start  76: QuestDialogueIntegrationTests
+ 69/124 Test  #73: QuestSystemTests ........................   Passed    0.65 sec
+        Start  77: QuestPersistenceTests
+ 70/124 Test  #74: QuestDefinitionTests ....................   Passed    0.58 sec
+ 71/124 Test  #75: QuestWorldIntegrationTests ..............   Passed    0.15 sec
+        Start  78: QuestPresentationStateTests
+        Start  79: ProgressionPresentationStateTests
+ 72/124 Test  #76: QuestDialogueIntegrationTests ...........   Passed    0.40 sec
+        Start  80: StarterRegionTests
+ 73/124 Test  #77: QuestPersistenceTests ...................   Passed    0.39 sec
+ 74/124 Test  #78: QuestPresentationStateTests .............   Passed    0.35 sec
+        Start  81: MiningBasicsQuestTests
+        Start  82: RecipeActionSystemTests
+ 75/124 Test  #79: ProgressionPresentationStateTests .......   Passed    0.75 sec
+        Start  83: RecipeBookTests
+ 76/124 Test  #80: StarterRegionTests ......................   Passed    0.86 sec
+ 77/124 Test  #81: MiningBasicsQuestTests ..................   Passed    0.81 sec
+ 78/124 Test  #18: StarterJourneyReplayCliTests ............   Passed   12.28 sec
+        Start  84: RecipeDiscoveryIntegrationTests
+        Start  85: CraftingRecipeTests
+        Start  86: CraftingTableWorldTests
+ 79/124 Test  #82: RecipeActionSystemTests .................   Passed    1.27 sec
+        Start  87: CraftingSessionTests
+ 80/124 Test  #83: RecipeBookTests .........................   Passed    0.81 sec
+ 81/124 Test  #84: RecipeDiscoveryIntegrationTests .........   Passed    0.55 sec
+ 82/124 Test  #85: CraftingRecipeTests .....................   Passed    0.50 sec
+        Start  88: MovementPathSafetyTests
+        Start  89: MovementSystemTests
+        Start  90: EntityManagerLookupTests
+ 83/124 Test  #86: CraftingTableWorldTests .................   Passed    1.03 sec
+        Start  91: ServerCommandQueueTests
+ 84/124 Test  #88: MovementPathSafetyTests .................   Passed    0.99 sec
+ 85/124 Test  #87: CraftingSessionTests ....................   Passed    1.04 sec
+ 86/124 Test  #89: MovementSystemTests .....................   Passed    0.93 sec
+        Start  92: StarterTutorialCheckpointTests
+        Start  93: TickSchedulerTests
+        Start  94: NpcDefinitionTests
+ 87/124 Test  #90: EntityManagerLookupTests ................   Passed    0.68 sec
+        Start  95: NpcSpawnManagerTests
+ 88/124 Test  #93: TickSchedulerTests ......................   Passed    0.23 sec
+ 89/124 Test  #92: StarterTutorialCheckpointTests ..........   Passed    0.28 sec
+        Start  96: MonsterWanderingTests
+        Start  97: FriendlyNpcTests
+ 90/124 Test  #94: NpcDefinitionTests ......................   Passed    0.24 sec
+        Start  98: NpcInteractionTests
+ 91/124 Test  #95: NpcSpawnManagerTests ....................   Passed    0.24 sec
+ 92/124 Test  #91: ServerCommandQueueTests .................   Passed    0.49 sec
+ 93/124 Test  #96: MonsterWanderingTests ...................   Passed    0.15 sec
+        Start  99: DialogueDefinitionTests
+        Start 100: DialogueSystemTests
+        Start 101: DialogueChoiceTests
+ 94/124 Test  #97: FriendlyNpcTests ........................   Passed    0.67 sec
+        Start 102: DialoguePresentationStateTests
+ 95/124 Test  #99: DialogueDefinitionTests .................   Passed    0.76 sec
+ 96/124 Test  #98: NpcInteractionTests .....................   Passed    0.82 sec
+ 97/124 Test #100: DialogueSystemTests .....................   Passed    0.36 sec
+ 98/124 Test  #21: StarterWorldVisualBridgeIntegration .....   Passed   14.30 sec
+        Start 103: EngineWorldClickDecisionTests
+        Start 104: ShopPresentationStateTests
+        Start 105: ShopDefinitionTests
+        Start 106: ShopSystemTests
+ 99/124 Test #101: DialogueChoiceTests .....................   Passed    0.91 sec
+        Start 107: ShopInteractionTests
+100/124 Test #102: DialoguePresentationStateTests ..........   Passed    0.89 sec
+101/124 Test #104: ShopPresentationStateTests ..............   Passed    0.63 sec
+102/124 Test  #22: StudioRecoveryIntegration ...............   Passed   14.87 sec
+103/124 Test #103: EngineWorldClickDecisionTests ...........   Passed    0.69 sec
+104/124 Test #105: ShopDefinitionTests .....................   Passed    0.51 sec
+        Start 108: UsabilityGraphicsTests
+        Start 109: PlayerAnimationTests
+        Start 110: WoodcuttingGraphicsTests
+        Start 111: MiningGraphicsTests
+        Start 112: WorldArtResourceGraphicsTests
+105/124 Test #106: ShopSystemTests .........................   Passed    0.35 sec
+        Start 113: MeleeGraphicsTests
+106/124 Test #107: ShopInteractionTests ....................   Passed    0.34 sec
+        Start 114: MonsterGraphicsTests
+107/124 Test #114: MonsterGraphicsTests ....................   Passed    0.09 sec
+        Start 115: MeleeClickIntegrationTests
+108/124 Test #115: MeleeClickIntegrationTests ..............   Passed    0.35 sec
+        Start 116: CombatFeedbackTests
+109/124 Test #116: CombatFeedbackTests .....................   Passed    0.29 sec
+        Start 117: CameraPresentationTests
+110/124 Test #117: CameraPresentationTests .................   Passed    0.15 sec
+        Start 118: MonsterRetaliationTests
+111/124 Test #108: UsabilityGraphicsTests ..................   Passed    1.29 sec
+        Start 119: QuestGraphicsTests
+112/124 Test #118: MonsterRetaliationTests .................   Passed    0.21 sec
+        Start 120: CraftingTableGraphicsTests
+113/124 Test #111: MiningGraphicsTests .....................   Passed    1.51 sec
+        Start 121: ClientDialogueIntegrationTests
+114/124 Test #109: PlayerAnimationTests ....................   Passed    1.67 sec
+        Start 122: ClientShopIntegrationTests
+115/124 Test #121: ClientDialogueIntegrationTests ..........   Passed    0.19 sec
+        Start 123: ClientCraftingIntegrationTests
+116/124 Test #122: ClientShopIntegrationTests ..............   Passed    0.17 sec
+        Start 124: ClientBankIntegrationTests
+117/124 Test #110: WoodcuttingGraphicsTests ................   Passed    1.93 sec
+118/124 Test #123: ClientCraftingIntegrationTests ..........   Passed    0.17 sec
+119/124 Test #112: WorldArtResourceGraphicsTests ...........   Passed    1.94 sec
+120/124 Test #113: MeleeGraphicsTests ......................   Passed    2.36 sec
+121/124 Test #119: QuestGraphicsTests ......................   Passed    1.68 sec
+122/124 Test #120: CraftingTableGraphicsTests ..............   Passed    1.63 sec
+123/124 Test #124: ClientBankIntegrationTests ..............   Passed    1.40 sec
+124/124 Test  #25: WorldArtPackagingIntegration ............   Passed   30.94 sec
+
+100% tests passed out of 124
+
+Label Time Summary:
+art         =  31.87 sec*proc (2 tests)
+audio       =   1.34 sec*proc (3 tests)
+client      =  38.93 sec*proc (10 tests)
+content     =  89.61 sec*proc (13 tests)
+graphics    =  18.56 sec*proc (15 tests)
+headless    = 106.84 sec*proc (99 tests)
+studio      =  40.30 sec*proc (4 tests)
+
+Total Test time (real) =  33.69 sec

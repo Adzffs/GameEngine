@@ -259,6 +259,7 @@ function(configure_gameengine_world_art target)
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/melee-pilot/textures/player.png"
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/melee-pilot/textures/equipment.png"
     )
+    set(pixellab_images "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/pixellab-pilot/textures/player.png")
     set(audio_files)
     foreach(name wood-1 wood-2 stone-1 stone-2 swing-1 heavy-swing-1
             hit-1 hit-2 block-1 miss-1 gather-1 craft-1 equip-1 inventory-1 eat-1)
@@ -312,11 +313,15 @@ function(configure_gameengine_world_art target)
                 "$<TARGET_FILE_DIR:${target}>/assets/embervale/melee-pilot/textures"
             COMMAND ${CMAKE_COMMAND} -E make_directory
                 "$<TARGET_FILE_DIR:${target}>/assets/embervale/audio-pilot"
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/pixellab-pilot/textures"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${pixellab_images}
+                "$<TARGET_FILE_DIR:${target}>/assets/embervale/pixellab-pilot/textures"
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${audio_files}
                 "$<TARGET_FILE_DIR:${target}>/assets/embervale/audio-pilot"
             DEPENDS ${forest_images} ${cast_images} ${environment_images}
                 ${service_images} ${building_images} ${variation_images}
-                ${woodcutting_images} ${mining_images} ${melee_images} ${audio_files}
+                ${woodcutting_images} ${mining_images} ${melee_images} ${pixellab_images} ${audio_files}
             VERBATIM
         )
         if(TARGET GameEngineWorldArtCheck)

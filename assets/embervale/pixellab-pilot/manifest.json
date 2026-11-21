@@ -1,0 +1,1519 @@
+{
+  "schema": "embervale.authoring-batch",
+  "version": 1,
+  "id": "pixellab-pilot",
+  "native_tile_size": 32,
+  "status": "eight-way empty-handed walking; equipped/actions retain their own batches",
+  "editor": "LibreSprite 1.1-dev",
+  "images": {
+    "player": {
+      "source": "source/player.ase",
+      "image": "textures/player.png",
+      "editor_metadata": "textures/player.export.json",
+      "size": [
+        576,
+        512
+      ],
+      "source_sha256": "8eb0923c98b26510b5e37f557d79d26e0101b1a907f3264541a560dbb7e2f687",
+      "image_sha256": "81129fa2da7dcd294928af7148eb393f7af424a332fa6aac4b4b01fe54dd9cb2"
+    }
+  },
+  "assets": [
+    {
+      "id": "character.locomotion.south.00",
+      "image": "player",
+      "rect": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.locomotion.south.01",
+      "image": "player",
+      "rect": [
+        64,
+        0,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.locomotion.south.02",
+      "image": "player",
+      "rect": [
+        128,
+        0,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.locomotion.south.03",
+      "image": "player",
+      "rect": [
+        192,
+        0,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.locomotion.south.04",
+      "image": "player",
+      "rect": [
+        256,
+        0,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.locomotion.south.05",
+      "image": "player",
+      "rect": [
+        320,
+        0,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.locomotion.south.06",
+      "image": "player",
+      "rect": [
+        384,
+        0,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 6
+    },
+    {
+      "id": "character.locomotion.south.07",
+      "image": "player",
+      "rect": [
+        448,
+        0,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 7
+    },
+    {
+      "id": "character.locomotion.south.08",
+      "image": "player",
+      "rect": [
+        512,
+        0,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 0,
+      "animation_frame": 8
+    },
+    {
+      "id": "character.locomotion.west.00",
+      "image": "player",
+      "rect": [
+        0,
+        64,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.locomotion.west.01",
+      "image": "player",
+      "rect": [
+        64,
+        64,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.locomotion.west.02",
+      "image": "player",
+      "rect": [
+        128,
+        64,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.locomotion.west.03",
+      "image": "player",
+      "rect": [
+        192,
+        64,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.locomotion.west.04",
+      "image": "player",
+      "rect": [
+        256,
+        64,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.locomotion.west.05",
+      "image": "player",
+      "rect": [
+        320,
+        64,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.locomotion.west.06",
+      "image": "player",
+      "rect": [
+        384,
+        64,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 6
+    },
+    {
+      "id": "character.locomotion.west.07",
+      "image": "player",
+      "rect": [
+        448,
+        64,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 7
+    },
+    {
+      "id": "character.locomotion.west.08",
+      "image": "player",
+      "rect": [
+        512,
+        64,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 1,
+      "animation_frame": 8
+    },
+    {
+      "id": "character.locomotion.east.00",
+      "image": "player",
+      "rect": [
+        0,
+        128,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.locomotion.east.01",
+      "image": "player",
+      "rect": [
+        64,
+        128,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.locomotion.east.02",
+      "image": "player",
+      "rect": [
+        128,
+        128,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.locomotion.east.03",
+      "image": "player",
+      "rect": [
+        192,
+        128,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.locomotion.east.04",
+      "image": "player",
+      "rect": [
+        256,
+        128,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.locomotion.east.05",
+      "image": "player",
+      "rect": [
+        320,
+        128,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.locomotion.east.06",
+      "image": "player",
+      "rect": [
+        384,
+        128,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 6
+    },
+    {
+      "id": "character.locomotion.east.07",
+      "image": "player",
+      "rect": [
+        448,
+        128,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 7
+    },
+    {
+      "id": "character.locomotion.east.08",
+      "image": "player",
+      "rect": [
+        512,
+        128,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 2,
+      "animation_frame": 8
+    },
+    {
+      "id": "character.locomotion.north.00",
+      "image": "player",
+      "rect": [
+        0,
+        192,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.locomotion.north.01",
+      "image": "player",
+      "rect": [
+        64,
+        192,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.locomotion.north.02",
+      "image": "player",
+      "rect": [
+        128,
+        192,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.locomotion.north.03",
+      "image": "player",
+      "rect": [
+        192,
+        192,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.locomotion.north.04",
+      "image": "player",
+      "rect": [
+        256,
+        192,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.locomotion.north.05",
+      "image": "player",
+      "rect": [
+        320,
+        192,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.locomotion.north.06",
+      "image": "player",
+      "rect": [
+        384,
+        192,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 6
+    },
+    {
+      "id": "character.locomotion.north.07",
+      "image": "player",
+      "rect": [
+        448,
+        192,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 7
+    },
+    {
+      "id": "character.locomotion.north.08",
+      "image": "player",
+      "rect": [
+        512,
+        192,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 3,
+      "animation_frame": 8
+    },
+    {
+      "id": "character.locomotion.south-west.00",
+      "image": "player",
+      "rect": [
+        0,
+        256,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.locomotion.south-west.01",
+      "image": "player",
+      "rect": [
+        64,
+        256,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.locomotion.south-west.02",
+      "image": "player",
+      "rect": [
+        128,
+        256,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.locomotion.south-west.03",
+      "image": "player",
+      "rect": [
+        192,
+        256,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.locomotion.south-west.04",
+      "image": "player",
+      "rect": [
+        256,
+        256,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.locomotion.south-west.05",
+      "image": "player",
+      "rect": [
+        320,
+        256,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.locomotion.south-west.06",
+      "image": "player",
+      "rect": [
+        384,
+        256,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 6
+    },
+    {
+      "id": "character.locomotion.south-west.07",
+      "image": "player",
+      "rect": [
+        448,
+        256,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 7
+    },
+    {
+      "id": "character.locomotion.south-west.08",
+      "image": "player",
+      "rect": [
+        512,
+        256,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 4,
+      "animation_frame": 8
+    },
+    {
+      "id": "character.locomotion.south-east.00",
+      "image": "player",
+      "rect": [
+        0,
+        320,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.locomotion.south-east.01",
+      "image": "player",
+      "rect": [
+        64,
+        320,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.locomotion.south-east.02",
+      "image": "player",
+      "rect": [
+        128,
+        320,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.locomotion.south-east.03",
+      "image": "player",
+      "rect": [
+        192,
+        320,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.locomotion.south-east.04",
+      "image": "player",
+      "rect": [
+        256,
+        320,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.locomotion.south-east.05",
+      "image": "player",
+      "rect": [
+        320,
+        320,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.locomotion.south-east.06",
+      "image": "player",
+      "rect": [
+        384,
+        320,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 6
+    },
+    {
+      "id": "character.locomotion.south-east.07",
+      "image": "player",
+      "rect": [
+        448,
+        320,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 7
+    },
+    {
+      "id": "character.locomotion.south-east.08",
+      "image": "player",
+      "rect": [
+        512,
+        320,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 5,
+      "animation_frame": 8
+    },
+    {
+      "id": "character.locomotion.north-west.00",
+      "image": "player",
+      "rect": [
+        0,
+        384,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.locomotion.north-west.01",
+      "image": "player",
+      "rect": [
+        64,
+        384,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.locomotion.north-west.02",
+      "image": "player",
+      "rect": [
+        128,
+        384,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.locomotion.north-west.03",
+      "image": "player",
+      "rect": [
+        192,
+        384,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.locomotion.north-west.04",
+      "image": "player",
+      "rect": [
+        256,
+        384,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.locomotion.north-west.05",
+      "image": "player",
+      "rect": [
+        320,
+        384,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.locomotion.north-west.06",
+      "image": "player",
+      "rect": [
+        384,
+        384,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 6
+    },
+    {
+      "id": "character.locomotion.north-west.07",
+      "image": "player",
+      "rect": [
+        448,
+        384,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 7
+    },
+    {
+      "id": "character.locomotion.north-west.08",
+      "image": "player",
+      "rect": [
+        512,
+        384,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 6,
+      "animation_frame": 8
+    },
+    {
+      "id": "character.locomotion.north-east.00",
+      "image": "player",
+      "rect": [
+        0,
+        448,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 0
+    },
+    {
+      "id": "character.locomotion.north-east.01",
+      "image": "player",
+      "rect": [
+        64,
+        448,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 1
+    },
+    {
+      "id": "character.locomotion.north-east.02",
+      "image": "player",
+      "rect": [
+        128,
+        448,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 2
+    },
+    {
+      "id": "character.locomotion.north-east.03",
+      "image": "player",
+      "rect": [
+        192,
+        448,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 3
+    },
+    {
+      "id": "character.locomotion.north-east.04",
+      "image": "player",
+      "rect": [
+        256,
+        448,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 4
+    },
+    {
+      "id": "character.locomotion.north-east.05",
+      "image": "player",
+      "rect": [
+        320,
+        448,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 5
+    },
+    {
+      "id": "character.locomotion.north-east.06",
+      "image": "player",
+      "rect": [
+        384,
+        448,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 6
+    },
+    {
+      "id": "character.locomotion.north-east.07",
+      "image": "player",
+      "rect": [
+        448,
+        448,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 7
+    },
+    {
+      "id": "character.locomotion.north-east.08",
+      "image": "player",
+      "rect": [
+        512,
+        448,
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "intended_ground_point_in_tile": [
+        16,
+        24
+      ],
+      "facing": 7,
+      "animation_frame": 8
+    }
+  ],
+  "locomotion": {
+    "idle_frame": 0,
+    "walk_frames": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "cycle_distance_tiles": 1.0,
+    "frame_durations_ms": [
+      80,
+      70,
+      80,
+      70,
+      80,
+      70,
+      80,
+      70
+    ],
+    "directions": [
+      "south",
+      "west",
+      "east",
+      "north",
+      "south-west",
+      "south-east",
+      "north-west",
+      "north-east"
+    ]
+  },
+  "provenance": {
+    "service": "PixelLab",
+    "model": "PixMiniMax",
+    "character_id": "73253a5c-9983-4f58-8d67-cd31a1c928d5",
+    "input_archive": "generated/walking-all-directions.zip",
+    "input_archive_sha256": "a7114eb87fd3144af6af75a65677a2c3345e3a966105559010f4b5712d16cf44",
+    "modifications": "Lossless atlas assembly, separate supplied idle, integer preview scaling; no pose redraw or deformation."
+  },
+  "previews": {
+    "walk-contact-sheet.png": {
+      "path": "previews/walk-contact-sheet.png",
+      "sha256": "869bd6d11bfcafe94c414ecd0597cdf972ed9ec512caa3b6893c324608fa66b7"
+    },
+    "walk-cycle.gif": {
+      "path": "previews/walk-cycle.gif",
+      "sha256": "71c5d194556b6d6e22e593a6b79be6dda7833fff73149f51c4a20014725340b3"
+    },
+    "validation.json": {
+      "path": "previews/validation.json",
+      "sha256": "fe88e05e4ec871d30f8d1ccdc8c611617e39128f0a2e9ead46ce879b2a2d12bc"
+    }
+  }
+}

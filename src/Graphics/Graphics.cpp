@@ -3174,7 +3174,8 @@ void Graphics::DrawPlayer(
     const float dy = visualPlayerInitialized ? position.y - visualPlayerY : 0.0f;
     const float travelled = std::hypot(dx, dy);
     int walkPose = 0;
-    if (travelled > 0.002f)
+    int locomotionPose = 0;
+    if (travelled > 0.00001f)
     {
         // Keep the facing through the last pixel of arrival: per-axis position
         // snapping can otherwise turn diagonal idle into a cardinal pose.
@@ -3199,6 +3200,26 @@ void Graphics::DrawPlayer(
             boundary += PlayerAnimationTiming::WalkMilliseconds[pose];
             if (phase < boundary) { walkPose = pose; break; }
         }
+        playerLocomotionDistance = std::fmod(playerLocomotionDistance + travelled,
+            ForestPilotLayout::PlayerLocomotionCycleTiles);
+        const float locomotionPhase = playerLocomotionDistance / ForestPilotLayout::PlayerLocomotionCycleTiles *
+            ForestPilotLayout::PlayerLocomotionCycleMilliseconds;
+        boundary = 0;
+        for (int pose = 0; pose < 8; ++pose)
+        {
+            boundary += ForestPilotLayout::PlayerLocomotionMilliseconds[pose];
+            if (locomotionPhase < boundary) { locomotionPose = pose + 1; break; }
+        }
+        lastLocomotionPose = locomotionPose;
+        locomotionGapSeconds = 0.0f;
+    }
+    else
+    {
+        locomotionGapSeconds += presentationDeltaSeconds;
+        // A one-frame gap between accepted 600-ms steps must not flash idle.
+        // Hold the last moving frame briefly without advancing travel or time.
+        if (movementPathActive && locomotionGapSeconds <= 0.08f) locomotionPose = lastLocomotionPose;
+        else { playerLocomotionDistance = 0.0f; lastLocomotionPose = 0; }
     }
     visualPlayerX = position.x;
     visualPlayerY = position.y;
@@ -3208,6 +3229,7 @@ void Graphics::DrawPlayer(
     {
         playerFacing = melee->facing;
         walkPose = 0;
+        locomotionPose = 0;
         if (worldArtEnabled && forestSprites.DrawEquippedPlayer(visualPlayerX, visualPlayerY,
             playerFacing, meleePresentation.GetPose(), melee->weapon, displayedShield, true)) return;
     }
@@ -3218,6 +3240,7 @@ void Graphics::DrawPlayer(
     {
         playerFacing = work->facing;
         walkPose = 0;
+        locomotionPose = 0;
         if (worldArtEnabled && (chop
             ? forestSprites.DrawWoodcutting(visualPlayerX, visualPlayerY, playerFacing, woodcuttingPresentation.GetPose(), work->toolTier)
             : forestSprites.DrawMiningAction(visualPlayerX, visualPlayerY, playerFacing, miningPresentation.GetPose(), work->toolTier))) return;
@@ -3225,7 +3248,7 @@ void Graphics::DrawPlayer(
     if (worldArtEnabled && !woodcuttingPresentation.GetAnimation() &&
         forestSprites.DrawEquippedPlayer(visualPlayerX, visualPlayerY,
             playerFacing, walkPose, displayedWeapon, displayedShield)) return;
-    if (worldArtEnabled && forestSprites.DrawPlayer(visualPlayerX, visualPlayerY, playerFacing, walkPose)) return;
+    if (worldArtEnabled && forestSprites.DrawPlayerLocomotion(visualPlayerX, visualPlayerY, playerFacing, locomotionPose)) return;
 
     SDL_FRect playerRectangle =
         SDL_FRect{visualPlayerX * TileSize + 4.0f,
@@ -6673,15 +6696,16 @@ void Graphics::Render(
     const std::map<int, MeleeAttackPresentation> *attackPresentations)
 {
     const Uint64 presentationTick = SDL_GetTicks();
+    const Uint64 frameTick = SDL_GetTicksNS();
     if (lastPresentationTick != 0)
     {
         presentationDeltaSeconds = std::clamp(
-            static_cast<float>(presentationTick - lastPresentationTick) /
-                1000.0f,
-            1.0f / 240.0f,
+            static_cast<float>(frameTick - lastPresentationTick) /
+                1000000000.0f,
+            0.0f,
             0.05f);
     }
-    lastPresentationTick = presentationTick;
+    lastPresentationTick = frameTick;
     PreparePlayerMovement(playerX, playerY);
     UpdateCamera(playerX, playerY, map);
     UpdateSpritePicking(resources, stations, groundItems);

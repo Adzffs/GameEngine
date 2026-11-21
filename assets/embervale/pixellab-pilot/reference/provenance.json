@@ -1,0 +1,99 @@
+{
+  "source": "assets/embervale/cast-pilot/textures/player.png",
+  "source_sha256": "b37d46285205cc54af937e113786d3815f1172084520d1f03c477d48fc35a97f",
+  "output_size": [
+    64,
+    64
+  ],
+  "translation": [
+    16,
+    8
+  ],
+  "ground_pivot": [
+    32,
+    48
+  ],
+  "scaled_or_redrawn": false,
+  "views": {
+    "south": {
+      "source_cell": [
+        0,
+        0,
+        32,
+        56
+      ],
+      "file": "player-south-64.png",
+      "sha256": "b7d1979e8ce9f95dc99491acf34be97e55f78addef7f672b81f8490b71598a19"
+    },
+    "west": {
+      "source_cell": [
+        0,
+        56,
+        32,
+        56
+      ],
+      "file": "player-west-64.png",
+      "sha256": "9aec448223efa39f8a160cf59fd6be99373b773015f44df946f11d130bf867bb"
+    },
+    "east": {
+      "source_cell": [
+        0,
+        112,
+        32,
+        56
+      ],
+      "file": "player-east-64.png",
+      "sha256": "9e8fef62b5423cbcbc7f0117a182bbb233c398b14cbaad7f948a238f2ba8145a"
+    },
+    "north": {
+      "source_cell": [
+        0,
+        168,
+        32,
+        56
+      ],
+      "file": "player-north-64.png",
+      "sha256": "0950d1f9c20b48f7a247d65983173efd3cd39a2c59fc8498d9294aaeb240deca"
+    },
+    "south-west": {
+      "source_cell": [
+        0,
+        224,
+        32,
+        56
+      ],
+      "file": "player-south-west-64.png",
+      "sha256": "9a6647ce5b38b7f331dd1837618d634a8783cec6be113ce759ca0a351ef38ac1"
+    },
+    "south-east": {
+      "source_cell": [
+        0,
+        280,
+        32,
+        56
+      ],
+      "file": "player-south-east-64.png",
+      "sha256": "6611841ba65f4854f3468d0f56648de594cd5aee5c6f6accc84a70efd7328272"
+    },
+    "north-west": {
+      "source_cell": [
+        0,
+        336,
+        32,
+        56
+      ],
+      "file": "player-north-west-64.png",
+      "sha256": "727b71cbc7ffdf717a77efff6705856c9307f66b457caf385c95996e58664431"
+    },
+    "north-east": {
+      "source_cell": [
+        0,
+        392,
+        32,
+        56
+      ],
+      "file": "player-north-east-64.png",
+      "sha256": "37c945470d81577981cfeb341bb68d6ecfa97047de5f93f7b269bb0864d9c1b6"
+    }
+  }
+}

@@ -46,6 +46,7 @@ namespace StarterJourney { struct Guidance; }
 
 class Graphics
 {
+    friend struct GraphicsPreviewAccess;
 public:
     Graphics();
     ~Graphics();
@@ -71,6 +72,7 @@ public:
     std::optional<ItemType> ConsumeMeleeSwing() { return meleePresentation.ConsumeSwing(); }
     void ShowGameGuide() { gameGuideVisible = true; }
     void SetCompiledMapLabelsVisible(bool visible) { compiledMapLabelsVisible = visible; }
+    void SetMovementPathActive(bool active) { movementPathActive = active; }
     // Authoring inspection only; normal play uses each building's stable profile.
     void SetBuildingConditionPreview(int condition) { forestSprites.SetBuildingConditionPreview(condition); }
     void ProcessEvents(bool &running, const World *world = nullptr);
@@ -585,6 +587,10 @@ private:
     float visualMovementSpeed = 1.0f / 0.6f;
     int playerFacing = 0;
     float playerWalkDistance = 0.0f;
+    float playerLocomotionDistance = 0.0f;
+    float locomotionGapSeconds = 0.0f;
+    int lastLocomotionPose = 0;
+    bool movementPathActive = false;
     WoodcuttingPresentationState woodcuttingPresentation;
     GatheringPresentationState miningPresentation{SkillType::MINING};
     MeleePresentationState meleePresentation;

@@ -13,6 +13,7 @@ struct GraphicsTestAccess
         graphics.visualPlayerX = 2.0f - dx;
         graphics.visualPlayerY = 2.0f - dy;
         graphics.playerWalkDistance = distance;
+        graphics.playerLocomotionDistance = distance;
         // Snap to the target so the test controls the exact visual displacement.
         graphics.presentationDeltaSeconds = 10.0f;
         graphics.DrawPlayer(2, 2);
@@ -28,6 +29,9 @@ struct GraphicsTestAccess
         for (int frame = 0; frame < 120; ++frame) graphics.DrawPlayer(2, 2);
     }
     static float Distance(const Graphics &graphics) { return graphics.playerWalkDistance; }
+    static float LocomotionDistance(const Graphics &graphics) { return graphics.playerLocomotionDistance; }
+    static void RedrawAtRest(Graphics &graphics, float delta)
+    { graphics.presentationDeltaSeconds = delta; graphics.DrawPlayer(2, 2); }
     static SDL_Renderer *Renderer(Graphics &graphics) { return graphics.renderer; }
     static ForestSprites &Sprites(Graphics &graphics) { return graphics.forestSprites; }
     static void BeginStep(Graphics &g)
@@ -35,6 +39,7 @@ struct GraphicsTestAccess
         g.visualPlayerInitialized = true; g.visualPlayerX = 2; g.visualPlayerY = 2;
         g.visualMovementTargetInitialized = true;
         g.visualMovementTargetX = 2; g.visualMovementTargetY = 2;
+        g.playerLocomotionDistance = 0;
     }
     static SDL_FPoint Step(Graphics &g, int x, int y, float delta)
     {
@@ -111,16 +116,16 @@ int main()
         }
 
 #if SDL_VERSION_ATLEAST(3, 4, 0)
-    test.Expect(sprites.HasPlayer(), "Packaged player atlas loads through the real texture cache");
+    test.Expect(sprites.HasPlayerLocomotion(), "Packaged PixelLab atlas loads through the real texture cache");
     std::set<std::uint64_t> idleDirections;
     for (int facing = 0; facing < 8; ++facing)
     {
-        std::array<std::uint64_t, PlayerAnimationTiming::WalkPoses> poses{};
-        for (int pose = 0; pose < PlayerAnimationTiming::WalkPoses; ++pose)
+        std::array<std::uint64_t, ForestPilotLayout::PlayerLocomotionFrames> poses{};
+        for (int pose = 0; pose < ForestPilotLayout::PlayerLocomotionFrames; ++pose)
         {
             SDL_SetRenderDrawColor(renderer, 30, 40, 50, 255);
             SDL_RenderClear(renderer);
-            test.Expect(sprites.DrawPlayer(2, 2, facing, pose),
+            test.Expect(sprites.DrawPlayerLocomotion(2, 2, facing, pose),
                 "Every direction and walk pose renders an authored sprite");
             poses[pose] = Capture(test, renderer);
         }
@@ -139,9 +144,47 @@ int main()
         GraphicsTestAccess::Travel(graphics, 0, 0, 0.6f);
         test.ExpectEqual(Capture(test, renderer), poses[0],
             "Stopping draws the neutral pose for the retained direction");
+        test.ExpectNear(GraphicsTestAccess::LocomotionDistance(graphics), 0.0f, 0.00001f,
+            "Stopped PixelLab walking resets to its separate idle instead of cycling a neutral stride");
+        // Check phase selection through Graphics, not just direct atlas drawing.
+        float elapsed = 0;
+        for (int pose = 1; pose < ForestPilotLayout::PlayerLocomotionFrames; ++pose)
+        {
+            const float halfway = elapsed + ForestPilotLayout::PlayerLocomotionMilliseconds[pose - 1] * 0.5f;
+            const float distance = halfway / ForestPilotLayout::PlayerLocomotionCycleMilliseconds *
+                ForestPilotLayout::PlayerLocomotionCycleTiles;
+            SDL_SetRenderDrawColor(renderer, 30, 40, 50, 255);
+            SDL_RenderClear(renderer);
+            GraphicsTestAccess::Travel(graphics, directions[facing].x * 0.3f, directions[facing].y * 0.3f,
+                distance - std::hypot(directions[facing].x * 0.3f, directions[facing].y * 0.3f));
+            test.ExpectEqual(Capture(test, renderer), poses[pose],
+                "Moving runtime selects each generated frame and excludes the separate idle");
+            elapsed += ForestPilotLayout::PlayerLocomotionMilliseconds[pose - 1];
+        }
     }
     test.ExpectEqual(idleDirections.size(), std::size_t{8},
         "The eight compass directions use visually distinct sprites");
+    SDL_SetRenderDrawColor(renderer, 30, 40, 50, 255);
+    SDL_RenderClear(renderer);
+    GraphicsTestAccess::Travel(graphics, 0.3f, 0);
+    const auto moving = Capture(test, renderer);
+    graphics.SetMovementPathActive(true);
+    for (int frame = 0; frame < 2; ++frame)
+    {
+        SDL_SetRenderDrawColor(renderer, 30, 40, 50, 255); SDL_RenderClear(renderer);
+        GraphicsTestAccess::RedrawAtRest(graphics, 0.04f);
+        test.ExpectEqual(Capture(test, renderer), moving, "Brief active-path tick gaps retain the moving pose without flashing idle");
+        test.ExpectNear(GraphicsTestAccess::LocomotionDistance(graphics), 0.3f, 0.0001f,
+            "Tick-gap hold does not invent travelled distance");
+    }
+    GraphicsTestAccess::RedrawAtRest(graphics, 0.04f);
+    test.ExpectNear(GraphicsTestAccess::LocomotionDistance(graphics), 0.0f, 0.00001f,
+        "A stalled path cannot keep the moving pose beyond its bounded grace interval");
+    graphics.SetMovementPathActive(false);
+    GraphicsTestAccess::Travel(graphics, 0.3f, 0);
+    GraphicsTestAccess::RedrawAtRest(graphics, 0.01f);
+    test.ExpectNear(GraphicsTestAccess::LocomotionDistance(graphics), 0.0f, 0.00001f,
+        "A cancelled or completed path returns to idle immediately");
 #endif
     for (const auto destination : std::array<SDL_Point,3>{{{3,2},{3,3},{4,2}}})
         for (const float delta : {1.0f/30.0f,1.0f/60.0f})
@@ -157,6 +200,14 @@ int main()
                 if (frame == 0) expectedStep = distance;
                 else test.ExpectNear(distance,expectedStep,0.0001f,"Walking and running retain steady visual speed throughout a step");
                 previous = next;
+                if (frame == frames / 2 - 1)
+                {
+                    const float expected = std::fmod(std::hypot(destination.x - 2.0f, destination.y - 2.0f) * 0.5f,
+                        ForestPilotLayout::PlayerLocomotionCycleTiles);
+                    const float error = std::abs(GraphicsTestAccess::LocomotionDistance(graphics) - expected);
+                    test.Expect(std::min(error, ForestPilotLayout::PlayerLocomotionCycleTiles - error) < 0.0001f,
+                        "Cardinal, diagonal and running gait phase agree at both 30 and 60 render frames per second");
+                }
             }
             test.ExpectNear(previous.x,static_cast<float>(destination.x),0.0001f,"Visual step reaches its authoritative X without overshoot");
             test.ExpectNear(previous.y,static_cast<float>(destination.y),0.0001f,"Visual step reaches its authoritative Y without overshoot");

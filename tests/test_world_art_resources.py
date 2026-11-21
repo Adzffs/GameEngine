@@ -168,8 +168,8 @@ class WorldArtResourceTests(unittest.TestCase):
         result = subprocess.run([sys.executable, str(ART_TOOLS / 'check_world_art.py'), '--check'],
                                 check=True, capture_output=True, text=True, timeout=20)
         report = json.loads(result.stdout)
-        self.assertEqual((report['batches'], report['images'], report['frames']), (9, 32, 3063))
-        self.assertEqual((report['rgba_texture_bytes'], report['alpha_bytes']), (23162880, 5790720))
+        self.assertEqual((report['batches'], report['images'], report['frames']), (10, 33, 3135))
+        self.assertEqual((report['rgba_texture_bytes'], report['alpha_bytes']), (24342528, 6085632))
         self.assertTrue(report['renderer_layout_matches'])
         self.assertEqual(before, hashes())
 
@@ -177,7 +177,7 @@ class WorldArtResourceTests(unittest.TestCase):
         # The eight-pose actions must not enlarge Mining's six-pose table.
         for prefix, variants, poses in [('character.woodcutting.', 1, 8), ('tool.axe.', 3, 8),
                 ('character.mining.', 1, 6), ('tool.pickaxe.', 3, 6),
-                ('character.melee.', 5, 16), ('equipment.melee.', 9, 16)]:
+                ('character.melee.', 5, 16), ('equipment.melee.', 9, 16), ('character.locomotion.', 1, 9)]:
             with self.subTest(prefix=prefix):
                 batch = copy.deepcopy(self.batch)
                 batch['assets'] = [dict(self.batch['assets'][0], id=f'{prefix}{tier}.{facing}.{pose}',
@@ -188,6 +188,22 @@ class WorldArtResourceTests(unittest.TestCase):
                 with self.assertRaises(art.ArtError): self.validate(incomplete, files=False)
                 out_of_bounds = copy.deepcopy(batch); out_of_bounds['assets'][-1]['animation_frame'] = poses
                 with self.assertRaises(art.ArtError): self.validate(out_of_bounds, files=False)
+
+    def test_locomotion_timing_idle_and_direction_metadata_reject_invalid_values(self):
+        batch = copy.deepcopy(self.batch)
+        batch['id'] = 'pixellab-pilot'
+        batch['locomotion'] = {'idle_frame': 0, 'walk_frames': list(range(1, 9)),
+            'cycle_distance_tiles': 1.0, 'frame_durations_ms': [80, 70, 80, 70, 80, 70, 80, 70],
+            'directions': ['south', 'west', 'east', 'north', 'south-west', 'south-east', 'north-west', 'north-east']}
+        self.validate(batch, files=False)
+        for key, value in [('idle_frame', True), ('idle_frame', 1), ('walk_frames', list(range(8))),
+                ('frame_durations_ms', [80] * 7), ('frame_durations_ms', [80] * 7 + [False]),
+                ('frame_durations_ms', [80] * 7 + [75]), ('cycle_distance_tiles', float('nan')),
+                ('cycle_distance_tiles', 0), ('cycle_distance_tiles', 2.0),
+                ('directions', list(reversed(batch['locomotion']['directions'])))]:
+            bad = copy.deepcopy(batch); bad['locomotion'][key] = value
+            with self.subTest(key=key, value=value), self.assertRaises(art.ArtError):
+                self.validate(bad, files=False)
 
     def test_binding_newlines_are_portable_without_accepting_changed_geometry(self):
         path = self.root / 'binding.h'
