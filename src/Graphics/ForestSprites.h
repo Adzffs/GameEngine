@@ -40,8 +40,10 @@ public:
     bool HitTree(int tileX, int tileY, float worldX, float worldY) const;
     bool HasTree() const;
     bool HasPlayer() const;
+    bool HasPlayerLocomotion() const;
     bool HasMara() const;
     bool DrawPlayer(float tileX, float tileY, int facing, int pose) const;
+    bool DrawPlayerLocomotion(float tileX, float tileY, int facing, int pose) const;
     bool DrawWoodcutting(float tileX, float tileY, int facing, int pose, int axeTier) const;
     bool DrawMiningAction(float tileX, float tileY, int facing, int pose, int pickaxeTier) const;
     bool DrawEquippedPlayer(float tileX, float tileY, int facing, int pose,
@@ -80,6 +82,7 @@ private:
     const Frame *stump = nullptr;
     // South, west, east, north, southwest, southeast, northwest, northeast.
     std::array<std::array<const Frame *, PlayerAnimationTiming::WalkPoses>, 8> player{};
+    std::array<std::array<const Frame *, ForestPilotLayout::PlayerLocomotionFrames>, 8> locomotion{};
     std::array<std::array<const Frame *, PlayerAnimationTiming::ChoppingPoses>, 8> chopping{};
     std::array<std::array<std::array<const Frame *, PlayerAnimationTiming::ChoppingPoses>, 8>, 3> choppingAxes{};
     // Unarmed, sword, two-handed, axe, pickaxe; eight walk and eight attack poses.

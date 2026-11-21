@@ -27,6 +27,16 @@ int main()
         test.ExpectEqual(cache.LoadedImageCount(), ForestPilotLayout::Images.size(), "Complete published art passes real bounded decode/cache");
         test.Expect(cache.GetResourceUsage().textureBytes > 0 && cache.GetResourceUsage().alphaBytes > 0,
             "Real cache reports logical texture and CPU alpha costs");
+        auto missingLocomotion = ForestPilotLayout::Images;
+        for (auto &image : missingLocomotion)
+            if (image.directory == "assets/embervale/pixellab-pilot/textures") image.filename = "missing-pixellab.png";
+        WorldArtResourceTestAccess::Initialize(cache, renderer, missingLocomotion, ForestPilotLayout::Frames,
+            std::filesystem::path(reinterpret_cast<const char8_t *>(SDL_GetBasePath())));
+        test.Expect(!cache.HasPlayerLocomotion() && cache.HasPlayer(),
+            "Missing PixelLab texture retains the original player cache");
+        for (int facing = 0; facing < 8; ++facing) for (int pose = 0; pose < 9; ++pose)
+            test.Expect(cache.DrawPlayerLocomotion(1, 1, facing, pose),
+                "Every PixelLab idle/walk slot falls back to a valid legacy body when its texture is unavailable");
         const auto root = std::filesystem::temp_directory_path() / ("embervale-art-render-" +
             std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
         const auto folder = root / "assets/embervale/forest-pilot/textures";

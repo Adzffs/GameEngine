@@ -1,6 +1,6 @@
 # Current project status
 
-**Reviewed:** 20 November 2026.\
+**Reviewed:** 21 November 2026.\
 **Published code:** [d40b491](https://github.com/Adzffs/GameEngine/commit/d40b491d8b8082edc65ec4be0efc26ed882f2c54).\
 **Source of truth:** Current code and the [project review](../06-development/PROJECT_REVIEW_2026-11-20.md). The older [engine inventory](IMPLEMENTED_SYSTEMS.md) retains its explicitly dated baseline.
 
@@ -19,7 +19,7 @@ Embervale is a playable local C++20/SDL3 RPG prototype with a bounded world edit
 | Authored world | Flat 100x100 River Crossing candidate, distributed services, existing actor homes and static workshop buildings | Visible encounter/escape/recovery and human pacing acceptance; more building assemblies |
 | World format | Schemas 1-4, bounded runtime validation, stable placements/allocation IDs, staged spawns and fixed version manifests | General region/definition authoring, content/save migrations and asset packages |
 | Studio | Shared edits/history, guarded drafts, private recovery, reopen, overlays, exact-byte validation, create-only version publishing and selected-version play/rollback | In-place replacement, richer diagnostics, brushes and broader accessibility/platform acceptance |
-| Published art | Nine batches, 3,063 frames/32 textures, eight-way walking/chopping/mining/melee and visible equipment, editable masters, guarded cache/fallback, bounded PNG streams and explicit resource budgets | Remaining cast/resource tiers, general importer, UI/accessibility and visible quality acceptance |
+| Art candidate | Ten batches, 3,135 frames/33 textures, eight-way walking/chopping/mining/melee and visible equipment, editable masters, guarded cache/fallback, bounded PNG streams and explicit resource budgets | Remaining cast/resource tiers, general importer, UI/accessibility and visible quality acceptance |
 | Audio | First sound pass: 15 original effects, committed-result routing, bounded playback, effects volume/mute and keyboard controls | Physical-device audible quality/balance and full starter acceptance |
 
 ## Integrated player actions
@@ -28,7 +28,7 @@ The [player action integration](../06-development/PLAYER_ACTION_INTEGRATION_2026
 
 Normal exports preserve all 32 editable masters. Lossless runtime packing fits 3,063 frames in 32 textures within the unchanged resource limits. Committed melee snapshots survive death cleanup and catch-up ticks; swing sound follows the visible wind-up once. All 47 packaged images/sounds match their sources.
 
-Animation remains the recovered working first pass. The owner has deferred further polish; ART-005 stays planned and visual approval is outstanding. ART-004 remains in progress for physical-device audible quality/balance. GAME-005 retains the uncoached starter journey and actual elapsed-time acceptance.
+ART-005 has resumed with [PixelLab eight-way empty-handed walking](../06-development/PIXELLAB_WALKING_2026-11-21.md). The owner liked the east-only trial; the complete in-game set remains a review candidate. Equipped walking, Mining, Woodcutting and melee retain their existing art until matching AI passes are ready. The new master is separate, taking the candidate to 33 masters/textures, 3,135 bound frames and 48 packaged images/sounds. ART-004 remains in progress for physical-device audible quality/balance. GAME-005 retains the uncoached starter journey and actual elapsed-time acceptance.
 
 The [starter combat/recovery follow-up](../06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) completes the automated tutorial and deliberate recovery exercise. It fixes skipped post-combat bank/Mara steps and misleading loot/reward hints. Six save/reload checkpoints and single persisted recovery pass; full human/visible acceptance remains open.
 
@@ -70,9 +70,9 @@ The unchanged preparation replay equips the shield at tick 245, equips the sword
 ## Current work order
 
 1. **Completed in this review:** ENG-003, ENG-004 and GAME-009 protect saves/items; QA-004 reconciles current automated evidence; GAME-010 and STUDIO-025 protect player progress/editor work; bounded STUDIO-026 publishes/selects fixed maps and STUDIO-063 now validates current art resources and memory budgets.
-2. **REL-004 complete:** use the published combined player-action build and matching source/export/capture evidence.
+2. **Current owner priority, ART-005:** review the PixelLab eight-way walking candidate, then produce matching equipped/action art. REL-004 remains complete for the earlier published combined player-action build.
 3. **GAME-005 / GAME-004:** automated combat, food, death/recovery and save/reload now pass; finish the visible/uncoached route, input/confusion, balance and real elapsed-time acceptance.
 4. **ART-004:** the bounded sound pass is implemented against published source; finish physical-device audible quality, repetition and balance acceptance; original animation synchronization now passes Windows checks.
-5. Continue QA-003 UI readability/keyboard/manual acceptance and REL-002 distribution/installation work after the verified usability fixes. GAME-010, bounded STUDIO-025 recovery, STUDIO-026 fixed publishing and STUDIO-063 current-art resource validation are complete for their stated scopes. Animation quality remains ART-005, deferred by the owner.
+5. Continue QA-003 UI readability/keyboard/manual acceptance and REL-002 distribution/installation work after the verified usability fixes. GAME-010, bounded STUDIO-025 recovery, STUDIO-026 fixed publishing and STUDIO-063 current-art resource validation are complete for their stated scopes. Animation quality remains ART-005, now in progress with the PixelLab walking candidate.
 
 R0-R4 remain partial milestones. Optional editor expansion, elevation, multiple regions, companions, bosses and multiplayer do not need to be completed before the existing flat starter experience improves. Use the [roadmap](../02-roadmap/MASTER_ROADMAP.md) and synchronized [backlog](../02-roadmap/BACKLOG.md) for exact tasks and dependencies.

@@ -11,6 +11,12 @@
 #include <stdexcept>
 #include <string_view>
 
+struct GraphicsPreviewAccess
+{
+    static void SetFrameDelta(Graphics &graphics, float seconds)
+    { graphics.lastPresentationTick = 0; graphics.presentationDeltaSeconds = seconds; }
+};
+
 namespace
 {
     int Coordinate(std::string_view value)
@@ -28,7 +34,7 @@ int main(int argc, char **argv)
     try
     {
         if (argc < 3)
-            throw std::invalid_argument("Usage: EmbervaleRenderPreview WORLD.json OUTPUT.png [--basic] [--deplete-trees] [--deplete-rocks] [--focus X Y] [--zoom 1|1.5] [--condition new|weathered|repaired] [--walk-to X Y | --chop X Y | --mine X Y | --melee X Y] [--weapon bronze-sword|godsword|bronze-axe|iron-axe|steel-axe|bronze-pickaxe|iron-pickaxe|steel-pickaxe|unarmed] [--shield] [--frames N]");
+            throw std::invalid_argument("Usage: EmbervaleRenderPreview WORLD.json OUTPUT.png [--basic] [--deplete-trees] [--deplete-rocks] [--focus X Y] [--zoom 1|1.5] [--condition new|weathered|repaired] [--walk-to X Y | --chop X Y | --mine X Y | --melee X Y] [--weapon bronze-sword|godsword|bronze-axe|iron-axe|steel-axe|bronze-pickaxe|iron-pickaxe|steel-pickaxe|unarmed] [--shield] [--frames N] [--sequence NEW_DIRECTORY]");
         const auto input = std::filesystem::path(reinterpret_cast<const char8_t *>(argv[1]));
         const auto output = std::filesystem::path(reinterpret_cast<const char8_t *>(argv[2]));
         std::error_code equivalentError;
@@ -43,13 +49,16 @@ int main(int argc, char **argv)
         std::optional<std::pair<int, int>> mine;
         std::optional<std::pair<int, int>> melee;
         std::optional<ItemType> weapon;
+        std::optional<std::filesystem::path> sequence;
         bool shield = false;
         float zoom = 1.0f;
         int frames = 0, condition = -1;
         for (int index = 3; index < argc; ++index)
         {
             const std::string_view option = argv[index];
-            if (option == "--basic") basic = true;
+            if (option == "--sequence" && index + 1 < argc)
+                sequence = std::filesystem::path(reinterpret_cast<const char8_t *>(argv[++index]));
+            else if (option == "--basic") basic = true;
             else if (option == "--condition" && index + 1 < argc)
             {
                 const std::string_view value = argv[++index];
@@ -207,6 +216,8 @@ int main(int argc, char **argv)
             throw std::runtime_error(SDL_GetError());
         const auto draw = [&]
         {
+            if (sequence) GraphicsPreviewAccess::SetFrameDelta(graphics, 0.04f);
+            graphics.SetMovementPathActive(world.HasActiveMovementPath(playerID));
             graphics.Render(world.GetMap(), world.GetEntities(), world.GetResources(), world.GetStations(),
                 world.GetGroundItems(), world.GetMeleeCombatFeedbacks(), player->GetPosition().GetX(), player->GetPosition().GetY(),
                 player->GetInventory(), player->GetEquipment(), *player, world.GetActionForEntity(playerID), meleeTargetID);
@@ -221,11 +232,17 @@ int main(int argc, char **argv)
             if (graphics.GetCameraZoom() == before) throw std::runtime_error("Requested preview zoom is unavailable");
         }
         const int frameCount = frames > 0 ? frames : (melee ? 32 : gatheringTarget ? 18 : walkTo ? 2 : 1);
+        if (sequence)
+        {
+            if (!std::filesystem::create_directories(*sequence))
+                throw std::invalid_argument("Sequence output requires a new directory");
+            if (walkTo) world.QueueMovementDestination(MovementDestinationRequest(playerID, walkTo->first, walkTo->second));
+        }
         for (int frame = 0; frame < frameCount; ++frame)
         {
             if (frame > 0)
             {
-                if (walkTo) player->GetPosition().SetPosition(walkTo->first, walkTo->second);
+                if (walkTo && !sequence) player->GetPosition().SetPosition(walkTo->first, walkTo->second);
                 // Bounded presentation fixture: advance real gathering every
                 // fifteen 40-ms frames and consume each authoritative result.
                 if (gatheringTarget && frame % 15 == 0)
@@ -238,9 +255,19 @@ int main(int argc, char **argv)
                     world.Update();
                     graphics.SynchronizeMeleeResults(playerID, world.GetMeleeCombatEvents());
                 }
-                SDL_Delay(40);
+                if (walkTo && sequence && frame % 15 == 0) world.Update();
+                if (!sequence) SDL_Delay(40);
             }
             draw();
+            if (sequence)
+            {
+                std::unique_ptr<SDL_Surface, decltype(&SDL_DestroySurface)> framePixels(
+                    SDL_RenderReadPixels(graphics.renderer, nullptr), SDL_DestroySurface);
+                const auto name = "frame-" + std::to_string(10000 + frame).substr(1) + ".png";
+                const auto framePath = (*sequence / name).u8string();
+                if (!framePixels || !SDL_SavePNG(framePixels.get(), reinterpret_cast<const char *>(framePath.c_str())))
+                    throw std::runtime_error(SDL_GetError());
+            }
         }
         std::unique_ptr<SDL_Surface, decltype(&SDL_DestroySurface)> pixels(
             SDL_RenderReadPixels(graphics.renderer, nullptr), SDL_DestroySurface);

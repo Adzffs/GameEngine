@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "reviewed_date": "2026-11-20",
+  "reviewed_date": "2026-11-21",
   "current_verified_master": "d40b491d8b8082edc65ec4be0efc26ed882f2c54",
   "verification_reconciliation": "Integrated code d40b491d8b8082edc65ec4be0efc26ed882f2c54: Windows Debug SDL 124/124 (99 headless, 10 client, 15 graphics), separate SDL-free 99/99; Python 81 run, 79 pass/two unavailable-symlink skips. Original melee/equipment, current Mining/audio and later safety/editor/usability changes are combined. All 32 masters preserved, 47 packaged files match; lossless runtime packing retains resource budgets. Human/device/owner acceptance remains open. Read docs/embervale/06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md.",
   "repository": "Adzffs/GameEngine",
@@ -990,7 +990,7 @@
       "evidence": [
         "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Selection, hit/miss feedback, names, objectives, tutorial guidance and gathering rewards are implemented in bounded form. Local melee/equipment is REL-004. UI scale/accessibility and animation quality acceptance remain open; ART-005 polish is owner-deferred."
+      "notes": "Selection, hit/miss feedback, names, objectives, tutorial guidance and gathering rewards are implemented in bounded form. Local melee/equipment is REL-004. UI scale/accessibility and animation quality acceptance remain open; ART-005 has resumed with PixelLab empty-handed walking; complete visual acceptance stays open."
     },
     {
       "id": "ART-004",
@@ -1691,16 +1691,17 @@
       "milestone": "R4",
       "priority": "P2",
       "title": "Polish and obtain acceptance of character animation",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "REL-004"
       ],
       "acceptance": "Compare consistent eight-way fixtures at gameplay scale; improve pose, attachment, weight, timing and transitions; record owner visual acceptance separately from automated correctness.",
       "github_issue": null,
       "evidence": [
-        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
+        "docs/embervale/06-development/PIXELLAB_WALKING_2026-11-21.md"
       ],
-      "notes": "Explicitly owner-deferred on 20 November: working first pass, not accepted finished animation. Use ANIMATION_GUIDE and the dated research."
+      "notes": "Resumed 21 November at owner request using PixelLab after procedural quality was rejected. Owner liked the east-only trial. Complete eight-way empty-handed walking is imported as a separate editable master with shared preview/runtime timing. Full native visual acceptance remains open; equipped walking and gathering/melee art retain the prior batches pending matching AI passes. The rejected uncommitted procedural revision is preserved in its original worktree."
     },
     {
       "id": "GAME-010",

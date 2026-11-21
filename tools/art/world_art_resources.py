@@ -1,4 +1,4 @@
-"""Read-only resource validation for the current nine world-art batches."""
+"""Read-only resource validation for the current world-art batches."""
 from __future__ import annotations
 import hashlib
 import json
@@ -10,7 +10,7 @@ import zlib
 
 REPO = Path(__file__).resolve().parents[2]
 BATCH_NAMES = ('forest-pilot', 'cast-pilot', 'environment-pilot', 'service-pilot',
-               'building-pilot', 'variation-pilot', 'woodcutting-pilot', 'mining-pilot', 'melee-pilot')
+               'building-pilot', 'variation-pilot', 'woodcutting-pilot', 'mining-pilot', 'melee-pilot', 'pixellab-pilot')
 BATCH_VERSIONS = {name: (2 if name in ('building-pilot', 'variation-pilot') else 1) for name in BATCH_NAMES}
 LIMIT_KEYS = {'max_images', 'max_frames', 'max_image_edge', 'max_image_pixels', 'max_png_bytes',
               'max_manifest_bytes', 'max_catalogue_png_bytes', 'max_texture_bytes', 'max_alpha_bytes',
@@ -18,6 +18,7 @@ LIMIT_KEYS = {'max_images', 'max_frames', 'max_image_edge', 'max_image_pixels', 
 TOKEN = re.compile(r'[a-z0-9._-]{1,128}\Z')
 PNG_SCRATCH_BYTES = 65536
 BINDINGS = {
+    'character.locomotion.': (1, 9, True),
     'character.player.': (1, 8, True), 'character.woodcutting.': (1, 8, True),
     'character.mining.': (1, 6, True), 'tool.axe.': (3, 8, True), 'tool.pickaxe.': (3, 6, True),
     'character.melee.': (5, 16, True), 'equipment.melee.': (9, 16, True),
@@ -152,6 +153,22 @@ def validate_manifests(root, manifests, limits, check_files=True):
         require(type(batch.get('native_tile_size')) is int and batch['native_tile_size'] == 32, 'Unsupported art tile size')
         require(isinstance(batch.get('images'), dict) and batch['images'], 'Batch has no images')
         require(isinstance(batch.get('assets'), list) and batch['assets'], 'Batch has no frames')
+        if identity == 'pixellab-pilot':
+            locomotion = batch.get('locomotion', {})
+            require(type(locomotion.get('idle_frame')) is int and locomotion['idle_frame'] == 0 and
+                    locomotion.get('walk_frames') == list(range(1, 9)) and
+                    all(type(n) is int for n in locomotion['walk_frames']), 'Invalid locomotion pose mapping')
+            durations = locomotion.get('frame_durations_ms')
+            require(isinstance(durations, list) and len(durations) == 8 and
+                    all(type(n) is int and 0 < n <= 1000 and n % 10 == 0 for n in durations),
+                    'Invalid locomotion frame durations')
+            cycle = locomotion.get('cycle_distance_tiles')
+            require(type(cycle) in (float, int) and math.isfinite(cycle) and 0 < cycle <= 8,
+                    'Invalid locomotion cycle distance')
+            require(abs(sum(durations) - cycle * 600) < 0.01,
+                    'Locomotion preview timing differs from normal walking travel')
+            require(locomotion.get('directions') == ['south', 'west', 'east', 'north', 'south-west',
+                    'south-east', 'north-west', 'north-east'], 'Invalid locomotion direction order')
         images.extend((batch, name, image) for name, image in batch['images'].items())
         assets.extend((batch, asset) for asset in batch['assets'])
     require(len(images) <= limits['max_images'] and len(assets) <= limits['max_frames'], 'Catalogue count exceeds limits')
@@ -243,6 +260,9 @@ def renderer_layout(manifests):
     images = [(batch, name, image) for batch in manifests for name, image in batch['images'].items()]
     assets = [(batch, asset) for batch in manifests for asset in batch['assets']]
     walk_cycle = float(next((batch['walk']['cycle_distance_tiles'] for batch in manifests if 'walk' in batch), 1.0))
+    locomotion = next((batch['locomotion'] for batch in manifests if batch['id'] == 'pixellab-pilot'),
+                      {'cycle_distance_tiles': 1.0, 'frame_durations_ms': [80, 70, 80, 70, 80, 70, 80, 70]})
+    durations = locomotion['frame_durations_ms']
     lines = ['// Generated from world-art batch manifests by tools/art/build_*_pilot.py.',
              '#pragma once', '#include <SDL3/SDL.h>', '#include <array>', '#include <cstddef>',
              '#include <string_view>', '', 'namespace ForestPilotLayout', '{',
@@ -251,6 +271,10 @@ def renderer_layout(manifests):
              '        SDL_FPoint pivot, ground; int connectionMask, grassVariant, facing, animationFrame; };',
              '    inline constexpr int TileSize = 32;',
              f'    inline constexpr float PlayerWalkCycleTiles = {walk_cycle}f;',
+             '    inline constexpr int PlayerLocomotionFrames = 9;',
+             f'    inline constexpr float PlayerLocomotionCycleTiles = {float(locomotion["cycle_distance_tiles"])}f;',
+             '    inline constexpr std::array<int, 8> PlayerLocomotionMilliseconds{' + ', '.join(map(str, durations)) + '};',
+             f'    inline constexpr int PlayerLocomotionCycleMilliseconds = {sum(durations)};',
              f'    inline constexpr std::array<Image, {len(images)}> Images{{{{']
     for batch, name, image in images:
         w, h = image['size']

@@ -1,0 +1,46 @@
+{
+  "configuration": "Windows Debug; UCRT64 GCC 16.1.0; SDL3 3.4.12; Python 3.14.6",
+  "ctest": {
+    "total": 124,
+    "passed": 124,
+    "headless_label": 99,
+    "client_label": 10,
+    "graphics_label": 15
+  },
+  "python": {
+    "run": 82,
+    "passed": 80,
+    "skipped": 2,
+    "skip_reason": "Symbolic links unavailable"
+  },
+  "final_resource_python": {
+    "run": 18,
+    "passed": 17,
+    "skipped": 1
+  },
+  "renderer_capture": {
+    "frames": 90,
+    "step_ms": 40,
+    "world": "content/worlds/river-crossing.blockout.json",
+    "focus": [
+      26,
+      68
+    ],
+    "walk_to": [
+      26,
+      65
+    ],
+    "zoom": 1.5,
+    "cached_textures": 33,
+    "sequence": "Actual World movement; one authoritative update per 15 frames; no saves",
+    "preview_crop": [
+      384,
+      192,
+      512,
+      384
+    ],
+    "preview_scale": 2,
+    "gif_sha256": "2d562e6d1aa6a8e6d9f7cc35898f4a7395bdddaee8f9e5ea227d7d27a04623bf"
+  },
+  "acceptance": "East trial liked by owner; complete eight-way native review and equipped/action AI passes remain open"
+}
