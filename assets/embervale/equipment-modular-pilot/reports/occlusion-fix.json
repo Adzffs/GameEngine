@@ -1,0 +1,278 @@
+{
+  "defective_prototype": "a58a53591309265dc4d3f5603fde742ae4fcf098",
+  "runtime_baseline": "c522956422259256dcfb8c2f5263e225cc34ccac",
+  "runtime_editable_masters": 33,
+  "runtime_textures": 33,
+  "unchanged_pilot_sha256": {
+    "source/body.ase": "853874b26a7d26ba4a4d09e3ea07c267d87913b4b49d2c83c64c328010aa8f4e",
+    "source/axe.ase": "22c62369ed9fbbfa4133bd9a634c365e9c6b39bdf1ac9f8176b98900269595f2",
+    "source/metal-mask.ase": "e542bda0a62a76e101b0d5e735f0e17e404e45c9d78de3a9d0017351da948c36",
+    "textures/body.png": "ff04058ac059e09d01501d7b19864ae05af20a7fa1640df59a3f090c22ba60ca",
+    "textures/axe.png": "eeb8e932d58b2f1798371deb8c8f536f9d1acfae253c15367e9d677fa8404f28",
+    "textures/metal-mask.png": "ff71bfd90c5359feaf737930073ec9c65f63b8d4fbc57db97fb9fac4ac85cfaa",
+    "textures/tools.png": "20a3e2c1de12cdf499cea9fb12b1061e27bd53be967d1e00c09f2bd4c04c191e"
+  },
+  "mismatches": [],
+  "fixed_visual_landmarks_checked": 36,
+  "old_output_failed_landmarks": [
+    {
+      "tier": 0,
+      "pose": 0,
+      "point": [
+        52,
+        36
+      ]
+    },
+    {
+      "tier": 0,
+      "pose": 0,
+      "point": [
+        47,
+        51
+      ]
+    },
+    {
+      "tier": 0,
+      "pose": 0,
+      "point": [
+        47,
+        53
+      ]
+    },
+    {
+      "tier": 0,
+      "pose": 1,
+      "point": [
+        46,
+        44
+      ]
+    },
+    {
+      "tier": 0,
+      "pose": 2,
+      "point": [
+        45,
+        42
+      ]
+    },
+    {
+      "tier": 0,
+      "pose": 3,
+      "point": [
+        53,
+        54
+      ]
+    },
+    {
+      "tier": 0,
+      "pose": 4,
+      "point": [
+        53,
+        54
+      ]
+    },
+    {
+      "tier": 0,
+      "pose": 5,
+      "point": [
+        52,
+        50
+      ]
+    },
+    {
+      "tier": 0,
+      "pose": 6,
+      "point": [
+        48,
+        51
+      ]
+    },
+    {
+      "tier": 0,
+      "pose": 7,
+      "point": [
+        52,
+        36
+      ]
+    },
+    {
+      "tier": 1,
+      "pose": 0,
+      "point": [
+        52,
+        36
+      ]
+    },
+    {
+      "tier": 1,
+      "pose": 0,
+      "point": [
+        47,
+        51
+      ]
+    },
+    {
+      "tier": 1,
+      "pose": 0,
+      "point": [
+        47,
+        53
+      ]
+    },
+    {
+      "tier": 1,
+      "pose": 1,
+      "point": [
+        46,
+        44
+      ]
+    },
+    {
+      "tier": 1,
+      "pose": 2,
+      "point": [
+        45,
+        42
+      ]
+    },
+    {
+      "tier": 1,
+      "pose": 3,
+      "point": [
+        53,
+        54
+      ]
+    },
+    {
+      "tier": 1,
+      "pose": 4,
+      "point": [
+        53,
+        54
+      ]
+    },
+    {
+      "tier": 1,
+      "pose": 5,
+      "point": [
+        52,
+        50
+      ]
+    },
+    {
+      "tier": 1,
+      "pose": 6,
+      "point": [
+        48,
+        51
+      ]
+    },
+    {
+      "tier": 1,
+      "pose": 7,
+      "point": [
+        52,
+        36
+      ]
+    },
+    {
+      "tier": 2,
+      "pose": 0,
+      "point": [
+        52,
+        36
+      ]
+    },
+    {
+      "tier": 2,
+      "pose": 0,
+      "point": [
+        47,
+        51
+      ]
+    },
+    {
+      "tier": 2,
+      "pose": 0,
+      "point": [
+        47,
+        53
+      ]
+    },
+    {
+      "tier": 2,
+      "pose": 1,
+      "point": [
+        46,
+        44
+      ]
+    },
+    {
+      "tier": 2,
+      "pose": 2,
+      "point": [
+        45,
+        42
+      ]
+    },
+    {
+      "tier": 2,
+      "pose": 3,
+      "point": [
+        53,
+        54
+      ]
+    },
+    {
+      "tier": 2,
+      "pose": 4,
+      "point": [
+        53,
+        54
+      ]
+    },
+    {
+      "tier": 2,
+      "pose": 5,
+      "point": [
+        52,
+        50
+      ]
+    },
+    {
+      "tier": 2,
+      "pose": 6,
+      "point": [
+        48,
+        51
+      ]
+    },
+    {
+      "tier": 2,
+      "pose": 7,
+      "point": [
+        52,
+        36
+      ]
+    }
+  ],
+  "corrected_output_failed_landmarks": [],
+  "focused_tests": {
+    "run": 11,
+    "passed": 11,
+    "skipped": 0
+  },
+  "composition": "body-tool-foreground",
+  "body_poses": 8,
+  "material_pose_cells": 24,
+  "shared_timing_ms": [
+    260,
+    200,
+    200,
+    80,
+    80,
+    80,
+    100,
+    200
+  ]
+}

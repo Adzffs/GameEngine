@@ -1,0 +1,129 @@
+{
+  "status": "generated",
+  "service": "PixelLab",
+  "character_url": "https://www.pixellab.ai/create-character/73253a5c-9983-4f58-8d67-cd31a1c928d5",
+  "reference_views": 8,
+  "reference_pixels_redrawn": false,
+  "camera": "low top-down",
+  "canvas": [
+    64,
+    64
+  ],
+  "action": "Walking",
+  "motion_section": "Free motion",
+  "model": "PixMiniMax",
+  "model_status": "beta",
+  "direction": "east",
+  "advertised_frames": 8,
+  "outline": "Single color outline",
+  "shading": "Medium shading",
+  "detail": "Medium detail",
+  "palette_override": null,
+  "displayed_cost_generation_units": {
+    "reference_import_skeleton_fitting": 0.25,
+    "one_east_walk": 1
+  },
+  "other_directions_requested": false,
+  "new_subscription_or_credit_purchase": false,
+  "visual_acceptance": false,
+  "runtime_integrated": false,
+  "actual_frames": 8,
+  "source_frame_size": [
+    64,
+    64
+  ],
+  "keep_first_frame_reported": true,
+  "original_gif_frame_duration_ms": 200,
+  "review_preview": {
+    "file": "walk-east-review-4x.gif",
+    "scale": 4,
+    "resampling": "nearest neighbour",
+    "frame_durations_ms": [
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100
+    ],
+    "cycle_ms": 800,
+    "source_poses_modified": false
+  },
+  "export_notes": [
+    "Direct GIF export contains a green background.",
+    "The review GIF uses the separate PNG-frame ZIP export."
+  ],
+  "outputs": {
+    "character-export.zip": {
+      "sha256": "72fc470f9f4c79c79e3bfbf43938c744882876513c15f682d57501c09a31e13b",
+      "bytes": 17861
+    },
+    "frame-checks.json": {
+      "sha256": "245c07c050359fae30f6a99055687ff630022f97f5f3d9114afd345b18abc2a5",
+      "bytes": 1605
+    },
+    "pixellab-metadata.json": {
+      "sha256": "4e0b98be7ff453e56d6f1a973a845ee65aeb91ed1dd059cce133513f077c379c",
+      "bytes": 1976
+    },
+    "walk-east-export.json": {
+      "sha256": "9de301a7866249a183d6ab12a63ca8b6e26cc935fe8921b6089c6057d1ad8ac0",
+      "bytes": 3314
+    },
+    "walk-east-review-4x.gif": {
+      "sha256": "ab297832255bbe662a14aa81523ceb05feb3254de4b0764f3e2e2e55e8c4faf4",
+      "bytes": 12259
+    },
+    "walk-east-review-4x.json": {
+      "sha256": "7e01494937127ee9a20f828aa09d83333ffc0de6b16aa3a15beed50ef7d606b1",
+      "bytes": 3403
+    },
+    "walk-east-review-4x.png": {
+      "sha256": "43d8ddb864e78bd16d00c6890126d837ec323d289c0932fbd296b2608a7d896b",
+      "bytes": 8081
+    },
+    "walk-east-sheet.png": {
+      "sha256": "7a193579a5fc079fbbbbba53204e7978079ccf562a465ab6d9192e5544ad4d38",
+      "bytes": 1411
+    },
+    "walk-east.gif": {
+      "sha256": "2e2511d53a78be86a01aa2191f0ca9edc0030a9154830bc9e73744acc637479c",
+      "bytes": 3632
+    },
+    "frames/walk-east-00.png": {
+      "sha256": "a1153510c125febab395876d9df20becd4dd57d62b6d76aef0e87ad8e579c5d0",
+      "bytes": 859
+    },
+    "frames/walk-east-01.png": {
+      "sha256": "cfd601cb39074ea57021389fb054a985e6686c2ba641b4169aac41ce8f128a86",
+      "bytes": 802
+    },
+    "frames/walk-east-02.png": {
+      "sha256": "86869d919e68679ababedf568a87dc5be06c77953b472ca57d21932467d5828e",
+      "bytes": 749
+    },
+    "frames/walk-east-03.png": {
+      "sha256": "13a0388edaeed9266ff221de3dc9d6e625052c3b45462e8b07261db5eb87381e",
+      "bytes": 848
+    },
+    "frames/walk-east-04.png": {
+      "sha256": "855ac5ccf8b3e00147b86a00d43131863d5459e620c7f8de0d0b33f361a5f24a",
+      "bytes": 876
+    },
+    "frames/walk-east-05.png": {
+      "sha256": "6a7d48fef264467cab4498eb1f831d5168519aade5abda946cb39de780b35786",
+      "bytes": 834
+    },
+    "frames/walk-east-06.png": {
+      "sha256": "8301ffab785a9968f8c07117615bd44fdb405e0af2977b76659334ca31212378",
+      "bytes": 787
+    },
+    "frames/walk-east-07.png": {
+      "sha256": "1853597b1cd2a6ff9d6ed3a02ca6f262b53fb6e6665972459a0b864079a72e0e",
+      "bytes": 782
+    }
+  },
+  "png_frames_have_transparent_corners": true
+}

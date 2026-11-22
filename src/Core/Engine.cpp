@@ -362,6 +362,7 @@ bool Engine::Run()
                 player->GetSkills().GetSkill(
                     SkillType::MINING);
 
+            graphics.SetMovementPathActive(world.HasActiveMovementPath(playerID));
             graphics.Render(
                 world.GetMap(),
                 world.GetEntities(),

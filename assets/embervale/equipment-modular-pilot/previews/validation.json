@@ -1,0 +1,52 @@
+{
+  "direction": "east",
+  "bodyPoses": 8,
+  "shapeViews": 1,
+  "materials": 3,
+  "exactBodyCells": 8,
+  "metalRegionPixels": [
+    12,
+    18,
+    7
+  ],
+  "protectedSourcePixels": 81,
+  "bodyAndHandleMismatchPixels": 0,
+  "alphaMismatchPixels": 0,
+  "materialDifferencePixels": [
+    {
+      "material": "iron",
+      "differentPixels": 300
+    },
+    {
+      "material": "steel",
+      "differentPixels": 300
+    }
+  ],
+  "composition": "body-tool-foreground",
+  "foregroundPixelsPreserved": 4737,
+  "foregroundToolOverlapPixels": 435,
+  "nonGripBodyToolOverlapPixels": 0,
+  "headToolOverlapPixels": 0,
+  "foregroundPixelsByPose": [
+    195,
+    198,
+    200,
+    197,
+    197,
+    199,
+    198,
+    195
+  ],
+  "visibleToolOverBodyPixelsByPose": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "maxSecondaryHandShaftDistance": 3.552713678800501e-15,
+  "sourceStatus": "Existing character with reposed pilot arms; visual acceptance remains open"
+}

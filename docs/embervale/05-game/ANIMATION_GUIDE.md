@@ -1,12 +1,20 @@
 # Animation guide
 
-**Resource guard follow-up, 20 November:** Validate/export against [asset resource limits](ASSET_RESOURCE_LIMITS.md). The [completed player action integration](../06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md) now has eight walking/chopping poses, six Mining poses and sixteen equipped walking/attack frames per direction. Both resource validators and runtime arrays agree. A different authored pose count requires matching runtime arrays and both validation tables, followed by complete binding/render checks; retain the lossless packed output instead of loosening budgets for the original oversized editable canvases. The read-only check preserves masters and geometry; further animation polish remains owner-deferred.
+**Resource guard follow-up, 20 November:** Validate/export against [asset resource limits](ASSET_RESOURCE_LIMITS.md). The [completed player action integration](../06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md) now has eight walking/chopping poses, six Mining poses and sixteen equipped walking/attack frames per direction. Both resource validators and runtime arrays agree. A different authored pose count requires matching runtime arrays and both validation tables, followed by complete binding/render checks; retain the lossless packed output instead of loosening budgets for the original oversized editable canvases. The read-only check preserves masters and geometry; ART-005 has resumed with the [PixelLab walking candidate](../06-development/PIXELLAB_WALKING_2026-11-21.md); full visual acceptance stays open.
 
 **Purpose:** Reusable production reference for player, equipment, gathering and future creature animation.  
 **Updated:** 20 November 2026.  
 **Status:** Adopted working guidance; exact frame counts and timings remain specific to each authored action.
 
 Read this before animating. The [research and measured findings](../06-development/ANIMATION_RESEARCH_2026-11-20.md) explain the sources, defects, prototype corrections and verification behind these rules. [Art and audio](ART_AND_AUDIO.md) owns the wider asset pipeline and current integration status.
+
+## Modular equipment production direction
+
+Follow the [modular equipment animation plan](MODULAR_EQUIPMENT_ANIMATION_PLAN.md), requested on 22 November 2026. Share authored body motions and hand tracks across compatible tool shapes and material palettes. First prove one chopping direction with bronze, iron and steel axes, then all eight directions and actual gameplay. Preserve the better body art, existing fallbacks, resource limits and authoritative event/audio contracts. The new authoring and visual-registry pipeline is planned; existing layered rendering is its working foundation.
+
+The [east-facing modular axe proof](../06-development/MODULAR_AXE_PROTOTYPE_2026-11-22.md) now implements the small authoring contract and material reuse with a reposed arm fixture that retains the character head/feet. Its [editable pilot](../../../assets/embervale/equipment-modular-pilot/README.md) stays outside the runtime catalogue. General visual lookup, new clean body acceptance and eight-way action migration remain planned.
+
+The [handle penetration and failed masking record](../06-development/MODULAR_AXE_OCCLUSION_FIX_2026-11-22.md) documents two errors: switching the whole axe behind the body, then claiming that foreground masks fixed it while leaving the shaft routed through the head/collar. The owner rejected the second attempt. Correct the actual body pose and hand/aim trajectory first. The revised pilot places both hands forward and lifts the tool beside the face; its unmasked tool may intersect the body only at the two grips. Retain this spatial guard and the saved rejected-pose regression. Head/hand masks support good geometry; they cannot repair a bad trajectory. Review the full timed swing, and do not equate preservation or masking checks with owner visual acceptance.
 
 ## Start an animation task
 
@@ -34,6 +42,12 @@ Prioritize silhouette, weight, ground contact and rhythm. More evenly spaced fra
 | Effects | Reserve short smears or arcs for the fast strike | The return does not look like another attack |
 
 Use longer readable telegraphs for a future enemy attack when its gameplay design requires reaction time. Player preparation must fit the existing input/result contract. Hitstop, camera shake, displacement and new attack delays require their own concrete design and verification; they are not automatic polish.
+
+## AI-generated walking
+
+Import the service PNG frames without redrawing their poses. Keep the supplied neutral views separate from the moving loop, record the actual preset/model and preserve the raw export. Review one direction before expanding the set. Normal exports preserve the editable master. A new body gait needs matching equipment poses; retain a complete existing equipped/action batch until that matching art is ready. Do not attach its old wrist overlays to an unrelated generated body.
+
+PixelLab locomotion uses its own nine-slot binding: idle 0, moving 1–8. The earlier cast, chopping, Mining and melee counts remain independent. Its 600-ms loop is shared between the manifest-generated runtime timing and preview; historical east-only inspection GIFs have different labelled timing.
 
 ## Preserve the character across eight directions
 

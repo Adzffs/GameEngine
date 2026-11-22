@@ -1,0 +1,1260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Win32-ninja"
+	tests="124"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="DESKTOP-DUH0DIS"
+	time="33"
+	timestamp="2026-11-21T01:56:33"
+	>
+	<testcase name="GameEngineStartupCliTests" classname="GameEngineStartupCliTests" time="0.957112" status="run">
+		<properties>
+			<property name="cmake_labels" value="client;content"/>
+		</properties>
+		<system-out>-- Client startup rejects bad content before graphics or player-save lifecycle
+</system-out>
+	</testcase>
+	<testcase name="GameLaunchOptionsTests" classname="GameLaunchOptionsTests" time="0.950285" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 33 assertions
+</system-out>
+	</testcase>
+	<testcase name="StarterWorldRuntimeInputTests" classname="StarterWorldRuntimeInputTests" time="0.83706" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 30 assertions
+</system-out>
+	</testcase>
+	<testcase name="StarterWorldEditTests" classname="StarterWorldEditTests" time="0.989391" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 104 assertions
+</system-out>
+	</testcase>
+	<testcase name="StarterWorldDraftFileTests" classname="StarterWorldDraftFileTests" time="0.430608" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 23 assertions
+</system-out>
+	</testcase>
+	<testcase name="WorldPublicationTests" classname="WorldPublicationTests" time="0.670381" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 31 assertions
+</system-out>
+	</testcase>
+	<testcase name="WorldArtResourcesTests" classname="WorldArtResourcesTests" time="0.617764" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 49 assertions
+</system-out>
+	</testcase>
+	<testcase name="StarterWorldHistoryTests" classname="StarterWorldHistoryTests" time="2.2308" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 53 assertions
+</system-out>
+	</testcase>
+	<testcase name="StarterWorldPlacementTests" classname="StarterWorldPlacementTests" time="1.44211" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] Bronze axe equipped
+[GAME] Player 4 gathered from Normal tree | Received: 1 Log | XP: 2025 (Level 13)
+[GAME] Normal tree has been depleted
+[PASS] 43 assertions
+</system-out>
+	</testcase>
+	<testcase name="StarterWorldRuntimeTests" classname="StarterWorldRuntimeTests" time="0.360904" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] Bronze axe equipped
+[GAME] Player 4 gathered from Normal tree | Received: 1 Log | XP: 2025 (Level 13)
+[GAME] Normal tree has been depleted
+[GAME] [COMBAT] Entity 2 died
+[GAME] [SPAWN] Monster 2 respawned at (32, 3)
+[GAME] [COMBAT] Entity 4 died
+[GAME] [COMBAT] Player 4 recovered at the village safe point
+[GAME] [RECOVERY] Player 4 recovered their protected inventory pile
+[GAME] [RECOVERY] Player 4 recovered their protected inventory pile
+[PASS] 175 assertions
+</system-out>
+	</testcase>
+	<testcase name="StarterWorldSnapshotTests" classname="StarterWorldSnapshotTests" time="0.249156" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 386 assertions
+</system-out>
+	</testcase>
+	<testcase name="StarterWorldSnapshotInputTests" classname="StarterWorldSnapshotInputTests" time="0.421886" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="StarterWorldExportCliTests" classname="StarterWorldExportCliTests" time="0.521266" status="run">
+		<properties>
+			<property name="cmake_labels" value="content;headless"/>
+		</properties>
+		<system-out>-- Canonical starter-world CLI output, JSON, fixture and read-only behaviour passed
+</system-out>
+	</testcase>
+	<testcase name="StarterWorldValidateCliTests" classname="StarterWorldValidateCliTests" time="0.491115" status="run">
+		<properties>
+			<property name="cmake_labels" value="content;headless"/>
+		</properties>
+		<system-out>-- Runtime snapshot validation CLI checks passed
+</system-out>
+	</testcase>
+	<testcase name="StarterWorldMoveCliTests" classname="StarterWorldMoveCliTests" time="0.961333" status="run">
+		<properties>
+			<property name="cmake_labels" value="content;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="StarterWorldPaintCliTests" classname="StarterWorldPaintCliTests" time="1.06592" status="run">
+		<properties>
+			<property name="cmake_labels" value="content;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="StarterWorldInteractiveSessionTests" classname="StarterWorldInteractiveSessionTests" time="1.15959" status="run">
+		<properties>
+			<property name="cmake_labels" value="content;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="StarterJourneyReplayCliTests" classname="StarterJourneyReplayCliTests" time="12.2837" status="run">
+		<properties>
+			<property name="cmake_labels" value="content;headless"/>
+		</properties>
+		<system-out>.....
+----------------------------------------------------------------------
+Ran 5 tests in 11.168s
+
+OK
+</system-out>
+	</testcase>
+	<testcase name="AudioAssetChecks" classname="AudioAssetChecks" time="1.01289" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless"/>
+		</properties>
+		<system-out>Verified 15 original PCM effects
+</system-out>
+	</testcase>
+	<testcase name="WorldArtAssetChecks" classname="WorldArtAssetChecks" time="0.929118" status="run">
+		<properties>
+			<property name="cmake_labels" value="art;content;headless"/>
+		</properties>
+		<system-out>{
+  "batches": 10,
+  "images": 33,
+  "frames": 3135,
+  "png_bytes": 494487,
+  "rgba_texture_bytes": 24342528,
+  "alpha_bytes": 6085632,
+  "retained_pixel_bytes": 30428160,
+  "peak_image_staging_bytes": 7112398,
+  "logical_pixel_and_staging_upper_bound_bytes": 37540558,
+  "textures": [
+    {
+      "batch": "forest-pilot",
+      "image": "terrain",
+      "path": "assets/embervale/forest-pilot/textures/terrain.png",
+      "width": 128,
+      "height": 160,
+      "pixels": 20480,
+      "rgba_texture_bytes": 81920,
+      "alpha_bytes": 20480,
+      "png_bytes": 4181,
+      "png_sha256": "3fdf5fb4cc07bbb8ed039b9cb58333ac89db988352d5c629e61eb16ebc243e07",
+      "source_sha256": "59b55ab1645e363d4d583074e482f907e2de302e15a4e0f636b237abedfc292b"
+    },
+    {
+      "batch": "forest-pilot",
+      "image": "oak",
+      "path": "assets/embervale/forest-pilot/textures/oak.png",
+      "width": 64,
+      "height": 96,
+      "pixels": 6144,
+      "rgba_texture_bytes": 24576,
+      "alpha_bytes": 6144,
+      "png_bytes": 3598,...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="StarterWorldVisualBridgeIntegration" classname="StarterWorldVisualBridgeIntegration" time="14.2969" status="run">
+		<properties>
+			<property name="cmake_labels" value="content;headless;studio"/>
+		</properties>
+		<system-out>test_actor_homes_move_undo_redo_save_and_reopen (__main__.RealWorldBridgeTests.test_actor_homes_move_undo_redo_save_and_reopen) ... ok
+test_actor_moves_reject_invalid_homes_and_preserve_v2_allocations (__main__.RealWorldBridgeTests.test_actor_moves_reject_invalid_homes_and_preserve_v2_allocations) ... ok
+test_create_remove_save_reopen_and_allocate_again (__main__.RealWorldBridgeTests.test_create_remove_save_reopen_and_allocate_again) ... ok
+test_creation_rejection_preserves_allocator_history_and_actor_spawns (__main__.RealWorldBridgeTests.test_creation_rejection_preserves_allocator_history_and_actor_spawns) ... ok
+test_draft_is_new_valid_sibling_and_reopens (__main__.RealWorldBridgeTests.test_draft_is_new_valid_sibling_and_reopens) ... ok
+test_paint_is_reversible_and_new_edit_discards_redo (__main__.RealWorldBridgeTests.test_paint_is_reversible_and_new_edit_discards_redo) ... ok
+test_playtest_validates_private_copy_and_never_passes_save_path (__main__.RealWorldBridgeTests.test_playtest_validates_private_copy_...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="StudioRecoveryIntegration" classname="StudioRecoveryIntegration" time="14.8704" status="run">
+		<properties>
+			<property name="cmake_labels" value="content;headless;studio"/>
+		</properties>
+		<system-out>..........
+----------------------------------------------------------------------
+Ran 10 tests in 13.643s
+
+OK
+</system-out>
+	</testcase>
+	<testcase name="WorldPublicationIntegration" classname="WorldPublicationIntegration" time="6.81784" status="run">
+		<properties>
+			<property name="cmake_labels" value="content;headless;studio"/>
+		</properties>
+		<system-out>..........
+----------------------------------------------------------------------
+Ran 10 tests in 6.164s
+
+OK
+</system-out>
+	</testcase>
+	<testcase name="PublishedWorldClientLaunchTests" classname="PublishedWorldClientLaunchTests" time="4.31671" status="run">
+		<properties>
+			<property name="cmake_labels" value="client;content;studio"/>
+		</properties>
+		<system-out>PASS: real v1/v2/v1 game startups, tamper rejection and library/save isolation
+</system-out>
+	</testcase>
+	<testcase name="WorldArtPackagingIntegration" classname="WorldArtPackagingIntegration" time="30.9393" status="run">
+		<properties>
+			<property name="cmake_labels" value="art;client;content"/>
+		</properties>
+		<system-out>PASS: 33 textures/15 sounds, invalid-source refusal, preserved output, no-relink repair, spaced paths and multi-config Release
+</system-out>
+	</testcase>
+	<testcase name="ActionFrameworkTests" classname="ActionFrameworkTests" time="0.112046" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 33 assertions
+</system-out>
+	</testcase>
+	<testcase name="AudioFeedbackTests" classname="AudioFeedbackTests" time="0.173851" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] [COMBAT] Entity 4 killed entity 12
+[PASS] 32 assertions
+</system-out>
+	</testcase>
+	<testcase name="AudioPlaybackTests" classname="AudioPlaybackTests" time="0.286995" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;client"/>
+		</properties>
+		<system-out>[WARN] Optional sound clips unavailable or invalid: 14
+[PASS] 21 assertions
+</system-out>
+	</testcase>
+	<testcase name="AudioUnavailableTests" classname="AudioUnavailableTests" time="0.0404352" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;client"/>
+		</properties>
+		<system-out>[WARN] Sound unavailable: Audio target 'nonexistent-test-driver' not available
+[PASS] 2 assertions
+</system-out>
+	</testcase>
+	<testcase name="AudioGraphicsTests" classname="AudioGraphicsTests" time="1.27563" status="run">
+		<properties>
+			<property name="cmake_labels" value="graphics"/>
+		</properties>
+		<system-out>World art: 33/33 textures cached; 24342528 RGBA estimate bytes, 6085632 alpha bytes, 7112398 peak image staging estimate bytes.
+[PASS] 9 assertions
+</system-out>
+	</testcase>
+	<testcase name="PlayerSaveGraphicsTests" classname="PlayerSaveGraphicsTests" time="2.17328" status="run">
+		<properties>
+			<property name="cmake_labels" value="graphics"/>
+		</properties>
+		<system-out>World art: 33/33 textures cached; 24342528 RGBA estimate bytes, 6085632 alpha bytes, 7112398 peak image staging estimate bytes.
+[PASS] 6 assertions
+</system-out>
+	</testcase>
+	<testcase name="GameplayActionIntegrationTests" classname="GameplayActionIntegrationTests" time="0.139396" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] You need to equip the correct tool
+[GAME] Bronze axe equipped
+[GAME] You need to equip the correct tool
+[GAME] Bronze axe equipped
+[GAME] Your inventory is full
+[GAME] Bronze axe equipped
+[GAME] You begin Smelt Bronze bar
+[GAME] You need 1 Tin ore
+[GAME] You begin Smelt Bronze bar
+[GAME] Created: Smelt Bronze bar
+[GAME] You need 1 Copper ore
+[GAME] You begin Smelt Bronze bar
+[GAME] Created: Smelt Bronze bar
+[GAME] Created: Smelt Bronze bar
+[GAME] You need 1 Copper ore
+[GAME] You must be beside the correct crafting station
+[GAME] You begin Smelt Bronze bar
+[GAME] You must be beside the correct crafting station
+[PASS] 38 assertions
+</system-out>
+	</testcase>
+	<testcase name="EquipmentStatsTests" classname="EquipmentStatsTests" time="0.148871" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] Bronze sword equipped
+[GAME] Developer Godsword equipped | Bronze sword returned to inventory
+[PASS] 66 assertions
+</system-out>
+	</testcase>
+	<testcase name="PlayerHealthTests" classname="PlayerHealthTests" time="0.112249" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] Wooden shield equipped
+[GAME] Bronze sword equipped
+[PASS] 65 assertions
+</system-out>
+	</testcase>
+	<testcase name="CombatFormulaTests" classname="CombatFormulaTests" time="1.13309" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 58 assertions
+</system-out>
+	</testcase>
+	<testcase name="MeleeAttackResolverTests" classname="MeleeAttackResolverTests" time="0.664753" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 137 assertions
+</system-out>
+	</testcase>
+	<testcase name="CombatServiceTests" classname="CombatServiceTests" time="0.217154" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 57 assertions
+</system-out>
+	</testcase>
+	<testcase name="MeleeCombatActionTests" classname="MeleeCombatActionTests" time="0.145572" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] You cannot target yourself
+[GAME] Attacker could not be found
+[GAME] Defender could not be found
+[GAME] Attacker is not alive
+[GAME] Defender is not alive
+[GAME] You are too far away from the defender
+[GAME] You are already performing an action
+[GAME] Melee attack duration must be at least one tick
+[GAME] Melee attack duration must be at least one tick
+[GAME] You are too far away from the defender
+[GAME] You are too far away from the defender
+[GAME] [COMBAT] Entity 12 died
+[GAME] [COMBAT] Entity 4 died
+[GAME] [COMBAT] Entity 4 killed entity 5
+[GAME] You begin Smelt Bronze bar
+[GAME] Bronze sword equipped
+[GAME] Wooden shield equipped
+[PASS] 92 assertions
+</system-out>
+	</testcase>
+	<testcase name="PendingMeleeInteractionTests" classname="PendingMeleeInteractionTests" time="0.147918" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 11 assertions
+</system-out>
+	</testcase>
+	<testcase name="MeleeEngagementTests" classname="MeleeEngagementTests" time="1.13407" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] You are already performing an action
+[GAME] [COMBAT] Entity 4 died
+[GAME] You are too far away from the defender
+[GAME] You begin Smelt Bronze bar
+[PASS] 46 assertions
+</system-out>
+	</testcase>
+	<testcase name="MeleeEngagementSystemTests" classname="MeleeEngagementSystemTests" time="1.11342" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 27 assertions
+</system-out>
+	</testcase>
+	<testcase name="InteractionSystemTests" classname="InteractionSystemTests" time="0.654063" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 23 assertions
+</system-out>
+	</testcase>
+	<testcase name="CombatantMonsterTests" classname="CombatantMonsterTests" time="0.228208" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] You are too far away from the defender
+[GAME] Attacker is not alive
+[GAME] Defender is not alive
+[GAME] Bronze sword equipped
+[GAME] You begin Smelt Bronze bar
+[GAME] [COMBAT] Entity 5 died
+[GAME] [COMBAT] Entity 4 died
+[GAME] You are too far away from the defender
+[GAME] Attacker could not be found
+[GAME] Defender could not be found
+[GAME] Defender could not be found
+[GAME] Attacker could not be found
+[PASS] 68 assertions
+</system-out>
+	</testcase>
+	<testcase name="EntityDeathEventTests" classname="EntityDeathEventTests" time="0.292706" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] [COMBAT] Entity 4 killed entity 13
+[GAME] [COMBAT] Entity 12 killed entity 13
+[GAME] [COMBAT] Entity 4 died
+[GAME] You are too far away from the defender
+[GAME] [COMBAT] Entity 12 killed entity 4
+[GAME] [COMBAT] Player 4 recovered at the village safe point
+[GAME] [RECOVERY] Player 4 recovered their protected inventory pile
+[GAME] [RECOVERY] Player 4 recovered their protected inventory pile
+[GAME] You begin Smelt Bronze bar
+[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] Attacker is not alive
+[PASS] 55 assertions
+</system-out>
+	</testcase>
+	<testcase name="RewardTableTests" classname="RewardTableTests" time="0.344653" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 52 assertions
+</system-out>
+	</testcase>
+	<testcase name="InventoryTransactionTests" classname="InventoryTransactionTests" time="0.693044" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 101 assertions
+</system-out>
+	</testcase>
+	<testcase name="InventoryStackOperationsTests" classname="InventoryStackOperationsTests" time="0.949521" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 2052 assertions
+</system-out>
+	</testcase>
+	<testcase name="PlayerSaveStateTests" classname="PlayerSaveStateTests" time="1.2526" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 238 assertions
+</system-out>
+	</testcase>
+	<testcase name="PlayerSaveTextCodecTests" classname="PlayerSaveTextCodecTests" time="0.834273" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 419 assertions
+</system-out>
+	</testcase>
+	<testcase name="PlayerSaveFileStoreTests" classname="PlayerSaveFileStoreTests" time="0.94689" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 110 assertions
+</system-out>
+	</testcase>
+	<testcase name="WorldPlayerPersistenceTests" classname="WorldPlayerPersistenceTests" time="0.685136" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] Bronze axe equipped
+[PASS] 152 assertions
+</system-out>
+	</testcase>
+	<testcase name="WorldPlayerPersistenceLifecycleTests" classname="WorldPlayerPersistenceLifecycleTests" time="0.31019" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 50 assertions
+</system-out>
+	</testcase>
+	<testcase name="PlayerAutosaveTests" classname="PlayerAutosaveTests" time="0.338066" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] [COMBAT] Entity 12 killed entity 4
+[GAME] [COMBAT] Player 4 recovered at the village safe point
+[GAME] [RECOVERY] Player 4 recovered their protected inventory pile
+[PASS] 31 assertions
+</system-out>
+	</testcase>
+	<testcase name="PlayerAutosaveInterruptionTests" classname="PlayerAutosaveInterruptionTests" time="1.23997" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>PASS: killed process reloads 71 saved coins; its later unsaved coin is absent
+</system-out>
+	</testcase>
+	<testcase name="EnginePlayerPersistenceLifecycleTests" classname="EnginePlayerPersistenceLifecycleTests" time="0.453259" status="run">
+		<properties>
+			<property name="cmake_labels" value="client"/>
+		</properties>
+		<system-out>[INFO] Player start: development player
+[INFO] Development Player persistence startup created new Player | runtimePlayerID=4 | path=C:\Users\dohnu\AppData\Local\Packages\openai.codex_2p2nqsd0c76g0\AC\#!sandbox.{30ebb777-f959-41df-b8c8-b137d47cf833}\Temp\gameengine_engine_player_lifecycle_81752034000100\missing\player.save
+[INFO] Player start: development player
+[INFO] Development Player persistence shutdown saved Player | runtimePlayerID=4 | path=C:\Users\dohnu\AppData\Local\Packages\openai.codex_2p2nqsd0c76g0\AC\#!sandbox.{30ebb777-f959-41df-b8c8-b137d47cf833}\Temp\gameengine_engine_player_lifecycle_81752034000100\missing\player.save
+[INFO] Development Player persistence startup loaded existing Player | runtimePlayerID=4 | path=C:\Users\dohnu\AppData\Local\Packages\openai.codex_2p2nqsd0c76g0\AC\#!sandbox.{30ebb777-f959-41df-b8c8-b137d47cf833}\Temp\gameengine_engine_player_lifecycle_81752034000100\existing.save
+[INFO] Player start: saved progress restored
+[INFO] Development Player persistence shutdown saved P...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="MonsterLootIntegrationTests" classname="MonsterLootIntegrationTests" time="0.226962" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] [LOOT] Player 4 received 1 Coal and 1 Copper ore
+[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] [LOOT] Player 4 received 1 Coal and 1 Tin ore
+[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] [LOOT] Player 4 received 1 Coal and 1 Iron ore
+[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] [LOOT] Player 4 received 1 Coal and 1 Tin ore
+[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] [LOOT] Player 4 received 1 Coal and 1 Tin ore
+[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] [LOOT] Player 4 received 1 Coal and 1 Copper ore
+[GAME] Defender is not alive
+[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] [COMBAT] Entity 12 killed entity 4
+[GAME] [COMBAT] Entity 4 killed entity 5
+[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] [COMBAT] Entity 12 died
+[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] [LOOT] Player 4 could not receive Monster 12 rewards
+[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] [LOOT] Player 4 could not roll Monster 12 rewards
+[GAME] [COMBAT] Ent...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="MonsterRespawnTests" classname="MonsterRespawnTests" time="0.152525" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] [COMBAT] Entity 4 died
+[GAME] [COMBAT] Entity 12 died
+[GAME] Defender is not alive
+[GAME] [SPAWN] Monster 12 respawned at (22, 10)
+[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] [LOOT] Player 4 received 1 Coal and 1 Copper ore
+[GAME] [SPAWN] Monster 12 respawned at (24, 10)
+[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] [LOOT] Player 4 received 1 Coal and 1 Copper ore
+[GAME] [SPAWN] Monster 12 respawned at (26, 10)
+[GAME] [COMBAT] Entity 12 died
+[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] [LOOT] Player 4 received 1 Coal and 1 Copper ore
+[GAME] [SPAWN] Monster 12 respawned at (28, 10)
+[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] [LOOT] Player 4 received 1 Coal and 1 Copper ore
+[GAME] [COMBAT] Entity 4 died
+[GAME] [COMBAT] Entity 5 died
+[GAME] [SPAWN] Monster 4 respawned at (30, 30)
+[GAME] [SPAWN] Monster 5 respawned at (31, 30)
+[GAME] [COMBAT] Entity 4 died
+[GAME] [COMBAT] Entity 4 died
+[PASS] 52 assertions
+</system-out>
+	</testcase>
+	<testcase name="EquipmentUnequipTests" classname="EquipmentUnequipTests" time="0.195074" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] Developer Godsword equipped
+[GAME] Developer Godsword unequipped
+[GAME] Developer Godsword equipped
+[GAME] Bronze sword equipped
+[GAME] Wooden shield equipped
+[GAME] Wooden shield unequipped
+[GAME] Wooden shield equipped
+[GAME] Bronze axe equipped
+[GAME] Bronze axe unequipped
+[GAME] Bronze axe equipped
+[GAME] Wooden shield equipped
+[GAME] Wooden shield unequipped
+[GAME] Developer Godsword equipped
+[GAME] Developer Godsword unequipped
+[GAME] Wooden shield equipped
+[GAME] Wooden shield unequipped
+[PASS] 70 assertions
+</system-out>
+	</testcase>
+	<testcase name="RequirementSystemTests" classname="RequirementSystemTests" time="0.646155" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] You begin Smelt Steel bar
+[GAME] Created: Smelt Steel bar
+[GAME] You need 1 Iron ore
+[GAME] Steel axe equipped
+[PASS] 42 assertions
+</system-out>
+	</testcase>
+	<testcase name="ActionLifecycleEventTests" classname="ActionLifecycleEventTests" time="0.705454" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] Bronze axe equipped
+[GAME] Bronze axe equipped
+[GAME] You begin Smelt Bronze bar
+[GAME] You begin Smelt Bronze bar
+[GAME] Attacker could not be found
+[GAME] Bronze axe equipped
+[GAME] You attempt to gather from the Normal tree but receive nothing
+[GAME] You begin Smelt Bronze bar
+[GAME] Created: Smelt Bronze bar
+[GAME] You need 1 Copper ore
+[GAME] You begin Smelt Bronze bar
+[GAME] Created: Smelt Bronze bar
+[GAME] You begin Smelt Bronze bar
+[GAME] You need 1 Tin ore
+[GAME] You begin Smelt Bronze bar
+[GAME] Created: Smelt Bronze bar
+[GAME] You need 1 Copper ore
+[GAME] You begin Smelt Iron bar
+[GAME] Created: Smelt Iron bar
+[GAME] You need 1 Iron ore
+[GAME] You begin Smelt Steel bar
+[GAME] Created: Smelt Steel bar
+[GAME] You need 1 Iron ore
+[GAME] You begin Smelt Bronze bar
+[GAME] You must be beside the correct crafting station
+[GAME] You begin Smelt Bronze bar
+[GAME] You must be beside the correct crafting station
+[GAME] You begin Smelt Bronze bar
+[GAME] You begin Smelt Bronze bar
+[GAME] You must be besi...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ContentValidationTests" classname="ContentValidationTests" time="0.818649" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 85 assertions
+</system-out>
+	</testcase>
+	<testcase name="StatusEffectTests" classname="StatusEffectTests" time="0.354936" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] Wooden shield equipped
+[GAME] Bronze axe equipped
+[GAME] [COMBAT] Entity 4 died
+[PASS] 129 assertions
+</system-out>
+	</testcase>
+	<testcase name="FoodHealingTests" classname="FoodHealingTests" time="0.229628" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] Wooden shield equipped
+[GAME] Bronze axe equipped
+[PASS] 78 assertions
+</system-out>
+	</testcase>
+	<testcase name="AggressiveMonsterTests" classname="AggressiveMonsterTests" time="0.268587" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] [COMBAT] Entity 4 died
+[GAME] [COMBAT] Entity 12 died
+[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] [LOOT] Player 4 received 1 Coal and 1 Tin ore
+[GAME] [SPAWN] Monster 12 respawned at (25, 25)
+[PASS] 61 assertions
+</system-out>
+	</testcase>
+	<testcase name="MonsterAISystemTests" classname="MonsterAISystemTests" time="0.259176" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 27 assertions
+</system-out>
+	</testcase>
+	<testcase name="WorldTickAuthorityTests" classname="WorldTickAuthorityTests" time="0.197271" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] Attacker could not be found
+[GAME] [COMBAT] Entity 4 died
+[GAME] [SPAWN] Monster 4 respawned at (20, 20)
+[PASS] 32 assertions
+</system-out>
+	</testcase>
+	<testcase name="ClockPacingTests" classname="ClockPacingTests" time="0.817238" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 24 assertions
+</system-out>
+	</testcase>
+	<testcase name="GatheringRandomTests" classname="GatheringRandomTests" time="0.786701" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] Bronze axe equipped
+[GAME] Player 4 gathered from Normal tree | Received: 1 Log | XP: 2025 (Level 13)
+[GAME] Normal tree has been depleted
+[GAME] Bronze axe equipped
+[GAME] Bronze axe equipped
+[GAME] You attempt to gather from the Normal tree but receive nothing
+[GAME] You attempt to gather from the Normal tree but receive nothing
+[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] [LOOT] Player 4 received 1 Coal and 1 Iron ore
+[GAME] Bronze axe equipped
+[GAME] Bronze axe equipped
+[GAME] You attempt to gather from the Normal tree but receive nothing
+[GAME] You attempt to gather from the Normal tree but receive nothing
+[GAME] Bronze axe equipped
+[GAME] Player 13 gathered from Normal tree | Received: 1 Log | XP: 2025 (Level 13)
+[GAME] Normal tree has been depleted
+[GAME] Bronze axe equipped
+[GAME] Player 4 gathered from Normal tree | Received: 1 Log | XP: 2025 (Level 13)
+[GAME] Normal tree has been depleted
+[GAME] [COMBAT] Entity 4 killed entity 12
+[GAME] [LOOT] Pla...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="GatheringSystemTests" classname="GatheringSystemTests" time="0.727662" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 30 assertions
+</system-out>
+	</testcase>
+	<testcase name="WoodcuttingPresentationTests" classname="WoodcuttingPresentationTests" time="0.280957" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] Player 4 gathered from Normal tree | Received: 1 Log | XP: 25 (Level 1)
+[GAME] Normal tree has been depleted
+[GAME] You attempt to gather from the Normal tree but receive nothing
+[PASS] 241 assertions
+</system-out>
+	</testcase>
+	<testcase name="MiningPresentationTests" classname="MiningPresentationTests" time="0.66224" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] Player 4 gathered from Copper rock | Received: 1 Copper ore | XP: 18 (Level 1)
+[GAME] Copper rock has been depleted
+[GAME] You attempt to gather from the Copper rock but receive nothing
+[PASS] 252 assertions
+</system-out>
+	</testcase>
+	<testcase name="MeleePresentationTests" classname="MeleePresentationTests" time="0.607956" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] [COMBAT] Entity 4 killed entity 12
+[PASS] 206 assertions
+</system-out>
+	</testcase>
+	<testcase name="QuestSystemTests" classname="QuestSystemTests" time="0.654712" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 24 assertions
+</system-out>
+	</testcase>
+	<testcase name="QuestDefinitionTests" classname="QuestDefinitionTests" time="0.582611" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 35 assertions
+</system-out>
+	</testcase>
+	<testcase name="QuestWorldIntegrationTests" classname="QuestWorldIntegrationTests" time="0.147592" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] Bronze axe equipped
+[GAME] Player 4 gathered from Normal tree | Received: 1 Log | XP: 2025 (Level 13)
+[GAME] Normal tree has been depleted
+[GAME] Player 4 gathered from Normal tree | Received: 1 Log | XP: 2050 (Level 13)
+[GAME] Normal tree has been depleted
+[GAME] Player 4 gathered from Normal tree | Received: 1 Log | XP: 2075 (Level 13)
+[GAME] Normal tree has been depleted
+[GAME] Player 4 gathered from Normal tree | Received: 1 Log | XP: 2100 (Level 13)
+[GAME] Normal tree has been depleted
+[GAME] Player 4 gathered from Normal tree | Received: 1 Log | XP: 2125 (Level 14)
+[GAME] Gathering skill level increased to 14
+[GAME] Normal tree has been depleted
+[GAME] Player 4 gathered from Normal tree | Received: 1 Log | XP: 2150 (Level 14)
+[GAME] Normal tree has been depleted
+[GAME] Player 4 gathered from Normal tree | Received: 1 Log | XP: 2175 (Level 14)
+[GAME] Normal tree has been depleted
+[GAME] Player 4 gathered from Normal tree | Received: 1 Log | XP: 2200 (Level 14)
+[GAME] Normal tree has been depleted
+...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="QuestDialogueIntegrationTests" classname="QuestDialogueIntegrationTests" time="0.395486" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 20 assertions
+</system-out>
+	</testcase>
+	<testcase name="QuestPersistenceTests" classname="QuestPersistenceTests" time="0.394987" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 32 assertions
+</system-out>
+	</testcase>
+	<testcase name="QuestPresentationStateTests" classname="QuestPresentationStateTests" time="0.345983" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 18 assertions
+</system-out>
+	</testcase>
+	<testcase name="ProgressionPresentationStateTests" classname="ProgressionPresentationStateTests" time="0.747797" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 13 assertions
+</system-out>
+	</testcase>
+	<testcase name="StarterRegionTests" classname="StarterRegionTests" time="0.863182" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 15 assertions
+</system-out>
+	</testcase>
+	<testcase name="MiningBasicsQuestTests" classname="MiningBasicsQuestTests" time="0.811531" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] Bronze pickaxe equipped
+[GAME] Player 4 gathered from Copper rock | Received: 1 Copper ore | XP: 5018 (Level 21)
+[GAME] Gathering skill level increased to 21
+[GAME] Copper rock has been depleted
+[GAME] Player 4 gathered from Copper rock | Received: 1 Copper ore | XP: 5036 (Level 21)
+[GAME] Copper rock has been depleted
+[GAME] Player 4 gathered from Copper rock | Received: 1 Copper ore | XP: 5054 (Level 21)
+[GAME] Copper rock has been depleted
+[GAME] Player 4 gathered from Copper rock | Received: 1 Copper ore | XP: 5072 (Level 21)
+[GAME] Copper rock has been depleted
+[GAME] Player 4 gathered from Copper rock | Received: 1 Copper ore | XP: 5090 (Level 21)
+[GAME] Copper rock has been depleted
+[GAME] Bronze pickaxe equipped
+[GAME] You attempt to gather from the Copper rock but receive nothing
+[GAME] Bronze pickaxe equipped
+[GAME] Player 4 gathered from Tin rock | Received: 1 Tin ore | XP: 5018 (Level 21)
+[GAME] Gathering skill level increased to 21
+[GAME] Tin rock has been depleted
+[GAME] You are too far a...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="RecipeActionSystemTests" classname="RecipeActionSystemTests" time="1.26596" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 44 assertions
+</system-out>
+	</testcase>
+	<testcase name="RecipeBookTests" classname="RecipeBookTests" time="0.805233" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 7 assertions
+</system-out>
+	</testcase>
+	<testcase name="RecipeDiscoveryIntegrationTests" classname="RecipeDiscoveryIntegrationTests" time="0.54931" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] You have not discovered this recipe
+[GAME] You begin Smelt Iron bar
+[GAME] Created: Smelt Iron bar
+[GAME] You need 1 Iron ore
+[PASS] 5 assertions
+</system-out>
+	</testcase>
+	<testcase name="CraftingRecipeTests" classname="CraftingRecipeTests" time="0.495757" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 50 assertions
+</system-out>
+	</testcase>
+	<testcase name="CraftingTableWorldTests" classname="CraftingTableWorldTests" time="1.02611" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] You begin Craft Wooden planks
+[GAME] Created: Craft Wooden planks
+[GAME] You begin Craft Wooden shield
+[GAME] Created: Craft Wooden shield
+[GAME] You need 1 Log
+[GAME] You begin Craft Wooden planks
+[GAME] You are already performing an action
+[GAME] Created: Craft Wooden planks
+[PASS] 15 assertions
+</system-out>
+	</testcase>
+	<testcase name="CraftingSessionTests" classname="CraftingSessionTests" time="1.03524" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] [COMBAT] Entity 4 died
+[PASS] 27 assertions
+</system-out>
+	</testcase>
+	<testcase name="MovementPathSafetyTests" classname="MovementPathSafetyTests" time="0.987072" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] Bronze axe equipped
+[PASS] 90 assertions
+</system-out>
+	</testcase>
+	<testcase name="MovementSystemTests" classname="MovementSystemTests" time="0.927234" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 58 assertions
+</system-out>
+	</testcase>
+	<testcase name="EntityManagerLookupTests" classname="EntityManagerLookupTests" time="0.684599" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 39 assertions
+</system-out>
+	</testcase>
+	<testcase name="ServerCommandQueueTests" classname="ServerCommandQueueTests" time="0.494047" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] Bronze axe equipped
+[GAME] Bronze sword equipped | Bronze axe returned to inventory
+[PASS] 51 assertions
+</system-out>
+	</testcase>
+	<testcase name="StarterTutorialCheckpointTests" classname="StarterTutorialCheckpointTests" time="0.281682" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 18 assertions
+</system-out>
+	</testcase>
+	<testcase name="TickSchedulerTests" classname="TickSchedulerTests" time="0.225481" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 29 assertions
+</system-out>
+	</testcase>
+	<testcase name="NpcDefinitionTests" classname="NpcDefinitionTests" time="0.241921" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 94 assertions
+</system-out>
+	</testcase>
+	<testcase name="NpcSpawnManagerTests" classname="NpcSpawnManagerTests" time="0.241992" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 29 assertions
+</system-out>
+	</testcase>
+	<testcase name="MonsterWanderingTests" classname="MonsterWanderingTests" time="0.150583" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] [COMBAT] Entity 2 died
+[GAME] [COMBAT] Entity 2 died
+[GAME] [SPAWN] Monster 2 respawned at (6, 1)
+[PASS] 61 assertions
+</system-out>
+	</testcase>
+	<testcase name="FriendlyNpcTests" classname="FriendlyNpcTests" time="0.666726" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 47 assertions
+</system-out>
+	</testcase>
+	<testcase name="NpcInteractionTests" classname="NpcInteractionTests" time="0.815822" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[GAME] [COMBAT] Entity 4 died
+[GAME] The target cannot be engaged in combat
+[GAME] The target cannot be engaged in combat
+[PASS] 111 assertions
+</system-out>
+	</testcase>
+	<testcase name="DialogueDefinitionTests" classname="DialogueDefinitionTests" time="0.763249" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 28 assertions
+</system-out>
+	</testcase>
+	<testcase name="DialogueSystemTests" classname="DialogueSystemTests" time="0.360413" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 16 assertions
+</system-out>
+	</testcase>
+	<testcase name="DialogueChoiceTests" classname="DialogueChoiceTests" time="0.905412" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 41 assertions
+</system-out>
+	</testcase>
+	<testcase name="DialoguePresentationStateTests" classname="DialoguePresentationStateTests" time="0.889961" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 14 assertions
+</system-out>
+	</testcase>
+	<testcase name="EngineWorldClickDecisionTests" classname="EngineWorldClickDecisionTests" time="0.692171" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 9 assertions
+</system-out>
+	</testcase>
+	<testcase name="ShopPresentationStateTests" classname="ShopPresentationStateTests" time="0.633449" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 14 assertions
+</system-out>
+	</testcase>
+	<testcase name="ShopDefinitionTests" classname="ShopDefinitionTests" time="0.510133" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 54 assertions
+</system-out>
+	</testcase>
+	<testcase name="ShopSystemTests" classname="ShopSystemTests" time="0.346199" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 11 assertions
+</system-out>
+	</testcase>
+	<testcase name="ShopInteractionTests" classname="ShopInteractionTests" time="0.339896" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless"/>
+		</properties>
+		<system-out>[PASS] 33 assertions
+</system-out>
+	</testcase>
+	<testcase name="UsabilityGraphicsTests" classname="UsabilityGraphicsTests" time="1.2893" status="run">
+		<properties>
+			<property name="cmake_labels" value="graphics"/>
+		</properties>
+		<system-out>World art: 33/33 textures cached; 24342528 RGBA estimate bytes, 6085632 alpha bytes, 7112398 peak image staging estimate bytes.
+[PASS] 22 assertions
+</system-out>
+	</testcase>
+	<testcase name="PlayerAnimationTests" classname="PlayerAnimationTests" time="1.67436" status="run">
+		<properties>
+			<property name="cmake_labels" value="graphics"/>
+		</properties>
+		<system-out>World art: 33/33 textures cached; 24342528 RGBA estimate bytes, 6085632 alpha bytes, 7112398 peak image staging estimate bytes.
+[PASS] 533 assertions
+</system-out>
+	</testcase>
+	<testcase name="WoodcuttingGraphicsTests" classname="WoodcuttingGraphicsTests" time="1.93106" status="run">
+		<properties>
+			<property name="cmake_labels" value="graphics"/>
+		</properties>
+		<system-out>World art: 33/33 textures cached; 24342528 RGBA estimate bytes, 6085632 alpha bytes, 7112398 peak image staging estimate bytes.
+[PASS] 521 assertions
+</system-out>
+	</testcase>
+	<testcase name="MiningGraphicsTests" classname="MiningGraphicsTests" time="1.5096" status="run">
+		<properties>
+			<property name="cmake_labels" value="graphics"/>
+		</properties>
+		<system-out>World art: 33/33 textures cached; 24342528 RGBA estimate bytes, 6085632 alpha bytes, 7112398 peak image staging estimate bytes.
+[PASS] 425 assertions
+</system-out>
+	</testcase>
+	<testcase name="WorldArtResourceGraphicsTests" classname="WorldArtResourceGraphicsTests" time="1.93698" status="run">
+		<properties>
+			<property name="cmake_labels" value="graphics"/>
+		</properties>
+		<system-out>World art: 33/33 textures cached; 24342528 RGBA estimate bytes, 6085632 alpha bytes, 7112398 peak image staging estimate bytes.
+World art unavailable: assets/embervale/pixellab-pilot/textures/missing-pixellab.png: world art: PNG must be a regular non-symlink file; using basic shapes.
+World art: 32/33 textures cached; 23162880 RGBA estimate bytes, 5790720 alpha bytes, 7112398 peak image staging estimate bytes.
+World art: 1/1 textures cached; 24576 RGBA estimate bytes, 6144 alpha bytes, 69134 peak image staging estimate bytes.
+World art catalogue unavailable: world art: frame rectangle is outside its texture; using basic shapes.
+World art catalogue unavailable: world art: frame rectangle is outside its texture; using basic shapes.
+World art catalogue unavailable: world art: image exceeds the pixel/texture/alpha budget; using basic shapes.
+World art unavailable: assets/embervale/forest-pilot/textures/oak.png: world art: invalid or oversized PNG; using basic shapes.
+World art: 0/1 textures cached; 0 RGBA estimate...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="MeleeGraphicsTests" classname="MeleeGraphicsTests" time="2.35662" status="run">
+		<properties>
+			<property name="cmake_labels" value="graphics"/>
+		</properties>
+		<system-out>World art: 33/33 textures cached; 24342528 RGBA estimate bytes, 6085632 alpha bytes, 7112398 peak image staging estimate bytes.
+[PASS] 1891 assertions
+</system-out>
+	</testcase>
+	<testcase name="MonsterGraphicsTests" classname="MonsterGraphicsTests" time="0.0911426" status="run">
+		<properties>
+			<property name="cmake_labels" value="graphics"/>
+		</properties>
+		<system-out>[PASS] 33 assertions
+</system-out>
+	</testcase>
+	<testcase name="MeleeClickIntegrationTests" classname="MeleeClickIntegrationTests" time="0.354762" status="run">
+		<properties>
+			<property name="cmake_labels" value="graphics"/>
+		</properties>
+		<system-out>[PASS] 26 assertions
+</system-out>
+	</testcase>
+	<testcase name="CombatFeedbackTests" classname="CombatFeedbackTests" time="0.289744" status="run">
+		<properties>
+			<property name="cmake_labels" value="graphics"/>
+		</properties>
+		<system-out>[GAME] You are too far away from the defender
+[GAME] [COMBAT] Entity 4 killed entity 12
+[PASS] 50 assertions
+</system-out>
+	</testcase>
+	<testcase name="CameraPresentationTests" classname="CameraPresentationTests" time="0.148311" status="run">
+		<properties>
+			<property name="cmake_labels" value="graphics"/>
+		</properties>
+		<system-out>[PASS] 18 assertions
+</system-out>
+	</testcase>
+	<testcase name="MonsterRetaliationTests" classname="MonsterRetaliationTests" time="0.209138" status="run">
+		<properties>
+			<property name="cmake_labels" value="graphics"/>
+		</properties>
+		<system-out>[GAME] [COMBAT] Entity 12 died
+[GAME] [COMBAT] Entity 4 died
+[GAME] [COMBAT] Entity 12 died
+[GAME] Attacker is not alive
+[GAME] [COMBAT] Entity 4 died
+[GAME] Attacker is not alive
+[GAME] [COMBAT] Entity 4 died
+[GAME] [COMBAT] Entity 4 died
+[GAME] [COMBAT] Entity 12 died
+[PASS] 65 assertions
+</system-out>
+	</testcase>
+	<testcase name="QuestGraphicsTests" classname="QuestGraphicsTests" time="1.68138" status="run">
+		<properties>
+			<property name="cmake_labels" value="graphics"/>
+		</properties>
+		<system-out>World art: 33/33 textures cached; 24342528 RGBA estimate bytes, 6085632 alpha bytes, 7112398 peak image staging estimate bytes.
+[RUNTIME] output=1280x720 panel={930,352,330,348} content={940,362,310,328}
+[PASS] 49 assertions
+</system-out>
+	</testcase>
+	<testcase name="CraftingTableGraphicsTests" classname="CraftingTableGraphicsTests" time="1.63399" status="run">
+		<properties>
+			<property name="cmake_labels" value="graphics"/>
+		</properties>
+		<system-out>World art: 33/33 textures cached; 24342528 RGBA estimate bytes, 6085632 alpha bytes, 7112398 peak image staging estimate bytes.
+[PASS] 20 assertions
+</system-out>
+	</testcase>
+	<testcase name="ClientDialogueIntegrationTests" classname="ClientDialogueIntegrationTests" time="0.191835" status="run">
+		<properties>
+			<property name="cmake_labels" value="client"/>
+		</properties>
+		<system-out>[INFO] Player start: development player
+[GAME] Developer Godsword equipped
+[PASS] 41 assertions
+</system-out>
+	</testcase>
+	<testcase name="ClientShopIntegrationTests" classname="ClientShopIntegrationTests" time="0.171938" status="run">
+		<properties>
+			<property name="cmake_labels" value="client"/>
+		</properties>
+		<system-out>[INFO] Player start: development player
+[GAME] Developer Godsword equipped
+[PASS] 36 assertions
+</system-out>
+	</testcase>
+	<testcase name="ClientCraftingIntegrationTests" classname="ClientCraftingIntegrationTests" time="0.174869" status="run">
+		<properties>
+			<property name="cmake_labels" value="client"/>
+		</properties>
+		<system-out>[INFO] Player start: development player
+[GAME] Developer Godsword equipped
+[GAME] You begin Craft Wooden planks
+[GAME] Created: Craft Wooden planks
+[GAME] You need 1 Log
+[GAME] You need 1 Copper ore
+[PASS] 24 assertions
+</system-out>
+	</testcase>
+	<testcase name="ClientBankIntegrationTests" classname="ClientBankIntegrationTests" time="1.40248" status="run">
+		<properties>
+			<property name="cmake_labels" value="client"/>
+		</properties>
+		<system-out>[INFO] Player start: fresh player
+World art: 33/33 textures cached; 24342528 RGBA estimate bytes, 6085632 alpha bytes, 7112398 peak image staging estimate bytes.
+[PASS] 12 assertions
+</system-out>
+	</testcase>
+</testsuite>

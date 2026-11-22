@@ -9,13 +9,21 @@ P0 is an integrity/prerequisite priority; P1 is required for its slice; P2 is su
 
 Completion refers to the stated bounded acceptance, with evidence and publication. It does not finish the entire milestone or imply visible approval. GAME-005 and QA-003 provide acceptance feedback while their associated features remain in progress. The JSON file carries the same inventory plus status, evidence and detailed notes. Older reports remain historical.
 
+ART-005 resumed on 21 November with the [PixelLab walking candidate](../06-development/PIXELLAB_WALKING_2026-11-21.md). The owner liked the east-only trial; full eight-way native review and equipped/action art remain open.
+
+The [22 November modular equipment plan](../05-game/MODULAR_EQUIPMENT_ANIMATION_PLAN.md) is the production direction for ART-005. Prove shared chopping poses/hand tracks with bronze, iron and steel axes, then eight directions and staged Mining, carry/shield and melee migration. The MEA units organize work under ART-005 without adding duplicate canonical tasks. The new pipeline is planned; full visual acceptance remains open.
+
+The [first modular axe proof](../06-development/MODULAR_AXE_PROTOTYPE_2026-11-22.md) provides one east-facing hand track, one tool master/mask and three material appearances. Actual editor tests verify protected pixels and master/output preservation. This is a bounded authoring proof using the existing body fixture; clean body acceptance, other directions and runtime migration remain open under ART-005.
+
+The owner rejected the mask-only handle correction. The [documented pose revision](../06-development/MODULAR_AXE_OCCLUSION_FIX_2026-11-22.md) now reposes the arms and tool path forward of the body. Twelve focused tests include unmasked body clearance in all 24 cells and refusal of the saved rejected pose. Revised visual acceptance remains open; ART-005 stays in progress.
+
 ## Current progress
 
 | Work | Current bounded result | Remaining acceptance |
 |---|---|---|
 | Player integrity | ENG-003/004 and GAME-009 fixed and regression verified | Windows regression verification and Linux Return/Exit/retry are recorded; broader manual acceptance remains |
 | Current verification | 124/124 Windows SDL, 99/99 standalone headless and 81 Python tests (79 pass/two skips); resource/packaging/publication/recovery/bridge included | Other current platforms and human playthrough are separate |
-| Player actions | REL-004 complete: original melee/equipment plus current Mining/audio are combined | ART-005 quality remains deferred; human/device acceptance stays open |
+| Player actions | REL-004 complete: original melee/equipment plus current Mining/audio are combined | ART-005 now has a PixelLab walking candidate; human/device acceptance stays open |
 | Ownership/architecture/export | Published bounded foundation and deterministic export | General regions/catalogue authoring remain separate |
 | Runtime content | Schema-1-4 input, geography/position checks and selected fixed publication manifests | General region/asset packages and content/save migrations |
 | Studio | Shared edits/history, guarded drafts, recovery, overlays, version publishing and selected-version play/rollback | In-place replacement, broader accessibility/platform acceptance and tools |

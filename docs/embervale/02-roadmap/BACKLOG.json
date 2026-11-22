@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "reviewed_date": "2026-11-20",
+  "reviewed_date": "2026-11-22",
   "current_verified_master": "d40b491d8b8082edc65ec4be0efc26ed882f2c54",
   "verification_reconciliation": "Integrated code d40b491d8b8082edc65ec4be0efc26ed882f2c54: Windows Debug SDL 124/124 (99 headless, 10 client, 15 graphics), separate SDL-free 99/99; Python 81 run, 79 pass/two unavailable-symlink skips. Original melee/equipment, current Mining/audio and later safety/editor/usability changes are combined. All 32 masters preserved, 47 packaged files match; lossless runtime packing retains resource budgets. Human/device/owner acceptance remains open. Read docs/embervale/06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md.",
   "repository": "Adzffs/GameEngine",
@@ -175,7 +175,7 @@
       "dependencies": [
         "ENG-002"
       ],
-      "acceptance": "Replay the source-derived Log\u2192planks\u2192shield chain; record actual net coins, constraints and stock behaviour; correct/test confirmed loops before balance signoff.",
+      "acceptance": "Replay the source-derived Log→planks→shield chain; record actual net coins, constraints and stock behaviour; correct/test confirmed loops before balance signoff.",
       "github_issue": null,
       "evidence": [
         "docs/embervale/06-development/STARTER_ECONOMY_2026-11-19.md",
@@ -242,7 +242,7 @@
         "STUDIO-011",
         "STUDIO-004"
       ],
-      "acceptance": "Export actual 100\u00d7100 definitions, pond, overlays, placements and lifecycle metadata; compare complete semantic baseline.",
+      "acceptance": "Export actual 100×100 definitions, pond, overlays, placements and lifecycle metadata; compare complete semantic baseline.",
       "github_issue": null,
       "evidence": [
         "src/Tools/WorldExportMain.cpp",
@@ -617,7 +617,7 @@
         "tests/test_world_editor_bridge.py",
         "docs/embervale/06-development/MASTER_ACCEPTANCE_2026-11-19.md"
       ],
-      "notes": "Merged PRs #21\u2013#22 provide collision, spawn, static reachability and selected resource/station approach overlays with an approach count. Keyboard/accessibility audit and broader diagnostics remain open."
+      "notes": "Merged PRs #21–#22 provide collision, spawn, static reachability and selected resource/station approach overlays with an approach count. Keyboard/accessibility audit and broader diagnostics remain open."
     },
     {
       "id": "STUDIO-090",
@@ -990,7 +990,7 @@
       "evidence": [
         "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
-      "notes": "Selection, hit/miss feedback, names, objectives, tutorial guidance and gathering rewards are implemented in bounded form. Local melee/equipment is REL-004. UI scale/accessibility and animation quality acceptance remain open; ART-005 polish is owner-deferred."
+      "notes": "Selection, hit/miss feedback, names, objectives, tutorial guidance and gathering rewards are implemented in bounded form. Local melee/equipment is REL-004. UI scale/accessibility and animation quality acceptance remain open; ART-005 has resumed with PixelLab empty-handed walking; complete visual acceptance stays open."
     },
     {
       "id": "ART-004",
@@ -1361,7 +1361,7 @@
         "STUDIO-080",
         "ENG-010"
       ],
-      "acceptance": "24\u00d724 fixture proves stairs/cliffs/diagonals and NPC navigation with authoritative transition rules.",
+      "acceptance": "24×24 fixture proves stairs/cliffs/diagonals and NPC navigation with authoritative transition rules.",
       "github_issue": null,
       "evidence": [],
       "notes": "Planning ID; not a GitHub issue number."
@@ -1691,16 +1691,20 @@
       "milestone": "R4",
       "priority": "P2",
       "title": "Polish and obtain acceptance of character animation",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "REL-004"
       ],
       "acceptance": "Compare consistent eight-way fixtures at gameplay scale; improve pose, attachment, weight, timing and transitions; record owner visual acceptance separately from automated correctness.",
       "github_issue": null,
       "evidence": [
-        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
+        "docs/embervale/06-development/PIXELLAB_WALKING_2026-11-21.md",
+        "docs/embervale/05-game/MODULAR_EQUIPMENT_ANIMATION_PLAN.md",
+        "docs/embervale/06-development/MODULAR_AXE_PROTOTYPE_2026-11-22.md",
+        "docs/embervale/06-development/MODULAR_AXE_OCCLUSION_FIX_2026-11-22.md"
       ],
-      "notes": "Explicitly owner-deferred on 20 November: working first pass, not accepted finished animation. Use ANIMATION_GUIDE and the dated research."
+      "notes": "Resumed 21 November at owner request using PixelLab after procedural quality was rejected. Owner liked the east-only trial. Complete eight-way empty-handed walking is imported as a separate editable master with shared preview/runtime timing. Full native visual acceptance remains open; equipped walking and gathering/melee art retain the prior batches pending matching AI passes. The rejected uncommitted procedural revision is preserved in its original worktree. On 22 November the owner requested the modular equipment production plan: shared authored body motions/hand tracks, reusable tool shapes, semantic material masks and bounded visual mappings. First prove one chop with bronze/iron/steel axes, then eight directions and staged action migration. Existing layered rendering is implemented; the new authoring/registry pipeline is planned. The MEA units remain substeps of ART-005; owner/native visual acceptance remains open. First bounded modular proof delivered 22 November: existing east-facing body pixels, authored hand/aim track, one axe view and semantic metal mask produce bronze/iron/steel. The original eight focused tests included real LibreSprite export, protected-pixel comparisons, repeatability, invalid-mask refusal and text portability. All 33 existing runtime masters/textures remain exact; the isolated authoring proof changes no runtime code. Clean chopping body quality, eight-way coverage and registry/gameplay migration remain open. Owner then reported handle penetration caused by the prototype switching the entire tool behind the body in two loading poses. That compositing mistake is documented and corrected with recipe v2 stable body-tool-foreground order and authored head/both-grip spans. Eleven focused tests now pass with actual export, independent all-cell readback, fixed occlusion landmarks and decoded malformed-foreground refusal. Earlier material/preservation checks did not establish depth continuity; corrected visual acceptance remains open. The owner rejected that mask-only attempt at 02fd3cd: the original wrists/aim still routed the shaft through the head/chest. The revised candidate reposes both arms and the hand/aim track forward, preserving head/feet. Export now checks the unmasked tool and permits body overlap only at both grips. Twelve real-editor tests pass, including refusal of the saved rejected recipe/body. The old collar landmark expectations were removed; owner visual acceptance stays open. Legacy bootstrap is retired."
     },
     {
       "id": "GAME-010",

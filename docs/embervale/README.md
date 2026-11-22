@@ -29,6 +29,11 @@
 | How will the editor work? | [Studio design](04-studio/STUDIO_DESIGN.md) |
 | Play or edit River Crossing? | [Candidate, map overview and launch guide](../../content/worlds/README.md) |
 | How is the settlement arranged? | [River Crossing geography](05-game/RIVER_CROSSING.md) |
+| Where is the new AI walking candidate? | [PixelLab eight-way walking and current checks](06-development/PIXELLAB_WALKING_2026-11-21.md) |
+| Where is the equipped-walking pilot and its recovery handoff? | [Retained art, visual defect and remaining checks](06-development/PIXELLAB_EQUIPPED_HANDOFF_2026-11-21.md) |
+| Does one motion already support several axe materials? | [East-facing modular axe proof and checks](06-development/MODULAR_AXE_PROTOTYPE_2026-11-22.md) |
+| Why did the handle fix fail, and how is the pose being revised? | [Rejected masking attempt, forward arm/tool path and spatial verification](06-development/MODULAR_AXE_OCCLUSION_FIX_2026-11-22.md) |
+| How can many tools and materials share animations? | [Modular equipment production plan](05-game/MODULAR_EQUIPMENT_ANIMATION_PLAN.md) |
 | How should future animations be authored and reviewed? | [Animation guide](05-game/ANIMATION_GUIDE.md) |
 | What did the animation research and polish establish? | [Sources, measured findings and prototype status](06-development/ANIMATION_RESEARCH_2026-11-20.md) |
 | Have combat, food, death and recovery been checked? | [Starter continuation, fixed checkpoints and save/reload evidence](06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) |

@@ -126,6 +126,19 @@ int main()
     test.Expect(!Reject([&]{ ValidateCatalogue(images, walking); }), "Complete eight-way action table passes");
     auto alias = walking.front(); ids.push_back("character.player.alias"); alias.id = ids.back(); walking.push_back(alias);
     test.Expect(Reject([&]{ ValidateCatalogue(images, walking); }), "Different IDs cannot overwrite one runtime binding slot");
+    ids.clear(); walking.clear(); ids.reserve(73); walking.reserve(73);
+    for (int facing = 0; facing < 8; ++facing) for (int pose = 0; pose < 9; ++pose)
+    {
+        ids.push_back("character.locomotion." + std::to_string(facing) + "." + std::to_string(pose));
+        auto entry = frame; entry.id = ids.back(); entry.facing = facing; entry.pose = pose; walking.push_back(entry);
+    }
+    test.Expect(!Reject([&]{ ValidateCatalogue(images, walking); }), "PixelLab binds a separate idle plus eight walking poses per direction");
+    auto missing = walking; missing.pop_back();
+    test.Expect(Reject([&]{ ValidateCatalogue(images, missing); }), "An incomplete PixelLab direction rejects");
+    auto invalid = walking; invalid.back().pose = 9;
+    test.Expect(Reject([&]{ ValidateCatalogue(images, invalid); }), "PixelLab does not admit an unbound tenth pose");
+    alias = walking.front(); ids.push_back("character.locomotion.alias"); alias.id = ids.back(); walking.push_back(alias);
+    test.Expect(Reject([&]{ ValidateCatalogue(images, walking); }), "PixelLab alias cannot overwrite an existing idle slot");
     auto broken = bytes; broken[45] ^= 1;
     test.Expect(Reject([&]{ ValidatePng(broken, image); }), "PNG chunk corruption rejects before decoder");
     broken = bytes; broken.resize(broken.size() - 3);

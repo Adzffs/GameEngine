@@ -4,6 +4,10 @@
 **Scope:** GameEngine, Embervale, Embervale Studio and project delivery.\
 **Canonical roadmap:** This document replaces the competing phase sequences in the earlier Studio plans. The original STUDIO task IDs remain traceable in the [backlog](BACKLOG.md).
 
+**22 November equipment production direction:** ART-005 now follows the [modular equipment animation plan](../05-game/MODULAR_EQUIPMENT_ANIMATION_PLAN.md): reusable body/hand tracks, independent tool shapes and masked material palettes. Prove one chopping action with three axe materials before expanding to eight directions, Mining, carry/shields and melee. The plan includes staged migration, resource growth checks and completion criteria. Its MEA work units sit under ART-005; the new pipeline is planned, not implemented. This direction supersedes repeatedly generating complete characters for each equipment/material combination.
+
+**First modular checkpoint:** The [east-facing axe authoring proof](../06-development/MODULAR_AXE_PROTOTYPE_2026-11-22.md) is implemented with one hand track, one shape and three materials; eight focused tests pass. Existing body pixels and the live game remain unchanged. The next visual work is the clean chopping performance and remaining directions; the larger registry/action migration is still planned.
+
 ## 1. The destination
 
 Build a coherent, expandable RPG whose world can be authored through dependable tools. The first player-facing objective is a balanced, flat River Crossing starter area with believable geography, distributed services and satisfying gathering, crafting and combat progression. The first tooling objective is a complete, reversible map-editing workflow available to both a person and an AI.
@@ -20,9 +24,9 @@ The review fixed recovery-file deletion after failed loads (ENG-003), crafting c
 2. **GAME-005 / GAME-004:** automated combat/food, death/recovery and six save/reload checkpoints now pass, with the tutorial skip fixed. Preparation remains 454 ticks; actual tutorial return is 741 and the deliberate death/recovery exercise totals 2370. Finish visible/uncoached navigation, input/confusion, balance and real-time acceptance on the recovered candidate.
 3. **ART-004:** finish acceptance of the implemented first sound pass: physical-device audible quality and balance during real play; Windows synchronization checks now pass.
 
-The owner is not satisfied with the current animation appearance and deferred polish. Keep ART-005 open. GAME-010 periodic autosave is complete. STUDIO-025 editor recovery is also complete for accepted work. STUDIO-026 fixed map publication is also complete for the current starter contract. STUDIO-063 current-art resource validation is also complete. Broader REL-002 distribution and accessibility remain separately scoped tasks.
+The owner rejected procedural animation quality and resumed ART-005 using PixelLab. The [eight-way walking candidate](../06-development/PIXELLAB_WALKING_2026-11-21.md) is the current art step; full visual acceptance stays open. GAME-010 periodic autosave is complete. STUDIO-025 editor recovery is also complete for accepted work. STUDIO-026 fixed map publication is also complete for the current starter contract. STUDIO-063 current-art resource validation is also complete. Broader REL-002 distribution and accessibility remain separately scoped tasks.
 
-REL-004 is **complete**: recovered melee/equipment, eight-pose walking/chopping and the original six-pose Mining now share the current verified Windows build and audio/editor code. The [player action integration](../06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md) records 124/124 SDL, 99/99 standalone headless and 81 Python tests (79 passed/two unavailable-symlink skips), 32 preserved masters and 47 matching packaged files. ART-004 remains **in progress** for physical-device sound quality and balance; GAME-005 remains **in progress** for visible/uncoached observation. ART-005 remains owner-deferred. The original recovery handoff is historical and superseded for integration status.
+REL-004 is **complete**: recovered melee/equipment, eight-pose walking/chopping and the original six-pose Mining now share the current verified Windows build and audio/editor code. The [player action integration](../06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md) records 124/124 SDL, 99/99 standalone headless and 81 Python tests (79 passed/two unavailable-symlink skips), 32 preserved masters and 47 matching packaged files. ART-004 remains **in progress** for physical-device sound quality and balance; GAME-005 remains **in progress** for visible/uncoached observation. ART-005 is in progress with PixelLab empty-handed walking; equipped/action passes remain subsequent work. The original recovery handoff is historical and superseded for integration status.
 
 GAME-010 is now **complete** for bounded periodic player persistence: 60-second checkpoints, 10-second retries, crafting/death safety, temporary-save isolation and killed-process reload. See the [autosave policy and verification](../06-development/PLAYER_AUTOSAVE_2026-11-20.md). The autosave follow-up passed 112/112 SDL, 93/93 standalone headless and 42/42 Python units for its recorded source; the newer editor recovery results follow. Current Windows/human acceptance stays open.
 
@@ -285,11 +289,11 @@ These are aspirations, not promised release dates. Keep features that reinforce 
 | Order | Work | Observable result |
 |---|---|---|
 | Completed in this review/follow-ups | ENG-003, ENG-004, GAME-009, GAME-010, STUDIO-025/026, STUDIO-063, QA-004 | Integrity fixes, player/editor recovery, fixed map publishing, art resource budgets and current verification published |
-| Next | REL-004 | Combined published Mining/melee/equipment and matching assets/previews |
+| Completed | REL-004 | Combined published Mining/melee/equipment and matching assets/previews |
 | Then | GAME-005 and GAME-004 | Fresh route with real elapsed time, confusion, food/combat/recovery findings |
 | During starter acceptance | ART-004 | First sound pass implemented; finish physical-device listening and balance review on the combined candidate |
 | Reliability work | QA-003, REL-002 | Windows usability regressions pass; wider keyboard/scale/manual/platform and clean installation remain |
-| Owner-deferred | ART-005 | Posing, weight, timing/transitions and visual acceptance |
+| Current owner priority | ART-005 | PixelLab eight-way walking candidate, followed by matching equipped/actions and visual acceptance |
 | As concrete changes require | ENG-005/006 | Progression/health integer policy and targeted responsibility extraction |
 
 The [QA-003 usability recovery handoff](../06-development/USABILITY_REVIEW_2026-11-20.md) records the draft control/save-recovery fixes and native Linux observations. The [Windows follow-up](../06-development/WINDOWS_USABILITY_2026-11-20.md) completes corrected-candidate regression verification and records the recovered original animation worktree. Wider accessibility and human acceptance remain open.

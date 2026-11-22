@@ -1,0 +1,104 @@
+{
+  "schema": "embervale.modular-equipment-proof",
+  "version": 1,
+  "status": "East-facing authoring proof; outside runtime catalogue; existing body quality unaccepted",
+  "inputs": {
+    "source/body.ase": "19dbdd643b56e81a21d109b6ef87f4971756159b6e3af7e1e4ba9fb7c83bf6fe",
+    "source/axe.ase": "22c62369ed9fbbfa4133bd9a634c365e9c6b39bdf1ac9f8176b98900269595f2",
+    "source/metal-mask.ase": "e542bda0a62a76e101b0d5e735f0e17e404e45c9d78de3a9d0017351da948c36",
+    "recipe.json": "3c405d13fe7357ddf0efc0d28974209583326b58a653c8d10f2a4939d3315ce0",
+    "shared_timing": "00826060417410ef6c329712ee7250f0450aeab44e5bf83c851d0c3ab9b3a60d",
+    "compiler/build_modular_axe_pilot.py": "0420bb76befbc0822165ebb7424f49ca3e50c964667491ba9b67031b2a9d8711",
+    "compiler/modular_equipment.py": "ce1fa3ac00e7d78c72cdcb6ccb2ade0291eb3d04dd36733e3be432c36e2270f7",
+    "compiler/modular_axe_pilot.js": "776399aaa41c2790546a184bd38e495bf477e975ae436ec17d85cc8542757b3d",
+    "compiler/cast_pilot.js": "91b3ab32c72a4bb8e84e0f6ce88f2a485a8b307dac575c0817dee3ad9b15f414",
+    "compiler/animation_common.py": "bdf89220cf0b497c5a725823b1f2618716af9b0c031939628bb6b5b711c7caee",
+    "compiler/build_forest_pilot.py": "b1a951fbd0d5d8893b92aefca6e22ff7692e0a2a16913c86276e2bd73ec94800",
+    "compiler/world_art_resources.py": "c4fbabf4e21aa03509f35be506aa0d0777cf4afbf16cb3f2fd75481548473a37"
+  },
+  "outputs": {
+    "previews/contact.png": "7d6200bf9b573434dc4fdf066d99156e1982af3a2cda097b0f6e5291eba2be85",
+    "previews/grips.png": "2d2b93b142c4534e7e2a255c8aba3cf2016cc400eebaffcc410b817761760e57",
+    "previews/materials.gif": "27ac9119c275b796f44c7d9774fe5a90347c7b3c1eae9fd7aa981e28ce713ac0",
+    "previews/occlusion.png": "5b6ba5df079ba9d1fdf0b226c26daeb6c4c372918179db5407df3c8f25edef45",
+    "previews/validation.json": "249a7a0aab5e55cc09d5160c4056cfc48c2a1cdc9f6bd775a7650e466ed368cb",
+    "textures/axe.png": "eeb8e932d58b2f1798371deb8c8f536f9d1acfae253c15367e9d677fa8404f28",
+    "textures/body.png": "845e4d93e4920a3b050dcb2c2755f9efd61ae11d9508a2e9010ebfd63b7100e7",
+    "textures/composites.png": "b3bde414687fd72cde19b24c38ccdd5f374e5870e732777e7f58415e36bf4b98",
+    "textures/metal-mask.png": "ff71bfd90c5359feaf737930073ec9c65f63b8d4fbc57db97fb9fac4ac85cfaa",
+    "textures/tools.png": "1f9a214ec55fb5ee71496fac8f58a6abc2d7ef7cd8029034846ec336e7b1406b"
+  },
+  "coverage": {
+    "facings": [
+      "east"
+    ],
+    "body_poses": 8,
+    "shape_views": 1,
+    "materials": 3,
+    "tool_pose_bindings": 24
+  },
+  "timing_ms": [
+    260,
+    200,
+    200,
+    80,
+    80,
+    80,
+    100,
+    200
+  ],
+  "validation": {
+    "direction": "east",
+    "bodyPoses": 8,
+    "shapeViews": 1,
+    "materials": 3,
+    "exactBodyCells": 8,
+    "metalRegionPixels": [
+      12,
+      18,
+      7
+    ],
+    "protectedSourcePixels": 81,
+    "bodyAndHandleMismatchPixels": 0,
+    "alphaMismatchPixels": 0,
+    "materialDifferencePixels": [
+      {
+        "material": "iron",
+        "differentPixels": 300
+      },
+      {
+        "material": "steel",
+        "differentPixels": 300
+      }
+    ],
+    "composition": "body-tool-foreground",
+    "foregroundPixelsPreserved": 4737,
+    "foregroundToolOverlapPixels": 435,
+    "nonGripBodyToolOverlapPixels": 0,
+    "headToolOverlapPixels": 0,
+    "foregroundPixelsByPose": [
+      195,
+      198,
+      200,
+      197,
+      197,
+      199,
+      198,
+      195
+    ],
+    "visibleToolOverBodyPixelsByPose": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "maxSecondaryHandShaftDistance": 3.552713678800501e-15,
+    "sourceStatus": "Existing character with reposed pilot arms; visual acceptance remains open"
+  },
+  "review_texture_rgba_bytes": 2074624,
+  "body_origin_sha256": "b82b900491e71ca4dc19059f0424f38d972c832821957da12fe8b8af8b294e24"
+}
