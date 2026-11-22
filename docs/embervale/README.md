@@ -30,6 +30,7 @@
 | Play or edit River Crossing? | [Candidate, map overview and launch guide](../../content/worlds/README.md) |
 | How is the settlement arranged? | [River Crossing geography](05-game/RIVER_CROSSING.md) |
 | Where is the new AI walking candidate? | [PixelLab eight-way walking and current checks](06-development/PIXELLAB_WALKING_2026-11-21.md) |
+| Where is the equipped-walking pilot and its recovery handoff? | [Retained art, visual defect and remaining checks](06-development/PIXELLAB_EQUIPPED_HANDOFF_2026-11-21.md) |
 | How should future animations be authored and reviewed? | [Animation guide](05-game/ANIMATION_GUIDE.md) |
 | What did the animation research and polish establish? | [Sources, measured findings and prototype status](06-development/ANIMATION_RESEARCH_2026-11-20.md) |
 | Have combat, food, death and recovery been checked? | [Starter continuation, fixed checkpoints and save/reload evidence](06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) |
