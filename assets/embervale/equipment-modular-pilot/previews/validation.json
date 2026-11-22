@@ -1,0 +1,28 @@
+{
+  "direction": "east",
+  "bodyPoses": 8,
+  "shapeViews": 1,
+  "materials": 3,
+  "exactBodyCells": 8,
+  "metalRegionPixels": [
+    12,
+    18,
+    7
+  ],
+  "protectedSourcePixels": 81,
+  "bodyAndHandleMismatchPixels": 0,
+  "alphaMismatchPixels": 0,
+  "materialDifferencePixels": [
+    {
+      "material": "iron",
+      "differentPixels": 271
+    },
+    {
+      "material": "steel",
+      "differentPixels": 271
+    }
+  ],
+  "frontHandPixelsPreserved": 24,
+  "maxSecondaryHandShaftDistance": 0.7993889900022653,
+  "sourceStatus": "Existing unchanged body fixture; body quality remains unaccepted"
+}

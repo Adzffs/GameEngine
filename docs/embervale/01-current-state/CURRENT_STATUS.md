@@ -22,6 +22,10 @@ Embervale is a playable local C++20/SDL3 RPG prototype with a bounded world edit
 | Art candidate | Ten batches, 3,135 frames/33 textures, eight-way walking/chopping/mining/melee and visible equipment, editable masters, guarded cache/fallback, bounded PNG streams and explicit resource budgets | Remaining cast/resource tiers, general importer, UI/accessibility and visible quality acceptance |
 | Audio | First sound pass: 15 original effects, committed-result routing, bounded playback, effects volume/mute and keyboard controls | Physical-device audible quality/balance and full starter acceptance |
 
+## Modular equipment authoring proof
+
+The [east-facing axe prototype](../06-development/MODULAR_AXE_PROTOTYPE_2026-11-22.md) now assembles one existing body sequence and explicit hand track with a separate axe master, semantic metal mask and bronze/iron/steel mappings. Eight focused tests pass, including real LibreSprite export, pixel preservation, rejected edits and portable receipts. The pilot is outside runtime packaging: all 33 existing runtime masters and textures remain exact, and the live catalogue stays at 3,135 frames. The existing body is an engineering fixture; clean motion quality, all eight directions and actual-game migration remain open.
+
 ## Integrated player actions
 
 The [player action integration](../06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md) completes REL-004. The original Windows work was recovered from its verified checkpoint and reconciled against current master without replacing the published snapshot history. Mining, weighted chopping/walking, visible weapons/shields, melee and current audio/editor/safety changes now share one verified build.

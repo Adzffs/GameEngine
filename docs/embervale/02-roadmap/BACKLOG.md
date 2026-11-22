@@ -13,6 +13,8 @@ ART-005 resumed on 21 November with the [PixelLab walking candidate](../06-devel
 
 The [22 November modular equipment plan](../05-game/MODULAR_EQUIPMENT_ANIMATION_PLAN.md) is the production direction for ART-005. Prove shared chopping poses/hand tracks with bronze, iron and steel axes, then eight directions and staged Mining, carry/shield and melee migration. The MEA units organize work under ART-005 without adding duplicate canonical tasks. The new pipeline is planned; full visual acceptance remains open.
 
+The [first modular axe proof](../06-development/MODULAR_AXE_PROTOTYPE_2026-11-22.md) provides one east-facing hand track, one tool master/mask and three material appearances. Actual editor tests verify protected pixels and master/output preservation. This is a bounded authoring proof using the existing body fixture; clean body acceptance, other directions and runtime migration remain open under ART-005.
+
 ## Current progress
 
 | Work | Current bounded result | Remaining acceptance |

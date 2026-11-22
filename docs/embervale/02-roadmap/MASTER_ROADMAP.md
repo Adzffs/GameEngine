@@ -6,6 +6,8 @@
 
 **22 November equipment production direction:** ART-005 now follows the [modular equipment animation plan](../05-game/MODULAR_EQUIPMENT_ANIMATION_PLAN.md): reusable body/hand tracks, independent tool shapes and masked material palettes. Prove one chopping action with three axe materials before expanding to eight directions, Mining, carry/shields and melee. The plan includes staged migration, resource growth checks and completion criteria. Its MEA work units sit under ART-005; the new pipeline is planned, not implemented. This direction supersedes repeatedly generating complete characters for each equipment/material combination.
 
+**First modular checkpoint:** The [east-facing axe authoring proof](../06-development/MODULAR_AXE_PROTOTYPE_2026-11-22.md) is implemented with one hand track, one shape and three materials; eight focused tests pass. Existing body pixels and the live game remain unchanged. The next visual work is the clean chopping performance and remaining directions; the larger registry/action migration is still planned.
+
 ## 1. The destination
 
 Build a coherent, expandable RPG whose world can be authored through dependable tools. The first player-facing objective is a balanced, flat River Crossing starter area with believable geography, distributed services and satisfying gathering, crafting and combat progression. The first tooling objective is a complete, reversible map-editing workflow available to both a person and an AI.

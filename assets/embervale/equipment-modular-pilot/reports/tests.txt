@@ -1,0 +1,13 @@
+test_body_matches_legacy_and_repeat_export_preserves_every_master (test_modular_equipment.RealExporterTests.test_body_matches_legacy_and_repeat_export_preserves_every_master) ... ok
+test_palette_only_edit_leaves_other_tiers_and_wood_unchanged (test_modular_equipment.RealExporterTests.test_palette_only_edit_leaves_other_tiers_and_wood_unchanged) ... ok
+test_real_invalid_semantic_mask_cannot_replace_usable_outputs (test_modular_equipment.RealExporterTests.test_real_invalid_semantic_mask_cannot_replace_usable_outputs) ... ok
+test_rejected_recipe_and_bootstrap_preserve_export (test_modular_equipment.RealExporterTests.test_rejected_recipe_and_bootstrap_preserve_export) ... ok
+test_text_line_endings_are_portable_without_relaxing_binary_hashes (test_modular_equipment.RealExporterTests.test_text_line_endings_are_portable_without_relaxing_binary_hashes) ... ok
+test_ambiguous_materials_and_out_of_budget_inputs_reject (test_modular_equipment.RecipeTests.test_ambiguous_materials_and_out_of_budget_inputs_reject) ... ok
+test_bad_grips_directions_durations_and_masks_reject (test_modular_equipment.RecipeTests.test_bad_grips_directions_durations_and_masks_reject) ... ok
+test_current_recipe_matches_shared_action_timing (test_modular_equipment.RecipeTests.test_current_recipe_matches_shared_action_timing) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 4.596s
+
+OK

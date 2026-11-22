@@ -12,6 +12,8 @@ Read this before animating. The [research and measured findings](../06-developme
 
 Follow the [modular equipment animation plan](MODULAR_EQUIPMENT_ANIMATION_PLAN.md), requested on 22 November 2026. Share authored body motions and hand tracks across compatible tool shapes and material palettes. First prove one chopping direction with bronze, iron and steel axes, then all eight directions and actual gameplay. Preserve the better body art, existing fallbacks, resource limits and authoritative event/audio contracts. The new authoring and visual-registry pipeline is planned; existing layered rendering is its working foundation.
 
+The [east-facing modular axe proof](../06-development/MODULAR_AXE_PROTOTYPE_2026-11-22.md) now implements the small authoring contract and material reuse with preserved legacy body pixels. Its [editable pilot](../../../assets/embervale/equipment-modular-pilot/README.md) stays outside the runtime catalogue. General visual lookup, new clean body acceptance and eight-way action migration remain planned.
+
 ## Start an animation task
 
 1. Read this guide, the dated research, the current art guide and the relevant action's source and tests.

@@ -1,0 +1,79 @@
+{
+  "schema": "embervale.modular-equipment-proof",
+  "version": 1,
+  "status": "East-facing authoring proof; outside runtime catalogue; existing body quality unaccepted",
+  "inputs": {
+    "source/body.ase": "853874b26a7d26ba4a4d09e3ea07c267d87913b4b49d2c83c64c328010aa8f4e",
+    "source/axe.ase": "22c62369ed9fbbfa4133bd9a634c365e9c6b39bdf1ac9f8176b98900269595f2",
+    "source/metal-mask.ase": "e542bda0a62a76e101b0d5e735f0e17e404e45c9d78de3a9d0017351da948c36",
+    "recipe.json": "e48796768f49204dbf7d1e5a96d98b231847e11369f36bb57e25ad6e9e4463b8",
+    "shared_timing": "00826060417410ef6c329712ee7250f0450aeab44e5bf83c851d0c3ab9b3a60d",
+    "compiler/build_modular_axe_pilot.py": "020ac610b977d6d674ff8e0bac2f8245c6813a02698ca211816f19e1e09f54d5",
+    "compiler/modular_equipment.py": "51253ab665aa364735436da621b5baaa79ee81eafc260d0146c96b98f4f0f3c9",
+    "compiler/modular_axe_pilot.js": "a91dba42ad856a7dae5f8c3e87d4cee4070fab911ecc8db50131bf51e216dbba",
+    "compiler/cast_pilot.js": "91b3ab32c72a4bb8e84e0f6ce88f2a485a8b307dac575c0817dee3ad9b15f414",
+    "compiler/animation_common.py": "bdf89220cf0b497c5a725823b1f2618716af9b0c031939628bb6b5b711c7caee",
+    "compiler/build_forest_pilot.py": "b1a951fbd0d5d8893b92aefca6e22ff7692e0a2a16913c86276e2bd73ec94800",
+    "compiler/world_art_resources.py": "c4fbabf4e21aa03509f35be506aa0d0777cf4afbf16cb3f2fd75481548473a37"
+  },
+  "outputs": {
+    "previews/contact.png": "f9dfdb1cd6d808c4fff263954d90d6f9e9d478fb5576faed7cc7169bf4e11c96",
+    "previews/grips.png": "5aa030209a6ce62e0024aa0205494ce1308a8a65a7c48e160014f67e8b7e4c4c",
+    "previews/materials.gif": "6aead06ca7223701c2b339e03c568693d0dc75f9b6a0a2479fe0cba3871bd154",
+    "previews/validation.json": "e7b60a245f60789dc24b70d9237b8608c4980f422191ecc6e351619acc712877",
+    "textures/axe.png": "eeb8e932d58b2f1798371deb8c8f536f9d1acfae253c15367e9d677fa8404f28",
+    "textures/body.png": "ff04058ac059e09d01501d7b19864ae05af20a7fa1640df59a3f090c22ba60ca",
+    "textures/composites.png": "731779e6cda10ea09ccd3eb58484f9973be5a1fb3c63db835b1485725979a066",
+    "textures/metal-mask.png": "ff71bfd90c5359feaf737930073ec9c65f63b8d4fbc57db97fb9fac4ac85cfaa",
+    "textures/tools.png": "20a3e2c1de12cdf499cea9fb12b1061e27bd53be967d1e00c09f2bd4c04c191e"
+  },
+  "coverage": {
+    "facings": [
+      "east"
+    ],
+    "body_poses": 8,
+    "shape_views": 1,
+    "materials": 3,
+    "tool_pose_bindings": 24
+  },
+  "timing_ms": [
+    260,
+    200,
+    200,
+    80,
+    80,
+    80,
+    100,
+    200
+  ],
+  "validation": {
+    "direction": "east",
+    "bodyPoses": 8,
+    "shapeViews": 1,
+    "materials": 3,
+    "exactBodyCells": 8,
+    "metalRegionPixels": [
+      12,
+      18,
+      7
+    ],
+    "protectedSourcePixels": 81,
+    "bodyAndHandleMismatchPixels": 0,
+    "alphaMismatchPixels": 0,
+    "materialDifferencePixels": [
+      {
+        "material": "iron",
+        "differentPixels": 271
+      },
+      {
+        "material": "steel",
+        "differentPixels": 271
+      }
+    ],
+    "frontHandPixelsPreserved": 24,
+    "maxSecondaryHandShaftDistance": 0.7993889900022653,
+    "sourceStatus": "Existing unchanged body fixture; body quality remains unaccepted"
+  },
+  "review_texture_rgba_bytes": 2074624,
+  "body_origin_sha256": "b82b900491e71ca4dc19059f0424f38d972c832821957da12fe8b8af8b294e24"
+}
