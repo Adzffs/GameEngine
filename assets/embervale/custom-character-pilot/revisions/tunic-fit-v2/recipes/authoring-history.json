@@ -1,0 +1,26 @@
+{
+  "service": "PixelLab pixelart_workbench",
+  "method": "exact layered drawing, no generated body redraw",
+  "first_drawing": "a4f51ced-232f-4283-83d8-95b01a5aaf32",
+  "shoulder_crest_revision": "4a92ebb9-9f2c-4a64-ba8c-48554bed9741",
+  "hand_clearance_revision": "139ec485-83ac-4351-9117-a4aa15139b73",
+  "asymmetric_shoulder_revision": "e809e23b-a129-4cee-9b88-9653fa41c058",
+  "final_sheet": "ea748233-0f2d-4219-a71e-69564f65148f",
+  "gallery": "4c2fd884-0d51-48a9-9344-d36413b80243",
+  "intermediate_failure": {
+    "frame": 12,
+    "covered_hand_pixels": [
+      [
+        34,
+        50
+      ],
+      [
+        34,
+        51
+      ]
+    ],
+    "correction": "Move left hem one native pixel outside the forward hand silhouette"
+  },
+  "body_or_animation_generations": 0,
+  "owner_visual_acceptance": "pending"
+}

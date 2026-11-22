@@ -203,6 +203,8 @@ GAME-007 now implements the bounded narrative/quest continuity pass: names and r
 
 ### Custom characters, 22 November
 
+**Garment follow-up:** The owner reports that the first tunic does not fit. [V2](../06-development/TUNIC_FIT_2026-11-22.md) now uses pose-specific shoulders/sleeves/neckline/hips and cloth shading; all twelve current south fit/hand checks pass. ART-007 is in progress, with owner visual acceptance and the wider coverage still open.
+
 Use one improved human fit family, shared body motions and separate skin/hair/clothing/equipment material definitions. Prove native world scale and a front layered renderer fixture first, then complete eight-way/action coverage before ordinary playable adoption. Appearance persistence and Apply/Cancel controls are deliberate later implementation steps. Preserve the existing player fallback and separate walking/modular-equipment candidate. The [owning design](../05-game/CUSTOM_CHARACTERS.md) provides the full staged delivery and acceptance matrix; the [review](../06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) tracks improvements without inventing visual approval.
 
 **Work packages:** STUDIO-060–063; ART-001–007; ENG-007; GAME-006–007, GAME-011–012; QA-005.

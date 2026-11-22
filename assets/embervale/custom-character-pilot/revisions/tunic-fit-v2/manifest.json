@@ -1,0 +1,93 @@
+{
+  "schema": "embervale.character-garment-revision",
+  "version": 1,
+  "id": "tunic-fit-v2",
+  "date": "2026-11-22",
+  "status": "revised authoring candidate; owner visual acceptance pending",
+  "supersedes": "../../v1/layers/tunic-south.png",
+  "body": "../../v1/layers/body-south.png",
+  "trousers": "../../v1/layers/trousers-south.png",
+  "tunic": "exports/tunic-south.png",
+  "outfit_reference": "exports/outfit-south.png",
+  "dressed_reference": "exports/dressed-south.png",
+  "cell_size": [
+    80,
+    80
+  ],
+  "source_cell_size": [
+    84,
+    84
+  ],
+  "source_to_export_offset": [
+    -2,
+    -2
+  ],
+  "ground_pivot": [
+    40,
+    70
+  ],
+  "coverage": {
+    "idle": [
+      "south"
+    ],
+    "walk": [
+      "south"
+    ]
+  },
+  "clips": {
+    "idle": {
+      "columns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "durations_ms": [
+        400,
+        400,
+        400,
+        400
+      ]
+    },
+    "walk": {
+      "columns": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "durations_ms": [
+        80,
+        70,
+        80,
+        70,
+        80,
+        70,
+        80,
+        70
+      ]
+    }
+  },
+  "draw_order": [
+    "body",
+    "trousers",
+    "tunic"
+  ],
+  "changes": [
+    "Neck and shoulder crest landmarks instead of a waistband-derived mask",
+    "Actual short sleeves, independent cloth shading and longer hip-covering hem",
+    "Per-pose torso lean; final walk frame clears the forward left hand"
+  ],
+  "pixel_art_service": {
+    "drawing_id": "e809e23b-a129-4cee-9b88-9653fa41c058",
+    "gallery_id": "4c2fd884-0d51-48a9-9344-d36413b80243",
+    "method": "free exact PixelLab pixelart_workbench draw and explicit revisions"
+  },
+  "new_body_or_animation_generations": 0,
+  "runtime_registered": false,
+  "source_body_and_trousers_changed": false
+}

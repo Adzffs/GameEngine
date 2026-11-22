@@ -6,7 +6,19 @@
 
 Start with the [custom character plan](../../../docs/embervale/05-game/CUSTOM_CHARACTERS.md), [improvement register](../../../docs/embervale/06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) and [production workflow](../../../docs/embervale/05-game/CUSTOM_CHARACTER_WORKFLOW.md).
 
-![Base body, separate outfit and combined result](v1/previews/character-layer-preview.png)
+## Latest revision: tunic fit v2
+
+The owner reported that the original tunic did not fit. The [v2 revision](revisions/tunic-fit-v2/README.md) supplies proper shoulder/sleeve/neckline/hip geometry and cloth shading across all twelve existing south idle/walk poses. The body and trousers are unchanged; owner review of the new fit remains open. See the [defect and correction record](../../../docs/embervale/06-development/TUNIC_FIT_2026-11-22.md).
+
+![Previous tunic and revised fit](revisions/tunic-fit-v2/previews/before-after.png)
+
+[Moving comparison](revisions/tunic-fit-v2/previews/before-after-walk.gif) · [Interactive revised preview](revisions/tunic-fit-v2/character-workshop.html)
+
+## Original v1 reference
+
+The faulty garment is retained below as historical source evidence.
+
+![Base body, separate original outfit and combined result](v1/previews/character-layer-preview.png)
 
 ## Inspect the first proof
 
@@ -44,4 +56,3 @@ The original art task used four generations. Its remaining-balance receipt was 4
 Twelve body cells are exact to their sources; garment alpha and layer composition checks pass. Those checks do not prove attractive anatomy, fabric quality, equipment clearance, eight-way animated fit or game acceptance.
 
 The preview JavaScript passed syntax checking. A live browser interaction check was blocked because the active browser address could not be confidently verified on Windows. No successful browser UI test or game-renderer playthrough is claimed. See the [dated review](../../../docs/embervale/06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) for the improvement and verification record.
-

@@ -1,5 +1,7 @@
 # Custom characters: design and implementation plan
 
+**Tunic-fit follow-up:** The owner specifically reports that the v1 tunic does not fit. The [v2 revision](../../../assets/embervale/custom-character-pilot/revisions/tunic-fit-v2/README.md) redraws the garment for all twelve current south poses, with independent cloth shading and protected hand/face checks. See the [actual defect, changes and evidence](../06-development/TUNIC_FIT_2026-11-22.md). This advances ART-007 to in progress; final body style, world scale, eight-way/action coverage and runtime adoption remain open.
+
 **Updated:** 22 November 2026.  
 **Owner direction:** Use PixelLab for artwork and develop custom characters from a reusable base. The owner has identified that the first result needs improvement; no finished visual approval is recorded.  
 **Status:** Production plan and retained art proof. Character creation, appearance persistence and a general layered character renderer are not implemented by this document.  
@@ -221,4 +223,3 @@ Keep one canonical backlog and this owning design. The dated review owns observa
 When an improvement lands, update its finding, the parent backlog status/notes, current status, relevant guidance and verification in the same change. Record native renderer captures separately from an authoring GIF or browser preview. Mark owner visual acceptance only after actual feedback on that version.
 
 **Next concrete implementation:** compare the proposed base beside the current player in a temporary world-renderer fixture, settle native size/proportions, then bind one south-facing body/tunic/trouser composition. Preserve the current playable default until that proof is coherent.
-

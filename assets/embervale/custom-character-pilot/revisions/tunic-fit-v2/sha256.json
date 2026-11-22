@@ -1,0 +1,20 @@
+{
+  "build_preview.py": "ae2659f3023052a2d2323a4e00bcdc6b0df62f86b4235636150851a8b7326573",
+  "character-workshop.html": "8128773184bbc652e9c8713381bd3988402d30b4619a76ed0f889d834f4ea247",
+  "exports/dressed-south.png": "127e824c548ead41619175e38d8f7873421e7ac8f91d4c578d6cf08a3d9a3f49",
+  "exports/outfit-south.png": "472a5ff3476da1f75e595260506a84a691483f752610f74e6257cabd43eea5b8",
+  "exports/tunic-south.png": "e7f5506dcf5e7dd173acf6bd8b560747268d181154856bb19e2bbbf762857132",
+  "manifest.json": "c3a83831db4f96d140ab3f9772f59a35c3b825d9f6230ff56287137770ae6223",
+  "previews/all-poses.png": "925bf91588ebe8752be6d5d21acce4d08a5a747ba922cd8a5638fd9a70017cd3",
+  "previews/before-after-walk.gif": "aa5d9f4e2c6978e73340651bcbc1b3a90939d7e820e607e7c301a4f75cb31129",
+  "previews/before-after.png": "7c3a3e0e16f9e704b97b7e0cb34372e321c9f6080a9b2e3f82b71fc70dfbead8",
+  "README.md": "239b088b5c215f077b0958799ca8aea58488809d95bcf05c1a68d2241fa24991",
+  "recipes/acceptance-samples.json": "676879118a4e553bea5d6c864ae050585101a78a8ab1194040d06f16b1ddd997",
+  "recipes/authoring-history.json": "537dd7db0605c3187bc92d5487625fc76f20bc84f4940d767b9872ff4c03a958",
+  "recipes/fit-landmarks.json": "d92815a17810339c004b9d8185b5809a6694cee598ec9b830e5aedecb3d509fe",
+  "recipes/shoulder-crest-samples.json": "165bbc24bd12d8a2095494e0a01b1d0b9d3362d4c2962d72f9b25da8774d7589",
+  "recipes/tunic.json": "4ba1e2079ea110c72b16700d8af384cd0159b4ae19497144ddc16eb6d8aab725",
+  "source/tunic-raw.png": "bb0fe04a8d245af8725e863cb6acaa218b6dcb2914a72fa5746e82526ef38bf3",
+  "validate.py": "bbf92d04c7a55a8c59374c668a2f591617979e2ee9f22daca8aa49422003478c",
+  "validation.json": "df07fbb5a3997f4baf9310ed30830257377c75f720402affd2405f47aeca06ec"
+}

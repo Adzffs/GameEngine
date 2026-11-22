@@ -1,0 +1,37 @@
+{
+  "schema": "embervale.garment-fit-validation",
+  "version": 1,
+  "status": "passed",
+  "coverage": "South idle 4 + walk 8",
+  "source_canvas": [
+    84,
+    84
+  ],
+  "summary": {
+    "status": "passed",
+    "frames": 12,
+    "v1_rejected_frames": 12,
+    "missing_coverage": 0,
+    "hand_overlaps": 0,
+    "face_overlap_pixels": 0,
+    "composition_exact": true,
+    "source_crop_lossless": true,
+    "v1_inventory_preserved": true,
+    "additional_raised_shoulder_samples": 19
+  },
+  "independent_samples": [
+    "recipes/acceptance-samples.json",
+    "recipes/shoulder-crest-samples.json"
+  ],
+  "visual_review": "Agent inspected every original and revised pose; owner acceptance remains pending",
+  "new_body_or_animation_generations": 0,
+  "runtime_integration": false,
+  "v1_files_preserved": 23,
+  "source_body_and_trousers_byte_identical": true,
+  "new_missing_required_samples": 0,
+  "new_tunic_over_protected_hands": 0,
+  "composition_exact": true,
+  "preview_javascript_syntax": "passed: node --check",
+  "browser_interaction_test": "not rerun; no successful live browser check claimed",
+  "owner_acceptance": "pending feedback on v2"
+}

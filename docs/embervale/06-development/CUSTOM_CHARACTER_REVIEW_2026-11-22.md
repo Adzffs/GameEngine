@@ -1,11 +1,13 @@
 # Custom character pilot review and improvements
 
+**Owner-confirmed garment defect:** The owner subsequently reported that the tunic does not fit. The [v2 correction](TUNIC_FIT_2026-11-22.md) supplies a new pose-fitted garment and stronger checks; owner visual acceptance remains pending. The original v1 observations and results below remain historical evidence, not an accepted fit.
+
 **Date:** 22 November 2026.  
 **Request:** Preserve the first PixelLab base on GitHub, identify improvements and prepare a comprehensive route to custom characters.  
 **Runtime baseline inspected:** [f2b5c6b](https://github.com/Adzffs/GameEngine/commit/f2b5c6b210654040e449ffe8101f32052a93d980).  
 **Status:** Reference art and documentation delivery. No custom-character renderer, player appearance save data or creator UI has been installed into the game.
 
-The owner said that improvements are needed. Specific aesthetic changes have not yet been enumerated by the owner. Findings below distinguish measured facts, agent visual observations and future design work; they do not invent owner approval or claim that every review suggestion is a confirmed defect.
+At the first publication the owner said improvements were needed without enumerating them. The later report specifically confirms the tunic fit defect, now recorded in the linked follow-up. Other findings below still distinguish measured facts, agent visual observations and future design work; no final owner approval is invented.
 
 The [design and staged implementation plan](../05-game/CUSTOM_CHARACTERS.md) owns future behaviour. The [workflow](../05-game/CUSTOM_CHARACTER_WORKFLOW.md) owns production recipes. The [asset entry point](../../../assets/embervale/custom-character-pilot/README.md) owns the retained source pack.
 
@@ -79,7 +81,7 @@ Priorities refer to making a coherent custom-character feature. “Open” means
 | CHAR-F03 — identity across views | P1 visual review; open | Eight generated views exist, but no real turntable/world acceptance | Inspect face, head/shoulder/pelvis sizes, perspective, lighting and asymmetry together; correct source views where needed | ART-006 |
 | CHAR-F04 — gait, idle and transitions | P1 motion review; open | Only south is animated; exact pixel conservation does not prove planted feet, a smooth seam or readable weight | Review loop velocity, foot contacts, arm opposition, idle-to-walk/start/stop/turns in the renderer at ordinary camera zoom | ART-005 / ENG-007 |
 | CHAR-F05 — incomplete facing/action coverage | P1 feature gap; open | Clothes/idle/walk south only; no matching carry, gather, melee or recovery set | Publish an explicit compatible matrix and complete required motions before making the character the normal default | ART-007 / ENG-007 |
-| CHAR-F06 — fabric design and garment fit | P1 art improvement; open | Current close-fitting masks reuse skin/muscle shading; inside-body alpha checks cannot prove correct cloth placement | Author believable seams, neckline, hem and folds; check shoulders/hands/knees and separate coverage on every pose | ART-007 |
+| CHAR-F06 — fabric design and garment fit | P1 owner-confirmed v1 defect; v2 review open | Owner reports poor fit; waistband-centred masks missed shoulder/hip coverage and reused muscle shading | V2 authors per-pose neckline, short sleeves and longer hem; all twelve semantic fit/hand checks pass. Record owner feedback on the revised garment before acceptance | ART-007 |
 | CHAR-F07 — production skin/material regions | P1 pipeline gap; open | Skin preview uses a warm-colour heuristic; clothes use exact ramps | Add semantic masks/regions that protect eyes, underwear, hair, leather and metal; prove palette isolation | ART-006 / ART-007 |
 | CHAR-F08 — editable and repeatable pipeline | P1 production gap; open | v1 has source PNGs and decisions, but no layered editor master; builder uses Windows fonts and can replace evidence fields on rebuild | Add an explicit revised master/import/export path, portable preview fonts and durable verification separate from regenerated previews | ART-006 |
 | CHAR-F09 — hair and body fit families | P2 content gap; open | Bald body only; no beard, head tracks or hat rules | Add a small compatible hair/facial-hair set, front/rear pieces and head/helmet tests; treat different physiques as separate fit work | ART-007 |
@@ -89,7 +91,7 @@ Priorities refer to making a coherent custom-character feature. “Open” means
 | CHAR-F13 — runtime cost and fallback | P1 integration prerequisite; open | New reference set is absent from runtime catalogue; layered colour/content growth has no measured runtime cost | Add only selected images through existing guards/cache; measure representative actors and prove complete compatible fallback | ENG-007 / QA-005 |
 | CHAR-F14 — unfinished-feature status | P1 documentation correction; addressed for this delivery | “Custom character” could otherwise imply the game already has a creator | Preserve prototype labels, publish this register, link the canonical plan and synchronise current status/roadmap/backlog | ART-006 |
 
-CHAR-F02/03/04/06 are review targets, not fabricated reports of specific owner complaints. Update them with before/after evidence and the owner's actual comments when a new revision is shown.
+CHAR-F06 now has explicit owner feedback and linked before/after evidence. CHAR-F02/03/04 remain agent review targets, not invented owner complaints. Record actual feedback and the exact accepted version before closing visual work.
 
 ## 5. Equipment failure that must not be repeated
 
@@ -114,4 +116,3 @@ The new asset directory is a reference folder outside the named runtime batch li
 5. Add persistent appearance and player controls, then the full acceptance matrix.
 
 Do not spend the remaining recorded balance automatically or generate a full wardrobe before the improved base is settled. The next task is a small visible integration/scale proof, not another disconnected pile of animations.
-

@@ -1761,7 +1761,7 @@
         "STUDIO-060"
       ],
       "acceptance": "Preserve original sources and evidence; settle body scale, proportions and fit revisions; provide editable semantic layers, a portable source-preserving export and one visible layered world-renderer proof.",
-      "notes": "First eight-view body and south idle/walk garment proof are retained; comprehensive design/workflow/review published. Four generations used for the original art task. Owner requests improvements; body quality and world scale are unaccepted. No general renderer, creator or save change is installed.",
+      "notes": "First eight-view body and south idle/walk garment proof are retained; comprehensive design/workflow/review published. Four generations used for the original art task. Owner requests improvements; body quality and world scale are unaccepted. No general renderer, creator or save change is installed. The owner-confirmed tunic-fit defect has a v2 correction candidate under ART-007; the original alpha/composition tests were insufficient to establish fit. No new paid generation or runtime integration was required.",
       "github_issue": null,
       "evidence": [
         "docs/embervale/05-game/CUSTOM_CHARACTERS.md",
@@ -1769,7 +1769,8 @@
         "docs/embervale/05-game/CUSTOM_CHARACTER_WORKFLOW.md",
         "docs/embervale/07-decisions/ADR_021_MODULAR_CHARACTER_APPEARANCE.md",
         "assets/embervale/custom-character-pilot/README.md",
-        "assets/embervale/custom-character-pilot/v1/validation.json"
+        "assets/embervale/custom-character-pilot/v1/validation.json",
+        "docs/embervale/06-development/TUNIC_FIT_2026-11-22.md"
       ]
     },
     {
@@ -1777,15 +1778,18 @@
       "milestone": "R4",
       "priority": "P1",
       "title": "Author compatible character layers and motion coverage",
-      "status": "planned",
+      "status": "in_progress",
       "dependencies": [
         "ART-006"
       ],
       "acceptance": "Complete declared eight-way body, clothing and a small hair set for required shared motions; record semantic palettes, fit families, hand tracks and equipment occlusion with source masters and visual review.",
-      "notes": "South idle/walk and a close-fitting tunic/trouser proof exist only as ART-006 evidence. Other animated facings, hairstyles and matching equipment/actions remain open. Different silhouettes require authored fit work; palette variants do not require new body animation.",
+      "notes": "South idle/walk and a close-fitting tunic/trouser proof exist only as ART-006 evidence. Other animated facings, hairstyles and matching equipment/actions remain open. Different silhouettes require authored fit work; palette variants do not require new body animation. Owner reported poor v1 tunic fit. V2 now authors actual per-pose garment geometry and cloth shading across all twelve existing south idle/walk poses; semantic coverage rejects v1 in all twelve and protected hand/face checks pass. Body/trousers and all v1 files are unchanged. Owner acceptance, other facings/actions and hair remain open.",
       "github_issue": null,
       "evidence": [
-        "docs/embervale/05-game/CUSTOM_CHARACTERS.md"
+        "docs/embervale/05-game/CUSTOM_CHARACTERS.md",
+        "docs/embervale/06-development/TUNIC_FIT_2026-11-22.md",
+        "assets/embervale/custom-character-pilot/revisions/tunic-fit-v2/manifest.json",
+        "assets/embervale/custom-character-pilot/revisions/tunic-fit-v2/validation.json"
       ]
     },
     {

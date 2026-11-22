@@ -124,6 +124,7 @@ Use [current status](01-current-state/CURRENT_STATUS.md) for the maintained impl
 
 | Document | What it contains |
 |---|---|
+| [TUNIC_FIT_2026-11-22.md](06-development/TUNIC_FIT_2026-11-22.md) | Owner-confirmed tunic defect, pose-fitted v2 garment and independent coverage/hand checks |
 | [CUSTOM_CHARACTER_REVIEW_2026-11-22.md](06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) | Fourteen improvement findings, exact v1 coverage, checks, costs and implementation limits |
 | [PROJECT_REVIEW_2026-11-20.md](06-development/PROJECT_REVIEW_2026-11-20.md) | Full review, three integrity fixes, current evidence and remaining priorities |
 | [PLAYER_ACTION_INTEGRATION_2026-11-20.md](06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md) | Verified combined Windows player actions, lossless packing, current results and remaining acceptance |

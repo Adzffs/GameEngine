@@ -1,5 +1,7 @@
 # Custom character production workflow
 
+**Tunic-fit lesson, 22 November:** The owner rejected the v1 tunic fit. The [v2 correction](../06-development/TUNIC_FIT_2026-11-22.md) uses actual per-pose shoulder/neck/sleeve/hip landmarks and independent cloth shading. Its coverage and protected-hand checks reject the old tunic in all twelve poses. A waistband-derived skin recolour and an inside-body-alpha pass are insufficient garment acceptance. Use the [revised source/recipe](../../../assets/embervale/custom-character-pilot/revisions/tunic-fit-v2/README.md); preserve v1 and retain owner review as pending.
+
 **Updated:** 22 November 2026.  
 **Scope:** PixelLab source artwork, reusable body motions, separate clothing/hair/material layers and checked integration into Embervale.  
 **Owner:** [Custom character plan](CUSTOM_CHARACTERS.md); current evidence is in the [pilot review](../06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md). Runtime support described below is planned unless its implementation is linked.
@@ -176,4 +178,3 @@ Never include credentials, bearer tokens or expiring signed download URLs in the
 ## 12. Practical next session
 
 Open the [review findings](../06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md). Make the in-world size/proportion comparison first, with no player save. Record a chosen fit revision and the owner's specific visual feedback. Then build one front-facing layered runtime proof. Expand the wardrobe and other directions from that evidence, rather than spending generations on an unsettled body.
-
