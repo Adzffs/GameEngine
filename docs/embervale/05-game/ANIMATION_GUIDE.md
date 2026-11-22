@@ -14,6 +14,8 @@ Follow the [modular equipment animation plan](MODULAR_EQUIPMENT_ANIMATION_PLAN.m
 
 The [east-facing modular axe proof](../06-development/MODULAR_AXE_PROTOTYPE_2026-11-22.md) now implements the small authoring contract and material reuse with preserved legacy body pixels. Its [editable pilot](../../../assets/embervale/equipment-modular-pilot/README.md) stays outside the runtime catalogue. General visual lookup, new clean body acceptance and eight-way action migration remain planned.
 
+The [handle occlusion correction](../06-development/MODULAR_AXE_OCCLUSION_FIX_2026-11-22.md) records a mistake in the first proof: moving the whole tool behind the whole body in two wind-up poses made the shaft appear to pass through the player. Keep a stable tool/body relationship through the motion, then restore explicitly authored head, hand and cuff/forearm regions where they cover the tool. The pilot's v2 recipe applies the same body-tool-foreground order to all poses/materials. Review depth continuity across wind-up, contact and recovery, including both grips. Material invariance and correct attachment coordinates do not prove correct occlusion; retain fixed decoded-output landmarks alongside timed visual review.
+
 ## Start an animation task
 
 1. Read this guide, the dated research, the current art guide and the relevant action's source and tests.

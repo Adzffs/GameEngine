@@ -15,14 +15,36 @@
   "materialDifferencePixels": [
     {
       "material": "iron",
-      "differentPixels": 271
+      "differentPixels": 249
     },
     {
       "material": "steel",
-      "differentPixels": 271
+      "differentPixels": 249
     }
   ],
-  "frontHandPixelsPreserved": 24,
+  "composition": "body-tool-foreground",
+  "foregroundPixelsPreserved": 4740,
+  "foregroundToolOverlapPixels": 918,
+  "foregroundPixelsByPose": [
+    200,
+    199,
+    199,
+    197,
+    190,
+    196,
+    199,
+    200
+  ],
+  "visibleToolOverBodyPixelsByPose": [
+    26,
+    13,
+    5,
+    0,
+    0,
+    1,
+    8,
+    26
+  ],
   "maxSecondaryHandShaftDistance": 0.7993889900022653,
   "sourceStatus": "Existing unchanged body fixture; body quality remains unaccepted"
 }

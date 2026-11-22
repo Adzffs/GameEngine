@@ -61,7 +61,8 @@ var tools=canvas(768,materials.length*96),combined=canvas(768,materials.length*9
 var report={direction:'east',bodyPoses:8,shapeViews:1,materials:materials.length,
   exactBodyCells:0,metalRegionPixels:regionCounts,protectedSourcePixels:0,
   bodyAndHandleMismatchPixels:0,alphaMismatchPixels:0,materialDifferencePixels:[],
-  frontHandPixelsPreserved:0,maxSecondaryHandShaftDistance:0,
+  composition:recipe.composition,foregroundPixelsPreserved:0,foregroundToolOverlapPixels:0,
+  foregroundPixelsByPose:[],visibleToolOverBodyPixelsByPose:[],maxSecondaryHandShaftDistance:0,
   sourceStatus:'Existing unchanged body fixture; body quality remains unaccepted'};
 for(var i=0;i<shape.pixels.length;i++)if(pc.rgbaA(shape.pixels[i])&&regionAt[i]<0)report.protectedSourcePixels++;
 for(var p=0;p<8;p++){
@@ -71,6 +72,19 @@ for(var p=0;p<8;p++){
   for(var i=0;i<b.pixels.length;i++)if(!equal(b.pixels[i],body.pixels[Math.floor(i/96)*768+p*96+i%96]))
     fail('Shared body cell changed during assembly');
   report.exactBodyCells++;
+  // The axe keeps one depth plane. Only explicitly authored body parts cover
+  // it; never flip the whole tool behind the body to hide a head intersection.
+  var foreground=new Array(9216).fill(false),foregroundCount=0;
+  Object.keys(frame.foreground).forEach(function(role){
+    frame.foreground[role].forEach(function(span){
+      for(var x=span[1];x<=span[2];x++){
+        var at=span[0]*96+x;
+        if(!pc.rgbaA(b.pixels[at]))fail('Foreground mask references empty body pixels');
+        foreground[at]=true;foregroundCount++;
+      }
+    });
+  });
+  report.foregroundPixelsByPose.push(foregroundCount);
   var ux=frame.aim[0],uy=frame.aim[1],vx=-uy,vy=ux;
   var off=[frame.off_hand[0]-frame.main_hand[0],frame.off_hand[1]-frame.main_hand[1]];
   report.maxSecondaryHandShaftDistance=Math.max(report.maxSecondaryHandShaftDistance,Math.abs(off[0]*vx+off[1]*vy));
@@ -88,13 +102,15 @@ for(var p=0;p<8;p++){
         if(tier===0)coverage[y*96+x]=region;}
     }
     bounded(tool,30);
-    if(frame.tool_in_front){blit(b,result,0,0);blit(tool,result,0,0);}
-    else{blit(tool,result,0,0);blit(b,result,0,0);}
-    frame.front_hand_pixels.forEach(function(pixel){
-      var at=pixel[1]*96+pixel[0],c=b.pixels[at];
-      if(!pc.rgbaA(c))fail('Front hand mask references empty body pixels');
-      result.pixels[at]=c;report.frontHandPixelsPreserved++;
-    });
+    blit(b,result,0,0);blit(tool,result,0,0);
+    var visibleOverlap=0;
+    for(var at=0;at<9216;at++){
+      if(foreground[at]){
+        result.pixels[at]=b.pixels[at];report.foregroundPixelsPreserved++;
+        if(pc.rgbaA(tool.pixels[at]))report.foregroundToolOverlapPixels++;
+      }else if(pc.rgbaA(b.pixels[at])&&pc.rgbaA(tool.pixels[at]))visibleOverlap++;
+    }
+    if(tier===0)report.visibleToolOverBodyPixelsByPose.push(visibleOverlap);
     bounded(result,100);
     if(!toolCells[tier]){toolCells[tier]=[];composites[tier]=[];}
     toolCells[tier][p]=tool;composites[tier][p]=result;
@@ -172,4 +188,15 @@ for(var p=0;p<8;p++){
   blit(tile,diagnostic,p*96,12);
 }
 save(scale(diagnostic,2),cfg.fixtures.grips,cfg.stage+'/previews/grips.png');
+var occlusion=board(768,108);
+for(var p=0;p<8;p++){
+  var tile=canvas(96,96);blit(bodyCells[p],tile,0,0);
+  Object.keys(recipe.frames[p].foreground).forEach(function(role){
+    recipe.frames[p].foreground[role].forEach(function(span){
+      for(var x=span[1];x<=span[2];x++)put(tile,x,span[0],colour(role==='head'?'b550a1':role==='main_hand'?'e83d55':'367ee8'));
+    });
+  });
+  label(occlusion,String(p),p*96+8,3);blit(tile,occlusion,p*96,12);
+}
+save(scale(occlusion,2),cfg.fixtures.grips,cfg.stage+'/previews/occlusion.png');
 console.log('MODULAR_AXE_JSON='+JSON.stringify(report));

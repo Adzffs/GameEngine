@@ -48,7 +48,8 @@ def check(output):
             type(report.get('version')) is int and report['version'] == 1, 'Unsupported proof receipt')
     require(report['inputs'] == fingerprint(output), 'An editable input changed; export is required')
     expected_outputs = {'textures/' + name + '.png' for name in ('body', 'axe', 'metal-mask', 'tools', 'composites')}
-    expected_outputs.update({'previews/contact.png', 'previews/grips.png', 'previews/materials.gif', 'previews/validation.json'})
+    expected_outputs.update({'previews/contact.png', 'previews/grips.png', 'previews/occlusion.png',
+                             'previews/materials.gif', 'previews/validation.json'})
     require(set(report['outputs']) == expected_outputs, 'Proof receipt has missing or unknown outputs')
     for name, expected in report['outputs'].items():
         require(output_checksum(output / name) == expected,

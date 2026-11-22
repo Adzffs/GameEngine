@@ -75,12 +75,30 @@ class RecipeTests(unittest.TestCase):
                              ('body_source', '../outside.ase'), ('frame_durations_ms', [150] * 7)]:
             bad = copy.deepcopy(self.recipe); bad[field] = value; cases.append(bad)
         for field, value in [('main_hand', [float('nan'), 40]), ('aim', [0, -2]),
-                             ('off_hand', [80, 80]), ('front_hand_pixels', [[2, 2]]),
+                             ('off_hand', [80, 80]), ('foreground', {}),
                              ('pose', True), ('tool_in_front', 1)]:
             bad = copy.deepcopy(self.recipe); bad['frames'][0][field] = value; cases.append(bad)
         for bad in cases:
             with self.subTest(bad=bad), self.assertRaises(ValueError):
                 validate_recipe(bad)
+
+    def test_unstable_depth_and_invalid_foreground_regions_reject(self):
+        for change in ('version', 'order', 'legacy-depth', 'missing-hand', 'empty',
+                       'bounds', 'boolean', 'duplicate', 'unsorted', 'detached', 'missing-grip'):
+            bad = copy.deepcopy(self.recipe)
+            frame = bad['frames'][0]
+            if change == 'version': bad['version'] = 1
+            elif change == 'order': bad['composition'] = 'tool-body'
+            elif change == 'legacy-depth': frame['tool_in_front'] = False
+            elif change == 'missing-hand': del frame['foreground']['off_hand']
+            elif change == 'empty': frame['foreground']['head'] = []
+            elif change == 'bounds': frame['foreground']['head'][0] = [28, -1, 40]
+            elif change == 'boolean': frame['foreground']['head'][0][0] = True
+            elif change == 'duplicate': frame['foreground']['head'].insert(1, frame['foreground']['head'][0])
+            elif change == 'unsorted': frame['foreground']['head'].reverse()
+            elif change == 'detached': frame['foreground']['off_hand'] = [[70, 70, 70]]
+            elif change == 'missing-grip': frame['foreground']['main_hand'] = [[50, 48, 48]]
+            with self.subTest(change=change), self.assertRaises(ValueError): validate_recipe(bad)
 
     def test_ambiguous_materials_and_out_of_budget_inputs_reject(self):
         for change in ('id', 'item', 'colour', 'count', 'extra'):
@@ -138,6 +156,52 @@ class RealExporterTests(unittest.TestCase):
                 self.assertEqual(after_tools[i:i+4], bytes.fromhex('ee00ccff'))
         self.assertEqual((self.pilot / 'textures/body.png').read_bytes(), before_body)
         self.assertEqual({name: (self.pilot / name).read_bytes() for name in SOURCES}, masters)
+
+    def test_exported_occlusion_preserves_head_and_both_grips_without_depth_switching(self):
+        build(self.editor, self.pilot)
+        recipe = json.loads((self.pilot / 'recipe.json').read_text())
+        _, _, body = png_pixels(self.pilot / 'textures/body.png')
+        _, _, tools = png_pixels(self.pilot / 'textures/tools.png')
+        _, _, combined = png_pixels(self.pilot / 'textures/composites.png')
+        def pixel(data, pose, x, y, tier=0):
+            at = ((tier * 96 + y) * 768 + pose * 96 + x) * 4
+            return data[at:at+4]
+        # Fixed visual landmarks, independent of mask generation: the lifted
+        # shaft stays in front of the shirt/collar, the head and both grips cover
+        # the tool. The old whole-tool flip fails the wind-up and grip checks.
+        landmarks = [(0, 52, 36, 'edbd89ff'), (0, 47, 51, 'd99d69ff'),
+                     (0, 47, 53, '935b3dff'), (1, 46, 44, 'b27c48ff'),
+                     (1, 42, 30, '7b4e2eff'), (2, 45, 42, 'b27c48ff'),
+                     (2, 41, 33, '563727ff'), (3, 53, 54, 'edbd89ff'),
+                     (4, 53, 54, 'edbd89ff'), (5, 52, 50, 'd99d69ff'),
+                     (6, 48, 51, 'd99d69ff'), (7, 52, 36, 'edbd89ff')]
+        for tier in range(3):
+            for p, x, y, expected in landmarks:
+                with self.subTest(tier=tier, pose=p, point=(x,y)):
+                    self.assertEqual(pixel(combined, p, x, y, tier).hex(), expected)
+            for p, frame in enumerate(recipe['frames']):
+                foreground = {(x,y) for spans in frame['foreground'].values()
+                              for y,x0,x1 in spans for x in range(x0,x1+1)}
+                for y in range(96):
+                    for x in range(96):
+                        b, t = pixel(body,p,x,y), pixel(tools,p,x,y,tier)
+                        expected = b if (x,y) in foreground or not t[3] else t
+                        self.assertEqual(pixel(combined,p,x,y,tier), expected,
+                                         f'Wrong occlusion: material {tier}, pose {p}, ({x},{y})')
+            for y in range(96):
+                for x in range(96):
+                    self.assertEqual(pixel(combined,0,x,y,tier), pixel(combined,7,x,y,tier))
+
+    def test_foreground_mask_on_empty_body_pixel_cannot_replace_usable_outputs(self):
+        path = self.pilot / 'recipe.json'
+        recipe = json.loads(path.read_text())
+        recipe['frames'][0]['foreground']['head'][0] = [0, 0, 0]
+        validate_recipe(recipe)  # Structurally valid; decoded artwork must reject.
+        path.write_text(json.dumps(recipe), encoding='utf-8')
+        before = inventory(self.pilot)
+        with self.assertRaisesRegex(RuntimeError, 'Foreground mask references empty body pixels'):
+            build(self.editor, self.pilot)
+        self.assertEqual(inventory(self.pilot), before)
 
     def test_rejected_recipe_and_bootstrap_preserve_export(self):
         recipe_path = self.pilot / 'recipe.json'

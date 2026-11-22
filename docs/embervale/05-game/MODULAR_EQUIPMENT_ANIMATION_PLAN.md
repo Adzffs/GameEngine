@@ -5,7 +5,7 @@
 **Document status:** Detailed implementation plan; the modular pipeline described here is proposed. Existing working equipment rendering is identified separately.  
 **First complete delivery:** One readable eight-direction chopping animation shared by bronze, iron and steel axes, followed by a demonstrated workflow for adding another appearance without reanimating the player.
 
-**Implementation checkpoint, 22 November:** The [first east-facing axe proof](../06-development/MODULAR_AXE_PROTOTYPE_2026-11-22.md) now assembles an unchanged existing body strip, one explicit hand track, one tool view and three masked material appearances. Eight focused tests pass, including actual editor exports. This is bounded engineering progress on MEA-02/04; clean body quality, eight-way coverage, runtime registry and gameplay migration remain open.
+**Implementation checkpoint, 22 November:** The [first east-facing axe proof](../06-development/MODULAR_AXE_PROTOTYPE_2026-11-22.md) now assembles an unchanged existing body strip, one explicit hand track, one tool view and three masked material appearances. The [owner-reported handle occlusion correction](../06-development/MODULAR_AXE_OCCLUSION_FIX_2026-11-22.md) replaces whole-tool depth switching with stable composition and head/both-grip foreground spans. Eleven focused tests pass, including actual editor exports and fixed visible-overlap landmarks. This is bounded engineering progress on MEA-02/04; clean body quality, eight-way coverage, runtime registry and gameplay migration remain open.
 
 ## 1. The production decision
 

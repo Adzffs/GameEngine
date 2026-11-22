@@ -21,10 +21,11 @@ def point(value, bounds=None):
 def validate_recipe(recipe):
     keys = {'schema', 'version', 'motion', 'facing', 'cell_size', 'ground_pivot', 'body_source',
             'shape_source', 'mask_source', 'shape_size', 'shape_grip', 'shape_axis',
-            'cutting_edge_local', 'timing_source', 'frame_durations_ms', 'frames', 'materials', 'provenance'}
+            'cutting_edge_local', 'timing_source', 'composition', 'frame_durations_ms', 'frames', 'materials', 'provenance'}
     require(isinstance(recipe, dict) and set(recipe) == keys, 'Unsupported recipe fields')
     require(recipe['schema'] == 'embervale.modular-equipment-pilot' and
-            type(recipe['version']) is int and recipe['version'] == 1, 'Unsupported recipe version')
+            type(recipe['version']) is int and recipe['version'] == 2, 'Unsupported recipe version')
+    require(recipe['composition'] == 'body-tool-foreground', 'Use the shared stable composition order')
     require(recipe['motion'] == 'woodcutting.standard.east' and recipe['facing'] == 'east',
             'This proof supports east-facing woodcutting only')
     require(recipe['cell_size'] == [96, 96] and recipe['ground_pivot'] == [48, 64] and
@@ -45,29 +46,43 @@ def validate_recipe(recipe):
     require(isinstance(frames, list) and len(frames) == 8, 'Eight authored hand-track poses required')
     for index, frame in enumerate(frames):
         require(isinstance(frame, dict) and set(frame) == {'pose', 'main_hand', 'off_hand', 'aim',
-                'front_hand_pixels', 'tool_in_front'}, 'Invalid hand-track fields')
+                'foreground'}, 'Invalid hand-track fields')
         require(type(frame['pose']) is int and frame['pose'] == index, 'Pose IDs must be ordered and complete')
         main = point(frame['main_hand'], [96, 96])
         off = point(frame['off_hand'], [96, 96])
         aim = point(frame['aim'])
         require(abs(math.hypot(*aim) - 1) < 0.00001, 'Tool aim must be normalized')
-        require(type(frame['tool_in_front']) is bool, 'Draw order must be explicit')
         # The canonical blade extends to the right of its upward shaft. This
         # facing must preserve the cutting edge toward the tree on screen-right.
         require(-aim[1] > 0, 'The axe cutting edge must face east')
         lateral = abs((off[0] - main[0]) * -aim[1] + (off[1] - main[1]) * aim[0])
         along = (off[0] - main[0]) * aim[0] + (off[1] - main[1]) * aim[1]
         require(lateral <= 1.5 and -6 <= along <= 1, 'Secondary hand no longer fits the shared shaft')
-        hand = frame['front_hand_pixels']
-        require(isinstance(hand, list) and 0 < len(hand) <= 9, 'A bounded front-hand mask is required')
+        foreground = frame['foreground']
+        require(isinstance(foreground, dict) and set(foreground) == {'head', 'main_hand', 'off_hand'},
+                'Explicit head and both grip masks are required')
         seen = set()
-        for pixel in hand:
-            point(pixel, [96, 96])
-            require(all(type(n) is int for n in pixel) and tuple(pixel) not in seen,
-                    'Hand mask pixels must be unique integer coordinates')
-            require(math.hypot(pixel[0] - main[0], pixel[1] - main[1]) <= 2,
-                    'Front-hand mask must remain at the main grip')
-            seen.add(tuple(pixel))
+        for role, spans in foreground.items():
+            require(isinstance(spans, list) and 0 < len(spans) <= 32, 'Foreground spans outside proof budget')
+            previous, pixels = (-1, -1), set()
+            for span in spans:
+                require(isinstance(span, list) and len(span) == 3 and
+                        all(type(n) is int for n in span), 'Foreground spans require integer y, x0, x1')
+                y, x0, x1 = span
+                require(0 <= y < 96 and 0 <= x0 <= x1 < 96 and (y, x0) > previous,
+                        'Foreground spans must be ordered and inside the body cell')
+                previous = (y, x0)
+                for x in range(x0, x1 + 1):
+                    require((x, y) not in seen, 'Foreground regions must not overlap')
+                    if role != 'head':
+                        grip = main if role == 'main_hand' else off
+                        require(math.hypot(x - grip[0], y - grip[1]) <= 3,
+                                'Grip foreground must remain at its hand')
+                    seen.add((x, y)); pixels.add((x, y))
+            require(len(pixels) <= (384 if role == 'head' else 29), 'Foreground pixels outside proof budget')
+            if role != 'head':
+                grip = main if role == 'main_hand' else off
+                require((round(grip[0]), round(grip[1])) in pixels, 'Foreground must cover each grip')
     materials = recipe['materials']
     require(isinstance(materials, list) and 1 <= len(materials) <= 8, 'Material count outside proof budget')
     ids, items = set(), set()

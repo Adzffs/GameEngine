@@ -32,6 +32,7 @@
 | Where is the new AI walking candidate? | [PixelLab eight-way walking and current checks](06-development/PIXELLAB_WALKING_2026-11-21.md) |
 | Where is the equipped-walking pilot and its recovery handoff? | [Retained art, visual defect and remaining checks](06-development/PIXELLAB_EQUIPPED_HANDOFF_2026-11-21.md) |
 | Does one motion already support several axe materials? | [East-facing modular axe proof and checks](06-development/MODULAR_AXE_PROTOTYPE_2026-11-22.md) |
+| Why did the axe handle pass through the player, and what fixed it? | [Recorded compositing mistake, stable foreground masks and verification](06-development/MODULAR_AXE_OCCLUSION_FIX_2026-11-22.md) |
 | How can many tools and materials share animations? | [Modular equipment production plan](05-game/MODULAR_EQUIPMENT_ANIMATION_PLAN.md) |
 | How should future animations be authored and reviewed? | [Animation guide](05-game/ANIMATION_GUIDE.md) |
 | What did the animation research and polish establish? | [Sources, measured findings and prototype status](06-development/ANIMATION_RESEARCH_2026-11-20.md) |
