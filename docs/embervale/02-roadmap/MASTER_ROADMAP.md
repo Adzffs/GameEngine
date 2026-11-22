@@ -4,6 +4,8 @@
 **Scope:** GameEngine, Embervale, Embervale Studio and project delivery.\
 **Canonical roadmap:** This document replaces the competing phase sequences in the earlier Studio plans. The original STUDIO task IDs remain traceable in the [backlog](BACKLOG.md).
 
+**22 November equipment production direction:** ART-005 now follows the [modular equipment animation plan](../05-game/MODULAR_EQUIPMENT_ANIMATION_PLAN.md): reusable body/hand tracks, independent tool shapes and masked material palettes. Prove one chopping action with three axe materials before expanding to eight directions, Mining, carry/shields and melee. The plan includes staged migration, resource growth checks and completion criteria. Its MEA work units sit under ART-005; the new pipeline is planned, not implemented. This direction supersedes repeatedly generating complete characters for each equipment/material combination.
+
 ## 1. The destination
 
 Build a coherent, expandable RPG whose world can be authored through dependable tools. The first player-facing objective is a balanced, flat River Crossing starter area with believable geography, distributed services and satisfying gathering, crafting and combat progression. The first tooling objective is a complete, reversible map-editing workflow available to both a person and an AI.

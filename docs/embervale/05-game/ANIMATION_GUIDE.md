@@ -8,6 +8,10 @@
 
 Read this before animating. The [research and measured findings](../06-development/ANIMATION_RESEARCH_2026-11-20.md) explain the sources, defects, prototype corrections and verification behind these rules. [Art and audio](ART_AND_AUDIO.md) owns the wider asset pipeline and current integration status.
 
+## Modular equipment production direction
+
+Follow the [modular equipment animation plan](MODULAR_EQUIPMENT_ANIMATION_PLAN.md), requested on 22 November 2026. Share authored body motions and hand tracks across compatible tool shapes and material palettes. First prove one chopping direction with bronze, iron and steel axes, then all eight directions and actual gameplay. Preserve the better body art, existing fallbacks, resource limits and authoritative event/audio contracts. The new authoring and visual-registry pipeline is planned; existing layered rendering is its working foundation.
+
 ## Start an animation task
 
 1. Read this guide, the dated research, the current art guide and the relevant action's source and tests.

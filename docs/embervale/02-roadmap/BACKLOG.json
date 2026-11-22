@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "reviewed_date": "2026-11-21",
+  "reviewed_date": "2026-11-22",
   "current_verified_master": "d40b491d8b8082edc65ec4be0efc26ed882f2c54",
   "verification_reconciliation": "Integrated code d40b491d8b8082edc65ec4be0efc26ed882f2c54: Windows Debug SDL 124/124 (99 headless, 10 client, 15 graphics), separate SDL-free 99/99; Python 81 run, 79 pass/two unavailable-symlink skips. Original melee/equipment, current Mining/audio and later safety/editor/usability changes are combined. All 32 masters preserved, 47 packaged files match; lossless runtime packing retains resource budgets. Human/device/owner acceptance remains open. Read docs/embervale/06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md.",
   "repository": "Adzffs/GameEngine",
@@ -1699,9 +1699,10 @@
       "github_issue": null,
       "evidence": [
         "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
-        "docs/embervale/06-development/PIXELLAB_WALKING_2026-11-21.md"
+        "docs/embervale/06-development/PIXELLAB_WALKING_2026-11-21.md",
+        "docs/embervale/05-game/MODULAR_EQUIPMENT_ANIMATION_PLAN.md"
       ],
-      "notes": "Resumed 21 November at owner request using PixelLab after procedural quality was rejected. Owner liked the east-only trial. Complete eight-way empty-handed walking is imported as a separate editable master with shared preview/runtime timing. Full native visual acceptance remains open; equipped walking and gathering/melee art retain the prior batches pending matching AI passes. The rejected uncommitted procedural revision is preserved in its original worktree."
+      "notes": "Resumed 21 November at owner request using PixelLab after procedural quality was rejected. Owner liked the east-only trial. Complete eight-way empty-handed walking is imported as a separate editable master with shared preview/runtime timing. Full native visual acceptance remains open; equipped walking and gathering/melee art retain the prior batches pending matching AI passes. The rejected uncommitted procedural revision is preserved in its original worktree. On 22 November the owner requested the modular equipment production plan: shared authored body motions/hand tracks, reusable tool shapes, semantic material masks and bounded visual mappings. First prove one chop with bronze/iron/steel axes, then eight directions and staged action migration. Existing layered rendering is implemented; the new authoring/registry pipeline is planned. The MEA units remain substeps of ART-005; owner/native visual acceptance remains open."
     },
     {
       "id": "GAME-010",

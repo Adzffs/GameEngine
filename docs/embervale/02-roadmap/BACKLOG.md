@@ -11,6 +11,8 @@ Completion refers to the stated bounded acceptance, with evidence and publicatio
 
 ART-005 resumed on 21 November with the [PixelLab walking candidate](../06-development/PIXELLAB_WALKING_2026-11-21.md). The owner liked the east-only trial; full eight-way native review and equipped/action art remain open.
 
+The [22 November modular equipment plan](../05-game/MODULAR_EQUIPMENT_ANIMATION_PLAN.md) is the production direction for ART-005. Prove shared chopping poses/hand tracks with bronze, iron and steel axes, then eight directions and staged Mining, carry/shield and melee migration. The MEA units organize work under ART-005 without adding duplicate canonical tasks. The new pipeline is planned; full visual acceptance remains open.
+
 ## Current progress
 
 | Work | Current bounded result | Remaining acceptance |
