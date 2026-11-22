@@ -1,0 +1,1043 @@
+{
+  "schema": "embervale.garment-registration-validation",
+  "version": 1,
+  "status": "passed",
+  "body_poses": 12,
+  "garment_cells": 36,
+  "source_pixels_compared_to_editable_master": 254016,
+  "covered_source_body_checks": 8193,
+  "unsupported_garment_pixels": 0,
+  "protected_body_overlaps": 0,
+  "disconnected_garment_components": 0,
+  "maximum_cuff_extra_width_px": 1,
+  "maximum_cuff_centre_error_px": 0.5,
+  "v4_unsupported_pixels": 352,
+  "v4_forearm_overlap_checks": 59,
+  "v4_bad_cuffs": 37,
+  "forearm_pixels_reclassified": 29,
+  "source_crop_lossless": true,
+  "composition_exact": true,
+  "original_body_unchanged": true,
+  "preserved_hash_entries": {
+    "v1": 22,
+    "tunic-fit-v2": 18,
+    "trouser-fit-v3": 19,
+    "coverage-fit-v4": 30
+  },
+  "walk_preview_duration_ms": 600,
+  "per_frame": [
+    {
+      "frame": 1,
+      "garments": {
+        "tunic": {
+          "pixels": 478,
+          "coverage_pixels": 132,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "knee": {
+          "pixels": 274,
+          "coverage_pixels": 242,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "full": {
+          "pixels": 399,
+          "coverage_pixels": 349,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        }
+      },
+      "cuffs": [
+        {
+          "variant": "knee",
+          "side": 0,
+          "y": 57,
+          "source_span": [
+            32,
+            38
+          ],
+          "new_span": [
+            31,
+            38
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "knee",
+          "side": 1,
+          "y": 57,
+          "source_span": [
+            44,
+            50
+          ],
+          "new_span": [
+            44,
+            51
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 0,
+          "y": 66,
+          "source_span": [
+            32,
+            37
+          ],
+          "new_span": [
+            31,
+            37
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 1,
+          "y": 66,
+          "source_span": [
+            45,
+            50
+          ],
+          "new_span": [
+            45,
+            51
+          ],
+          "centre_error_px": 0.5
+        }
+      ]
+    },
+    {
+      "frame": 2,
+      "garments": {
+        "tunic": {
+          "pixels": 474,
+          "coverage_pixels": 131,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "knee": {
+          "pixels": 287,
+          "coverage_pixels": 253,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "full": {
+          "pixels": 412,
+          "coverage_pixels": 360,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        }
+      },
+      "cuffs": [
+        {
+          "variant": "knee",
+          "side": 0,
+          "y": 57,
+          "source_span": [
+            33,
+            38
+          ],
+          "new_span": [
+            32,
+            38
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "knee",
+          "side": 1,
+          "y": 57,
+          "source_span": [
+            44,
+            50
+          ],
+          "new_span": [
+            44,
+            51
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 0,
+          "y": 66,
+          "source_span": [
+            32,
+            37
+          ],
+          "new_span": [
+            31,
+            37
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 1,
+          "y": 66,
+          "source_span": [
+            45,
+            50
+          ],
+          "new_span": [
+            45,
+            51
+          ],
+          "centre_error_px": 0.5
+        }
+      ]
+    },
+    {
+      "frame": 3,
+      "garments": {
+        "tunic": {
+          "pixels": 472,
+          "coverage_pixels": 128,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "knee": {
+          "pixels": 287,
+          "coverage_pixels": 253,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "full": {
+          "pixels": 414,
+          "coverage_pixels": 362,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        }
+      },
+      "cuffs": [
+        {
+          "variant": "knee",
+          "side": 0,
+          "y": 57,
+          "source_span": [
+            33,
+            38
+          ],
+          "new_span": [
+            32,
+            38
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "knee",
+          "side": 1,
+          "y": 57,
+          "source_span": [
+            44,
+            50
+          ],
+          "new_span": [
+            44,
+            51
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 0,
+          "y": 66,
+          "source_span": [
+            32,
+            37
+          ],
+          "new_span": [
+            31,
+            37
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 1,
+          "y": 66,
+          "source_span": [
+            45,
+            50
+          ],
+          "new_span": [
+            45,
+            51
+          ],
+          "centre_error_px": 0.5
+        }
+      ]
+    },
+    {
+      "frame": 4,
+      "garments": {
+        "tunic": {
+          "pixels": 468,
+          "coverage_pixels": 140,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "knee": {
+          "pixels": 268,
+          "coverage_pixels": 236,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "full": {
+          "pixels": 395,
+          "coverage_pixels": 345,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        }
+      },
+      "cuffs": [
+        {
+          "variant": "knee",
+          "side": 0,
+          "y": 57,
+          "source_span": [
+            33,
+            38
+          ],
+          "new_span": [
+            32,
+            38
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "knee",
+          "side": 1,
+          "y": 57,
+          "source_span": [
+            44,
+            49
+          ],
+          "new_span": [
+            44,
+            50
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 0,
+          "y": 66,
+          "source_span": [
+            32,
+            37
+          ],
+          "new_span": [
+            31,
+            37
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 1,
+          "y": 66,
+          "source_span": [
+            45,
+            50
+          ],
+          "new_span": [
+            45,
+            51
+          ],
+          "centre_error_px": 0.5
+        }
+      ]
+    },
+    {
+      "frame": 5,
+      "garments": {
+        "tunic": {
+          "pixels": 499,
+          "coverage_pixels": 152,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "knee": {
+          "pixels": 249,
+          "coverage_pixels": 225,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "full": {
+          "pixels": 326,
+          "coverage_pixels": 291,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        }
+      },
+      "cuffs": [
+        {
+          "variant": "knee",
+          "side": 0,
+          "y": 57,
+          "source_span": [
+            32,
+            39
+          ],
+          "new_span": [
+            31,
+            39
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "knee",
+          "side": 1,
+          "y": 59,
+          "source_span": [
+            42,
+            48
+          ],
+          "new_span": [
+            42,
+            49
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 0,
+          "y": 62,
+          "source_span": [
+            35,
+            40
+          ],
+          "new_span": [
+            34,
+            40
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 1,
+          "y": 65,
+          "source_span": [
+            42,
+            46
+          ],
+          "new_span": [
+            42,
+            47
+          ],
+          "centre_error_px": 0.5
+        }
+      ]
+    },
+    {
+      "frame": 6,
+      "garments": {
+        "tunic": {
+          "pixels": 499,
+          "coverage_pixels": 148,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "knee": {
+          "pixels": 239,
+          "coverage_pixels": 217,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "full": {
+          "pixels": 345,
+          "coverage_pixels": 308,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        }
+      },
+      "cuffs": [
+        {
+          "variant": "knee",
+          "side": 0,
+          "y": 55,
+          "source_span": [
+            32,
+            38
+          ],
+          "new_span": [
+            31,
+            38
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "knee",
+          "side": 1,
+          "y": 58,
+          "source_span": [
+            42,
+            48
+          ],
+          "new_span": [
+            42,
+            49
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 0,
+          "y": 64,
+          "source_span": [
+            35,
+            40
+          ],
+          "new_span": [
+            34,
+            40
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 1,
+          "y": 64,
+          "source_span": [
+            42,
+            46
+          ],
+          "new_span": [
+            42,
+            47
+          ],
+          "centre_error_px": 0.5
+        }
+      ]
+    },
+    {
+      "frame": 7,
+      "garments": {
+        "tunic": {
+          "pixels": 497,
+          "coverage_pixels": 142,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "knee": {
+          "pixels": 260,
+          "coverage_pixels": 235,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "full": {
+          "pixels": 336,
+          "coverage_pixels": 300,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        }
+      },
+      "cuffs": [
+        {
+          "variant": "knee",
+          "side": 0,
+          "y": 59,
+          "source_span": [
+            33,
+            39
+          ],
+          "new_span": [
+            32,
+            39
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "knee",
+          "side": 1,
+          "y": 57,
+          "source_span": [
+            42,
+            48
+          ],
+          "new_span": [
+            42,
+            49
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 0,
+          "y": 65,
+          "source_span": [
+            34,
+            38
+          ],
+          "new_span": [
+            33,
+            38
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 1,
+          "y": 62,
+          "source_span": [
+            42,
+            46
+          ],
+          "new_span": [
+            42,
+            47
+          ],
+          "centre_error_px": 0.5
+        }
+      ]
+    },
+    {
+      "frame": 8,
+      "garments": {
+        "tunic": {
+          "pixels": 488,
+          "coverage_pixels": 143,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "knee": {
+          "pixels": 230,
+          "coverage_pixels": 209,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "full": {
+          "pixels": 303,
+          "coverage_pixels": 271,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        }
+      },
+      "cuffs": [
+        {
+          "variant": "knee",
+          "side": 0,
+          "y": 60,
+          "source_span": [
+            34,
+            40
+          ],
+          "new_span": [
+            33,
+            40
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "knee",
+          "side": 1,
+          "y": 56,
+          "source_span": [
+            42,
+            48
+          ],
+          "new_span": [
+            42,
+            49
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 0,
+          "y": 66,
+          "source_span": [
+            36,
+            40
+          ],
+          "new_span": [
+            35,
+            40
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 1,
+          "y": 61,
+          "source_span": [
+            42,
+            46
+          ],
+          "new_span": [
+            42,
+            47
+          ],
+          "centre_error_px": 0.5
+        }
+      ]
+    },
+    {
+      "frame": 9,
+      "garments": {
+        "tunic": {
+          "pixels": 502,
+          "coverage_pixels": 152,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "knee": {
+          "pixels": 237,
+          "coverage_pixels": 215,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "full": {
+          "pixels": 332,
+          "coverage_pixels": 297,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        }
+      },
+      "cuffs": [
+        {
+          "variant": "knee",
+          "side": 0,
+          "y": 59,
+          "source_span": [
+            34,
+            40
+          ],
+          "new_span": [
+            33,
+            40
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "knee",
+          "side": 1,
+          "y": 55,
+          "source_span": [
+            43,
+            50
+          ],
+          "new_span": [
+            43,
+            51
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 0,
+          "y": 65,
+          "source_span": [
+            36,
+            40
+          ],
+          "new_span": [
+            35,
+            40
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 1,
+          "y": 62,
+          "source_span": [
+            42,
+            47
+          ],
+          "new_span": [
+            42,
+            48
+          ],
+          "centre_error_px": 0.5
+        }
+      ]
+    },
+    {
+      "frame": 10,
+      "garments": {
+        "tunic": {
+          "pixels": 499,
+          "coverage_pixels": 148,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "knee": {
+          "pixels": 253,
+          "coverage_pixels": 229,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "full": {
+          "pixels": 351,
+          "coverage_pixels": 313,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        }
+      },
+      "cuffs": [
+        {
+          "variant": "knee",
+          "side": 0,
+          "y": 58,
+          "source_span": [
+            34,
+            40
+          ],
+          "new_span": [
+            33,
+            40
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "knee",
+          "side": 1,
+          "y": 56,
+          "source_span": [
+            43,
+            49
+          ],
+          "new_span": [
+            43,
+            50
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 0,
+          "y": 64,
+          "source_span": [
+            36,
+            40
+          ],
+          "new_span": [
+            35,
+            40
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 1,
+          "y": 64,
+          "source_span": [
+            42,
+            47
+          ],
+          "new_span": [
+            42,
+            48
+          ],
+          "centre_error_px": 0.5
+        }
+      ]
+    },
+    {
+      "frame": 11,
+      "garments": {
+        "tunic": {
+          "pixels": 494,
+          "coverage_pixels": 142,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "knee": {
+          "pixels": 245,
+          "coverage_pixels": 220,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "full": {
+          "pixels": 328,
+          "coverage_pixels": 291,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        }
+      },
+      "cuffs": [
+        {
+          "variant": "knee",
+          "side": 0,
+          "y": 56,
+          "source_span": [
+            34,
+            40
+          ],
+          "new_span": [
+            33,
+            40
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "knee",
+          "side": 1,
+          "y": 59,
+          "source_span": [
+            43,
+            49
+          ],
+          "new_span": [
+            43,
+            50
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 0,
+          "y": 62,
+          "source_span": [
+            36,
+            40
+          ],
+          "new_span": [
+            35,
+            40
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 1,
+          "y": 65,
+          "source_span": [
+            44,
+            48
+          ],
+          "new_span": [
+            44,
+            49
+          ],
+          "centre_error_px": 0.5
+        }
+      ]
+    },
+    {
+      "frame": 12,
+      "garments": {
+        "tunic": {
+          "pixels": 478,
+          "coverage_pixels": 142,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "knee": {
+          "pixels": 226,
+          "coverage_pixels": 207,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        },
+        "full": {
+          "pixels": 294,
+          "coverage_pixels": 265,
+          "unsupported_pixels": 0,
+          "protected_overlaps": 0,
+          "connected_parts": 1
+        }
+      },
+      "cuffs": [
+        {
+          "variant": "knee",
+          "side": 0,
+          "y": 57,
+          "source_span": [
+            34,
+            40
+          ],
+          "new_span": [
+            33,
+            40
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "knee",
+          "side": 1,
+          "y": 60,
+          "source_span": [
+            42,
+            48
+          ],
+          "new_span": [
+            42,
+            49
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 0,
+          "y": 61,
+          "source_span": [
+            36,
+            40
+          ],
+          "new_span": [
+            35,
+            40
+          ],
+          "centre_error_px": 0.5
+        },
+        {
+          "variant": "full",
+          "side": 1,
+          "y": 66,
+          "source_span": [
+            43,
+            47
+          ],
+          "new_span": [
+            43,
+            48
+          ],
+          "centre_error_px": 0.5
+        }
+      ]
+    }
+  ],
+  "owner_visual_acceptance": "pending",
+  "visual_review": "Every pose inspected individually in both variants with 4x overview and 8x details",
+  "preview_javascript_syntax": "passed: node --check",
+  "live_browser_interaction": "not run",
+  "runtime_integration": false
+}

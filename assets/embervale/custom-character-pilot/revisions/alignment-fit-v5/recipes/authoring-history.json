@@ -1,0 +1,39 @@
+{
+  "service": "PixelLab pixelart_workbench",
+  "final": {
+    "tunic": {
+      "drawing": "c232eb15-0064-4bf4-8c5a-e751c86b15bb",
+      "sheet": "ee9ca0f5-041e-4631-82d5-bbe12462bdb9",
+      "gallery": "470f423e-638a-4155-9d87-83c2631d9ae6"
+    },
+    "knee": {
+      "drawing": "73bad703-1481-4ea6-b320-a01373746885",
+      "sheet": "7e9a62c4-a7c0-44a5-8dac-48683886a24c",
+      "gallery": "5fcd71ea-ae06-488f-a31d-6dddde3c104a"
+    },
+    "full": {
+      "drawing": "7e11e473-0a71-43f4-8000-ca92cdb82a57",
+      "sheet": "38cd8997-4e90-46b0-b14a-776c989ba76a",
+      "gallery": "18dd1e7d-1903-499d-aba8-450cf371c802"
+    }
+  },
+  "initial_drawings": {
+    "tunic": "e7901f10-9305-43e1-85f5-86a13c4444d0",
+    "knee": "14786caa-96b7-4a15-94a9-66d6edc937d6",
+    "full": "f6f3c351-b97f-4143-8e28-18be4e542d25"
+  },
+  "initial_findings": [
+    "Excess torso ease beyond one lateral pixel",
+    "Disconnected forearm scraps from incorrect body labels",
+    "Over-simplified neckline and cloth shading"
+  ],
+  "corrections": [
+    "Bound all clothing to per-pose contours",
+    "Protect 29 reclassified forearm pixels",
+    "Restore authored neckline and fabric shading",
+    "Register cuffs to actual source row spans"
+  ],
+  "body_unchanged": true,
+  "new_body_or_animation_generations": 0,
+  "owner_visual_acceptance": "pending"
+}

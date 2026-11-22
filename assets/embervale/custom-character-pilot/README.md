@@ -6,7 +6,15 @@
 
 Start with the [custom character plan](../../../docs/embervale/05-game/CUSTOM_CHARACTERS.md), [improvement register](../../../docs/embervale/06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) and [production workflow](../../../docs/embervale/05-game/CUSTOM_CHARACTER_WORKFLOW.md).
 
-## Latest revision: garment coverage v4
+## Latest revision: clothing alignment v5
+
+The owner reports that v4 still does not align. [V5](revisions/alignment-fit-v5/README.md) rebuilds complete contours around every original pose, corrects forearm/leg labels and registers cuffs to actual limb cross-sections. Both pant lengths are retained. See the [diagnosis and evidence](../../../docs/embervale/06-development/GARMENT_ALIGNMENT_2026-11-22.md). Owner visual acceptance remains pending.
+
+![Source body, v4 and both revised choices](revisions/alignment-fit-v5/previews/before-after.png)
+
+[Moving comparison](revisions/alignment-fit-v5/previews/before-after-walk.gif) · [Twelve individual pixel-review boards](revisions/alignment-fit-v5/README.md#view-and-inspect) · [Interactive preview](revisions/alignment-fit-v5/character-workshop.html)
+
+## Earlier revision: garment coverage v4
 
 The owner identified remaining shoulder/leg skin and requested both pant lengths. [V4](revisions/coverage-fit-v4/README.md) supplies the repaired shared top plus knee-length and full-length pants on the unchanged body. Whole-area coverage replaces the earlier sparse fit checks; see the [findings and correction](../../../docs/embervale/06-development/GARMENT_COVERAGE_2026-11-22.md). Owner visual review remains open.
 

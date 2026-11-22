@@ -203,7 +203,7 @@ GAME-007 now implements the bounded narrative/quest continuity pass: names and r
 
 ### Custom characters, 22 November
 
-**Latest outfit candidate:** [Coverage-fit-v4](../06-development/GARMENT_COVERAGE_2026-11-22.md) corrects the owner-reported remaining shoulder/leg skin and adds both knee/full pant choices. It uses whole-area coverage and actual hand/thigh labels across twelve south poses. Owner visual review, world scale, broader facing/action coverage and game integration remain open.
+**Latest outfit candidate:** [Alignment-fit-v5](../06-development/GARMENT_ALIGNMENT_2026-11-22.md) responds to the owner's v4 alignment rejection. It registers top and both pant lengths to actual poses, corrects forearm labels and validates complete silhouettes/cuffs plus every source/master pixel. Individual frame-review boards retained; owner acceptance, world scale, wider coverage and game integration remain open.
 
 **Garment follow-up:** The owner reports that the first tunic does not fit. [V2](../06-development/TUNIC_FIT_2026-11-22.md) now uses pose-specific shoulders/sleeves/neckline/hips and cloth shading; all twelve current south fit/hand checks pass. ART-007 is in progress, with owner visual acceptance and the wider coverage still open.
 

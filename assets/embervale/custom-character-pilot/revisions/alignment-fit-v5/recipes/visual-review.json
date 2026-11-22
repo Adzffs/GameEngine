@@ -1,0 +1,116 @@
+{
+  "reviewer": "assistant",
+  "method": "Individual source/v4/knee/full boards at 4x with 8x shoulder/hip/cuff details",
+  "frames": [
+    {
+      "frame": 1,
+      "board": "../previews/frames/frame-01.png",
+      "variants": [
+        "knee",
+        "full"
+      ],
+      "observation": "Idle rest: shoulders, neckline, both wrist gaps and source ankle spans align."
+    },
+    {
+      "frame": 2,
+      "board": "../previews/frames/frame-02.png",
+      "variants": [
+        "knee",
+        "full"
+      ],
+      "observation": "Idle rise: collar and hem follow the one-pixel body rise; wrist scraps removed."
+    },
+    {
+      "frame": 3,
+      "board": "../previews/frames/frame-03.png",
+      "variants": [
+        "knee",
+        "full"
+      ],
+      "observation": "Idle variation: right wrist remains skin; source foot/ankle edges retained."
+    },
+    {
+      "frame": 4,
+      "board": "../previews/frames/frame-04.png",
+      "variants": [
+        "knee",
+        "full"
+      ],
+      "observation": "Idle lowered pose: outward hands stay clear of the hem and trouser edges."
+    },
+    {
+      "frame": 5,
+      "board": "../previews/frames/frame-05.png",
+      "variants": [
+        "knee",
+        "full"
+      ],
+      "observation": "Walk 1: raised screen-left leg and longer screen-right leg have independent contours and cuffs."
+    },
+    {
+      "frame": 6,
+      "board": "../previews/frames/frame-06.png",
+      "variants": [
+        "knee",
+        "full"
+      ],
+      "observation": "Walk 2: crossed stride retains body leg separation and both source ankle spans."
+    },
+    {
+      "frame": 7,
+      "board": "../previews/frames/frame-07.png",
+      "variants": [
+        "knee",
+        "full"
+      ],
+      "observation": "Walk 3: screen-left planted leg and bent screen-right leg remain distinct beneath the hem."
+    },
+    {
+      "frame": 8,
+      "board": "../previews/frames/frame-08.png",
+      "variants": [
+        "knee",
+        "full"
+      ],
+      "observation": "Walk 4: forward screen-left leg and shorter rear leg retain their individual cuffs."
+    },
+    {
+      "frame": 9,
+      "board": "../previews/frames/frame-09.png",
+      "variants": [
+        "knee",
+        "full"
+      ],
+      "observation": "Walk 5: right hand beside the thigh stays bare; knee and ankle follow their source rows."
+    },
+    {
+      "frame": 10,
+      "board": "../previews/frames/frame-10.png",
+      "variants": [
+        "knee",
+        "full"
+      ],
+      "observation": "Walk 6: close wrist/hip boundary remains clear; both bent leg contours align."
+    },
+    {
+      "frame": 11,
+      "board": "../previews/frames/frame-11.png",
+      "variants": [
+        "knee",
+        "full"
+      ],
+      "observation": "Walk 7: lifted screen-left foot and longer screen-right leg retain separate cuffs; forearm strip removed."
+    },
+    {
+      "frame": 12,
+      "board": "../previews/frames/frame-12.png",
+      "variants": [
+        "knee",
+        "full"
+      ],
+      "observation": "Walk 8: left hand beside hem stays clear; shortened left leg and leading right ankle follow the original pose."
+    }
+  ],
+  "owner_visual_acceptance": "pending",
+  "native_game_review": false
+}

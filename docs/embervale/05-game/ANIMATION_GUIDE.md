@@ -12,7 +12,7 @@ Read this before animating. The [research and measured findings](../06-developme
 
 ## Start an animation task
 
-**Garment coverage:** Declare the complete source-body areas a layer must cover, plus protected face/neck, hands/forearms and feet. Check every pixel in those areas and inspect enlarged shoulder/thigh edges as well as full-body motion. Sparse fit points can pass while edges remain exposed; broad hand rectangles can incorrectly exempt leg pixels. The [22 November correction](../06-development/GARMENT_COVERAGE_2026-11-22.md) records that failure and the revised checks for both pant lengths.
+**Garment alignment and coverage:** Register complete contours and cuff cross-sections to the actual source pose; verify protected body labels and inter-leg spaces, reject detached scraps and retain every-frame evidence at integer zoom. Check every exported pixel against the editable master. The [22 November alignment correction](../06-development/GARMENT_ALIGNMENT_2026-11-22.md) records why whole-area coverage alone still passed misaligned garments and mislabelled forearms. Owner visual acceptance remains separate from automated checks.
 
 1. Read this guide, the dated research, the current art guide and the relevant action's source and tests.
 2. Record the actual checkout commit. Compare current code with the dated report before reusing its helper names or numbers.

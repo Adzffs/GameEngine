@@ -1,0 +1,124 @@
+{
+  "schema": "embervale.character-garment-revision",
+  "version": 1,
+  "id": "alignment-fit-v5",
+  "date": "2026-11-22",
+  "status": "revised authoring candidate; owner visual acceptance pending",
+  "owner_feedback": "V4 still did not align; inspect every pixel and frame",
+  "body": "../../v1/layers/body-south.png",
+  "tunic": "exports/tunic-south.png",
+  "pants_variants": {
+    "knee": {
+      "layer": "exports/trousers-knee-south.png",
+      "outfit": "exports/outfit-knee-south.png",
+      "dressed": "exports/dressed-knee-south.png",
+      "recipe": "recipes/knee.json"
+    },
+    "full": {
+      "layer": "exports/trousers-full-south.png",
+      "outfit": "exports/outfit-full-south.png",
+      "dressed": "exports/dressed-full-south.png",
+      "recipe": "recipes/full.json"
+    }
+  },
+  "tunic_recipe": "recipes/tunic.json",
+  "pose_registration": "recipes/pose-registration.json",
+  "cell_size": [
+    80,
+    80
+  ],
+  "source_cell_size": [
+    84,
+    84
+  ],
+  "source_to_export_offset": [
+    -2,
+    -2
+  ],
+  "ground_pivot": [
+    40,
+    70
+  ],
+  "coverage": {
+    "idle": [
+      "south"
+    ],
+    "walk": [
+      "south"
+    ]
+  },
+  "clips": {
+    "idle": {
+      "columns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "durations_ms": [
+        400,
+        400,
+        400,
+        400
+      ]
+    },
+    "walk": {
+      "columns": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "durations_ms": [
+        80,
+        70,
+        80,
+        70,
+        80,
+        70,
+        80,
+        70
+      ]
+    }
+  },
+  "draw_order": [
+    "body",
+    "chosen_pants",
+    "tunic"
+  ],
+  "pixel_art_service": {
+    "name": "PixelLab pixelart_workbench",
+    "sources": {
+      "tunic": {
+        "drawing": "c232eb15-0064-4bf4-8c5a-e751c86b15bb",
+        "sheet": "ee9ca0f5-041e-4631-82d5-bbe12462bdb9",
+        "gallery": "470f423e-638a-4155-9d87-83c2631d9ae6"
+      },
+      "knee": {
+        "drawing": "73bad703-1481-4ea6-b320-a01373746885",
+        "sheet": "7e9a62c4-a7c0-44a5-8dac-48683886a24c",
+        "gallery": "5fcd71ea-ae06-488f-a31d-6dddde3c104a"
+      },
+      "full": {
+        "drawing": "7e11e473-0a71-43f4-8000-ca92cdb82a57",
+        "sheet": "38cd8997-4e90-46b0-b14a-776c989ba76a",
+        "gallery": "18dd1e7d-1903-499d-aba8-450cf371c802"
+      }
+    }
+  },
+  "runtime_registered": false,
+  "new_body_or_animation_generations": 0,
+  "source_body_changed": false,
+  "preserved_revisions": [
+    "v1",
+    "tunic-fit-v2",
+    "trouser-fit-v3",
+    "coverage-fit-v4"
+  ],
+  "overview_zoom": 4,
+  "detail_zoom": 8
+}
