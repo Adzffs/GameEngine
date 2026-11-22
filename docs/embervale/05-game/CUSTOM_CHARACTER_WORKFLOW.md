@@ -1,5 +1,7 @@
 # Custom character production workflow
 
+**Trouser-fit lesson, 22 November:** Use separate hip, crotch, leg-bend and cuff landmarks for each pose, with cloth shading independent of anatomy. Review the pelvis with the tunic hidden and check hand clearance at the hips. The [v3 correction](../06-development/TROUSER_FIT_2026-11-22.md) pairs new trousers with the unchanged v2 tunic; its initial hand overlaps were corrected before publication. Preserve both earlier revisions.
+
 **Tunic-fit lesson, 22 November:** The owner rejected the v1 tunic fit. The [v2 correction](../06-development/TUNIC_FIT_2026-11-22.md) uses actual per-pose shoulder/neck/sleeve/hip landmarks and independent cloth shading. Its coverage and protected-hand checks reject the old tunic in all twelve poses. A waistband-derived skin recolour and an inside-body-alpha pass are insufficient garment acceptance. Use the [revised source/recipe](../../../assets/embervale/custom-character-pilot/revisions/tunic-fit-v2/README.md); preserve v1 and retain owner review as pending.
 
 **Updated:** 22 November 2026.  

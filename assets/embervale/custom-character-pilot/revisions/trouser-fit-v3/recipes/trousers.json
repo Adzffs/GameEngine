@@ -1,0 +1,4991 @@
+{
+  "job": {
+    "canvas": [
+      84,
+      84
+    ],
+    "frame_count": 12,
+    "durations_ms": [
+      400,
+      400,
+      400,
+      400,
+      80,
+      70,
+      80,
+      70,
+      80,
+      70,
+      80,
+      70
+    ],
+    "views": [
+      {
+        "id": "south",
+        "offset": [
+          0,
+          0
+        ]
+      }
+    ],
+    "source_bookends_exact": false,
+    "body_palette_exact": false,
+    "body_prefix": "Trousers",
+    "require_clear_border": true
+  },
+  "scene": {
+    "palette": {
+      "ink": "#241d23",
+      "deep": "#352a2a",
+      "shadow": "#49382f",
+      "cloth": "#624a38",
+      "light": "#7c6247",
+      "seam": "#97805a"
+    },
+    "layers": [
+      {
+        "id": "trousers",
+        "name": "Trousers - cloth"
+      }
+    ],
+    "views": {
+      "south": {
+        "nodes": {
+          "trousers": {
+            "layer": "trousers",
+            "at": [
+              0,
+              0
+            ],
+            "draw": [
+              {
+                "op": "polygon",
+                "points": [
+                  [
+                    34,
+                    42
+                  ],
+                  [
+                    50,
+                    42
+                  ],
+                  [
+                    51,
+                    48
+                  ],
+                  [
+                    51,
+                    50
+                  ],
+                  [
+                    43,
+                    51
+                  ],
+                  [
+                    42,
+                    50
+                  ],
+                  [
+                    41,
+                    51
+                  ],
+                  [
+                    33,
+                    50
+                  ],
+                  [
+                    33,
+                    48
+                  ]
+                ],
+                "color": "cloth",
+                "outline": "ink",
+                "stroke_width": 1
+              },
+              {
+                "op": "polygon",
+                "points": [
+                  [
+                    33,
+                    48
+                  ],
+                  [
+                    41,
+                    50
+                  ],
+                  [
+                    40,
+                    53
+                  ],
+                  [
+                    40,
+                    57
+                  ],
+                  [
+                    32,
+                    57
+                  ],
+                  [
+                    33,
+                    53
+                  ]
+                ],
+                "color": "cloth",
+                "outline": "ink",
+                "stroke_width": 1
+              },
+              {
+                "op": "polygon",
+                "points": [
+                  [
+                    43,
+                    50
+                  ],
+                  [
+                    51,
+                    48
+                  ],
+                  [
+                    51,
+                    53
+                  ],
+                  [
+                    51,
+                    57
+                  ],
+                  [
+                    43,
+                    57
+                  ],
+                  [
+                    43,
+                    53
+                  ]
+                ],
+                "color": "cloth",
+                "outline": "ink",
+                "stroke_width": 1
+              },
+              {
+                "op": "polygon",
+                "points": [
+                  [
+                    40,
+                    48
+                  ],
+                  [
+                    41,
+                    51
+                  ],
+                  [
+                    39,
+                    53
+                  ],
+                  [
+                    39,
+                    56
+                  ],
+                  [
+                    37,
+                    56
+                  ],
+                  [
+                    37,
+                    53
+                  ]
+                ],
+                "color": "shadow"
+              },
+              {
+                "op": "polygon",
+                "points": [
+                  [
+                    49,
+                    48
+                  ],
+                  [
+                    50,
+                    49
+                  ],
+                  [
+                    50,
+                    53
+                  ],
+                  [
+                    50,
+                    56
+                  ],
+                  [
+                    48,
+                    56
+                  ],
+                  [
+                    48,
+                    53
+                  ]
+                ],
+                "color": "shadow"
+              },
+              {
+                "op": "polygon",
+                "points": [
+                  [
+                    34,
+                    48
+                  ],
+                  [
+                    36,
+                    48
+                  ],
+                  [
+                    36,
+                    53
+                  ],
+                  [
+                    35,
+                    55
+                  ],
+                  [
+                    33,
+                    55
+                  ],
+                  [
+                    34,
+                    53
+                  ]
+                ],
+                "color": "light"
+              },
+              {
+                "op": "polygon",
+                "points": [
+                  [
+                    44,
+                    51
+                  ],
+                  [
+                    46,
+                    51
+                  ],
+                  [
+                    46,
+                    53
+                  ],
+                  [
+                    46,
+                    55
+                  ],
+                  [
+                    44,
+                    55
+                  ],
+                  [
+                    44,
+                    53
+                  ]
+                ],
+                "color": "light"
+              },
+              {
+                "op": "brush",
+                "points": [
+                  [
+                    35,
+                    43
+                  ],
+                  [
+                    49,
+                    43
+                  ]
+                ],
+                "color": "shadow",
+                "size": 1,
+                "shape": "square",
+                "pixel_perfect": true
+              },
+              {
+                "op": "brush",
+                "points": [
+                  [
+                    42,
+                    44
+                  ],
+                  [
+                    42,
+                    50
+                  ]
+                ],
+                "color": "shadow",
+                "size": 1,
+                "shape": "square",
+                "pixel_perfect": true
+              },
+              {
+                "op": "brush",
+                "points": [
+                  [
+                    36,
+                    45
+                  ],
+                  [
+                    36,
+                    47
+                  ],
+                  [
+                    38,
+                    48
+                  ]
+                ],
+                "color": "shadow",
+                "size": 1,
+                "shape": "square",
+                "pixel_perfect": true
+              },
+              {
+                "op": "brush",
+                "points": [
+                  [
+                    48,
+                    45
+                  ],
+                  [
+                    48,
+                    47
+                  ],
+                  [
+                    46,
+                    48
+                  ]
+                ],
+                "color": "shadow",
+                "size": 1,
+                "shape": "square",
+                "pixel_perfect": true
+              },
+              {
+                "op": "brush",
+                "points": [
+                  [
+                    33,
+                    56
+                  ],
+                  [
+                    39,
+                    56
+                  ]
+                ],
+                "color": "seam",
+                "size": 1,
+                "shape": "square",
+                "pixel_perfect": true
+              },
+              {
+                "op": "brush",
+                "points": [
+                  [
+                    44,
+                    56
+                  ],
+                  [
+                    50,
+                    56
+                  ]
+                ],
+                "color": "light",
+                "size": 1,
+                "shape": "square",
+                "pixel_perfect": true
+              },
+              {
+                "op": "brush",
+                "points": [
+                  [
+                    32,
+                    57
+                  ],
+                  [
+                    40,
+                    57
+                  ]
+                ],
+                "color": "ink",
+                "size": 1,
+                "shape": "square",
+                "pixel_perfect": true
+              },
+              {
+                "op": "brush",
+                "points": [
+                  [
+                    43,
+                    57
+                  ],
+                  [
+                    51,
+                    57
+                  ]
+                ],
+                "color": "ink",
+                "size": 1,
+                "shape": "square",
+                "pixel_perfect": true
+              }
+            ]
+          }
+        },
+        "poses": {
+          "p01": {
+            "trousers": {
+              "draw": [
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      34,
+                      42
+                    ],
+                    [
+                      50,
+                      42
+                    ],
+                    [
+                      51,
+                      48
+                    ],
+                    [
+                      51,
+                      50
+                    ],
+                    [
+                      43,
+                      51
+                    ],
+                    [
+                      42,
+                      50
+                    ],
+                    [
+                      41,
+                      51
+                    ],
+                    [
+                      33,
+                      50
+                    ],
+                    [
+                      33,
+                      48
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      33,
+                      48
+                    ],
+                    [
+                      41,
+                      50
+                    ],
+                    [
+                      40,
+                      53
+                    ],
+                    [
+                      40,
+                      57
+                    ],
+                    [
+                      32,
+                      57
+                    ],
+                    [
+                      33,
+                      53
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      43,
+                      50
+                    ],
+                    [
+                      51,
+                      48
+                    ],
+                    [
+                      51,
+                      53
+                    ],
+                    [
+                      51,
+                      57
+                    ],
+                    [
+                      43,
+                      57
+                    ],
+                    [
+                      43,
+                      53
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      40,
+                      48
+                    ],
+                    [
+                      41,
+                      51
+                    ],
+                    [
+                      39,
+                      53
+                    ],
+                    [
+                      39,
+                      56
+                    ],
+                    [
+                      37,
+                      56
+                    ],
+                    [
+                      37,
+                      53
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      49,
+                      48
+                    ],
+                    [
+                      50,
+                      49
+                    ],
+                    [
+                      50,
+                      53
+                    ],
+                    [
+                      50,
+                      56
+                    ],
+                    [
+                      48,
+                      56
+                    ],
+                    [
+                      48,
+                      53
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      34,
+                      48
+                    ],
+                    [
+                      36,
+                      48
+                    ],
+                    [
+                      36,
+                      53
+                    ],
+                    [
+                      35,
+                      55
+                    ],
+                    [
+                      33,
+                      55
+                    ],
+                    [
+                      34,
+                      53
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      44,
+                      51
+                    ],
+                    [
+                      46,
+                      51
+                    ],
+                    [
+                      46,
+                      53
+                    ],
+                    [
+                      46,
+                      55
+                    ],
+                    [
+                      44,
+                      55
+                    ],
+                    [
+                      44,
+                      53
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      35,
+                      43
+                    ],
+                    [
+                      49,
+                      43
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      42,
+                      44
+                    ],
+                    [
+                      42,
+                      50
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      36,
+                      45
+                    ],
+                    [
+                      36,
+                      47
+                    ],
+                    [
+                      38,
+                      48
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      48,
+                      45
+                    ],
+                    [
+                      48,
+                      47
+                    ],
+                    [
+                      46,
+                      48
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      33,
+                      56
+                    ],
+                    [
+                      39,
+                      56
+                    ]
+                  ],
+                  "color": "seam",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      44,
+                      56
+                    ],
+                    [
+                      50,
+                      56
+                    ]
+                  ],
+                  "color": "light",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      32,
+                      57
+                    ],
+                    [
+                      40,
+                      57
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      43,
+                      57
+                    ],
+                    [
+                      51,
+                      57
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                }
+              ]
+            }
+          },
+          "p02": {
+            "trousers": {
+              "draw": [
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      34,
+                      41
+                    ],
+                    [
+                      50,
+                      41
+                    ],
+                    [
+                      51,
+                      47
+                    ],
+                    [
+                      51,
+                      49
+                    ],
+                    [
+                      43,
+                      50
+                    ],
+                    [
+                      42,
+                      49
+                    ],
+                    [
+                      41,
+                      50
+                    ],
+                    [
+                      33,
+                      49
+                    ],
+                    [
+                      33,
+                      47
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      33,
+                      47
+                    ],
+                    [
+                      41,
+                      49
+                    ],
+                    [
+                      40,
+                      53
+                    ],
+                    [
+                      40,
+                      57
+                    ],
+                    [
+                      32,
+                      57
+                    ],
+                    [
+                      33,
+                      53
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      43,
+                      49
+                    ],
+                    [
+                      51,
+                      47
+                    ],
+                    [
+                      51,
+                      53
+                    ],
+                    [
+                      51,
+                      57
+                    ],
+                    [
+                      43,
+                      57
+                    ],
+                    [
+                      43,
+                      53
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      40,
+                      47
+                    ],
+                    [
+                      41,
+                      50
+                    ],
+                    [
+                      39,
+                      53
+                    ],
+                    [
+                      39,
+                      56
+                    ],
+                    [
+                      37,
+                      56
+                    ],
+                    [
+                      37,
+                      53
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      49,
+                      47
+                    ],
+                    [
+                      50,
+                      48
+                    ],
+                    [
+                      50,
+                      53
+                    ],
+                    [
+                      50,
+                      56
+                    ],
+                    [
+                      48,
+                      56
+                    ],
+                    [
+                      48,
+                      53
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      34,
+                      47
+                    ],
+                    [
+                      36,
+                      47
+                    ],
+                    [
+                      36,
+                      53
+                    ],
+                    [
+                      35,
+                      55
+                    ],
+                    [
+                      33,
+                      55
+                    ],
+                    [
+                      34,
+                      53
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      44,
+                      50
+                    ],
+                    [
+                      46,
+                      50
+                    ],
+                    [
+                      46,
+                      53
+                    ],
+                    [
+                      46,
+                      55
+                    ],
+                    [
+                      44,
+                      55
+                    ],
+                    [
+                      44,
+                      53
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      35,
+                      42
+                    ],
+                    [
+                      49,
+                      42
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      42,
+                      43
+                    ],
+                    [
+                      42,
+                      49
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      36,
+                      44
+                    ],
+                    [
+                      36,
+                      46
+                    ],
+                    [
+                      38,
+                      47
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      48,
+                      44
+                    ],
+                    [
+                      48,
+                      46
+                    ],
+                    [
+                      46,
+                      47
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      33,
+                      56
+                    ],
+                    [
+                      39,
+                      56
+                    ]
+                  ],
+                  "color": "seam",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      44,
+                      56
+                    ],
+                    [
+                      50,
+                      56
+                    ]
+                  ],
+                  "color": "light",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      32,
+                      57
+                    ],
+                    [
+                      40,
+                      57
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      43,
+                      57
+                    ],
+                    [
+                      51,
+                      57
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                }
+              ]
+            }
+          },
+          "p03": {
+            "trousers": {
+              "draw": [
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      34,
+                      41
+                    ],
+                    [
+                      50,
+                      41
+                    ],
+                    [
+                      51,
+                      47
+                    ],
+                    [
+                      51,
+                      49
+                    ],
+                    [
+                      43,
+                      50
+                    ],
+                    [
+                      42,
+                      49
+                    ],
+                    [
+                      41,
+                      50
+                    ],
+                    [
+                      33,
+                      49
+                    ],
+                    [
+                      33,
+                      47
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      33,
+                      47
+                    ],
+                    [
+                      41,
+                      49
+                    ],
+                    [
+                      40,
+                      53
+                    ],
+                    [
+                      40,
+                      57
+                    ],
+                    [
+                      32,
+                      57
+                    ],
+                    [
+                      33,
+                      53
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      43,
+                      49
+                    ],
+                    [
+                      51,
+                      47
+                    ],
+                    [
+                      51,
+                      53
+                    ],
+                    [
+                      51,
+                      57
+                    ],
+                    [
+                      43,
+                      57
+                    ],
+                    [
+                      43,
+                      53
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      40,
+                      47
+                    ],
+                    [
+                      41,
+                      50
+                    ],
+                    [
+                      39,
+                      53
+                    ],
+                    [
+                      39,
+                      56
+                    ],
+                    [
+                      37,
+                      56
+                    ],
+                    [
+                      37,
+                      53
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      49,
+                      47
+                    ],
+                    [
+                      50,
+                      48
+                    ],
+                    [
+                      50,
+                      53
+                    ],
+                    [
+                      50,
+                      56
+                    ],
+                    [
+                      48,
+                      56
+                    ],
+                    [
+                      48,
+                      53
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      34,
+                      47
+                    ],
+                    [
+                      36,
+                      47
+                    ],
+                    [
+                      36,
+                      53
+                    ],
+                    [
+                      35,
+                      55
+                    ],
+                    [
+                      33,
+                      55
+                    ],
+                    [
+                      34,
+                      53
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      44,
+                      50
+                    ],
+                    [
+                      46,
+                      50
+                    ],
+                    [
+                      46,
+                      53
+                    ],
+                    [
+                      46,
+                      55
+                    ],
+                    [
+                      44,
+                      55
+                    ],
+                    [
+                      44,
+                      53
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      35,
+                      42
+                    ],
+                    [
+                      49,
+                      42
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      42,
+                      43
+                    ],
+                    [
+                      42,
+                      49
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      36,
+                      44
+                    ],
+                    [
+                      36,
+                      46
+                    ],
+                    [
+                      38,
+                      47
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      48,
+                      44
+                    ],
+                    [
+                      48,
+                      46
+                    ],
+                    [
+                      46,
+                      47
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      33,
+                      56
+                    ],
+                    [
+                      39,
+                      56
+                    ]
+                  ],
+                  "color": "seam",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      44,
+                      56
+                    ],
+                    [
+                      50,
+                      56
+                    ]
+                  ],
+                  "color": "light",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      32,
+                      57
+                    ],
+                    [
+                      40,
+                      57
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      43,
+                      57
+                    ],
+                    [
+                      51,
+                      57
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                }
+              ]
+            }
+          },
+          "p04": {
+            "trousers": {
+              "draw": [
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      34,
+                      42
+                    ],
+                    [
+                      50,
+                      42
+                    ],
+                    [
+                      51,
+                      48
+                    ],
+                    [
+                      51,
+                      50
+                    ],
+                    [
+                      43,
+                      51
+                    ],
+                    [
+                      42,
+                      50
+                    ],
+                    [
+                      41,
+                      51
+                    ],
+                    [
+                      33,
+                      50
+                    ],
+                    [
+                      33,
+                      48
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      33,
+                      48
+                    ],
+                    [
+                      41,
+                      50
+                    ],
+                    [
+                      40,
+                      53
+                    ],
+                    [
+                      40,
+                      57
+                    ],
+                    [
+                      32,
+                      57
+                    ],
+                    [
+                      33,
+                      53
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      43,
+                      50
+                    ],
+                    [
+                      51,
+                      48
+                    ],
+                    [
+                      51,
+                      53
+                    ],
+                    [
+                      51,
+                      57
+                    ],
+                    [
+                      43,
+                      57
+                    ],
+                    [
+                      43,
+                      53
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      40,
+                      48
+                    ],
+                    [
+                      41,
+                      51
+                    ],
+                    [
+                      39,
+                      53
+                    ],
+                    [
+                      39,
+                      56
+                    ],
+                    [
+                      37,
+                      56
+                    ],
+                    [
+                      37,
+                      53
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      49,
+                      48
+                    ],
+                    [
+                      50,
+                      49
+                    ],
+                    [
+                      50,
+                      53
+                    ],
+                    [
+                      50,
+                      56
+                    ],
+                    [
+                      48,
+                      56
+                    ],
+                    [
+                      48,
+                      53
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      34,
+                      48
+                    ],
+                    [
+                      36,
+                      48
+                    ],
+                    [
+                      36,
+                      53
+                    ],
+                    [
+                      35,
+                      55
+                    ],
+                    [
+                      33,
+                      55
+                    ],
+                    [
+                      34,
+                      53
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      44,
+                      51
+                    ],
+                    [
+                      46,
+                      51
+                    ],
+                    [
+                      46,
+                      53
+                    ],
+                    [
+                      46,
+                      55
+                    ],
+                    [
+                      44,
+                      55
+                    ],
+                    [
+                      44,
+                      53
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      35,
+                      43
+                    ],
+                    [
+                      49,
+                      43
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      42,
+                      44
+                    ],
+                    [
+                      42,
+                      50
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      36,
+                      45
+                    ],
+                    [
+                      36,
+                      47
+                    ],
+                    [
+                      38,
+                      48
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      48,
+                      45
+                    ],
+                    [
+                      48,
+                      47
+                    ],
+                    [
+                      46,
+                      48
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      33,
+                      56
+                    ],
+                    [
+                      39,
+                      56
+                    ]
+                  ],
+                  "color": "seam",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      44,
+                      56
+                    ],
+                    [
+                      50,
+                      56
+                    ]
+                  ],
+                  "color": "light",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      32,
+                      57
+                    ],
+                    [
+                      40,
+                      57
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      43,
+                      57
+                    ],
+                    [
+                      51,
+                      57
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                }
+              ]
+            }
+          },
+          "p05": {
+            "trousers": {
+              "draw": [
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      35,
+                      44
+                    ],
+                    [
+                      50,
+                      44
+                    ],
+                    [
+                      52,
+                      49
+                    ],
+                    [
+                      52,
+                      51
+                    ],
+                    [
+                      43,
+                      52
+                    ],
+                    [
+                      42,
+                      51
+                    ],
+                    [
+                      41,
+                      52
+                    ],
+                    [
+                      34,
+                      51
+                    ],
+                    [
+                      34,
+                      49
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      34,
+                      49
+                    ],
+                    [
+                      41,
+                      51
+                    ],
+                    [
+                      40,
+                      53
+                    ],
+                    [
+                      40,
+                      57
+                    ],
+                    [
+                      33,
+                      57
+                    ],
+                    [
+                      34,
+                      53
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      43,
+                      51
+                    ],
+                    [
+                      52,
+                      49
+                    ],
+                    [
+                      51,
+                      54
+                    ],
+                    [
+                      50,
+                      59
+                    ],
+                    [
+                      42,
+                      59
+                    ],
+                    [
+                      43,
+                      54
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      40,
+                      49
+                    ],
+                    [
+                      41,
+                      52
+                    ],
+                    [
+                      39,
+                      53
+                    ],
+                    [
+                      39,
+                      56
+                    ],
+                    [
+                      37,
+                      56
+                    ],
+                    [
+                      37,
+                      53
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      50,
+                      49
+                    ],
+                    [
+                      51,
+                      50
+                    ],
+                    [
+                      50,
+                      54
+                    ],
+                    [
+                      49,
+                      58
+                    ],
+                    [
+                      47,
+                      58
+                    ],
+                    [
+                      48,
+                      54
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      35,
+                      49
+                    ],
+                    [
+                      37,
+                      49
+                    ],
+                    [
+                      37,
+                      53
+                    ],
+                    [
+                      36,
+                      55
+                    ],
+                    [
+                      34,
+                      55
+                    ],
+                    [
+                      35,
+                      53
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      44,
+                      52
+                    ],
+                    [
+                      46,
+                      52
+                    ],
+                    [
+                      46,
+                      54
+                    ],
+                    [
+                      45,
+                      57
+                    ],
+                    [
+                      43,
+                      57
+                    ],
+                    [
+                      44,
+                      54
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      36,
+                      45
+                    ],
+                    [
+                      49,
+                      45
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      42,
+                      46
+                    ],
+                    [
+                      42,
+                      51
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      37,
+                      47
+                    ],
+                    [
+                      37,
+                      49
+                    ],
+                    [
+                      39,
+                      50
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      48,
+                      47
+                    ],
+                    [
+                      48,
+                      49
+                    ],
+                    [
+                      46,
+                      50
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      34,
+                      56
+                    ],
+                    [
+                      39,
+                      56
+                    ]
+                  ],
+                  "color": "seam",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      43,
+                      58
+                    ],
+                    [
+                      49,
+                      58
+                    ]
+                  ],
+                  "color": "light",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      33,
+                      57
+                    ],
+                    [
+                      40,
+                      57
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      42,
+                      59
+                    ],
+                    [
+                      50,
+                      59
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                }
+              ]
+            }
+          },
+          "p06": {
+            "trousers": {
+              "draw": [
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      35,
+                      43
+                    ],
+                    [
+                      50,
+                      43
+                    ],
+                    [
+                      52,
+                      48
+                    ],
+                    [
+                      52,
+                      50
+                    ],
+                    [
+                      43,
+                      51
+                    ],
+                    [
+                      42,
+                      50
+                    ],
+                    [
+                      41,
+                      51
+                    ],
+                    [
+                      34,
+                      50
+                    ],
+                    [
+                      34,
+                      48
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      34,
+                      48
+                    ],
+                    [
+                      41,
+                      50
+                    ],
+                    [
+                      40,
+                      51
+                    ],
+                    [
+                      40,
+                      55
+                    ],
+                    [
+                      34,
+                      55
+                    ],
+                    [
+                      34,
+                      51
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      43,
+                      50
+                    ],
+                    [
+                      52,
+                      48
+                    ],
+                    [
+                      51,
+                      53
+                    ],
+                    [
+                      50,
+                      58
+                    ],
+                    [
+                      42,
+                      58
+                    ],
+                    [
+                      43,
+                      53
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      40,
+                      48
+                    ],
+                    [
+                      41,
+                      51
+                    ],
+                    [
+                      39,
+                      51
+                    ],
+                    [
+                      39,
+                      54
+                    ],
+                    [
+                      37,
+                      54
+                    ],
+                    [
+                      37,
+                      51
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      50,
+                      48
+                    ],
+                    [
+                      51,
+                      49
+                    ],
+                    [
+                      50,
+                      53
+                    ],
+                    [
+                      49,
+                      57
+                    ],
+                    [
+                      47,
+                      57
+                    ],
+                    [
+                      48,
+                      53
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      35,
+                      48
+                    ],
+                    [
+                      37,
+                      48
+                    ],
+                    [
+                      37,
+                      51
+                    ],
+                    [
+                      37,
+                      53
+                    ],
+                    [
+                      35,
+                      53
+                    ],
+                    [
+                      35,
+                      51
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      44,
+                      51
+                    ],
+                    [
+                      46,
+                      51
+                    ],
+                    [
+                      46,
+                      53
+                    ],
+                    [
+                      45,
+                      56
+                    ],
+                    [
+                      43,
+                      56
+                    ],
+                    [
+                      44,
+                      53
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      36,
+                      44
+                    ],
+                    [
+                      49,
+                      44
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      42,
+                      45
+                    ],
+                    [
+                      42,
+                      50
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      37,
+                      46
+                    ],
+                    [
+                      37,
+                      48
+                    ],
+                    [
+                      39,
+                      49
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      48,
+                      46
+                    ],
+                    [
+                      48,
+                      48
+                    ],
+                    [
+                      46,
+                      49
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      35,
+                      54
+                    ],
+                    [
+                      39,
+                      54
+                    ]
+                  ],
+                  "color": "seam",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      43,
+                      57
+                    ],
+                    [
+                      49,
+                      57
+                    ]
+                  ],
+                  "color": "light",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      34,
+                      55
+                    ],
+                    [
+                      40,
+                      55
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      42,
+                      58
+                    ],
+                    [
+                      50,
+                      58
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                }
+              ]
+            }
+          },
+          "p07": {
+            "trousers": {
+              "draw": [
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      34,
+                      44
+                    ],
+                    [
+                      49,
+                      44
+                    ],
+                    [
+                      50,
+                      49
+                    ],
+                    [
+                      50,
+                      51
+                    ],
+                    [
+                      43,
+                      52
+                    ],
+                    [
+                      42,
+                      51
+                    ],
+                    [
+                      41,
+                      52
+                    ],
+                    [
+                      33,
+                      51
+                    ],
+                    [
+                      33,
+                      49
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      33,
+                      49
+                    ],
+                    [
+                      41,
+                      51
+                    ],
+                    [
+                      41,
+                      55
+                    ],
+                    [
+                      40,
+                      59
+                    ],
+                    [
+                      33,
+                      59
+                    ],
+                    [
+                      33,
+                      55
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      43,
+                      51
+                    ],
+                    [
+                      50,
+                      49
+                    ],
+                    [
+                      50,
+                      53
+                    ],
+                    [
+                      49,
+                      57
+                    ],
+                    [
+                      42,
+                      57
+                    ],
+                    [
+                      43,
+                      53
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      40,
+                      49
+                    ],
+                    [
+                      41,
+                      52
+                    ],
+                    [
+                      40,
+                      55
+                    ],
+                    [
+                      39,
+                      58
+                    ],
+                    [
+                      37,
+                      58
+                    ],
+                    [
+                      38,
+                      55
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      48,
+                      49
+                    ],
+                    [
+                      49,
+                      50
+                    ],
+                    [
+                      49,
+                      53
+                    ],
+                    [
+                      48,
+                      56
+                    ],
+                    [
+                      46,
+                      56
+                    ],
+                    [
+                      47,
+                      53
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      34,
+                      49
+                    ],
+                    [
+                      36,
+                      49
+                    ],
+                    [
+                      36,
+                      55
+                    ],
+                    [
+                      36,
+                      57
+                    ],
+                    [
+                      34,
+                      57
+                    ],
+                    [
+                      34,
+                      55
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      44,
+                      52
+                    ],
+                    [
+                      46,
+                      52
+                    ],
+                    [
+                      46,
+                      53
+                    ],
+                    [
+                      45,
+                      55
+                    ],
+                    [
+                      43,
+                      55
+                    ],
+                    [
+                      44,
+                      53
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      35,
+                      45
+                    ],
+                    [
+                      48,
+                      45
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      42,
+                      46
+                    ],
+                    [
+                      42,
+                      51
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      36,
+                      47
+                    ],
+                    [
+                      36,
+                      49
+                    ],
+                    [
+                      38,
+                      50
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      47,
+                      47
+                    ],
+                    [
+                      47,
+                      49
+                    ],
+                    [
+                      45,
+                      50
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      34,
+                      58
+                    ],
+                    [
+                      39,
+                      58
+                    ]
+                  ],
+                  "color": "seam",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      43,
+                      56
+                    ],
+                    [
+                      48,
+                      56
+                    ]
+                  ],
+                  "color": "light",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      33,
+                      59
+                    ],
+                    [
+                      40,
+                      59
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      42,
+                      57
+                    ],
+                    [
+                      49,
+                      57
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                }
+              ]
+            }
+          },
+          "p08": {
+            "trousers": {
+              "draw": [
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      34,
+                      45
+                    ],
+                    [
+                      47,
+                      45
+                    ],
+                    [
+                      48,
+                      50
+                    ],
+                    [
+                      48,
+                      52
+                    ],
+                    [
+                      42,
+                      53
+                    ],
+                    [
+                      41,
+                      52
+                    ],
+                    [
+                      40,
+                      53
+                    ],
+                    [
+                      33,
+                      52
+                    ],
+                    [
+                      33,
+                      50
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      33,
+                      50
+                    ],
+                    [
+                      40,
+                      52
+                    ],
+                    [
+                      40,
+                      55
+                    ],
+                    [
+                      41,
+                      60
+                    ],
+                    [
+                      33,
+                      60
+                    ],
+                    [
+                      33,
+                      55
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      42,
+                      52
+                    ],
+                    [
+                      48,
+                      50
+                    ],
+                    [
+                      48,
+                      53
+                    ],
+                    [
+                      48,
+                      56
+                    ],
+                    [
+                      42,
+                      56
+                    ],
+                    [
+                      42,
+                      53
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      39,
+                      50
+                    ],
+                    [
+                      40,
+                      53
+                    ],
+                    [
+                      39,
+                      55
+                    ],
+                    [
+                      40,
+                      59
+                    ],
+                    [
+                      38,
+                      59
+                    ],
+                    [
+                      37,
+                      55
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      46,
+                      50
+                    ],
+                    [
+                      47,
+                      51
+                    ],
+                    [
+                      47,
+                      53
+                    ],
+                    [
+                      47,
+                      55
+                    ],
+                    [
+                      45,
+                      55
+                    ],
+                    [
+                      45,
+                      53
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      34,
+                      50
+                    ],
+                    [
+                      36,
+                      50
+                    ],
+                    [
+                      36,
+                      55
+                    ],
+                    [
+                      36,
+                      58
+                    ],
+                    [
+                      34,
+                      58
+                    ],
+                    [
+                      34,
+                      55
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      43,
+                      53
+                    ],
+                    [
+                      45,
+                      53
+                    ],
+                    [
+                      45,
+                      53
+                    ],
+                    [
+                      45,
+                      54
+                    ],
+                    [
+                      43,
+                      54
+                    ],
+                    [
+                      43,
+                      53
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      35,
+                      46
+                    ],
+                    [
+                      46,
+                      46
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      41,
+                      47
+                    ],
+                    [
+                      41,
+                      52
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      36,
+                      48
+                    ],
+                    [
+                      36,
+                      50
+                    ],
+                    [
+                      38,
+                      51
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      45,
+                      48
+                    ],
+                    [
+                      45,
+                      50
+                    ],
+                    [
+                      43,
+                      51
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      34,
+                      59
+                    ],
+                    [
+                      40,
+                      59
+                    ]
+                  ],
+                  "color": "seam",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      43,
+                      55
+                    ],
+                    [
+                      47,
+                      55
+                    ]
+                  ],
+                  "color": "light",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      33,
+                      60
+                    ],
+                    [
+                      41,
+                      60
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      42,
+                      56
+                    ],
+                    [
+                      48,
+                      56
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                }
+              ]
+            }
+          },
+          "p09": {
+            "trousers": {
+              "draw": [
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      33,
+                      44
+                    ],
+                    [
+                      47,
+                      44
+                    ],
+                    [
+                      49,
+                      49
+                    ],
+                    [
+                      49,
+                      51
+                    ],
+                    [
+                      42,
+                      52
+                    ],
+                    [
+                      41,
+                      51
+                    ],
+                    [
+                      40,
+                      52
+                    ],
+                    [
+                      32,
+                      51
+                    ],
+                    [
+                      32,
+                      49
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      32,
+                      49
+                    ],
+                    [
+                      40,
+                      51
+                    ],
+                    [
+                      40,
+                      55
+                    ],
+                    [
+                      41,
+                      59
+                    ],
+                    [
+                      33,
+                      59
+                    ],
+                    [
+                      32,
+                      55
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      42,
+                      51
+                    ],
+                    [
+                      49,
+                      49
+                    ],
+                    [
+                      49,
+                      52
+                    ],
+                    [
+                      49,
+                      55
+                    ],
+                    [
+                      43,
+                      55
+                    ],
+                    [
+                      43,
+                      52
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      39,
+                      49
+                    ],
+                    [
+                      40,
+                      52
+                    ],
+                    [
+                      39,
+                      55
+                    ],
+                    [
+                      40,
+                      58
+                    ],
+                    [
+                      38,
+                      58
+                    ],
+                    [
+                      37,
+                      55
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      47,
+                      49
+                    ],
+                    [
+                      48,
+                      50
+                    ],
+                    [
+                      48,
+                      52
+                    ],
+                    [
+                      48,
+                      54
+                    ],
+                    [
+                      46,
+                      54
+                    ],
+                    [
+                      46,
+                      52
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      33,
+                      49
+                    ],
+                    [
+                      35,
+                      49
+                    ],
+                    [
+                      35,
+                      55
+                    ],
+                    [
+                      36,
+                      57
+                    ],
+                    [
+                      34,
+                      57
+                    ],
+                    [
+                      33,
+                      55
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      43,
+                      52
+                    ],
+                    [
+                      45,
+                      52
+                    ],
+                    [
+                      46,
+                      52
+                    ],
+                    [
+                      46,
+                      53
+                    ],
+                    [
+                      44,
+                      53
+                    ],
+                    [
+                      44,
+                      52
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      34,
+                      45
+                    ],
+                    [
+                      46,
+                      45
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      41,
+                      46
+                    ],
+                    [
+                      41,
+                      51
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      35,
+                      47
+                    ],
+                    [
+                      35,
+                      49
+                    ],
+                    [
+                      37,
+                      50
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      45,
+                      47
+                    ],
+                    [
+                      45,
+                      49
+                    ],
+                    [
+                      43,
+                      50
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      34,
+                      58
+                    ],
+                    [
+                      40,
+                      58
+                    ]
+                  ],
+                  "color": "seam",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      44,
+                      54
+                    ],
+                    [
+                      48,
+                      54
+                    ]
+                  ],
+                  "color": "light",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      33,
+                      59
+                    ],
+                    [
+                      41,
+                      59
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      43,
+                      55
+                    ],
+                    [
+                      49,
+                      55
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                }
+              ]
+            }
+          },
+          "p10": {
+            "trousers": {
+              "draw": [
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      33,
+                      43
+                    ],
+                    [
+                      47,
+                      43
+                    ],
+                    [
+                      49,
+                      48
+                    ],
+                    [
+                      49,
+                      50
+                    ],
+                    [
+                      42,
+                      51
+                    ],
+                    [
+                      41,
+                      50
+                    ],
+                    [
+                      40,
+                      51
+                    ],
+                    [
+                      32,
+                      50
+                    ],
+                    [
+                      32,
+                      48
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      32,
+                      48
+                    ],
+                    [
+                      40,
+                      50
+                    ],
+                    [
+                      40,
+                      54
+                    ],
+                    [
+                      41,
+                      58
+                    ],
+                    [
+                      33,
+                      58
+                    ],
+                    [
+                      32,
+                      54
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      42,
+                      50
+                    ],
+                    [
+                      49,
+                      48
+                    ],
+                    [
+                      49,
+                      52
+                    ],
+                    [
+                      49,
+                      56
+                    ],
+                    [
+                      43,
+                      56
+                    ],
+                    [
+                      43,
+                      52
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      39,
+                      48
+                    ],
+                    [
+                      40,
+                      51
+                    ],
+                    [
+                      39,
+                      54
+                    ],
+                    [
+                      40,
+                      57
+                    ],
+                    [
+                      38,
+                      57
+                    ],
+                    [
+                      37,
+                      54
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      47,
+                      48
+                    ],
+                    [
+                      48,
+                      49
+                    ],
+                    [
+                      48,
+                      52
+                    ],
+                    [
+                      48,
+                      55
+                    ],
+                    [
+                      46,
+                      55
+                    ],
+                    [
+                      46,
+                      52
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      33,
+                      48
+                    ],
+                    [
+                      35,
+                      48
+                    ],
+                    [
+                      35,
+                      54
+                    ],
+                    [
+                      36,
+                      56
+                    ],
+                    [
+                      34,
+                      56
+                    ],
+                    [
+                      33,
+                      54
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      43,
+                      51
+                    ],
+                    [
+                      45,
+                      51
+                    ],
+                    [
+                      46,
+                      52
+                    ],
+                    [
+                      46,
+                      54
+                    ],
+                    [
+                      44,
+                      54
+                    ],
+                    [
+                      44,
+                      52
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      34,
+                      44
+                    ],
+                    [
+                      46,
+                      44
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      41,
+                      45
+                    ],
+                    [
+                      41,
+                      50
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      35,
+                      46
+                    ],
+                    [
+                      35,
+                      48
+                    ],
+                    [
+                      37,
+                      49
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      45,
+                      46
+                    ],
+                    [
+                      45,
+                      48
+                    ],
+                    [
+                      43,
+                      49
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      34,
+                      57
+                    ],
+                    [
+                      40,
+                      57
+                    ]
+                  ],
+                  "color": "seam",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      44,
+                      55
+                    ],
+                    [
+                      48,
+                      55
+                    ]
+                  ],
+                  "color": "light",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      33,
+                      58
+                    ],
+                    [
+                      41,
+                      58
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      43,
+                      56
+                    ],
+                    [
+                      49,
+                      56
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                }
+              ]
+            }
+          },
+          "p11": {
+            "trousers": {
+              "draw": [
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      34,
+                      44
+                    ],
+                    [
+                      49,
+                      44
+                    ],
+                    [
+                      50,
+                      49
+                    ],
+                    [
+                      50,
+                      51
+                    ],
+                    [
+                      43,
+                      52
+                    ],
+                    [
+                      42,
+                      51
+                    ],
+                    [
+                      41,
+                      52
+                    ],
+                    [
+                      33,
+                      51
+                    ],
+                    [
+                      33,
+                      49
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      33,
+                      49
+                    ],
+                    [
+                      41,
+                      51
+                    ],
+                    [
+                      42,
+                      53
+                    ],
+                    [
+                      42,
+                      56
+                    ],
+                    [
+                      34,
+                      56
+                    ],
+                    [
+                      34,
+                      53
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      43,
+                      51
+                    ],
+                    [
+                      50,
+                      49
+                    ],
+                    [
+                      50,
+                      54
+                    ],
+                    [
+                      50,
+                      59
+                    ],
+                    [
+                      43,
+                      59
+                    ],
+                    [
+                      43,
+                      54
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      40,
+                      49
+                    ],
+                    [
+                      41,
+                      52
+                    ],
+                    [
+                      41,
+                      53
+                    ],
+                    [
+                      41,
+                      55
+                    ],
+                    [
+                      39,
+                      55
+                    ],
+                    [
+                      39,
+                      53
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      48,
+                      49
+                    ],
+                    [
+                      49,
+                      50
+                    ],
+                    [
+                      49,
+                      54
+                    ],
+                    [
+                      49,
+                      58
+                    ],
+                    [
+                      47,
+                      58
+                    ],
+                    [
+                      47,
+                      54
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      34,
+                      49
+                    ],
+                    [
+                      36,
+                      49
+                    ],
+                    [
+                      37,
+                      53
+                    ],
+                    [
+                      37,
+                      54
+                    ],
+                    [
+                      35,
+                      54
+                    ],
+                    [
+                      35,
+                      53
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      44,
+                      52
+                    ],
+                    [
+                      46,
+                      52
+                    ],
+                    [
+                      46,
+                      54
+                    ],
+                    [
+                      46,
+                      57
+                    ],
+                    [
+                      44,
+                      57
+                    ],
+                    [
+                      44,
+                      54
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      35,
+                      45
+                    ],
+                    [
+                      48,
+                      45
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      42,
+                      46
+                    ],
+                    [
+                      42,
+                      51
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      36,
+                      47
+                    ],
+                    [
+                      36,
+                      49
+                    ],
+                    [
+                      38,
+                      50
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      47,
+                      47
+                    ],
+                    [
+                      47,
+                      49
+                    ],
+                    [
+                      45,
+                      50
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      35,
+                      55
+                    ],
+                    [
+                      41,
+                      55
+                    ]
+                  ],
+                  "color": "seam",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      44,
+                      58
+                    ],
+                    [
+                      49,
+                      58
+                    ]
+                  ],
+                  "color": "light",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      34,
+                      56
+                    ],
+                    [
+                      42,
+                      56
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      43,
+                      59
+                    ],
+                    [
+                      50,
+                      59
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                }
+              ]
+            }
+          },
+          "p12": {
+            "trousers": {
+              "draw": [
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      36,
+                      45
+                    ],
+                    [
+                      50,
+                      45
+                    ],
+                    [
+                      51,
+                      50
+                    ],
+                    [
+                      51,
+                      52
+                    ],
+                    [
+                      44,
+                      53
+                    ],
+                    [
+                      43,
+                      52
+                    ],
+                    [
+                      42,
+                      53
+                    ],
+                    [
+                      35,
+                      52
+                    ],
+                    [
+                      35,
+                      50
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      35,
+                      50
+                    ],
+                    [
+                      42,
+                      52
+                    ],
+                    [
+                      41,
+                      54
+                    ],
+                    [
+                      41,
+                      57
+                    ],
+                    [
+                      34,
+                      57
+                    ],
+                    [
+                      35,
+                      54
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      44,
+                      52
+                    ],
+                    [
+                      51,
+                      50
+                    ],
+                    [
+                      51,
+                      56
+                    ],
+                    [
+                      50,
+                      60
+                    ],
+                    [
+                      42,
+                      60
+                    ],
+                    [
+                      43,
+                      56
+                    ]
+                  ],
+                  "color": "cloth",
+                  "outline": "ink",
+                  "stroke_width": 1
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      41,
+                      50
+                    ],
+                    [
+                      42,
+                      53
+                    ],
+                    [
+                      40,
+                      54
+                    ],
+                    [
+                      40,
+                      56
+                    ],
+                    [
+                      38,
+                      56
+                    ],
+                    [
+                      38,
+                      54
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      49,
+                      50
+                    ],
+                    [
+                      50,
+                      51
+                    ],
+                    [
+                      50,
+                      56
+                    ],
+                    [
+                      49,
+                      59
+                    ],
+                    [
+                      47,
+                      59
+                    ],
+                    [
+                      48,
+                      56
+                    ]
+                  ],
+                  "color": "shadow"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      36,
+                      50
+                    ],
+                    [
+                      38,
+                      50
+                    ],
+                    [
+                      38,
+                      54
+                    ],
+                    [
+                      37,
+                      55
+                    ],
+                    [
+                      35,
+                      55
+                    ],
+                    [
+                      36,
+                      54
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "polygon",
+                  "points": [
+                    [
+                      45,
+                      53
+                    ],
+                    [
+                      47,
+                      53
+                    ],
+                    [
+                      46,
+                      56
+                    ],
+                    [
+                      45,
+                      58
+                    ],
+                    [
+                      43,
+                      58
+                    ],
+                    [
+                      44,
+                      56
+                    ]
+                  ],
+                  "color": "light"
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      37,
+                      46
+                    ],
+                    [
+                      49,
+                      46
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      43,
+                      47
+                    ],
+                    [
+                      43,
+                      52
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      38,
+                      48
+                    ],
+                    [
+                      38,
+                      50
+                    ],
+                    [
+                      40,
+                      51
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      48,
+                      48
+                    ],
+                    [
+                      48,
+                      50
+                    ],
+                    [
+                      46,
+                      51
+                    ]
+                  ],
+                  "color": "shadow",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      35,
+                      56
+                    ],
+                    [
+                      40,
+                      56
+                    ]
+                  ],
+                  "color": "seam",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      43,
+                      59
+                    ],
+                    [
+                      49,
+                      59
+                    ]
+                  ],
+                  "color": "light",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      34,
+                      57
+                    ],
+                    [
+                      41,
+                      57
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                },
+                {
+                  "op": "brush",
+                  "points": [
+                    [
+                      42,
+                      60
+                    ],
+                    [
+                      50,
+                      60
+                    ]
+                  ],
+                  "color": "ink",
+                  "size": 1,
+                  "shape": "square",
+                  "pixel_perfect": true
+                }
+              ]
+            }
+          }
+        },
+        "frames": [
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p05",
+          "p06",
+          "p07",
+          "p08",
+          "p09",
+          "p10",
+          "p11",
+          "p12"
+        ]
+      }
+    }
+  }
+}

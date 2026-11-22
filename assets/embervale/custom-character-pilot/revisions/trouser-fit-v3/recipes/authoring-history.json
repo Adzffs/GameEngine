@@ -1,0 +1,31 @@
+{
+  "service": "PixelLab pixelart_workbench",
+  "initial_drawing": "b9449fd3-229b-4fb3-844e-af36b26e1ed9",
+  "leg_and_cuff_revision": "a5700627-782e-435f-9015-710b67dd0c2e",
+  "final_hand_clearance_revision": "8b5245db-e51f-458f-a560-d8dd169c207d",
+  "final_sheet": "53a0ca61-268a-4c12-84a8-854edd1510e5",
+  "gallery": "c66a08a6-c69e-40cc-889e-c988f19b4f01",
+  "rejected_source": "../source/trousers-initial-rejected.png",
+  "initial_findings": {
+    "protected_hand_pixels_covered": 10,
+    "cuff_alignment": "First two walking poses needed their left cuffs moved toward the actual knee"
+  },
+  "second_candidate_findings": {
+    "frame": 6,
+    "protected_hand_pixels_covered": [
+      [
+        33,
+        54
+      ],
+      [
+        33,
+        55
+      ]
+    ],
+    "correction": "Move the left cuff edge inward by one native pixel"
+  },
+  "final_protected_hand_overlap_pixels": 0,
+  "body_or_animation_generations": 0,
+  "body_and_v2_tunic_preserved": true,
+  "owner_visual_acceptance": "pending"
+}

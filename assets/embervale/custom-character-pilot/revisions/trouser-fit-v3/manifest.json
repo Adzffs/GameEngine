@@ -1,0 +1,96 @@
+{
+  "schema": "embervale.character-garment-revision",
+  "version": 1,
+  "id": "trouser-fit-v3",
+  "date": "2026-11-22",
+  "status": "revised authoring candidate; owner visual acceptance pending",
+  "supersedes": "../../v1/layers/trousers-south.png",
+  "previous_outfit": "../tunic-fit-v2/exports/dressed-south.png",
+  "body": "../../v1/layers/body-south.png",
+  "tunic": "../tunic-fit-v2/exports/tunic-south.png",
+  "trousers": "exports/trousers-south.png",
+  "outfit_reference": "exports/outfit-south.png",
+  "dressed_reference": "exports/dressed-south.png",
+  "cell_size": [
+    80,
+    80
+  ],
+  "source_cell_size": [
+    84,
+    84
+  ],
+  "source_to_export_offset": [
+    -2,
+    -2
+  ],
+  "ground_pivot": [
+    40,
+    70
+  ],
+  "coverage": {
+    "idle": [
+      "south"
+    ],
+    "walk": [
+      "south"
+    ]
+  },
+  "clips": {
+    "idle": {
+      "columns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "durations_ms": [
+        400,
+        400,
+        400,
+        400
+      ]
+    },
+    "walk": {
+      "columns": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "durations_ms": [
+        80,
+        70,
+        80,
+        70,
+        80,
+        70,
+        80,
+        70
+      ]
+    }
+  },
+  "draw_order": [
+    "body",
+    "trousers",
+    "tunic"
+  ],
+  "changes": [
+    "Separate hip/seat and leg panels follow each original pose",
+    "Knee-length cuffs follow each leg instead of one fixed waist-relative rectangle",
+    "Independent brown cloth folds, seams and outlines replace skin-derived shading",
+    "Hand clearance and exposed lower legs preserved"
+  ],
+  "pixel_art_service": {
+    "drawing_id": "8b5245db-e51f-458f-a560-d8dd169c207d",
+    "sheet_id": "53a0ca61-268a-4c12-84a8-854edd1510e5",
+    "gallery_id": "c66a08a6-c69e-40cc-889e-c988f19b4f01",
+    "method": "free exact PixelLab pixelart_workbench draw and explicit revisions"
+  },
+  "new_body_or_animation_generations": 0,
+  "runtime_registered": false,
+  "source_body_and_v2_tunic_changed": false
+}

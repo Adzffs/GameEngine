@@ -1,5 +1,7 @@
 # Custom characters: design and implementation plan
 
+**Latest garment revision:** The owner requested the same improvement process for the trousers. The [v3 outfit](../../../assets/embervale/custom-character-pilot/revisions/trouser-fit-v3/README.md) pairs new pose-fitted brown trousers with the unchanged v2 tunic and original body. See the [fit evidence](../06-development/TROUSER_FIT_2026-11-22.md). All twelve current south poses pass coverage, leg-gap and protected-hand/lower-leg checks; ART-007 and owner visual review remain open.
+
 **Tunic-fit follow-up:** The owner specifically reports that the v1 tunic does not fit. The [v2 revision](../../../assets/embervale/custom-character-pilot/revisions/tunic-fit-v2/README.md) redraws the garment for all twelve current south poses, with independent cloth shading and protected hand/face checks. See the [actual defect, changes and evidence](../06-development/TUNIC_FIT_2026-11-22.md). This advances ART-007 to in progress; final body style, world scale, eight-way/action coverage and runtime adoption remain open.
 
 **Updated:** 22 November 2026.  

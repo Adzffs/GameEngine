@@ -1,0 +1,21 @@
+{
+  "build_preview.py": "c47a37fd9a6412fdaa145b539e96d6df51970a835b2b071150f07b697766cd9c",
+  "character-workshop.html": "0fb3a0184fdb423abb96278bf4dcc39401826d8cc75286db60f2e30676ffb036",
+  "exports/dressed-south.png": "4e2702df0c9a406525b91d90d3e285619349acd7a73927f359d0b44dbaf6ec1e",
+  "exports/outfit-south.png": "d3375c591144db5e7a27229dc60ed2b4950809de9ff90c50d99994e2d595bc91",
+  "exports/trousers-south.png": "c85a96d87c97e4790284e7101cf70eeef6f450667f3154b44403a631ad503fc7",
+  "manifest.json": "67c9bc609673dc3e148fc7e09a68b56b8e82f1225f3ac94f21d7336d4f7b847b",
+  "previews/all-poses.png": "876882ba156893e153069d32bc5134c0123200da921b2755230cc23967d89737",
+  "previews/before-after-walk.gif": "5286343297eb3f177884f866bf0f828060ff5ac14d37c0e5ecad5738c332e0a2",
+  "previews/before-after.png": "540b28d7bd961a29a7c434d212940400895ab99085ad455b318fe1b481e9f0c0",
+  "previews/fit-study.png": "ac463099b51ea534eb61daca0fe04e57a30c21dd5ec5775b636441898d0172c2",
+  "README.md": "a08a7b12e220514c244ae84fae6ed2cdb247c77884928e7e2dee00e3eb457523",
+  "recipes/acceptance-samples.json": "10ddb10bc64d2707f8c3e0272c2bd71e70c6c89d2360e6210d81836d207b7d6b",
+  "recipes/authoring-history.json": "f28f6aa0e62c5ce9e7a517266bcc03e581a78a87eda37576d598859c7d02aa03",
+  "recipes/fit-landmarks.json": "c658e5eac0133441d89744f3f447e4b530d363c5c70e2f902399788b8f0c9ce8",
+  "recipes/trousers.json": "eed4cfa88e9f8ed2b7c89e9bc359faf9d747e436e2e9d6bd3b487f8a091cdd3e",
+  "source/trousers-initial-rejected.png": "97c1f808abab444348da2422ff4688126fdf869cede7fca22a212977c3280eff",
+  "source/trousers-raw.png": "a64d3254295b3992560ec70977ea408fc606e222b9c3799ac3a8489bb355bf5f",
+  "validate.py": "fe8edfea6e2f87ad1375712150385e5b746af1d6e724654d16c5c03b18a4e538",
+  "validation.json": "d61798b8c2c59322b096e04b65355d8dc0a1aff2a5f1137c6e0dc48a617625b3"
+}

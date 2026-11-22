@@ -1,0 +1,28 @@
+{
+  "schema": "embervale.garment-fit-validation",
+  "version": 1,
+  "status": "passed",
+  "frames": 12,
+  "body_coverage_samples": 96,
+  "clear_gap_samples": 12,
+  "protected_hand_pixels": 1055,
+  "protected_lower_leg_pixels": 1192,
+  "hand_overlaps": 0,
+  "lower_leg_overlaps": 0,
+  "source_crop_lossless": true,
+  "composition_exact": true,
+  "body_and_v2_tunic_unchanged": true,
+  "preserved_hash_entries": {
+    "v1": 22,
+    "tunic-fit-v2": 18
+  },
+  "preview_layer_matches_export": true,
+  "coverage": "South idle 4 + walk 8",
+  "independent_samples": "recipes/acceptance-samples.json",
+  "visual_review": "Agent inspected all twelve original/revised poses, dressed and with tunic hidden",
+  "preview_javascript_syntax": "passed: node --check",
+  "browser_interaction_test": "not run for this revision; no live browser acceptance claimed",
+  "owner_visual_acceptance": "pending",
+  "runtime_integration": false,
+  "new_body_or_animation_generations": 0
+}

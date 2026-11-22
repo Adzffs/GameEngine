@@ -6,7 +6,15 @@
 
 Start with the [custom character plan](../../../docs/embervale/05-game/CUSTOM_CHARACTERS.md), [improvement register](../../../docs/embervale/06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) and [production workflow](../../../docs/embervale/05-game/CUSTOM_CHARACTER_WORKFLOW.md).
 
-## Latest revision: tunic fit v2
+## Latest revision: trouser fit v3
+
+The owner requested the same fitting treatment for the pants. [V3](revisions/trouser-fit-v3/README.md) adds per-pose hip, crotch, leg and cuff geometry with independent brown cloth shading. The latest combined outfit reuses the original body and unchanged v2 tunic. All twelve south poses pass coverage and protected-hand/lower-leg checks; owner visual review remains open. See the [correction record](../../../docs/embervale/06-development/TROUSER_FIT_2026-11-22.md).
+
+![Previous and revised trousers](revisions/trouser-fit-v3/previews/before-after.png)
+
+[Moving comparison](revisions/trouser-fit-v3/previews/before-after-walk.gif) · [All poses](revisions/trouser-fit-v3/previews/all-poses.png) · [Interactive revised preview](revisions/trouser-fit-v3/character-workshop.html)
+
+## Earlier revision: tunic fit v2
 
 The owner reported that the original tunic did not fit. The [v2 revision](revisions/tunic-fit-v2/README.md) supplies proper shoulder/sleeve/neckline/hip geometry and cloth shading across all twelve existing south idle/walk poses. The body and trousers are unchanged; owner review of the new fit remains open. See the [defect and correction record](../../../docs/embervale/06-development/TUNIC_FIT_2026-11-22.md).
 

@@ -1783,13 +1783,16 @@
         "ART-006"
       ],
       "acceptance": "Complete declared eight-way body, clothing and a small hair set for required shared motions; record semantic palettes, fit families, hand tracks and equipment occlusion with source masters and visual review.",
-      "notes": "South idle/walk and a close-fitting tunic/trouser proof exist only as ART-006 evidence. Other animated facings, hairstyles and matching equipment/actions remain open. Different silhouettes require authored fit work; palette variants do not require new body animation. Owner reported poor v1 tunic fit. V2 now authors actual per-pose garment geometry and cloth shading across all twelve existing south idle/walk poses; semantic coverage rejects v1 in all twelve and protected hand/face checks pass. Body/trousers and all v1 files are unchanged. Owner acceptance, other facings/actions and hair remain open.",
+      "notes": "South idle/walk and a close-fitting tunic/trouser proof exist only as ART-006 evidence. Other animated facings, hairstyles and matching equipment/actions remain open. Different silhouettes require authored fit work; palette variants do not require new body animation. Owner reported poor v1 tunic fit. V2 now authors actual per-pose garment geometry and cloth shading across all twelve existing south idle/walk poses; semantic coverage rejects v1 in all twelve and protected hand/face checks pass. Body/trousers and all v1 files are unchanged. Owner acceptance, other facings/actions and hair remain open. The owner then requested the same treatment for trousers. Trouser-fit-v3 authors hip/crotch/leg/cuff geometry and brown fabric shading for all twelve south poses, paired with unchanged v2 tunic and v1 body. Coverage, leg gaps, hand/lower-leg clearance, lossless packing and exact composition pass. Both earlier revisions are preserved; owner acceptance and wider coverage remain open.",
       "github_issue": null,
       "evidence": [
         "docs/embervale/05-game/CUSTOM_CHARACTERS.md",
         "docs/embervale/06-development/TUNIC_FIT_2026-11-22.md",
         "assets/embervale/custom-character-pilot/revisions/tunic-fit-v2/manifest.json",
-        "assets/embervale/custom-character-pilot/revisions/tunic-fit-v2/validation.json"
+        "assets/embervale/custom-character-pilot/revisions/tunic-fit-v2/validation.json",
+        "docs/embervale/06-development/TROUSER_FIT_2026-11-22.md",
+        "assets/embervale/custom-character-pilot/revisions/trouser-fit-v3/manifest.json",
+        "assets/embervale/custom-character-pilot/revisions/trouser-fit-v3/validation.json"
       ]
     },
     {
