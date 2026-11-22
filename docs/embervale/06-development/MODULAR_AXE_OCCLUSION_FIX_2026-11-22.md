@@ -1,50 +1,52 @@
-# Modular axe handle occlusion correction
+# Modular axe handle penetration: failed masking and pose revision
 
 **Date:** 22 November 2026.  
 **Task:** ART-005, still in progress.  
-**Defective published prototype:** `a58a53591309265dc4d3f5603fde742ae4fcf098`.  
-**Scope:** Correct the east-facing authoring proof; the runtime art remains unchanged.
+**Original defective prototype:** `a58a53591309265dc4d3f5603fde742ae4fcf098`.  
+**Rejected masking attempt:** `02fd3cd526ccda6fbb6a68123b9ce1f73d20e005`.  
+**Current status:** Arms and tool trajectory reposed; revised authoring candidate, owner visual acceptance open. Runtime art is unchanged.
 
-## The mistake
+## What went wrong
 
-The owner correctly reported that the handle appeared to pass through the player and switch between behind and in front during the swing. This was a compositing mistake introduced in the first modular prototype.
+The owner reported that the axe handle went through the player and appeared to switch from behind to in front. The original proof switched the whole tool behind the body in loaded poses 1 and 2, then returned it to the front for contact. That was an incorrect compositing workaround.
 
-Poses 1 and 2 used `tool_in_front: false` to hide head intersections. The other six poses used `true`. This moved the **entire axe** behind the entire body during loading, then in front again at contact. Restoring one main-hand pixel did not preserve the second grip or the surrounding forearm. The initial report incorrectly described that switch as a successful depth adjustment.
+The first attempted correction removed the whole-tool toggle and restored head/both-grip pixels over the tool. **The owner rejected that result: the problem was still visible.** Its wrists and aim vectors were unchanged. The shaft still ran through the head/chest, and covering part of it with a mask merely hid the intersection. The previous claim that the problem was fixed was wrong.
 
-The original eight tests verified body preservation, materials, grips, bounds, hashes and export behaviour. They did not verify visible depth continuity or both hands covering the shaft. Passing those checks was insufficient evidence that the animation looked correct. This defect belongs to the prototype composition, rather than the source character, material colours or animation timing.
+The first eight preservation/material tests did not check this geometry. The next eleven tests also passed because their expectations explicitly allowed the shaft over the collar and restored head pixels over it. Their 30-before/zero-after landmark count measured the intended masking operation, rather than a clear physical tool path. Those numbers are retained as historical evidence, not visual acceptance.
 
-The retained [defective GIF](../../../assets/embervale/equipment-modular-pilot/reports/handle-layering-before.gif) and [contact sheet](../../../assets/embervale/equipment-modular-pilot/reports/handle-layering-before.png) record the mistake. They are historical evidence and must not replace the corrected export.
+The failed [original GIF](../../../assets/embervale/equipment-modular-pilot/reports/handle-layering-before.gif) and [original sheet](../../../assets/embervale/equipment-modular-pilot/reports/handle-layering-before.png) remain recorded. The [rejected masking GIF](../../../assets/embervale/equipment-modular-pilot/reports/rejected-masking/materials.gif), [sheet](../../../assets/embervale/equipment-modular-pilot/reports/rejected-masking/contact.png), [recipe](../../../assets/embervale/equipment-modular-pilot/reports/rejected-masking/recipe.json) and [body master](../../../assets/embervale/equipment-modular-pilot/reports/rejected-masking/body.ase) reproduce the second failure.
 
-## The correction
+## What changed in the revised candidate
 
-Recipe version 2 uses one order for all eight poses and every material:
+The actual source poses and attachment track now change together:
 
-1. Draw the unchanged body.
-2. Draw the independently transformed axe over the body.
-3. Restore only explicitly authored foreground pixels for the head, main grip and offhand grip, including their small cuff/forearm areas.
+- Both hands move forward of the torso. The raised shaft lifts vertically beside the face; it does not pass behind the hair or through the collar.
+- The near and far arms are reposed once in the editable body master to reach those same grips. The character's head and feet remain exact; the original outfit is retained beneath the arm edit.
+- The contact and bite reach forward, followed by a return to the same ready pose. The tool stays on the same visible side throughout.
+- One axe shape, its wooden handle, semantic metal mask and three material palettes remain shared. The correction is not repeated per material.
 
-The head continues to hide overlapping upper tool pixels. The exposed shaft stays in front of the shirt below it, and both grips cover the shaft. No pose can switch the whole tool behind the character. This is a small body-part occlusion contract for the current fixture, rather than a general 3D depth solver.
+The [current recipe](../../../assets/embervale/equipment-modular-pilot/recipe.json) retains explicit hand/aim points and body-tool-foreground composition. Grip foreground pixels wrap the handle. Head foreground data remains available, but **no tool pixels overlap the head at all** in this candidate. A head mask is not used to conceal a bad shaft route.
 
-The source of truth is each frame's `foreground` spans in the [recipe](../../../assets/embervale/equipment-modular-pilot/recipe.json): named `head`, `main_hand` and `off_hand` groups, stored as inclusive `[y, x0, x1]` runs in 96x96 body-cell coordinates. Normal export reads those authored runs. It does not infer foreground from RGB, recolour the body, regenerate masks, or move the hands. All three material appearances receive the same correction.
+Normal export reads the edited masters and track. It never regenerates the arms or infers a new mask. The initial legacy bootstrap is now retired and rejects: importing the old body would restore the bad attachment geometry. Existing runtime masters are not changed by this offline source edit.
 
-Validation rejects missing grips, detached grip masks, unsorted/overlapping/out-of-bounds runs, excessive spans and old per-frame depth fields. The decoded-art check also rejects a foreground run that references transparent body pixels before replacing any usable output. The [mask diagnostic](../../../assets/embervale/equipment-modular-pilot/previews/occlusion.png) shows head pixels in purple, main grip in red and offhand grip in blue.
+![Reposed candidate with a clear tool path](../../../assets/embervale/equipment-modular-pilot/previews/materials.gif)
 
-![Corrected shared axe motion](../../../assets/embervale/equipment-modular-pilot/previews/materials.gif)
+The [contact sheet](../../../assets/embervale/equipment-modular-pilot/previews/contact.png) shows all eight poses in three materials. The preview uses a closer integer-scale camera so that the hands, face clearance and full raised tool are visible together.
 
-The [corrected contact sheet](../../../assets/embervale/equipment-modular-pilot/previews/contact.png) contains all eight poses across bronze, iron and steel. Review the wind-up, contact, recovery and loop seam together. A remaining body-performance concern should be addressed as its own art change, without reinstating a whole-tool depth toggle.
+## Verification that addresses the actual defect
 
-## Verification
+The compositor now examines the **unmasked** tool against the body before composition. Any opaque tool/body overlap outside the two bounded grip regions rejects the candidate before replacing output. Hiding the middle of the shaft under head or shirt pixels cannot satisfy this check.
 
-The [focused suite](../../../tests/test_modular_equipment.py) now includes independent PNG readback of every composite pixel in all 24 material/pose cells. Fixed visual landmarks separately require the loaded shaft to cover the shirt/collar, the head and both grips to cover the tool, and the ready/closing poses to match exactly. These landmarks do not derive their expected colours from the authored mask. They fail on the original depth-switching output.
+The [independent PNG tests](../../../tests/test_modular_equipment.py) inspect every native pixel in all 24 material/pose cells. They require all actual tool/body intersections to lie at the grips, zero head intersections, visible skin at both grip anchors, correct composition and an exact ready/closing seam. A real exporter test loads the saved owner-rejected recipe and body and verifies that the new spatial guard refuses them without replacing usable outputs.
 
-The [before/after verification receipt](../../../assets/embervale/equipment-modular-pilot/reports/occlusion-fix.json) records 30 failed comparisons in the original output and zero in the correction across 36 fixed landmark/material comparisons. It also records exact pilot-source hashes and the unchanged 33 runtime masters/textures.
+Twelve tests pass with real LibreSprite export and no skips; see the [test log](../../../assets/embervale/equipment-modular-pilot/reports/tests.txt). The old fixed-collar expectations were removed because they endorsed the wrong result. Preservation tests now correctly allow the intentional pilot arm edit while checking exact head/foot retention and unchanged masters on normal export. Metal/wood isolation, rejected data, malformed decoded masks and portable receipts remain covered.
 
-Eleven tests pass with the real LibreSprite exporter and no skips. The [recorded test output](../../../assets/embervale/equipment-modular-pilot/reports/tests.txt) includes malformed foreground refusal, existing semantic-metal isolation, exact body reuse, deterministic repeat export and source preservation. The original timing remains `[260,200,200,80,80,80,100,200]` ms, total 1,200 ms.
+The [current revision receipt](../../../assets/embervale/equipment-modular-pilot/reports/pose-revision.json) records the revised clearance and preservation results. The earlier [masking receipt](../../../assets/embervale/equipment-modular-pilot/reports/occlusion-fix.json) belongs to the rejected attempt.
 
-The three pilot masters, standalone body, axe, semantic-mask and transformed-tool PNGs remain byte-exact against the defective prototype. Only composition, its review outputs and receipts change. Existing runtime art remains 33 masters/33 textures and 3,135 frames, with unchanged live costs of 24,342,528 RGBA bytes and 6,085,632 alpha bytes. This offline correction adds no runtime code, gameplay timing or save change.
+The axe and metal-mask masters are unchanged. The pilot body and transformed tool poses intentionally change. All 33 runtime editable masters and 33 runtime textures remain exact; the live catalogue remains 3,135 frames, 24,342,528 RGBA bytes and 6,085,632 alpha bytes. Timing remains `[260,200,200,80,80,80,100,200]` ms, total 1,200 ms. No runtime code, gameplay timing or save change is included.
 
-The output remains an east-facing authoring candidate. Full eight-way coverage, owner acceptance of the corrected motion/body, runtime migration and the remaining [production plan](../05-game/MODULAR_EQUIPMENT_ANIMATION_PLAN.md) stay open.
+## Lesson and remaining scope
 
-## Reusable lesson
+Correct the body pose and tool path first. A stable draw order and masks cannot repair a shaft routed through the character. Inspect the unmasked body/tool overlap, both grips and the full timed motion. Tests must reject the visible defect rather than assert pixels chosen to implement a workaround.
 
-Keep a stable relationship between the tool and body parts throughout a motion. Resolve hand, head and arm overlaps with explicit foreground regions or appropriate authored geometry. Never conceal an intersection by changing the entire tool's depth relative to the entire character on selected frames. Material/pixel preservation checks and a visual occlusion review answer different questions; retain both.
+This remains one east-facing authoring candidate. The owner has not accepted this revised motion. Body quality, the other seven directions, actual-game migration and the remaining [production plan](../05-game/MODULAR_EQUIPMENT_ANIMATION_PLAN.md) stay open.

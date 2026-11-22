@@ -15,7 +15,7 @@ The [22 November modular equipment plan](../05-game/MODULAR_EQUIPMENT_ANIMATION_
 
 The [first modular axe proof](../06-development/MODULAR_AXE_PROTOTYPE_2026-11-22.md) provides one east-facing hand track, one tool master/mask and three material appearances. Actual editor tests verify protected pixels and master/output preservation. This is a bounded authoring proof using the existing body fixture; clean body acceptance, other directions and runtime migration remain open under ART-005.
 
-The owner-reported handle penetration is [recorded and corrected](../06-development/MODULAR_AXE_OCCLUSION_FIX_2026-11-22.md): stable body-tool-foreground composition and explicit head/both-grip masks replace whole-tool depth switching. Eleven focused tests now include actual exported occlusion landmarks and all 24 composite cells. ART-005 remains in progress.
+The owner rejected the mask-only handle correction. The [documented pose revision](../06-development/MODULAR_AXE_OCCLUSION_FIX_2026-11-22.md) now reposes the arms and tool path forward of the body. Twelve focused tests include unmasked body clearance in all 24 cells and refusal of the saved rejected pose. Revised visual acceptance remains open; ART-005 stays in progress.
 
 ## Current progress
 

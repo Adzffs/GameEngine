@@ -1,4 +1,4 @@
-"""The shared motion must preserve body/wood pixels and survive rejected edits."""
+"""Verify visible tool clearance, shared materials and preserved authored sources."""
 import copy
 import hashlib
 import json
@@ -121,11 +121,18 @@ class RealExporterTests(unittest.TestCase):
         shutil.copytree(PILOT, self.pilot)
         self.editor = Path(os.environ['EMBERVALE_ART_EDITOR'])
 
-    def test_body_matches_legacy_and_repeat_export_preserves_every_master(self):
+    def test_reposed_body_preserves_head_feet_and_repeat_export_preserves_every_master(self):
         _, _, legacy = png_pixels(ROOT / 'assets/embervale/woodcutting-pilot/textures/player.png')
         w, h, body = png_pixels(self.pilot / 'textures/body.png')
         self.assertEqual((w, h), (768, 96))
-        self.assertEqual(body, legacy[192*768*4:288*768*4])
+        self.assertNotEqual(body, legacy[192*768*4:288*768*4])
+        recipe = json.loads((self.pilot / 'recipe.json').read_text())
+        for p, frame in enumerate(recipe['frames']):
+            for y,x0,x1 in frame['foreground']['head']:
+                for x in range(x0,x1+1):
+                    at=(y*768+p*96+x)*4
+                    self.assertEqual(body[at:at+4], legacy[192*768*4+at:192*768*4+at+4])
+        self.assertEqual(body[56*768*4:], legacy[248*768*4:288*768*4])
         before = inventory(self.pilot)
         build(self.editor, self.pilot)
         self.assertEqual(inventory(self.pilot), before)
@@ -157,7 +164,7 @@ class RealExporterTests(unittest.TestCase):
         self.assertEqual((self.pilot / 'textures/body.png').read_bytes(), before_body)
         self.assertEqual({name: (self.pilot / name).read_bytes() for name in SOURCES}, masters)
 
-    def test_exported_occlusion_preserves_head_and_both_grips_without_depth_switching(self):
+    def test_tool_clears_the_entire_body_except_both_grips_in_every_exported_pose(self):
         build(self.editor, self.pilot)
         recipe = json.loads((self.pilot / 'recipe.json').read_text())
         _, _, body = png_pixels(self.pilot / 'textures/body.png')
@@ -166,31 +173,42 @@ class RealExporterTests(unittest.TestCase):
         def pixel(data, pose, x, y, tier=0):
             at = ((tier * 96 + y) * 768 + pose * 96 + x) * 4
             return data[at:at+4]
-        # Fixed visual landmarks, independent of mask generation: the lifted
-        # shaft stays in front of the shirt/collar, the head and both grips cover
-        # the tool. The old whole-tool flip fails the wind-up and grip checks.
-        landmarks = [(0, 52, 36, 'edbd89ff'), (0, 47, 51, 'd99d69ff'),
-                     (0, 47, 53, '935b3dff'), (1, 46, 44, 'b27c48ff'),
-                     (1, 42, 30, '7b4e2eff'), (2, 45, 42, 'b27c48ff'),
-                     (2, 41, 33, '563727ff'), (3, 53, 54, 'edbd89ff'),
-                     (4, 53, 54, 'edbd89ff'), (5, 52, 50, 'd99d69ff'),
-                     (6, 48, 51, 'd99d69ff'), (7, 52, 36, 'edbd89ff')]
         for tier in range(3):
-            for p, x, y, expected in landmarks:
-                with self.subTest(tier=tier, pose=p, point=(x,y)):
-                    self.assertEqual(pixel(combined, p, x, y, tier).hex(), expected)
             for p, frame in enumerate(recipe['frames']):
                 foreground = {(x,y) for spans in frame['foreground'].values()
                               for y,x0,x1 in spans for x in range(x0,x1+1)}
+                grips = {(x,y) for role in ('main_hand','off_hand')
+                         for y,x0,x1 in frame['foreground'][role] for x in range(x0,x1+1)}
+                head = {(x,y) for y,x0,x1 in frame['foreground']['head'] for x in range(x0,x1+1)}
+                for role in ('main_hand','off_hand'):
+                    x,y=map(round,frame[role])
+                    self.assertEqual(pixel(body,p,x,y).hex(), 'edbd89ff')
+                    self.assertEqual(pixel(combined,p,x,y,tier), pixel(body,p,x,y))
                 for y in range(96):
                     for x in range(96):
                         b, t = pixel(body,p,x,y), pixel(tools,p,x,y,tier)
+                        # Inspect the unmasked tool. Hiding its middle with a
+                        # foreground mask must never count as body clearance.
+                        if b[3] and t[3]:
+                            self.assertIn((x,y), grips,
+                                          f'Tool passes through body: material {tier}, pose {p}, ({x},{y})')
+                            self.assertNotIn((x,y), head)
                         expected = b if (x,y) in foreground or not t[3] else t
                         self.assertEqual(pixel(combined,p,x,y,tier), expected,
                                          f'Wrong occlusion: material {tier}, pose {p}, ({x},{y})')
             for y in range(96):
                 for x in range(96):
                     self.assertEqual(pixel(combined,0,x,y,tier), pixel(combined,7,x,y,tier))
+
+    def test_the_owner_rejected_mask_only_pose_is_refused_before_output_replacement(self):
+        archive = self.pilot / 'reports/rejected-masking'
+        shutil.copyfile(archive / 'recipe.json', self.pilot / 'recipe.json')
+        shutil.copyfile(archive / 'body.ase', self.pilot / 'source/body.ase')
+        validate_recipe(json.loads((self.pilot / 'recipe.json').read_text()))
+        before = inventory(self.pilot)
+        with self.assertRaisesRegex(RuntimeError, 'Tool intersects body outside the two grip regions'):
+            build(self.editor, self.pilot)
+        self.assertEqual(inventory(self.pilot), before)
 
     def test_foreground_mask_on_empty_body_pixel_cannot_replace_usable_outputs(self):
         path = self.pilot / 'recipe.json'

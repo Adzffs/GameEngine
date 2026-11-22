@@ -58,6 +58,7 @@ def check(output):
 
 
 def build(editor, output=PILOT, import_legacy=False):
+    require(not import_legacy, 'Legacy bootstrap is retired; retain the authored body and tool masters')
     output = output.resolve()
     recipe = load_recipe(output / 'recipe.json')
     for name in SOURCES:
@@ -91,7 +92,7 @@ def build(editor, output=PILOT, import_legacy=False):
         count = len(recipe['materials'])
         sizes = {'body': [768, 96], 'shape': [32, 40], 'mask': [32, 40],
                  'tools': [768, count * 96], 'composites': [768, count * 96],
-                 'comparison': [count * 96 * 3, 108 * 3], 'contact': [1536, count * 108 * 2],
+                 'comparison': [count * 52 * 4, 64 * 4], 'contact': [1248, count * 64 * 3],
                  'grips': [1536, 216]}
         fixtures = {}
         for name, size in sizes.items():
@@ -163,7 +164,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--editor', type=Path)
     parser.add_argument('--output', type=Path, default=PILOT)
-    parser.add_argument('--import-legacy', action='store_true', help='Create missing proof masters once; never regenerate the body')
+    parser.add_argument('--import-legacy', action='store_true', help='Retired legacy bootstrap; authored poses must be retained')
     parser.add_argument('--check', action='store_true', help='Verify the current recipe, masters and exported receipts without writes')
     args = parser.parse_args()
     if args.check:

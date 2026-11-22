@@ -1,0 +1,91 @@
+{
+  "previous_attempt": "02fd3cd526ccda6fbb6a68123b9ce1f73d20e005",
+  "previous_attempt_owner_rejected": true,
+  "revision_status": "Reposed candidate; owner visual acceptance remains open",
+  "unmasked_tool_body_overlap_outside_grips_before_by_pose": [
+    52,
+    71,
+    44,
+    0,
+    0,
+    1,
+    10,
+    52
+  ],
+  "unmasked_tool_body_overlap_outside_grips_after_by_pose": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "tool_head_overlap_before_by_pose": [
+    26,
+    58,
+    39,
+    0,
+    0,
+    0,
+    2,
+    26
+  ],
+  "tool_head_overlap_after_by_pose": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "material_pose_cells_checked": 24,
+  "pilot_body_intentionally_changed_pixels": 618,
+  "pilot_head_and_feet_exact": true,
+  "pilot_body_source_sha256": "19dbdd643b56e81a21d109b6ef87f4971756159b6e3af7e1e4ba9fb7c83bf6fe",
+  "unchanged_pilot_sources": {
+    "source/axe.ase": "22c62369ed9fbbfa4133bd9a634c365e9c6b39bdf1ac9f8176b98900269595f2",
+    "source/metal-mask.ase": "e542bda0a62a76e101b0d5e735f0e17e404e45c9d78de3a9d0017351da948c36",
+    "textures/axe.png": "eeb8e932d58b2f1798371deb8c8f536f9d1acfae253c15367e9d677fa8404f28",
+    "textures/metal-mask.png": "ff71bfd90c5359feaf737930073ec9c65f63b8d4fbc57db97fb9fac4ac85cfaa"
+  },
+  "runtime_baseline": "c522956422259256dcfb8c2f5263e225cc34ccac",
+  "runtime_masters_unchanged": 33,
+  "runtime_textures_unchanged": 33,
+  "runtime_mismatches": [],
+  "tests_run": 12,
+  "tests_passed": 12,
+  "tests_skipped": 0,
+  "timing_ms": [
+    260,
+    200,
+    200,
+    80,
+    80,
+    80,
+    100,
+    200
+  ],
+  "exported_gif_readback": {
+    "frames": 8,
+    "size": [
+      624,
+      256
+    ],
+    "durations_ms": [
+      260,
+      200,
+      200,
+      80,
+      80,
+      80,
+      100,
+      200
+    ],
+    "visible_art_pixels_verified": 1118208,
+    "mismatches": 0
+  }
+}

@@ -5,7 +5,7 @@
 **Starting published branch:** `b026c60e71d56927d4ad66043531d71089135a08`.  
 **Result:** The first east-facing authoring proof is implemented and checked. Full eight-direction migration and new body-animation acceptance remain open.
 
-**Owner-reported defect corrected:** The original proof at `a58a535` switched the whole axe behind the body during loading, making the handle appear to pass through the player. That was an implementation mistake, missed by the original eight tests. The [occlusion correction record](MODULAR_AXE_OCCLUSION_FIX_2026-11-22.md) documents it, preserves the defective preview and explains the new checks. Images below show the corrected composition.
+**Owner rejected the first attempted correction:** The original whole-tool switch was followed by a masking-only change at `02fd3cd`; the handle still appeared to pass through the player. The [failure and pose revision record](MODULAR_AXE_OCCLUSION_FIX_2026-11-22.md) documents both mistakes. The current images show an actual forward arm/hand/tool reposing candidate, with visual acceptance still open.
 
 ## What now works
 
@@ -15,7 +15,7 @@ One saved body sequence, one explicit eight-pose hand track and one independent 
 
 Recipe version 2 stores main/offhand positions, aim vectors and explicit head/both-grip foreground spans. The tool is rasterized around its local grip. All poses draw the same stable body-tool-foreground order; selected original head, hand and cuff/forearm pixels cover the shaft. Per-pose whole-tool depth toggles are rejected. No character pixels are regenerated.
 
-The saved body comes from the existing woodcutting master, east-facing row. It is an engineering fixture, not a new AI motion or a claim that the owner accepted the earlier procedural body's quality. The previously generated empty-handed PixelLab walk and equipped pilot remain separate. No subscription, generation request or credit purchase was needed for this proof.
+The character comes from the existing woodcutting master, east-facing row. Its pilot arms are now reposed to reach forward; the head and feet remain exact and the outfit is retained beneath the arm edit. It is an engineering fixture, not a new AI motion or a claim that the owner accepted the earlier procedural body's quality. The previously generated empty-handed PixelLab walk and equipped pilot remain separate. No subscription, generation request or credit purchase was needed for this proof.
 
 ## Source and output structure
 
@@ -42,10 +42,11 @@ Implementation locations:
 
 | Check | Result |
 |---|---|
-| Focused Python/real LibreSprite suite | 11 tests passed, no skips in the corrected run; the original eight tests missed temporal occlusion |
-| Occlusion and continuity | Independent readback verifies all 24 composite cells, fixed shaft/head/both-grip landmarks and the exact ready/closing seam |
+| Focused Python/real LibreSprite suite | 12 tests passed, no skips; the original eight and later eleven tests did not establish a clear tool path |
+| Spatial clearance and continuity | Independent unmasked readback verifies all 24 cells: tool/body intersections only at the grips, zero head intersections, visible grip anchors and exact loop closure |
+| Rejected masking regression | The actual owner-rejected recipe/body fails export without replacing usable outputs |
 | Malformed foreground mask | Decoded transparent-body references reject before replacing usable output |
-| Body source comparison | All eight proof cells match the saved legacy east-facing pixels; independent PNG readback verifies the entire body strip |
+| Body source comparison | Eight edited source cells export exactly; head/feet match the original fixture and normal export preserves the arm edits |
 | Material invariants | Zero changed body/handle pixels outside the metal mask; zero tool alpha mismatches |
 | Semantic colour isolation | Changing bronze midtone, whose original RGB also appears in wood, changes metal while preserving wood and both other materials |
 | Normal export | Repeated export reproduces the pilot inventory and preserves all editable masters |
@@ -63,9 +64,9 @@ The actual environment uses Windows, Python 3.14.6 and LibreSprite 1.1-dev with 
 
 ## Visual findings and limits
 
-The single tool view stays attached through ready, load, contact, bite and recovery. The blade remains on the tree-facing side. The original report incorrectly treated rear ordering in the two loaded poses as a successful depth adjustment. The owner identified the resulting handle penetration; it is now replaced by a stable composition and explicit head/both-grip foreground masks shared by all materials. The secondary hand remains within the declared shaft-fit tolerance; the measured maximum perpendicular separation is about 0.80 native pixels.
+The single tool view is now attached to forward grips through ready, lift, contact, bite and recovery. Its raised shaft stays beside the face. Both the original depth switch and the later mask-only attempt were rejected as solutions to the handle penetration. The actual arms and hand/aim path now change together, with no head/chest intersections hidden under masks. Both grips lie on the shared shaft; the secondary-hand perpendicular separation is zero within floating-point precision.
 
-The enlarged sheet and native composition show the current body performance without adding new body frames. Body weight and natural motion still belong to the art review. This proof has one local tool view and explicit foreground regions for this fixed body fixture; general segmented occlusion, new body types, other action families and the bounded runtime visual registry are not yet delivered. Automated pixel checks do not claim owner visual acceptance.
+The enlarged sheet and native composition show the current body performance without adding new body frames. Body weight and natural motion still belong to the art review. This proof has one local tool view, an edited arm/body fixture and explicit grip foreground regions; general segmented occlusion, new body types, other action families and the bounded runtime visual registry are not yet delivered. Automated pixel checks do not claim owner visual acceptance.
 
 The [production plan](../05-game/MODULAR_EQUIPMENT_ANIMATION_PLAN.md) remains the full target. MEA-02 and MEA-04 now have a bounded engineering proof, and part of MEA-01 is evidenced by the preservation inventory. MEA-03's clean-body visual outcome is not completed merely by reusing the older fixture. MEA-05 onward remain planned. ART-005 stays in progress.
 

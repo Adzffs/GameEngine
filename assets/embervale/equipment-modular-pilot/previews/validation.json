@@ -15,36 +15,38 @@
   "materialDifferencePixels": [
     {
       "material": "iron",
-      "differentPixels": 249
+      "differentPixels": 300
     },
     {
       "material": "steel",
-      "differentPixels": 249
+      "differentPixels": 300
     }
   ],
   "composition": "body-tool-foreground",
-  "foregroundPixelsPreserved": 4740,
-  "foregroundToolOverlapPixels": 918,
+  "foregroundPixelsPreserved": 4737,
+  "foregroundToolOverlapPixels": 435,
+  "nonGripBodyToolOverlapPixels": 0,
+  "headToolOverlapPixels": 0,
   "foregroundPixelsByPose": [
+    195,
+    198,
     200,
-    199,
-    199,
     197,
-    190,
-    196,
+    197,
     199,
-    200
+    198,
+    195
   ],
   "visibleToolOverBodyPixelsByPose": [
-    26,
-    13,
-    5,
     0,
     0,
-    1,
-    8,
-    26
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
   ],
-  "maxSecondaryHandShaftDistance": 0.7993889900022653,
-  "sourceStatus": "Existing unchanged body fixture; body quality remains unaccepted"
+  "maxSecondaryHandShaftDistance": 3.552713678800501e-15,
+  "sourceStatus": "Existing character with reposed pilot arms; visual acceptance remains open"
 }

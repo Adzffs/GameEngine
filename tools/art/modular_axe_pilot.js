@@ -62,8 +62,9 @@ var report={direction:'east',bodyPoses:8,shapeViews:1,materials:materials.length
   exactBodyCells:0,metalRegionPixels:regionCounts,protectedSourcePixels:0,
   bodyAndHandleMismatchPixels:0,alphaMismatchPixels:0,materialDifferencePixels:[],
   composition:recipe.composition,foregroundPixelsPreserved:0,foregroundToolOverlapPixels:0,
+  nonGripBodyToolOverlapPixels:0,headToolOverlapPixels:0,
   foregroundPixelsByPose:[],visibleToolOverBodyPixelsByPose:[],maxSecondaryHandShaftDistance:0,
-  sourceStatus:'Existing unchanged body fixture; body quality remains unaccepted'};
+  sourceStatus:'Existing character with reposed pilot arms; visual acceptance remains open'};
 for(var i=0;i<shape.pixels.length;i++)if(pc.rgbaA(shape.pixels[i])&&regionAt[i]<0)report.protectedSourcePixels++;
 for(var p=0;p<8;p++){
   var frame=recipe.frames[p],b=crop(body,p*96,0,96,96);bounded(b,100);bodyCells[p]=b;
@@ -74,13 +75,14 @@ for(var p=0;p<8;p++){
   report.exactBodyCells++;
   // The axe keeps one depth plane. Only explicitly authored body parts cover
   // it; never flip the whole tool behind the body to hide a head intersection.
-  var foreground=new Array(9216).fill(false),foregroundCount=0;
+  var foreground=new Array(9216).fill(false),gripForeground=new Array(9216).fill(false),foregroundCount=0;
   Object.keys(frame.foreground).forEach(function(role){
     frame.foreground[role].forEach(function(span){
       for(var x=span[1];x<=span[2];x++){
         var at=span[0]*96+x;
         if(!pc.rgbaA(b.pixels[at]))fail('Foreground mask references empty body pixels');
         foreground[at]=true;foregroundCount++;
+        if(role!=='head')gripForeground[at]=true;
       }
     });
   });
@@ -102,6 +104,13 @@ for(var p=0;p<8;p++){
         if(tier===0)coverage[y*96+x]=region;}
     }
     bounded(tool,30);
+    // A mask cannot repair a shaft routed through the head/chest. In this
+    // side-view proof all tool/body intersections must be at the two grips.
+    for(var at=0;at<9216;at++)if(pc.rgbaA(tool.pixels[at])&&pc.rgbaA(b.pixels[at])){
+      if(foreground[at]&&!gripForeground[at])report.headToolOverlapPixels++;
+      if(!gripForeground[at])report.nonGripBodyToolOverlapPixels++;
+    }
+    if(report.nonGripBodyToolOverlapPixels)fail('Tool intersects body outside the two grip regions');
     blit(b,result,0,0);blit(tool,result,0,0);
     var visibleOverlap=0;
     for(var at=0;at<9216;at++){
@@ -161,17 +170,17 @@ function label(out,name,x,y){name.toUpperCase().split('').forEach(function(c,ind
 });}
 function board(w,h){var out=canvas(w,h);out.pixels.fill(colour('caced0'));return out;}
 for(var p=0;p<8;p++){
-  var row=board(materials.length*96,108);
+  var row=board(materials.length*52,64);
   for(var tier=0;tier<materials.length;tier++){
-    label(row,materials[tier].id,tier*96+8,3);blit(composites[tier][p],row,tier*96,12);}
-  save(scale(row,3),cfg.fixtures.comparison,cfg.loopFrames[p]);
+    label(row,materials[tier].id,tier*52+2,1);blit(crop(composites[tier][p],32,12,52,56),row,tier*52,8);}
+  save(scale(row,4),cfg.fixtures.comparison,cfg.loopFrames[p]);
 }
-var contact=board(768,materials.length*108);
+var contact=board(416,materials.length*64);
 for(var tier=0;tier<materials.length;tier++){
-  label(contact,materials[tier].id,8,tier*108+3);
-  for(var p=0;p<8;p++)blit(composites[tier][p],contact,p*96,tier*108+12);
+  label(contact,materials[tier].id,2,tier*64+1);
+  for(var p=0;p<8;p++)blit(crop(composites[tier][p],32,12,52,56),contact,p*52,tier*64+8);
 }
-save(scale(contact,2),cfg.fixtures.contact,cfg.stage+'/previews/contact.png');
+save(scale(contact,3),cfg.fixtures.contact,cfg.stage+'/previews/contact.png');
 var diagnostic=board(768,108);
 function cross(out,point,c){
   var x=Math.round(point[0]),y=Math.round(point[1]);
