@@ -1,5 +1,7 @@
 # Embervale game design
 
+**Custom player appearance, 22 November — planned:** The player should be able to choose a coherent body/skin/hair/clothing appearance, keep it while using authoritative equipment and retain it after save/reload. Use the [custom-character design](CUSTOM_CHARACTERS.md) for the staged scope, fit/layer model, default, creator Apply/Cancel and acceptance. The [first source proof](../../../assets/embervale/custom-character-pilot/README.md) is reference art with improvements open; no game character creator, appearance persistence, cosmetic item economy or new gameplay equipment is implemented by that proof.
+
 **Current implementation/evidence:** See [current status](../01-current-state/CURRENT_STATUS.md) and the [20 November review](../06-development/PROJECT_REVIEW_2026-11-20.md). Current starter replay reaches the prepared return at tick 454, while human timing and full combat/recovery acceptance remain open. Planned design goals below are not claims of measured completion.
 
 

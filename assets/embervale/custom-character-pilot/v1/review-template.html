@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Embervale Character Workshop</title>
+<style>
+:root{color-scheme:dark;font-family:Segoe UI,system-ui,sans-serif;background:#10191e;color:#e8ede3;--muted:#a2b3b0;--border:#354a4d;--accent:#acd6ba}*{box-sizing:border-box}body{margin:0}button,select{font:inherit}button,select{color:inherit;background:#23343a;border:1px solid #46615e;border-radius:8px;padding:10px 12px}button{cursor:pointer}button:hover,select:hover{border-color:var(--accent)}button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #e9be72;outline-offset:3px}button:disabled,select:disabled{opacity:.42;cursor:default}header,main,footer{max-width:1190px;margin:auto}header{padding:34px 28px 24px;display:flex;align-items:center;justify-content:space-between;gap:24px}.eyebrow{font-size:12px;color:#c6b58a;letter-spacing:.2em;font-weight:700}h1{font-family:Georgia,serif;font-size:38px;font-weight:500;margin:8px 0}p{color:var(--muted);line-height:1.55}.subtitle{margin:0;font-size:15px}.badge{border:1px solid var(--border);border-radius:30px;padding:9px 15px;color:#bed3c8;white-space:nowrap;font-size:13px}main{padding:0 28px;display:grid;grid-template-columns:1.28fr 1fr;gap:22px}.panel{background:#19262c;border:1px solid var(--border);border-radius:16px;overflow:hidden}.panel-head{padding:19px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--border)}.panel-head strong{font-size:14px;font-weight:600}.small{font-size:12px;color:var(--muted)}.stage{min-height:420px;display:grid;place-items:center;position:relative;background-color:#1d2c30;background-image:linear-gradient(#25373b 1px,transparent 1px),linear-gradient(90deg,#25373b 1px,transparent 1px);background-size:32px 32px}.stage:after{content:'';position:absolute;bottom:30px;left:14%;right:14%;height:1px;background:linear-gradient(90deg,transparent,#46615a,transparent)}#preview{display:block;width:400px;height:400px;max-width:100%;image-rendering:pixelated;position:relative;z-index:1}.transport{display:flex;gap:10px;padding:16px 20px;align-items:center;flex-wrap:wrap}.transport button{min-width:80px}.transport .spacer{flex:1}.controls{padding:22px}.field{margin-bottom:21px}.field label,.field .label{display:block;font-size:13px;font-weight:600;margin-bottom:9px;color:#c8d8cf}.field select{width:100%}.split{display:grid;grid-template-columns:1fr 1fr;gap:14px}.swatches{display:flex;gap:9px}.swatch{width:45px;height:36px;position:relative;padding:0;border-radius:7px}.swatch[aria-pressed=true]:after{content:'✓';position:absolute;inset:2px;display:grid;place-items:center;color:#fff;text-shadow:0 1px 3px #000;font-weight:700}.hint{font-size:13px;padding:13px 15px;background:#213239;border-radius:9px;margin:0;color:#abc3bb;min-height:62px}.facing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.facing{padding:6px 2px 9px;background:#203036;border-color:#30494b;font-size:11px;color:#becdc6}.facing[aria-pressed=true]{border-color:#acd6ba;background:#2a433f}.facing canvas{display:block;width:64px;height:64px;max-width:100%;margin:auto;image-rendering:pixelated}.rules{border-top:1px solid var(--border);padding-top:18px;margin-top:18px}.rules label{display:flex;gap:8px;font-size:13px;color:var(--muted)}input[type=checkbox]{accent-color:#8aba9d}.note{margin:20px 0 0;font-size:13px;color:#92aaa2;line-height:1.6}footer{padding:20px 30px 30px;font-size:12px;display:flex;justify-content:space-between;gap:20px;color:#8fa59e}a{color:#b7d7c7}#error{display:none;padding:15px;color:#ffc8bb}#export{background:#aecdb3;color:#162a23;border-color:#aecdb3;font-weight:600}.shortcuts{font-size:11px;color:#8fa59e;margin:0 0 0 auto}@media(max-width:850px){main{grid-template-columns:1fr}.stage{min-height:360px}header{align-items:flex-start}.badge{display:none}#preview{width:360px;height:360px}footer{flex-direction:column}}@media(prefers-reduced-motion:reduce){.stage{scroll-behavior:auto}}
+</style>
+<header><div><div class="eyebrow">EMBERVALE · ART WORKSHOP</div><h1>Build from one body.</h1><p class="subtitle">A reusable base, shared movement, clothes you can switch.</p></div><div class="badge">Character pilot 01</div></header>
+<main>
+ <section class="panel" aria-label="Character preview"><div class="panel-head"><strong id="clip-title">Walk · South</strong><span id="counter" class="small">Loading…</span></div><div class="stage"><canvas id="preview" width="80" height="80" aria-label="Animated character preview"></canvas></div><div class="transport"><button id="play" type="button">Pause</button><button id="step" type="button" aria-label="Pause and advance one frame">Step</button><select id="speed" aria-label="Playback speed"><option value="0.5">½ speed</option><option value="1" selected>Normal</option><option value="1.5">1½ speed</option></select><span class="spacer"></span><button id="export" type="button">Save pose PNG</button></div><div id="error" role="alert"></div></section>
+ <section class="panel" aria-label="Character options"><div class="panel-head"><strong>Customise the character</strong><span class="small">Works offline</span></div><div class="controls">
+  <div class="split"><div class="field"><label for="motion">Motion</label><select id="motion"><option value="standing">Standing view</option><option value="idle">Idle</option><option value="walk" selected>Walk</option></select></div><div class="field"><label for="display">Show</label><select id="display"><option value="character">Character + outfit</option><option value="body">Body only</option><option value="outfit">Outfit only</option></select></div></div>
+  <div class="split"><div class="field"><label for="skin">Skin palette</label><select id="skin"><option value="original">Original</option><option value="warm">Golden</option><option value="deep">Deep</option></select></div><div class="field"><span class="label">Tunic colour</span><div class="swatches" role="group" aria-label="Tunic colour"><button type="button" class="swatch" style="background:#488574" data-colour="teal" aria-label="Teal" aria-pressed="true"></button><button type="button" class="swatch" style="background:#c77853" data-colour="rust" aria-label="Rust" aria-pressed="false"></button><button type="button" class="swatch" style="background:#6795b1" data-colour="blue" aria-label="Blue" aria-pressed="false"></button></div></div></div>
+  <div class="field"><span class="label">Facing</span><div id="facings" class="facing-grid"></div></div>
+  <p id="coverage" class="hint">Idle, walking and the outfit are ready in the front view. All eight directions have standing body artwork.</p>
+  <div class="rules"><label><input id="anchor" type="checkbox"> Show foot anchor</label></div>
+  <p class="note">The outfit uses the same body frames. Changing its colour needs no new character animation. Hair, beards and more body shapes can be added around this base.</p>
+ </div></section>
+</main>
+<footer><span>22 November 2026 · Art and customisation pilot · Separate from the live game</span><a href="https://www.pixellab.ai/create-character/506e9990-e9e3-4771-b17f-892c787939d1" target="_blank" rel="noopener">Open the PixelLab character ↗</a></footer>
+<script>
+'use strict';
+const DATA = /*PAYLOAD*/;
+const DIRECTIONS=['south','west','east','north','south-west','south-east','north-west','north-east'];
+const LABELS=['South','West','East','North','Southwest','Southeast','Northwest','Northeast'];
+const $=id=>document.getElementById(id);
+const canvas=$('preview'),ctx=canvas.getContext('2d',{willReadFrequently:true});
+const temp=document.createElement('canvas');temp.width=temp.height=80;
+const paint=temp.getContext('2d',{willReadFrequently:true});
+let imgs={},facing='south',frame=0,playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,tunic='teal',elapsed=0,last=0;
+function colourMap(image,map){
+ if(!map||Object.keys(map).length===0)return;
+ const a=image.data;
+ for(let i=0;i<a.length;i+=4){if(!a[i+3])continue;const c=map[a[i]+','+a[i+1]+','+a[i+2]];if(c){a[i]=c[0];a[i+1]=c[1];a[i+2]=c[2];}}
+}
+function clothMap(){
+ const m={};DATA.shirtRamp.forEach((hex,i)=>{const rgb=hex.slice(1).match(/../g).map(n=>parseInt(n,16));m[rgb.join(',')]=DATA.shirtPalettes[tunic][i].slice(1).match(/../g).map(n=>parseInt(n,16));});return m;
+}
+function piece(img,col,map){
+ paint.clearRect(0,0,80,80);paint.drawImage(img,col*80,0,80,80,0,0,80,80);
+ const pixels=paint.getImageData(0,0,80,80);colourMap(pixels,map);paint.putImageData(pixels,0,0);ctx.drawImage(temp,0,0);
+}
+function clip(){return $('motion').value;}
+function durations(){return clip()==='walk'?DATA.walkMs:clip()==='idle'?DATA.idleMs:[1000];}
+function reset(){frame=0;elapsed=0;last=performance.now();render();}
+function available(){return facing==='south'&&clip()!=='standing';}
+function sync(){
+ for(const option of $('motion').options)option.disabled=facing!=='south'&&option.value!=='standing';
+ const ok=available();
+ $('display').disabled=!ok;$('speed').disabled=clip()==='standing';$('play').disabled=clip()==='standing';$('step').disabled=clip()==='standing';
+ document.querySelectorAll('[data-colour]').forEach(b=>b.disabled=!ok||$('display').value==='body');
+ $('skin').disabled=ok&&$('display').value==='outfit';
+ $('coverage').textContent=ok?'The front-facing outfit follows the idle and walk. Try Body only or Outfit only to see the separate layers.':'This is a standing body view. Choose South, then Idle or Walk, to preview the interchangeable outfit.';
+ document.querySelectorAll('[data-facing]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.facing===facing?'true':'false'));
+ $('play').textContent=playing?'Pause':'Play';
+ const label=LABELS[DIRECTIONS.indexOf(facing)];
+ $('clip-title').textContent=clip().charAt(0).toUpperCase()+clip().slice(1)+' · '+label;
+}
+function render(includeAnchor=true){
+ if(!imgs.standing)return;
+ ctx.clearRect(0,0,80,80);ctx.imageSmoothingEnabled=false;
+ const skin=DATA.skinMaps[$('skin').value];
+ if(clip()==='standing'){piece(imgs.standing,DIRECTIONS.indexOf(facing),skin);}
+ else {
+   const col=(clip()==='idle'?0:4)+frame,view=$('display').value;
+   if(view!=='outfit')piece(imgs['body-south'],col,skin);
+   if(view!=='body'){piece(imgs['trousers-south'],col,null);piece(imgs['tunic-south'],col,clothMap());}
+ }
+ if(includeAnchor&&$('anchor').checked){ctx.fillStyle='#f0cf83';ctx.fillRect(37,70,7,1);ctx.fillRect(40,67,1,7);}
+ $('counter').textContent=clip()==='standing'?'8 standing views':`Frame ${frame+1} / ${durations().length}`;
+}
+function tick(now){
+ const delta=last?Math.min(now-last,250):0;last=now;
+ if(playing&&clip()!=='standing'){
+   elapsed+=delta*Number($('speed').value);const d=durations();
+   while(elapsed>=d[frame]){elapsed-=d[frame];frame=(frame+1)%d.length;}
+ }
+ render();requestAnimationFrame(tick);
+}
+async function start(){
+ const names=Object.keys(DATA.images);
+ await Promise.all(names.map(name=>new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>{imgs[name]=img;resolve();};img.onerror=()=>reject(new Error('The embedded artwork could not be loaded.'));img.src=DATA.images[name];})));
+ for(let i=0;i<DIRECTIONS.length;i++){
+   const b=document.createElement('button');b.type='button';b.className='facing';b.dataset.facing=DIRECTIONS[i];b.setAttribute('aria-label','Face '+LABELS[i]);
+   const c=document.createElement('canvas');c.width=c.height=80;const g=c.getContext('2d');g.drawImage(imgs.standing,i*80,0,80,80,0,0,80,80);b.append(c,document.createTextNode(LABELS[i]));
+   b.addEventListener('click',()=>{facing=DIRECTIONS[i];if(facing!=='south')$('motion').value='standing';sync();reset();});$('facings').append(b);
+ }
+ $('motion').addEventListener('change',()=>{sync();reset();});
+ for(const name of ['display','skin','anchor'])$(name).addEventListener('change',()=>{sync();render();});
+ document.querySelectorAll('[data-colour]').forEach(b=>b.addEventListener('click',()=>{tunic=b.dataset.colour;document.querySelectorAll('[data-colour]').forEach(v=>v.setAttribute('aria-pressed',v===b?'true':'false'));render();}));
+ $('play').addEventListener('click',()=>{playing=!playing;last=performance.now();sync();});
+ $('step').addEventListener('click',()=>{playing=false;frame=(frame+1)%durations().length;elapsed=0;sync();render();});
+ $('export').addEventListener('click',()=>{render(false);const a=document.createElement('a');a.download=`embervale-${facing}-${clip()}-${frame+1}.png`;a.href=canvas.toDataURL('image/png');a.click();render();});
+ document.addEventListener('keydown',e=>{if(e.code==='Space'&&!['SELECT','INPUT','BUTTON'].includes(document.activeElement.tagName)){e.preventDefault();if(clip()!=='standing'){playing=!playing;sync();}}});
+ sync();reset();requestAnimationFrame(tick);
+}
+start().catch(error=>{$('error').style.display='block';$('error').textContent=error.message;$('counter').textContent='Unable to load';});
+</script>
+</html>

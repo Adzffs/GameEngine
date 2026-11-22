@@ -1,5 +1,7 @@
 # Evidence ledger and review limits
 
+**Custom-character evidence, 22 November:** The [pilot review](../06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) records eight standing body views, twelve south idle/walk source-exact cells, independent tunic/trouser layers, binary alpha, zero off-body clothing pixels for this close-fitting proof and exact dressed composition. The [retained source](../../../assets/embervale/custom-character-pilot/README.md) includes original hashes and decision files. Browser interaction checking was blocked by unverified active Windows browser URL; preview syntax passed. This is authoring/reference evidence, not a game-renderer, save/creator, full eight-way animation or owner-acceptance result. Default runtime f2b5c6b and separate art candidate 2c7b915 are distinguished in the [plan](../05-game/CUSTOM_CHARACTERS.md).
+
 **Current evidence reconciliation, 20 November:** [Asset resource validation](../06-development/ASSET_RESOURCE_VALIDATION_2026-11-20.md) pins code 4d7d01cb16ce5025687d2f1e0f2bb87513475f58: Linux 120/120 SDL and 98/98 standalone headless CTest entries, 79/79 Python units per interpreter, bounded PNG/metadata/budget rejection, real SDL fallback/accounting and private package refusal/repair with spaced Multi-Config Release. Current source art/masters/bindings remain unchanged. Texture memory is a recorded RGBA estimate, not measured VRAM. Earlier publication/recovery/Windows results retain their source pins. See [current status](CURRENT_STATUS.md); historical sections below retain their scope.
 
 

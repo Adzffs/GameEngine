@@ -1,0 +1,33 @@
+{
+  "schema": "embervale.reference-art-provenance",
+  "version": 1,
+  "date": "2026-11-22",
+  "status": "reference_only",
+  "owner_visual_acceptance": "improvements requested; pending",
+  "original_archive_name": "embervale-modular-human-v1.zip",
+  "original_archive_sha256": "1964d891f3e81e4dfd1003e3482c213e837e1c407c7d4d5d7d970ace97aab1ae",
+  "original_archive_bytes": 501379,
+  "retained_directory": "v1",
+  "retained_file_count": 23,
+  "source_files_byte_identical_to_original_archive": true,
+  "inventory": "v1/sha256.json",
+  "character_id": "506e9990-e9e3-4771-b17f-892c787939d1",
+  "idle_group_id": "249aa0d8-8620-4863-853b-f294efdaa4b0",
+  "walk_group_id": "21093bb9-a630-4aaf-8252-60ec1414f034",
+  "runtime_baseline": "f2b5c6b210654040e449ffe8101f32052a93d980",
+  "runtime_registered": false,
+  "rights": {
+    "creator": "Generated for the owner through the connected PixelLab service; exact garment masks authored for this proof",
+    "service_terms": "https://www.pixellab.ai/termsofservice",
+    "repository_asset_licence": "not selected; no new licence is asserted"
+  },
+  "generations": {
+    "original_art_task": 4,
+    "publication_and_planning_task": 0
+  },
+  "verification": {
+    "original_source_hashes": true,
+    "archive_entries_match": true,
+    "body_and_layer_checks": "v1/validation.json"
+  }
+}

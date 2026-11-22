@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "reviewed_date": "2026-11-20",
+  "reviewed_date": "2026-11-22",
   "current_verified_master": "d40b491d8b8082edc65ec4be0efc26ed882f2c54",
   "verification_reconciliation": "Integrated code d40b491d8b8082edc65ec4be0efc26ed882f2c54: Windows Debug SDL 124/124 (99 headless, 10 client, 15 graphics), separate SDL-free 99/99; Python 81 run, 79 pass/two unavailable-symlink skips. Original melee/equipment, current Mining/audio and later safety/editor/usability changes are combined. All 32 masters preserved, 47 packaged files match; lossless runtime packing retains resource budgets. Human/device/owner acceptance remains open. Read docs/embervale/06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md.",
   "repository": "Adzffs/GameEngine",
@@ -175,7 +175,7 @@
       "dependencies": [
         "ENG-002"
       ],
-      "acceptance": "Replay the source-derived Log\u2192planks\u2192shield chain; record actual net coins, constraints and stock behaviour; correct/test confirmed loops before balance signoff.",
+      "acceptance": "Replay the source-derived Log→planks→shield chain; record actual net coins, constraints and stock behaviour; correct/test confirmed loops before balance signoff.",
       "github_issue": null,
       "evidence": [
         "docs/embervale/06-development/STARTER_ECONOMY_2026-11-19.md",
@@ -242,7 +242,7 @@
         "STUDIO-011",
         "STUDIO-004"
       ],
-      "acceptance": "Export actual 100\u00d7100 definitions, pond, overlays, placements and lifecycle metadata; compare complete semantic baseline.",
+      "acceptance": "Export actual 100×100 definitions, pond, overlays, placements and lifecycle metadata; compare complete semantic baseline.",
       "github_issue": null,
       "evidence": [
         "src/Tools/WorldExportMain.cpp",
@@ -617,7 +617,7 @@
         "tests/test_world_editor_bridge.py",
         "docs/embervale/06-development/MASTER_ACCEPTANCE_2026-11-19.md"
       ],
-      "notes": "Merged PRs #21\u2013#22 provide collision, spawn, static reachability and selected resource/station approach overlays with an approach count. Keyboard/accessibility audit and broader diagnostics remain open."
+      "notes": "Merged PRs #21–#22 provide collision, spawn, static reachability and selected resource/station approach overlays with an approach count. Keyboard/accessibility audit and broader diagnostics remain open."
     },
     {
       "id": "STUDIO-090",
@@ -1361,7 +1361,7 @@
         "STUDIO-080",
         "ENG-010"
       ],
-      "acceptance": "24\u00d724 fixture proves stairs/cliffs/diagonals and NPC navigation with authoritative transition rules.",
+      "acceptance": "24×24 fixture proves stairs/cliffs/diagonals and NPC navigation with authoritative transition rules.",
       "github_issue": null,
       "evidence": [],
       "notes": "Planning ID; not a GitHub issue number."
@@ -1698,9 +1698,11 @@
       "acceptance": "Compare consistent eight-way fixtures at gameplay scale; improve pose, attachment, weight, timing and transitions; record owner visual acceptance separately from automated correctness.",
       "github_issue": null,
       "evidence": [
-        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
+        "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md",
+        "docs/embervale/05-game/CUSTOM_CHARACTERS.md",
+        "docs/embervale/06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md"
       ],
-      "notes": "Explicitly owner-deferred on 20 November: working first pass, not accepted finished animation. Use ANIMATION_GUIDE and the dated research."
+      "notes": "Explicitly owner-deferred on 20 November: working first pass, not accepted finished animation. Use ANIMATION_GUIDE and the dated research. On 22 November the owner selected PixelLab artwork and requested custom-character improvements/planning under ART-006. This does not accept the first body or resume rejected procedural-body polishing. Preserve the separate walking/modular-equipment candidate and its axe-occlusion record."
     },
     {
       "id": "GAME-010",
@@ -1747,6 +1749,127 @@
         "docs/embervale/06-development/PROJECT_REVIEW_2026-11-20.md"
       ],
       "notes": "World.cpp/Graphics.cpp concentrate commands, sessions, persistence, UI and presentation. This is maintenance debt; avoid a speculative engine rewrite."
+    },
+    {
+      "id": "ART-006",
+      "milestone": "R4",
+      "priority": "P1",
+      "title": "Establish the reusable PixelLab character pipeline",
+      "status": "in_progress",
+      "dependencies": [
+        "REL-004",
+        "STUDIO-060"
+      ],
+      "acceptance": "Preserve original sources and evidence; settle body scale, proportions and fit revisions; provide editable semantic layers, a portable source-preserving export and one visible layered world-renderer proof.",
+      "notes": "First eight-view body and south idle/walk garment proof are retained; comprehensive design/workflow/review published. Four generations used for the original art task. Owner requests improvements; body quality and world scale are unaccepted. No general renderer, creator or save change is installed.",
+      "github_issue": null,
+      "evidence": [
+        "docs/embervale/05-game/CUSTOM_CHARACTERS.md",
+        "docs/embervale/06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md",
+        "docs/embervale/05-game/CUSTOM_CHARACTER_WORKFLOW.md",
+        "docs/embervale/07-decisions/ADR_021_MODULAR_CHARACTER_APPEARANCE.md",
+        "assets/embervale/custom-character-pilot/README.md",
+        "assets/embervale/custom-character-pilot/v1/validation.json"
+      ]
+    },
+    {
+      "id": "ART-007",
+      "milestone": "R4",
+      "priority": "P1",
+      "title": "Author compatible character layers and motion coverage",
+      "status": "planned",
+      "dependencies": [
+        "ART-006"
+      ],
+      "acceptance": "Complete declared eight-way body, clothing and a small hair set for required shared motions; record semantic palettes, fit families, hand tracks and equipment occlusion with source masters and visual review.",
+      "notes": "South idle/walk and a close-fitting tunic/trouser proof exist only as ART-006 evidence. Other animated facings, hairstyles and matching equipment/actions remain open. Different silhouettes require authored fit work; palette variants do not require new body animation.",
+      "github_issue": null,
+      "evidence": [
+        "docs/embervale/05-game/CUSTOM_CHARACTERS.md"
+      ]
+    },
+    {
+      "id": "ENG-007",
+      "milestone": "R4",
+      "priority": "P1",
+      "title": "Resolve and render bounded character appearance layers",
+      "status": "planned",
+      "dependencies": [
+        "ART-006",
+        "STUDIO-063",
+        "REL-004"
+      ],
+      "acceptance": "Resolve validated compatible cosmetic IDs into a shared-pose layered draw list with correct pivots, equipment authority, bounded cache/resource use and complete fallback; verify real renderer transitions without changing gameplay.",
+      "notes": "Build a focused adapter around existing body/equipment rendering. Reconcile default master with the separate nine-slot PixelLab walking candidate first. Keep pilot sources outside runtime packaging until the chosen geometry, action coverage and resource definitions are implemented.",
+      "github_issue": null,
+      "evidence": [
+        "docs/embervale/05-game/CUSTOM_CHARACTERS.md"
+      ]
+    },
+    {
+      "id": "GAME-011",
+      "milestone": "R4",
+      "priority": "P1",
+      "title": "Persist validated player appearance safely",
+      "status": "planned",
+      "dependencies": [
+        "ENG-007",
+        "ENG-003",
+        "GAME-009"
+      ],
+      "acceptance": "Add bounded stable cosmetic IDs with deterministic defaults and intentional save migration; verify old/new/malformed round trips, failed-write preservation, equipment separation and temporary-session isolation.",
+      "notes": "Current save version stays 13. Select the next appropriate version after checking current source at implementation time. No item, stat, unlock or equipment ownership may be granted by an appearance descriptor.",
+      "github_issue": null,
+      "evidence": [
+        "docs/embervale/05-game/CUSTOM_CHARACTERS.md"
+      ]
+    },
+    {
+      "id": "GAME-012",
+      "milestone": "R4",
+      "priority": "P1",
+      "title": "Provide accessible character appearance controls",
+      "status": "planned",
+      "dependencies": [
+        "GAME-011"
+      ],
+      "acceptance": "Provide a compatible default and labelled appearance preview with rotate, motion, keyboard focus, Apply and Cancel; mutate live or persistent appearance only after whole-descriptor validation and explicit application.",
+      "notes": "The offline HTML is an authoring preview, not the in-game creator. Keep drafts isolated, preserve existing modal/Escape behaviour and avoid forcing a long creation flow before ordinary play.",
+      "github_issue": null,
+      "evidence": [
+        "docs/embervale/05-game/CUSTOM_CHARACTERS.md"
+      ]
+    },
+    {
+      "id": "QA-005",
+      "milestone": "R4",
+      "priority": "P1",
+      "title": "Accept custom characters across the real player journey",
+      "status": "planned",
+      "dependencies": [
+        "ART-007",
+        "ENG-007",
+        "GAME-011",
+        "GAME-012"
+      ],
+      "acceptance": "Record actual visual and runtime evidence for appearance combinations, eight-way movement, equipment/gathering/combat/death, save migration, creator cancellation, missing-asset fallback and measured resource/frame-time impact.",
+      "notes": "Image correctness, browser review and game-renderer acceptance are separate evidence. Owner visual acceptance remains open; no full feature completion follows from generated assets or passing source/layer checks.",
+      "github_issue": null,
+      "evidence": [
+        "docs/embervale/05-game/CUSTOM_CHARACTERS.md"
+      ]
     }
-  ]
+  ],
+  "latest_review_scope": "Custom-character source publication, improvement findings and planning only; prior runtime verification remains tied to its original source/configuration.",
+  "custom_character_planning": {
+    "date": "2026-11-22",
+    "runtime_source_inspected": "f2b5c6b210654040e449ffe8101f32052a93d980",
+    "prior_art_candidate": "2c7b9155ec7dc561046aeb0613a88375041f6393",
+    "reference_path": "assets/embervale/custom-character-pilot",
+    "plan": "docs/embervale/05-game/CUSTOM_CHARACTERS.md",
+    "review": "docs/embervale/06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md",
+    "workflow": "docs/embervale/05-game/CUSTOM_CHARACTER_WORKFLOW.md",
+    "decision": "docs/embervale/07-decisions/ADR_021_MODULAR_CHARACTER_APPEARANCE.md",
+    "runtime_integration": "not implemented"
+  }
 }

@@ -1,0 +1,3574 @@
+[
+  {
+    "layer": "image",
+    "frames": [
+      1
+    ],
+    "operation": "select_mask",
+    "name": "shirt",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          29
+        ],
+        [
+          38,
+          27
+        ],
+        [
+          41,
+          31
+        ],
+        [
+          44,
+          27
+        ],
+        [
+          48,
+          29
+        ],
+        [
+          47,
+          38
+        ],
+        [
+          48,
+          44
+        ],
+        [
+          34,
+          44
+        ],
+        [
+          35,
+          38
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      1
+    ],
+    "operation": "select_mask",
+    "name": "pants",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          42
+        ],
+        [
+          48,
+          42
+        ],
+        [
+          50,
+          57
+        ],
+        [
+          32,
+          57
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      1
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "selector": {
+      "kind": "rectangle",
+      "region": [
+        0,
+        0,
+        83,
+        83
+      ]
+    },
+    "reason": "Isolate clothing only"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      1
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          29
+        ],
+        [
+          38,
+          27
+        ],
+        [
+          41,
+          31
+        ],
+        [
+          44,
+          27
+        ],
+        [
+          48,
+          29
+        ],
+        [
+          47,
+          38
+        ],
+        [
+          48,
+          44
+        ],
+        [
+          34,
+          44
+        ],
+        [
+          35,
+          38
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      1
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          42
+        ],
+        [
+          48,
+          42
+        ],
+        [
+          50,
+          57
+        ],
+        [
+          32,
+          57
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      1
+    ],
+    "operation": "brush",
+    "mask": "outside",
+    "mode": "erase",
+    "points": [
+      [
+        42,
+        32
+      ],
+      [
+        42,
+        52
+      ]
+    ],
+    "size": 64,
+    "shape": "square",
+    "reason": "Remove body from clothing layer"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      1
+    ],
+    "operation": "map_colors",
+    "mask": "pants",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#080005ff": "#241d23ff",
+      "#110206ff": "#241d23ff",
+      "#160e15ff": "#241d23ff",
+      "#170506ff": "#241d23ff",
+      "#1a0102ff": "#241d23ff",
+      "#210101ff": "#241d23ff",
+      "#211d25ff": "#241d23ff",
+      "#220705ff": "#241d23ff",
+      "#2d0a17ff": "#241d23ff",
+      "#2d0b06ff": "#241d23ff",
+      "#2f2d33ff": "#352a2aff",
+      "#343439ff": "#352a2aff",
+      "#3d1108ff": "#241d23ff",
+      "#3f4045ff": "#352a2aff",
+      "#45484cff": "#49382fff",
+      "#4b1807ff": "#241d23ff",
+      "#525558ff": "#49382fff",
+      "#5f1c27ff": "#352a2aff",
+      "#636769ff": "#49382fff",
+      "#662011ff": "#352a2aff",
+      "#747a7cff": "#624a38ff",
+      "#7a262bff": "#352a2aff",
+      "#842f2eff": "#352a2aff",
+      "#8e3830ff": "#49382fff",
+      "#90301cff": "#352a2aff",
+      "#9a4231ff": "#49382fff",
+      "#a84f35ff": "#49382fff",
+      "#b25839ff": "#49382fff",
+      "#be6641ff": "#624a38ff",
+      "#ca744aff": "#624a38ff",
+      "#d38052ff": "#624a38ff",
+      "#d8d8cfff": "#97805aff",
+      "#e3e5dcff": "#97805aff",
+      "#e49c69ff": "#7c6247ff",
+      "#eaaa76ff": "#7c6247ff",
+      "#eeb683ff": "#97805aff",
+      "#f4ca9aff": "#97805aff",
+      "#fcebcfff": "#97805aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      1
+    ],
+    "operation": "map_colors",
+    "mask": "shirt",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#080005ff": "#10292aff",
+      "#110206ff": "#10292aff",
+      "#160e15ff": "#10292aff",
+      "#170506ff": "#10292aff",
+      "#1a0102ff": "#10292aff",
+      "#210101ff": "#10292aff",
+      "#211d25ff": "#10292aff",
+      "#220705ff": "#10292aff",
+      "#2d0a17ff": "#10292aff",
+      "#2d0b06ff": "#10292aff",
+      "#2f2d33ff": "#163c3cff",
+      "#343439ff": "#163c3cff",
+      "#3d1108ff": "#10292aff",
+      "#3f4045ff": "#163c3cff",
+      "#45484cff": "#20534fff",
+      "#4b1807ff": "#10292aff",
+      "#525558ff": "#20534fff",
+      "#5f1c27ff": "#163c3cff",
+      "#636769ff": "#20534fff",
+      "#662011ff": "#163c3cff",
+      "#747a7cff": "#2f6c61ff",
+      "#7a262bff": "#163c3cff",
+      "#842f2eff": "#163c3cff",
+      "#8e3830ff": "#20534fff",
+      "#90301cff": "#163c3cff",
+      "#9a4231ff": "#20534fff",
+      "#a84f35ff": "#20534fff",
+      "#b25839ff": "#20534fff",
+      "#be6641ff": "#2f6c61ff",
+      "#ca744aff": "#2f6c61ff",
+      "#d38052ff": "#2f6c61ff",
+      "#d8d8cfff": "#71a18aff",
+      "#e3e5dcff": "#71a18aff",
+      "#e49c69ff": "#488574ff",
+      "#eaaa76ff": "#488574ff",
+      "#eeb683ff": "#71a18aff",
+      "#f4ca9aff": "#71a18aff",
+      "#fcebcfff": "#71a18aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      2
+    ],
+    "operation": "select_mask",
+    "name": "shirt",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          28
+        ],
+        [
+          38,
+          26
+        ],
+        [
+          41,
+          30
+        ],
+        [
+          44,
+          26
+        ],
+        [
+          48,
+          28
+        ],
+        [
+          47,
+          37
+        ],
+        [
+          48,
+          43
+        ],
+        [
+          34,
+          43
+        ],
+        [
+          35,
+          37
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      2
+    ],
+    "operation": "select_mask",
+    "name": "pants",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          41
+        ],
+        [
+          48,
+          41
+        ],
+        [
+          50,
+          56
+        ],
+        [
+          32,
+          56
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      2
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "selector": {
+      "kind": "rectangle",
+      "region": [
+        0,
+        0,
+        83,
+        83
+      ]
+    },
+    "reason": "Isolate clothing only"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      2
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          28
+        ],
+        [
+          38,
+          26
+        ],
+        [
+          41,
+          30
+        ],
+        [
+          44,
+          26
+        ],
+        [
+          48,
+          28
+        ],
+        [
+          47,
+          37
+        ],
+        [
+          48,
+          43
+        ],
+        [
+          34,
+          43
+        ],
+        [
+          35,
+          37
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      2
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          41
+        ],
+        [
+          48,
+          41
+        ],
+        [
+          50,
+          56
+        ],
+        [
+          32,
+          56
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      2
+    ],
+    "operation": "brush",
+    "mask": "outside",
+    "mode": "erase",
+    "points": [
+      [
+        42,
+        32
+      ],
+      [
+        42,
+        52
+      ]
+    ],
+    "size": 64,
+    "shape": "square",
+    "reason": "Remove body from clothing layer"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      2
+    ],
+    "operation": "map_colors",
+    "mask": "pants",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#080005ff": "#241d23ff",
+      "#110206ff": "#241d23ff",
+      "#160e15ff": "#241d23ff",
+      "#170506ff": "#241d23ff",
+      "#1a0102ff": "#241d23ff",
+      "#210101ff": "#241d23ff",
+      "#211d25ff": "#241d23ff",
+      "#220705ff": "#241d23ff",
+      "#2d0a17ff": "#241d23ff",
+      "#2d0b06ff": "#241d23ff",
+      "#2f2d33ff": "#352a2aff",
+      "#343439ff": "#352a2aff",
+      "#3d1108ff": "#241d23ff",
+      "#3f4045ff": "#352a2aff",
+      "#45484cff": "#49382fff",
+      "#525558ff": "#49382fff",
+      "#5f1c27ff": "#352a2aff",
+      "#636769ff": "#49382fff",
+      "#747a7cff": "#624a38ff",
+      "#7a262bff": "#352a2aff",
+      "#842f2eff": "#352a2aff",
+      "#8e3830ff": "#49382fff",
+      "#9a4231ff": "#49382fff",
+      "#a84f35ff": "#49382fff",
+      "#b25839ff": "#49382fff",
+      "#be6641ff": "#624a38ff",
+      "#ca744aff": "#624a38ff",
+      "#d38052ff": "#624a38ff",
+      "#d8d8cfff": "#97805aff",
+      "#e3e5dcff": "#97805aff",
+      "#e49c69ff": "#7c6247ff",
+      "#eaaa76ff": "#7c6247ff",
+      "#eeb683ff": "#97805aff",
+      "#f4ca9aff": "#97805aff",
+      "#fcebcfff": "#97805aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      2
+    ],
+    "operation": "map_colors",
+    "mask": "shirt",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#080005ff": "#10292aff",
+      "#110206ff": "#10292aff",
+      "#160e15ff": "#10292aff",
+      "#170506ff": "#10292aff",
+      "#1a0102ff": "#10292aff",
+      "#210101ff": "#10292aff",
+      "#211d25ff": "#10292aff",
+      "#220705ff": "#10292aff",
+      "#2d0a17ff": "#10292aff",
+      "#2d0b06ff": "#10292aff",
+      "#2f2d33ff": "#163c3cff",
+      "#343439ff": "#163c3cff",
+      "#3d1108ff": "#10292aff",
+      "#3f4045ff": "#163c3cff",
+      "#45484cff": "#20534fff",
+      "#525558ff": "#20534fff",
+      "#5f1c27ff": "#163c3cff",
+      "#636769ff": "#20534fff",
+      "#747a7cff": "#2f6c61ff",
+      "#7a262bff": "#163c3cff",
+      "#842f2eff": "#163c3cff",
+      "#8e3830ff": "#20534fff",
+      "#9a4231ff": "#20534fff",
+      "#a84f35ff": "#20534fff",
+      "#b25839ff": "#20534fff",
+      "#be6641ff": "#2f6c61ff",
+      "#ca744aff": "#2f6c61ff",
+      "#d38052ff": "#2f6c61ff",
+      "#d8d8cfff": "#71a18aff",
+      "#e3e5dcff": "#71a18aff",
+      "#e49c69ff": "#488574ff",
+      "#eaaa76ff": "#488574ff",
+      "#eeb683ff": "#71a18aff",
+      "#f4ca9aff": "#71a18aff",
+      "#fcebcfff": "#71a18aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      3
+    ],
+    "operation": "select_mask",
+    "name": "shirt",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          28
+        ],
+        [
+          38,
+          26
+        ],
+        [
+          41,
+          30
+        ],
+        [
+          44,
+          26
+        ],
+        [
+          48,
+          28
+        ],
+        [
+          47,
+          37
+        ],
+        [
+          48,
+          43
+        ],
+        [
+          34,
+          43
+        ],
+        [
+          35,
+          37
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      3
+    ],
+    "operation": "select_mask",
+    "name": "pants",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          41
+        ],
+        [
+          48,
+          41
+        ],
+        [
+          50,
+          56
+        ],
+        [
+          32,
+          56
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      3
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "selector": {
+      "kind": "rectangle",
+      "region": [
+        0,
+        0,
+        83,
+        83
+      ]
+    },
+    "reason": "Isolate clothing only"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      3
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          28
+        ],
+        [
+          38,
+          26
+        ],
+        [
+          41,
+          30
+        ],
+        [
+          44,
+          26
+        ],
+        [
+          48,
+          28
+        ],
+        [
+          47,
+          37
+        ],
+        [
+          48,
+          43
+        ],
+        [
+          34,
+          43
+        ],
+        [
+          35,
+          37
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      3
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          41
+        ],
+        [
+          48,
+          41
+        ],
+        [
+          50,
+          56
+        ],
+        [
+          32,
+          56
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      3
+    ],
+    "operation": "brush",
+    "mask": "outside",
+    "mode": "erase",
+    "points": [
+      [
+        42,
+        32
+      ],
+      [
+        42,
+        52
+      ]
+    ],
+    "size": 64,
+    "shape": "square",
+    "reason": "Remove body from clothing layer"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      3
+    ],
+    "operation": "map_colors",
+    "mask": "pants",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#080005ff": "#241d23ff",
+      "#110206ff": "#241d23ff",
+      "#160e15ff": "#241d23ff",
+      "#170506ff": "#241d23ff",
+      "#1a0102ff": "#241d23ff",
+      "#210101ff": "#241d23ff",
+      "#211d25ff": "#241d23ff",
+      "#220705ff": "#241d23ff",
+      "#2d0a17ff": "#241d23ff",
+      "#2d0b06ff": "#241d23ff",
+      "#2f2d33ff": "#352a2aff",
+      "#343439ff": "#352a2aff",
+      "#3d1108ff": "#241d23ff",
+      "#3f4045ff": "#352a2aff",
+      "#45484cff": "#49382fff",
+      "#4b1807ff": "#241d23ff",
+      "#525558ff": "#49382fff",
+      "#5f1c27ff": "#352a2aff",
+      "#636769ff": "#49382fff",
+      "#662011ff": "#352a2aff",
+      "#747a7cff": "#624a38ff",
+      "#7a262bff": "#352a2aff",
+      "#842f2eff": "#352a2aff",
+      "#8e3830ff": "#49382fff",
+      "#90301cff": "#352a2aff",
+      "#9a4231ff": "#49382fff",
+      "#a84f35ff": "#49382fff",
+      "#b25839ff": "#49382fff",
+      "#be6641ff": "#624a38ff",
+      "#ca744aff": "#624a38ff",
+      "#d38052ff": "#624a38ff",
+      "#d8d8cfff": "#97805aff",
+      "#e3e5dcff": "#97805aff",
+      "#e49c69ff": "#7c6247ff",
+      "#eaaa76ff": "#7c6247ff",
+      "#eeb683ff": "#97805aff",
+      "#f4ca9aff": "#97805aff",
+      "#fcebcfff": "#97805aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      3
+    ],
+    "operation": "map_colors",
+    "mask": "shirt",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#080005ff": "#10292aff",
+      "#110206ff": "#10292aff",
+      "#160e15ff": "#10292aff",
+      "#170506ff": "#10292aff",
+      "#1a0102ff": "#10292aff",
+      "#210101ff": "#10292aff",
+      "#211d25ff": "#10292aff",
+      "#220705ff": "#10292aff",
+      "#2d0a17ff": "#10292aff",
+      "#2d0b06ff": "#10292aff",
+      "#2f2d33ff": "#163c3cff",
+      "#343439ff": "#163c3cff",
+      "#3d1108ff": "#10292aff",
+      "#3f4045ff": "#163c3cff",
+      "#45484cff": "#20534fff",
+      "#4b1807ff": "#10292aff",
+      "#525558ff": "#20534fff",
+      "#5f1c27ff": "#163c3cff",
+      "#636769ff": "#20534fff",
+      "#662011ff": "#163c3cff",
+      "#747a7cff": "#2f6c61ff",
+      "#7a262bff": "#163c3cff",
+      "#842f2eff": "#163c3cff",
+      "#8e3830ff": "#20534fff",
+      "#90301cff": "#163c3cff",
+      "#9a4231ff": "#20534fff",
+      "#a84f35ff": "#20534fff",
+      "#b25839ff": "#20534fff",
+      "#be6641ff": "#2f6c61ff",
+      "#ca744aff": "#2f6c61ff",
+      "#d38052ff": "#2f6c61ff",
+      "#d8d8cfff": "#71a18aff",
+      "#e3e5dcff": "#71a18aff",
+      "#e49c69ff": "#488574ff",
+      "#eaaa76ff": "#488574ff",
+      "#eeb683ff": "#71a18aff",
+      "#f4ca9aff": "#71a18aff",
+      "#fcebcfff": "#71a18aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      4
+    ],
+    "operation": "select_mask",
+    "name": "shirt",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          29
+        ],
+        [
+          38,
+          27
+        ],
+        [
+          41,
+          31
+        ],
+        [
+          44,
+          27
+        ],
+        [
+          48,
+          29
+        ],
+        [
+          47,
+          38
+        ],
+        [
+          48,
+          44
+        ],
+        [
+          34,
+          44
+        ],
+        [
+          35,
+          38
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      4
+    ],
+    "operation": "select_mask",
+    "name": "pants",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          42
+        ],
+        [
+          48,
+          42
+        ],
+        [
+          50,
+          57
+        ],
+        [
+          32,
+          57
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      4
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "selector": {
+      "kind": "rectangle",
+      "region": [
+        0,
+        0,
+        83,
+        83
+      ]
+    },
+    "reason": "Isolate clothing only"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      4
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          29
+        ],
+        [
+          38,
+          27
+        ],
+        [
+          41,
+          31
+        ],
+        [
+          44,
+          27
+        ],
+        [
+          48,
+          29
+        ],
+        [
+          47,
+          38
+        ],
+        [
+          48,
+          44
+        ],
+        [
+          34,
+          44
+        ],
+        [
+          35,
+          38
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      4
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          42
+        ],
+        [
+          48,
+          42
+        ],
+        [
+          50,
+          57
+        ],
+        [
+          32,
+          57
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      4
+    ],
+    "operation": "brush",
+    "mask": "outside",
+    "mode": "erase",
+    "points": [
+      [
+        42,
+        32
+      ],
+      [
+        42,
+        52
+      ]
+    ],
+    "size": 64,
+    "shape": "square",
+    "reason": "Remove body from clothing layer"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      4
+    ],
+    "operation": "map_colors",
+    "mask": "pants",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#080005ff": "#241d23ff",
+      "#110206ff": "#241d23ff",
+      "#160e15ff": "#241d23ff",
+      "#170506ff": "#241d23ff",
+      "#1a0102ff": "#241d23ff",
+      "#210101ff": "#241d23ff",
+      "#211d25ff": "#241d23ff",
+      "#220705ff": "#241d23ff",
+      "#2d0a17ff": "#241d23ff",
+      "#2d0b06ff": "#241d23ff",
+      "#2f2d33ff": "#352a2aff",
+      "#343439ff": "#352a2aff",
+      "#3d1108ff": "#241d23ff",
+      "#3f4045ff": "#352a2aff",
+      "#45484cff": "#49382fff",
+      "#4b1807ff": "#241d23ff",
+      "#525558ff": "#49382fff",
+      "#5f1c27ff": "#352a2aff",
+      "#636769ff": "#49382fff",
+      "#747a7cff": "#624a38ff",
+      "#7a262bff": "#352a2aff",
+      "#842f2eff": "#352a2aff",
+      "#8e3830ff": "#49382fff",
+      "#9a4231ff": "#49382fff",
+      "#a84f35ff": "#49382fff",
+      "#b25839ff": "#49382fff",
+      "#be6641ff": "#624a38ff",
+      "#ca744aff": "#624a38ff",
+      "#d38052ff": "#624a38ff",
+      "#d8d8cfff": "#97805aff",
+      "#e3e5dcff": "#97805aff",
+      "#e49c69ff": "#7c6247ff",
+      "#eaaa76ff": "#7c6247ff",
+      "#eeb683ff": "#97805aff",
+      "#f4ca9aff": "#97805aff",
+      "#fcebcfff": "#97805aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      4
+    ],
+    "operation": "map_colors",
+    "mask": "shirt",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#080005ff": "#10292aff",
+      "#110206ff": "#10292aff",
+      "#160e15ff": "#10292aff",
+      "#170506ff": "#10292aff",
+      "#1a0102ff": "#10292aff",
+      "#210101ff": "#10292aff",
+      "#211d25ff": "#10292aff",
+      "#220705ff": "#10292aff",
+      "#2d0a17ff": "#10292aff",
+      "#2d0b06ff": "#10292aff",
+      "#2f2d33ff": "#163c3cff",
+      "#343439ff": "#163c3cff",
+      "#3d1108ff": "#10292aff",
+      "#3f4045ff": "#163c3cff",
+      "#45484cff": "#20534fff",
+      "#4b1807ff": "#10292aff",
+      "#525558ff": "#20534fff",
+      "#5f1c27ff": "#163c3cff",
+      "#636769ff": "#20534fff",
+      "#747a7cff": "#2f6c61ff",
+      "#7a262bff": "#163c3cff",
+      "#842f2eff": "#163c3cff",
+      "#8e3830ff": "#20534fff",
+      "#9a4231ff": "#20534fff",
+      "#a84f35ff": "#20534fff",
+      "#b25839ff": "#20534fff",
+      "#be6641ff": "#2f6c61ff",
+      "#ca744aff": "#2f6c61ff",
+      "#d38052ff": "#2f6c61ff",
+      "#d8d8cfff": "#71a18aff",
+      "#e3e5dcff": "#71a18aff",
+      "#e49c69ff": "#488574ff",
+      "#eaaa76ff": "#488574ff",
+      "#eeb683ff": "#71a18aff",
+      "#f4ca9aff": "#71a18aff",
+      "#fcebcfff": "#71a18aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      5
+    ],
+    "operation": "select_mask",
+    "name": "shirt",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          31
+        ],
+        [
+          38,
+          29
+        ],
+        [
+          41,
+          33
+        ],
+        [
+          44,
+          29
+        ],
+        [
+          48,
+          31
+        ],
+        [
+          47,
+          40
+        ],
+        [
+          48,
+          46
+        ],
+        [
+          34,
+          46
+        ],
+        [
+          35,
+          40
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      5
+    ],
+    "operation": "select_mask",
+    "name": "pants",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          35,
+          44
+        ],
+        [
+          48,
+          44
+        ],
+        [
+          50,
+          59
+        ],
+        [
+          33,
+          59
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      5
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "selector": {
+      "kind": "rectangle",
+      "region": [
+        0,
+        0,
+        83,
+        83
+      ]
+    },
+    "reason": "Isolate clothing only"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      5
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          31
+        ],
+        [
+          38,
+          29
+        ],
+        [
+          41,
+          33
+        ],
+        [
+          44,
+          29
+        ],
+        [
+          48,
+          31
+        ],
+        [
+          47,
+          40
+        ],
+        [
+          48,
+          46
+        ],
+        [
+          34,
+          46
+        ],
+        [
+          35,
+          40
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      5
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          35,
+          44
+        ],
+        [
+          48,
+          44
+        ],
+        [
+          50,
+          59
+        ],
+        [
+          33,
+          59
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      5
+    ],
+    "operation": "brush",
+    "mask": "outside",
+    "mode": "erase",
+    "points": [
+      [
+        42,
+        32
+      ],
+      [
+        42,
+        52
+      ]
+    ],
+    "size": 64,
+    "shape": "square",
+    "reason": "Remove body from clothing layer"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      5
+    ],
+    "operation": "map_colors",
+    "mask": "pants",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#110206ff": "#241d23ff",
+      "#170506ff": "#241d23ff",
+      "#1a0102ff": "#241d23ff",
+      "#210101ff": "#241d23ff",
+      "#211d25ff": "#241d23ff",
+      "#2d0a17ff": "#241d23ff",
+      "#2d0b06ff": "#241d23ff",
+      "#2f2d33ff": "#352a2aff",
+      "#343439ff": "#352a2aff",
+      "#45484cff": "#49382fff",
+      "#4b1807ff": "#241d23ff",
+      "#525558ff": "#49382fff",
+      "#5f1c27ff": "#352a2aff",
+      "#636769ff": "#49382fff",
+      "#747a7cff": "#624a38ff",
+      "#7a262bff": "#352a2aff",
+      "#842f2eff": "#352a2aff",
+      "#8e3830ff": "#49382fff",
+      "#9a4231ff": "#49382fff",
+      "#a84f35ff": "#49382fff",
+      "#b25839ff": "#49382fff",
+      "#be6641ff": "#624a38ff",
+      "#ca744aff": "#624a38ff",
+      "#d38052ff": "#624a38ff",
+      "#e3e5dcff": "#97805aff",
+      "#e49c69ff": "#7c6247ff",
+      "#eaaa76ff": "#7c6247ff",
+      "#eeb683ff": "#97805aff",
+      "#f4ca9aff": "#97805aff",
+      "#fcebcfff": "#97805aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      5
+    ],
+    "operation": "map_colors",
+    "mask": "shirt",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#110206ff": "#10292aff",
+      "#170506ff": "#10292aff",
+      "#1a0102ff": "#10292aff",
+      "#210101ff": "#10292aff",
+      "#211d25ff": "#10292aff",
+      "#2d0a17ff": "#10292aff",
+      "#2d0b06ff": "#10292aff",
+      "#2f2d33ff": "#163c3cff",
+      "#343439ff": "#163c3cff",
+      "#45484cff": "#20534fff",
+      "#4b1807ff": "#10292aff",
+      "#525558ff": "#20534fff",
+      "#5f1c27ff": "#163c3cff",
+      "#636769ff": "#20534fff",
+      "#747a7cff": "#2f6c61ff",
+      "#7a262bff": "#163c3cff",
+      "#842f2eff": "#163c3cff",
+      "#8e3830ff": "#20534fff",
+      "#9a4231ff": "#20534fff",
+      "#a84f35ff": "#20534fff",
+      "#b25839ff": "#20534fff",
+      "#be6641ff": "#2f6c61ff",
+      "#ca744aff": "#2f6c61ff",
+      "#d38052ff": "#2f6c61ff",
+      "#e3e5dcff": "#71a18aff",
+      "#e49c69ff": "#488574ff",
+      "#eaaa76ff": "#488574ff",
+      "#eeb683ff": "#71a18aff",
+      "#f4ca9aff": "#71a18aff",
+      "#fcebcfff": "#71a18aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      6
+    ],
+    "operation": "select_mask",
+    "name": "shirt",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          30
+        ],
+        [
+          38,
+          28
+        ],
+        [
+          41,
+          32
+        ],
+        [
+          44,
+          28
+        ],
+        [
+          48,
+          30
+        ],
+        [
+          47,
+          39
+        ],
+        [
+          48,
+          45
+        ],
+        [
+          34,
+          45
+        ],
+        [
+          35,
+          39
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      6
+    ],
+    "operation": "select_mask",
+    "name": "pants",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          35,
+          43
+        ],
+        [
+          48,
+          43
+        ],
+        [
+          50,
+          58
+        ],
+        [
+          33,
+          58
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      6
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "selector": {
+      "kind": "rectangle",
+      "region": [
+        0,
+        0,
+        83,
+        83
+      ]
+    },
+    "reason": "Isolate clothing only"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      6
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          30
+        ],
+        [
+          38,
+          28
+        ],
+        [
+          41,
+          32
+        ],
+        [
+          44,
+          28
+        ],
+        [
+          48,
+          30
+        ],
+        [
+          47,
+          39
+        ],
+        [
+          48,
+          45
+        ],
+        [
+          34,
+          45
+        ],
+        [
+          35,
+          39
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      6
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          35,
+          43
+        ],
+        [
+          48,
+          43
+        ],
+        [
+          50,
+          58
+        ],
+        [
+          33,
+          58
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      6
+    ],
+    "operation": "brush",
+    "mask": "outside",
+    "mode": "erase",
+    "points": [
+      [
+        42,
+        32
+      ],
+      [
+        42,
+        52
+      ]
+    ],
+    "size": 64,
+    "shape": "square",
+    "reason": "Remove body from clothing layer"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      6
+    ],
+    "operation": "map_colors",
+    "mask": "pants",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#110206ff": "#241d23ff",
+      "#1a0102ff": "#241d23ff",
+      "#210101ff": "#241d23ff",
+      "#211d25ff": "#241d23ff",
+      "#2d0a17ff": "#241d23ff",
+      "#2d0b06ff": "#241d23ff",
+      "#2f2d33ff": "#352a2aff",
+      "#343439ff": "#352a2aff",
+      "#45484cff": "#49382fff",
+      "#4b1807ff": "#241d23ff",
+      "#525558ff": "#49382fff",
+      "#5f1c27ff": "#352a2aff",
+      "#636769ff": "#49382fff",
+      "#747a7cff": "#624a38ff",
+      "#7a262bff": "#352a2aff",
+      "#842f2eff": "#352a2aff",
+      "#8e3830ff": "#49382fff",
+      "#9a4231ff": "#49382fff",
+      "#a84f35ff": "#49382fff",
+      "#b25839ff": "#49382fff",
+      "#be6641ff": "#624a38ff",
+      "#ca744aff": "#624a38ff",
+      "#d38052ff": "#624a38ff",
+      "#e3e5dcff": "#97805aff",
+      "#e49c69ff": "#7c6247ff",
+      "#eaaa76ff": "#7c6247ff",
+      "#eeb683ff": "#97805aff",
+      "#f4ca9aff": "#97805aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      6
+    ],
+    "operation": "map_colors",
+    "mask": "shirt",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#110206ff": "#10292aff",
+      "#1a0102ff": "#10292aff",
+      "#210101ff": "#10292aff",
+      "#211d25ff": "#10292aff",
+      "#2d0a17ff": "#10292aff",
+      "#2d0b06ff": "#10292aff",
+      "#2f2d33ff": "#163c3cff",
+      "#343439ff": "#163c3cff",
+      "#45484cff": "#20534fff",
+      "#4b1807ff": "#10292aff",
+      "#525558ff": "#20534fff",
+      "#5f1c27ff": "#163c3cff",
+      "#636769ff": "#20534fff",
+      "#747a7cff": "#2f6c61ff",
+      "#7a262bff": "#163c3cff",
+      "#842f2eff": "#163c3cff",
+      "#8e3830ff": "#20534fff",
+      "#9a4231ff": "#20534fff",
+      "#a84f35ff": "#20534fff",
+      "#b25839ff": "#20534fff",
+      "#be6641ff": "#2f6c61ff",
+      "#ca744aff": "#2f6c61ff",
+      "#d38052ff": "#2f6c61ff",
+      "#e3e5dcff": "#71a18aff",
+      "#e49c69ff": "#488574ff",
+      "#eaaa76ff": "#488574ff",
+      "#eeb683ff": "#71a18aff",
+      "#f4ca9aff": "#71a18aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      7
+    ],
+    "operation": "select_mask",
+    "name": "shirt",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          31
+        ],
+        [
+          38,
+          29
+        ],
+        [
+          41,
+          33
+        ],
+        [
+          44,
+          29
+        ],
+        [
+          48,
+          31
+        ],
+        [
+          47,
+          40
+        ],
+        [
+          48,
+          46
+        ],
+        [
+          34,
+          46
+        ],
+        [
+          35,
+          40
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      7
+    ],
+    "operation": "select_mask",
+    "name": "pants",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          35,
+          44
+        ],
+        [
+          47,
+          44
+        ],
+        [
+          49,
+          59
+        ],
+        [
+          33,
+          59
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      7
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "selector": {
+      "kind": "rectangle",
+      "region": [
+        0,
+        0,
+        83,
+        83
+      ]
+    },
+    "reason": "Isolate clothing only"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      7
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          31
+        ],
+        [
+          38,
+          29
+        ],
+        [
+          41,
+          33
+        ],
+        [
+          44,
+          29
+        ],
+        [
+          48,
+          31
+        ],
+        [
+          47,
+          40
+        ],
+        [
+          48,
+          46
+        ],
+        [
+          34,
+          46
+        ],
+        [
+          35,
+          40
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      7
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          35,
+          44
+        ],
+        [
+          47,
+          44
+        ],
+        [
+          49,
+          59
+        ],
+        [
+          33,
+          59
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      7
+    ],
+    "operation": "brush",
+    "mask": "outside",
+    "mode": "erase",
+    "points": [
+      [
+        42,
+        32
+      ],
+      [
+        42,
+        52
+      ]
+    ],
+    "size": 64,
+    "shape": "square",
+    "reason": "Remove body from clothing layer"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      7
+    ],
+    "operation": "map_colors",
+    "mask": "pants",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#110206ff": "#241d23ff",
+      "#1a0102ff": "#241d23ff",
+      "#210101ff": "#241d23ff",
+      "#211d25ff": "#241d23ff",
+      "#2d0a17ff": "#241d23ff",
+      "#2d0b06ff": "#241d23ff",
+      "#2f2d33ff": "#352a2aff",
+      "#343439ff": "#352a2aff",
+      "#45484cff": "#49382fff",
+      "#4b1807ff": "#241d23ff",
+      "#525558ff": "#49382fff",
+      "#5f1c27ff": "#352a2aff",
+      "#636769ff": "#49382fff",
+      "#747a7cff": "#624a38ff",
+      "#7a262bff": "#352a2aff",
+      "#842f2eff": "#352a2aff",
+      "#8e3830ff": "#49382fff",
+      "#9a4231ff": "#49382fff",
+      "#a84f35ff": "#49382fff",
+      "#b25839ff": "#49382fff",
+      "#be6641ff": "#624a38ff",
+      "#ca744aff": "#624a38ff",
+      "#d38052ff": "#624a38ff",
+      "#e3e5dcff": "#97805aff",
+      "#e49c69ff": "#7c6247ff",
+      "#eaaa76ff": "#7c6247ff",
+      "#eeb683ff": "#97805aff",
+      "#f4ca9aff": "#97805aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      7
+    ],
+    "operation": "map_colors",
+    "mask": "shirt",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#110206ff": "#10292aff",
+      "#1a0102ff": "#10292aff",
+      "#210101ff": "#10292aff",
+      "#211d25ff": "#10292aff",
+      "#2d0a17ff": "#10292aff",
+      "#2d0b06ff": "#10292aff",
+      "#2f2d33ff": "#163c3cff",
+      "#343439ff": "#163c3cff",
+      "#45484cff": "#20534fff",
+      "#4b1807ff": "#10292aff",
+      "#525558ff": "#20534fff",
+      "#5f1c27ff": "#163c3cff",
+      "#636769ff": "#20534fff",
+      "#747a7cff": "#2f6c61ff",
+      "#7a262bff": "#163c3cff",
+      "#842f2eff": "#163c3cff",
+      "#8e3830ff": "#20534fff",
+      "#9a4231ff": "#20534fff",
+      "#a84f35ff": "#20534fff",
+      "#b25839ff": "#20534fff",
+      "#be6641ff": "#2f6c61ff",
+      "#ca744aff": "#2f6c61ff",
+      "#d38052ff": "#2f6c61ff",
+      "#e3e5dcff": "#71a18aff",
+      "#e49c69ff": "#488574ff",
+      "#eaaa76ff": "#488574ff",
+      "#eeb683ff": "#71a18aff",
+      "#f4ca9aff": "#71a18aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      8
+    ],
+    "operation": "select_mask",
+    "name": "shirt",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          33,
+          32
+        ],
+        [
+          37,
+          30
+        ],
+        [
+          40,
+          34
+        ],
+        [
+          43,
+          30
+        ],
+        [
+          47,
+          32
+        ],
+        [
+          46,
+          41
+        ],
+        [
+          47,
+          47
+        ],
+        [
+          33,
+          47
+        ],
+        [
+          34,
+          41
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      8
+    ],
+    "operation": "select_mask",
+    "name": "pants",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          45
+        ],
+        [
+          46,
+          45
+        ],
+        [
+          48,
+          60
+        ],
+        [
+          32,
+          60
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      8
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "selector": {
+      "kind": "rectangle",
+      "region": [
+        0,
+        0,
+        83,
+        83
+      ]
+    },
+    "reason": "Isolate clothing only"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      8
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          33,
+          32
+        ],
+        [
+          37,
+          30
+        ],
+        [
+          40,
+          34
+        ],
+        [
+          43,
+          30
+        ],
+        [
+          47,
+          32
+        ],
+        [
+          46,
+          41
+        ],
+        [
+          47,
+          47
+        ],
+        [
+          33,
+          47
+        ],
+        [
+          34,
+          41
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      8
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          45
+        ],
+        [
+          46,
+          45
+        ],
+        [
+          48,
+          60
+        ],
+        [
+          32,
+          60
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      8
+    ],
+    "operation": "brush",
+    "mask": "outside",
+    "mode": "erase",
+    "points": [
+      [
+        42,
+        32
+      ],
+      [
+        42,
+        52
+      ]
+    ],
+    "size": 64,
+    "shape": "square",
+    "reason": "Remove body from clothing layer"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      8
+    ],
+    "operation": "map_colors",
+    "mask": "pants",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#110206ff": "#241d23ff",
+      "#1a0102ff": "#241d23ff",
+      "#210101ff": "#241d23ff",
+      "#211d25ff": "#241d23ff",
+      "#2d0b06ff": "#241d23ff",
+      "#2f2d33ff": "#352a2aff",
+      "#343439ff": "#352a2aff",
+      "#45484cff": "#49382fff",
+      "#4b1807ff": "#241d23ff",
+      "#525558ff": "#49382fff",
+      "#5f1c27ff": "#352a2aff",
+      "#636769ff": "#49382fff",
+      "#747a7cff": "#624a38ff",
+      "#7a262bff": "#352a2aff",
+      "#842f2eff": "#352a2aff",
+      "#8e3830ff": "#49382fff",
+      "#9a4231ff": "#49382fff",
+      "#a84f35ff": "#49382fff",
+      "#b25839ff": "#49382fff",
+      "#be6641ff": "#624a38ff",
+      "#ca744aff": "#624a38ff",
+      "#d38052ff": "#624a38ff",
+      "#e3e5dcff": "#97805aff",
+      "#e49c69ff": "#7c6247ff",
+      "#eaaa76ff": "#7c6247ff",
+      "#eeb683ff": "#97805aff",
+      "#f4ca9aff": "#97805aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      8
+    ],
+    "operation": "map_colors",
+    "mask": "shirt",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#110206ff": "#10292aff",
+      "#1a0102ff": "#10292aff",
+      "#210101ff": "#10292aff",
+      "#211d25ff": "#10292aff",
+      "#2d0b06ff": "#10292aff",
+      "#2f2d33ff": "#163c3cff",
+      "#343439ff": "#163c3cff",
+      "#45484cff": "#20534fff",
+      "#4b1807ff": "#10292aff",
+      "#525558ff": "#20534fff",
+      "#5f1c27ff": "#163c3cff",
+      "#636769ff": "#20534fff",
+      "#747a7cff": "#2f6c61ff",
+      "#7a262bff": "#163c3cff",
+      "#842f2eff": "#163c3cff",
+      "#8e3830ff": "#20534fff",
+      "#9a4231ff": "#20534fff",
+      "#a84f35ff": "#20534fff",
+      "#b25839ff": "#20534fff",
+      "#be6641ff": "#2f6c61ff",
+      "#ca744aff": "#2f6c61ff",
+      "#d38052ff": "#2f6c61ff",
+      "#e3e5dcff": "#71a18aff",
+      "#e49c69ff": "#488574ff",
+      "#eaaa76ff": "#488574ff",
+      "#eeb683ff": "#71a18aff",
+      "#f4ca9aff": "#71a18aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      9
+    ],
+    "operation": "select_mask",
+    "name": "shirt",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          33,
+          31
+        ],
+        [
+          37,
+          29
+        ],
+        [
+          40,
+          33
+        ],
+        [
+          43,
+          29
+        ],
+        [
+          47,
+          31
+        ],
+        [
+          46,
+          40
+        ],
+        [
+          47,
+          46
+        ],
+        [
+          33,
+          46
+        ],
+        [
+          34,
+          40
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      9
+    ],
+    "operation": "select_mask",
+    "name": "pants",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          44
+        ],
+        [
+          47,
+          44
+        ],
+        [
+          49,
+          59
+        ],
+        [
+          32,
+          59
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      9
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "selector": {
+      "kind": "rectangle",
+      "region": [
+        0,
+        0,
+        83,
+        83
+      ]
+    },
+    "reason": "Isolate clothing only"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      9
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          33,
+          31
+        ],
+        [
+          37,
+          29
+        ],
+        [
+          40,
+          33
+        ],
+        [
+          43,
+          29
+        ],
+        [
+          47,
+          31
+        ],
+        [
+          46,
+          40
+        ],
+        [
+          47,
+          46
+        ],
+        [
+          33,
+          46
+        ],
+        [
+          34,
+          40
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      9
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          44
+        ],
+        [
+          47,
+          44
+        ],
+        [
+          49,
+          59
+        ],
+        [
+          32,
+          59
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      9
+    ],
+    "operation": "brush",
+    "mask": "outside",
+    "mode": "erase",
+    "points": [
+      [
+        42,
+        32
+      ],
+      [
+        42,
+        52
+      ]
+    ],
+    "size": 64,
+    "shape": "square",
+    "reason": "Remove body from clothing layer"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      9
+    ],
+    "operation": "map_colors",
+    "mask": "pants",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#110206ff": "#241d23ff",
+      "#1a0102ff": "#241d23ff",
+      "#210101ff": "#241d23ff",
+      "#211d25ff": "#241d23ff",
+      "#2d0b06ff": "#241d23ff",
+      "#2f2d33ff": "#352a2aff",
+      "#343439ff": "#352a2aff",
+      "#45484cff": "#49382fff",
+      "#4b1807ff": "#241d23ff",
+      "#525558ff": "#49382fff",
+      "#5f1c27ff": "#352a2aff",
+      "#636769ff": "#49382fff",
+      "#747a7cff": "#624a38ff",
+      "#7a262bff": "#352a2aff",
+      "#842f2eff": "#352a2aff",
+      "#8e3830ff": "#49382fff",
+      "#9a4231ff": "#49382fff",
+      "#a84f35ff": "#49382fff",
+      "#b25839ff": "#49382fff",
+      "#be6641ff": "#624a38ff",
+      "#ca744aff": "#624a38ff",
+      "#d38052ff": "#624a38ff",
+      "#e3e5dcff": "#97805aff",
+      "#e49c69ff": "#7c6247ff",
+      "#eaaa76ff": "#7c6247ff",
+      "#eeb683ff": "#97805aff",
+      "#f4ca9aff": "#97805aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      9
+    ],
+    "operation": "map_colors",
+    "mask": "shirt",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#110206ff": "#10292aff",
+      "#1a0102ff": "#10292aff",
+      "#210101ff": "#10292aff",
+      "#211d25ff": "#10292aff",
+      "#2d0b06ff": "#10292aff",
+      "#2f2d33ff": "#163c3cff",
+      "#343439ff": "#163c3cff",
+      "#45484cff": "#20534fff",
+      "#4b1807ff": "#10292aff",
+      "#525558ff": "#20534fff",
+      "#5f1c27ff": "#163c3cff",
+      "#636769ff": "#20534fff",
+      "#747a7cff": "#2f6c61ff",
+      "#7a262bff": "#163c3cff",
+      "#842f2eff": "#163c3cff",
+      "#8e3830ff": "#20534fff",
+      "#9a4231ff": "#20534fff",
+      "#a84f35ff": "#20534fff",
+      "#b25839ff": "#20534fff",
+      "#be6641ff": "#2f6c61ff",
+      "#ca744aff": "#2f6c61ff",
+      "#d38052ff": "#2f6c61ff",
+      "#e3e5dcff": "#71a18aff",
+      "#e49c69ff": "#488574ff",
+      "#eaaa76ff": "#488574ff",
+      "#eeb683ff": "#71a18aff",
+      "#f4ca9aff": "#71a18aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      10
+    ],
+    "operation": "select_mask",
+    "name": "shirt",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          33,
+          30
+        ],
+        [
+          37,
+          28
+        ],
+        [
+          40,
+          32
+        ],
+        [
+          43,
+          28
+        ],
+        [
+          47,
+          30
+        ],
+        [
+          46,
+          39
+        ],
+        [
+          47,
+          45
+        ],
+        [
+          33,
+          45
+        ],
+        [
+          34,
+          39
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      10
+    ],
+    "operation": "select_mask",
+    "name": "pants",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          43
+        ],
+        [
+          47,
+          43
+        ],
+        [
+          49,
+          58
+        ],
+        [
+          32,
+          58
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      10
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "selector": {
+      "kind": "rectangle",
+      "region": [
+        0,
+        0,
+        83,
+        83
+      ]
+    },
+    "reason": "Isolate clothing only"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      10
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          33,
+          30
+        ],
+        [
+          37,
+          28
+        ],
+        [
+          40,
+          32
+        ],
+        [
+          43,
+          28
+        ],
+        [
+          47,
+          30
+        ],
+        [
+          46,
+          39
+        ],
+        [
+          47,
+          45
+        ],
+        [
+          33,
+          45
+        ],
+        [
+          34,
+          39
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      10
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          43
+        ],
+        [
+          47,
+          43
+        ],
+        [
+          49,
+          58
+        ],
+        [
+          32,
+          58
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      10
+    ],
+    "operation": "brush",
+    "mask": "outside",
+    "mode": "erase",
+    "points": [
+      [
+        42,
+        32
+      ],
+      [
+        42,
+        52
+      ]
+    ],
+    "size": 64,
+    "shape": "square",
+    "reason": "Remove body from clothing layer"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      10
+    ],
+    "operation": "map_colors",
+    "mask": "pants",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#110206ff": "#241d23ff",
+      "#1a0102ff": "#241d23ff",
+      "#210101ff": "#241d23ff",
+      "#211d25ff": "#241d23ff",
+      "#2d0a17ff": "#241d23ff",
+      "#2d0b06ff": "#241d23ff",
+      "#2f2d33ff": "#352a2aff",
+      "#343439ff": "#352a2aff",
+      "#45484cff": "#49382fff",
+      "#4b1807ff": "#241d23ff",
+      "#525558ff": "#49382fff",
+      "#5f1c27ff": "#352a2aff",
+      "#636769ff": "#49382fff",
+      "#747a7cff": "#624a38ff",
+      "#7a262bff": "#352a2aff",
+      "#842f2eff": "#352a2aff",
+      "#8e3830ff": "#49382fff",
+      "#9a4231ff": "#49382fff",
+      "#a84f35ff": "#49382fff",
+      "#b25839ff": "#49382fff",
+      "#be6641ff": "#624a38ff",
+      "#ca744aff": "#624a38ff",
+      "#d38052ff": "#624a38ff",
+      "#e3e5dcff": "#97805aff",
+      "#e49c69ff": "#7c6247ff",
+      "#eaaa76ff": "#7c6247ff",
+      "#eeb683ff": "#97805aff",
+      "#f4ca9aff": "#97805aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      10
+    ],
+    "operation": "map_colors",
+    "mask": "shirt",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#110206ff": "#10292aff",
+      "#1a0102ff": "#10292aff",
+      "#210101ff": "#10292aff",
+      "#211d25ff": "#10292aff",
+      "#2d0a17ff": "#10292aff",
+      "#2d0b06ff": "#10292aff",
+      "#2f2d33ff": "#163c3cff",
+      "#343439ff": "#163c3cff",
+      "#45484cff": "#20534fff",
+      "#4b1807ff": "#10292aff",
+      "#525558ff": "#20534fff",
+      "#5f1c27ff": "#163c3cff",
+      "#636769ff": "#20534fff",
+      "#747a7cff": "#2f6c61ff",
+      "#7a262bff": "#163c3cff",
+      "#842f2eff": "#163c3cff",
+      "#8e3830ff": "#20534fff",
+      "#9a4231ff": "#20534fff",
+      "#a84f35ff": "#20534fff",
+      "#b25839ff": "#20534fff",
+      "#be6641ff": "#2f6c61ff",
+      "#ca744aff": "#2f6c61ff",
+      "#d38052ff": "#2f6c61ff",
+      "#e3e5dcff": "#71a18aff",
+      "#e49c69ff": "#488574ff",
+      "#eaaa76ff": "#488574ff",
+      "#eeb683ff": "#71a18aff",
+      "#f4ca9aff": "#71a18aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      11
+    ],
+    "operation": "select_mask",
+    "name": "shirt",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          33,
+          31
+        ],
+        [
+          37,
+          29
+        ],
+        [
+          40,
+          33
+        ],
+        [
+          43,
+          29
+        ],
+        [
+          47,
+          31
+        ],
+        [
+          46,
+          40
+        ],
+        [
+          47,
+          46
+        ],
+        [
+          33,
+          46
+        ],
+        [
+          34,
+          40
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      11
+    ],
+    "operation": "select_mask",
+    "name": "pants",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          44
+        ],
+        [
+          47,
+          44
+        ],
+        [
+          49,
+          59
+        ],
+        [
+          32,
+          59
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      11
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "selector": {
+      "kind": "rectangle",
+      "region": [
+        0,
+        0,
+        83,
+        83
+      ]
+    },
+    "reason": "Isolate clothing only"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      11
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          33,
+          31
+        ],
+        [
+          37,
+          29
+        ],
+        [
+          40,
+          33
+        ],
+        [
+          43,
+          29
+        ],
+        [
+          47,
+          31
+        ],
+        [
+          46,
+          40
+        ],
+        [
+          47,
+          46
+        ],
+        [
+          33,
+          46
+        ],
+        [
+          34,
+          40
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      11
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          34,
+          44
+        ],
+        [
+          47,
+          44
+        ],
+        [
+          49,
+          59
+        ],
+        [
+          32,
+          59
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      11
+    ],
+    "operation": "brush",
+    "mask": "outside",
+    "mode": "erase",
+    "points": [
+      [
+        42,
+        32
+      ],
+      [
+        42,
+        52
+      ]
+    ],
+    "size": 64,
+    "shape": "square",
+    "reason": "Remove body from clothing layer"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      11
+    ],
+    "operation": "map_colors",
+    "mask": "pants",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#110206ff": "#241d23ff",
+      "#1a0102ff": "#241d23ff",
+      "#210101ff": "#241d23ff",
+      "#211d25ff": "#241d23ff",
+      "#2d0b06ff": "#241d23ff",
+      "#2f2d33ff": "#352a2aff",
+      "#343439ff": "#352a2aff",
+      "#45484cff": "#49382fff",
+      "#4b1807ff": "#241d23ff",
+      "#525558ff": "#49382fff",
+      "#5f1c27ff": "#352a2aff",
+      "#636769ff": "#49382fff",
+      "#747a7cff": "#624a38ff",
+      "#7a262bff": "#352a2aff",
+      "#842f2eff": "#352a2aff",
+      "#8e3830ff": "#49382fff",
+      "#9a4231ff": "#49382fff",
+      "#a84f35ff": "#49382fff",
+      "#b25839ff": "#49382fff",
+      "#be6641ff": "#624a38ff",
+      "#ca744aff": "#624a38ff",
+      "#d38052ff": "#624a38ff",
+      "#e3e5dcff": "#97805aff",
+      "#e49c69ff": "#7c6247ff",
+      "#eaaa76ff": "#7c6247ff",
+      "#eeb683ff": "#97805aff",
+      "#f4ca9aff": "#97805aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      11
+    ],
+    "operation": "map_colors",
+    "mask": "shirt",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#110206ff": "#10292aff",
+      "#1a0102ff": "#10292aff",
+      "#210101ff": "#10292aff",
+      "#211d25ff": "#10292aff",
+      "#2d0b06ff": "#10292aff",
+      "#2f2d33ff": "#163c3cff",
+      "#343439ff": "#163c3cff",
+      "#45484cff": "#20534fff",
+      "#4b1807ff": "#10292aff",
+      "#525558ff": "#20534fff",
+      "#5f1c27ff": "#163c3cff",
+      "#636769ff": "#20534fff",
+      "#747a7cff": "#2f6c61ff",
+      "#7a262bff": "#163c3cff",
+      "#842f2eff": "#163c3cff",
+      "#8e3830ff": "#20534fff",
+      "#9a4231ff": "#20534fff",
+      "#a84f35ff": "#20534fff",
+      "#b25839ff": "#20534fff",
+      "#be6641ff": "#2f6c61ff",
+      "#ca744aff": "#2f6c61ff",
+      "#d38052ff": "#2f6c61ff",
+      "#e3e5dcff": "#71a18aff",
+      "#e49c69ff": "#488574ff",
+      "#eaaa76ff": "#488574ff",
+      "#eeb683ff": "#71a18aff",
+      "#f4ca9aff": "#71a18aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      12
+    ],
+    "operation": "select_mask",
+    "name": "shirt",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          35,
+          32
+        ],
+        [
+          39,
+          30
+        ],
+        [
+          42,
+          34
+        ],
+        [
+          45,
+          30
+        ],
+        [
+          49,
+          32
+        ],
+        [
+          48,
+          41
+        ],
+        [
+          49,
+          47
+        ],
+        [
+          35,
+          47
+        ],
+        [
+          36,
+          41
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      12
+    ],
+    "operation": "select_mask",
+    "name": "pants",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          36,
+          45
+        ],
+        [
+          48,
+          45
+        ],
+        [
+          50,
+          60
+        ],
+        [
+          34,
+          60
+        ]
+      ]
+    },
+    "reason": "Follow authored body pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      12
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "selector": {
+      "kind": "rectangle",
+      "region": [
+        0,
+        0,
+        83,
+        83
+      ]
+    },
+    "reason": "Isolate clothing only"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      12
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          35,
+          32
+        ],
+        [
+          39,
+          30
+        ],
+        [
+          42,
+          34
+        ],
+        [
+          45,
+          30
+        ],
+        [
+          49,
+          32
+        ],
+        [
+          48,
+          41
+        ],
+        [
+          49,
+          47
+        ],
+        [
+          35,
+          47
+        ],
+        [
+          36,
+          41
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      12
+    ],
+    "operation": "select_mask",
+    "name": "outside",
+    "combine": "subtract",
+    "selector": {
+      "kind": "polygon",
+      "points": [
+        [
+          36,
+          45
+        ],
+        [
+          48,
+          45
+        ],
+        [
+          50,
+          60
+        ],
+        [
+          34,
+          60
+        ]
+      ]
+    },
+    "reason": "Keep clothing region"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      12
+    ],
+    "operation": "brush",
+    "mask": "outside",
+    "mode": "erase",
+    "points": [
+      [
+        42,
+        32
+      ],
+      [
+        42,
+        52
+      ]
+    ],
+    "size": 64,
+    "shape": "square",
+    "reason": "Remove body from clothing layer"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      12
+    ],
+    "operation": "map_colors",
+    "mask": "pants",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#110206ff": "#241d23ff",
+      "#1a0102ff": "#241d23ff",
+      "#210101ff": "#241d23ff",
+      "#211d25ff": "#241d23ff",
+      "#2d0a17ff": "#241d23ff",
+      "#2d0b06ff": "#241d23ff",
+      "#2f2d33ff": "#352a2aff",
+      "#343439ff": "#352a2aff",
+      "#45484cff": "#49382fff",
+      "#4b1807ff": "#241d23ff",
+      "#525558ff": "#49382fff",
+      "#5f1c27ff": "#352a2aff",
+      "#636769ff": "#49382fff",
+      "#747a7cff": "#624a38ff",
+      "#7a262bff": "#352a2aff",
+      "#842f2eff": "#352a2aff",
+      "#8e3830ff": "#49382fff",
+      "#9a4231ff": "#49382fff",
+      "#a84f35ff": "#49382fff",
+      "#b25839ff": "#49382fff",
+      "#be6641ff": "#624a38ff",
+      "#ca744aff": "#624a38ff",
+      "#d38052ff": "#624a38ff",
+      "#e3e5dcff": "#97805aff",
+      "#e49c69ff": "#7c6247ff",
+      "#eaaa76ff": "#7c6247ff",
+      "#eeb683ff": "#97805aff",
+      "#f4ca9aff": "#97805aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  },
+  {
+    "layer": "image",
+    "frames": [
+      12
+    ],
+    "operation": "map_colors",
+    "mask": "shirt",
+    "region": [
+      0,
+      0,
+      83,
+      83
+    ],
+    "colors": {
+      "#110206ff": "#10292aff",
+      "#1a0102ff": "#10292aff",
+      "#210101ff": "#10292aff",
+      "#211d25ff": "#10292aff",
+      "#2d0a17ff": "#10292aff",
+      "#2d0b06ff": "#10292aff",
+      "#2f2d33ff": "#163c3cff",
+      "#343439ff": "#163c3cff",
+      "#45484cff": "#20534fff",
+      "#4b1807ff": "#10292aff",
+      "#525558ff": "#20534fff",
+      "#5f1c27ff": "#163c3cff",
+      "#636769ff": "#20534fff",
+      "#747a7cff": "#2f6c61ff",
+      "#7a262bff": "#163c3cff",
+      "#842f2eff": "#163c3cff",
+      "#8e3830ff": "#20534fff",
+      "#9a4231ff": "#20534fff",
+      "#a84f35ff": "#20534fff",
+      "#b25839ff": "#20534fff",
+      "#be6641ff": "#2f6c61ff",
+      "#ca744aff": "#2f6c61ff",
+      "#d38052ff": "#2f6c61ff",
+      "#e3e5dcff": "#71a18aff",
+      "#e49c69ff": "#488574ff",
+      "#eaaa76ff": "#488574ff",
+      "#eeb683ff": "#71a18aff",
+      "#f4ca9aff": "#71a18aff"
+    },
+    "reason": "Shade cloth without changing pose"
+  }
+]

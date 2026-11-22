@@ -1,5 +1,7 @@
 # Content catalogue and expansion register
 
+**Appearance content planning, 22 November:** [Custom characters](CUSTOM_CHARACTERS.md) introduces proposed body/fit, skin/hair/material and clothing definitions under ART-006/007. The [first pilot](../../../assets/embervale/custom-character-pilot/README.md) is an art reference, not new gameplay ItemType entries, recipes, unlocks or equippable inventory ownership. Future stable cosmetic IDs and their catalogue/compatibility rules belong to ENG-007/GAME-011. Existing counts below retain their dated source scope.
+
 **20 November context:** Definition/placement counts below retain their pinned original baseline. Current River Crossing placements come from the [authored candidate](../../../content/worlds/README.md). Use [current status](../01-current-state/CURRENT_STATUS.md) and the [project review](../06-development/PROJECT_REVIEW_2026-11-20.md) for implementation/evidence.
 
 

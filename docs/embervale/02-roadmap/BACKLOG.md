@@ -1,6 +1,6 @@
 # Implementation backlog
 
-**Version:** 1.2 · **Reviewed:** 20 November 2026
+**Version:** 1.3 · **Updated:** 22 November 2026 (custom-character scope; existing runtime evidence retains its original dates)
 **Purpose:** Maintained records synchronized with BACKLOG.json; planning IDs are not GitHub issue numbers.
 
 ## How to use this backlog
@@ -20,6 +20,7 @@ Completion refers to the stated bounded acceptance, with evidence and publicatio
 | Runtime content | Schema-1-4 input, geography/position checks and selected fixed publication manifests | General region/asset packages and content/save migrations |
 | Studio | Shared edits/history, guarded drafts, recovery, overlays, version publishing and selected-version play/rollback | In-place replacement, broader accessibility/platform acceptance and tools |
 | Art | Nine published batches, 3,063 frames/32 textures, walking/chopping/mining/melee and visible equipment, validated frames/PNG streams and resource budgets | Remaining cast/tiers/buildings, general importer, audible/device review and visible acceptance |
+| Custom characters | ART-006 in progress: eight standing body views, south idle/walk, separate tunic/trousers and comprehensive plan | Improved body/fit contract, real renderer, complete coverage, appearance saves and player controls remain planned |
 | Action audio and packaging | 15 original effects, synchronized action edges, controls and one copy owner; current Windows suites pass | Physical-device audible quality, balance and full starter acceptance |
 | Player autosave | GAME-010 complete: 60-second saves, 10-second retries, crafting/death and killed-process reload checks | Windows/human notice review and stronger durability remain separate |
 | Starter progression | Fresh tutorial plus combat, food, death, persisted recovery and six round trips pass; skipped checkpoints fixed | Uncoached navigation, combat/food/death/recovery and full quest-chain acceptance |
@@ -27,6 +28,8 @@ Completion refers to the stated bounded acceptance, with evidence and publicatio
 | Timber exploit | Current two cycles: 60 -> 54 -> 48; regressions pass | Broader economy balance is GAME-004 |
 
 ## Next work
+
+**Owner-selected character work, 22 November:** Start ART-006 with the [custom-character improvement register](../06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) and [canonical plan](../05-game/CUSTOM_CHARACTERS.md). Settle the base body/world fit and one real layered renderer proof before ART-007/ENG-007 coverage and GAME-011/012 persistence/controls. QA-005 owns full feature acceptance. The existing starter/audio work below remains separately open; the reference pack adds no runtime assets.
 
 1. REL-004 is complete; use the verified combined build for the remaining starter and audio acceptance.
 2. GAME-005 / GAME-004: the automated full tutorial/recovery route passes; finish visible/uncoached observation and tuning.
@@ -131,6 +134,12 @@ STUDIO-063 is now **complete** for the current eight-batch resource contract: sh
 | ART-005 | P2 | Polish and obtain acceptance of character animation | REL-004 | Compare consistent eight-way fixtures at gameplay scale; improve pose, attachment, weight, timing and transitions; record owner visual acceptance separately from automated correctness. |
 | GAME-010 | P1 | Add bounded periodic player autosave | ENG-003; GAME-009 | Checkpoint only explicitly persistent players at safe intervals/events; keep no-save/fresh playtests temporary, preserve valid data on failure, handle crafting/death and test interruption/reload. |
 | ENG-006 | P2 | Extract World and Graphics responsibilities as needed | None | A concrete feature extracts one tested responsibility behind a stable boundary without changing authority, draw order, public behavior or unrelated subsystems. |
+| ART-006 | P1 | Establish the reusable PixelLab character pipeline | REL-004; STUDIO-060 | Preserve original sources and evidence; settle body scale, proportions and fit revisions; provide editable semantic layers, a portable source-preserving export and one visible layered world-renderer proof. |
+| ART-007 | P1 | Author compatible character layers and motion coverage | ART-006 | Complete declared eight-way body, clothing and a small hair set for required shared motions; record semantic palettes, fit families, hand tracks and equipment occlusion with source masters and visual review. |
+| ENG-007 | P1 | Resolve and render bounded character appearance layers | ART-006; STUDIO-063; REL-004 | Resolve validated compatible cosmetic IDs into a shared-pose layered draw list with correct pivots, equipment authority, bounded cache/resource use and complete fallback; verify real renderer transitions without changing gameplay. |
+| GAME-011 | P1 | Persist validated player appearance safely | ENG-007; ENG-003; GAME-009 | Add bounded stable cosmetic IDs with deterministic defaults and intentional save migration; verify old/new/malformed round trips, failed-write preservation, equipment separation and temporary-session isolation. |
+| GAME-012 | P1 | Provide accessible character appearance controls | GAME-011 | Provide a compatible default and labelled appearance preview with rotate, motion, keyboard focus, Apply and Cancel; mutate live or persistent appearance only after whole-descriptor validation and explicit application. |
+| QA-005 | P1 | Accept custom characters across the real player journey | ART-007; ENG-007; GAME-011; GAME-012 | Record actual visual and runtime evidence for appearance combinations, eight-way movement, equipment/gathering/combat/death, save migration, creator cancellation, missing-asset fallback and measured resource/frame-time impact. |
 
 ### R5
 

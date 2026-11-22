@@ -1,6 +1,6 @@
 # Embervale master roadmap
 
-**Version:** 1.1 · **Status date:** 20 November 2026\
+**Version:** 1.2 · **Updated:** 22 November 2026 (custom-character planning; runtime evidence retains its recorded dates)\
 **Scope:** GameEngine, Embervale, Embervale Studio and project delivery.\
 **Canonical roadmap:** This document replaces the competing phase sequences in the earlier Studio plans. The original STUDIO task IDs remain traceable in the [backlog](BACKLOG.md).
 
@@ -11,6 +11,8 @@ Build a coherent, expandable RPG whose world can be authored through dependable 
 Longer-term work includes richer assets and content, multiple regions, elevation, repeatable encounters, companions and multiplayer research. Each is a separately scoped investment. None is a prerequisite for proving that the current game can support an enjoyable starter experience.
 
 ## 2. Current starting point and immediate priorities
+
+**22 November owner-selected art direction:** Preserve the [first custom-character proof](../../../assets/embervale/custom-character-pilot/README.md) and improve it through ART-006. Follow the [custom-character plan](../05-game/CUSTOM_CHARACTERS.md), [findings](../06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) and [workflow](../05-game/CUSTOM_CHARACTER_WORKFLOW.md). The parent work is in progress; the first body is unaccepted and reference-only. ART-007, ENG-007, GAME-011, GAME-012 and QA-005 cover compatible content, actual rendering, safe persistence, creator controls and full acceptance. No new runtime art count, save format or full character feature is claimed.
 
 The original engine baseline e9d32932 remains historical context. Read [current status](../01-current-state/CURRENT_STATUS.md) and the [20 November review](../06-development/PROJECT_REVIEW_2026-11-20.md). Published source now includes schemas 1-4, shared editing/history, a Python/Tk editor, guarded new drafts, River Crossing, nine art batches and walking/chopping/mining/melee with visible equipment.
 
@@ -199,7 +201,11 @@ Run a fresh-player vertical slice: learn movement and interaction, gather materi
 
 GAME-007 now implements the bounded narrative/quest continuity pass: names and reward rules agree with source, the next quest follows the tutorial, and full details identify both reward contacts. Builds and compiled content validation passed; [implementation and deferred acceptance](../06-development/QUEST_CONTINUITY_2026-11-19.md). Eight bounded LibreSprite batches now render grass/paths, normal tree/stump, player/Mara/furnace, water/banks/stone/copper/tin and bank/table sprites, plus a modular building kit and the first workshop. Contextual variation adds coherent grass patches, maintained/worn/overgrown paths, shallow/deep water, stone conditions, clustered wildflowers, reeds, grass clumps and leaf litter under real trees. Building conditions include new, weathered and repaired surfaces, plus terracotta/slate kit materials; the workshop uses localized repairs. Directional wall caps/windows and corners now form a coherent room, with interior front cutaways. The shared cache covers 1,175 frames across 30 PNGs, with editable masters and reproducible default exports. Client/launcher builds and actual software-renderer captures passed. Bank/shop building assemblies, remaining cast/tiers, audio and general importing remain open. See the [wall-orientation record](../06-development/WALL_ORIENTATION_2026-11-19.md). The 20 November follow-up adds eight-way walking, woodcutting and mining, bronze/iron/steel tool visuals, interruption handling and reward feedback from committed world events. [Woodcutting implementation](../06-development/WOODCUTTING_ANIMATION_2026-11-20.md) and [latest mining record and local checks](../06-development/MINING_ANIMATION_2026-11-20.md). Broader R4 playthrough and presentation acceptance are still required.
 
-**Work packages:** STUDIO-060–063; ART-001–004; GAME-006–007.
+### Custom characters, 22 November
+
+Use one improved human fit family, shared body motions and separate skin/hair/clothing/equipment material definitions. Prove native world scale and a front layered renderer fixture first, then complete eight-way/action coverage before ordinary playable adoption. Appearance persistence and Apply/Cancel controls are deliberate later implementation steps. Preserve the existing player fallback and separate walking/modular-equipment candidate. The [owning design](../05-game/CUSTOM_CHARACTERS.md) provides the full staged delivery and acceptance matrix; the [review](../06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) tracks improvements without inventing visual approval.
+
+**Work packages:** STUDIO-060–063; ART-001–007; ENG-007; GAME-006–007, GAME-011–012; QA-005.
 
 ## 10. R5 — Gameplay authoring workspaces
 
@@ -285,7 +291,9 @@ These are aspirations, not promised release dates. Keep features that reinforce 
 | Order | Work | Observable result |
 |---|---|---|
 | Completed in this review/follow-ups | ENG-003, ENG-004, GAME-009, GAME-010, STUDIO-025/026, STUDIO-063, QA-004 | Integrity fixes, player/editor recovery, fixed map publishing, art resource budgets and current verification published |
-| Next | REL-004 | Combined published Mining/melee/equipment and matching assets/previews |
+| Completed integration | REL-004 | Combined published Mining/melee/equipment and matching assets/previews |
+| Owner-selected character foundation | ART-006 | Preserved PixelLab proof and improvement plan; next settle base/world fit and a visible layered renderer fixture |
+| After the fit contract | ART-007, ENG-007, GAME-011/012, QA-005 | Complete compatible content/rendering, appearance persistence, player controls and acceptance |
 | Then | GAME-005 and GAME-004 | Fresh route with real elapsed time, confusion, food/combat/recovery findings |
 | During starter acceptance | ART-004 | First sound pass implemented; finish physical-device listening and balance review on the combined candidate |
 | Reliability work | QA-003, REL-002 | Windows usability regressions pass; wider keyboard/scale/manual/platform and clean installation remain |

@@ -1,0 +1,100 @@
+{
+  "status": "passed",
+  "frames_checked": 12,
+  "source_bodies_preserved": true,
+  "transparent_padding_crop_lossless": true,
+  "off_body_clothing_pixels": 0,
+  "composition_matches_pixellab_dressed_frames": true,
+  "separate_material_layers_match_outfit": true,
+  "standing_foot_pivots_aligned": 8,
+  "checks": [
+    {
+      "frame": 0,
+      "source_pixels_exact": true,
+      "off_body_clothing_pixels": 0,
+      "composition_exact": true,
+      "transparent_crop_lossless": true
+    },
+    {
+      "frame": 1,
+      "source_pixels_exact": true,
+      "off_body_clothing_pixels": 0,
+      "composition_exact": true,
+      "transparent_crop_lossless": true
+    },
+    {
+      "frame": 2,
+      "source_pixels_exact": true,
+      "off_body_clothing_pixels": 0,
+      "composition_exact": true,
+      "transparent_crop_lossless": true
+    },
+    {
+      "frame": 3,
+      "source_pixels_exact": true,
+      "off_body_clothing_pixels": 0,
+      "composition_exact": true,
+      "transparent_crop_lossless": true
+    },
+    {
+      "frame": 4,
+      "source_pixels_exact": true,
+      "off_body_clothing_pixels": 0,
+      "composition_exact": true,
+      "transparent_crop_lossless": true
+    },
+    {
+      "frame": 5,
+      "source_pixels_exact": true,
+      "off_body_clothing_pixels": 0,
+      "composition_exact": true,
+      "transparent_crop_lossless": true
+    },
+    {
+      "frame": 6,
+      "source_pixels_exact": true,
+      "off_body_clothing_pixels": 0,
+      "composition_exact": true,
+      "transparent_crop_lossless": true
+    },
+    {
+      "frame": 7,
+      "source_pixels_exact": true,
+      "off_body_clothing_pixels": 0,
+      "composition_exact": true,
+      "transparent_crop_lossless": true
+    },
+    {
+      "frame": 8,
+      "source_pixels_exact": true,
+      "off_body_clothing_pixels": 0,
+      "composition_exact": true,
+      "transparent_crop_lossless": true
+    },
+    {
+      "frame": 9,
+      "source_pixels_exact": true,
+      "off_body_clothing_pixels": 0,
+      "composition_exact": true,
+      "transparent_crop_lossless": true
+    },
+    {
+      "frame": 10,
+      "source_pixels_exact": true,
+      "off_body_clothing_pixels": 0,
+      "composition_exact": true,
+      "transparent_crop_lossless": true
+    },
+    {
+      "frame": 11,
+      "source_pixels_exact": true,
+      "off_body_clothing_pixels": 0,
+      "composition_exact": true,
+      "transparent_crop_lossless": true
+    }
+  ],
+  "game_renderer_or_gameplay_tests_run": false,
+  "owner_visual_acceptance": "pending",
+  "preview_javascript_syntax": "passed: node --check",
+  "preview_browser_check": "blocked: Computer Use could not verify the current browser URL on Windows; no browser-control workaround attempted"
+}

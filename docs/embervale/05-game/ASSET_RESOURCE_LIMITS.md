@@ -1,5 +1,7 @@
 # World-art validation and memory limits
 
+**Custom-character reference, 22 November:** The [v1 pilot](../../../assets/embervale/custom-character-pilot/README.md) uses a separate reference schema and 80×80 cells; it is not in the current named batch list or explicit runtime copies. Its publication changes no limits, runtime texture counts or generated bindings. Future ENG-007 integration must validate chosen cell/pivot/pose geometry, compatible layer coverage, independent palette-cache cost and adjusted trim pivots through the existing read-only gate. Do not loosen current budgets to fit editing canvases or silently feed the reference manifest to the world-art importer. See [resource planning](CUSTOM_CHARACTERS.md#resource-planning).
+
 **Implemented:** 20 November 2026 · **Task:** STUDIO-063, current nine-batch world-art scope.
 
 The exporter, read-only asset check and game cache now enforce the current sprite contract and explicit resource budgets. Invalid catalogue metadata falls back to basic shapes before loading images. An invalid/missing optional image falls back individually. Existing artwork, animation timing, editable masters and generated frame geometry are preserved.

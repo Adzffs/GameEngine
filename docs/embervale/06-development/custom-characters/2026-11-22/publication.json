@@ -1,0 +1,82 @@
+{
+  "date": "2026-11-22",
+  "runtime_baseline": "f2b5c6b210654040e449ffe8101f32052a93d980",
+  "scope": "Reference source publication and custom-character planning only",
+  "checks": {
+    "documentation": {
+      "result": "passed",
+      "markdown_files": 113,
+      "links": 1500,
+      "matching_backlog_tasks": 102,
+      "acyclic_dependencies": true,
+      "retained_legacy_studio_ids": 45,
+      "baseline_only_targets": 227,
+      "uninspected_local_anchors": 0
+    },
+    "asset_readme_links": "passed",
+    "original_pack_files": {
+      "count": 23,
+      "byte_identical_to_original_archive": true
+    },
+    "new_artwork_generations": 0,
+    "runtime_source_or_packaging_changes": false
+  },
+  "commands": [
+    "python tools/check_documentation.py --root <staging-root> --baseline-tree <pinned-tree.json>",
+    "original archive CRC, exact source-file comparison and SHA-256 inventory validation",
+    "asset README local-link validation"
+  ],
+  "limits": [
+    "External URLs are not checked by the local Markdown checker; the pinned candidate source documents were retrieved directly.",
+    "Runtime sources and images referenced only through the supplied baseline tree were not rebuilt.",
+    "No new C++/SDL/browser/creator/save implementation or visual acceptance is claimed."
+  ],
+  "published_paths": [
+    "AGENTS.md",
+    "README.md",
+    "assets/embervale/custom-character-pilot/README.md",
+    "assets/embervale/custom-character-pilot/provenance.json",
+    "assets/embervale/custom-character-pilot/v1/README.md",
+    "assets/embervale/custom-character-pilot/v1/build_pack.py",
+    "assets/embervale/custom-character-pilot/v1/character-workshop.html",
+    "assets/embervale/custom-character-pilot/v1/layers/body-south.png",
+    "assets/embervale/custom-character-pilot/v1/layers/body-standing-eight-way.png",
+    "assets/embervale/custom-character-pilot/v1/layers/dressed-south.png",
+    "assets/embervale/custom-character-pilot/v1/layers/outfit-south.png",
+    "assets/embervale/custom-character-pilot/v1/layers/trousers-south.png",
+    "assets/embervale/custom-character-pilot/v1/layers/tunic-south.png",
+    "assets/embervale/custom-character-pilot/v1/manifest.json",
+    "assets/embervale/custom-character-pilot/v1/outfit-decisions.json",
+    "assets/embervale/custom-character-pilot/v1/outfit-tracks.json",
+    "assets/embervale/custom-character-pilot/v1/palette-options.json",
+    "assets/embervale/custom-character-pilot/v1/prepare_outfit.py",
+    "assets/embervale/custom-character-pilot/v1/previews/character-layer-preview.gif",
+    "assets/embervale/custom-character-pilot/v1/previews/character-layer-preview.png",
+    "assets/embervale/custom-character-pilot/v1/review-template.html",
+    "assets/embervale/custom-character-pilot/v1/sha256.json",
+    "assets/embervale/custom-character-pilot/v1/source/idle-south-raw.png",
+    "assets/embervale/custom-character-pilot/v1/source/layer-proof-raw.png",
+    "assets/embervale/custom-character-pilot/v1/source/rotations.png",
+    "assets/embervale/custom-character-pilot/v1/source/walk-south-raw.png",
+    "assets/embervale/custom-character-pilot/v1/validation.json",
+    "docs/embervale/01-current-state/CURRENT_STATUS.md",
+    "docs/embervale/01-current-state/EVIDENCE_LEDGER.md",
+    "docs/embervale/02-roadmap/BACKLOG.json",
+    "docs/embervale/02-roadmap/BACKLOG.md",
+    "docs/embervale/02-roadmap/MASTER_ROADMAP.md",
+    "docs/embervale/02-roadmap/RELEASE_GATES.md",
+    "docs/embervale/03-engine/SAVE_COMPATIBILITY.md",
+    "docs/embervale/05-game/ANIMATION_GUIDE.md",
+    "docs/embervale/05-game/ART_AND_AUDIO.md",
+    "docs/embervale/05-game/ASSET_RESOURCE_LIMITS.md",
+    "docs/embervale/05-game/CONTENT_CATALOGUE.md",
+    "docs/embervale/05-game/CUSTOM_CHARACTERS.md",
+    "docs/embervale/05-game/CUSTOM_CHARACTER_WORKFLOW.md",
+    "docs/embervale/05-game/GAME_DESIGN.md",
+    "docs/embervale/06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md",
+    "docs/embervale/07-decisions/ADR_021_MODULAR_CHARACTER_APPEARANCE.md",
+    "docs/embervale/07-decisions/DECISIONS.md",
+    "docs/embervale/07-decisions/RISKS_AND_QUESTIONS.md",
+    "docs/embervale/README.md"
+  ]
+}

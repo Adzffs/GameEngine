@@ -1,7 +1,7 @@
 # Design decisions and architecture decision register
 
 **Purpose:** Preserve why choices were made and distinguish agreed direction from implementation proposals.\
-**Status date:** 19 November 2026. Use the [ADR template](../08-templates/ADR_TEMPLATE.md) for decisions that need more detail.
+**Updated:** 22 November 2026; earlier decisions retain their implementation/evidence scope. Use the [ADR template](../08-templates/ADR_TEMPLATE.md) for decisions that need more detail.
 
 ## 1. Decision status
 
@@ -17,6 +17,8 @@
 | DEC-004 | Make tools usable visually and by AI | User direction | Shared command/validation semantics; basic automation belongs early |
 | DEC-005 | Flat-ground capability is the current reality | Source verified and user constraint | Elevation requires an isolated engine feature milestone |
 | DEC-006 | Make documentation comprehensive, organised and expandable; publish it cleanly to GitHub | User direction | One canonical index/roadmap, evidence-based status and focused repository changes |
+| DEC-007 | Use PixelLab as the artwork production service, with editors/exporters supporting cleanup and integration | User direction, 22 November | Preserve original generated art and reusable motions; do not resume rejected procedural body polishing by default |
+| DEC-008 | Develop custom characters from an improved reusable base with compatible separate appearance layers | User direction; implementation planned | Preserve the first proof, improve fit/quality and build explicit renderer/save/creator support rather than equating artwork with a finished feature |
 
 ## 3. Technical decision register
 
@@ -41,8 +43,8 @@
 | [ADR-017](ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md) | Bounded explicit runtime import | Implemented starter parser/validator, shared core, selected spawn catalogue and isolated playtests | Shared editing/publication remains separate |
 | [ADR-018](ADR_018_BOUNDED_OBJECT_PLACEMENT.md) | Bounded resource/station membership | Implemented schema-2 allocations, shared place/remove/history and guarded drafts | Larger footprints and actor membership remain separate |
 | [ADR-019](ADR_019_BOUNDED_SPAWN_SETTINGS.md) | Existing monster spawn settings | Implemented schema-3 wander/cap/respawn editing; game/tool builds passed, runtime/visible checks deferred | New actor identities, friendly wandering and population filling remain separate |
-
 | [ADR-020](ADR_020_STATIC_BUILDING_SHELLS.md) | Static building shells | Schema-4 rectangular shells, shared wall/door collision, readonly Studio footprint and independent roof visibility | More building styles, entrances and authoring controls remain separate |
+| [ADR-021](ADR_021_MODULAR_CHARACTER_APPEARANCE.md) | Modular character appearance | Accepted production direction; runtime implementation proposed | Reviewed fit contract and real renderer proof before catalogue/persistence/creator adoption |
 
 ## 4. Rationale for the key proposals
 

@@ -1,6 +1,6 @@
 # Embervale documentation
 
-**Documentation version:** 1.2 · **Review date:** 20 November 2026\
+**Documentation version:** 1.3 · **Updated:** 22 November 2026 (custom-character documentation; runtime review evidence remains dated)\
 **Original source-review baseline:** [e9d32932e8f9b27e96283313cca320058792a81f](https://github.com/Adzffs/GameEngine/commit/e9d32932e8f9b27e96283313cca320058792a81f)
 
 ## Start with the question you have
@@ -11,6 +11,10 @@
 | What has actually been implemented? | [Current reviewed status](01-current-state/CURRENT_STATUS.md) |
 | What did the full project review find? | [Critical fixes and roadmap reconciliation](06-development/PROJECT_REVIEW_2026-11-20.md) |
 | Are Mining, melee, equipment and sound now combined? | [Recovered player actions and current verification](06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md) |
+| How will custom characters work? | [Canonical design and staged delivery](05-game/CUSTOM_CHARACTERS.md) |
+| What needs improving in the first base? | [Measured pilot review and improvement register](06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) |
+| How do we make reusable character layers? | [PixelLab production workflow](05-game/CUSTOM_CHARACTER_WORKFLOW.md) |
+| Where is the first body/outfit source pack? | [Reference pilot](../../assets/embervale/custom-character-pilot/README.md) |
 | What should we do next? | [Master roadmap](02-roadmap/MASTER_ROADMAP.md) |
 | What task can I pick up? | [Backlog](02-roadmap/BACKLOG.md) |
 | How do I run the game? | [Getting started](06-development/GETTING_STARTED.md) |
@@ -76,7 +80,7 @@ Use [current status](01-current-state/CURRENT_STATUS.md) for the maintained impl
 | Document | What it contains |
 |---|---|
 | [MASTER_ROADMAP.md](02-roadmap/MASTER_ROADMAP.md) | R0–R10 milestones, dependencies, outcomes and implementation order |
-| [BACKLOG.md](02-roadmap/BACKLOG.md) | 96 work packages with priorities, dependencies and acceptance results |
+| [BACKLOG.md](02-roadmap/BACKLOG.md) | 102 work packages with priorities, dependencies and acceptance results |
 | [BACKLOG.json](02-roadmap/BACKLOG.json) | The same work-package records in a machine-readable form |
 | [RELEASE_GATES.md](02-roadmap/RELEASE_GATES.md) | Observable acceptance criteria for foundations, Alpha releases, beta and experiments |
 
@@ -113,11 +117,14 @@ Use [current status](01-current-state/CURRENT_STATUS.md) for the maintained impl
 | [ART_AND_AUDIO.md](05-game/ART_AND_AUDIO.md) | Small art pilot, asset pipeline, animation, sound, readability and provenance |
 | [ASSET_RESOURCE_LIMITS.md](05-game/ASSET_RESOURCE_LIMITS.md) | Current frame/PNG/resource guards, memory accounting, build gate and future authoring rules |
 | [ANIMATION_GUIDE.md](05-game/ANIMATION_GUIDE.md) | Reusable pose, timing, equipment, authority, export, review and handoff guidance |
+| [CUSTOM_CHARACTERS.md](05-game/CUSTOM_CHARACTERS.md) | Appearance design, fit/layer contracts, ordered implementation, persistence and acceptance |
+| [CUSTOM_CHARACTER_WORKFLOW.md](05-game/CUSTOM_CHARACTER_WORKFLOW.md) | PixelLab briefs, original pixels, masks, palettes, equipment, export and handoff |
 
 ### Repeatable development
 
 | Document | What it contains |
 |---|---|
+| [CUSTOM_CHARACTER_REVIEW_2026-11-22.md](06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) | Fourteen improvement findings, exact v1 coverage, checks, costs and implementation limits |
 | [PROJECT_REVIEW_2026-11-20.md](06-development/PROJECT_REVIEW_2026-11-20.md) | Full review, three integrity fixes, current evidence and remaining priorities |
 | [PLAYER_ACTION_INTEGRATION_2026-11-20.md](06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md) | Verified combined Windows player actions, lossless packing, current results and remaining acceptance |
 | [INTEGRATION_HANDOFF_2026-11-20.md](06-development/INTEGRATION_HANDOFF_2026-11-20.md) | Interrupted local Mining/melee integration, recovery details and pending starter/audio checks |
@@ -156,6 +163,7 @@ Use [current status](01-current-state/CURRENT_STATUS.md) for the maintained impl
 
 | Document | What it contains |
 |---|---|
+| [ADR_021_MODULAR_CHARACTER_APPEARANCE.md](07-decisions/ADR_021_MODULAR_CHARACTER_APPEARANCE.md) | Accepted production direction and proposed bounded runtime appearance design |
 | [DECISIONS.md](07-decisions/DECISIONS.md) | User direction, proposed architecture choices and open ADRs |
 | [ADR_016_READ_ONLY_WORLD_EXPORT.md](07-decisions/ADR_016_READ_ONLY_WORLD_EXPORT.md) | Original export decision, deterministic format and historical dependency boundary |
 | [ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md](07-decisions/ADR_017_BOUNDED_STARTER_WORLD_IMPORT.md) | Implemented bounded parser, core/runtime ownership, selected spawn authority and isolated playtests |
@@ -185,4 +193,3 @@ The [current candidate overview](../../content/worlds/river-crossing.overview.sv
 ## Keeping this useful
 
 Use [documentation maintenance](06-development/DOCUMENTATION_MAINTENANCE.md) when a feature changes. Keep one canonical roadmap, preserve planning IDs, pin factual sources and label proposed examples. New work should enter through a focused specification or issue, with acceptance evidence recorded when it is complete.
-

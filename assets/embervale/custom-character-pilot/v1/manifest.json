@@ -1,0 +1,329 @@
+{
+  "schema": "embervale.modular-character-pilot",
+  "version": 1,
+  "date": "2026-11-22",
+  "status": "art and customisation proof; not installed into the game",
+  "character_id": "506e9990-e9e3-4771-b17f-892c787939d1",
+  "character_url": "https://www.pixellab.ai/create-character/506e9990-e9e3-4771-b17f-892c787939d1",
+  "cell_size": [
+    80,
+    80
+  ],
+  "ground_pivot": [
+    40,
+    70
+  ],
+  "native_tile_size": 32,
+  "source_geometry": {
+    "standing_cells": [
+      64,
+      64
+    ],
+    "animated_cells": [
+      84,
+      84
+    ],
+    "animation_export_crop": [
+      2,
+      2,
+      82,
+      82
+    ],
+    "standing_offsets": [
+      {
+        "direction": "south",
+        "source_offset": [
+          8,
+          8
+        ]
+      },
+      {
+        "direction": "west",
+        "source_offset": [
+          8,
+          8
+        ]
+      },
+      {
+        "direction": "east",
+        "source_offset": [
+          8,
+          8
+        ]
+      },
+      {
+        "direction": "north",
+        "source_offset": [
+          8,
+          11
+        ]
+      },
+      {
+        "direction": "south-west",
+        "source_offset": [
+          8,
+          8
+        ]
+      },
+      {
+        "direction": "south-east",
+        "source_offset": [
+          8,
+          8
+        ]
+      },
+      {
+        "direction": "north-west",
+        "source_offset": [
+          8,
+          10
+        ]
+      },
+      {
+        "direction": "north-east",
+        "source_offset": [
+          8,
+          10
+        ]
+      }
+    ],
+    "rescaled_or_deformed_body_pixels": false
+  },
+  "direction_order": [
+    "south",
+    "west",
+    "east",
+    "north",
+    "south-west",
+    "south-east",
+    "north-west",
+    "north-east"
+  ],
+  "standing": {
+    "image": "layers/body-standing-eight-way.png",
+    "frames": [
+      {
+        "direction": "south",
+        "rect": [
+          0,
+          0,
+          80,
+          80
+        ],
+        "pivot": [
+          40,
+          70
+        ]
+      },
+      {
+        "direction": "west",
+        "rect": [
+          80,
+          0,
+          80,
+          80
+        ],
+        "pivot": [
+          40,
+          70
+        ]
+      },
+      {
+        "direction": "east",
+        "rect": [
+          160,
+          0,
+          80,
+          80
+        ],
+        "pivot": [
+          40,
+          70
+        ]
+      },
+      {
+        "direction": "north",
+        "rect": [
+          240,
+          0,
+          80,
+          80
+        ],
+        "pivot": [
+          40,
+          70
+        ]
+      },
+      {
+        "direction": "south-west",
+        "rect": [
+          320,
+          0,
+          80,
+          80
+        ],
+        "pivot": [
+          40,
+          70
+        ]
+      },
+      {
+        "direction": "south-east",
+        "rect": [
+          400,
+          0,
+          80,
+          80
+        ],
+        "pivot": [
+          40,
+          70
+        ]
+      },
+      {
+        "direction": "north-west",
+        "rect": [
+          480,
+          0,
+          80,
+          80
+        ],
+        "pivot": [
+          40,
+          70
+        ]
+      },
+      {
+        "direction": "north-east",
+        "rect": [
+          560,
+          0,
+          80,
+          80
+        ],
+        "pivot": [
+          40,
+          70
+        ]
+      }
+    ]
+  },
+  "layers": {
+    "body": "layers/body-south.png",
+    "trousers": "layers/trousers-south.png",
+    "tunic": "layers/tunic-south.png",
+    "outfit_reference": "layers/outfit-south.png",
+    "dressed_reference": "layers/dressed-south.png"
+  },
+  "draw_order": [
+    "body",
+    "trousers",
+    "tunic"
+  ],
+  "clips": {
+    "idle": {
+      "direction": "south",
+      "columns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "durations_ms": [
+        400,
+        400,
+        400,
+        400
+      ],
+      "loop": true,
+      "group_id": "249aa0d8-8620-4863-853b-f294efdaa4b0"
+    },
+    "walk": {
+      "direction": "south",
+      "columns": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "durations_ms": [
+        80,
+        70,
+        80,
+        70,
+        80,
+        70,
+        80,
+        70
+      ],
+      "loop": true,
+      "one_cycle_per_tile_at_ordinary_walk": true,
+      "group_id": "21093bb9-a630-4aaf-8252-60ec1414f034"
+    }
+  },
+  "coverage": {
+    "standing": [
+      "south",
+      "west",
+      "east",
+      "north",
+      "south-west",
+      "south-east",
+      "north-west",
+      "north-east"
+    ],
+    "idle": [
+      "south"
+    ],
+    "walk": [
+      "south"
+    ],
+    "outfit_idle": [
+      "south"
+    ],
+    "outfit_walk": [
+      "south"
+    ]
+  },
+  "outfit": {
+    "name": "Starter sleeveless tunic and knee-length trousers",
+    "type": "close-fitting palette-and-mask clothing proof",
+    "tunic_ramp": [
+      "#10292a",
+      "#163c3c",
+      "#20534f",
+      "#2f6c61",
+      "#488574",
+      "#71a18a"
+    ],
+    "trousers_ramp": [
+      "#241d23",
+      "#352a2a",
+      "#49382f",
+      "#624a38",
+      "#7c6247",
+      "#97805a"
+    ],
+    "source": "PixelLab exact pixel workbench decisions on original generated poses",
+    "new_body_generations_per_colour": 0
+  },
+  "cost": {
+    "base_eight_directions": 2,
+    "south_idle": 1,
+    "south_walk": 1,
+    "outfit_layers_and_packaging": 0,
+    "total_generations": 4,
+    "verified_account_generations_remaining": 4.75
+  },
+  "known_limits": [
+    "Animated body and outfit cover south only; other facings are standing body views.",
+    "This body is taller than the existing player. The exported 80x80 cells and (40,70) pivot are not a drop-in replacement for the old 64x64, (32,48) binding.",
+    "Hair, beards, extra body shapes, equipment hand tracks and gameplay integration are not part of this pilot.",
+    "Close-fitting cloth follows source shading. Loose sleeves, skirts and bulky armour require their own silhouette and occlusion work.",
+    "Skin and cloth colour controls are review palette examples, not owner-accepted final character designs."
+  ]
+}

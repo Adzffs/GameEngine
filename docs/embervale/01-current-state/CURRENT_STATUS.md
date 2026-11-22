@@ -1,5 +1,7 @@
 # Current project status
 
+**Custom-character update, 22 November:** ART-006 is in progress for a reusable PixelLab base and production plan. The [retained proof](../../../assets/embervale/custom-character-pilot/README.md) has eight standing views, south idle/walk and two independent garments; the owner requests improvements. [Design/work order](../05-game/CUSTOM_CHARACTERS.md), [findings](../06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) and [workflow](../05-game/CUSTOM_CHARACTER_WORKFLOW.md) separate this authoring proof from future ART-007/ENG-007/GAME-011/012/QA-005 implementation. The original runtime evidence below remains dated; nine runtime batches, existing saves and gameplay are unchanged.
+
 **Reviewed:** 20 November 2026.\
 **Published code:** [d40b491](https://github.com/Adzffs/GameEngine/commit/d40b491d8b8082edc65ec4be0efc26ed882f2c54).\
 **Source of truth:** Current code and the [project review](../06-development/PROJECT_REVIEW_2026-11-20.md). The older [engine inventory](IMPLEMENTED_SYSTEMS.md) retains its explicitly dated baseline.
@@ -20,6 +22,7 @@ Embervale is a playable local C++20/SDL3 RPG prototype with a bounded world edit
 | World format | Schemas 1-4, bounded runtime validation, stable placements/allocation IDs, staged spawns and fixed version manifests | General region/definition authoring, content/save migrations and asset packages |
 | Studio | Shared edits/history, guarded drafts, private recovery, reopen, overlays, exact-byte validation, create-only version publishing and selected-version play/rollback | In-place replacement, richer diagnostics, brushes and broader accessibility/platform acceptance |
 | Published art | Nine batches, 3,063 frames/32 textures, eight-way walking/chopping/mining/melee and visible equipment, editable masters, guarded cache/fallback, bounded PNG streams and explicit resource budgets | Remaining cast/resource tiers, general importer, UI/accessibility and visible quality acceptance |
+| Custom characters | Published reference-only base/outfit sources and comprehensive design/workflow; image/layer checks pass | Body improvements, world fit, eight-way animated layers, equipment tracks, appearance saves and game creator remain open |
 | Audio | First sound pass: 15 original effects, committed-result routing, bounded playback, effects volume/mute and keyboard controls | Physical-device audible quality/balance and full starter acceptance |
 
 ## Integrated player actions
@@ -68,6 +71,8 @@ The current Windows follow-up uses UCRT64 GCC 16.1.0, CMake 4.4.3, Ninja 1.13.2,
 The unchanged preparation replay equips the shield at tick 245, equips the sword at 376 and buys food by 454. The extended route defeats Mossling at 677 and completes the tutorial by returning to Mara at 741. A separate intentional death/recovery segment ends at cumulative tick 2370 across two primary sessions, with six save/reload checks. These simulation measurements do not establish human elapsed time; the older 451-tick preparation belongs to its historical source. The timber replay still loses six coins per complete cycle.
 
 ## Current work order
+
+**Owner-selected appearance work:** Start ART-006 with the base proportion/world-size review and one temporary layered renderer proof, then follow the [character plan](../05-game/CUSTOM_CHARACTERS.md). ART-005 finished visual acceptance remains open; earlier manual/procedural polish deferral is not a reason to label the new PixelLab proof accepted. The earlier starter/reliability priorities retain their scopes below.
 
 1. **Completed in this review:** ENG-003, ENG-004 and GAME-009 protect saves/items; QA-004 reconciles current automated evidence; GAME-010 and STUDIO-025 protect player progress/editor work; bounded STUDIO-026 publishes/selects fixed maps and STUDIO-063 now validates current art resources and memory budgets.
 2. **REL-004 complete:** use the published combined player-action build and matching source/export/capture evidence.

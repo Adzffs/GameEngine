@@ -93,3 +93,16 @@ Two-region acceptance requires reliable travel, identity, save/reload and recove
 ## 11. Gate record template
 
 For each candidate, record: release/milestone; exact commit and content versions; required scenarios; automated commands/results; manual observations; platform/tool versions; unresolved failures; compatibility/migration checks; rollback verification; and decision. Decisions are **pass**, **fail**, or **deferred with a named scope limitation**. Avoid a generic “mostly done” status.
+
+## Custom-character adoption gate
+
+This is a scoped R4 feature gate owned by ART-006/007, ENG-007, GAME-011/012 and QA-005. See the [canonical character acceptance matrix](../05-game/CUSTOM_CHARACTERS.md#acceptance-matrix). Publishing the source proof does not pass this gate.
+
+- Record the chosen body/rig/motion revision and native world scale, with actual owner visual feedback.
+- Prove consistent eight-way idle/walk and supported gameplay actions with matching hair/clothing/equipment, stable feet and shared frame selection.
+- Verify anatomical grip, unmasked shaft clearance, tool orientation, front/rear order and correct committed events/audio.
+- Exercise Apply/Cancel/defaults and keyboard/focus behaviour, with appearance round trips, older-save migration, malformed IDs, failed saves and temporary-session isolation.
+- Record bounded resource/cache/frame-time measurements and complete compatible fallback for missing images or definitions.
+- Keep authoring GIFs, browser checks, software renderer captures, native playthrough and owner acceptance distinctly labelled.
+
+The first gate delivery is a temporary real-renderer fit/layer proof, not an automatic default-player replacement or a save-format change.

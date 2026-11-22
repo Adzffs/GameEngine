@@ -1,5 +1,7 @@
 # Save compatibility and content migration
 
+**Appearance persistence proposal, 22 November:** [Custom characters](../05-game/CUSTOM_CHARACTERS.md#9-saving-and-character-creation) plans a bounded value-only cosmetic descriptor under GAME-011. This documentation/source-art publication changes no player-save bytes or version; current saves remain version 13. At implementation, inspect the then-current codec, select the appropriate version/migration, give older saves a deterministic appearance default, bound unknown/malformed IDs and preserve inventory/crafting/quests/skills plus failed-write and no-save guarantees. Appearance must not grant equipment or stats.
+
 **20 November safety update:** The [project review](../06-development/PROJECT_REVIEW_2026-11-20.md) records current corrections. Failed primary loads retain recovery files until validation succeeds. Crafting cursor/grid items are projected into saved inventory without live mutation; insufficient capacity rejects before writing. Failed shutdown saving offers return to play or explicit unsaved exit. Save version 13 is unchanged. The [autosave policy and verification](../06-development/PLAYER_AUTOSAVE_2026-11-20.md) now checkpoints persistent players every 60 seconds, retries failures after 10 seconds and waits through death.
 
 **Status:** Current starter import and selected fixed world versions preserve save version 13 and use the same selected-map position handling. Publication metadata is independently versioned at 1. Broader content/save migrations below remain proposed.\

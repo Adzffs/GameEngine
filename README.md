@@ -21,6 +21,10 @@ A C++20 and SDL3 tile-based RPG project, with an existing playable development w
 | See bank and crafting table art | [Service art and captures](docs/embervale/06-development/SERVICE_RENDERING_2026-11-19.md) |
 | See the workshop and building kit | [Building art, collision and roof visibility](docs/embervale/06-development/BUILDING_RENDERING_2026-11-19.md) |
 | Animate characters, weapons or actions | [Animation guide](docs/embervale/05-game/ANIMATION_GUIDE.md) |
+| Plan and improve custom player characters | [Custom character design and delivery plan](docs/embervale/05-game/CUSTOM_CHARACTERS.md) |
+| Inspect the first reusable base and its limitations | [Pilot review and improvement register](docs/embervale/06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) |
+| Produce compatible character artwork | [PixelLab character workflow](docs/embervale/05-game/CUSTOM_CHARACTER_WORKFLOW.md) |
+| Open the retained body, clothing layers and preview | [Custom character pilot](assets/embervale/custom-character-pilot/README.md) |
 | Reuse animation research and measured findings | [Animation research, 20 November](docs/embervale/06-development/ANIMATION_RESEARCH_2026-11-20.md) |
 | Check combat, food and recovery verification | [Starter replay and corrected tutorial checkpoints](docs/embervale/06-development/STARTER_COMBAT_RECOVERY_2026-11-20.md) |
 | Check when progress is saved | [Autosave policy, retries and interruption/reload evidence](docs/embervale/06-development/PLAYER_AUTOSAVE_2026-11-20.md) |
@@ -31,6 +35,8 @@ A C++20 and SDL3 tile-based RPG project, with an existing playable development w
 | Find every document | [Documentation index](docs/embervale/README.md) |
 
 ## Project status
+
+**Custom characters, 22 November:** The [first PixelLab base/layer proof](assets/embervale/custom-character-pilot/README.md) is preserved with eight standing views, south idle/walk and separate tunic/trousers. The owner requests improvements. Its [plan](docs/embervale/05-game/CUSTOM_CHARACTERS.md) covers body quality/scale, compatible layers, equipment, renderer integration, safe appearance saves and creator controls. This is reference art outside the game catalogue; no finished creator or runtime replacement is claimed.
 
 The project has an authoritative local RPG simulation, movement/running, gathering/crafting, melee/AI/loot, quests/dialogue, shops/banking and versioned saves. River Crossing is an authored flat starter candidate. The bounded Python/Tk editor supports shared edits/history, guarded new drafts, reopen, isolated playtests and overlays. Nine art batches and eight-way walking/chopping/mining/melee with visible equipment use the shared cache.
 
@@ -58,6 +64,8 @@ Export the compiled starter area and validate the selected document:
 With an SDL3 client build, launch it using `./build-client/GameEngine --world development-starter.playtest.json` (`GameEngine.exe` on Windows). Imported-world playtests use temporary player progress unless an explicit `--save` path is supplied. See [runtime import](docs/embervale/04-studio/STARTER_WORLD_IMPORT.md) for supported edits, limits and all launch options.
 
 ## Development direction
+
+The owner-selected custom-character work begins with ART-006: compare the improved base at world scale and prove one layered character in the existing renderer. Follow the [staged character plan](docs/embervale/05-game/CUSTOM_CHARACTERS.md) and preserve the separate walking/equipment candidate. Further actions, wardrobe coverage, persistence and player controls have explicit backlog entries. Existing starter acceptance remains open below.
 
 Use the verified combined Mining/melee/equipment version to observe the fresh-player journey and resolve blocking navigation/combat/recovery issues, then finish audible acceptance of the implemented sound pass. The [roadmap](docs/embervale/02-roadmap/MASTER_ROADMAP.md) and [backlog](docs/embervale/02-roadmap/BACKLOG.md) retain reliability, presentation and authoring work.
 

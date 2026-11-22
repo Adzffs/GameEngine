@@ -1,5 +1,7 @@
 # Risk register and open questions
 
+**Custom-character findings, 22 November:** Use the [dated improvement register](../06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) for CHAR-F01–14 and the [implementation plan](../05-game/CUSTOM_CHARACTERS.md). Open prerequisites include body scale/proportions, consistent native perspective, eight-way/action layer coverage, semantic material masks, new-body hand tracks, bounded renderer resources/fallback, appearance migration and accessible Apply/Cancel controls. The original axe masking rejection remains a required physical-clearance lesson. ART-006 is in progress; ART-007, ENG-007, GAME-011/012 and QA-005 are planned. Reference-image checks do not close runtime or visual acceptance.
+
 **Reviewed:** 20 November 2026. **Status:** Open items unless evidence below says otherwise.\
 This register distinguishes observed findings from future design risks. Priority is a planning judgement, not a measured probability or a security severity score.
 
