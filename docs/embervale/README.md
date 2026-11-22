@@ -124,6 +124,7 @@ Use [current status](01-current-state/CURRENT_STATUS.md) for the maintained impl
 
 | Document | What it contains |
 |---|---|
+| [GARMENT_COVERAGE_2026-11-22.md](06-development/GARMENT_COVERAGE_2026-11-22.md) | Owner-reported remaining shoulder/thigh skin, complete coverage checks and knee/full pant choices |
 | [TROUSER_FIT_2026-11-22.md](06-development/TROUSER_FIT_2026-11-22.md) | Pose-fitted trousers, leg/cuff geometry and protected hand/lower-leg evidence, paired with unchanged v2 tunic |
 | [TUNIC_FIT_2026-11-22.md](06-development/TUNIC_FIT_2026-11-22.md) | Owner-confirmed tunic defect, pose-fitted v2 garment and independent coverage/hand checks |
 | [CUSTOM_CHARACTER_REVIEW_2026-11-22.md](06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) | Fourteen improvement findings, exact v1 coverage, checks, costs and implementation limits |

@@ -1,0 +1,121 @@
+{
+  "schema": "embervale.character-garment-revision",
+  "version": 1,
+  "id": "coverage-fit-v4",
+  "date": "2026-11-22",
+  "status": "revised authoring candidate; owner visual acceptance pending",
+  "owner_feedback": "Top and pants still show skin at shoulders and leg muscles; offer both pant lengths",
+  "body": "../../v1/layers/body-south.png",
+  "tunic": "exports/tunic-south.png",
+  "pants_variants": {
+    "knee": {
+      "layer": "exports/trousers-knee-south.png",
+      "outfit": "exports/outfit-knee-south.png",
+      "dressed": "exports/dressed-knee-south.png",
+      "recipe": "recipes/trousers-knee.json"
+    },
+    "full": {
+      "layer": "exports/trousers-full-south.png",
+      "outfit": "exports/outfit-full-south.png",
+      "dressed": "exports/dressed-full-south.png",
+      "recipe": "recipes/trousers-full.json"
+    }
+  },
+  "tunic_recipe": "recipes/tunic.json",
+  "body_domains": "recipes/body-coverage-domains.json",
+  "cell_size": [
+    80,
+    80
+  ],
+  "source_cell_size": [
+    84,
+    84
+  ],
+  "source_to_export_offset": [
+    -2,
+    -2
+  ],
+  "ground_pivot": [
+    40,
+    70
+  ],
+  "coverage": {
+    "idle": [
+      "south"
+    ],
+    "walk": [
+      "south"
+    ]
+  },
+  "clips": {
+    "idle": {
+      "columns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "durations_ms": [
+        400,
+        400,
+        400,
+        400
+      ]
+    },
+    "walk": {
+      "columns": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "durations_ms": [
+        80,
+        70,
+        80,
+        70,
+        80,
+        70,
+        80,
+        70
+      ]
+    }
+  },
+  "draw_order": [
+    "body",
+    "chosen_pants",
+    "tunic"
+  ],
+  "pixel_art_service": {
+    "name": "PixelLab pixelart_workbench",
+    "sources": {
+      "tunic": {
+        "drawing": "f48ea606-c883-425b-ace4-56ba696f4679",
+        "sheet": "bdc7d9d2-48df-400d-ac27-e786207cee0e",
+        "gallery": "9efc7ee5-8682-488e-aea4-b2be637e34f9"
+      },
+      "knee": {
+        "drawing": "d73e814d-9928-458b-8382-5b3b87f1b367",
+        "sheet": "3f72d73c-a910-4d67-becf-1677d6476452",
+        "gallery": "ed54c87d-3171-4b12-b923-1299f8e52851"
+      },
+      "full": {
+        "drawing": "4b4d64f0-79e0-446b-9f99-abc880c82774",
+        "sheet": "eb676bd8-4e3f-4b8c-a54e-e0a64815eb1c",
+        "gallery": "4b19948e-7169-4092-a142-b21e85414d3e"
+      }
+    }
+  },
+  "runtime_registered": false,
+  "new_body_or_animation_generations": 0,
+  "source_body_changed": false,
+  "preserved_revisions": [
+    "v1",
+    "tunic-fit-v2",
+    "trouser-fit-v3"
+  ]
+}

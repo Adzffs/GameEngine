@@ -20,7 +20,7 @@ Completion refers to the stated bounded acceptance, with evidence and publicatio
 | Runtime content | Schema-1-4 input, geography/position checks and selected fixed publication manifests | General region/asset packages and content/save migrations |
 | Studio | Shared edits/history, guarded drafts, recovery, overlays, version publishing and selected-version play/rollback | In-place replacement, broader accessibility/platform acceptance and tools |
 | Art | Nine published batches, 3,063 frames/32 textures, walking/chopping/mining/melee and visible equipment, validated frames/PNG streams and resource budgets | Remaining cast/tiers/buildings, general importer, audible/device review and visible acceptance |
-| Custom characters | ART-006/007 in progress: reusable base/source plan, revised south tunic and pose-fitted trousers with protected hand/lower-leg checks | Body/world fit, complete facing/action wardrobe, hair, runtime renderer, saves and creator remain open; owner visual acceptance pending |
+| Custom characters | ART-006/007 in progress: shared base, repaired south top and knee/full pant alternatives with whole-area coverage checks | Body/world fit, complete facing/action wardrobe, hair, runtime renderer, saves and creator remain open; owner visual acceptance pending |
 | Action audio and packaging | 15 original effects, synchronized action edges, controls and one copy owner; current Windows suites pass | Physical-device audible quality, balance and full starter acceptance |
 | Player autosave | GAME-010 complete: 60-second saves, 10-second retries, crafting/death and killed-process reload checks | Windows/human notice review and stronger durability remain separate |
 | Starter progression | Fresh tutorial plus combat, food, death, persisted recovery and six round trips pass; skipped checkpoints fixed | Uncoached navigation, combat/food/death/recovery and full quest-chain acceptance |
@@ -29,9 +29,7 @@ Completion refers to the stated bounded acceptance, with evidence and publicatio
 
 ## Next work
 
-**Trouser follow-up:** The [v3 correction](../06-development/TROUSER_FIT_2026-11-22.md) adds pose-fitted pants to the unchanged v2 tunic. ART-007 remains in progress; both revised garments await owner review and complete facing/action coverage.
-
-**Owner tunic-fit report:** The [v2 correction](../06-development/TUNIC_FIT_2026-11-22.md) advances ART-007 garment work. The improved south candidate is ready for owner review; this does not close overall art quality or the planned world-scale/renderer proof.
+**Latest garment coverage:** The [v4 correction](../06-development/GARMENT_COVERAGE_2026-11-22.md) repairs remaining shoulder/thigh gaps and provides both requested pant lengths. ART-007 remains in progress; whole-area checks and enlarged review replace reliance on sparse fit points.
 
 **Owner-selected character work, 22 November:** Start ART-006 with the [custom-character improvement register](../06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) and [canonical plan](../05-game/CUSTOM_CHARACTERS.md). Settle the base body/world fit and one real layered renderer proof before ART-007/ENG-007 coverage and GAME-011/012 persistence/controls. QA-005 owns full feature acceptance. The existing starter/audio work below remains separately open; the reference pack adds no runtime assets.
 

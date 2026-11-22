@@ -6,7 +6,15 @@
 
 Start with the [custom character plan](../../../docs/embervale/05-game/CUSTOM_CHARACTERS.md), [improvement register](../../../docs/embervale/06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) and [production workflow](../../../docs/embervale/05-game/CUSTOM_CHARACTER_WORKFLOW.md).
 
-## Latest revision: trouser fit v3
+## Latest revision: garment coverage v4
+
+The owner identified remaining shoulder/leg skin and requested both pant lengths. [V4](revisions/coverage-fit-v4/README.md) supplies the repaired shared top plus knee-length and full-length pants on the unchanged body. Whole-area coverage replaces the earlier sparse fit checks; see the [findings and correction](../../../docs/embervale/06-development/GARMENT_COVERAGE_2026-11-22.md). Owner visual review remains open.
+
+![Previous outfit and both revised choices](revisions/coverage-fit-v4/previews/before-after.png)
+
+[Moving comparison](revisions/coverage-fit-v4/previews/before-after-walk.gif) · [Shoulder closeups](revisions/coverage-fit-v4/previews/shoulders-closeups.png) · [Leg closeups](revisions/coverage-fit-v4/previews/legs-closeups.png) · [Interactive preview with both lengths](revisions/coverage-fit-v4/character-workshop.html)
+
+## Earlier revision: trouser fit v3
 
 The owner requested the same fitting treatment for the pants. [V3](revisions/trouser-fit-v3/README.md) adds per-pose hip, crotch, leg and cuff geometry with independent brown cloth shading. The latest combined outfit reuses the original body and unchanged v2 tunic. All twelve south poses pass coverage and protected-hand/lower-leg checks; owner visual review remains open. See the [correction record](../../../docs/embervale/06-development/TROUSER_FIT_2026-11-22.md).
 

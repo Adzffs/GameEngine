@@ -1,0 +1,33 @@
+{
+  "schema": "embervale.garment-coverage-validation",
+  "version": 1,
+  "status": "passed",
+  "frames": 12,
+  "pants_variants": [
+    "knee",
+    "full"
+  ],
+  "covered_shoulder_pixels": 1700,
+  "covered_knee_trouser_pixels": 2770,
+  "covered_full_trouser_pixels": 3781,
+  "protected_hand_pixels": 1144,
+  "protected_foot_pixels": 893,
+  "previous_uncovered_shoulder_pixels": 90,
+  "previous_uncovered_knee_trouser_pixels": 60,
+  "missing_covered_body_pixels": 0,
+  "protected_body_overlaps": 0,
+  "source_crop_lossless": true,
+  "composition_exact": true,
+  "unchanged_body": true,
+  "preserved_hash_entries": {
+    "v1": 22,
+    "tunic-fit-v2": 18,
+    "trouser-fit-v3": 19
+  },
+  "walk_preview_duration_ms": 600,
+  "owner_visual_acceptance": "pending",
+  "agent_visual_review": "All twelve poses in each variant, plus enlarged shoulder/leg comparisons",
+  "preview_javascript_syntax": "passed: node --check",
+  "live_browser_interaction": "not run",
+  "runtime_integration": false
+}
