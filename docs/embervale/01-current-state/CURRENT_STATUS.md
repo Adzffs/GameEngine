@@ -24,6 +24,8 @@ Embervale is a playable local C++20/SDL3 RPG prototype with a bounded world edit
 
 ## Modular equipment authoring proof
 
+**Paused by owner, 22 November:** The latest axe candidate is better, but animation production now waits for the owner's PixelLab subscription. PixelLab is the chosen artwork tool; resume with a reusable artwork pipeline when he confirms it is ready. Other gameplay work can continue. The pause does not complete ART-005 or imply full visual acceptance.
+
 The [east-facing axe prototype](../06-development/MODULAR_AXE_PROTOTYPE_2026-11-22.md) now assembles one existing body sequence and explicit hand track with a separate axe master, semantic metal mask and bronze/iron/steel mappings. The owner rejected the initial masking-only attempt to fix handle penetration. The [documented pose revision](../06-development/MODULAR_AXE_OCCLUSION_FIX_2026-11-22.md) now reposes both arms and hand/aim tracks so the shaft lifts beside the face and remains forward of the torso. Twelve focused tests pass, including actual LibreSprite export, unmasked clearance in all 24 cells and refusal of the saved rejected pose. The pilot head/feet and axe/mask sources are preserved; its arm source intentionally changes. The pilot is outside runtime packaging: all 33 existing runtime masters and textures remain exact, and the live catalogue stays at 3,135 frames. The existing body is an engineering fixture; clean motion quality, all eight directions and actual-game migration remain open.
 
 ## Integrated player actions

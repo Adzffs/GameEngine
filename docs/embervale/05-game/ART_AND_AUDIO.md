@@ -1,5 +1,7 @@
 # Art, animation and audio production guide
 
+**Owner decision, 22 November 2026:** PixelLab is the chosen tool for Embervale artwork. Animation production is paused until the owner confirms his subscription is ready. Then build the reusable artwork pipeline around PixelLab, shared motions, separate equipment and material variants. Preserve existing assets and use local editors/exporters to support cleanup, integration and validation. Do not resume manual/procedural animation polishing during the pause.
+
 **Status:** Ten world-art batches in the current walking candidate render terrain, cast, resources, services, buildings, contextual variation and gathering actions. The player has eight-way walking, chopping and mining; the shared cache covers 3,135 frames in 33 textures. [Current asset resource limits](ASSET_RESOURCE_LIMITS.md) now validate metadata, PNG streams, cache costs and pre-copy resources. The ten-batch candidate uses about 23.21 MiB of logical RGBA pixels and 5.80 MiB of retained alpha; driver/allocator/decoder overhead is separate. A general importer and the broader production workflow below remain proposed.\
 **Reviewed:** 21 November 2026.\
 **Purpose:** Replace placeholder presentation in manageable steps while preserving gameplay and making assets easy for humans and AI to work with.
