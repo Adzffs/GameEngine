@@ -1,0 +1,19 @@
+{
+  "source/tunic-raw.png": "943dfa83c8336fc7cd8083732e40aeda5cdd116ef8cb39a56d1638f3ba7c5f42",
+  "exports/tunic-south.png": "d9cf60726089a5e934e1e92ca420f43dd7bd7abe1a27ea6fab4639b4ae9d571e",
+  "exports/outfit-knee-south.png": "58663520defcbc37cd31fe58b0ee0ede72809ec3b1c86c993d8ccdfe71ef16ef",
+  "exports/dressed-knee-south.png": "60103b119fddf62f02c95eae88abb35e75985a3f66cd65ec5a705242e61d57e2",
+  "exports/outfit-full-south.png": "8982c113e0f69061cb81bdcc90e8ca187fed4a12a3f3ee1c75b03923652e6064",
+  "exports/dressed-full-south.png": "15a3af35d3fa4893096e82505ac87c91ac3e9b762e076715f7be9ce7900a79b9",
+  "previews/shoulder-before-after.png": "d3d7b054df3d57e75db5c463118aa4fd37fbd6d774571488bc92b37168c2dd54",
+  "previews/shoulders-01-04.png": "a66679062072680e9be759b181dde0658198ed45bef1fbad30cc04847318b001",
+  "previews/shoulders-05-08.png": "8df563f2c821477f9cf4c18bc038e2a77f1636eda80a4723e6b261cf5dbaf363",
+  "previews/shoulders-09-12.png": "ee481edb1fd211e45287f332b56507597bb54f19294307d8bb54ad83bc1578d6",
+  "recipes/tunic.json": "93ba9bb00652ddc97b808d2291fe82f6ef56ebc71a22754561a6a6d23df97fbb",
+  "recipes/shoulder-boundary.json": "084f752ee984e8aeafec15a7537f5f8e2d772992d0f7c8974b49fbe7ecb7de3b",
+  "manifest.json": "078715e76bc9a7398613343c8392f27e7836fc31d82392e76793553084d18de9",
+  "validation.json": "f614dce311d932a332533328614ee798b3699925939fa4ddac0dbcaeb23e967f",
+  "character-workshop.html": "def704bb06edb0f2ea64a6efd8c21f3b1e6f4431527451efdeca4c2f105100e1",
+  "README.md": "83ac82806789ab66000229ddc1513bf1881497d20367d64c663e8d4a1a167994",
+  "EXPORT_RECOVERY.md": "a60f7cadac9a4bd5fdaf6cb89973615f3ccf0d9029e15feb3fac2d3e4a9b3b5b"
+}

@@ -1,0 +1,112 @@
+{
+  "schema": "embervale.character-garment-revision",
+  "version": 1,
+  "id": "shoulder-crest-v6",
+  "date": "2026-11-23",
+  "status": "revised candidate; owner visual acceptance pending",
+  "owner_feedback": "Look at the top of his shoulders",
+  "body": "../../v1/layers/body-south.png",
+  "tunic": "exports/tunic-south.png",
+  "source": "source/tunic-raw.png",
+  "recipe": "recipes/tunic.json",
+  "boundary": "recipes/shoulder-boundary.json",
+  "pants_variants": {
+    "knee": {
+      "layer": "../alignment-fit-v5/exports/trousers-knee-south.png",
+      "outfit": "exports/outfit-knee-south.png",
+      "dressed": "exports/dressed-knee-south.png"
+    },
+    "full": {
+      "layer": "../alignment-fit-v5/exports/trousers-full-south.png",
+      "outfit": "exports/outfit-full-south.png",
+      "dressed": "exports/dressed-full-south.png"
+    }
+  },
+  "cell_size": [
+    80,
+    80
+  ],
+  "source_cell_size": [
+    84,
+    84
+  ],
+  "source_to_export_offset": [
+    -2,
+    -2
+  ],
+  "ground_pivot": [
+    40,
+    70
+  ],
+  "coverage": {
+    "idle": [
+      "south"
+    ],
+    "walk": [
+      "south"
+    ]
+  },
+  "clips": {
+    "idle": {
+      "columns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "durations_ms": [
+        400,
+        400,
+        400,
+        400
+      ]
+    },
+    "walk": {
+      "columns": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "durations_ms": [
+        80,
+        70,
+        80,
+        70,
+        80,
+        70,
+        80,
+        70
+      ]
+    }
+  },
+  "changes": {
+    "added_shoulder_pixels": 39,
+    "changed_pixels_including_edge_cleanup": 75,
+    "changed_frames": [
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ]
+  },
+  "pixel_lab": {
+    "rendered_drawing": "467475fb-d1a3-45d8-8576-9d38f73c7a4c",
+    "joined_sheet": "96be0e6c-b131-4494-8385-10113fc2de6e",
+    "source_download_complete": false,
+    "export": "Recovered lossless PNGs from the retained pixel master and explicit shoulder correction after the editing environment disconnected; these are master exports, not claimed original service PNG bytes.",
+    "recovery_colour_rule": "Two tied neighbouring cloth samples, frame 6 (37,27) and frame 11 (36,28), consistently use the existing cloth highlight."
+  },
+  "new_body_or_animation_generations": 0,
+  "body_changed": false,
+  "pants_changed": false,
+  "runtime_registered": false
+}

@@ -12,7 +12,7 @@ Read this before animating. The [research and measured findings](../06-developme
 
 ## Start an animation task
 
-**Garment alignment and coverage:** Register complete contours and cuff cross-sections to the actual source pose; verify protected body labels and inter-leg spaces, reject detached scraps and retain every-frame evidence at integer zoom. Check every exported pixel against the editable master. The [22 November alignment correction](../06-development/GARMENT_ALIGNMENT_2026-11-22.md) records why whole-area coverage alone still passed misaligned garments and mislabelled forearms. Owner visual acceptance remains separate from automated checks.
+**Garment alignment and coverage:** Register contours/cuffs to actual source poses, verify body-part labels and inspect boundary strips against the naked source. Master/export parity does not prove those labels correct. The [shoulder-crest follow-up](../06-development/SHOULDER_CREST_2026-11-23.md) found shoulder pixels wrongly protected by a face rectangle; actual jaw spans now distinguish the raised crest. Preserve negative spaces, check every frame at integer zoom and retain owner feedback separately from automated passes.
 
 1. Read this guide, the dated research, the current art guide and the relevant action's source and tests.
 2. Record the actual checkout commit. Compare current code with the dated report before reusing its helper names or numbers.

@@ -6,7 +6,15 @@
 
 Start with the [custom character plan](../../../docs/embervale/05-game/CUSTOM_CHARACTERS.md), [improvement register](../../../docs/embervale/06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) and [production workflow](../../../docs/embervale/05-game/CUSTOM_CHARACTER_WORKFLOW.md).
 
-## Latest revision: clothing alignment v5
+## Latest revision: shoulder crest v6
+
+The owner identified the remaining exposed ridge at the very top of the shoulders. [V6](revisions/shoulder-crest-v6/README.md) covers the explicitly reviewed crest pixels beside the jaw and cleans the local outline. It retains the v5 pants and all lower artwork. See the [correction record](../../../docs/embervale/06-development/SHOULDER_CREST_2026-11-23.md).
+
+![Previous and corrected shoulder edge](revisions/shoulder-crest-v6/previews/shoulder-before-after.png)
+
+[All twelve shoulder comparisons](revisions/shoulder-crest-v6/README.md) · [Interactive preview](revisions/shoulder-crest-v6/character-workshop.html)
+
+## Earlier revision: clothing alignment v5
 
 The owner reports that v4 still does not align. [V5](revisions/alignment-fit-v5/README.md) rebuilds complete contours around every original pose, corrects forearm/leg labels and registers cuffs to actual limb cross-sections. Both pant lengths are retained. See the [diagnosis and evidence](../../../docs/embervale/06-development/GARMENT_ALIGNMENT_2026-11-22.md). Owner visual acceptance remains pending.
 
