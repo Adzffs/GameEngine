@@ -1,6 +1,6 @@
 # Embervale master roadmap
 
-**25 November checkpoint.** The first developer-only layered idle and walk now render in River Crossing. ART-006 continues with review of the 60% scale and body proportions. [World comparison, clip and reproduction](../06-development/CHARACTER_FIT_2026-11-25.md).
+**25 November checkpoint.** The first developer-only layered idle and walk now render in River Crossing. The south-facing preview is good enough to continue at 60%. Carry that size into the first side-facing walk. [World comparison, clip and reproduction](../06-development/CHARACTER_FIT_2026-11-25.md).
 
 **Version:** 1.2 · **Updated:** 22 November 2026 (custom-character planning; runtime evidence retains its recorded dates)\
 **Scope:** GameEngine, Embervale, Embervale Studio and project delivery.\

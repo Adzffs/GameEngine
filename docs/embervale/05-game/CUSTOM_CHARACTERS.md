@@ -1,6 +1,6 @@
 # Custom characters: design and implementation plan
 
-**25 November.** The [first in-world comparison](../06-development/CHARACTER_FIT_2026-11-25.md) renders the separate body, trousers and v6 tunic at their native size and at 60%. Compare the southern idle and walk beside the established cast before selecting a production size.
+**25 November.** The [first in-world comparison](../06-development/CHARACTER_FIT_2026-11-25.md) renders the separate body, trousers and v6 tunic at their native size and at 60%. The south-facing result looks good to the owner for now. Use 60% as the working size for the next facing.
 
 **Latest garment revision:** The owner points out an exposed ridge at the tops of the shoulders. [V6](../../../assets/embervale/custom-character-pilot/revisions/shoulder-crest-v6/README.md) corrects the shoulder/jaw boundary in eight south walk poses, reusing v5 pants and all other artwork. The [record](../06-development/SHOULDER_CREST_2026-11-23.md) explains the incorrect rectangular face exclusion and the focused change. ART-007, owner visual acceptance and runtime adoption remain open.
 
@@ -62,7 +62,7 @@ Resolve these decisions in a small in-world comparison:
 
 | Decision | Required evidence | Current disposition |
 |---|---|---|
-| Body height and width | Same camera, tile, doorway, Mara, tree and equipped examples | Open; pilot body is taller than the existing character |
+| Body height and width | Same camera, tile, doorway, Mara, tree and equipped examples | Working size is 60% after the south-facing review. Confirm proportions as other facings are added. |
 | Proportions and silhouette | Front/side/rear/diagonal turntable at native and gameplay scales | Open; current build reads muscular and is not an accepted universal body |
 | Camera and lighting | Head/shoulder/foot perspective and one lighting convention across eight views | Open visual review |
 | Underwear and skin ramp | All shades readable on grass, stone and indoor floors; modest neutral default | Pilot only |
@@ -226,4 +226,4 @@ Keep one canonical backlog and this owning design. The dated review owns observa
 
 When an improvement lands, update its finding, the parent backlog status/notes, current status, relevant guidance and verification in the same change. Record native renderer captures separately from an authoring GIF or browser preview. Mark owner visual acceptance only after actual feedback on that version.
 
-**Next decision.** Review the 60% standing height and the moving shoulders and feet in the [River Crossing comparison](../06-development/CHARACTER_FIT_2026-11-25.md). Once the body size is selected, use that ground pivot and visible height to fit the remaining walk directions.
+**Next comparison.** Start with one side-facing walk. Match the foot position and 60% scale from the [south-facing preview](../06-development/CHARACTER_FIT_2026-11-25.md), then inspect the tunic shoulder and trouser fit in motion.

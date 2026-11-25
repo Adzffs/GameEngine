@@ -1,6 +1,6 @@
 # Current project status
 
-**25 November.** The developer preview now draws the revised tunic and both trouser lengths on the south-facing character in River Crossing. The normal-zoom comparison beside Mara and at the workshop shows the original body and a 60% fit candidate. The shipped player and appearance saves remain as before. [See the comparison and motion capture](../06-development/CHARACTER_FIT_2026-11-25.md).
+**25 November.** The developer preview now draws the revised tunic and both trouser lengths on the south-facing character in River Crossing. After reviewing the south-facing idle and walk, the owner was happy with the preview for now. The next facing will use the same 60% scale. [See the comparison and motion capture](../06-development/CHARACTER_FIT_2026-11-25.md).
 
 **Shoulder crest correction, 23 November:** [V6](../../../assets/embervale/custom-character-pilot/revisions/shoulder-crest-v6/README.md) addresses the owner's remaining exposed top shoulder ridge. Thirty-nine crest pixels beside the jaw are covered across eight south walk poses, with local outline cleanup. Actual jaw pixels, idle poses, lower top, body and v5 pants remain unchanged. [Evidence](../06-development/SHOULDER_CREST_2026-11-23.md) records the edit and recovered export. ART-007, owner visual review and game adoption remain open.
 

@@ -6,7 +6,7 @@
 
 The custom character at 60% stands **37 screen pixels tall** in the first idle pose. Mara and the current player each stand **36 pixels tall**. At the original size the same custom pose stands **61 pixels tall**. All three columns use one-times camera zoom and the same tile and foot position. The source-scale character overlaps the workshop eave, so the renderer fades the roof. The 60% character clears the eave.
 
-I suggest using 60% to review the proportions and shoulder outline. Small details in the 80-pixel source cell get fewer pixels at this scale. A final production body can be authored to the selected visible height once the size is approved.
+After reviewing the south-facing preview, the owner said it “seems pretty good for now”. Use 60% as the working size for the next facing. Final production proportions are still open.
 
 ## Idle and walk
 
@@ -35,4 +35,4 @@ Use `--fit-outfit knee` for the short trousers. Add `--fit-scale native` to see 
 - The four idle poses and all eight walk poses were identified in the world captures by comparing opaque pixels against the independently sampled dressed reference. The first shot covers a full idle cycle. The middle step beyond the eave shows every walk pose with an exact match on the sampled pixels.
 - Swapping trouser length changed 53 pixels on the lower legs in each of the two stationary 60% captures. Twenty east-facing frames and two sword-and-shield frames matched the existing character pixel-for-pixel with the option on and off.
 
-The next decision is the body height and proportions at normal zoom. The remaining seven clothed movement directions, action coverage and the player-facing creator are later work.
+The next comparison is a side-facing walk at the same scale and foot position. Check how the tunic shoulder and trouser legs move through that turn. The remaining directional coverage, action poses and player-facing creator are still open.

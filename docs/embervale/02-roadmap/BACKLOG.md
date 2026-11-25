@@ -20,7 +20,7 @@ Completion refers to the stated bounded acceptance, with evidence and publicatio
 | Runtime content | Schema-1-4 input, geography/position checks and selected fixed publication manifests | General region/asset packages and content/save migrations |
 | Studio | Shared edits/history, guarded drafts, recovery, overlays, version publishing and selected-version play/rollback | In-place replacement, broader accessibility/platform acceptance and tools |
 | Art | Nine published batches, 3,063 frames/32 textures, walking/chopping/mining/melee and visible equipment, validated frames/PNG streams and resource budgets | Remaining cast/tiers/buildings, general importer, audible/device review and visible acceptance |
-| Custom characters | ART-006/007 in progress. A [world preview](../06-development/CHARACTER_FIT_2026-11-25.md) shows the v6 tunic and v5 trousers on a shared south idle/walk at two scales. | Choose body size and proportions, then extend directional clothing coverage. General appearance rendering, saves and controls are pending. |
+| Custom characters | ART-006/007 in progress. A [world preview](../06-development/CHARACTER_FIT_2026-11-25.md) shows the v6 tunic and v5 trousers on a shared south idle/walk at two scales. | Use the provisional 60% size to check the next facing and extend clothing coverage. General appearance rendering, saves and controls are pending. |
 | Action audio and packaging | 15 original effects, synchronized action edges, controls and one copy owner; current Windows suites pass | Physical-device audible quality, balance and full starter acceptance |
 | Player autosave | GAME-010 complete: 60-second saves, 10-second retries, crafting/death and killed-process reload checks | Windows/human notice review and stronger durability remain separate |
 | Starter progression | Fresh tutorial plus combat, food, death, persisted recovery and six round trips pass; skipped checkpoints fixed | Uncoached navigation, combat/food/death/recovery and full quest-chain acceptance |
@@ -31,7 +31,7 @@ Completion refers to the stated bounded acceptance, with evidence and publicatio
 
 **Latest garment correction:** The [v6 shoulder fix](../06-development/SHOULDER_CREST_2026-11-23.md) covers the exposed ridge beside the jaw that the owner identified in v5. It uses actual jaw spans and a tightly bounded edit; v5 pants and other artwork remain unchanged. ART-007 remains in progress.
 
-**Owner-selected character work.** Review the proposed size, shoulder outline and walk in the [25 November renderer comparison](../06-development/CHARACTER_FIT_2026-11-25.md). Then extend the compatible layers and directions under ART-007/ENG-007. The [character plan](../05-game/CUSTOM_CHARACTERS.md) covers later persistence and creator controls.
+**Owner-selected character work.** The owner was happy with the [south-facing preview](../06-development/CHARACTER_FIT_2026-11-25.md) for now. Continue at 60% with one side-facing walk and its clothing layers under ART-007/ENG-007. The [character plan](../05-game/CUSTOM_CHARACTERS.md) covers later persistence and creator controls.
 
 1. REL-004 is complete; use the verified combined build for the remaining starter and audio acceptance.
 2. GAME-005 / GAME-004: the automated full tutorial/recovery route passes; finish visible/uncoached observation and tuning.
