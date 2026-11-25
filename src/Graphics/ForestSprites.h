@@ -42,6 +42,7 @@ public:
     bool HasPlayer() const;
     bool HasMara() const;
     bool DrawPlayer(float tileX, float tileY, int facing, int pose) const;
+    void DrawCharacterShadow(float footX, float footY) const;
     bool DrawWoodcutting(float tileX, float tileY, int facing, int pose, int axeTier) const;
     bool DrawMiningAction(float tileX, float tileY, int facing, int pose, int pickaxeTier) const;
     bool DrawEquippedPlayer(float tileX, float tileY, int facing, int pose,

@@ -343,6 +343,7 @@ if(GAMEENGINE_BUILD_CLIENT)
             src/Graphics/Graphics.cpp
         )
         target_link_libraries(EmbervaleRenderPreview PRIVATE GameEngineCore SDL3::SDL3)
+        include(src/Tools/CharacterFitPreview.cmake)
         configure_gameengine_world_art(EmbervaleRenderPreview)
     endif()
 endif()
@@ -388,6 +389,12 @@ function(add_gameengine_graphics_test target source)
 endfunction()
 
 if(BUILD_TESTING)
+    if(TARGET EmbervaleRenderPreview AND Python3_Interpreter_FOUND)
+        add_test(NAME CharacterFitPreviewTests COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/CharacterFitPreviewTests.py"
+            "$<TARGET_FILE:EmbervaleRenderPreview>" "${CMAKE_CURRENT_SOURCE_DIR}")
+        set_tests_properties(CharacterFitPreviewTests PROPERTIES LABELS "graphics;art" TIMEOUT 90)
+    endif()
     if(GAMEENGINE_BUILD_CLIENT)
         add_test(
             NAME GameEngineStartupCliTests

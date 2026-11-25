@@ -320,6 +320,9 @@ Graphics::Graphics()
 
 Graphics::~Graphics()
 {
+#ifdef EMBERVALE_CHARACTER_FIT_PREVIEW
+    characterFit.reset();
+#endif
     forestSprites.Clear();
     if (renderer != nullptr)
     {
@@ -3004,6 +3007,11 @@ void Graphics::DrawWorldObjects(Map &map, const std::vector<std::unique_ptr<Enti
         TileSize - 8.0f, TileSize - 8.0f};
     if (worldArtEnabled && forestSprites.HasPlayer())
         visualPlayerRectangle = {nextPlayer.x * TileSize + 4.0f, nextPlayer.y * TileSize - 12.0f, 24.0f, 36.0f};
+#ifdef EMBERVALE_CHARACTER_FIT_PREVIEW
+    if (UsesCharacterFit(MovementFacing(nextPlayer, playerX, playerY)))
+        visualPlayerRectangle = characterFit->OcclusionBounds(
+            nextPlayer.x * TileSize + 16.0f, nextPlayer.y * TileSize + 24.0f);
+#endif
     entries.push_back({nextPlayer.y * TileSize + 24.0f, Kind::PLAYER, 0});
     std::stable_sort(entries.begin(), entries.end(), [](const Entry &a, const Entry &b)
     {
@@ -3164,6 +3172,28 @@ void Graphics::DrawClickedTile()
         renderer,
         &clickedRectangle);
 }
+int Graphics::MovementFacing(const SDL_FPoint &next, int targetX, int targetY) const
+{
+    if (!visualPlayerInitialized) return playerFacing;
+    const float dx = next.x - visualPlayerX, dy = next.y - visualPlayerY;
+    // Retain the facing through the final pixel of arrival.
+    if (std::hypot(dx, dy) <= 0.002f || std::hypot(targetX - visualPlayerX, targetY - visualPlayerY) <= 0.04f)
+        return playerFacing;
+    constexpr float diagonalBoundary = 0.41421356f; // tan(22.5 degrees)
+    if (std::abs(dy) <= std::abs(dx) * diagonalBoundary) return dx < 0.0f ? 1 : 2;
+    if (std::abs(dx) <= std::abs(dy) * diagonalBoundary) return dy < 0.0f ? 3 : 0;
+    return dy > 0.0f ? (dx < 0.0f ? 4 : 5) : (dx < 0.0f ? 6 : 7);
+}
+
+#ifdef EMBERVALE_CHARACTER_FIT_PREVIEW
+bool Graphics::UsesCharacterFit(int facing) const
+{
+    return worldArtEnabled && characterFit && facing == 0 && displayedWeapon == ItemType::NONE &&
+        displayedShield == ItemType::NONE && !woodcuttingPresentation.GetAnimation() &&
+        !miningPresentation.GetAnimation() && !meleePresentation.GetAnimation();
+}
+#endif
+
 void Graphics::DrawPlayer(
     int playerX,
     int playerY)
@@ -3176,20 +3206,7 @@ void Graphics::DrawPlayer(
     int walkPose = 0;
     if (travelled > 0.002f)
     {
-        // Keep the facing through the last pixel of arrival: per-axis position
-        // snapping can otherwise turn diagonal idle into a cardinal pose.
-        if (std::hypot(playerX - visualPlayerX, playerY - visualPlayerY) > 0.04f)
-        {
-            // Eight 45-degree sectors also ignore small perpendicular tails
-            // when turning onto a cardinal route.
-            constexpr float diagonalBoundary = 0.41421356f; // tan(22.5 degrees)
-            if (std::abs(dy) <= std::abs(dx) * diagonalBoundary)
-                playerFacing = dx < 0.0f ? 1 : 2;
-            else if (std::abs(dx) <= std::abs(dy) * diagonalBoundary)
-                playerFacing = dy < 0.0f ? 3 : 0;
-            else
-                playerFacing = dy > 0.0f ? (dx < 0.0f ? 4 : 5) : (dx < 0.0f ? 6 : 7);
-        }
+        playerFacing = MovementFacing(position, playerX, playerY);
         playerWalkDistance = std::fmod(playerWalkDistance + travelled, ForestPilotLayout::PlayerWalkCycleTiles);
         const float phase = playerWalkDistance / ForestPilotLayout::PlayerWalkCycleTiles *
             PlayerAnimationTiming::WalkCycleMilliseconds;
@@ -3222,6 +3239,16 @@ void Graphics::DrawPlayer(
             ? forestSprites.DrawWoodcutting(visualPlayerX, visualPlayerY, playerFacing, woodcuttingPresentation.GetPose(), work->toolTier)
             : forestSprites.DrawMiningAction(visualPlayerX, visualPlayerY, playerFacing, miningPresentation.GetPose(), work->toolTier))) return;
     }
+#ifdef EMBERVALE_CHARACTER_FIT_PREVIEW
+    if (UsesCharacterFit(playerFacing))
+    {
+        const float footX = visualPlayerX * TileSize + 16.0f;
+        const float footY = visualPlayerY * TileSize + 24.0f;
+        forestSprites.DrawCharacterShadow(footX, footY);
+        characterFit->Draw(footX, footY, travelled > 0.002f, travelled, lastPresentationTick);
+        return;
+    }
+#endif
     if (worldArtEnabled && !woodcuttingPresentation.GetAnimation() &&
         forestSprites.DrawEquippedPlayer(visualPlayerX, visualPlayerY,
             playerFacing, walkPose, displayedWeapon, displayedShield)) return;
@@ -6672,7 +6699,11 @@ void Graphics::Render(
     int recoveryPileY,
     const std::map<int, MeleeAttackPresentation> *attackPresentations)
 {
+#ifdef EMBERVALE_CHARACTER_FIT_PREVIEW
+    const Uint64 presentationTick = captureTick.value_or(SDL_GetTicks());
+#else
     const Uint64 presentationTick = SDL_GetTicks();
+#endif
     if (lastPresentationTick != 0)
     {
         presentationDeltaSeconds = std::clamp(

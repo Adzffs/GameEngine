@@ -2,6 +2,9 @@
 
 #include <SDL3/SDL.h>
 #include "ForestSprites.h"
+#ifdef EMBERVALE_CHARACTER_FIT_PREVIEW
+#include "../Tools/CharacterFitPreview.h"
+#endif
 #include "../Audio/AudioCue.h"
 #include "../Gathering/WoodcuttingPresentationState.h"
 #include "../Combat/MeleePresentationState.h"
@@ -73,6 +76,11 @@ public:
     void SetCompiledMapLabelsVisible(bool visible) { compiledMapLabelsVisible = visible; }
     // Authoring inspection only; normal play uses each building's stable profile.
     void SetBuildingConditionPreview(int condition) { forestSprites.SetBuildingConditionPreview(condition); }
+#ifdef EMBERVALE_CHARACTER_FIT_PREVIEW
+    void EnableCharacterFitPreview(const std::filesystem::path &pilotRoot, bool kneePants, bool nativeSize)
+    { characterFit.emplace(renderer, pilotRoot, kneePants, nativeSize); }
+    void SetCaptureTick(Uint64 tick) { captureTick = tick; }
+#endif
     void ProcessEvents(bool &running, const World *world = nullptr);
     bool ConsumeClickedTile(int &tileX, int &tileY);
     bool ConsumeClickedTile(
@@ -512,10 +520,18 @@ public:
     bool sidePanelOpen;
 
 private:
+    int MovementFacing(const SDL_FPoint &next, int targetX, int targetY) const;
+#ifdef EMBERVALE_CHARACTER_FIT_PREVIEW
+    bool UsesCharacterFit(int facing) const;
+#endif
     AudioSettings audioSettings;
     friend struct GraphicsTestAccess;
 
     ForestSprites forestSprites;
+#ifdef EMBERVALE_CHARACTER_FIT_PREVIEW
+    std::optional<CharacterFitPreview> characterFit;
+    std::optional<Uint64> captureTick;
+#endif
     bool worldArtEnabled = true;
     SDL_FRect visualPlayerRectangle{};
     struct SpriteObjectTarget

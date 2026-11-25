@@ -1,5 +1,7 @@
 # Custom character pilot review and improvements
 
+**25 November follow-up.** The [River Crossing comparison](CHARACTER_FIT_2026-11-25.md) supplies native and world-scale captures for CHAR-F01 and a south idle/walk sample for CHAR-F04. Body proportions and visual acceptance are still open.
+
 **Latest owner-reported shoulder defect, 23 November:** The owner points at the very top of the shoulders. [V6](SHOULDER_CREST_2026-11-23.md) covers the exposed raised crest beside the jaw in all eight south walk poses. Those pixels had been incorrectly protected as face/neck in v5. Actual jaw spans, focused edit scope and enlarged comparisons are retained; owner visual acceptance remains pending.
 
 **Owner-confirmed garment defect:** The owner subsequently reported that the tunic does not fit. The [v2 correction](TUNIC_FIT_2026-11-22.md) supplies a new pose-fitted garment and stronger checks; owner visual acceptance remains pending. The original v1 observations and results below remain historical evidence, not an accepted fit.

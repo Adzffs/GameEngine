@@ -1,0 +1,16 @@
+#pragma once
+#include <array>
+
+namespace CharacterFit
+{
+    inline constexpr int CellWidth = @fit_width@, CellHeight = @fit_height@;
+    inline constexpr int PivotX = @fit_pivot_x@, PivotY = @fit_pivot_y@;
+    inline constexpr std::array IdleColumns{@fit_idle_columns@};
+    inline constexpr std::array IdleDurations{@fit_idle_durations_ms@};
+    inline constexpr std::array WalkColumns{@fit_walk_columns@};
+    inline constexpr std::array WalkDurations{@fit_walk_durations_ms@};
+    inline constexpr char Body[] = "@fit_body@";
+    inline constexpr char Tunic[] = "@fit_tunic@";
+    inline constexpr char FullPants[] = "@fit_full@";
+    inline constexpr char KneePants[] = "@fit_knee@";
+}
