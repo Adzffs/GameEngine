@@ -1,6 +1,6 @@
 # Embervale master roadmap
 
-**26 November checkpoint.** ART-006/007 have four clothed cardinal walks at 60%. The east-to-west reversal completes this set for both trouser lengths. The next movement milestone is the four diagonals. [West reversal](../06-development/CHARACTER_WEST_WALK_2026-11-26.md) · [North turn](../06-development/CHARACTER_NORTH_WALK_2026-11-26.md) · [East fit](../06-development/CHARACTER_EAST_WALK_2026-11-25.md) · [South scale](../06-development/CHARACTER_FIT_2026-11-25.md).
+**26 November checkpoint.** ART-006/007 now cover eight-way standing and walking in the developer preview, with the fitted tunic and both trouser lengths at 60%. Review this movement set in River Crossing before extending the playable appearance renderer to gear and actions. [Eight-way recording, pose sheet and verification](../06-development/CHARACTER_EIGHT_WAY_WALK_2026-11-26.md).
 
 **Version:** 1.2 · **Updated:** 22 November 2026 (custom-character planning; runtime evidence retains its recorded dates)\
 **Scope:** GameEngine, Embervale, Embervale Studio and project delivery.\

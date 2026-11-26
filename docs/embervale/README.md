@@ -8,7 +8,7 @@
 | Your question | Best starting point |
 |---|---|
 | What is this project? | [Project overview](00-overview/PROJECT_OVERVIEW.md) |
-| How does the custom character look in River Crossing? | [South idle and scale](06-development/CHARACTER_FIT_2026-11-25.md) · [East walk and both trouser lengths](06-development/CHARACTER_EAST_WALK_2026-11-25.md) · [East-to-north turn](06-development/CHARACTER_NORTH_WALK_2026-11-26.md) · [East-to-west reversal](06-development/CHARACTER_WEST_WALK_2026-11-26.md) |
+| How does the custom character look in River Crossing? | [All eight walks and the diagonal turn](06-development/CHARACTER_EIGHT_WAY_WALK_2026-11-26.md) · [South idle and scale](06-development/CHARACTER_FIT_2026-11-25.md) · [East walk and both trouser lengths](06-development/CHARACTER_EAST_WALK_2026-11-25.md) · [East-to-north turn](06-development/CHARACTER_NORTH_WALK_2026-11-26.md) · [East-to-west reversal](06-development/CHARACTER_WEST_WALK_2026-11-26.md) |
 | What has actually been implemented? | [Current reviewed status](01-current-state/CURRENT_STATUS.md) |
 | What did the full project review find? | [Critical fixes and roadmap reconciliation](06-development/PROJECT_REVIEW_2026-11-20.md) |
 | Are Mining, melee, equipment and sound now combined? | [Recovered player actions and current verification](06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md) |

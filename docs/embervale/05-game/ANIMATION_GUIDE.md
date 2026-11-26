@@ -1,5 +1,7 @@
 # Animation guide
 
+A diagonal tile and a cardinal tile take the same server time. For a walk defined as one stride per tile, track the larger horizontal or vertical map displacement. Check every pose on each tile and the settled facing on arrival. [Eight-way cadence and diagonal turn](../06-development/CHARACTER_EIGHT_WAY_WALK_2026-11-26.md).
+
 For a change of direction, compare the last pose before the turn with the first pose after it. Measure the top of the head and the lowest sole relative to the same ground pivot. Track the visible foot against the moving background as well. A camera following the next server tile can make a grounded character appear to step backward. [East-to-north capture and camera correction](../06-development/CHARACTER_NORTH_WALK_2026-11-26.md).
 
 For a side-to-side reversal, compare the actual screen pixels of the planted sole on the last outgoing and first returning frame. Also inspect the bare source on a contrasting background. A transparent hole inside the hip needs a local repair, while the gap between a swinging forearm and the torso should show the world. Keep the raw source and record the repair separately. [West reversal and source repair](../06-development/CHARACTER_WEST_WALK_2026-11-26.md).

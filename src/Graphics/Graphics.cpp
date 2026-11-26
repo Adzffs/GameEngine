@@ -3227,7 +3227,9 @@ void Graphics::DrawPlayer(
         const float footX = visualPlayerX * TileSize + 16.0f;
         const float footY = visualPlayerY * TileSize + 24.0f;
         forestSprites.DrawCharacterShadow(footX, footY);
-        characterFit->Draw(footX, footY, playerFacing, travelled, lastPresentationTick);
+        // Each accepted map step takes one tick, including diagonal steps.
+        const float tileProgress = std::max(std::abs(dx), std::abs(dy));
+        characterFit->Draw(footX, footY, playerFacing, tileProgress, lastPresentationTick);
         return;
     }
     if (characterFit) characterFit->ResetMotion();

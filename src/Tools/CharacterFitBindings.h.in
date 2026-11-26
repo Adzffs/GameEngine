@@ -23,27 +23,6 @@ namespace CharacterFit
         const char *body, *tunic, *fullPants, *kneePants;
         int halfWidth, height;
     };
-    inline constexpr std::array SouthIdle{@south_idle_columns@}, SouthIdleTimes{@south_idle_durations_ms@};
-    inline constexpr std::array SouthWalk{@south_walk_columns@}, SouthWalkTimes{@south_walk_durations_ms@};
-    inline constexpr std::array EastIdle{@east_idle_columns@}, EastIdleTimes{@east_idle_durations_ms@};
-    inline constexpr std::array EastWalk{@east_walk_columns@}, EastWalkTimes{@east_walk_durations_ms@};
-    inline constexpr std::array NorthIdle{@north_idle_columns@}, NorthIdleTimes{@north_idle_durations_ms@};
-    inline constexpr std::array NorthWalk{@north_walk_columns@}, NorthWalkTimes{@north_walk_durations_ms@};
-    inline constexpr std::array WestIdle{@west_idle_columns@}, WestIdleTimes{@west_idle_durations_ms@};
-    inline constexpr std::array WestWalk{@west_walk_columns@}, WestWalkTimes{@west_walk_durations_ms@};
-
-    // The retained south v6 silhouettes span x=22..56, y=8..70.
-    inline constexpr Direction South{{SouthIdle, SouthIdleTimes}, {SouthWalk, SouthWalkTimes},
-        "@south_body@", "@south_tunic@", "@south_full@", "@south_knee@", PivotX - 22, PivotY - 8};
-    inline constexpr Direction East{{EastIdle, EastIdleTimes}, {EastWalk, EastWalkTimes},
-        "@east_body@", "@east_tunic@", "@east_full@", "@east_knee@",
-        std::max(PivotX - @east_left@, @east_right@ - PivotX), PivotY - @east_top@};
-    inline constexpr Direction North{{NorthIdle, NorthIdleTimes}, {NorthWalk, NorthWalkTimes},
-        "@north_body@", "@north_tunic@", "@north_full@", "@north_knee@",
-        std::max(PivotX - @north_left@, @north_right@ - PivotX), PivotY - @north_top@};
-    inline constexpr Direction West{{WestIdle, WestIdleTimes}, {WestWalk, WestWalkTimes},
-        "@west_body@", "@west_tunic@", "@west_full@", "@west_knee@",
-        std::max(PivotX - @west_left@, @west_right@ - PivotX), PivotY - @west_top@};
-    // MovementFacing uses south, west, east, north and then the four diagonals.
-    inline constexpr std::array<const Direction *, 4> ByFacing{&South, &West, &East, &North};
+@fit_includes@
+    inline constexpr std::array ByFacing{@fit_table@};
 }

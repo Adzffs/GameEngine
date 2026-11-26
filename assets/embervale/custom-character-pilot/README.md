@@ -6,6 +6,10 @@
 
 Start with the [custom character plan](../../../docs/embervale/05-game/CUSTOM_CHARACTERS.md), [improvement register](../../../docs/embervale/06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) and [production workflow](../../../docs/embervale/05-game/CUSTOM_CHARACTER_WORKFLOW.md).
 
+## Eight-way walk
+
+The four diagonal revisions complete the fitted walking set in the developer preview. Each retains its source strip, registration offsets, editable tunic and trousers, and original standing view. [See all eight directions and open the individual diagonal manifests](../../../docs/embervale/06-development/CHARACTER_EIGHT_WAY_WALK_2026-11-26.md).
+
 ## West walk
 
 The [west manifest](revisions/west-walk-v1/manifest.json) retains the original west body, foot registration, editable hip repair, tunic and both trouser lengths. [See the reversal beside Mara and the eight west poses](../../../docs/embervale/06-development/CHARACTER_WEST_WALK_2026-11-26.md).

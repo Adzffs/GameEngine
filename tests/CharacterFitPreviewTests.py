@@ -68,11 +68,26 @@ def check(preview: Path, root: Path) -> None:
             equipped = walk(direction + "-shield", start, end, shield, 33, via=corner)
             if equipped != walk(direction + "-shield-fit", start, end, shield + full, 33, via=corner):
                 raise AssertionError(f"The {direction} layers obscured the shield-equipped player")
-        diagonal = walk("diagonal-current", start, (16, 26), ())
-        diagonal_fit = walk("diagonal-fit", start, (16, 26), full)
-        # Frame zero faces south. The diagonal uses the existing character.
-        if diagonal[0] == diagonal_fit[0] or diagonal[1:] != diagonal_fit[1:]:
-            raise AssertionError("Southeast fallback or the initial south outfit changed")
+        # Approach the same junction from each corner. Once the camera settles
+        # the same world is visible, so each held diagonal must still be distinct.
+        junction = (17, 27)
+        diagonal_stands = set()
+        for facing, origin in (("south-east", (16, 26)), ("south-west", (18, 26)),
+                               ("north-east", (16, 28)), ("north-west", (18, 28))):
+            ordinary = walk(facing + "-current", origin, junction, (), 43)
+            trousers = walk(facing + "-full", origin, junction, full, 43)
+            shorts = walk(facing + "-knee", origin, junction, short, 43)
+            if any(len({a, b, c}) != 3 for a, b, c in zip(ordinary, trousers, shorts)):
+                raise AssertionError(f"{facing} lost its layered outfit or trouser choice")
+            if any(len(set(route[-6:])) != 1 for route in (trousers, shorts)):
+                raise AssertionError(f"{facing} did not hold its standing pose")
+            diagonal_stands.update((trousers[-1], shorts[-1]))
+        if len(diagonal_stands) != 8:
+            raise AssertionError("Two fitted diagonal stands rendered the same image")
+        armed = ("--weapon", "bronze-sword", "--shield")
+        if (walk("diagonal-armed", (16, 26), junction, armed)
+                != walk("diagonal-armed-fit", (16, 26), junction, armed + full)):
+            raise AssertionError("The diagonal outfit obscured the equipped character")
 
         render("missing-layers", *full, cwd=output, success=False)
         render("missing-outfit", "--fit-scale", "world", success=False)
