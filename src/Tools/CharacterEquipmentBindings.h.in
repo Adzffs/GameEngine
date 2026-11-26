@@ -1,0 +1,20 @@
+#pragma once
+
+#include "Inventory/ItemType.h"
+#include <array>
+#include <cstdint>
+
+namespace CharacterEquipment
+{
+    enum class Motion { Overhead, Slash, Heavy, Shield };
+    struct Shape { std::array<int, 8> views; bool mirrorByFacing; Motion motion; };
+    struct Item { ItemType type; const Shape &shape; int material; };
+    using Palette = std::array<std::uint32_t, 3>;
+    inline constexpr int Width = @cell_0@, Height = @cell_1@, Columns = @atlas_columns@, Rows = @atlas_rows@;
+    inline constexpr float GripX = @grip_0@ + 0.5f, GripY = @grip_1@ + 0.5f;
+    inline constexpr std::array Palettes{
+        @palettes@};
+    @shapes@
+    inline constexpr std::array Items{
+        @visuals@};
+}

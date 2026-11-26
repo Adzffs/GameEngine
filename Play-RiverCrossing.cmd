@@ -2,7 +2,9 @@
 setlocal
 
 if not "%~2"=="" goto usage
-if not "%~1"=="" if /i not "%~1"=="--build-only" goto usage
+if not "%~1"=="" if /i not "%~1"=="--build-only" if /i not "%~1"=="--character-playtest" goto usage
+set "playtestOption="
+if /i "%~1"=="--character-playtest" set "playtestOption=--character-playtest"
 
 set "repoRoot=%~dp0."
 set "buildRoot=%~dp0build-river-crossing"
@@ -25,7 +27,7 @@ if /i "%~1"=="--build-only" exit /b 0
 echo Starting a fresh River Crossing character with temporary progress.
 pushd "%repoRoot%"
 if errorlevel 1 goto failed
-"%buildRoot%\GameEngine.exe" --world "%worldFile%" --profile fresh --no-save
+"%buildRoot%\GameEngine.exe" --world "%worldFile%" --profile fresh --no-save %playtestOption%
 set "gameExit=%ERRORLEVEL%"
 popd
 if not "%gameExit%"=="0" goto failed
@@ -43,7 +45,7 @@ echo For another installation, set GAMEENGINE_UCRT64_BIN to its ucrt64\bin direc
 goto failed
 
 :usage
-echo Usage: Play-RiverCrossing.cmd [--build-only]
+echo Usage: Play-RiverCrossing.cmd [--build-only ^| --character-playtest]
 exit /b 2
 
 :failed

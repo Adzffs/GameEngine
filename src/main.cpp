@@ -38,6 +38,7 @@ int main(int argc, char **argv)
     {
         EngineConfiguration configuration;
         configuration.newPlayerMode = options.newPlayerMode;
+        configuration.characterPlaytest = options.characterPlaytest;
         if (options.worldVersionManifestPath)
         {
             auto loaded = WorldPublication::Load(*options.worldVersionManifestPath);
@@ -50,7 +51,9 @@ int main(int argc, char **argv)
             configuration.starterWorldSnapshot =
                 StarterWorldImport::LoadFile(*options.worldSnapshotPath);
         }
-        if ((options.worldSnapshotPath || options.worldVersionManifestPath) && !options.playerSavePath)
+        if (options.characterPlaytest)
+            std::cout << "Character playtest: temporary progress. F7 changes trouser length.\n";
+        else if ((options.worldSnapshotPath || options.worldVersionManifestPath) && !options.playerSavePath)
             std::cout << "World playtest: player progress is temporary. Use --save <player.save> to keep it.\n";
         configuration.developmentPlayerSavePath = options.playerSavePath;
         Engine engine(configuration);

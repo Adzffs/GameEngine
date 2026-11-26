@@ -336,6 +336,11 @@ if(GAMEENGINE_BUILD_CLIENT)
 
     target_link_libraries(GameEngine PRIVATE GameEngineCore SDL3::SDL3)
     configure_gameengine_world_art(GameEngine)
+    if(SDL3_VERSION VERSION_GREATER_EQUAL 3.4.0)
+        include(src/Tools/CharacterFitPreview.cmake)
+        configure_character_fit(GameEngine)
+        add_dependencies(GameEngine GameEngineCharacterLayers)
+    endif()
 
     if(GAMEENGINE_BUILD_CONTENT_TOOLS AND SDL3_VERSION VERSION_GREATER_EQUAL 3.4.0)
         add_executable(EmbervaleRenderPreview
@@ -343,6 +348,8 @@ if(GAMEENGINE_BUILD_CLIENT)
             src/Graphics/Graphics.cpp
         )
         target_link_libraries(EmbervaleRenderPreview PRIVATE GameEngineCore SDL3::SDL3)
+        configure_character_fit(EmbervaleRenderPreview)
+        target_compile_definitions(EmbervaleRenderPreview PRIVATE EMBERVALE_CHARACTER_FIT_PREVIEW)
         configure_gameengine_world_art(EmbervaleRenderPreview)
     endif()
 endif()
@@ -388,6 +395,20 @@ function(add_gameengine_graphics_test target source)
 endfunction()
 
 if(BUILD_TESTING)
+    if(GAMEENGINE_BUILD_GRAPHICS_TESTS AND TARGET GameEngineCharacterLayers)
+        add_executable(CharacterHeldItemTests tests/CharacterHeldItemTests.cpp)
+        target_link_libraries(CharacterHeldItemTests PRIVATE GameEngineCore SDL3::SDL3)
+        configure_character_fit(CharacterHeldItemTests)
+        add_test(NAME CharacterHeldItemTests COMMAND CharacterHeldItemTests
+            "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/custom-character-pilot")
+        set_tests_properties(CharacterHeldItemTests PROPERTIES LABELS "graphics;art")
+    endif()
+    if(TARGET EmbervaleRenderPreview AND Python3_Interpreter_FOUND)
+        add_test(NAME CharacterFitPreviewTests COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/CharacterFitPreviewTests.py"
+            "$<TARGET_FILE:EmbervaleRenderPreview>" "${CMAKE_CURRENT_SOURCE_DIR}")
+        set_tests_properties(CharacterFitPreviewTests PROPERTIES LABELS "graphics;art" TIMEOUT 90)
+    endif()
     if(GAMEENGINE_BUILD_CLIENT)
         add_test(
             NAME GameEngineStartupCliTests

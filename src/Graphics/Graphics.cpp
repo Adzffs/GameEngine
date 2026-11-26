@@ -22,6 +22,7 @@
 #include <map>
 #include <cmath>
 #include <cctype>
+#include <stdexcept>
 #include "../Core/Logger.h"
 
 namespace
@@ -306,7 +307,6 @@ Graphics::Graphics()
       sidePanelOpen(false),
       inventorySlotClickPending(false),
       clickedInventorySlotIndex(-1),
-      weaponSlotClickPending(false),
       recipeRequestPending(false),
       requestedRecipeType(RecipeType::NONE),
       stationMenuOpen(false),
@@ -320,6 +320,9 @@ Graphics::Graphics()
 
 Graphics::~Graphics()
 {
+#ifdef EMBERVALE_CHARACTER_FIT
+    characterFit.reset();
+#endif
     forestSprites.Clear();
     if (renderer != nullptr)
     {
@@ -1004,7 +1007,7 @@ void Graphics::DrawStationMenu()
         DrawLogIcon(slot.GetItemType(), bounds.x, bounds.y, bounds.w);
         DrawOreIcon(slot.GetItemType(), bounds.x, bounds.y, bounds.w);
         DrawAxeIcon(slot.GetItemType(), bounds.x, bounds.y, bounds.w);
-        DrawSwordIcon(slot.GetItemType(), bounds.x, bounds.y, bounds.w);
+        DrawMeleeGearIcon(slot.GetItemType(), bounds.x, bounds.y, bounds.w);
         DrawPickaxeIcon(slot.GetItemType(), bounds.x, bounds.y, bounds.w);
         DrawBarIcon(slot.GetItemType(), bounds.x, bounds.y, bounds.w);
         DrawFoodIcon(slot.GetItemType(), bounds.x, bounds.y, bounds.w);
@@ -1150,7 +1153,7 @@ void Graphics::DrawStationMenu()
                     cursorBounds.x, cursorBounds.y, cursorBounds.w);
         DrawAxeIcon(craftingSessionSnapshot->cursor.GetItemType(),
                     cursorBounds.x, cursorBounds.y, cursorBounds.w);
-        DrawSwordIcon(craftingSessionSnapshot->cursor.GetItemType(),
+        DrawMeleeGearIcon(craftingSessionSnapshot->cursor.GetItemType(),
                       cursorBounds.x, cursorBounds.y, cursorBounds.w);
         DrawPickaxeIcon(craftingSessionSnapshot->cursor.GetItemType(),
                         cursorBounds.x, cursorBounds.y, cursorBounds.w);
@@ -1320,7 +1323,7 @@ void Graphics::DrawBankPanel()
         SDL_SetRenderDrawColor(renderer, 135, 117, 78, 255); SDL_RenderRect(renderer, &slot);
         DrawCraftingItemIcon(type, slot); DrawLogIcon(type, slot.x, slot.y, slot.w);
         DrawOreIcon(type, slot.x, slot.y, slot.w); DrawAxeIcon(type, slot.x, slot.y, slot.w);
-        DrawSwordIcon(type, slot.x, slot.y, slot.w); DrawPickaxeIcon(type, slot.x, slot.y, slot.w);
+        DrawMeleeGearIcon(type, slot.x, slot.y, slot.w); DrawPickaxeIcon(type, slot.x, slot.y, slot.w);
         DrawBarIcon(type, slot.x, slot.y, slot.w); DrawFoodIcon(type, slot.x, slot.y, slot.w);
         if (amount > 1) { const std::string text = std::to_string(amount);
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -1714,33 +1717,14 @@ bool Graphics::HandleSidePanelClick(
             }
         }
 
-        constexpr float weaponXOffset =
-            16.0f;
-
-        constexpr float weaponYOffset =
-            112.0f;
-
-        constexpr float equipmentSlotSize =
-            48.0f;
-
-        const float weaponX =
-            panelX + weaponXOffset;
-
-        const float weaponY =
-            panelY + weaponYOffset;
-
-        const bool insideWeaponSlot =
-            mouseX >= weaponX &&
-            mouseX < weaponX +
-                         equipmentSlotSize &&
-            mouseY >= weaponY &&
-            mouseY < weaponY +
-                         equipmentSlotSize;
-
-        if (insideWeaponSlot)
+        for (const auto slot : {EquipmentSlotType::WEAPON, EquipmentSlotType::SHIELD})
         {
-            weaponSlotClickPending = true;
-            return true;
+            const float x = panelX + (slot == EquipmentSlotType::WEAPON ? 16.0f : 136.0f);
+            if (IsPointInsideRectangle(mouseX, mouseY, SDL_FRect{x, panelY + 112.0f, 48.0f, 48.0f}))
+            {
+                equipmentSlotClick = slot;
+                return true;
+            }
         }
     }
 
@@ -1855,6 +1839,13 @@ void Graphics::ProcessEvents(bool &running, const World *world)
         if (event.type == SDL_EVENT_KEY_DOWN &&
             !event.key.repeat)
         {
+#ifdef EMBERVALE_CHARACTER_FIT
+            if (event.key.scancode == SDL_SCANCODE_F7 && characterFit && characterFit->ToggleTrousers())
+            {
+                UpdateCharacterPlaytestTitle();
+                continue;
+            }
+#endif
             if (event.key.scancode == SDL_SCANCODE_F8)
             {
                 audioSettings.ToggleMute();
@@ -2639,8 +2630,7 @@ bool Graphics::ConsumeStationMenuClose()
 }
 
 void Graphics::UpdateCamera(
-    int playerX,
-    int playerY,
+    SDL_FPoint visualPosition,
     const Map &map)
 {
     cameraWorldPixelWidth = static_cast<float>(map.GetWidth() * TileSize);
@@ -2660,12 +2650,12 @@ void Graphics::UpdateCamera(
         0.0f,
         static_cast<float>(map.GetHeight() * TileSize) - screenWorldHeight);
     const float targetX = std::clamp(
-        static_cast<float>(playerX * TileSize) + TileSize * 0.5f -
+        visualPosition.x * TileSize + TileSize * 0.5f -
             preferredPlayerScreenX,
         0.0f,
         maximumX);
     const float targetY = std::clamp(
-        static_cast<float>(playerY * TileSize) + TileSize * 0.5f -
+        visualPosition.y * TileSize + TileSize * 0.5f -
             preferredPlayerScreenY,
         0.0f,
         maximumY);
@@ -3004,6 +2994,11 @@ void Graphics::DrawWorldObjects(Map &map, const std::vector<std::unique_ptr<Enti
         TileSize - 8.0f, TileSize - 8.0f};
     if (worldArtEnabled && forestSprites.HasPlayer())
         visualPlayerRectangle = {nextPlayer.x * TileSize + 4.0f, nextPlayer.y * TileSize - 12.0f, 24.0f, 36.0f};
+#ifdef EMBERVALE_CHARACTER_FIT
+    if (const auto pose = FittedPlayerPose(MovementFacing(nextPlayer, playerX, playerY)))
+        visualPlayerRectangle = characterFit->OcclusionBounds(
+            nextPlayer.x * TileSize + 16.0f, nextPlayer.y * TileSize + 24.0f, pose->facing);
+#endif
     entries.push_back({nextPlayer.y * TileSize + 24.0f, Kind::PLAYER, 0});
     std::stable_sort(entries.begin(), entries.end(), [](const Entry &a, const Entry &b)
     {
@@ -3164,6 +3159,56 @@ void Graphics::DrawClickedTile()
         renderer,
         &clickedRectangle);
 }
+int Graphics::MovementFacing(const SDL_FPoint &next, int targetX, int targetY) const
+{
+    if (!visualPlayerInitialized) return playerFacing;
+    const float dx = next.x - visualPlayerX, dy = next.y - visualPlayerY;
+    // Retain the facing through the final pixel of arrival.
+    if (std::hypot(dx, dy) <= 0.002f || std::hypot(targetX - visualPlayerX, targetY - visualPlayerY) <= 0.04f)
+        return playerFacing;
+    constexpr float diagonalBoundary = 0.41421356f; // tan(22.5 degrees)
+    if (std::abs(dy) <= std::abs(dx) * diagonalBoundary) return dx < 0.0f ? 1 : 2;
+    if (std::abs(dx) <= std::abs(dy) * diagonalBoundary) return dy < 0.0f ? 3 : 0;
+    return dy > 0.0f ? (dx < 0.0f ? 4 : 5) : (dx < 0.0f ? 6 : 7);
+}
+
+void Graphics::EnableCharacterPlaytest()
+{
+#ifdef EMBERVALE_CHARACTER_FIT
+    const char *base = SDL_GetBasePath();
+    if (!base) throw std::runtime_error(SDL_GetError());
+    const auto root = std::filesystem::path{reinterpret_cast<const char8_t *>(base)} /
+        "assets" / "embervale" / "custom-character-pilot";
+    characterFit.emplace(renderer, root, false, false, true);
+    UpdateCharacterPlaytestTitle();
+#else
+    throw std::runtime_error("The character playtest requires a client built with SDL 3.4 or newer");
+#endif
+}
+
+#ifdef EMBERVALE_CHARACTER_FIT
+void Graphics::UpdateCharacterPlaytestTitle()
+{
+    SDL_SetWindowTitle(window, characterFit->WearsKneePants()
+        ? "Embervale - River Crossing | Knee-length trousers | F7 to change"
+        : "Embervale - River Crossing | Full-length trousers | F7 to change");
+}
+
+std::optional<CharacterPose> Graphics::FittedPlayerPose(int movementFacing) const
+{
+    if (!worldArtEnabled || !characterFit) return std::nullopt;
+    CharacterPose pose{movementFacing, displayedWeapon, displayedShield};
+    if (const auto &melee = meleePresentation.GetAnimation())
+        pose = {melee->facing, melee->weapon, displayedShield, CharacterAction::Melee, meleePresentation.GetPose()};
+    else if (const auto &chop = woodcuttingPresentation.GetAnimation())
+        pose = {chop->facing, displayedWeapon, displayedShield, CharacterAction::Chop, woodcuttingPresentation.GetPose()};
+    else if (const auto &mine = miningPresentation.GetAnimation())
+        pose = {mine->facing, displayedWeapon, displayedShield, CharacterAction::Mine, miningPresentation.GetPose()};
+    if (!CharacterFitPreview::SupportsFacing(pose.facing)) return std::nullopt;
+    return pose;
+}
+#endif
+
 void Graphics::DrawPlayer(
     int playerX,
     int playerY)
@@ -3176,20 +3221,7 @@ void Graphics::DrawPlayer(
     int walkPose = 0;
     if (travelled > 0.002f)
     {
-        // Keep the facing through the last pixel of arrival: per-axis position
-        // snapping can otherwise turn diagonal idle into a cardinal pose.
-        if (std::hypot(playerX - visualPlayerX, playerY - visualPlayerY) > 0.04f)
-        {
-            // Eight 45-degree sectors also ignore small perpendicular tails
-            // when turning onto a cardinal route.
-            constexpr float diagonalBoundary = 0.41421356f; // tan(22.5 degrees)
-            if (std::abs(dy) <= std::abs(dx) * diagonalBoundary)
-                playerFacing = dx < 0.0f ? 1 : 2;
-            else if (std::abs(dx) <= std::abs(dy) * diagonalBoundary)
-                playerFacing = dy < 0.0f ? 3 : 0;
-            else
-                playerFacing = dy > 0.0f ? (dx < 0.0f ? 4 : 5) : (dx < 0.0f ? 6 : 7);
-        }
+        playerFacing = MovementFacing(position, playerX, playerY);
         playerWalkDistance = std::fmod(playerWalkDistance + travelled, ForestPilotLayout::PlayerWalkCycleTiles);
         const float phase = playerWalkDistance / ForestPilotLayout::PlayerWalkCycleTiles *
             PlayerAnimationTiming::WalkCycleMilliseconds;
@@ -3204,6 +3236,20 @@ void Graphics::DrawPlayer(
     visualPlayerY = position.y;
     visualPlayerInitialized = true;
 
+#ifdef EMBERVALE_CHARACTER_FIT
+    if (const auto pose = FittedPlayerPose(playerFacing))
+    {
+        playerFacing = pose->facing;
+        const float footX = visualPlayerX * TileSize + 16.0f;
+        const float footY = visualPlayerY * TileSize + 24.0f;
+        forestSprites.DrawCharacterShadow(footX, footY);
+        // Each accepted map step takes one tick, including diagonal steps.
+        const float tileProgress = std::max(std::abs(dx), std::abs(dy));
+        characterFit->Draw(footX, footY, *pose, tileProgress, lastPresentationTick);
+        return;
+    }
+    if (characterFit) characterFit->ResetMotion();
+#endif
     if (const auto &melee = meleePresentation.GetAnimation(); melee)
     {
         playerFacing = melee->facing;
@@ -5386,12 +5432,21 @@ void Graphics::DrawAxeIcon(
         &axeHeadRectangle);
 }
 
-void Graphics::DrawSwordIcon(
+void Graphics::DrawMeleeGearIcon(
     ItemType itemType,
     float x,
     float y,
     float size)
 {
+    if (itemType == ItemType::WOODEN_SHIELD)
+    {
+        if (!forestSprites.DrawShieldIcon({x, y, size, size}))
+        {
+            SDL_SetRenderDrawColor(renderer, 215, 181, 126, 255);
+            SDL_RenderDebugText(renderer, x + 2, y + size * 0.4f, "SHLD");
+        }
+        return;
+    }
     int bladeRed = 0;
     int bladeGreen = 0;
     int bladeBlue = 0;
@@ -5951,7 +6006,7 @@ void Graphics::DrawInventory(
             slotY,
             slotSize);
 
-        DrawSwordIcon(
+        DrawMeleeGearIcon(
             slot.GetItemType(),
             slotX,
             slotY,
@@ -6187,7 +6242,7 @@ void Graphics::DrawEquipment(
             slot.y,
             slotSize);
 
-        DrawSwordIcon(
+        DrawMeleeGearIcon(
             equippedItem,
             slot.x,
             slot.y,
@@ -6323,15 +6378,11 @@ std::optional<CombatStyle> Graphics::ConsumeCombatStyleRequest()
     return request;
 }
 
-bool Graphics::ConsumeWeaponSlotClick()
+std::optional<EquipmentSlotType> Graphics::ConsumeEquipmentSlotClick()
 {
-    if (!weaponSlotClickPending)
-    {
-        return false;
-    }
-
-    weaponSlotClickPending = false;
-    return true;
+    auto slot = equipmentSlotClick;
+    equipmentSlotClick.reset();
+    return slot;
 }
 
 void Graphics::DrawDialoguePanel()
@@ -6672,7 +6723,11 @@ void Graphics::Render(
     int recoveryPileY,
     const std::map<int, MeleeAttackPresentation> *attackPresentations)
 {
+#ifdef EMBERVALE_CHARACTER_FIT_PREVIEW
+    const Uint64 presentationTick = captureTick.value_or(SDL_GetTicks());
+#else
     const Uint64 presentationTick = SDL_GetTicks();
+#endif
     if (lastPresentationTick != 0)
     {
         presentationDeltaSeconds = std::clamp(
@@ -6683,10 +6738,10 @@ void Graphics::Render(
     }
     lastPresentationTick = presentationTick;
     PreparePlayerMovement(playerX, playerY);
-    UpdateCamera(playerX, playerY, map);
+    const auto nextPosition = NextPlayerPosition(playerX, playerY);
+    UpdateCamera(nextPosition, map);
     UpdateSpritePicking(resources, stations, groundItems);
     UpdateProgressionFeedback(player, inventory);
-    const auto nextPosition = NextPlayerPosition(playerX, playerY);
     woodcuttingPresentation.Update(player, activeAction, resources, presentationDeltaSeconds,
         std::hypot(nextPosition.x - playerX, nextPosition.y - playerY) <= 0.04f);
     miningPresentation.Update(player, activeAction, resources, presentationDeltaSeconds,

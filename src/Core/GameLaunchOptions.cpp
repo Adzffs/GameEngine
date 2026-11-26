@@ -25,6 +25,12 @@ GameLaunchOptions ParseGameLaunchOptions(std::span<const std::string_view> argum
                 throw std::invalid_argument("select exactly one world source");
             compiledWorld = true;
         }
+        else if (argument == "--character-playtest")
+        {
+            if (options.characterPlaytest)
+                throw std::invalid_argument("duplicate --character-playtest");
+            options.characterPlaytest = true;
+        }
         else if (argument == "--no-save")
         {
             if (noSave || options.playerSavePath)
@@ -68,6 +74,12 @@ GameLaunchOptions ParseGameLaunchOptions(std::span<const std::string_view> argum
         }
         else
             throw std::invalid_argument("unknown argument: " + std::string(argument));
+    }
+    if (options.characterPlaytest)
+    {
+        if (options.playerSavePath || (profileSelected && options.newPlayerMode != PlayerInitializationMode::FRESH_START))
+            throw std::invalid_argument("--character-playtest requires a fresh, temporary player");
+        options.newPlayerMode = PlayerInitializationMode::FRESH_START;
     }
     if (!options.playerSavePath && !noSave && !options.worldSnapshotPath && !options.worldVersionManifestPath &&
         options.newPlayerMode == PlayerInitializationMode::DEVELOPMENT_DEFAULTS)
@@ -143,7 +155,7 @@ void ValidateGameLaunchPaths(const GameLaunchOptions &options)
 std::string_view GameLaunchUsage()
 {
     return "Usage: GameEngine [--world <snapshot.json> | --world-version <manifest.json> | --compiled-world] "
-        "[--save <player.save> | --no-save] [--profile fresh|development]\n"
+        "[--save <player.save> | --no-save] [--profile fresh|development] [--character-playtest]\n"
         "       GameEngine --help\n"
         "\n"
         "No arguments: use the compiled starter world and normal development save.\n"
@@ -156,6 +168,7 @@ std::string_view GameLaunchUsage()
         "Fresh starts keep progress temporary unless --save is supplied.\n"
         "--profile development: use the existing boosted development defaults (the default profile).\n"
         "Profiles apply only when creating a character; an existing selected save retains its progress.\n"
+        "--character-playtest: try the fitted character with the starting axe, pickaxe and shield. F7 changes trousers.\n"
         "--save: use the selected player save file.\n"
         "--no-save: do not read or write a player save.\n";
 }

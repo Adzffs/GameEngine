@@ -13,6 +13,15 @@
 
 namespace
 {
+    void SaveFrame(SDL_Renderer *renderer, const std::filesystem::path &path)
+    {
+        std::unique_ptr<SDL_Surface, decltype(&SDL_DestroySurface)> pixels(
+            SDL_RenderReadPixels(renderer, nullptr), SDL_DestroySurface);
+        const auto name = path.u8string();
+        if (!pixels || !SDL_SavePNG(pixels.get(), reinterpret_cast<const char *>(name.c_str())))
+            throw std::runtime_error(SDL_GetError());
+    }
+
     int Coordinate(std::string_view value)
     {
         int coordinate = 0;
@@ -28,7 +37,7 @@ int main(int argc, char **argv)
     try
     {
         if (argc < 3)
-            throw std::invalid_argument("Usage: EmbervaleRenderPreview WORLD.json OUTPUT.png [--basic] [--deplete-trees] [--deplete-rocks] [--focus X Y] [--zoom 1|1.5] [--condition new|weathered|repaired] [--walk-to X Y | --chop X Y | --mine X Y | --melee X Y] [--weapon bronze-sword|godsword|bronze-axe|iron-axe|steel-axe|bronze-pickaxe|iron-pickaxe|steel-pickaxe|unarmed] [--shield] [--frames N]");
+            throw std::invalid_argument("Usage: EmbervaleRenderPreview WORLD.json OUTPUT.png [--basic] [--deplete-trees] [--deplete-rocks] [--focus X Y] [--zoom 1|1.5] [--condition new|weathered|repaired] [--walk-to X Y [--walk-via X Y] | --chop X Y | --mine X Y | --melee X Y] [--weapon bronze-sword|godsword|bronze-axe|iron-axe|steel-axe|bronze-pickaxe|iron-pickaxe|steel-pickaxe|unarmed] [--shield] [--frames N] [--fit-outfit full|knee] [--fit-scale world|native] [--frames-to NEW_DIRECTORY]");
         const auto input = std::filesystem::path(reinterpret_cast<const char8_t *>(argv[1]));
         const auto output = std::filesystem::path(reinterpret_cast<const char8_t *>(argv[2]));
         std::error_code equivalentError;
@@ -38,12 +47,14 @@ int main(int argc, char **argv)
             throw std::invalid_argument("Preview output must be a separate .png file");
         bool basic = false, deplete = false, depleteRocks = false;
         std::optional<std::pair<int, int>> focus;
-        std::optional<std::pair<int, int>> walkTo;
+        std::optional<std::pair<int, int>> walkTo, walkVia;
         std::optional<std::pair<int, int>> chop;
         std::optional<std::pair<int, int>> mine;
         std::optional<std::pair<int, int>> melee;
         std::optional<ItemType> weapon;
         bool shield = false;
+        std::optional<std::string_view> fitOutfit, fitScale;
+        std::optional<std::filesystem::path> sequence;
         float zoom = 1.0f;
         int frames = 0, condition = -1;
         for (int index = 3; index < argc; ++index)
@@ -66,11 +77,11 @@ int main(int argc, char **argv)
                 const int y = Coordinate(argv[++index]);
                 focus = std::pair{x, y};
             }
-            else if (option == "--walk-to" && index + 2 < argc)
+            else if ((option == "--walk-to" || option == "--walk-via") && index + 2 < argc)
             {
                 const int x = Coordinate(argv[++index]);
                 const int y = Coordinate(argv[++index]);
-                walkTo = std::pair{x, y};
+                (option == "--walk-to" ? walkTo : walkVia) = std::pair{x, y};
             }
             else if ((option == "--chop" || option == "--mine") && index + 2 < argc)
             {
@@ -84,6 +95,20 @@ int main(int argc, char **argv)
                 const int y = Coordinate(argv[++index]);
                 melee = std::pair{x,y};
             }
+            else if (option == "--fit-outfit" && index + 1 < argc)
+            {
+                fitOutfit = argv[++index];
+                if (*fitOutfit != "full" && *fitOutfit != "knee")
+                    throw std::invalid_argument("Fit outfit must be full or knee");
+            }
+            else if (option == "--fit-scale" && index + 1 < argc)
+            {
+                fitScale = argv[++index];
+                if (*fitScale != "world" && *fitScale != "native")
+                    throw std::invalid_argument("Fit scale must be world or native");
+            }
+            else if (option == "--frames-to" && index + 1 < argc)
+                sequence = std::filesystem::path(reinterpret_cast<const char8_t *>(argv[++index]));
             else if (option == "--shield") shield = true;
             else if (option == "--weapon" && index + 1 < argc)
             {
@@ -113,6 +138,11 @@ int main(int argc, char **argv)
             }
             else throw std::invalid_argument("Unknown or incomplete preview option");
         }
+        if (fitScale && !fitOutfit) throw std::invalid_argument("Fit scale requires a fit outfit");
+        if (fitOutfit && basic) throw std::invalid_argument("Character comparison requires world art");
+        if (sequence && (sequence->empty() || !frames)) throw std::invalid_argument("Frame export requires a new directory and --frames N");
+        if (walkVia && (!walkTo || !sequence))
+            throw std::invalid_argument("A walk waypoint requires --walk-to and --frames-to");
         // Fixed, independent streams keep authored captures reproducible.
         // Production game launches retain their normal random sources.
         World world(StarterWorldImport::LoadFile(input), 1337U, 7331U, 1U);
@@ -121,10 +151,12 @@ int main(int argc, char **argv)
             throw std::invalid_argument("Select only one walk, chopping, mining or melee fixture");
         if (chop && deplete) throw std::invalid_argument("Chopping requires an intact tree");
         if (mine && depleteRocks) throw std::invalid_argument("Mining requires an intact rock");
-        if ((chop || mine) && (weapon || shield))
+        if ((chop || mine) && weapon)
             throw std::invalid_argument("Gathering previews select their own equipped tool");
         if (walkTo && !world.GetMap().IsValidPosition(walkTo->first, walkTo->second))
             throw std::invalid_argument("Walk preview destination must be walkable");
+        if (walkVia && !world.GetMap().IsValidPosition(walkVia->first, walkVia->second))
+            throw std::invalid_argument("Walk preview waypoint must be walkable");
         const int playerID = world.CreatePlayer(PlayerInitializationMode::FRESH_START);
         auto *player = dynamic_cast<Player *>(world.GetEntityByID(playerID));
         if (!player) throw std::runtime_error("Preview player could not be created");
@@ -187,6 +219,11 @@ int main(int argc, char **argv)
         SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
         Graphics graphics;
         if (!graphics.Initialize()) throw std::runtime_error("Preview renderer initialization failed");
+        if (fitOutfit)
+            graphics.EnableCharacterFitPreview("assets/embervale/custom-character-pilot", *fitOutfit == "knee", fitScale == "native");
+        // A capture sequence uses a private 25-Hz clock for the presentation.
+        constexpr Uint64 firstTick = 1000;
+        if (sequence) graphics.SetCaptureTick(firstTick);
         graphics.SynchronizeGatheringRewards(playerID, world.GetGatheringRewardEvents());
         graphics.SynchronizeMeleeResults(playerID, world.GetMeleeCombatEvents());
         graphics.SetCompiledMapLabelsVisible(false);
@@ -221,11 +258,35 @@ int main(int argc, char **argv)
             if (graphics.GetCameraZoom() == before) throw std::runtime_error("Requested preview zoom is unavailable");
         }
         const int frameCount = frames > 0 ? frames : (melee ? 32 : gatheringTarget ? 18 : walkTo ? 2 : 1);
+        if (sequence)
+        {
+            if (!std::filesystem::create_directories(*sequence))
+                throw std::invalid_argument("Frame output directory already exists");
+            if (walkTo)
+            {
+                const auto first = walkVia.value_or(*walkTo);
+                world.QueueMovementDestination({playerID, first.first, first.second});
+            }
+        }
         for (int frame = 0; frame < frameCount; ++frame)
         {
+            if (sequence) graphics.SetCaptureTick(firstTick + frame * 40);
             if (frame > 0)
             {
-                if (walkTo) player->GetPosition().SetPosition(walkTo->first, walkTo->second);
+                if (walkTo && sequence)
+                {
+                    if ((frame - 1) % 15 == 0)
+                    {
+                        if (walkVia && player->GetPosition().GetX() == walkVia->first &&
+                            player->GetPosition().GetY() == walkVia->second)
+                        {
+                            world.QueueMovementDestination({playerID, walkTo->first, walkTo->second});
+                            walkVia.reset();
+                        }
+                        world.Update();
+                    }
+                }
+                else if (walkTo) player->GetPosition().SetPosition(walkTo->first, walkTo->second);
                 // Bounded presentation fixture: advance real gathering every
                 // fifteen 40-ms frames and consume each authoritative result.
                 if (gatheringTarget && frame % 15 == 0)
@@ -238,17 +299,19 @@ int main(int argc, char **argv)
                     world.Update();
                     graphics.SynchronizeMeleeResults(playerID, world.GetMeleeCombatEvents());
                 }
-                SDL_Delay(40);
+                if (!sequence) SDL_Delay(40);
             }
             draw();
+            if (sequence)
+            {
+                const std::string digits = std::to_string(1000 + frame).substr(1);
+                SaveFrame(graphics.renderer, *sequence / ("frame-" + digits + ".png"));
+            }
         }
-        std::unique_ptr<SDL_Surface, decltype(&SDL_DestroySurface)> pixels(
-            SDL_RenderReadPixels(graphics.renderer, nullptr), SDL_DestroySurface);
-        if (!pixels) throw std::runtime_error(SDL_GetError());
         if (!output.parent_path().empty()) std::filesystem::create_directories(output.parent_path());
-        if (!SDL_SavePNG(pixels.get(), argv[2])) throw std::runtime_error(SDL_GetError());
+        SaveFrame(graphics.renderer, output);
         SDL_SetRenderTarget(graphics.renderer, nullptr);
-        std::cout << "Rendered " << pixels->w << 'x' << pixels->h
+        std::cout << "Rendered " << Graphics::WindowWidth << 'x' << Graphics::WindowHeight
             << " through the game renderer; " << (basic ? "basic" : "world")
             << " art, " << (melee ? "melee" : mine ? "mining" : chop ? "woodcutting" : walkTo ? "walking" : "static")
             << " preview. No player or world files written.\n";

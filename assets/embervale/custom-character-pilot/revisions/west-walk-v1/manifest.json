@@ -1,0 +1,175 @@
+{
+  "schema": "embervale.character-garment-revision",
+  "version": 1,
+  "id": "west-walk-v1",
+  "direction": "west",
+  "body": "exports/body-west.png",
+  "tunic": "exports/tunic-west.png",
+  "pants_variants": {
+    "full": {
+      "layer": "exports/trousers-full-west.png"
+    },
+    "knee": {
+      "layer": "exports/trousers-knee-west.png"
+    }
+  },
+  "cell_size": [
+    80,
+    80
+  ],
+  "ground_pivot": [
+    40,
+    70
+  ],
+  "silhouette_bounds_inclusive": [
+    22,
+    11,
+    55,
+    69
+  ],
+  "clips": {
+    "idle": {
+      "columns": [
+        0
+      ],
+      "durations_ms": [
+        400
+      ],
+      "pose": "held standing"
+    },
+    "walk": {
+      "columns": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "durations_ms": [
+        80,
+        70,
+        80,
+        70,
+        80,
+        70,
+        80,
+        70
+      ]
+    }
+  },
+  "sources": {
+    "stand": {
+      "sheet": "../../v1/layers/body-standing-eight-way.png",
+      "column": 1,
+      "cell_size": [
+        80,
+        80
+      ]
+    },
+    "walk": {
+      "sheet": "source/walk-west-raw.png",
+      "cell_size": [
+        84,
+        84
+      ],
+      "crop_xywh": [
+        2,
+        2,
+        80,
+        80
+      ],
+      "post_crop_offsets_xy": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "contact_row": 69,
+      "registration": "Translate the whole cropped pose vertically until the support sole reaches row 69."
+    },
+    "briefs": {
+      "recipe": "recipes/brief-repair.json",
+      "composite": "Over the registered body before clothing.",
+      "new_opaque_pixels_by_column": [
+        0,
+        28,
+        4,
+        0,
+        0,
+        0,
+        0,
+        8,
+        10
+      ],
+      "retinted_pixels_by_column": [
+        0,
+        0,
+        2,
+        29,
+        30,
+        32,
+        36,
+        19,
+        4
+      ],
+      "scope": "Fill holes inside the hip and restore the charcoal briefs. Keep the original hand, arm gaps and standing body."
+    }
+  },
+  "recipes": {
+    "tunic": "recipes/tunic.json",
+    "full": "recipes/full.json",
+    "knee": "recipes/knee.json",
+    "brief-repair": "recipes/brief-repair.json"
+  },
+  "pixellab": {
+    "character": "506e9990-e9e3-4771-b17f-892c787939d1",
+    "walk_group": "21093bb9-a630-4aaf-8252-60ec1414f034",
+    "west_walk_job": "ebf10b21-9c2a-45a9-93f5-40f469e42ece",
+    "walk_sheet_gallery": "a1c173ab-b881-41c0-b31e-ab67ab114aa7",
+    "drawing_ids": {
+      "tunic": "dc115c18-7827-4187-8e40-fb6bb33524d4",
+      "full": "7b6d8bdc-60d3-4ef2-a6de-5a47cf8f002a",
+      "knee": "24147861-ca47-4623-9168-3ac406be1d4a",
+      "brief-repair": "0de992fc-f9a4-42e2-ab4b-d0d37a2b1bfc"
+    },
+    "garment_sheet_gallery": "146606f6-019e-406c-9089-77ec62cecd31",
+    "garment_sheet_rows": [
+      "tunic",
+      "full",
+      "knee",
+      "brief-repair"
+    ]
+  },
+  "runtime_registered": false
+}

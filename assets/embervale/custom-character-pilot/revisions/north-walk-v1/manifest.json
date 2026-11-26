@@ -1,0 +1,145 @@
+{
+  "schema": "embervale.character-garment-revision",
+  "version": 1,
+  "id": "north-walk-v1",
+  "direction": "north",
+  "body": "exports/body-north.png",
+  "tunic": "exports/tunic-north.png",
+  "pants_variants": {
+    "full": {
+      "layer": "exports/trousers-full-north.png"
+    },
+    "knee": {
+      "layer": "exports/trousers-knee-north.png"
+    }
+  },
+  "cell_size": [
+    80,
+    80
+  ],
+  "ground_pivot": [
+    40,
+    70
+  ],
+  "silhouette_bounds_inclusive": [
+    23,
+    11,
+    55,
+    69
+  ],
+  "clips": {
+    "idle": {
+      "columns": [
+        0
+      ],
+      "durations_ms": [
+        400
+      ],
+      "pose": "held standing"
+    },
+    "walk": {
+      "columns": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "durations_ms": [
+        80,
+        70,
+        80,
+        70,
+        80,
+        70,
+        80,
+        70
+      ]
+    }
+  },
+  "sources": {
+    "stand": {
+      "sheet": "../../v1/layers/body-standing-eight-way.png",
+      "column": 3,
+      "cell_size": [
+        80,
+        80
+      ]
+    },
+    "walk": {
+      "sheet": "source/walk-north-raw.png",
+      "cell_size": [
+        84,
+        84
+      ],
+      "crop_xywh": [
+        2,
+        2,
+        80,
+        80
+      ],
+      "post_crop_offsets_xy": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "contact_row": 69,
+      "registration": "Translate each cropped cell down to put the lowest opaque sole pixel on the contact row. Preserve all opaque pixels and horizontal motion."
+    }
+  },
+  "recipes": {
+    "tunic": "recipes/tunic.json",
+    "full": "recipes/full.json",
+    "knee": "recipes/knee.json"
+  },
+  "pixellab": {
+    "character": "506e9990-e9e3-4771-b17f-892c787939d1",
+    "walk_group": "21093bb9-a630-4aaf-8252-60ec1414f034",
+    "north_walk_job": "5a90c6d6-a9c9-4b38-938c-0763965524eb",
+    "walk_sheet_gallery": "80dbdf11-01e6-43ca-aedd-f7b72919d1c6",
+    "drawing_ids": {
+      "tunic": "dbd55b38-82d5-417a-b0af-d19c5d72229f",
+      "full": "ae2f39cf-078a-40a5-a21e-0eb705412b43",
+      "knee": "73196254-d148-4943-819f-ff55f9983ad4"
+    },
+    "garment_sheet_gallery": "9ee1759e-8b84-416c-9bd2-2025600e00fe",
+    "garment_sheet_rows": [
+      "tunic",
+      "full",
+      "knee"
+    ]
+  },
+  "runtime_registered": false
+}

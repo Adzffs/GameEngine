@@ -1,0 +1,514 @@
+{
+  "job": {
+    "canvas": [
+      80,
+      80
+    ],
+    "frame_count": 9,
+    "durations_ms": [
+      400,
+      80,
+      70,
+      80,
+      70,
+      80,
+      70,
+      80,
+      70
+    ],
+    "views": [
+      {
+        "id": "east",
+        "offset": [
+          0,
+          0
+        ]
+      }
+    ],
+    "body_prefix": "Garment",
+    "source_bookends_exact": false,
+    "body_palette_exact": false,
+    "require_clear_border": true
+  },
+  "scene": {
+    "palette": {},
+    "layers": [
+      {
+        "id": "garment",
+        "name": "East-facing tunic"
+      }
+    ],
+    "views": {
+      "east": {
+        "nodes": {
+          "garment": {
+            "layer": "garment",
+            "at": [
+              0,
+              0
+            ],
+            "draw": [
+              {
+                "op": "grid",
+                "at": [
+                  33,
+                  25
+                ],
+                "legend": {
+                  "i": "#10292a",
+                  "d": "#163c3c",
+                  "s": "#20534f",
+                  "m": "#2f6c61",
+                  "l": "#488574",
+                  "h": "#71a18a"
+                },
+                "rows": [
+                  "..dd..........",
+                  "..slddd.......",
+                  ".dsmlllddi....",
+                  ".ssmlllllliii.",
+                  "dssmlllmmmmmd.",
+                  "sssmlllmmmmmmd",
+                  "sssmlllmlllmmd",
+                  "sssmmmmmlllmmd",
+                  "sssmmmmmlllmd.",
+                  "dddddddmlllmd.",
+                  ".......dlllmd.",
+                  ".......dlllmd.",
+                  ".......dlllmd.",
+                  "......dmmmmd..",
+                  "......dmmmmd..",
+                  ".......dmmmd..",
+                  ".......dmmmd..",
+                  ".......dmmmd..",
+                  ".......dmmd...",
+                  "........dmd...",
+                  ".i......imi...",
+                  "..i......i...."
+                ]
+              }
+            ]
+          }
+        },
+        "poses": {
+          "p00": {
+            "garment": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    33,
+                    25
+                  ],
+                  "legend": {
+                    "i": "#10292a",
+                    "d": "#163c3c",
+                    "s": "#20534f",
+                    "m": "#2f6c61",
+                    "l": "#488574",
+                    "h": "#71a18a"
+                  },
+                  "rows": [
+                    "..dd..........",
+                    "..slddd.......",
+                    ".dsmlllddi....",
+                    ".ssmlllllliii.",
+                    "dssmlllmmmmmd.",
+                    "sssmlllmmmmmmd",
+                    "sssmlllmlllmmd",
+                    "sssmmmmmlllmmd",
+                    "sssmmmmmlllmd.",
+                    "dddddddmlllmd.",
+                    ".......dlllmd.",
+                    ".......dlllmd.",
+                    ".......dlllmd.",
+                    "......dmmmmd..",
+                    "......dmmmmd..",
+                    ".......dmmmd..",
+                    ".......dmmmd..",
+                    ".......dmmmd..",
+                    ".......dmmd...",
+                    "........dmd...",
+                    ".i......imi...",
+                    "..i......i...."
+                  ]
+                }
+              ]
+            }
+          },
+          "p01": {
+            "garment": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    32,
+                    25
+                  ],
+                  "legend": {
+                    "i": "#10292a",
+                    "d": "#163c3c",
+                    "s": "#20534f",
+                    "m": "#2f6c61",
+                    "l": "#488574",
+                    "h": "#71a18a"
+                  },
+                  "rows": [
+                    "...dd..........",
+                    "...slddd.......",
+                    "..dsmlllddi....",
+                    "..ssmlllllliii.",
+                    ".dssmlllmmmmmd.",
+                    ".sssmlllmmmmmmd",
+                    ".sssmlllmlllmmd",
+                    ".sssmmmmmlllmmd",
+                    "ssssmmmmmlllmd.",
+                    "dddddddmmlllmd.",
+                    ".......dmlllmd.",
+                    ".......dmlllmd.",
+                    ".......dmlllmd.",
+                    "......dmmmmmd..",
+                    "......dmmmmmd..",
+                    ".......dmmmmd..",
+                    ".......dmmddd..",
+                    ".......dmd.....",
+                    ".......dmmdd...",
+                    "........dmmd...",
+                    "........immi...",
+                    ".........ii...."
+                  ]
+                }
+              ]
+            }
+          },
+          "p02": {
+            "garment": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    33,
+                    24
+                  ],
+                  "legend": {
+                    "i": "#10292a",
+                    "d": "#163c3c",
+                    "s": "#20534f",
+                    "m": "#2f6c61",
+                    "l": "#488574",
+                    "h": "#71a18a"
+                  },
+                  "rows": [
+                    "..dd..........",
+                    "..slddd.......",
+                    ".dsmlllddi....",
+                    ".ssmlllllliii.",
+                    "dssmlllmmmmmd.",
+                    "sssmlllmmmmmmd",
+                    "sssmlllmlllmmd",
+                    "sssmmmmmlllmmd",
+                    "sssmmmmmlllmd.",
+                    "ddddddddlllmd.",
+                    "........dllmd.",
+                    "........dllmd.",
+                    "........dllmd.",
+                    ".......dmmmd..",
+                    ".......dmmmd..",
+                    "........dmmd..",
+                    ".........ddd..",
+                    "...........d..",
+                    ".........ddsd.",
+                    "..d.......dsd.",
+                    "..dd......iiii",
+                    "..iii........."
+                  ]
+                }
+              ]
+            }
+          },
+          "p03": {
+            "garment": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    32,
+                    25
+                  ],
+                  "legend": {
+                    "i": "#10292a",
+                    "d": "#163c3c",
+                    "s": "#20534f",
+                    "m": "#2f6c61",
+                    "l": "#488574",
+                    "h": "#71a18a"
+                  },
+                  "rows": [
+                    "...dd.............",
+                    "...slddd..........",
+                    "..dsmlllddi.......",
+                    "..ssmlllllliii....",
+                    ".dssmlllmmmmmd....",
+                    ".sssmlllmmmmmmd...",
+                    "ssssmlllmlllmmd...",
+                    "ssssmmmmmlllmmd...",
+                    "ssssmmmmmlllmd....",
+                    "ddddddddddllmd....",
+                    "..........dlmd....",
+                    "...........dmd....",
+                    "...........dmd....",
+                    "...........dd.....",
+                    "....d......dd.....",
+                    "....d.......d.....",
+                    "....d.............",
+                    "....dd............",
+                    "....dd............",
+                    ".dddssd.......id..",
+                    ".iissssd.......iii",
+                    "...iiiiiii........"
+                  ]
+                }
+              ]
+            }
+          },
+          "p04": {
+            "garment": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    32,
+                    26
+                  ],
+                  "legend": {
+                    "i": "#10292a",
+                    "d": "#163c3c",
+                    "s": "#20534f",
+                    "m": "#2f6c61",
+                    "l": "#488574",
+                    "h": "#71a18a"
+                  },
+                  "rows": [
+                    "...dd..........",
+                    "...slddd.......",
+                    "..dsmlllddi....",
+                    "..ssmlllllliii.",
+                    ".dssmlllmmmmmd.",
+                    ".sssmlllmmmmmmd",
+                    "ssssmlllmlllmmd",
+                    "ssssmmmmmlllmmd",
+                    "ssssmmmmmlllmd.",
+                    "ddddddddddllmd.",
+                    "..........dlmd.",
+                    "...........dmd.",
+                    "...........dmd.",
+                    "...........dd..",
+                    "...........dd..",
+                    "............d..",
+                    "....d..........",
+                    "....d..........",
+                    "....dd.........",
+                    ".d..dsd........",
+                    ".iidsssdd......",
+                    "...iiiiiii....."
+                  ]
+                }
+              ]
+            }
+          },
+          "p05": {
+            "garment": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    33,
+                    25
+                  ],
+                  "legend": {
+                    "i": "#10292a",
+                    "d": "#163c3c",
+                    "s": "#20534f",
+                    "m": "#2f6c61",
+                    "l": "#488574",
+                    "h": "#71a18a"
+                  },
+                  "rows": [
+                    "..dd..........",
+                    "..slddd.......",
+                    ".dsmlllddi....",
+                    ".ssmlllllliii.",
+                    "dssmlllmmmmmd.",
+                    "sssmlllmmmmmmd",
+                    "sssmlllmlllmmd",
+                    "sssmmmmmlllmmd",
+                    "sssmmmmmlllmd.",
+                    "ddddddddlllmd.",
+                    "........dllmd.",
+                    "........dllmd.",
+                    "........dllmd.",
+                    ".......dmmmd..",
+                    ".......dmmmd..",
+                    "........dmmd..",
+                    "........dddd..",
+                    "........d..d..",
+                    "........dddd..",
+                    "..........dd..",
+                    "..dd.....iii..",
+                    "..iii........."
+                  ]
+                }
+              ]
+            }
+          },
+          "p06": {
+            "garment": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    32,
+                    24
+                  ],
+                  "legend": {
+                    "i": "#10292a",
+                    "d": "#163c3c",
+                    "s": "#20534f",
+                    "m": "#2f6c61",
+                    "l": "#488574",
+                    "h": "#71a18a"
+                  },
+                  "rows": [
+                    "...dd............",
+                    "...slddd.........",
+                    "..dsmlllddi......",
+                    "..ssmlllllliii...",
+                    ".dssmlllmmmmmd...",
+                    ".sssmlllmmmmmmd..",
+                    ".sssmlllmlllmmd..",
+                    ".sssmmmmmlllmmd..",
+                    "ssssmmmmmlllmd...",
+                    "ddddddmmmlllmd...",
+                    "......dmmlllmd...",
+                    ".......dmlllmd...",
+                    "......dmmlllmd...",
+                    ".....dsmmmmmmd...",
+                    ".....dsmmmmmmd...",
+                    "......dmmmmmd.d..",
+                    "......dmmmdd.....",
+                    "......dmmd.......",
+                    "......dmmmdd.....",
+                    "......dmmmmd....i",
+                    "......immmmi.....",
+                    ".......iiii......"
+                  ]
+                }
+              ]
+            }
+          },
+          "p07": {
+            "garment": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    29,
+                    25
+                  ],
+                  "legend": {
+                    "i": "#10292a",
+                    "d": "#163c3c",
+                    "s": "#20534f",
+                    "m": "#2f6c61",
+                    "l": "#488574",
+                    "h": "#71a18a"
+                  },
+                  "rows": [
+                    "......dd..........",
+                    "......slddd.......",
+                    "....ddsmlllddi....",
+                    "...dsssmlllllliii.",
+                    "...ssssmlllmmmmmmi",
+                    "...ssssmlllmmmmmmd",
+                    "..sssssmlllmlllmmd",
+                    ".ssssssmmmmmlllmmd",
+                    ".ssssssmmmmmlllmmd",
+                    ".dddddddmmmmlllmmd",
+                    "........dmmmlllmdd",
+                    "........dmmmllld..",
+                    ".......dmmmmllld..",
+                    ".......dssmmmmd...",
+                    "......ssssmmmmd...",
+                    ".......dssmmmmd...",
+                    ".......dssmmmmd...",
+                    ".......dssmmmd.d..",
+                    "......ssssmmmmdd..",
+                    "i......dssmmmmmsi.",
+                    ".......issmmmmii..",
+                    "........iiiiii...."
+                  ]
+                }
+              ]
+            }
+          },
+          "p08": {
+            "garment": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    30,
+                    26
+                  ],
+                  "legend": {
+                    "i": "#10292a",
+                    "d": "#163c3c",
+                    "s": "#20534f",
+                    "m": "#2f6c61",
+                    "l": "#488574",
+                    "h": "#71a18a"
+                  },
+                  "rows": [
+                    ".....dd..........",
+                    ".....slddd.......",
+                    "....dsmlllddi....",
+                    "...dssmlllllliii.",
+                    "..dsssmlllmmmmmd.",
+                    "..ssssmlllmmmmmmd",
+                    ".sssssmlllmlllmmd",
+                    "ssssssmmmmmlllmmd",
+                    "ssssssmmmmmlllmmd",
+                    "dddddddmmmmlllmmd",
+                    ".......dmmmlllmdd",
+                    ".......dmmmllld..",
+                    "......dmmmmllld..",
+                    "......dssmmmmd...",
+                    ".....ssssmmmmd...",
+                    "......dssmmmmd...",
+                    "......dssmmmmd...",
+                    ".....ssssmmmmmd..",
+                    ".....ssssmmmmmd..",
+                    "......dssmmmmmd..",
+                    "......issmmmmii..",
+                    ".......iiiiii...."
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "frames": [
+          "p00",
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p05",
+          "p06",
+          "p07",
+          "p08"
+        ]
+      }
+    }
+  }
+}

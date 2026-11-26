@@ -589,17 +589,31 @@ bool ForestSprites::DrawEquippedPlayer(float tileX, float tileY, int facing, int
     return true;
 }
 
+bool ForestSprites::DrawShieldIcon(const SDL_FRect &slot) const
+{
+    const auto *shield = meleeEquipment[8][0][0];
+    if (!Available(shield)) return false;
+    const float scale = std::min({2.0f, (slot.w - 6) / shield->source.w, (slot.h - 6) / shield->source.h});
+    const float width = shield->source.w * scale, height = shield->source.h * scale;
+    return Draw(shield, {slot.x + (slot.w - width) * 0.5f, slot.y + (slot.h - height) * 0.5f, width, height});
+}
+
 bool ForestSprites::DrawCharacter(const Frame *frame, float tileX, float tileY) const
 {
     if (!Available(frame)) return false;
+    DrawCharacterShadow(tileX * ForestPilotLayout::TileSize + frame->ground.x,
+                        tileY * ForestPilotLayout::TileSize + frame->ground.y);
+    return Draw(frame, Bounds(*frame, tileX, tileY));
+}
+
+void ForestSprites::DrawCharacterShadow(float footX, float footY) const
+{
     SDL_BlendMode previousBlend;
     Uint8 red, green, blue, alpha;
     SDL_GetRenderDrawBlendMode(renderer, &previousBlend);
     SDL_GetRenderDrawColor(renderer, &red, &green, &blue, &alpha);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_SetRenderDrawColor(renderer, 17, 22, 18, 78);
-    const float footX = tileX * ForestPilotLayout::TileSize + frame->ground.x;
-    const float footY = tileY * ForestPilotLayout::TileSize + frame->ground.y;
     for (int row = -2; row <= 2; ++row)
     {
         const float halfWidth = 10.0f - std::abs(row) * 2.0f;
@@ -607,7 +621,6 @@ bool ForestSprites::DrawCharacter(const Frame *frame, float tileX, float tileY) 
     }
     SDL_SetRenderDrawBlendMode(renderer, previousBlend);
     SDL_SetRenderDrawColor(renderer, red, green, blue, alpha);
-    return Draw(frame, Bounds(*frame, tileX, tileY));
 }
 
 const ForestSprites::Frame *ForestSprites::StationFrame(StationType type) const

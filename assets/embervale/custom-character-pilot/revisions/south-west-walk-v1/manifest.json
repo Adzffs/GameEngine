@@ -1,0 +1,153 @@
+{
+  "schema": "embervale.character-garment-revision",
+  "version": 1,
+  "id": "south-west-walk-v1",
+  "direction": "south-west",
+  "body": "exports/body-south-west.png",
+  "tunic": "exports/tunic-south-west.png",
+  "pants_variants": {
+    "full": {
+      "layer": "exports/trousers-full-south-west.png"
+    },
+    "knee": {
+      "layer": "exports/trousers-knee-south-west.png"
+    }
+  },
+  "cell_size": [
+    80,
+    80
+  ],
+  "ground_pivot": [
+    40,
+    70
+  ],
+  "silhouette_bounds_inclusive": [
+    23,
+    8,
+    55,
+    69
+  ],
+  "clips": {
+    "idle": {
+      "columns": [
+        0
+      ],
+      "durations_ms": [
+        400
+      ],
+      "pose": "held standing"
+    },
+    "walk": {
+      "columns": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        1
+      ],
+      "durations_ms": [
+        80,
+        70,
+        80,
+        70,
+        80,
+        70,
+        80,
+        70
+      ]
+    }
+  },
+  "sources": {
+    "stand": {
+      "sheet": "../../v1/layers/body-standing-eight-way.png",
+      "column": 4,
+      "cell_size": [
+        80,
+        80
+      ]
+    },
+    "walk": {
+      "sheet": "source/walk-south-west-raw.png",
+      "cell_size": [
+        84,
+        84
+      ],
+      "crop_xywh": [
+        2,
+        2,
+        80,
+        80
+      ],
+      "post_crop_offsets_xy": [
+        [
+          0,
+          -3
+        ],
+        [
+          0,
+          -1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          -1
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          -1
+        ]
+      ],
+      "contact_row": 69,
+      "registration": "Translate the complete source body vertically until the lowest sole is on row 69."
+    }
+  },
+  "phase_selection": {
+    "neighbours": [
+      "south",
+      "west"
+    ],
+    "first_source_column": 2,
+    "method": "At the shared pivot, compare lower-leg and foot alpha on rows 48 through 70 with both adjoining cardinal walks. Start at the circular offset with the fewest total differing pixels over eight phases. Keep the original sequence and 600 ms gait."
+  },
+  "recipes": {
+    "tunic": "recipes/tunic.json",
+    "full": "recipes/full.json",
+    "knee": "recipes/knee.json"
+  },
+  "pixellab": {
+    "character": "506e9990-e9e3-4771-b17f-892c787939d1",
+    "walk_group": "21093bb9-a630-4aaf-8252-60ec1414f034",
+    "walk_job": "d0e39c52-e2cd-4d26-ba6e-28d3472ff319",
+    "walk_sheet_gallery": "3747f240-c087-4dc3-9214-f2d169db745d",
+    "drawing_ids": {
+      "tunic": "58e1859b-fd0b-4d60-ab29-57ac3fbeaf49",
+      "full": "386e00e9-87a3-4b39-8930-9356674c369f",
+      "knee": "b5c96c8c-ac0b-49be-bdd4-52b75fd28ab1"
+    },
+    "garment_sheet_gallery": "6fa6cb8c-1fe2-40ac-88f2-34a7f85876e7",
+    "garment_sheet_rows": [
+      "tunic",
+      "full",
+      "knee"
+    ]
+  },
+  "runtime_registered": false
+}

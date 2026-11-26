@@ -1,5 +1,15 @@
 # Animation guide
 
+A diagonal tile and a cardinal tile take the same server time. For a walk defined as one stride per tile, track the larger horizontal or vertical map displacement. Check every pose on each tile and the settled facing on arrival. [Eight-way cadence and diagonal turn](../06-development/CHARACTER_EIGHT_WAY_WALK_2026-11-26.md).
+
+For a change of direction, compare the last pose before the turn with the first pose after it. Measure the top of the head and the lowest sole relative to the same ground pivot. Track the visible foot against the moving background as well. A camera following the next server tile can make a grounded character appear to step backward. [East-to-north capture and camera correction](../06-development/CHARACTER_NORTH_WALK_2026-11-26.md).
+
+For a side-to-side reversal, compare the actual screen pixels of the planted sole on the last outgoing and first returning frame. Also inspect the bare source on a contrasting background. A transparent hole inside the hip needs a local repair, while the gap between a swinging forearm and the torso should show the world. Keep the raw source and record the repair separately. [West reversal and source repair](../06-development/CHARACTER_WEST_WALK_2026-11-26.md).
+
+For a side walk, trace the exposed near and far arms independently wherever they cross the waist. Set each trouser hem on its own leg, including the raised foot. Inspect both lengths on synchronised copies of the same world frames. [East walk and pose sheet](../06-development/CHARACTER_EAST_WALK_2026-11-25.md).
+
+For character-scale reviews, use the same tile and normal zoom for the current player, the source at native size and the proposed world fit. Use the scaled silhouette for roof overlap and the same foot pivot for every clothing layer. [River Crossing captures](../06-development/CHARACTER_FIT_2026-11-25.md).
+
 **Reusable custom characters, 22 November:** Read [custom-character design](CUSTOM_CHARACTERS.md), [workflow](CUSTOM_CHARACTER_WORKFLOW.md) and [v1 findings](../06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) before adopting the new body. Its 80×80/(40,70) packed geometry and south-only idle/walk are not existing runtime bindings. Resolve the body pose once and share it across compatible layers; author hand/ordering tracks for the chosen body, preserve anatomical handedness and validate unmasked tool clearance before compositing. The first proof is not owner visual acceptance. The separate later PixelLab locomotion candidate has a different idle/moving slot contract; reconcile the actual checkout rather than copying old counts or timelines.
 
 **Resource guard follow-up, 20 November:** Validate/export against [asset resource limits](ASSET_RESOURCE_LIMITS.md). The [completed player action integration](../06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md) now has eight walking/chopping poses, six Mining poses and sixteen equipped walking/attack frames per direction. Both resource validators and runtime arrays agree. A different authored pose count requires matching runtime arrays and both validation tables, followed by complete binding/render checks; retain the lossless packed output instead of loosening budgets for the original oversized editable canvases. The read-only check preserves masters and geometry; further animation polish remains owner-deferred.
@@ -50,6 +60,8 @@ Keep the main-hand weapon in the same anatomical hand. Select rear/front body an
 Treat equipment as attached to a joint. Body and overlay must consume the same wrist/grip coordinates. Use bounded shoulder/elbow/wrist geometry for ordinary poses; intentional stylized deformation needs a visible reason and a clear recovery. The prototype's 9.5-native-pixel shoulder-to-wrist limit is specific to this character, not a universal anatomical constant.
 
 ## Keep feet, movement and equipment coherent
+
+The River Crossing fitted character has one right/left hand pair per body column. Bind each new item to a shape and material in the [held-item catalogue](../../../assets/embervale/custom-character-pilot/held-items/catalogue.json). Review both weapon and shield in motion at game scale, including the far hand on a rear diagonal. The [production example](../06-development/CHARACTER_HELD_ITEMS_2026-11-26.md) covers adding a material, silhouette or grip family.
 
 Use the established ground pivot through every frame. The player base uses 32×48 cells; the editable action masters use 96×96 cells with pivot `(48, 64)`, corresponding to base ground point `(16, 24)`. Melee runtime output is losslessly cropped/packed with adjusted per-frame pivots. Check the actual manifest/binding before changing geometry; editable cell size is not the packed rectangle size.
 

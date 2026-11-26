@@ -1,0 +1,514 @@
+{
+  "job": {
+    "canvas": [
+      80,
+      80
+    ],
+    "frame_count": 9,
+    "durations_ms": [
+      400,
+      80,
+      70,
+      80,
+      70,
+      80,
+      70,
+      80,
+      70
+    ],
+    "views": [
+      {
+        "id": "west",
+        "offset": [
+          0,
+          0
+        ]
+      }
+    ],
+    "body_prefix": "Layer",
+    "source_bookends_exact": false,
+    "body_palette_exact": false,
+    "require_clear_border": true
+  },
+  "scene": {
+    "palette": {},
+    "layers": [
+      {
+        "id": "layer",
+        "name": "West-facing tunic"
+      }
+    ],
+    "views": {
+      "west": {
+        "nodes": {
+          "layer": {
+            "layer": "layer",
+            "at": [
+              0,
+              0
+            ],
+            "draw": [
+              {
+                "op": "grid",
+                "at": [
+                  33,
+                  25
+                ],
+                "legend": {
+                  "i": "#10292a",
+                  "d": "#163c3c",
+                  "s": "#20534f",
+                  "m": "#2f6c61",
+                  "l": "#488574",
+                  "h": "#71a18a"
+                },
+                "rows": [
+                  "........sdd...",
+                  ".....sddllmd..",
+                  "...silllmllld.",
+                  "..slllllhhlld.",
+                  ".sssmlllllllmd",
+                  "ssssmlllllllmd",
+                  "ssssmlllllllmd",
+                  "ssssmlllllllmd",
+                  "ssssmllllmmmsd",
+                  "ssssmldddddddd",
+                  "ssssmd........",
+                  "ssssmd........",
+                  "dssssmd.......",
+                  ".dsssmld......",
+                  ".dsssmmd......",
+                  ".dsssmd.......",
+                  ".dsssd........",
+                  ".dsssd........",
+                  "dssssd........",
+                  "dsssmi........",
+                  "iiisd.......i.",
+                  "...ii......i.."
+                ]
+              }
+            ]
+          }
+        },
+        "poses": {
+          "p00": {
+            "layer": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    33,
+                    25
+                  ],
+                  "legend": {
+                    "i": "#10292a",
+                    "d": "#163c3c",
+                    "s": "#20534f",
+                    "m": "#2f6c61",
+                    "l": "#488574",
+                    "h": "#71a18a"
+                  },
+                  "rows": [
+                    "........sdd...",
+                    ".....sddllmd..",
+                    "...silllmllld.",
+                    "..slllllhhlld.",
+                    ".sssmlllllllmd",
+                    "ssssmlllllllmd",
+                    "ssssmlllllllmd",
+                    "ssssmlllllllmd",
+                    "ssssmllllmmmsd",
+                    "ssssmldddddddd",
+                    "ssssmd........",
+                    "ssssmd........",
+                    "dssssmd.......",
+                    ".dsssmld......",
+                    ".dsssmmd......",
+                    ".dsssmd.......",
+                    ".dsssd........",
+                    ".dsssd........",
+                    "dssssd........",
+                    "dsssmi........",
+                    "iiisd.......i.",
+                    "...ii......i.."
+                  ]
+                }
+              ]
+            }
+          },
+          "p01": {
+            "layer": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    32,
+                    27
+                  ],
+                  "legend": {
+                    "i": "#10292a",
+                    "d": "#163c3c",
+                    "s": "#20534f",
+                    "m": "#2f6c61",
+                    "l": "#488574",
+                    "h": "#71a18a"
+                  },
+                  "rows": [
+                    ".........sdd....",
+                    "......sddllmdd..",
+                    "....silllmlllmd.",
+                    "...slllllhhllmd.",
+                    "..sssmlllllllmd.",
+                    "..sssmlllllllmd.",
+                    ".ssssmlllllllmd.",
+                    ".ssssmlllllllmd.",
+                    ".ssssmllllmmmssd",
+                    ".ssssddddddddddd",
+                    ".sssd...........",
+                    ".sssd...........",
+                    ".dssd...........",
+                    "..dssd..........",
+                    "..dsdd..........",
+                    "..dd............",
+                    "..di............",
+                    ".di........d....",
+                    ".d.........d....",
+                    ".i........dd....",
+                    "i.......ddld....",
+                    ".......iiiii...."
+                  ]
+                }
+              ]
+            }
+          },
+          "p02": {
+            "layer": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    33,
+                    27
+                  ],
+                  "legend": {
+                    "i": "#10292a",
+                    "d": "#163c3c",
+                    "s": "#20534f",
+                    "m": "#2f6c61",
+                    "l": "#488574",
+                    "h": "#71a18a"
+                  },
+                  "rows": [
+                    "........sdd...",
+                    ".....sddllmdd.",
+                    "...silllmllld.",
+                    "..slllllhhlld.",
+                    ".sssmlllllllmd",
+                    ".sssmlllllllmd",
+                    "ssssmlllllllmd",
+                    "ssssmlllllllmd",
+                    "ssssmllllmmmsd",
+                    "ssssmldddddddd",
+                    "ssssmd........",
+                    "ssssmd........",
+                    "dssssd........",
+                    ".dsssmd.......",
+                    ".dsssmd.......",
+                    ".dsssmd.......",
+                    ".dsssd........",
+                    "dssssi........",
+                    "dsssd.........",
+                    "dsssd.......d.",
+                    "iiisi.......i.",
+                    "...i.......i.."
+                  ]
+                }
+              ]
+            }
+          },
+          "p03": {
+            "layer": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    33,
+                    26
+                  ],
+                  "legend": {
+                    "i": "#10292a",
+                    "d": "#163c3c",
+                    "s": "#20534f",
+                    "m": "#2f6c61",
+                    "l": "#488574",
+                    "h": "#71a18a"
+                  },
+                  "rows": [
+                    ".......sdddd....",
+                    ".....sdlllmmd...",
+                    "...sillmmllld...",
+                    "..slllllhhllmd..",
+                    ".sssmlllllllmmd.",
+                    ".sssmlllllllmmd.",
+                    "ssssmlllllllmmd.",
+                    "ssssmlllllllmmd.",
+                    "ssssmllllmmmssd.",
+                    "ssssmllldddddddd",
+                    "ssssmlld........",
+                    "ssssmmmd........",
+                    "dssssmmd........",
+                    "ddsssmmmd.......",
+                    "..dssmmmld......",
+                    "..dssmmmmd......",
+                    "..issmmmmd......",
+                    "...dsmmmmd......",
+                    "..dssmmmmd......",
+                    "..dsmmmmmd......",
+                    ".iismmmmmd......",
+                    "...iiiiiii......"
+                  ]
+                }
+              ]
+            }
+          },
+          "p04": {
+            "layer": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    32,
+                    27
+                  ],
+                  "legend": {
+                    "i": "#10292a",
+                    "d": "#163c3c",
+                    "s": "#20534f",
+                    "m": "#2f6c61",
+                    "l": "#488574",
+                    "h": "#71a18a"
+                  },
+                  "rows": [
+                    ".........sdd.......",
+                    "......sddllmdd.....",
+                    "....silllmlllmd....",
+                    "...slllllhhllmmd...",
+                    ".sissmlllllllmmmd..",
+                    ".ssssmlllllllmmmd..",
+                    "sssssmlllllllmmmd..",
+                    "dssssmlllllllmmmmd.",
+                    ".dsssmllllmmmssssd.",
+                    "..sssmllllddddddddd",
+                    "..sssmllld.........",
+                    "..sssmmmmmd........",
+                    "..dsssmmmmd........",
+                    "...dssmmmmmdd......",
+                    "...dssmmmmmssd.....",
+                    "...dssmmmmmsd......",
+                    "...dssmmmmmssd.....",
+                    ".iisssmmmmmssd.....",
+                    "..dsssmmmmmssd.....",
+                    "..dssmmmmmmssd.....",
+                    "..iismmmmmmssi.....",
+                    "....iiiiiiiii......"
+                  ]
+                }
+              ]
+            }
+          },
+          "p05": {
+            "layer": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    30,
+                    27
+                  ],
+                  "legend": {
+                    "i": "#10292a",
+                    "d": "#163c3c",
+                    "s": "#20534f",
+                    "m": "#2f6c61",
+                    "l": "#488574",
+                    "h": "#71a18a"
+                  },
+                  "rows": [
+                    "...........sdd........",
+                    "........sddllmdd......",
+                    "......silllmlllmd.....",
+                    ".....slllllhhllmmd....",
+                    "..siissmlllllllmmmd...",
+                    "..sssssmlllllllmmmd...",
+                    ".ssssssmlllllllmmmmd..",
+                    ".ddssssmlllllllmmmmmd.",
+                    "...dsssmllllmmmssssssd",
+                    "....sssmllllmddddddddd",
+                    "....sssmlllld.........",
+                    "....sssmmmmmmd........",
+                    "....dsssmmmmmmd.......",
+                    ".....dssmmmmmmd.......",
+                    ".....dssmmmmmsd.......",
+                    "....dsssmmmmmsd.......",
+                    "..i.dsssmmmmmsd.......",
+                    "i...dsssmmmmmssd......",
+                    "....dsssmmmmmssd......",
+                    "....issmmmmmmssd......",
+                    ".....ismmmmmmssi......",
+                    "......iiiiiiiii......."
+                  ]
+                }
+              ]
+            }
+          },
+          "p06": {
+            "layer": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    32,
+                    26
+                  ],
+                  "legend": {
+                    "i": "#10292a",
+                    "d": "#163c3c",
+                    "s": "#20534f",
+                    "m": "#2f6c61",
+                    "l": "#488574",
+                    "h": "#71a18a"
+                  },
+                  "rows": [
+                    "........sdddd.....",
+                    "......sdlllmmd....",
+                    "....sillmmlllmd...",
+                    "...slllllhhllmmd..",
+                    ".sissmlllllllmmmd.",
+                    ".ssssmlllllllmmmd.",
+                    ".ssssmlllllllmmmd.",
+                    ".ssssmlllllllmmmd.",
+                    "sssssmllllmmmssssd",
+                    "ddsssmlllldddddddd",
+                    "..sssmllld........",
+                    "..sssmmmmd........",
+                    "..dsssmmmd........",
+                    "...dssmmmmd.......",
+                    "...dssmmmmldd.....",
+                    "...dssmmmmmsd.....",
+                    "...dssmmmmmsd.....",
+                    "..dsssmmmmmsd.....",
+                    ".issssmmmmmsd.....",
+                    "..dssmmmmmmsd.....",
+                    "..iismmmmmmssi....",
+                    "....iiiiiiiii....."
+                  ]
+                }
+              ]
+            }
+          },
+          "p07": {
+            "layer": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    31,
+                    25
+                  ],
+                  "legend": {
+                    "i": "#10292a",
+                    "d": "#163c3c",
+                    "s": "#20534f",
+                    "m": "#2f6c61",
+                    "l": "#488574",
+                    "h": "#71a18a"
+                  },
+                  "rows": [
+                    "..........sdd.....",
+                    ".......sddllmdd...",
+                    ".....silllmllld...",
+                    "....slllllhhllmd..",
+                    "...sssmlllllllmd..",
+                    "...sssmlllllllmmd.",
+                    "..ssssmlllllllmmd.",
+                    "..ssssmlllllllmmd.",
+                    "..ssssmllllmmmssd.",
+                    "..ssssmllldddddddd",
+                    "..ssssmlld........",
+                    "..ssssmmmd........",
+                    "..dssssmd.........",
+                    "...dsssmmdd.......",
+                    "...dsssmmld.......",
+                    "...dsssmmmd.......",
+                    "..iisssmmmd.......",
+                    "....dssmmmd.......",
+                    "....dssmmmd.......",
+                    "....dsmmmmd.......",
+                    "iiiiismmmmd.......",
+                    ".....iiiiii......."
+                  ]
+                }
+              ]
+            }
+          },
+          "p08": {
+            "layer": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    32,
+                    25
+                  ],
+                  "legend": {
+                    "i": "#10292a",
+                    "d": "#163c3c",
+                    "s": "#20534f",
+                    "m": "#2f6c61",
+                    "l": "#488574",
+                    "h": "#71a18a"
+                  },
+                  "rows": [
+                    ".........sdd...",
+                    "......sddllmdd.",
+                    "....silllmllld.",
+                    "...slllllhhlld.",
+                    "..sssmllllllld.",
+                    "..sssmlllllllmd",
+                    ".ssssmlllllllmd",
+                    ".ssssmlllllllmd",
+                    ".ssssmllllmmmsd",
+                    ".ssssmldddddddd",
+                    ".ssssmd........",
+                    ".ssssmd........",
+                    ".dssssd........",
+                    "..dsssd........",
+                    "..dsssmd.......",
+                    "..dsssmd.......",
+                    "..dsssd........",
+                    ".dssssd........",
+                    ".dssssi........",
+                    "dssssd.........",
+                    "iiiisd.......i.",
+                    "....ii........."
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "frames": [
+          "p00",
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p05",
+          "p06",
+          "p07",
+          "p08"
+        ]
+      }
+    }
+  }
+}

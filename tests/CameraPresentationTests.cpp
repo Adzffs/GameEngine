@@ -1,17 +1,19 @@
 #include "TestSupport.h"
 
 #include "../src/Graphics/Graphics.h"
+#include "../src/Player/Player.h"
 #include "../src/World/Map.h"
+#include <algorithm>
 
 struct GraphicsTestAccess
 {
     static void UpdateCamera(
         Graphics &graphics,
-        int playerX,
-        int playerY,
+        float playerX,
+        float playerY,
         const Map &map)
     {
-        graphics.UpdateCamera(playerX, playerY, map);
+        graphics.UpdateCamera({playerX, playerY}, map);
     }
 
     static SDL_FPoint ScreenToWorldPoint(
@@ -35,6 +37,20 @@ struct GraphicsTestAccess
     static void SetPresentationDelta(Graphics &graphics, float seconds)
     {
         graphics.presentationDeltaSeconds = seconds;
+    }
+
+    static void DrawWalkingFrame(Graphics &graphics, Map &map, Player &player, int y)
+    {
+        graphics.lastPresentationTick = 0;
+        graphics.presentationDeltaSeconds = 0.04f;
+        player.GetPosition().SetPosition(40, y);
+        graphics.Render(map, {}, {}, {}, {}, {}, 40, y, player.GetInventory(),
+            player.GetEquipment(), player, nullptr);
+    }
+
+    static float FootScreenY(const Graphics &graphics)
+    {
+        return graphics.visualPlayerY * Graphics::TileSize + 24.0f - graphics.cameraPixelY;
     }
 
     static void SetMinimapOrigin(Graphics &graphics, int x, int y)
@@ -136,6 +152,26 @@ int main()
         "Minimap click converts its local column to a world tile");
     test.ExpectEqual(walkY, 34,
         "Minimap click converts its local row to a world tile");
+
+    Graphics walkingCamera;
+    if (!walkingCamera.Initialize())
+    {
+        test.Expect(false, "Walking camera renderer initializes");
+        return test.Finish();
+    }
+    Player walker(1, PlayerInitializationMode::FRESH_START);
+    GraphicsTestAccess::DrawWalkingFrame(walkingCamera, map, walker, 40);
+    float previousY = GraphicsTestAccess::FootScreenY(walkingCamera);
+    float largestBackwardStep = 0.0f;
+    for (int frame = 0; frame < 30; ++frame)
+    {
+        GraphicsTestAccess::DrawWalkingFrame(walkingCamera, map, walker, 39 - frame / 15);
+        const float y = GraphicsTestAccess::FootScreenY(walkingCamera);
+        largestBackwardStep = std::max(largestBackwardStep, y - previousY);
+        previousY = y;
+    }
+    test.Expect(largestBackwardStep < 0.1f,
+        "A northward walk keeps moving forward on screen across server tile updates");
 
     return test.Finish();
 }

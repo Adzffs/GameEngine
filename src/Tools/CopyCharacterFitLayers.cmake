@@ -1,0 +1,5 @@
+foreach(layer IN LISTS layer_files)
+    get_filename_component(directory "${output_root}/${layer}" DIRECTORY)
+    file(MAKE_DIRECTORY "${directory}")
+    configure_file("${source_root}/${layer}" "${output_root}/${layer}" COPYONLY)
+endforeach()

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "reviewed_date": "2026-11-22",
+  "reviewed_date": "2026-11-26",
   "current_verified_master": "d40b491d8b8082edc65ec4be0efc26ed882f2c54",
   "verification_reconciliation": "Integrated code d40b491d8b8082edc65ec4be0efc26ed882f2c54: Windows Debug SDL 124/124 (99 headless, 10 client, 15 graphics), separate SDL-free 99/99; Python 81 run, 79 pass/two unavailable-symlink skips. Original melee/equipment, current Mining/audio and later safety/editor/usability changes are combined. All 32 masters preserved, 47 packaged files match; lossless runtime packing retains resource budgets. Human/device/owner acceptance remains open. Read docs/embervale/06-development/PLAYER_ACTION_INTEGRATION_2026-11-20.md.",
   "repository": "Adzffs/GameEngine",
@@ -1761,7 +1761,7 @@
         "STUDIO-060"
       ],
       "acceptance": "Preserve original sources and evidence; settle body scale, proportions and fit revisions; provide editable semantic layers, a portable source-preserving export and one visible layered world-renderer proof.",
-      "notes": "First eight-view body and south idle/walk garment proof are retained; comprehensive design/workflow/review published. Four generations used for the original art task. Owner requests improvements; body quality and world scale are unaccepted. No general renderer, creator or save change is installed. The owner-confirmed tunic-fit defect has a v2 correction candidate under ART-007; the original alpha/composition tests were insufficient to establish fit. No new paid generation or runtime integration was required.",
+      "notes": "First eight-view body and south idle/walk garment proof are retained; comprehensive design/workflow/review published. Four generations used for the original art task. The initial body prompted improvements to garment fit and an in-world scale comparison. No general renderer, creator or save change is installed. The owner-confirmed tunic-fit defect has a v2 correction candidate under ART-007; the original alpha/composition tests were insufficient to establish fit. No new paid generation or runtime integration was required. The owner was happy with the south-facing world preview for now. All eight walking views now use the same 60% size and foot pivot. Each diagonal sole stays one screen pixel above the anchor. On 26 November the owner approved the eight-way walk at the 60% preview size.",
       "github_issue": null,
       "evidence": [
         "docs/embervale/05-game/CUSTOM_CHARACTERS.md",
@@ -1770,7 +1770,12 @@
         "docs/embervale/07-decisions/ADR_021_MODULAR_CHARACTER_APPEARANCE.md",
         "assets/embervale/custom-character-pilot/README.md",
         "assets/embervale/custom-character-pilot/v1/validation.json",
-        "docs/embervale/06-development/TUNIC_FIT_2026-11-22.md"
+        "docs/embervale/06-development/TUNIC_FIT_2026-11-22.md",
+        "docs/embervale/06-development/CHARACTER_FIT_2026-11-25.md",
+        "docs/embervale/06-development/CHARACTER_EAST_WALK_2026-11-25.md",
+        "docs/embervale/06-development/CHARACTER_NORTH_WALK_2026-11-26.md",
+        "docs/embervale/06-development/CHARACTER_WEST_WALK_2026-11-26.md",
+        "docs/embervale/06-development/CHARACTER_EIGHT_WAY_WALK_2026-11-26.md"
       ]
     },
     {
@@ -1783,7 +1788,7 @@
         "ART-006"
       ],
       "acceptance": "Complete declared eight-way body, clothing and a small hair set for required shared motions; record semantic palettes, fit families, hand tracks and equipment occlusion with source masters and visual review.",
-      "notes": "South idle/walk and a close-fitting tunic/trouser proof exist only as ART-006 evidence. Other animated facings, hairstyles and matching equipment/actions remain open. Different silhouettes require authored fit work; palette variants do not require new body animation. Owner reported poor v1 tunic fit. V2 now authors actual per-pose garment geometry and cloth shading across all twelve existing south idle/walk poses; semantic coverage rejects v1 in all twelve and protected hand/face checks pass. Body/trousers and all v1 files are unchanged. Owner acceptance, other facings/actions and hair remain open. The owner then requested the same treatment for trousers. Trouser-fit-v3 authors hip/crotch/leg/cuff geometry and brown fabric shading for all twelve south poses, paired with unchanged v2 tunic and v1 body. Coverage, leg gaps, hand/lower-leg clearance, lossless packing and exact composition pass. Both earlier revisions are preserved; owner acceptance and wider coverage remain open. Owner subsequently found shoulder/leg skin still showing after v2/v3 and requested both knee-length and full-length pants. Coverage-fit-v4 repairs the shared top and both pant choices, using whole-area source-body checks and corrected hand/thigh classification. All twelve south poses pass with zero missing covered pixels and protected-body overlaps; enlarged comparisons are retained. Earlier spot-check success was insufficient. Owner acceptance and full facing/action/runtime coverage remain open. Owner subsequently rejected v4 alignment and requested every-pixel/frame inspection. Alignment-fit-v5 registers full garment contours/cuffs to each actual pose, corrects 29 forearm labels and removes detached scraps. All 254016 garment source pixels match editable masters; independent silhouette, cuff, leg-gap and body-protection checks pass. Every pose has individual 4x/8x review evidence. Prior coverage success did not establish fit; owner acceptance, wider coverage and game integration remain open. On 23 November the owner identifies exposed tops of shoulders in v5. Shoulder-crest-v6 corrects 39 crest pixels wrongly classified as face/neck, using actual source jaw spans, plus 36 neighbouring outline-colour edits. Idle, lower top, body and v5 pants are unchanged. Enlarged comparisons cover all twelve poses. PixelLab rendered the correction before the editing session disconnected; PNGs were recovered losslessly from the retained master, with export provenance recorded. Owner acceptance and game integration remain open.",
+      "notes": "South idle/walk and a close-fitting tunic/trouser proof exist only as ART-006 evidence. Other animated facings, hairstyles and matching equipment/actions remain open. Different silhouettes require authored fit work; palette variants do not require new body animation. Owner reported poor v1 tunic fit. V2 now authors actual per-pose garment geometry and cloth shading across all twelve existing south idle/walk poses; semantic coverage rejects v1 in all twelve and protected hand/face checks pass. Body/trousers and all v1 files are unchanged. Owner acceptance, other facings/actions and hair remain open. The owner then requested the same treatment for trousers. Trouser-fit-v3 authors hip/crotch/leg/cuff geometry and brown fabric shading for all twelve south poses, paired with unchanged v2 tunic and v1 body. Coverage, leg gaps, hand/lower-leg clearance, lossless packing and exact composition pass. Both earlier revisions are preserved; owner acceptance and wider coverage remain open. Owner subsequently found shoulder/leg skin still showing after v2/v3 and requested both knee-length and full-length pants. Coverage-fit-v4 repairs the shared top and both pant choices, using whole-area source-body checks and corrected hand/thigh classification. All twelve south poses pass with zero missing covered pixels and protected-body overlaps; enlarged comparisons are retained. Earlier spot-check success was insufficient. Owner acceptance and full facing/action/runtime coverage remain open. Owner subsequently rejected v4 alignment and requested every-pixel/frame inspection. Alignment-fit-v5 registers full garment contours/cuffs to each actual pose, corrects 29 forearm labels and removes detached scraps. All 254016 garment source pixels match editable masters; independent silhouette, cuff, leg-gap and body-protection checks pass. Every pose has individual 4x/8x review evidence. Prior coverage success did not establish fit; owner acceptance, wider coverage and game integration remain open. On 23 November the owner identifies exposed tops of shoulders in v5. Shoulder-crest-v6 corrects 39 crest pixels wrongly classified as face/neck, using actual source jaw spans, plus 36 neighbouring outline-colour edits. Idle, lower top, body and v5 pants are unchanged. Enlarged comparisons cover all twelve poses. PixelLab rendered the correction before the editing session disconnected; PNGs were recovered losslessly from the retained master, with export provenance recorded. Owner acceptance and game integration remain open. Both v5 trouser lengths and the v6 shoulder seam now draw with the retained south idle and walk in the developer preview. The first east comparison now shows both fitted trouser lengths with the tunic over eight moving poses and one held stand. The north turn adds a real rear stand and eight rear walking poses, with a separately fitted tunic and both trouser hems. The west side has eight walking poses, both trouser lengths and a local source-hip repair. All four diagonal walks now have independent PixelLab body motion, tunic and both fitted trouser lengths. Action, equipment and hair coverage are open. The owner approved the fitted tunic and both trouser lengths on the eight-way walking set on 26 November. The character playtest keeps both trouser fits during tool use, combat and shield carry. Nine item entries share hand tracks and material masks. Review dedicated family poses next.",
       "github_issue": null,
       "evidence": [
         "docs/embervale/05-game/CUSTOM_CHARACTERS.md",
@@ -1801,7 +1806,12 @@
         "assets/embervale/custom-character-pilot/revisions/alignment-fit-v5/validation.json",
         "docs/embervale/06-development/SHOULDER_CREST_2026-11-23.md",
         "assets/embervale/custom-character-pilot/revisions/shoulder-crest-v6/manifest.json",
-        "assets/embervale/custom-character-pilot/revisions/shoulder-crest-v6/validation.json"
+        "assets/embervale/custom-character-pilot/revisions/shoulder-crest-v6/validation.json",
+        "docs/embervale/06-development/CHARACTER_FIT_2026-11-25.md",
+        "docs/embervale/06-development/CHARACTER_EAST_WALK_2026-11-25.md",
+        "docs/embervale/06-development/CHARACTER_NORTH_WALK_2026-11-26.md",
+        "docs/embervale/06-development/CHARACTER_WEST_WALK_2026-11-26.md",
+        "docs/embervale/06-development/CHARACTER_EIGHT_WAY_WALK_2026-11-26.md"
       ]
     },
     {
@@ -1816,10 +1826,15 @@
         "REL-004"
       ],
       "acceptance": "Resolve validated compatible cosmetic IDs into a shared-pose layered draw list with correct pivots, equipment authority, bounded cache/resource use and complete fallback; verify real renderer transitions without changing gameplay.",
-      "notes": "Build a focused adapter around existing body/equipment rendering. Reconcile default master with the separate nine-slot PixelLab walking candidate first. Keep pilot sources outside runtime packaging until the chosen geometry, action coverage and resource definitions are implemented.",
+      "notes": "Build a focused adapter around existing body/equipment rendering. Reconcile default master with the separate nine-slot PixelLab walking candidate first. Keep pilot sources outside runtime packaging until the chosen geometry, action coverage and resource definitions are implemented. A developer-only proof draws three independently loaded layers with one resolved pose, ground pivot and shadow. The general gameplay adapter remains planned. The developer renderer resolves all eight facings from their garment manifests. Each accepted tile advances one full stride, including diagonal motion. Camera follow uses the interpolated player position during the continuous turn.",
       "github_issue": null,
       "evidence": [
-        "docs/embervale/05-game/CUSTOM_CHARACTERS.md"
+        "docs/embervale/05-game/CUSTOM_CHARACTERS.md",
+        "docs/embervale/06-development/CHARACTER_FIT_2026-11-25.md",
+        "docs/embervale/06-development/CHARACTER_EAST_WALK_2026-11-25.md",
+        "docs/embervale/06-development/CHARACTER_NORTH_WALK_2026-11-26.md",
+        "docs/embervale/06-development/CHARACTER_WEST_WALK_2026-11-26.md",
+        "docs/embervale/06-development/CHARACTER_EIGHT_WAY_WALK_2026-11-26.md"
       ]
     },
     {
@@ -1876,7 +1891,7 @@
       ]
     }
   ],
-  "latest_review_scope": "Custom-character source publication, improvement findings and planning only; prior runtime verification remains tied to its original source/configuration.",
+  "latest_review_scope": "Character scale, ground contact and garment composition in the River Crossing developer preview. Existing player actions and whole-game verification retain their recorded scope.",
   "custom_character_planning": {
     "date": "2026-11-22",
     "runtime_source_inspected": "f2b5c6b210654040e449ffe8101f32052a93d980",
@@ -1886,6 +1901,7 @@
     "review": "docs/embervale/06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md",
     "workflow": "docs/embervale/05-game/CUSTOM_CHARACTER_WORKFLOW.md",
     "decision": "docs/embervale/07-decisions/ADR_021_MODULAR_CHARACTER_APPEARANCE.md",
-    "runtime_integration": "not implemented"
+    "runtime_integration": "Developer-only south idle and walk preview. Player-facing appearance selection is pending.",
+    "world_fit_review": "docs/embervale/06-development/CHARACTER_FIT_2026-11-25.md"
   }
 }

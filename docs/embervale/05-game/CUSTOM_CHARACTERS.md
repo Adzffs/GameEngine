@@ -1,12 +1,14 @@
 # Custom characters: design and implementation plan
 
+**26 November.** The River Crossing character playtest keeps the fitted body and both trouser lengths when you equip gear, chop, mine or attack. Start with `Play-RiverCrossing.cmd --character-playtest`, equip the axe, pickaxe or wooden shield from Inventory, and press F7 to switch trousers. The nine current equipment entries share five shapes and the hand positions for the eight-way walk. [Held-item production guide and playtest](../06-development/CHARACTER_HELD_ITEMS_2026-11-26.md) · [Approved walk](../06-development/CHARACTER_EIGHT_WAY_WALK_2026-11-26.md).
+
 **Latest garment revision:** The owner points out an exposed ridge at the tops of the shoulders. [V6](../../../assets/embervale/custom-character-pilot/revisions/shoulder-crest-v6/README.md) corrects the shoulder/jaw boundary in eight south walk poses, reusing v5 pants and all other artwork. The [record](../06-development/SHOULDER_CREST_2026-11-23.md) explains the incorrect rectangular face exclusion and the focused change. ART-007, owner visual acceptance and runtime adoption remain open.
 
 **Tunic-fit follow-up:** The owner specifically reports that the v1 tunic does not fit. The [v2 revision](../../../assets/embervale/custom-character-pilot/revisions/tunic-fit-v2/README.md) redraws the garment for all twelve current south poses, with independent cloth shading and protected hand/face checks. See the [actual defect, changes and evidence](../06-development/TUNIC_FIT_2026-11-22.md). This advances ART-007 to in progress; final body style, world scale, eight-way/action coverage and runtime adoption remain open.
 
 **Updated:** 22 November 2026.  
 **Owner direction:** Use PixelLab for artwork and develop custom characters from a reusable base. The owner has identified that the first result needs improvement; no finished visual approval is recorded.  
-**Status:** Production plan and retained art proof. Character creation, appearance persistence and a general layered character renderer are not implemented by this document.  
+**Status.** The developer preview renders the layered outfit for all eight movement facings. Character creation, saved appearance and general gameplay rendering are planned.
 **Parent work:** ART-006, ART-007, ENG-007, GAME-011, GAME-012 and QA-005 in the [canonical backlog](../02-roadmap/BACKLOG.md).
 
 Start with the [pilot review and improvement register](../06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md), [asset entry point](../../../assets/embervale/custom-character-pilot/README.md) and [production workflow](CUSTOM_CHARACTER_WORKFLOW.md). [ADR-021](../07-decisions/ADR_021_MODULAR_CHARACTER_APPEARANCE.md) records the architectural direction.
@@ -60,7 +62,7 @@ Resolve these decisions in a small in-world comparison:
 
 | Decision | Required evidence | Current disposition |
 |---|---|---|
-| Body height and width | Same camera, tile, doorway, Mara, tree and equipped examples | Open; pilot body is taller than the existing character |
+| Body height and width | Same camera, tile, doorway, Mara, tree and equipped examples | Working size is 60% after the south-facing review. Confirm proportions as other facings are added. |
 | Proportions and silhouette | Front/side/rear/diagonal turntable at native and gameplay scales | Open; current build reads muscular and is not an accepted universal body |
 | Camera and lighting | Head/shoulder/foot perspective and one lighting convention across eight views | Open visual review |
 | Underwear and skin ramp | All shades readable on grass, stone and indoor floors; modest neutral default | Pilot only |
@@ -224,4 +226,4 @@ Keep one canonical backlog and this owning design. The dated review owns observa
 
 When an improvement lands, update its finding, the parent backlog status/notes, current status, relevant guidance and verification in the same change. Record native renderer captures separately from an authoring GIF or browser preview. Mark owner visual acceptance only after actual feedback on that version.
 
-**Next concrete implementation:** compare the proposed base beside the current player in a temporary world-renderer fixture, settle native size/proportions, then bind one south-facing body/tunic/trouser composition. Preserve the current playable default until that proof is coherent.
+**Current comparison.** The owner approved both trouser lengths in the [eight-way movement preview](../06-development/CHARACTER_EIGHT_WAY_WALK_2026-11-26.md). The playable appearance renderer, equipment and action coverage are open.

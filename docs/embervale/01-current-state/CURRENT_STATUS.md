@@ -1,5 +1,9 @@
 # Current project status
 
+**26 November playtest.** The fitted character now keeps the same skin and clothes while carrying equipment, chopping, mining and attacking. The Windows playtest includes three tool materials and the wooden shield. [Playable equipment and authoring guide](../06-development/CHARACTER_HELD_ITEMS_2026-11-26.md).
+
+**26 November.** The custom character walks and stops in all eight directions in the River Crossing developer preview. The owner approved the eight-way walk with both trouser lengths at 60% scale. Each straight or diagonal tile takes one 600 ms stride. [Eight-way recording and all diagonal poses](../06-development/CHARACTER_EIGHT_WAY_WALK_2026-11-26.md) · [West reversal beside Mara](../06-development/CHARACTER_WEST_WALK_2026-11-26.md).
+
 **Shoulder crest correction, 23 November:** [V6](../../../assets/embervale/custom-character-pilot/revisions/shoulder-crest-v6/README.md) addresses the owner's remaining exposed top shoulder ridge. Thirty-nine crest pixels beside the jaw are covered across eight south walk poses, with local outline cleanup. Actual jaw pixels, idle poses, lower top, body and v5 pants remain unchanged. [Evidence](../06-development/SHOULDER_CREST_2026-11-23.md) records the edit and recovered export. ART-007, owner visual review and game adoption remain open.
 
 **Tunic fit revision, 22 November:** The owner confirmed a fit defect in the reference tunic. The [v2 garment](../../../assets/embervale/custom-character-pilot/revisions/tunic-fit-v2/README.md) and [correction record](../06-development/TUNIC_FIT_2026-11-22.md) now contain pose-specific shoulders, sleeves, neckline and hem with cloth shading. Twelve south-facing fit/hand checks pass; original body/trouser pixels and v1 sources remain unchanged. ART-007 is in progress. This remains authoring evidence, with owner review and game integration open.
@@ -26,7 +30,7 @@ Embervale is a playable local C++20/SDL3 RPG prototype with a bounded world edit
 | World format | Schemas 1-4, bounded runtime validation, stable placements/allocation IDs, staged spawns and fixed version manifests | General region/definition authoring, content/save migrations and asset packages |
 | Studio | Shared edits/history, guarded drafts, private recovery, reopen, overlays, exact-byte validation, create-only version publishing and selected-version play/rollback | In-place replacement, richer diagnostics, brushes and broader accessibility/platform acceptance |
 | Published art | Nine batches, 3,063 frames/32 textures, eight-way walking/chopping/mining/melee and visible equipment, editable masters, guarded cache/fallback, bounded PNG streams and explicit resource budgets | Remaining cast/resource tiers, general importer, UI/accessibility and visible quality acceptance |
-| Custom characters | Published reference-only base/outfit sources and comprehensive design/workflow; image/layer checks pass | Body improvements, world fit, eight-way animated layers, equipment tracks, appearance saves and game creator remain open |
+| Custom characters | Playable eight-way walk, fitted clothing, right/left hand tracks, nine equipped item bindings and shared first-pass actions | Dedicated family poses, appearance saves and character creation |
 | Audio | First sound pass: 15 original effects, committed-result routing, bounded playback, effects volume/mute and keyboard controls | Physical-device audible quality/balance and full starter acceptance |
 
 ## Integrated player actions
@@ -76,7 +80,7 @@ The unchanged preparation replay equips the shield at tick 245, equips the sword
 
 ## Current work order
 
-**Owner-selected appearance work:** Start ART-006 with the base proportion/world-size review and one temporary layered renderer proof, then follow the [character plan](../05-game/CUSTOM_CHARACTERS.md). ART-005 finished visual acceptance remains open; earlier manual/procedural polish deferral is not a reason to label the new PixelLab proof accepted. The earlier starter/reliability priorities retain their scopes below.
+**Appearance work.** Review the overhead swing at game scale with an axe and a pickaxe before expanding either family. The [character plan](../05-game/CUSTOM_CHARACTERS.md) tracks clothing, controls and saves.
 
 1. **Completed in this review:** ENG-003, ENG-004 and GAME-009 protect saves/items; QA-004 reconciles current automated evidence; GAME-010 and STUDIO-025 protect player progress/editor work; bounded STUDIO-026 publishes/selects fixed maps and STUDIO-063 now validates current art resources and memory budgets.
 2. **REL-004 complete:** use the published combined player-action build and matching source/export/capture evidence.

@@ -1,5 +1,7 @@
 # Embervale master roadmap
 
+**26 November checkpoint.** The approved walk is playable with both trouser lengths and nine equipment bindings. ART-006/007 now have shared hand positions and first-pass action presentation. Review the overhead motion once for axes and picks before expanding their catalogue. [Playable results and production guide](../06-development/CHARACTER_HELD_ITEMS_2026-11-26.md).
+
 **Version:** 1.2 · **Updated:** 22 November 2026 (custom-character planning; runtime evidence retains its recorded dates)\
 **Scope:** GameEngine, Embervale, Embervale Studio and project delivery.\
 **Canonical roadmap:** This document replaces the competing phase sequences in the earlier Studio plans. The original STUDIO task IDs remain traceable in the [backlog](BACKLOG.md).

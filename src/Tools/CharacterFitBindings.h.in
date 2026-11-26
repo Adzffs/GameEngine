@@ -1,0 +1,30 @@
+#pragma once
+#include <algorithm>
+#include <array>
+#include <numeric>
+#include <span>
+
+namespace CharacterFit
+{
+    inline constexpr int CellWidth = @south_width@, CellHeight = @south_height@;
+    inline constexpr int PivotX = @south_pivot_x@, PivotY = @south_pivot_y@;
+
+    struct Clip
+    {
+        std::span<const int> columns, durations;
+        int milliseconds;
+        template<std::size_t N>
+        constexpr Clip(const std::array<int, N> &frames, const std::array<int, N> &times)
+            : columns(frames), durations(times), milliseconds(std::accumulate(times.begin(), times.end(), 0)) {}
+    };
+    struct Hands { int mainX, mainY, offX, offY; };
+    struct Direction
+    {
+        Clip idle, walk;
+        const char *body, *tunic, *fullPants, *kneePants;
+        int halfWidth, height;
+        std::span<const Hands> hands;
+    };
+@fit_includes@
+    inline constexpr std::array ByFacing{@fit_table@};
+}
