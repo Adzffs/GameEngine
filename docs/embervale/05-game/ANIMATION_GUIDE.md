@@ -1,5 +1,7 @@
 # Animation guide
 
+For a side walk, trace the exposed near and far arms independently wherever they cross the waist. Set each trouser hem on its own leg, including the raised foot. Inspect both lengths on synchronised copies of the same world frames. [East walk and pose sheet](../06-development/CHARACTER_EAST_WALK_2026-11-25.md).
+
 For character-scale reviews, use the same tile and normal zoom for the current player, the source at native size and the proposed world fit. Use the scaled silhouette for roof overlap and the same foot pivot for every clothing layer. [River Crossing captures](../06-development/CHARACTER_FIT_2026-11-25.md).
 
 **Reusable custom characters, 22 November:** Read [custom-character design](CUSTOM_CHARACTERS.md), [workflow](CUSTOM_CHARACTER_WORKFLOW.md) and [v1 findings](../06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) before adopting the new body. Its 80×80/(40,70) packed geometry and south-only idle/walk are not existing runtime bindings. Resolve the body pose once and share it across compatible layers; author hand/ordering tracks for the chosen body, preserve anatomical handedness and validate unmasked tool clearance before compositing. The first proof is not owner visual acceptance. The separate later PixelLab locomotion candidate has a different idle/moving slot contract; reconcile the actual checkout rather than copying old counts or timelines.

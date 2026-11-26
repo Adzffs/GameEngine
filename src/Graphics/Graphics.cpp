@@ -3008,9 +3008,10 @@ void Graphics::DrawWorldObjects(Map &map, const std::vector<std::unique_ptr<Enti
     if (worldArtEnabled && forestSprites.HasPlayer())
         visualPlayerRectangle = {nextPlayer.x * TileSize + 4.0f, nextPlayer.y * TileSize - 12.0f, 24.0f, 36.0f};
 #ifdef EMBERVALE_CHARACTER_FIT_PREVIEW
-    if (UsesCharacterFit(MovementFacing(nextPlayer, playerX, playerY)))
+    const int fitFacing = MovementFacing(nextPlayer, playerX, playerY);
+    if (UsesCharacterFit(fitFacing))
         visualPlayerRectangle = characterFit->OcclusionBounds(
-            nextPlayer.x * TileSize + 16.0f, nextPlayer.y * TileSize + 24.0f);
+            nextPlayer.x * TileSize + 16.0f, nextPlayer.y * TileSize + 24.0f, fitFacing);
 #endif
     entries.push_back({nextPlayer.y * TileSize + 24.0f, Kind::PLAYER, 0});
     std::stable_sort(entries.begin(), entries.end(), [](const Entry &a, const Entry &b)
@@ -3188,7 +3189,7 @@ int Graphics::MovementFacing(const SDL_FPoint &next, int targetX, int targetY) c
 #ifdef EMBERVALE_CHARACTER_FIT_PREVIEW
 bool Graphics::UsesCharacterFit(int facing) const
 {
-    return worldArtEnabled && characterFit && facing == 0 && displayedWeapon == ItemType::NONE &&
+    return worldArtEnabled && characterFit && CharacterFitPreview::SupportsFacing(facing) && displayedWeapon == ItemType::NONE &&
         displayedShield == ItemType::NONE && !woodcuttingPresentation.GetAnimation() &&
         !miningPresentation.GetAnimation() && !meleePresentation.GetAnimation();
 }
@@ -3221,6 +3222,17 @@ void Graphics::DrawPlayer(
     visualPlayerY = position.y;
     visualPlayerInitialized = true;
 
+#ifdef EMBERVALE_CHARACTER_FIT_PREVIEW
+    if (UsesCharacterFit(playerFacing))
+    {
+        const float footX = visualPlayerX * TileSize + 16.0f;
+        const float footY = visualPlayerY * TileSize + 24.0f;
+        forestSprites.DrawCharacterShadow(footX, footY);
+        characterFit->Draw(footX, footY, playerFacing, travelled, lastPresentationTick);
+        return;
+    }
+    if (characterFit) characterFit->ResetMotion();
+#endif
     if (const auto &melee = meleePresentation.GetAnimation(); melee)
     {
         playerFacing = melee->facing;
@@ -3239,16 +3251,6 @@ void Graphics::DrawPlayer(
             ? forestSprites.DrawWoodcutting(visualPlayerX, visualPlayerY, playerFacing, woodcuttingPresentation.GetPose(), work->toolTier)
             : forestSprites.DrawMiningAction(visualPlayerX, visualPlayerY, playerFacing, miningPresentation.GetPose(), work->toolTier))) return;
     }
-#ifdef EMBERVALE_CHARACTER_FIT_PREVIEW
-    if (UsesCharacterFit(playerFacing))
-    {
-        const float footX = visualPlayerX * TileSize + 16.0f;
-        const float footY = visualPlayerY * TileSize + 24.0f;
-        forestSprites.DrawCharacterShadow(footX, footY);
-        characterFit->Draw(footX, footY, travelled > 0.002f, travelled, lastPresentationTick);
-        return;
-    }
-#endif
     if (worldArtEnabled && !woodcuttingPresentation.GetAnimation() &&
         forestSprites.DrawEquippedPlayer(visualPlayerX, visualPlayerY,
             playerFacing, walkPose, displayedWeapon, displayedShield)) return;

@@ -1,16 +1,37 @@
 #pragma once
+#include <algorithm>
 #include <array>
+#include <numeric>
+#include <span>
 
 namespace CharacterFit
 {
-    inline constexpr int CellWidth = @fit_width@, CellHeight = @fit_height@;
-    inline constexpr int PivotX = @fit_pivot_x@, PivotY = @fit_pivot_y@;
-    inline constexpr std::array IdleColumns{@fit_idle_columns@};
-    inline constexpr std::array IdleDurations{@fit_idle_durations_ms@};
-    inline constexpr std::array WalkColumns{@fit_walk_columns@};
-    inline constexpr std::array WalkDurations{@fit_walk_durations_ms@};
-    inline constexpr char Body[] = "@fit_body@";
-    inline constexpr char Tunic[] = "@fit_tunic@";
-    inline constexpr char FullPants[] = "@fit_full@";
-    inline constexpr char KneePants[] = "@fit_knee@";
+    inline constexpr int CellWidth = @south_width@, CellHeight = @south_height@;
+    inline constexpr int PivotX = @south_pivot_x@, PivotY = @south_pivot_y@;
+
+    struct Clip
+    {
+        std::span<const int> columns, durations;
+        int milliseconds;
+        template<std::size_t N>
+        constexpr Clip(const std::array<int, N> &frames, const std::array<int, N> &times)
+            : columns(frames), durations(times), milliseconds(std::accumulate(times.begin(), times.end(), 0)) {}
+    };
+    struct Direction
+    {
+        Clip idle, walk;
+        const char *body, *tunic, *fullPants, *kneePants;
+        int halfWidth, height;
+    };
+    inline constexpr std::array SouthIdle{@south_idle_columns@}, SouthIdleTimes{@south_idle_durations_ms@};
+    inline constexpr std::array SouthWalk{@south_walk_columns@}, SouthWalkTimes{@south_walk_durations_ms@};
+    inline constexpr std::array EastIdle{@east_idle_columns@}, EastIdleTimes{@east_idle_durations_ms@};
+    inline constexpr std::array EastWalk{@east_walk_columns@}, EastWalkTimes{@east_walk_durations_ms@};
+
+    // The retained south v6 silhouettes span x=22..56, y=8..70.
+    inline constexpr Direction South{{SouthIdle, SouthIdleTimes}, {SouthWalk, SouthWalkTimes},
+        "@south_body@", "@south_tunic@", "@south_full@", "@south_knee@", PivotX - 22, PivotY - 8};
+    inline constexpr Direction East{{EastIdle, EastIdleTimes}, {EastWalk, EastWalkTimes},
+        "@east_body@", "@east_tunic@", "@east_full@", "@east_knee@",
+        std::max(PivotX - @east_left@, @east_right@ - PivotX), PivotY - @east_top@};
 }

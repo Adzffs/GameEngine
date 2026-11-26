@@ -6,7 +6,11 @@
 
 Start with the [custom character plan](../../../docs/embervale/05-game/CUSTOM_CHARACTERS.md), [improvement register](../../../docs/embervale/06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) and [production workflow](../../../docs/embervale/05-game/CUSTOM_CHARACTER_WORKFLOW.md).
 
-## Latest revision: shoulder crest v6
+## East walk
+
+The [east manifest](revisions/east-walk-v1/manifest.json) identifies the standing pose, eight original walk frames, three editable garment recipes and four fitted atlas exports. [See both trouser lengths walking beside Mara](../../../docs/embervale/06-development/CHARACTER_EAST_WALK_2026-11-25.md).
+
+## South shoulder crest v6
 
 The owner identified the remaining exposed ridge at the very top of the shoulders. [V6](revisions/shoulder-crest-v6/README.md) covers the explicitly reviewed crest pixels beside the jaw and cleans the local outline. It retains the v5 pants and all lower artwork. See the [correction record](../../../docs/embervale/06-development/SHOULDER_CREST_2026-11-23.md).
 

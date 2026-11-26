@@ -1,6 +1,6 @@
 # Custom characters: design and implementation plan
 
-**25 November.** The [first in-world comparison](../06-development/CHARACTER_FIT_2026-11-25.md) renders the separate body, trousers and v6 tunic at their native size and at 60%. The south-facing result looks good to the owner for now. Use 60% as the working size for the next facing.
+**25 November.** The owner was happy with the south-facing result for now. The [east walk](../06-development/CHARACTER_EAST_WALK_2026-11-25.md) uses the same 60% working scale and foot pivot. Both trouser lengths are visible beside Mara, with a near-hand crossing in each stride. [Original scale comparison](../06-development/CHARACTER_FIT_2026-11-25.md).
 
 **Latest garment revision:** The owner points out an exposed ridge at the tops of the shoulders. [V6](../../../assets/embervale/custom-character-pilot/revisions/shoulder-crest-v6/README.md) corrects the shoulder/jaw boundary in eight south walk poses, reusing v5 pants and all other artwork. The [record](../06-development/SHOULDER_CREST_2026-11-23.md) explains the incorrect rectangular face exclusion and the focused change. ART-007, owner visual acceptance and runtime adoption remain open.
 
@@ -8,7 +8,7 @@
 
 **Updated:** 22 November 2026.  
 **Owner direction:** Use PixelLab for artwork and develop custom characters from a reusable base. The owner has identified that the first result needs improvement; no finished visual approval is recorded.  
-**Status.** The developer preview renders the retained south-facing outfit. Character creation, saved appearance and general gameplay rendering are planned.
+**Status.** The developer preview renders the south and east outfits. Character creation, saved appearance and general gameplay rendering are planned.
 **Parent work:** ART-006, ART-007, ENG-007, GAME-011, GAME-012 and QA-005 in the [canonical backlog](../02-roadmap/BACKLOG.md).
 
 Start with the [pilot review and improvement register](../06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md), [asset entry point](../../../assets/embervale/custom-character-pilot/README.md) and [production workflow](CUSTOM_CHARACTER_WORKFLOW.md). [ADR-021](../07-decisions/ADR_021_MODULAR_CHARACTER_APPEARANCE.md) records the architectural direction.
@@ -226,4 +226,4 @@ Keep one canonical backlog and this owning design. The dated review owns observa
 
 When an improvement lands, update its finding, the parent backlog status/notes, current status, relevant guidance and verification in the same change. Record native renderer captures separately from an authoring GIF or browser preview. Mark owner visual acceptance only after actual feedback on that version.
 
-**Next comparison.** Start with one side-facing walk. Match the foot position and 60% scale from the [south-facing preview](../06-development/CHARACTER_FIT_2026-11-25.md), then inspect the tunic shoulder and trouser fit in motion.
+**Current comparison.** Review the [eight east walk poses](../06-development/CHARACTER_EAST_WALK_2026-11-25.md) at game size and in the enlarged crops. The remaining six walk directions and the gameplay appearance adapter are open.
