@@ -2,7 +2,7 @@
 
 #include <SDL3/SDL.h>
 #include "ForestSprites.h"
-#ifdef EMBERVALE_CHARACTER_FIT_PREVIEW
+#ifdef EMBERVALE_CHARACTER_FIT
 #include "../Tools/CharacterFitPreview.h"
 #endif
 #include "../Audio/AudioCue.h"
@@ -76,6 +76,7 @@ public:
     void SetCompiledMapLabelsVisible(bool visible) { compiledMapLabelsVisible = visible; }
     // Authoring inspection only; normal play uses each building's stable profile.
     void SetBuildingConditionPreview(int condition) { forestSprites.SetBuildingConditionPreview(condition); }
+    void EnableCharacterPlaytest();
 #ifdef EMBERVALE_CHARACTER_FIT_PREVIEW
     void EnableCharacterFitPreview(const std::filesystem::path &pilotRoot, bool kneePants, bool nativeSize)
     { characterFit.emplace(renderer, pilotRoot, kneePants, nativeSize); }
@@ -96,7 +97,7 @@ public:
     bool ConsumeRunToggle();
     std::optional<CombatStyle> ConsumeCombatStyleRequest();
 
-    bool ConsumeWeaponSlotClick();
+    std::optional<EquipmentSlotType> ConsumeEquipmentSlotClick();
     bool ConsumeRecipeRequest(
         RecipeType &recipeType);
     bool ConsumeCraftingGridRequest(
@@ -474,7 +475,7 @@ public:
         float x,
         float y,
         float size);
-    void DrawSwordIcon(
+    void DrawMeleeGearIcon(
         ItemType itemType,
         float x,
         float y,
@@ -521,15 +522,18 @@ public:
 
 private:
     int MovementFacing(const SDL_FPoint &next, int targetX, int targetY) const;
-#ifdef EMBERVALE_CHARACTER_FIT_PREVIEW
+#ifdef EMBERVALE_CHARACTER_FIT
     bool UsesCharacterFit(int facing) const;
+    void UpdateCharacterPlaytestTitle();
 #endif
     AudioSettings audioSettings;
     friend struct GraphicsTestAccess;
 
     ForestSprites forestSprites;
-#ifdef EMBERVALE_CHARACTER_FIT_PREVIEW
+#ifdef EMBERVALE_CHARACTER_FIT
     std::optional<CharacterFitPreview> characterFit;
+#endif
+#ifdef EMBERVALE_CHARACTER_FIT_PREVIEW
     std::optional<Uint64> captureTick;
 #endif
     bool worldArtEnabled = true;
@@ -563,7 +567,7 @@ private:
     bool tutorialSkipPending = false;
     std::optional<CombatStyle> combatStyleRequest;
 
-    bool weaponSlotClickPending;
+    std::optional<EquipmentSlotType> equipmentSlotClick;
     bool recipeRequestPending;
     RecipeType requestedRecipeType;
     bool craftingGridRequestPending = false;

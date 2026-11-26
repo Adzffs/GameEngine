@@ -336,6 +336,11 @@ if(GAMEENGINE_BUILD_CLIENT)
 
     target_link_libraries(GameEngine PRIVATE GameEngineCore SDL3::SDL3)
     configure_gameengine_world_art(GameEngine)
+    if(SDL3_VERSION VERSION_GREATER_EQUAL 3.4.0)
+        include(src/Tools/CharacterFitPreview.cmake)
+        configure_character_fit(GameEngine)
+        add_dependencies(GameEngine GameEngineCharacterLayers)
+    endif()
 
     if(GAMEENGINE_BUILD_CONTENT_TOOLS AND SDL3_VERSION VERSION_GREATER_EQUAL 3.4.0)
         add_executable(EmbervaleRenderPreview
@@ -343,7 +348,8 @@ if(GAMEENGINE_BUILD_CLIENT)
             src/Graphics/Graphics.cpp
         )
         target_link_libraries(EmbervaleRenderPreview PRIVATE GameEngineCore SDL3::SDL3)
-        include(src/Tools/CharacterFitPreview.cmake)
+        configure_character_fit(EmbervaleRenderPreview)
+        target_compile_definitions(EmbervaleRenderPreview PRIVATE EMBERVALE_CHARACTER_FIT_PREVIEW)
         configure_gameengine_world_art(EmbervaleRenderPreview)
     endif()
 endif()

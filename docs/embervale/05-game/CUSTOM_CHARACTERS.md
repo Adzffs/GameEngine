@@ -1,6 +1,6 @@
 # Custom characters: design and implementation plan
 
-**26 November.** The custom character now walks and stops in every compass direction at the shared 60% scale and ground pivot. The full-length and knee-length trousers use the same body motion. [Eight-way recording and four diagonal pose sets](../06-development/CHARACTER_EIGHT_WAY_WALK_2026-11-26.md).
+**26 November.** The approved unarmed walk is playable in River Crossing in all eight directions at the shared 60% scale. Run `Play-RiverCrossing.cmd --character-playtest` to start a temporary character. Left-click the ground to walk and press F7 to switch between full-length and knee-length trousers. The wooden shield in your inventory lets you try the existing equipped walk and return to the fitted outfit. [Playtest and eight-way recordings](../06-development/CHARACTER_EIGHT_WAY_WALK_2026-11-26.md).
 
 **Latest garment revision:** The owner points out an exposed ridge at the tops of the shoulders. [V6](../../../assets/embervale/custom-character-pilot/revisions/shoulder-crest-v6/README.md) corrects the shoulder/jaw boundary in eight south walk poses, reusing v5 pants and all other artwork. The [record](../06-development/SHOULDER_CREST_2026-11-23.md) explains the incorrect rectangular face exclusion and the focused change. ART-007, owner visual acceptance and runtime adoption remain open.
 

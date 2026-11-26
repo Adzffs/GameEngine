@@ -12,4 +12,5 @@ struct EngineConfiguration
     std::optional<StarterWorldExport::Snapshot> starterWorldSnapshot;
     // Applies only to newly created characters; loaded saves restore their own state.
     PlayerInitializationMode newPlayerMode = PlayerInitializationMode::DEVELOPMENT_DEFAULTS;
+    bool characterPlaytest = false;
 };

@@ -39,6 +39,7 @@ private:
 
     int playerID = -1;
     PlayerInitializationMode newPlayerMode = PlayerInitializationMode::DEVELOPMENT_DEFAULTS;
+    bool characterPlaytest = false;
     bool initializationSucceeded = false;
     bool autosaveWarningActive = false;
     std::unique_ptr<WorldPlayerPersistenceLifecycle> playerPersistenceLifecycle;

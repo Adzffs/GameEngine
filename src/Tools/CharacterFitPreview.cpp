@@ -24,15 +24,6 @@ namespace
         return texture;
     }
 
-    std::array<Texture, 3> LoadOutfit(SDL_Renderer *renderer, const std::filesystem::path &root,
-        const CharacterFit::Direction &direction, bool kneePants)
-    {
-        const int columns = static_cast<int>(direction.idle.columns.size() + direction.walk.columns.size());
-        return {LoadLayer(renderer, root / direction.body, columns),
-                LoadLayer(renderer, root / (kneePants ? direction.kneePants : direction.fullPants), columns),
-                LoadLayer(renderer, root / direction.tunic, columns)};
-    }
-
     int ColumnAt(const CharacterFit::Clip &clip, int phase)
     {
         for (std::size_t i = 0; i < clip.columns.size(); ++i)
@@ -45,12 +36,30 @@ namespace
 }
 
 CharacterFitPreview::CharacterFitPreview(SDL_Renderer *target, const std::filesystem::path &root,
-    bool kneePants, bool nativeSize)
-    : renderer(target), scale(nativeSize ? 1.0f : 0.6f)
+    bool kneePants, bool nativeSize, bool switchable)
+    : renderer(target), scale(nativeSize ? 1.0f : 0.6f), kneeLength(kneePants), canSwitchTrousers(switchable)
 {
     for (std::size_t facing = 0; facing < layers.size(); ++facing)
-        if (const auto *direction = CharacterFit::ByFacing[facing])
-            layers[facing] = LoadOutfit(target, root, *direction, kneePants);
+    {
+        const auto *direction = CharacterFit::ByFacing[facing];
+        if (!direction) continue;
+        const int columns = static_cast<int>(direction->idle.columns.size() + direction->walk.columns.size());
+        layers[facing] = Layers{
+            LoadLayer(target, root / direction->body, columns),
+            LoadLayer(target, root / (kneePants ? direction->kneePants : direction->fullPants), columns),
+            LoadLayer(target, root / direction->tunic, columns),
+            switchable ? LoadLayer(target, root / (kneePants ? direction->fullPants : direction->kneePants), columns)
+                       : Texture(nullptr, SDL_DestroyTexture)};
+    }
+}
+
+bool CharacterFitPreview::ToggleTrousers()
+{
+    if (!canSwitchTrousers) return false;
+    for (auto &outfit : layers)
+        if (outfit) outfit->trousers.swap(outfit->alternateTrousers);
+    kneeLength = !kneeLength;
+    return true;
 }
 
 bool CharacterFitPreview::SupportsFacing(int facing)
@@ -97,7 +106,8 @@ void CharacterFitPreview::Draw(float groundX, float groundY, int facing, float t
     wasWalking = walking;
     const SDL_FRect source{static_cast<float>(column * CellWidth), 0, CellWidth, CellHeight};
     const SDL_FRect dest{groundX - PivotX * scale, groundY - PivotY * scale, CellWidth * scale, CellHeight * scale};
-    for (const auto &layer : *layers[facing])
-        if (!SDL_RenderTexture(renderer, layer.get(), &source, &dest))
+    const auto &outfit = *layers[facing];
+    for (auto *layer : {outfit.body.get(), outfit.trousers.get(), outfit.tunic.get()})
+        if (!SDL_RenderTexture(renderer, layer, &source, &dest))
             throw std::runtime_error(SDL_GetError());
 }

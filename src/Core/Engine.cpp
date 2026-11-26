@@ -43,7 +43,8 @@ Engine::Engine()
 }
 
 Engine::Engine(EngineConfiguration configuration)
-    : world(configuration.starterWorldSnapshot), playerID(-1), newPlayerMode(configuration.newPlayerMode)
+    : world(configuration.starterWorldSnapshot), playerID(-1), newPlayerMode(configuration.newPlayerMode),
+      characterPlaytest(configuration.characterPlaytest)
 {
     // The old area's fixed pixel labels do not describe an imported map.
     graphics.SetCompiledMapLabelsVisible(!configuration.starterWorldSnapshot.has_value());
@@ -91,6 +92,12 @@ bool Engine::InitializeWorldForRun(Clock::TimePoint now)
     if (playerID <= 0) return false;
     if (createdNew && newPlayerMode == PlayerInitializationMode::DEVELOPMENT_DEFAULTS)
         AddDevelopmentEquipment();
+    if (characterPlaytest && !playerPersistenceLifecycle && newPlayerMode == PlayerInitializationMode::FRESH_START)
+    {
+        auto *player = dynamic_cast<Player *>(world.GetEntityByID(playerID));
+        if (!player || !player->GetInventory().AddItem(ItemType::WOODEN_SHIELD, 1))
+            return false;
+    }
     Logger::Info(std::string("Player start: ") +
         (!createdNew ? "saved progress restored" :
          newPlayerMode == PlayerInitializationMode::FRESH_START ? "fresh player" : "development player"));
@@ -127,7 +134,8 @@ void Engine::AddDevelopmentEquipment()
 bool Engine::Run()
 {
     if (!graphics.Initialize()) return false;
-    graphics.ShowGameGuide();
+    if (characterPlaytest) graphics.EnableCharacterPlaytest();
+    else graphics.ShowGameGuide();
     if (!InitializeWorldForRun()) return false;
     audioFeedback.Reset(playerID);
     audio.Initialize(); // Optional presentation: device failure never blocks play.
@@ -216,12 +224,12 @@ bool Engine::Run()
             world.EnqueueCommand(SetCombatStyleCommand{playerID, *style});
         }
 
-        if (graphics.ConsumeWeaponSlotClick())
+        if (const auto slot = graphics.ConsumeEquipmentSlotClick())
         {
             audioFeedback.TrackCommand(world.EnqueueCommand(
                 UnequipItemCommand{
                     playerID,
-                    EquipmentSlotType::WEAPON}), AudioCue::EQUIP);
+                    *slot}), AudioCue::EQUIP);
         }
 
         int clickedTileX;

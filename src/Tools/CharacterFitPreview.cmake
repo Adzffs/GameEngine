@@ -1,9 +1,10 @@
-# Only the developer renderer needs the character-fit atlases.
+# Build the same facing table for live play and deterministic captures.
 set(fit_pilot "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/custom-character-pilot")
 # Graphics::MovementFacing returns these indices for world rendering and occlusion.
 set(fit_facings south west east north south-west south-east north-west north-east)
 set(fit_includes "")
 set(fit_directions "")
+set(fit_runtime_layers "")
 foreach(direction IN LISTS fit_facings)
     set(directory "${fit_pilot}/revisions/${direction}-walk-v1")
     if(direction STREQUAL "south")
@@ -35,6 +36,7 @@ foreach(direction IN LISTS fit_facings)
             string(JSON relative GET "${fit_json}" ${layer})
         endif()
         file(RELATIVE_PATH ${layer} "${fit_pilot}" "${directory}/${relative}")
+        list(APPEND fit_runtime_layers "${${layer}}")
     endforeach()
     if(direction STREQUAL "south")
         # Retained v6 predates the bounds field. Its measured silhouette is x=22..56, y=8..70.
@@ -62,6 +64,15 @@ foreach(direction IN LISTS fit_facings)
 endforeach()
 string(JOIN ", " fit_table ${fit_directions})
 configure_file(src/Tools/CharacterFitBindings.h.in "${CMAKE_CURRENT_BINARY_DIR}/CharacterFitBindings.h" @ONLY)
-target_include_directories(EmbervaleRenderPreview PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
-target_sources(EmbervaleRenderPreview PRIVATE src/Tools/CharacterFitPreview.cpp)
-target_compile_definitions(EmbervaleRenderPreview PRIVATE EMBERVALE_CHARACTER_FIT_PREVIEW)
+function(configure_character_fit target)
+    target_include_directories(${target} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+    target_sources(${target} PRIVATE src/Tools/CharacterFitPreview.cpp)
+    target_compile_definitions(${target} PRIVATE EMBERVALE_CHARACTER_FIT)
+endfunction()
+
+list(REMOVE_DUPLICATES fit_runtime_layers)
+add_custom_target(GameEngineCharacterLayers
+    COMMAND "${CMAKE_COMMAND}" "-Dsource_root=${fit_pilot}"
+        "-Doutput_root=$<TARGET_FILE_DIR:GameEngine>/assets/embervale/custom-character-pilot"
+        "-Dlayer_files=${fit_runtime_layers}" -P "${CMAKE_CURRENT_LIST_DIR}/CopyCharacterFitLayers.cmake"
+    VERBATIM)

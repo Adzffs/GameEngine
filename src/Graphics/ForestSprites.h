@@ -47,6 +47,7 @@ public:
     bool DrawMiningAction(float tileX, float tileY, int facing, int pose, int pickaxeTier) const;
     bool DrawEquippedPlayer(float tileX, float tileY, int facing, int pose,
         ItemType weapon, ItemType shield, bool attacking = false) const;
+    bool DrawShieldIcon(const SDL_FRect &slot) const;
     bool DrawMara(int tileX, int tileY) const;
     bool DrawStation(StationType type, int tileX, int tileY) const;
     bool HitMara(int tileX, int tileY, float worldX, float worldY) const;

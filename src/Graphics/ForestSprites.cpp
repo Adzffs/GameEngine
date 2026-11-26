@@ -589,6 +589,15 @@ bool ForestSprites::DrawEquippedPlayer(float tileX, float tileY, int facing, int
     return true;
 }
 
+bool ForestSprites::DrawShieldIcon(const SDL_FRect &slot) const
+{
+    const auto *shield = meleeEquipment[8][0][0];
+    if (!Available(shield)) return false;
+    const float scale = std::min({2.0f, (slot.w - 6) / shield->source.w, (slot.h - 6) / shield->source.h});
+    const float width = shield->source.w * scale, height = shield->source.h * scale;
+    return Draw(shield, {slot.x + (slot.w - width) * 0.5f, slot.y + (slot.h - height) * 0.5f, width, height});
+}
+
 bool ForestSprites::DrawCharacter(const Frame *frame, float tileX, float tileY) const
 {
     if (!Available(frame)) return false;

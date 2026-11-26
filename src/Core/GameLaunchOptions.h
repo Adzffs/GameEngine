@@ -9,6 +9,7 @@
 struct GameLaunchOptions
 {
     bool showHelp = false;
+    bool characterPlaytest = false;
     std::optional<std::filesystem::path> worldSnapshotPath;
     std::optional<std::filesystem::path> worldVersionManifestPath;
     std::optional<std::filesystem::path> playerSavePath;

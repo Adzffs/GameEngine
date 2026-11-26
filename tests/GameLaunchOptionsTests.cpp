@@ -31,6 +31,14 @@ int main()
     test.Expect(normal.playerSavePath == std::filesystem::path{"saves/development-player.save"},
         "normal startup retains established save location");
     const auto imported = Parse({"--world", "world.json"});
+    const auto character = Parse({"--character-playtest"});
+    test.Expect(character.characterPlaytest && !character.playerSavePath &&
+        character.newPlayerMode == PlayerInitializationMode::FRESH_START, "walk playtest is fresh and temporary");
+    test.Expect(!normal.characterPlaytest && Parse({"--profile", "fresh", "--world", "map.json",
+        "--no-save", "--character-playtest"}).characterPlaytest, "playtest is opt-in and accepts an imported world");
+    Reject(test, {"--character-playtest", "--save", "keep.save"}, "walk playtest cannot open a save");
+    Reject(test, {"--profile", "development", "--character-playtest"}, "walk playtest needs a fresh loadout");
+    Reject(test, {"--character-playtest", "--character-playtest"}, "duplicate walk playtest rejected");
     test.Expect(imported.worldSnapshotPath == std::filesystem::path{"world.json"},
         "explicit world selection is retained");
     test.Expect(!imported.playerSavePath, "edited-world playtest never implicitly opens normal save");
