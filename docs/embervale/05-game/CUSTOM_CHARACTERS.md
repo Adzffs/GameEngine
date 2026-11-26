@@ -1,6 +1,6 @@
 # Custom characters: design and implementation plan
 
-**26 November.** The [east-to-north turn](../06-development/CHARACTER_NORTH_WALK_2026-11-26.md) uses the same working size and ground pivot as the [side walk](../06-development/CHARACTER_EAST_WALK_2026-11-25.md) and [south fit](../06-development/CHARACTER_FIT_2026-11-25.md). The north tunic and both trouser lengths now follow the original rear stand and eight walking poses.
+**26 November.** All four cardinal walks use the same ground pivot and working 60% scale in River Crossing. Both trouser lengths follow the same stride as the player reverses direction beside Mara. [West turn and eight poses](../06-development/CHARACTER_WEST_WALK_2026-11-26.md) · [North turn](../06-development/CHARACTER_NORTH_WALK_2026-11-26.md) · [East walk](../06-development/CHARACTER_EAST_WALK_2026-11-25.md) · [South fit](../06-development/CHARACTER_FIT_2026-11-25.md).
 
 **Latest garment revision:** The owner points out an exposed ridge at the tops of the shoulders. [V6](../../../assets/embervale/custom-character-pilot/revisions/shoulder-crest-v6/README.md) corrects the shoulder/jaw boundary in eight south walk poses, reusing v5 pants and all other artwork. The [record](../06-development/SHOULDER_CREST_2026-11-23.md) explains the incorrect rectangular face exclusion and the focused change. ART-007, owner visual acceptance and runtime adoption remain open.
 
@@ -8,7 +8,7 @@
 
 **Updated:** 22 November 2026.  
 **Owner direction:** Use PixelLab for artwork and develop custom characters from a reusable base. The owner has identified that the first result needs improvement; no finished visual approval is recorded.  
-**Status.** The developer preview renders the layered outfit facing south, east and north. Character creation, saved appearance and general gameplay rendering are planned.
+**Status.** The developer preview renders the layered outfit facing south, west, east and north. Character creation, saved appearance and general gameplay rendering are planned.
 **Parent work:** ART-006, ART-007, ENG-007, GAME-011, GAME-012 and QA-005 in the [canonical backlog](../02-roadmap/BACKLOG.md).
 
 Start with the [pilot review and improvement register](../06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md), [asset entry point](../../../assets/embervale/custom-character-pilot/README.md) and [production workflow](CUSTOM_CHARACTER_WORKFLOW.md). [ADR-021](../07-decisions/ADR_021_MODULAR_CHARACTER_APPEARANCE.md) records the architectural direction.
@@ -226,4 +226,4 @@ Keep one canonical backlog and this owning design. The dated review owns observa
 
 When an improvement lands, update its finding, the parent backlog status/notes, current status, relevant guidance and verification in the same change. Record native renderer captures separately from an authoring GIF or browser preview. Mark owner visual acceptance only after actual feedback on that version.
 
-**Current comparison.** Review the rear shoulder coverage and the two hems through the [east-to-north turn beside Mara](../06-development/CHARACTER_NORTH_WALK_2026-11-26.md). West, the four diagonal walks and the playable appearance adapter are open.
+**Current comparison.** The player reverses direction in front of Mara, with both hems and the swinging hand visible in the [west walk recording](../06-development/CHARACTER_WEST_WALK_2026-11-26.md). The four diagonal walks and the playable appearance adapter are open.

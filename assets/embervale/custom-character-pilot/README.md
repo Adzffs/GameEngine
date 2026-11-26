@@ -6,6 +6,10 @@
 
 Start with the [custom character plan](../../../docs/embervale/05-game/CUSTOM_CHARACTERS.md), [improvement register](../../../docs/embervale/06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) and [production workflow](../../../docs/embervale/05-game/CUSTOM_CHARACTER_WORKFLOW.md).
 
+## West walk
+
+The [west manifest](revisions/west-walk-v1/manifest.json) retains the original west body, foot registration, editable hip repair, tunic and both trouser lengths. [See the reversal beside Mara and the eight west poses](../../../docs/embervale/06-development/CHARACTER_WEST_WALK_2026-11-26.md).
+
 ## North walk
 
 The [north manifest](revisions/north-walk-v1/manifest.json) retains the source, each pose’s sole alignment and the editable tunic and trouser layers. [See the east-to-north turn beside Mara](../../../docs/embervale/06-development/CHARACTER_NORTH_WALK_2026-11-26.md).

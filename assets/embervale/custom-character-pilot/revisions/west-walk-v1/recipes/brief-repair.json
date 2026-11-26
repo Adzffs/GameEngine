@@ -1,0 +1,294 @@
+{
+  "job": {
+    "canvas": [
+      80,
+      80
+    ],
+    "frame_count": 9,
+    "durations_ms": [
+      400,
+      80,
+      70,
+      80,
+      70,
+      80,
+      70,
+      80,
+      70
+    ],
+    "views": [
+      {
+        "id": "west",
+        "offset": [
+          0,
+          0
+        ]
+      }
+    ],
+    "body_prefix": "Layer",
+    "source_bookends_exact": false,
+    "body_palette_exact": false,
+    "require_clear_border": true
+  },
+  "scene": {
+    "palette": {},
+    "layers": [
+      {
+        "id": "layer",
+        "name": "West-facing brief-repair"
+      }
+    ],
+    "views": {
+      "west": {
+        "nodes": {
+          "layer": {
+            "layer": "layer",
+            "at": [
+              0,
+              0
+            ],
+            "draw": []
+          }
+        },
+        "poses": {
+          "p00": {
+            "layer": {
+              "draw": []
+            }
+          },
+          "p01": {
+            "layer": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    38,
+                    47
+                  ],
+                  "legend": {
+                    "d": "#343439",
+                    "m": "#45484c",
+                    "l": "#636769"
+                  },
+                  "rows": [
+                    "..mm...",
+                    ".mmmd..",
+                    ".mmmd..",
+                    "mmmmdd.",
+                    "mmmmddd",
+                    ".ddddd."
+                  ]
+                }
+              ]
+            }
+          },
+          "p02": {
+            "layer": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    34,
+                    45
+                  ],
+                  "legend": {
+                    "d": "#343439",
+                    "m": "#45484c",
+                    "l": "#636769"
+                  },
+                  "rows": [
+                    "...l",
+                    "....",
+                    "m..l",
+                    "m...",
+                    "m...",
+                    "m..."
+                  ]
+                }
+              ]
+            }
+          },
+          "p03": {
+            "layer": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    34,
+                    44
+                  ],
+                  "legend": {
+                    "d": "#343439",
+                    "m": "#45484c",
+                    "l": "#636769"
+                  },
+                  "rows": [
+                    "...llll",
+                    ".......",
+                    "...llll",
+                    "..llll.",
+                    ".lllll.",
+                    "llllll.",
+                    ".llll..",
+                    "...ll.."
+                  ]
+                }
+              ]
+            }
+          },
+          "p04": {
+            "layer": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    34,
+                    45
+                  ],
+                  "legend": {
+                    "d": "#343439",
+                    "m": "#45484c",
+                    "l": "#636769"
+                  },
+                  "rows": [
+                    "...llll.",
+                    "........",
+                    "..llllll",
+                    ".lllll..",
+                    ".llll...",
+                    "llllll..",
+                    ".lll....",
+                    "..ll...."
+                  ]
+                }
+              ]
+            }
+          },
+          "p05": {
+            "layer": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    35,
+                    45
+                  ],
+                  "legend": {
+                    "d": "#343439",
+                    "m": "#45484c",
+                    "l": "#636769"
+                  },
+                  "rows": [
+                    "..llll.",
+                    ".......",
+                    "..lllll",
+                    ".lllll.",
+                    ".lllll.",
+                    "lllll..",
+                    "lllll..",
+                    ".lll..."
+                  ]
+                }
+              ]
+            }
+          },
+          "p06": {
+            "layer": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    35,
+                    44
+                  ],
+                  "legend": {
+                    "d": "#343439",
+                    "m": "#45484c",
+                    "l": "#636769"
+                  },
+                  "rows": [
+                    "..llll",
+                    "......",
+                    ".lllll",
+                    ".lllll",
+                    "..llll",
+                    "lllll.",
+                    "lllll.",
+                    "lllll.",
+                    ".lll.."
+                  ]
+                }
+              ]
+            }
+          },
+          "p07": {
+            "layer": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    32,
+                    43
+                  ],
+                  "legend": {
+                    "d": "#343439",
+                    "m": "#45484c",
+                    "l": "#636769"
+                  },
+                  "rows": [
+                    ".....lll..",
+                    "..........",
+                    ".m..lll..m",
+                    "..m.llll.m",
+                    "mmm..lll..",
+                    "..m...l...",
+                    "....l.ll..",
+                    ".....l....",
+                    "......l..."
+                  ]
+                }
+              ]
+            }
+          },
+          "p08": {
+            "layer": {
+              "draw": [
+                {
+                  "op": "grid",
+                  "at": [
+                    32,
+                    43
+                  ],
+                  "legend": {
+                    "d": "#343439",
+                    "m": "#45484c",
+                    "l": "#636769"
+                  },
+                  "rows": [
+                    ".....l",
+                    ".m....",
+                    ".mm.ll",
+                    "mmm..l",
+                    "mmm...",
+                    ".m...."
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "frames": [
+          "p00",
+          "p01",
+          "p02",
+          "p03",
+          "p04",
+          "p05",
+          "p06",
+          "p07",
+          "p08"
+        ]
+      }
+    }
+  }
+}

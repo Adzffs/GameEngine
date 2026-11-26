@@ -44,7 +44,7 @@ def check(preview: Path, root: Path) -> None:
                 raise AssertionError(f"{name} produced {len(images)} of {frames} frames")
             return images
 
-        start, corner, end = (15, 25), (16, 25), (16, 24)
+        start, corner = (15, 25), (16, 25)
         short = ("--fit-outfit", "knee")
         east = walk("east-current", start, corner, (), 31)
         east_full = walk("east-full", start, corner, full, 31)
@@ -53,24 +53,26 @@ def check(preview: Path, root: Path) -> None:
             raise AssertionError("East route lost a fitted outfit during the turn, walk or arrival")
         if any(len(set(route[16:])) != 1 for route in (east_full, east_knee)):
             raise AssertionError("East standing pose did not hold after arrival")
-        turn = walk("turn-current", start, end, (), 55, via=corner)
-        turn_full = walk("turn-full", start, end, full, 55, via=corner)
-        turn_knee = walk("turn-knee", start, end, short, 55, via=corner)
-        for straight, turning in ((east, turn), (east_full, turn_full), (east_knee, turn_knee)):
-            if straight[:16] != turning[:16] or straight[16] == turning[16]:
-                raise AssertionError("The turn must begin immediately after reaching the east waypoint")
-        if any(len({a, b, c}) != 3 for a, b, c in zip(turn[16:], turn_full[16:], turn_knee[16:])):
-            raise AssertionError("The north leg lost a fitted outfit during movement or arrival")
-        # Let the camera finish following the player after the last tile.
-        if any(len(set(route[-12:])) != 1 for route in (turn_full, turn_knee)):
-            raise AssertionError("North standing pose did not hold after arrival")
-        if walk("turn-shield", start, end, shield, 33, via=corner) != walk("turn-shield-fit", start, end, shield + full, 33, via=corner):
-            raise AssertionError("East or north layers obscured the shield-equipped player")
-        west = walk("west-current", corner, start, ())
-        west_fit = walk("west-fit", corner, start, full)
-        # Frame zero faces south. Subsequent frames move or stand facing west.
-        if west[0] == west_fit[0] or west[1:] != west_fit[1:]:
-            raise AssertionError("West fallback or the initial south outfit changed")
+        for direction, end in (("north", (16, 24)), ("west", start)):
+            turn = walk(direction + "-current", start, end, (), 55, via=corner)
+            turn_full = walk(direction + "-full", start, end, full, 55, via=corner)
+            turn_knee = walk(direction + "-knee", start, end, short, 55, via=corner)
+            for straight, turning in ((east, turn), (east_full, turn_full), (east_knee, turn_knee)):
+                if straight[:16] != turning[:16] or straight[16] == turning[16]:
+                    raise AssertionError(f"The {direction} turn did not begin immediately after the east waypoint")
+            if any(len({a, b, c}) != 3 for a, b, c in zip(turn[16:], turn_full[16:], turn_knee[16:])):
+                raise AssertionError(f"The {direction} leg lost a fitted outfit during movement or arrival")
+            # Let the camera finish following the player after the last tile.
+            if any(len(set(route[-12:])) != 1 for route in (turn_full, turn_knee)):
+                raise AssertionError(f"The {direction} standing pose did not hold after arrival")
+            equipped = walk(direction + "-shield", start, end, shield, 33, via=corner)
+            if equipped != walk(direction + "-shield-fit", start, end, shield + full, 33, via=corner):
+                raise AssertionError(f"The {direction} layers obscured the shield-equipped player")
+        diagonal = walk("diagonal-current", start, (16, 26), ())
+        diagonal_fit = walk("diagonal-fit", start, (16, 26), full)
+        # Frame zero faces south. The diagonal uses the existing character.
+        if diagonal[0] == diagonal_fit[0] or diagonal[1:] != diagonal_fit[1:]:
+            raise AssertionError("Southeast fallback or the initial south outfit changed")
 
         render("missing-layers", *full, cwd=output, success=False)
         render("missing-outfit", "--fit-scale", "world", success=False)

@@ -2,6 +2,8 @@
 
 For a change of direction, compare the last pose before the turn with the first pose after it. Measure the top of the head and the lowest sole relative to the same ground pivot. Track the visible foot against the moving background as well. A camera following the next server tile can make a grounded character appear to step backward. [East-to-north capture and camera correction](../06-development/CHARACTER_NORTH_WALK_2026-11-26.md).
 
+For a side-to-side reversal, compare the actual screen pixels of the planted sole on the last outgoing and first returning frame. Also inspect the bare source on a contrasting background. A transparent hole inside the hip needs a local repair, while the gap between a swinging forearm and the torso should show the world. Keep the raw source and record the repair separately. [West reversal and source repair](../06-development/CHARACTER_WEST_WALK_2026-11-26.md).
+
 For a side walk, trace the exposed near and far arms independently wherever they cross the waist. Set each trouser hem on its own leg, including the raised foot. Inspect both lengths on synchronised copies of the same world frames. [East walk and pose sheet](../06-development/CHARACTER_EAST_WALK_2026-11-25.md).
 
 For character-scale reviews, use the same tile and normal zoom for the current player, the source at native size and the proposed world fit. Use the scaled silhouette for roof overlap and the same foot pivot for every clothing layer. [River Crossing captures](../06-development/CHARACTER_FIT_2026-11-25.md).
