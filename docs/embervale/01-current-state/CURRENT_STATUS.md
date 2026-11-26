@@ -1,6 +1,6 @@
 # Current project status
 
-**25 November.** The developer preview now covers south and east at the provisional 60% scale. The east walk has eight poses and a held standing pose. Both trouser lengths are visible on the same three-tile route past Mara. [East walk](../06-development/CHARACTER_EAST_WALK_2026-11-25.md) · [South idle and scale comparison](../06-development/CHARACTER_FIT_2026-11-25.md).
+**26 November.** The custom character now walks south, east and north in the developer preview at the provisional 60% scale. Both trouser lengths follow the rear stride. The shared camera follows the player between server tiles, which removes a backward jolt on the east-to-north turn beside Mara. [North turn](../06-development/CHARACTER_NORTH_WALK_2026-11-26.md) · [East walk](../06-development/CHARACTER_EAST_WALK_2026-11-25.md) · [South idle and scale](../06-development/CHARACTER_FIT_2026-11-25.md).
 
 **Shoulder crest correction, 23 November:** [V6](../../../assets/embervale/custom-character-pilot/revisions/shoulder-crest-v6/README.md) addresses the owner's remaining exposed top shoulder ridge. Thirty-nine crest pixels beside the jaw are covered across eight south walk poses, with local outline cleanup. Actual jaw pixels, idle poses, lower top, body and v5 pants remain unchanged. [Evidence](../06-development/SHOULDER_CREST_2026-11-23.md) records the edit and recovered export. ART-007, owner visual review and game adoption remain open.
 

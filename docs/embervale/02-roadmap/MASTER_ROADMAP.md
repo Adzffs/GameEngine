@@ -1,6 +1,6 @@
 # Embervale master roadmap
 
-**25 November checkpoint.** ART-006/007 now have a clothed south and east walk at the same provisional 60% scale. The owner was happy with the south fit for now. The east shoulder and both trouser lengths are ready to review in motion. [East walk and poses](../06-development/CHARACTER_EAST_WALK_2026-11-25.md) · [South scale comparison](../06-development/CHARACTER_FIT_2026-11-25.md).
+**26 November checkpoint.** ART-006/007 have a clothed south, east and north walk at 60%. Both trouser lengths now have an in-world turn from side to rear. West and the four diagonals are the remaining walking directions. [North turn and poses](../06-development/CHARACTER_NORTH_WALK_2026-11-26.md) · [East fit](../06-development/CHARACTER_EAST_WALK_2026-11-25.md) · [South scale comparison](../06-development/CHARACTER_FIT_2026-11-25.md).
 
 **Version:** 1.2 · **Updated:** 22 November 2026 (custom-character planning; runtime evidence retains its recorded dates)\
 **Scope:** GameEngine, Embervale, Embervale Studio and project delivery.\

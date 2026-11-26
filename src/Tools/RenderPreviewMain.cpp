@@ -37,7 +37,7 @@ int main(int argc, char **argv)
     try
     {
         if (argc < 3)
-            throw std::invalid_argument("Usage: EmbervaleRenderPreview WORLD.json OUTPUT.png [--basic] [--deplete-trees] [--deplete-rocks] [--focus X Y] [--zoom 1|1.5] [--condition new|weathered|repaired] [--walk-to X Y | --chop X Y | --mine X Y | --melee X Y] [--weapon bronze-sword|godsword|bronze-axe|iron-axe|steel-axe|bronze-pickaxe|iron-pickaxe|steel-pickaxe|unarmed] [--shield] [--frames N] [--fit-outfit full|knee] [--fit-scale world|native] [--frames-to NEW_DIRECTORY]");
+            throw std::invalid_argument("Usage: EmbervaleRenderPreview WORLD.json OUTPUT.png [--basic] [--deplete-trees] [--deplete-rocks] [--focus X Y] [--zoom 1|1.5] [--condition new|weathered|repaired] [--walk-to X Y [--walk-via X Y] | --chop X Y | --mine X Y | --melee X Y] [--weapon bronze-sword|godsword|bronze-axe|iron-axe|steel-axe|bronze-pickaxe|iron-pickaxe|steel-pickaxe|unarmed] [--shield] [--frames N] [--fit-outfit full|knee] [--fit-scale world|native] [--frames-to NEW_DIRECTORY]");
         const auto input = std::filesystem::path(reinterpret_cast<const char8_t *>(argv[1]));
         const auto output = std::filesystem::path(reinterpret_cast<const char8_t *>(argv[2]));
         std::error_code equivalentError;
@@ -47,7 +47,7 @@ int main(int argc, char **argv)
             throw std::invalid_argument("Preview output must be a separate .png file");
         bool basic = false, deplete = false, depleteRocks = false;
         std::optional<std::pair<int, int>> focus;
-        std::optional<std::pair<int, int>> walkTo;
+        std::optional<std::pair<int, int>> walkTo, walkVia;
         std::optional<std::pair<int, int>> chop;
         std::optional<std::pair<int, int>> mine;
         std::optional<std::pair<int, int>> melee;
@@ -77,11 +77,11 @@ int main(int argc, char **argv)
                 const int y = Coordinate(argv[++index]);
                 focus = std::pair{x, y};
             }
-            else if (option == "--walk-to" && index + 2 < argc)
+            else if ((option == "--walk-to" || option == "--walk-via") && index + 2 < argc)
             {
                 const int x = Coordinate(argv[++index]);
                 const int y = Coordinate(argv[++index]);
-                walkTo = std::pair{x, y};
+                (option == "--walk-to" ? walkTo : walkVia) = std::pair{x, y};
             }
             else if ((option == "--chop" || option == "--mine") && index + 2 < argc)
             {
@@ -141,6 +141,8 @@ int main(int argc, char **argv)
         if (fitScale && !fitOutfit) throw std::invalid_argument("Fit scale requires a fit outfit");
         if (fitOutfit && basic) throw std::invalid_argument("Character comparison requires world art");
         if (sequence && (sequence->empty() || !frames)) throw std::invalid_argument("Frame export requires a new directory and --frames N");
+        if (walkVia && (!walkTo || !sequence))
+            throw std::invalid_argument("A walk waypoint requires --walk-to and --frames-to");
         // Fixed, independent streams keep authored captures reproducible.
         // Production game launches retain their normal random sources.
         World world(StarterWorldImport::LoadFile(input), 1337U, 7331U, 1U);
@@ -153,6 +155,8 @@ int main(int argc, char **argv)
             throw std::invalid_argument("Gathering previews select their own equipped tool");
         if (walkTo && !world.GetMap().IsValidPosition(walkTo->first, walkTo->second))
             throw std::invalid_argument("Walk preview destination must be walkable");
+        if (walkVia && !world.GetMap().IsValidPosition(walkVia->first, walkVia->second))
+            throw std::invalid_argument("Walk preview waypoint must be walkable");
         const int playerID = world.CreatePlayer(PlayerInitializationMode::FRESH_START);
         auto *player = dynamic_cast<Player *>(world.GetEntityByID(playerID));
         if (!player) throw std::runtime_error("Preview player could not be created");
@@ -258,7 +262,11 @@ int main(int argc, char **argv)
         {
             if (!std::filesystem::create_directories(*sequence))
                 throw std::invalid_argument("Frame output directory already exists");
-            if (walkTo) world.QueueMovementDestination({playerID, walkTo->first, walkTo->second});
+            if (walkTo)
+            {
+                const auto first = walkVia.value_or(*walkTo);
+                world.QueueMovementDestination({playerID, first.first, first.second});
+            }
         }
         for (int frame = 0; frame < frameCount; ++frame)
         {
@@ -267,7 +275,16 @@ int main(int argc, char **argv)
             {
                 if (walkTo && sequence)
                 {
-                    if ((frame - 1) % 15 == 0) world.Update();
+                    if ((frame - 1) % 15 == 0)
+                    {
+                        if (walkVia && player->GetPosition().GetX() == walkVia->first &&
+                            player->GetPosition().GetY() == walkVia->second)
+                        {
+                            world.QueueMovementDestination({playerID, walkTo->first, walkTo->second});
+                            walkVia.reset();
+                        }
+                        world.Update();
+                    }
                 }
                 else if (walkTo) player->GetPosition().SetPosition(walkTo->first, walkTo->second);
                 // Bounded presentation fixture: advance real gathering every

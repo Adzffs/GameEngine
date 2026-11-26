@@ -30,36 +30,55 @@ def check(preview: Path, root: Path) -> None:
         if len({current, fitted, knee, native}) != 4:
             raise AssertionError("World comparison lost a distinct outfit or scale")
 
-        # A shield takes precedence over the layered fixture in either direction.
+        # A shield takes precedence over the layered fixture.
         shield = ("--shield",)
         if render("shield", *shield) != render("shield-fit", *shield, *full):
             raise AssertionError("Custom layers obscured the existing equipped player")
-        def step(name, x, target_x, outfit, frames=18):
+        def walk(name, start, end, outfit, frames=18, via=None):
             sequence = output / name
-            render(name, *outfit, "--walk-to", target_x, "25", "--frames", str(frames),
-                   "--frames-to", sequence, focus=(x, "25"))
+            waypoint = ("--walk-via", *map(str, via)) if via else ()
+            render(name, *outfit, "--walk-to", *map(str, end), *waypoint, "--frames", str(frames),
+                   "--frames-to", sequence, focus=tuple(map(str, start)))
             images = [sha256(path.read_bytes()).digest() for path in sorted(sequence.glob("frame-*.png"))]
             if len(images) != frames:
                 raise AssertionError(f"{name} produced {len(images)} of {frames} frames")
             return images
 
-        east = step("east-current", "15", "16", (), 31)
-        east_full = step("east-full", "15", "16", full, 31)
-        east_knee = step("east-knee", "15", "16", ("--fit-outfit", "knee"), 31)
+        start, corner, end = (15, 25), (16, 25), (16, 24)
+        short = ("--fit-outfit", "knee")
+        east = walk("east-current", start, corner, (), 31)
+        east_full = walk("east-full", start, corner, full, 31)
+        east_knee = walk("east-knee", start, corner, short, 31)
         if any(len({a, b, c}) != 3 for a, b, c in zip(east, east_full, east_knee)):
             raise AssertionError("East route lost a fitted outfit during the turn, walk or arrival")
         if any(len(set(route[16:])) != 1 for route in (east_full, east_knee)):
             raise AssertionError("East standing pose did not hold after arrival")
-        if step("east-shield", "15", "16", shield) != step("east-shield-fit", "15", "16", shield + full):
-            raise AssertionError("East clothing obscured the equipped player")
-        west = step("west-current", "16", "15", ())
-        west_fit = step("west-fit", "16", "15", full)
+        turn = walk("turn-current", start, end, (), 55, via=corner)
+        turn_full = walk("turn-full", start, end, full, 55, via=corner)
+        turn_knee = walk("turn-knee", start, end, short, 55, via=corner)
+        for straight, turning in ((east, turn), (east_full, turn_full), (east_knee, turn_knee)):
+            if straight[:16] != turning[:16] or straight[16] == turning[16]:
+                raise AssertionError("The turn must begin immediately after reaching the east waypoint")
+        if any(len({a, b, c}) != 3 for a, b, c in zip(turn[16:], turn_full[16:], turn_knee[16:])):
+            raise AssertionError("The north leg lost a fitted outfit during movement or arrival")
+        # Let the camera finish following the player after the last tile.
+        if any(len(set(route[-12:])) != 1 for route in (turn_full, turn_knee)):
+            raise AssertionError("North standing pose did not hold after arrival")
+        if walk("turn-shield", start, end, shield, 33, via=corner) != walk("turn-shield-fit", start, end, shield + full, 33, via=corner):
+            raise AssertionError("East or north layers obscured the shield-equipped player")
+        west = walk("west-current", corner, start, ())
+        west_fit = walk("west-fit", corner, start, full)
         # Frame zero faces south. Subsequent frames move or stand facing west.
         if west[0] == west_fit[0] or west[1:] != west_fit[1:]:
             raise AssertionError("West fallback or the initial south outfit changed")
 
         render("missing-layers", *full, cwd=output, success=False)
         render("missing-outfit", "--fit-scale", "world", success=False)
+        render("waypoint-without-walk", "--walk-via", "16", "25", "--frames", "12",
+               "--frames-to", output / "no-route", success=False)
+        render("waypoint-without-sequence", "--walk-via", "16", "25", "--walk-to", "16", "24", success=False)
+        render("invalid-waypoint", "--walk-to", "16", "24", "--walk-via", "-1", "25", "--frames", "12",
+               "--frames-to", output / "invalid-route", success=False)
 
 
 if __name__ == "__main__":

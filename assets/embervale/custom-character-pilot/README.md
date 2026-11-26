@@ -6,6 +6,10 @@
 
 Start with the [custom character plan](../../../docs/embervale/05-game/CUSTOM_CHARACTERS.md), [improvement register](../../../docs/embervale/06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) and [production workflow](../../../docs/embervale/05-game/CUSTOM_CHARACTER_WORKFLOW.md).
 
+## North walk
+
+The [north manifest](revisions/north-walk-v1/manifest.json) retains the source, each pose’s sole alignment and the editable tunic and trouser layers. [See the east-to-north turn beside Mara](../../../docs/embervale/06-development/CHARACTER_NORTH_WALK_2026-11-26.md).
+
 ## East walk
 
 The [east manifest](revisions/east-walk-v1/manifest.json) identifies the standing pose, eight original walk frames, three editable garment recipes and four fitted atlas exports. [See both trouser lengths walking beside Mara](../../../docs/embervale/06-development/CHARACTER_EAST_WALK_2026-11-25.md).

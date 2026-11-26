@@ -680,7 +680,7 @@ private:
         ItemType itemType,
         const SDL_FRect &bounds);
     void DrawWorldHoverFeedback();
-    void UpdateCamera(int playerX, int playerY, const Map &map);
+    void UpdateCamera(SDL_FPoint visualPosition, const Map &map);
     SDL_FPoint ScreenToWorldPoint(float screenX, float screenY) const;
     bool HandleMinimapClick(float screenX, float screenY);
     void DrawMinimap(

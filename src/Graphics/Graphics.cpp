@@ -2642,8 +2642,7 @@ bool Graphics::ConsumeStationMenuClose()
 }
 
 void Graphics::UpdateCamera(
-    int playerX,
-    int playerY,
+    SDL_FPoint visualPosition,
     const Map &map)
 {
     cameraWorldPixelWidth = static_cast<float>(map.GetWidth() * TileSize);
@@ -2663,12 +2662,12 @@ void Graphics::UpdateCamera(
         0.0f,
         static_cast<float>(map.GetHeight() * TileSize) - screenWorldHeight);
     const float targetX = std::clamp(
-        static_cast<float>(playerX * TileSize) + TileSize * 0.5f -
+        visualPosition.x * TileSize + TileSize * 0.5f -
             preferredPlayerScreenX,
         0.0f,
         maximumX);
     const float targetY = std::clamp(
-        static_cast<float>(playerY * TileSize) + TileSize * 0.5f -
+        visualPosition.y * TileSize + TileSize * 0.5f -
             preferredPlayerScreenY,
         0.0f,
         maximumY);
@@ -6716,10 +6715,10 @@ void Graphics::Render(
     }
     lastPresentationTick = presentationTick;
     PreparePlayerMovement(playerX, playerY);
-    UpdateCamera(playerX, playerY, map);
+    const auto nextPosition = NextPlayerPosition(playerX, playerY);
+    UpdateCamera(nextPosition, map);
     UpdateSpritePicking(resources, stations, groundItems);
     UpdateProgressionFeedback(player, inventory);
-    const auto nextPosition = NextPlayerPosition(playerX, playerY);
     woodcuttingPresentation.Update(player, activeAction, resources, presentationDeltaSeconds,
         std::hypot(nextPosition.x - playerX, nextPosition.y - playerY) <= 0.04f);
     miningPresentation.Update(player, activeAction, resources, presentationDeltaSeconds,

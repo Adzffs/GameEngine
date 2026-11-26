@@ -1,5 +1,4 @@
 #include "CharacterFitPreview.h"
-#include "CharacterFitBindings.h"
 #include "../Content/Assets/WorldArtResources.h"
 #include <cmath>
 #include <stdexcept>
@@ -8,13 +7,6 @@
 namespace
 {
     using Texture = std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)>;
-
-    constexpr int SouthFacing = 0, EastFacing = 2;
-
-    const CharacterFit::Direction &BindingFor(int facing)
-    {
-        return facing == EastFacing ? CharacterFit::East : CharacterFit::South;
-    }
 
     Texture LoadLayer(SDL_Renderer *renderer, const std::filesystem::path &path, int columns)
     {
@@ -54,16 +46,17 @@ namespace
 
 CharacterFitPreview::CharacterFitPreview(SDL_Renderer *target, const std::filesystem::path &root,
     bool kneePants, bool nativeSize)
-    : renderer(target),
-      southLayers(LoadOutfit(target, root, CharacterFit::South, kneePants)),
-      eastLayers(LoadOutfit(target, root, CharacterFit::East, kneePants)),
-      scale(nativeSize ? 1.0f : 0.6f)
+    : renderer(target), scale(nativeSize ? 1.0f : 0.6f)
 {
+    for (std::size_t facing = 0; facing < layers.size(); ++facing)
+        if (const auto *direction = CharacterFit::ByFacing[facing])
+            layers[facing] = LoadOutfit(target, root, *direction, kneePants);
 }
 
 bool CharacterFitPreview::SupportsFacing(int facing)
 {
-    return facing == SouthFacing || facing == EastFacing;
+    return facing >= 0 && static_cast<std::size_t>(facing) < CharacterFit::ByFacing.size() &&
+           CharacterFit::ByFacing[facing] != nullptr;
 }
 
 void CharacterFitPreview::ResetMotion()
@@ -76,7 +69,7 @@ void CharacterFitPreview::ResetMotion()
 SDL_FRect CharacterFitPreview::OcclusionBounds(float groundX, float groundY, int facing) const
 {
     // The world also reads the bottom centre of this rectangle as the feet.
-    const auto &direction = BindingFor(facing);
+    const auto &direction = *CharacterFit::ByFacing[facing];
     const float halfWidth = direction.halfWidth * scale;
     const float height = direction.height * scale;
     return {groundX - halfWidth, groundY - height, 2 * halfWidth, height};
@@ -85,7 +78,7 @@ SDL_FRect CharacterFitPreview::OcclusionBounds(float groundX, float groundY, int
 void CharacterFitPreview::Draw(float groundX, float groundY, int facing, float travelled, Uint64 tick)
 {
     using namespace CharacterFit;
-    const auto &direction = BindingFor(facing);
+    const auto &direction = *ByFacing[facing];
     const bool walking = travelled > 0.002f;
     int column;
     if (walking)
@@ -104,7 +97,7 @@ void CharacterFitPreview::Draw(float groundX, float groundY, int facing, float t
     wasWalking = walking;
     const SDL_FRect source{static_cast<float>(column * CellWidth), 0, CellWidth, CellHeight};
     const SDL_FRect dest{groundX - PivotX * scale, groundY - PivotY * scale, CellWidth * scale, CellHeight * scale};
-    for (const auto &layer : (facing == EastFacing ? eastLayers : southLayers))
+    for (const auto &layer : *layers[facing])
         if (!SDL_RenderTexture(renderer, layer.get(), &source, &dest))
             throw std::runtime_error(SDL_GetError());
 }

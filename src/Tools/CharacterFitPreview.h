@@ -1,9 +1,11 @@
 #pragma once
 
+#include "CharacterFitBindings.h"
 #include <SDL3/SDL.h>
 #include <array>
 #include <filesystem>
 #include <memory>
+#include <optional>
 
 // Only linked into EmbervaleRenderPreview. Bindings are generated from the
 // retained garment manifests at configure time.
@@ -18,8 +20,9 @@ public:
 
 private:
     using Texture = std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)>;
+    using Layers = std::array<Texture, 3>;
     SDL_Renderer *renderer;
-    std::array<Texture, 3> southLayers, eastLayers;
+    std::array<std::optional<Layers>, CharacterFit::ByFacing.size()> layers;
     float scale;
     float walkDistance = 0.0f;
     Uint64 idleStart = 0;
