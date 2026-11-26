@@ -395,6 +395,14 @@ function(add_gameengine_graphics_test target source)
 endfunction()
 
 if(BUILD_TESTING)
+    if(GAMEENGINE_BUILD_GRAPHICS_TESTS AND TARGET GameEngineCharacterLayers)
+        add_executable(CharacterHeldItemTests tests/CharacterHeldItemTests.cpp)
+        target_link_libraries(CharacterHeldItemTests PRIVATE GameEngineCore SDL3::SDL3)
+        configure_character_fit(CharacterHeldItemTests)
+        add_test(NAME CharacterHeldItemTests COMMAND CharacterHeldItemTests
+            "${CMAKE_CURRENT_SOURCE_DIR}/assets/embervale/custom-character-pilot")
+        set_tests_properties(CharacterHeldItemTests PROPERTIES LABELS "graphics;art")
+    endif()
     if(TARGET EmbervaleRenderPreview AND Python3_Interpreter_FOUND)
         add_test(NAME CharacterFitPreviewTests COMMAND "${Python3_EXECUTABLE}"
             "${CMAKE_CURRENT_SOURCE_DIR}/tests/CharacterFitPreviewTests.py"

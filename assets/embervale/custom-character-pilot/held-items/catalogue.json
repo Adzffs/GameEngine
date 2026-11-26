@@ -1,0 +1,29 @@
+{
+  "cell": [40, 48],
+  "grip": [20, 32],
+  "columns": 6,
+  "rows": 1,
+  "materials": {
+    "bronze": ["84622c", "c8a653", "e3c073"],
+    "iron": ["404542", "8da39c", "a69a7e"],
+    "steel": ["37617d", "8da39c", "efe0b7"]
+  },
+  "shapes": {
+    "axe":       {"views": [0,0,0,0,0,0,0,0], "mirror_by_facing": true,  "motion": "Overhead"},
+    "pickaxe":   {"views": [1,1,1,1,1,1,1,1], "mirror_by_facing": true,  "motion": "Overhead"},
+    "sword":     {"views": [2,2,2,2,2,2,2,2], "mirror_by_facing": true,  "motion": "Slash"},
+    "godsword":  {"views": [3,3,3,3,3,3,3,3], "mirror_by_facing": true,  "motion": "Heavy"},
+    "shield":    {"views": [4,5,5,4,4,4,4,4], "mirror_by_facing": false, "motion": "Shield"}
+  },
+  "items": {
+    "BRONZE_AXE": ["axe", "bronze"],
+    "IRON_AXE": ["axe", "iron"],
+    "STEEL_AXE": ["axe", "steel"],
+    "BRONZE_PICKAXE": ["pickaxe", "bronze"],
+    "IRON_PICKAXE": ["pickaxe", "iron"],
+    "STEEL_PICKAXE": ["pickaxe", "steel"],
+    "BRONZE_SWORD": ["sword", "bronze"],
+    "DEVELOPER_GODSWORD": ["godsword", "steel"],
+    "WOODEN_SHIELD": ["shield", "bronze"]
+  }
+}

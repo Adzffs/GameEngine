@@ -35,7 +35,7 @@ On the northeast-to-northwest turn, the final northeast frame and the first nort
 
 From a Windows source checkout with the UCRT64 toolchain and SDL 3.4 or later, run `Play-RiverCrossing.cmd --character-playtest`. The portable Windows build also includes a launcher called `Play Embervale.cmd`.
 
-The fresh character arrives empty-handed. Left-click open ground to walk, click another tile while moving to turn, then let the character reach a nearby tile to see the idle. F7 switches trouser length, including mid-stride. Open Inventory and click the wooden shield to see the equipped walk. Open Equipment and click the shield to return to the fitted outfit. Progress is temporary.
+The fresh character arrives empty-handed. Left-click open ground to walk and click another tile while moving to turn. F7 switches trouser length, including mid-stride. Click the axe, pickaxe or wooden shield in Inventory to equip it. Click its Equipment slot to remove it. The [equipment follow-up](CHARACTER_HELD_ITEMS_2026-11-26.md) keeps the fitted outfit throughout. Progress is temporary.
 
 ## Reproduce the recordings
 
@@ -71,4 +71,4 @@ foreach ($outfit in 'full','knee') {
 - Matched every opaque body and garment pixel against an independently composited pose in 810 captured frames. This covers eight straight routes and the diagonal turn in both outfits. Each of the four new facings showed all eight phases on each tile, held its stand at the end and kept its sole one screen pixel above the pivot. Switching trousers changed 22–48 lower-leg pixels per diagonal frame at the working size.
 - The Windows game and developer renderer built. All five focused tests passed, covering the fitted walks, distinct diagonal stands, equipped fallback, camera follow, player animation, world-art resources and startup options.
 
-The custom body is available in the interactive walk playtest and the developer renderer. Equipping a weapon or shield, gathering and melee use the existing character art. Character creation, appearance saves and fitting equipment to this body remain open. [Custom-character plan](../05-game/CUSTOM_CHARACTERS.md)
+The initial unarmed trial used the earlier character art for equipment. The [held-item follow-up](CHARACTER_HELD_ITEMS_2026-11-26.md) keeps the fitted body in the interactive playtest and developer renderer through equipment changes, gathering and melee. Character creation and appearance saves remain open.

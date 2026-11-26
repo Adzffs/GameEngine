@@ -2995,10 +2995,9 @@ void Graphics::DrawWorldObjects(Map &map, const std::vector<std::unique_ptr<Enti
     if (worldArtEnabled && forestSprites.HasPlayer())
         visualPlayerRectangle = {nextPlayer.x * TileSize + 4.0f, nextPlayer.y * TileSize - 12.0f, 24.0f, 36.0f};
 #ifdef EMBERVALE_CHARACTER_FIT
-    const int fitFacing = MovementFacing(nextPlayer, playerX, playerY);
-    if (UsesCharacterFit(fitFacing))
+    if (const auto pose = FittedPlayerPose(MovementFacing(nextPlayer, playerX, playerY)))
         visualPlayerRectangle = characterFit->OcclusionBounds(
-            nextPlayer.x * TileSize + 16.0f, nextPlayer.y * TileSize + 24.0f, fitFacing);
+            nextPlayer.x * TileSize + 16.0f, nextPlayer.y * TileSize + 24.0f, pose->facing);
 #endif
     entries.push_back({nextPlayer.y * TileSize + 24.0f, Kind::PLAYER, 0});
     std::stable_sort(entries.begin(), entries.end(), [](const Entry &a, const Entry &b)
@@ -3195,11 +3194,18 @@ void Graphics::UpdateCharacterPlaytestTitle()
         : "Embervale - River Crossing | Full-length trousers | F7 to change");
 }
 
-bool Graphics::UsesCharacterFit(int facing) const
+std::optional<CharacterPose> Graphics::FittedPlayerPose(int movementFacing) const
 {
-    return worldArtEnabled && characterFit && CharacterFitPreview::SupportsFacing(facing) && displayedWeapon == ItemType::NONE &&
-        displayedShield == ItemType::NONE && !woodcuttingPresentation.GetAnimation() &&
-        !miningPresentation.GetAnimation() && !meleePresentation.GetAnimation();
+    if (!worldArtEnabled || !characterFit) return std::nullopt;
+    CharacterPose pose{movementFacing, displayedWeapon, displayedShield};
+    if (const auto &melee = meleePresentation.GetAnimation())
+        pose = {melee->facing, melee->weapon, displayedShield, CharacterAction::Melee, meleePresentation.GetPose()};
+    else if (const auto &chop = woodcuttingPresentation.GetAnimation())
+        pose = {chop->facing, displayedWeapon, displayedShield, CharacterAction::Chop, woodcuttingPresentation.GetPose()};
+    else if (const auto &mine = miningPresentation.GetAnimation())
+        pose = {mine->facing, displayedWeapon, displayedShield, CharacterAction::Mine, miningPresentation.GetPose()};
+    if (!CharacterFitPreview::SupportsFacing(pose.facing)) return std::nullopt;
+    return pose;
 }
 #endif
 
@@ -3231,14 +3237,15 @@ void Graphics::DrawPlayer(
     visualPlayerInitialized = true;
 
 #ifdef EMBERVALE_CHARACTER_FIT
-    if (UsesCharacterFit(playerFacing))
+    if (const auto pose = FittedPlayerPose(playerFacing))
     {
+        playerFacing = pose->facing;
         const float footX = visualPlayerX * TileSize + 16.0f;
         const float footY = visualPlayerY * TileSize + 24.0f;
         forestSprites.DrawCharacterShadow(footX, footY);
         // Each accepted map step takes one tick, including diagonal steps.
         const float tileProgress = std::max(std::abs(dx), std::abs(dy));
-        characterFit->Draw(footX, footY, playerFacing, tileProgress, lastPresentationTick);
+        characterFit->Draw(footX, footY, *pose, tileProgress, lastPresentationTick);
         return;
     }
     if (characterFit) characterFit->ResetMotion();

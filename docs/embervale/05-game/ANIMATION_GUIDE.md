@@ -61,6 +61,8 @@ Treat equipment as attached to a joint. Body and overlay must consume the same w
 
 ## Keep feet, movement and equipment coherent
 
+The River Crossing fitted character has one right/left hand pair per body column. Bind each new item to a shape and material in the [held-item catalogue](../../../assets/embervale/custom-character-pilot/held-items/catalogue.json). Review both weapon and shield in motion at game scale, including the far hand on a rear diagonal. The [production example](../06-development/CHARACTER_HELD_ITEMS_2026-11-26.md) covers adding a material, silhouette or grip family.
+
 Use the established ground pivot through every frame. The player base uses 32×48 cells; the editable action masters use 96×96 cells with pivot `(48, 64)`, corresponding to base ground point `(16, 24)`. Melee runtime output is losslessly cropped/packed with adjusted per-frame pivots. Check the actual manifest/binding before changing geometry; editable cell size is not the packed rectangle size.
 
 Walking phase should follow visual distance travelled, stop on a neutral pose and remain consistent across render rates. Coordinate the two legs, preserve the waist, use restrained torso/head motion and counter-swing the arms. Test walking with a sword, shield and two-handed equipment as well as an empty body.

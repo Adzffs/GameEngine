@@ -30,10 +30,10 @@ def check(preview: Path, root: Path) -> None:
         if len({current, fitted, knee, native}) != 4:
             raise AssertionError("World comparison lost a distinct outfit or scale")
 
-        # A shield takes precedence over the layered fixture.
         shield = ("--shield",)
-        if render("shield", *shield) != render("shield-fit", *shield, *full):
-            raise AssertionError("Custom layers obscured the existing equipped player")
+        if len({render("shield", *shield), render("shield-fit", *shield, *full),
+                render("shield-knee", *shield, "--fit-outfit", "knee"), fitted}) != 4:
+            raise AssertionError("Equipping the shield lost the shield, body or trouser choice")
         def walk(name, start, end, outfit, frames=18, via=None):
             sequence = output / name
             waypoint = ("--walk-via", *map(str, via)) if via else ()
@@ -66,8 +66,9 @@ def check(preview: Path, root: Path) -> None:
             if any(len(set(route[-12:])) != 1 for route in (turn_full, turn_knee)):
                 raise AssertionError(f"The {direction} standing pose did not hold after arrival")
             equipped = walk(direction + "-shield", start, end, shield, 33, via=corner)
-            if equipped != walk(direction + "-shield-fit", start, end, shield + full, 33, via=corner):
-                raise AssertionError(f"The {direction} layers obscured the shield-equipped player")
+            fitted_equipped = walk(direction + "-shield-fit", start, end, shield + full, 33, via=corner)
+            if any(a == b for a, b in zip(equipped, fitted_equipped)):
+                raise AssertionError(f"The {direction} shield walk reverted to the old player")
         # Approach the same junction from each corner. Once the camera settles
         # the same world is visible, so each held diagonal must still be distinct.
         junction = (17, 27)
@@ -85,9 +86,22 @@ def check(preview: Path, root: Path) -> None:
         if len(diagonal_stands) != 8:
             raise AssertionError("Two fitted diagonal stands rendered the same image")
         armed = ("--weapon", "bronze-sword", "--shield")
-        if (walk("diagonal-armed", (16, 26), junction, armed)
-                != walk("diagonal-armed-fit", (16, 26), junction, armed + full)):
-            raise AssertionError("The diagonal outfit obscured the equipped character")
+        old = walk("diagonal-armed", (16, 26), junction, armed)
+        new = walk("diagonal-armed-fit", (16, 26), junction, armed + full)
+        if any(a == b for a, b in zip(old, new)):
+            raise AssertionError("The diagonal equipped walk reverted to the old player")
+
+        # Exercise active World actions through Graphics, including shield + tool.
+        for action, focus, target in (("chop", ("7","55"), ("8","55")), ("mine", ("83","60"), ("84","60")),
+                                      ("melee", ("26","68"), ("27","68"))):
+            options = ("--"+action, *target, "--shield", "--frames", "25")
+            histories = []
+            for variant, outfit in (("existing", ()), ("full", full), ("knee", short)):
+                name = action + "-" + variant
+                render(name, *options, *outfit, "--frames-to", output/name, focus=focus)
+                histories.append([sha256(p.read_bytes()).digest() for p in sorted((output/name).glob("frame-*.png"))])
+            if any(len(frames) != 25 for frames in histories) or any(len(set(row)) != 3 for row in zip(*histories)):
+                raise AssertionError(f"{action} lost the fitted outfit during its action")
 
         render("missing-layers", *full, cwd=output, success=False)
         render("missing-outfit", "--fit-scale", "world", success=False)

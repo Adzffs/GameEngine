@@ -151,7 +151,7 @@ int main(int argc, char **argv)
             throw std::invalid_argument("Select only one walk, chopping, mining or melee fixture");
         if (chop && deplete) throw std::invalid_argument("Chopping requires an intact tree");
         if (mine && depleteRocks) throw std::invalid_argument("Mining requires an intact rock");
-        if ((chop || mine) && (weapon || shield))
+        if ((chop || mine) && weapon)
             throw std::invalid_argument("Gathering previews select their own equipped tool");
         if (walkTo && !world.GetMap().IsValidPosition(walkTo->first, walkTo->second))
             throw std::invalid_argument("Walk preview destination must be walkable");

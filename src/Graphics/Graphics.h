@@ -523,7 +523,7 @@ public:
 private:
     int MovementFacing(const SDL_FPoint &next, int targetX, int targetY) const;
 #ifdef EMBERVALE_CHARACTER_FIT
-    bool UsesCharacterFit(int facing) const;
+    std::optional<CharacterPose> FittedPlayerPose(int movementFacing) const;
     void UpdateCharacterPlaytestTitle();
 #endif
     AudioSettings audioSettings;

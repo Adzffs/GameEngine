@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CharacterFitBindings.h"
+#include "CharacterHeldItems.h"
 #include <SDL3/SDL.h>
 #include <array>
 #include <filesystem>
@@ -16,14 +16,14 @@ public:
     bool ToggleTrousers();
     bool WearsKneePants() const { return kneeLength; }
     static bool SupportsFacing(int facing);
-    void Draw(float groundX, float groundY, int facing, float travelled, Uint64 tick);
+    void Draw(float groundX, float groundY, const CharacterPose &pose, float travelled, Uint64 tick);
     void ResetMotion();
     SDL_FRect OcclusionBounds(float groundX, float groundY, int facing) const;
 
 private:
     using Texture = std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)>;
     struct Layers { Texture body, trousers, tunic, alternateTrousers; };
-    SDL_Renderer *renderer;
+    CharacterHeldItems heldItems;
     std::array<std::optional<Layers>, CharacterFit::ByFacing.size()> layers;
     float scale;
     bool kneeLength;

@@ -7,6 +7,7 @@
 
 | Your question | Best starting point |
 |---|---|
+| How do we add tools, weapons and materials to the fitted character? | [Held-item shapes, hand positions and action families](06-development/CHARACTER_HELD_ITEMS_2026-11-26.md) |
 | What is this project? | [Project overview](00-overview/PROJECT_OVERVIEW.md) |
 | How does the custom character look in River Crossing? | [All eight walks and the diagonal turn](06-development/CHARACTER_EIGHT_WAY_WALK_2026-11-26.md) · [South idle and scale](06-development/CHARACTER_FIT_2026-11-25.md) · [East walk and both trouser lengths](06-development/CHARACTER_EAST_WALK_2026-11-25.md) · [East-to-north turn](06-development/CHARACTER_NORTH_WALK_2026-11-26.md) · [East-to-west reversal](06-development/CHARACTER_WEST_WALK_2026-11-26.md) |
 | What has actually been implemented? | [Current reviewed status](01-current-state/CURRENT_STATUS.md) |

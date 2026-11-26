@@ -37,7 +37,7 @@ namespace
 
 CharacterFitPreview::CharacterFitPreview(SDL_Renderer *target, const std::filesystem::path &root,
     bool kneePants, bool nativeSize, bool switchable)
-    : renderer(target), scale(nativeSize ? 1.0f : 0.6f), kneeLength(kneePants), canSwitchTrousers(switchable)
+    : heldItems(target, root), scale(nativeSize ? 1.0f : 0.6f), kneeLength(kneePants), canSwitchTrousers(switchable)
 {
     for (std::size_t facing = 0; facing < layers.size(); ++facing)
     {
@@ -84,13 +84,18 @@ SDL_FRect CharacterFitPreview::OcclusionBounds(float groundX, float groundY, int
     return {groundX - halfWidth, groundY - height, 2 * halfWidth, height};
 }
 
-void CharacterFitPreview::Draw(float groundX, float groundY, int facing, float travelled, Uint64 tick)
+void CharacterFitPreview::Draw(float groundX, float groundY, const CharacterPose &pose, float travelled, Uint64 tick)
 {
     using namespace CharacterFit;
-    const auto &direction = *ByFacing[facing];
+    const auto &direction = *ByFacing[pose.facing];
     const bool walking = travelled > 0.002f;
     int column;
-    if (walking)
+    if (pose.action != CharacterAction::Carry)
+    {
+        ResetMotion();
+        column = direction.idle.columns.front();
+    }
+    else if (walking)
     {
         // One authored walk loop per accepted tile, independent of render FPS.
         walkDistance = std::fmod(walkDistance + travelled, 1.0f);
@@ -102,12 +107,9 @@ void CharacterFitPreview::Draw(float groundX, float groundY, int facing, float t
         walkDistance = 0.0f;
         column = ColumnAt(direction.idle, static_cast<int>((tick - idleStart) % direction.idle.milliseconds));
     }
-    started = true;
-    wasWalking = walking;
-    const SDL_FRect source{static_cast<float>(column * CellWidth), 0, CellWidth, CellHeight};
+    started = pose.action == CharacterAction::Carry;
+    wasWalking = walking && started;
     const SDL_FRect dest{groundX - PivotX * scale, groundY - PivotY * scale, CellWidth * scale, CellHeight * scale};
-    const auto &outfit = *layers[facing];
-    for (auto *layer : {outfit.body.get(), outfit.trousers.get(), outfit.tunic.get()})
-        if (!SDL_RenderTexture(renderer, layer, &source, &dest))
-            throw std::runtime_error(SDL_GetError());
+    const auto &outfit = *layers[pose.facing];
+    heldItems.Draw(pose, column, dest, {outfit.body.get(), outfit.trousers.get(), outfit.tunic.get()});
 }

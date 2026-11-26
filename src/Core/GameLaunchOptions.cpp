@@ -168,7 +168,7 @@ std::string_view GameLaunchUsage()
         "Fresh starts keep progress temporary unless --save is supplied.\n"
         "--profile development: use the existing boosted development defaults (the default profile).\n"
         "Profiles apply only when creating a character; an existing selected save retains its progress.\n"
-        "--character-playtest: try the eight-way fitted walk with a temporary fresh player and wooden shield. F7 changes trousers.\n"
+        "--character-playtest: try the fitted character with the starting axe, pickaxe and shield. F7 changes trousers.\n"
         "--save: use the selected player save file.\n"
         "--no-save: do not read or write a player save.\n";
 }

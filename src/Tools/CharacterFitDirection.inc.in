@@ -2,7 +2,8 @@
     {
         inline constexpr std::array idle{@idle_columns@}, idleTimes{@idle_durations_ms@};
         inline constexpr std::array walk{@walk_columns@}, walkTimes{@walk_durations_ms@};
+        inline constexpr std::array hands{@hand_pairs@};
         inline constexpr Direction binding{{idle, idleTimes}, {walk, walkTimes},
             "@body@", "@tunic@", "@full@", "@knee@",
-            std::max(PivotX - @left@, @right@ - PivotX), PivotY - @top@};
+            std::max(PivotX - @left@, @right@ - PivotX), PivotY - @top@, hands};
     }
