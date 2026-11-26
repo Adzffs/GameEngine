@@ -4,6 +4,10 @@ The tunic, full-length trousers and knee-length trousers now follow the custom c
 
 ![Eight walking directions with both trouser lengths, around a game-size northeast-to-northwest turn](character-fit/2026-11-26/eight-way-walk.gif)
 
+## Visual review
+
+On 26 November 2026 the owner approved the eight-way walk as shown in River Crossing, with the tunic and both trouser lengths at 60% scale. This is the movement reference for the first playable-client trial. [Reviewed revision](https://github.com/Adzffs/GameEngine/commit/6b51a600f594702b7f2db5c1bd294a82ff3b365f)
+
 ## Four diagonal walks
 
 Four PixelLab generations added 32 moving body poses to the existing human walk group. Each direction uses its own original standing view and eight distinct walk frames. Each moving frame is cropped from 84 × 84 to 80 × 80 and translated vertically until its support sole reaches row 69, directly above the shared (40, 70) pivot. Both trouser choices reuse that body and the same tunic.

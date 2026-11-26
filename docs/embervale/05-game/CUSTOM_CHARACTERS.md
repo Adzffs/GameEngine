@@ -226,4 +226,4 @@ Keep one canonical backlog and this owning design. The dated review owns observa
 
 When an improvement lands, update its finding, the parent backlog status/notes, current status, relevant guidance and verification in the same change. Record native renderer captures separately from an authoring GIF or browser preview. Mark owner visual acceptance only after actual feedback on that version.
 
-**Current comparison.** Review both trouser lengths across [all eight directions and the diagonal turn](../06-development/CHARACTER_EIGHT_WAY_WALK_2026-11-26.md). The playable appearance renderer, equipment and action coverage are open.
+**Current comparison.** The owner approved both trouser lengths in the [eight-way movement preview](../06-development/CHARACTER_EIGHT_WAY_WALK_2026-11-26.md). The playable appearance renderer, equipment and action coverage are open.

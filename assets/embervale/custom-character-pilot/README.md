@@ -2,7 +2,7 @@
 
 **Status:** Retained art/customisation proof, not a runtime world-art batch.  
 **Created:** 22 November 2026.  
-**Owner feedback:** Improvements are required; finished visual acceptance is open.
+**Visual review, 26 November.** The owner approved the revised eight-way walk with both trouser lengths as shown in River Crossing.
 
 Start with the [custom character plan](../../../docs/embervale/05-game/CUSTOM_CHARACTERS.md), [improvement register](../../../docs/embervale/06-development/CUSTOM_CHARACTER_REVIEW_2026-11-22.md) and [production workflow](../../../docs/embervale/05-game/CUSTOM_CHARACTER_WORKFLOW.md).
 

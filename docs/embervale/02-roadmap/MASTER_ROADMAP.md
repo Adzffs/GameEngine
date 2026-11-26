@@ -1,6 +1,6 @@
 # Embervale master roadmap
 
-**26 November checkpoint.** ART-006/007 now cover eight-way standing and walking in the developer preview, with the fitted tunic and both trouser lengths at 60%. Review this movement set in River Crossing before extending the playable appearance renderer to gear and actions. [Eight-way recording, pose sheet and verification](../06-development/CHARACTER_EIGHT_WAY_WALK_2026-11-26.md).
+**26 November checkpoint.** ART-006/007 now cover eight-way standing and walking in the developer preview, with the fitted tunic and both trouser lengths at 60%. The owner approved this movement set in River Crossing. The next step is an unarmed walking trial in the playable client. [Eight-way recording, pose sheet and verification](../06-development/CHARACTER_EIGHT_WAY_WALK_2026-11-26.md).
 
 **Version:** 1.2 · **Updated:** 22 November 2026 (custom-character planning; runtime evidence retains its recorded dates)\
 **Scope:** GameEngine, Embervale, Embervale Studio and project delivery.\
